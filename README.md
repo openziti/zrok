@@ -24,6 +24,10 @@ $ zrok enable <token>
 
 A registered user should only need a single executable (`zrok`), along with their identity, to enable `zrok` capabilities in any shell environment.
 
+### URLs that Don't Change
+
+The smallest, simplest `zrok` implementation could be capable of providing URLs that don't change. The competition does not offer this capability without a subscription.
+
 ## Expand into Ziti
 
 The `zrok` implementation should (ideally) be such that `zrok` usage patterns can co-exist with larger, more featureful Ziti implementations. Ideally, a developer who started with `zrok` should have patterns that allow them to incrementally expand their usage.
