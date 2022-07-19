@@ -12,7 +12,13 @@
 
 ### Simple Registration
 
-Registering for access to `zrok` should provide the user with a single identity, which can be used from any shell environment to quickly enable access to private applications.
+Registering for access to `zrok` should provide the user with a single identity token, which can be used from any shell environment to quickly enable access to private applications.
+
+Enabling `zrok` in a shell should be as simple as executing something like:
+
+```
+$ zrok enable <token>
+```
 
 ### Single-Executable Deployment
 
