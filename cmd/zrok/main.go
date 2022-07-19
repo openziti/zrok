@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti-test-kitchen/zrok/proxy"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -12,6 +13,7 @@ import (
 func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
+	rootCmd.AddCommand(proxyCmd)
 }
 
 var rootCmd = &cobra.Command{
@@ -24,6 +26,16 @@ var rootCmd = &cobra.Command{
 	},
 }
 var verbose bool
+
+var proxyCmd = &cobra.Command{
+	Use:   "proxy <configPath>",
+	Short: "Start a zrok proxy",
+	Run: func(_ *cobra.Command, args []string) {
+		if err := proxy.Run(&proxy.Config{Address: "0.0.0.0:10081"}); err != nil {
+			panic(err)
+		}
+	},
+}
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
