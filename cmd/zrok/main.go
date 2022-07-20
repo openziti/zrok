@@ -33,7 +33,7 @@ var proxyCmd = &cobra.Command{
 	Use:   "proxy <configPath>",
 	Short: "Start a zrok proxy",
 	Run: func(_ *cobra.Command, args []string) {
-		if err := proxy.Run(&proxy.Config{Address: "0.0.0.0:10081"}); err != nil {
+		if err := proxy.Run(&proxy.Config{IdentityPath: args[0], Address: "0.0.0.0:10081"}); err != nil {
 			panic(err)
 		}
 	},
