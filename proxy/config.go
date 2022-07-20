@@ -1,5 +1,6 @@
 package proxy
 
 type Config struct {
-	Address string
+	IdentityPath string
+	Address      string
 }
