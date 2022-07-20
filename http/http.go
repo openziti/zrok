@@ -1,10 +1,12 @@
 package http
 
 import (
+	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"time"
 )
@@ -34,7 +36,25 @@ type handler struct{}
 
 func (self *handler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	logrus.Infof("handling request from [%v]", req.RemoteAddr)
-	if _, err := res.Write([]byte(time.Now().String())); err != nil {
-		panic(err)
+
+	req.Host = "localhost:3000"
+	req.URL.Host = "localhost:3000"
+	req.URL.Scheme = "http"
+	req.RequestURI = ""
+
+	rRes, err := http.DefaultClient.Do(req)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(res, err)
+		return
 	}
+
+	n, err := io.Copy(res, rRes.Body)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(res, err)
+		return
+	}
+
+	logrus.Infof("proxied [%d] bytes", n)
 }
