@@ -40,10 +40,10 @@ var proxyCmd = &cobra.Command{
 }
 
 var httpCmd = &cobra.Command{
-	Use:   "http <endpointAddress>",
+	Use:   "http <identity>",
 	Short: "Start an http endpoint",
 	Run: func(_ *cobra.Command, args []string) {
-		if err := http.Run(&http.Config{EndpointAddress: args[0]}); err != nil {
+		if err := http.Run(&http.Config{IdentityPath: args[0]}); err != nil {
 			panic(err)
 		}
 	},
