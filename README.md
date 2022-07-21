@@ -32,6 +32,10 @@ The smallest, simplest `zrok` implementation could be capable of providing URLs 
 
 The `zrok` implementation should (ideally) be such that `zrok` usage patterns can co-exist with larger, more featureful Ziti implementations. Ideally, a developer who started with `zrok` should have patterns that allow them to incrementally expand their usage.
 
+## Multiple Isolated Tenants
+
+A single `zrok` implementation should support multiple isolated tenants coexisting on the same deployment (and underlying Ziti network) in a secure manner.
+
 ## Self-hosting Capable
 
 The `zrok` implementation should support self-hosting, such that existing Ziti users can easily add `zrok` capabilities to their existing networks.
