@@ -17,6 +17,7 @@ func NewProxy(target string) (*httputil.ReverseProxy, error) {
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
+		logrus.Infof("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
@@ -38,6 +39,5 @@ func NewProxyHandler(proxy *httputil.ReverseProxy) *proxyHandler {
 }
 
 func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("%v->%v", r.Host, r.URL)
 	self.proxy.ServeHTTP(w, r)
 }
