@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
@@ -35,24 +36,33 @@ func Run(cfg *Config) error {
 type handler struct{}
 
 func (self *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("handling request from [%v]", r.RemoteAddr)
+	logrus.Warnf("handling request from [%v]", r.RemoteAddr)
 
 	r.Host = "localhost:3000"
 	r.URL.Host = "localhost:3000"
 	r.URL.Scheme = "http"
 	r.RequestURI = ""
+	logrus.Info(util.DumpHeaders(r.Header, true))
 
+	logrus.Infof("forwarding to: %v [%v]", r.Method, r.URL)
 	rr, err := http.DefaultClient.Do(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprint(w, err)
 		return
 	}
+	w.WriteHeader(rr.StatusCode)
+	logrus.Infof("response: %v", rr.Status)
 
+	// forward headers
 	for k, v := range rr.Header {
-		w.Header().Add(k, v[0])
+		for _, vi := range v {
+			w.Header().Add(k, vi)
+		}
 	}
+	logrus.Info(util.DumpHeaders(w.Header(), false))
 
+	// copy body
 	n, err := io.Copy(w, rr.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

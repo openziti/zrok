@@ -31,29 +31,37 @@ type handler struct {
 }
 
 func (self *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("handling request from [%v]", r.RemoteAddr)
+	logrus.Warnf("handling request from [%v]", r.RemoteAddr)
 
-	zDialCtx := util.ZitiDialContext{Context: self.zCtx}
-	zTransport := http.DefaultTransport.(*http.Transport).Clone()
-	zTransport.DialContext = zDialCtx.Dial
-	client := &http.Client{Transport: zTransport}
 	r.Host = "zrok"
 	r.URL.Host = "zrok"
 	r.URL.Scheme = "http"
 	r.RequestURI = ""
-	logrus.Warnf("request: %v", r)
+	logrus.Info(util.DumpHeaders(r.Header, true))
 
-	rr, err := client.Do(r)
+	logrus.Infof("forwarding to: %v [%v]", r.Method, r.URL)
+	zDialCtx := util.ZitiDialContext{Context: self.zCtx}
+	zTransport := http.DefaultTransport.(*http.Transport).Clone()
+	zTransport.DialContext = zDialCtx.Dial
+	zClient := &http.Client{Transport: zTransport}
+	rr, err := zClient.Do(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprint(w, err)
 		return
 	}
+	w.WriteHeader(rr.StatusCode)
+	logrus.Infof("response: %v", rr.Status)
 
+	// forward headers
 	for k, v := range rr.Header {
-		w.Header().Add(k, v[0])
+		for _, vi := range v {
+			w.Header().Add(k, vi)
+		}
 	}
+	logrus.Info(util.DumpHeaders(w.Header(), false))
 
+	// copy body
 	n, err := io.Copy(w, rr.Body)
 	if err != nil {
 		panic(err)
