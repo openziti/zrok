@@ -38,6 +38,6 @@ func NewProxyHandler(proxy *httputil.ReverseProxy) *proxyHandler {
 }
 
 func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("proxying from: %v", r.RequestURI)
+	logrus.Infof("%v->%v", r.Host, r.URL)
 	self.proxy.ServeHTTP(w, r)
 }
