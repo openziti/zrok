@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti-test-kitchen/zrok/controller"
 	"github.com/openziti-test-kitchen/zrok/http"
 	"github.com/openziti-test-kitchen/zrok/proxy"
 	"github.com/sirupsen/logrus"
@@ -14,6 +15,7 @@ import (
 func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
+	rootCmd.AddCommand(controllerCmd)
 	rootCmd.AddCommand(httpCmd)
 	rootCmd.AddCommand(proxyCmd)
 }
@@ -29,11 +31,12 @@ var rootCmd = &cobra.Command{
 }
 var verbose bool
 
-var proxyCmd = &cobra.Command{
-	Use:   "proxy <configPath>",
-	Short: "Start a zrok proxy",
+var controllerCmd = &cobra.Command{
+	Use:     "controller <configPath>",
+	Short:   "Start a zrok controller",
+	Aliases: []string{"ctrl"},
 	Run: func(_ *cobra.Command, args []string) {
-		if err := proxy.Run(&proxy.Config{IdentityPath: args[0], Address: "0.0.0.0:10081"}); err != nil {
+		if err := controller.Run(&controller.Config{ApiEndpoint: "0.0.0.0:18888"}); err != nil {
 			panic(err)
 		}
 	},
@@ -41,9 +44,19 @@ var proxyCmd = &cobra.Command{
 
 var httpCmd = &cobra.Command{
 	Use:   "http <identity>",
-	Short: "Start an http endpoint",
+	Short: "Start an http terminator",
 	Run: func(_ *cobra.Command, args []string) {
 		if err := http.Run(&http.Config{IdentityPath: args[0]}); err != nil {
+			panic(err)
+		}
+	},
+}
+
+var proxyCmd = &cobra.Command{
+	Use:   "proxy <configPath>",
+	Short: "Start a zrok proxy",
+	Run: func(_ *cobra.Command, args []string) {
+		if err := proxy.Run(&proxy.Config{IdentityPath: args[0], Address: "0.0.0.0:10081"}); err != nil {
 			panic(err)
 		}
 	},
