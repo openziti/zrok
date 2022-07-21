@@ -34,25 +34,29 @@ func Run(cfg *Config) error {
 
 type handler struct{}
 
-func (self *handler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	logrus.Infof("handling request from [%v]", req.RemoteAddr)
+func (self *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("handling request from [%v]", r.RemoteAddr)
 
-	req.Host = "localhost:3000"
-	req.URL.Host = "localhost:3000"
-	req.URL.Scheme = "http"
-	req.RequestURI = ""
+	r.Host = "localhost:3000"
+	r.URL.Host = "localhost:3000"
+	r.URL.Scheme = "http"
+	r.RequestURI = ""
 
-	rRes, err := http.DefaultClient.Do(req)
+	rr, err := http.DefaultClient.Do(r)
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprint(res, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(w, err)
 		return
 	}
 
-	n, err := io.Copy(res, rRes.Body)
+	for k, v := range rr.Header {
+		w.Header().Add(k, v[0])
+	}
+
+	n, err := io.Copy(w, rr.Body)
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprint(res, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprint(w, err)
 		return
 	}
 

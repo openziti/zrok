@@ -43,14 +43,18 @@ func (self *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.RequestURI = ""
 	logrus.Warnf("request: %v", r)
 
-	pResp, err := client.Do(r)
+	rr, err := client.Do(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = fmt.Fprint(w, err)
 		return
 	}
 
-	n, err := io.Copy(w, pResp.Body)
+	for k, v := range rr.Header {
+		w.Header().Add(k, v[0])
+	}
+
+	n, err := io.Copy(w, rr.Body)
 	if err != nil {
 		panic(err)
 	}
