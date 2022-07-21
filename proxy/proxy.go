@@ -6,8 +6,6 @@ import (
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 )
 
 func Run(cfg *Config) error {
@@ -20,20 +18,10 @@ func Run(cfg *Config) error {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	targetURL, err := url.Parse("http://zrok")
+	proxy, err := util.NewProxy("http://zrok")
 	if err != nil {
-		return errors.Wrap(err, "error parsing url")
+		return err
 	}
-
-	proxy := httputil.NewSingleHostReverseProxy(targetURL)
 	proxy.Transport = zTransport
-	return http.ListenAndServe(cfg.Address, &proxyHandler{proxy: proxy})
-}
-
-type proxyHandler struct {
-	proxy *httputil.ReverseProxy
-}
-
-func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	self.proxy.ServeHTTP(w, r)
+	return http.ListenAndServe(cfg.Address, util.NewProxyHandler(proxy))
 }

@@ -1,12 +1,11 @@
 package http
 
 import (
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"time"
 )
 
@@ -24,24 +23,13 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error listening")
 	}
 
-	targetURL, err := url.Parse("http://localhost:3000")
+	proxy, err := util.NewProxy("http://localhost:3000")
 	if err != nil {
-		return errors.Wrap(err, "error parsing url")
+		return err
 	}
-
-	proxy := httputil.NewSingleHostReverseProxy(targetURL)
-
-	if err := http.Serve(listener, &proxyHandler{proxy: proxy}); err != nil {
+	if err := http.Serve(listener, util.NewProxyHandler(proxy)); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-type proxyHandler struct {
-	proxy *httputil.ReverseProxy
-}
-
-func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	self.proxy.ServeHTTP(w, r)
 }
