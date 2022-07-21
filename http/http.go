@@ -1,14 +1,12 @@
 package http
 
 import (
-	"fmt"
-	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"io"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"time"
 )
 
@@ -26,49 +24,24 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error listening")
 	}
 
-	if err := http.Serve(listener, &handler{}); err != nil {
+	targetURL, err := url.Parse("http://localhost:3000")
+	if err != nil {
+		return errors.Wrap(err, "error parsing url")
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+
+	if err := http.Serve(listener, &proxyHandler{proxy: proxy}); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-type handler struct{}
+type proxyHandler struct {
+	proxy *httputil.ReverseProxy
+}
 
-func (self *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logrus.Warnf("handling request from [%v]", r.RemoteAddr)
-
-	r.Host = "localhost:3000"
-	r.URL.Host = "localhost:3000"
-	r.URL.Scheme = "http"
-	r.RequestURI = ""
-	logrus.Info(util.DumpHeaders(r.Header, true))
-
-	logrus.Infof("forwarding to: %v [%v]", r.Method, r.URL)
-	rr, err := http.DefaultClient.Do(r)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprint(w, err)
-		return
-	}
-	w.WriteHeader(rr.StatusCode)
-	logrus.Infof("response: %v", rr.Status)
-
-	// forward headers
-	for k, v := range rr.Header {
-		for _, vi := range v {
-			w.Header().Add(k, vi)
-		}
-	}
-	logrus.Info(util.DumpHeaders(w.Header(), false))
-
-	// copy body
-	n, err := io.Copy(w, rr.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprint(w, err)
-		return
-	}
-
-	logrus.Infof("proxied [%d] bytes", n)
+func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	self.proxy.ServeHTTP(w, r)
 }
