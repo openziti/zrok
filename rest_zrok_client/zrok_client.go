@@ -67,10 +67,10 @@ func DefaultTransportConfig() *TransportConfig {
 		BasePath: DefaultBasePath,
 		Schemes:  DefaultSchemes,
 	}
-}
-
 // TransportConfig contains the transport related info,
 // found in the meta section of the spec file.
+}
+
 type TransportConfig struct {
 	Host     string
 	BasePath string
