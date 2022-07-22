@@ -8,7 +8,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/metadata"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 func init() {
@@ -29,7 +28,7 @@ var apiVersionCmd = &cobra.Command{
 		transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 		transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 		zrok := rest_zrok_client.New(transport, strfmt.Default)
-		resp, err := zrok.Metadata.Get(metadata.NewGetParamsWithTimeout(30 * time.Second))
+		resp, err := zrok.Metadata.Get(metadata.NewGetParams())
 		if err != nil {
 			panic(err)
 		}

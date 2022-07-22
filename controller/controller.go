@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations"
@@ -10,7 +11,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+var str *store.Store
+
 func Run(cfg *Config) error {
+	if v, err := store.Open(cfg.Store); err == nil {
+		str = v
+	} else {
+		return errors.Wrap(err, "error opening store")
+	}
+
 	swaggerSpec, err := loads.Embedded(rest_zrok_server.SwaggerJSON, rest_zrok_server.FlatSwaggerJSON)
 	if err != nil {
 		return errors.Wrap(err, "error loading embedded swagger spec")
@@ -18,7 +27,7 @@ func Run(cfg *Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.MetadataGetHandler = metadata.GetHandlerFunc(func(params metadata.GetParams) middleware.Responder {
-		return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "oh, wow!"})
+		return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "v0.0.0; sk3tch"})
 	})
 
 	server := rest_zrok_server.NewServer(api)
