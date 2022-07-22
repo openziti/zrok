@@ -16,7 +16,7 @@ import (
 // GetOKCode is the HTTP code returned for type GetOK
 const GetOKCode int = 200
 
-/*GetOK Retrieve the current server version
+/*GetOK retrieve the current server version
 
 swagger:response getOK
 */

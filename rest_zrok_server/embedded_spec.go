@@ -29,8 +29,8 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Client access service",
-    "title": "zrok Client",
+    "description": "zrok client access",
+    "title": "zrok",
     "version": "1.0.0"
   },
   "paths": {
@@ -41,7 +41,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "Retrieve the current server version",
+            "description": "retrieve the current server version",
             "schema": {
               "$ref": "#/definitions/version"
             }
@@ -74,8 +74,8 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Client access service",
-    "title": "zrok Client",
+    "description": "zrok client access",
+    "title": "zrok",
     "version": "1.0.0"
   },
   "paths": {
@@ -86,7 +86,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "Retrieve the current server version",
+            "description": "retrieve the current server version",
             "schema": {
               "$ref": "#/definitions/version"
             }

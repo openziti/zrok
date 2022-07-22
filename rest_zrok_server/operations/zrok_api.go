@@ -22,9 +22,9 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
 )
 
-// NewZrokClientAPI creates a new ZrokClient instance
-func NewZrokClientAPI(spec *loads.Document) *ZrokClientAPI {
-	return &ZrokClientAPI{
+// NewZrokAPI creates a new Zrok instance
+func NewZrokAPI(spec *loads.Document) *ZrokAPI {
+	return &ZrokAPI{
 		handlers:            make(map[string]map[string]http.Handler),
 		formats:             strfmt.Default,
 		defaultConsumes:     "application/json",
@@ -50,8 +50,8 @@ func NewZrokClientAPI(spec *loads.Document) *ZrokClientAPI {
 	}
 }
 
-/*ZrokClientAPI Client access service */
-type ZrokClientAPI struct {
+/*ZrokAPI zrok client access */
+type ZrokAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -106,52 +106,52 @@ type ZrokClientAPI struct {
 }
 
 // UseRedoc for documentation at /docs
-func (o *ZrokClientAPI) UseRedoc() {
+func (o *ZrokAPI) UseRedoc() {
 	o.useSwaggerUI = false
 }
 
 // UseSwaggerUI for documentation at /docs
-func (o *ZrokClientAPI) UseSwaggerUI() {
+func (o *ZrokAPI) UseSwaggerUI() {
 	o.useSwaggerUI = true
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *ZrokClientAPI) SetDefaultProduces(mediaType string) {
+func (o *ZrokAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *ZrokClientAPI) SetDefaultConsumes(mediaType string) {
+func (o *ZrokAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *ZrokClientAPI) SetSpec(spec *loads.Document) {
+func (o *ZrokAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *ZrokClientAPI) DefaultProduces() string {
+func (o *ZrokAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *ZrokClientAPI) DefaultConsumes() string {
+func (o *ZrokAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *ZrokClientAPI) Formats() strfmt.Registry {
+func (o *ZrokAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *ZrokClientAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *ZrokAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the ZrokClientAPI
-func (o *ZrokClientAPI) Validate() error {
+// Validate validates the registrations in the ZrokAPI
+func (o *ZrokAPI) Validate() error {
 	var unregistered []string
 
 	if o.JSONConsumer == nil {
@@ -174,23 +174,23 @@ func (o *ZrokClientAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *ZrokClientAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *ZrokAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *ZrokClientAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *ZrokAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 	return nil
 }
 
 // Authorizer returns the registered authorizer
-func (o *ZrokClientAPI) Authorizer() runtime.Authorizer {
+func (o *ZrokAPI) Authorizer() runtime.Authorizer {
 	return nil
 }
 
 // ConsumersFor gets the consumers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *ZrokClientAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *ZrokAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -207,7 +207,7 @@ func (o *ZrokClientAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Con
 
 // ProducersFor gets the producers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *ZrokClientAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *ZrokAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -223,7 +223,7 @@ func (o *ZrokClientAPI) ProducersFor(mediaTypes []string) map[string]runtime.Pro
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *ZrokClientAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *ZrokAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -238,8 +238,8 @@ func (o *ZrokClientAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	return h, ok
 }
 
-// Context returns the middleware context for the zrok client API
-func (o *ZrokClientAPI) Context() *middleware.Context {
+// Context returns the middleware context for the zrok API
+func (o *ZrokAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -247,7 +247,7 @@ func (o *ZrokClientAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *ZrokClientAPI) initHandlerCache() {
+func (o *ZrokAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
@@ -261,7 +261,7 @@ func (o *ZrokClientAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *ZrokClientAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *ZrokAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -274,24 +274,24 @@ func (o *ZrokClientAPI) Serve(builder middleware.Builder) http.Handler {
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middleware as you see fit
-func (o *ZrokClientAPI) Init() {
+func (o *ZrokAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}
 }
 
 // RegisterConsumer allows you to add (or override) a consumer for a media type.
-func (o *ZrokClientAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
+func (o *ZrokAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
 	o.customConsumers[mediaType] = consumer
 }
 
 // RegisterProducer allows you to add (or override) a producer for a media type.
-func (o *ZrokClientAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
+func (o *ZrokAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
 	o.customProducers[mediaType] = producer
 }
 
 // AddMiddlewareFor adds a http middleware to existing handler
-func (o *ZrokClientAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
+func (o *ZrokAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
 	um := strings.ToUpper(method)
 	if path == "/" {
 		path = ""

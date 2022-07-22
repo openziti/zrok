@@ -13,7 +13,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/metadata"
 )
 
-// Default zrok client HTTP client.
+// Default zrok HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -28,14 +28,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new zrok client HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *ZrokClient {
+// NewHTTPClient creates a new zrok HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *Zrok {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new zrok client HTTP client,
+// NewHTTPClientWithConfig creates a new zrok HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *ZrokClient {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Zrok {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -46,14 +46,14 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Zro
 	return New(transport, formats)
 }
 
-// New creates a new zrok client client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *ZrokClient {
+// New creates a new zrok client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(ZrokClient)
+	cli := new(Zrok)
 	cli.Transport = transport
 	cli.Metadata = metadata.New(transport, formats)
 	return cli
@@ -98,15 +98,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// ZrokClient is a client for zrok client
-type ZrokClient struct {
+// Zrok is a client for zrok
+type Zrok struct {
 	Metadata metadata.ClientService
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *ZrokClient) SetTransport(transport runtime.ClientTransport) {
+func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Metadata.SetTransport(transport)
 }

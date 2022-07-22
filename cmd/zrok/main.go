@@ -36,7 +36,7 @@ var controllerCmd = &cobra.Command{
 	Short:   "Start a zrok controller",
 	Aliases: []string{"ctrl"},
 	Run: func(_ *cobra.Command, args []string) {
-		if err := controller.Run(&controller.Config{ApiEndpoint: "0.0.0.0:18888"}); err != nil {
+		if err := controller.Run(&controller.Config{Host: "0.0.0.0", Port: 10888}); err != nil {
 			panic(err)
 		}
 	},
@@ -56,7 +56,7 @@ var proxyCmd = &cobra.Command{
 	Use:   "proxy <configPath>",
 	Short: "Start a zrok proxy",
 	Run: func(_ *cobra.Command, args []string) {
-		if err := proxy.Run(&proxy.Config{IdentityPath: args[0], Address: "0.0.0.0:10081"}); err != nil {
+		if err := proxy.Run(&proxy.Config{IdentityPath: args[0], Address: "0.0.0.0:10111"}); err != nil {
 			panic(err)
 		}
 	},

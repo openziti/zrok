@@ -41,7 +41,7 @@ func NewGetOK() *GetOK {
 
 /* GetOK describes a response with status code 200, with default header values.
 
-Retrieve the current server version
+retrieve the current server version
 */
 type GetOK struct {
 	Payload *rest_model.Version

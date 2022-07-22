@@ -14,13 +14,13 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
 )
 
-//go:generate swagger generate server --target ../../zrok --name ZrokClient --spec ../specs/zrok.yml --model-package rest_model --server-package rest_zrok_server --principal interface{}
+//go:generate swagger generate server --target ../../zrok --name Zrok --spec ../specs/zrok.yml --model-package rest_model --server-package rest_zrok_server --principal interface{}
 
-func configureFlags(api *operations.ZrokClientAPI) {
+func configureFlags(api *operations.ZrokAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.ZrokClientAPI) http.Handler {
+func configureAPI(api *operations.ZrokAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 

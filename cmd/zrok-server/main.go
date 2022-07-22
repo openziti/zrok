@@ -23,13 +23,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewZrokClientAPI(swaggerSpec)
+	api := operations.NewZrokAPI(swaggerSpec)
 	server := rest_zrok_server.NewServer(api)
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "zrok Client"
-	parser.LongDescription = "Client access service"
+	parser.ShortDescription = "zrok"
+	parser.LongDescription = "zrok client access"
 	server.ConfigureFlags()
 	for _, optsGroup := range api.CommandLineOptionsGroups {
 		_, err := parser.AddGroup(optsGroup.ShortDescription, optsGroup.LongDescription, optsGroup.Options)

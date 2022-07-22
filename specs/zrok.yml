@@ -1,6 +1,6 @@
 info:
-  description: Client access service
-  title: zrok Client
+  description: zrok client access
+  title: zrok
   version: 1.0.0
 paths:
   /:
@@ -9,7 +9,7 @@ paths:
         - metadata
       responses:
         200:
-          description: Retrieve the current server version
+          description: retrieve the current server version
           schema:
             $ref: "#/definitions/version"
 definitions:

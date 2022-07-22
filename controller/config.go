@@ -1,5 +1,6 @@
 package controller
 
 type Config struct {
-	ApiEndpoint string
+	Host string
+	Port int
 }
