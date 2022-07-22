@@ -10,10 +10,10 @@
 //  Version: 1.0.0
 //
 //  Consumes:
-//    - application/zrok.client.v1+json
+//    - application/zrok.v1+json
 //
 //  Produces:
-//    - application/zrok.client.v1+json
+//    - application/zrok.v1+json
 //
 // swagger:meta
 package rest_zrok_server

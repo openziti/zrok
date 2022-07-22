@@ -76,11 +76,11 @@ type ZrokAPI struct {
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
 
 	// JSONConsumer registers a consumer for the following mime types:
-	//   - application/zrok.client.v1+json
+	//   - application/zrok.v1+json
 	JSONConsumer runtime.Consumer
 
 	// JSONProducer registers a producer for the following mime types:
-	//   - application/zrok.client.v1+json
+	//   - application/zrok.v1+json
 	JSONProducer runtime.Producer
 
 	// MetadataGetHandler sets the operation handler for the get operation
@@ -194,8 +194,8 @@ func (o *ZrokAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer 
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/zrok.client.v1+json":
-			result["application/zrok.client.v1+json"] = o.JSONConsumer
+		case "application/zrok.v1+json":
+			result["application/zrok.v1+json"] = o.JSONConsumer
 		}
 
 		if c, ok := o.customConsumers[mt]; ok {
@@ -211,8 +211,8 @@ func (o *ZrokAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer 
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/zrok.client.v1+json":
-			result["application/zrok.client.v1+json"] = o.JSONProducer
+		case "application/zrok.v1+json":
+			result["application/zrok.v1+json"] = o.JSONProducer
 		}
 
 		if p, ok := o.customProducers[mt]; ok {

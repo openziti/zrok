@@ -19,10 +19,10 @@ var (
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "consumes": [
-    "application/zrok.client.v1+json"
+    "application/zrok.v1+json"
   ],
   "produces": [
-    "application/zrok.client.v1+json"
+    "application/zrok.v1+json"
   ],
   "schemes": [
     "http"
@@ -64,10 +64,10 @@ func init() {
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "consumes": [
-    "application/zrok.client.v1+json"
+    "application/zrok.v1+json"
   ],
   "produces": [
-    "application/zrok.client.v1+json"
+    "application/zrok.v1+json"
   ],
   "schemes": [
     "http"

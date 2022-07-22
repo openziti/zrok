@@ -14,14 +14,6 @@ zrokDir=$(realpath "$scriptDir/..")
 
 zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
-zrokServerPath=$(realpath "$zrokDir/rest_server_zrok")
-echo "...removing any existing server from $zrokServerPath"
-rm -rf "$zrokServerPath"
-
-zrokClientPath=$(realpath "$zrokDir/rest_client_zrok")
-echo "...removing any existing client from $zrokClientPath"
-rm -rf "$zrokClientPath"
-
 echo "...generating zrok server"
 swagger generate server -f "$zrokSpec" -s rest_zrok_server -t "$zrokDir" -m "rest_model"
 

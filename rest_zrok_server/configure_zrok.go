@@ -4,6 +4,7 @@ package rest_zrok_server
 
 import (
 	"crypto/tls"
+	"github.com/sirupsen/logrus"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -21,21 +22,10 @@ func configureFlags(api *operations.ZrokAPI) {
 }
 
 func configureAPI(api *operations.ZrokAPI) http.Handler {
-	// configure the api here
 	api.ServeError = errors.ServeError
-
-	// Set your custom logger if needed. Default one is log.Printf
-	// Expected interface func(string, ...interface{})
-	//
-	// Example:
-	// api.Logger = log.Printf
-
+	api.Logger = logrus.Printf
 	api.UseSwaggerUI()
-	// To continue using redoc as your UI, uncomment the following line
-	// api.UseRedoc()
-
 	api.JSONConsumer = runtime.JSONConsumer()
-
 	api.JSONProducer = runtime.JSONProducer()
 
 	if api.MetadataGetHandler == nil {

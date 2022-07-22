@@ -20,9 +20,9 @@ definitions:
         type: string
         minLength: 1
 produces:
-- application/zrok.client.v1+json
+- application/zrok.v1+json
 consumes:
-- application/zrok.client.v1+json
+- application/zrok.v1+json
 schemes:
 - http
 swagger: "2.0"
