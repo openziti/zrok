@@ -1,0 +1,12 @@
+swagger: '2.0'
+info:
+  description: zrok Client API
+  title: zrok-client
+  version: v1
+paths:
+  /:
+    get:
+      summary: Retrieve version information
+      responses:
+        '200':
+          description: Version information
