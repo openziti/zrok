@@ -9,10 +9,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/middleware"
-
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
 )
 
 //go:generate swagger generate server --target ../../zrok --name Zrok --spec ../specs/zrok.yml --model-package rest_model --server-package rest_zrok_server --principal interface{}
@@ -27,12 +24,6 @@ func configureAPI(api *operations.ZrokAPI) http.Handler {
 	api.UseSwaggerUI()
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
-
-	if api.MetadataGetHandler == nil {
-		api.MetadataGetHandler = metadata.GetHandlerFunc(func(params metadata.GetParams) middleware.Responder {
-			return middleware.NotImplemented("operation metadata.Get has not yet been implemented")
-		})
-	}
 
 	api.PreServerShutdown = func() {}
 

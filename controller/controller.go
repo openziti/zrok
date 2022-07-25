@@ -26,7 +26,7 @@ func Run(cfg *Config) error {
 	}
 
 	api := operations.NewZrokAPI(swaggerSpec)
-	api.MetadataGetHandler = metadata.GetHandlerFunc(func(params metadata.GetParams) middleware.Responder {
+	api.MetadataVersionHandler = metadata.VersionHandlerFunc(func(_ metadata.VersionParams) middleware.Responder {
 		return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "v0.0.0; sk3tch"})
 	})
 

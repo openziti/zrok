@@ -45,11 +45,11 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		MetadataGetHandler: metadata.GetHandlerFunc(func(params metadata.GetParams) middleware.Responder {
-			return middleware.NotImplemented("operation metadata.Get has not yet been implemented")
-		}),
 		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
+		}),
+		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
 	}
 }
@@ -87,10 +87,10 @@ type ZrokAPI struct {
 	//   - application/zrok.v1+json
 	JSONProducer runtime.Producer
 
-	// MetadataGetHandler sets the operation handler for the get operation
-	MetadataGetHandler metadata.GetHandler
 	// IdentityCreateAccountHandler sets the operation handler for the create account operation
 	IdentityCreateAccountHandler identity.CreateAccountHandler
+	// MetadataVersionHandler sets the operation handler for the version operation
+	MetadataVersionHandler metadata.VersionHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -168,11 +168,11 @@ func (o *ZrokAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.MetadataGetHandler == nil {
-		unregistered = append(unregistered, "metadata.GetHandler")
-	}
 	if o.IdentityCreateAccountHandler == nil {
 		unregistered = append(unregistered, "identity.CreateAccountHandler")
+	}
+	if o.MetadataVersionHandler == nil {
+		unregistered = append(unregistered, "metadata.VersionHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -262,14 +262,14 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"][""] = metadata.NewGet(o.context, o.MetadataGetHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/version"] = metadata.NewVersion(o.context, o.MetadataVersionHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

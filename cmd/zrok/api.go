@@ -28,7 +28,7 @@ var apiVersionCmd = &cobra.Command{
 		transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 		transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 		zrok := rest_zrok_client.New(transport, strfmt.Default)
-		resp, err := zrok.Metadata.Get(metadata.NewGetParams())
+		resp, err := zrok.Metadata.Version(metadata.NewVersionParams())
 		if err != nil {
 			panic(err)
 		}

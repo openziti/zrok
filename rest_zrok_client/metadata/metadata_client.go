@@ -30,28 +30,28 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	Get(params *GetParams, opts ...ClientOption) (*GetOK, error)
+	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
 
 /*
-  Get get API
+  Version version API
 */
-func (a *Client) Get(params *GetParams, opts ...ClientOption) (*GetOK, error) {
+func (a *Client) Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetParams()
+		params = NewVersionParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "Get",
+		ID:                 "version",
 		Method:             "GET",
-		PathPattern:        "/",
+		PathPattern:        "/version",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetReader{formats: a.formats},
+		Reader:             &VersionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -63,13 +63,13 @@ func (a *Client) Get(params *GetParams, opts ...ClientOption) (*GetOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetOK)
+	success, ok := result.(*VersionOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for Get: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for version: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

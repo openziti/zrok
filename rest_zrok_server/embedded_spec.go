@@ -34,21 +34,6 @@ func init() {
     "version": "1.0.0"
   },
   "paths": {
-    "/": {
-      "get": {
-        "tags": [
-          "metadata"
-        ],
-        "responses": {
-          "200": {
-            "description": "retrieve the current server version",
-            "schema": {
-              "$ref": "#/definitions/version"
-            }
-          }
-        }
-      }
-    },
     "/account": {
       "post": {
         "tags": [
@@ -69,6 +54,22 @@ func init() {
             "description": "account created",
             "schema": {
               "$ref": "#/definitions/accountResponse"
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "version",
+        "responses": {
+          "200": {
+            "description": "retrieve the current server version",
+            "schema": {
+              "$ref": "#/definitions/version"
             }
           }
         }
@@ -122,21 +123,6 @@ func init() {
     "version": "1.0.0"
   },
   "paths": {
-    "/": {
-      "get": {
-        "tags": [
-          "metadata"
-        ],
-        "responses": {
-          "200": {
-            "description": "retrieve the current server version",
-            "schema": {
-              "$ref": "#/definitions/version"
-            }
-          }
-        }
-      }
-    },
     "/account": {
       "post": {
         "tags": [
@@ -157,6 +143,22 @@ func init() {
             "description": "account created",
             "schema": {
               "$ref": "#/definitions/accountResponse"
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "version",
+        "responses": {
+          "200": {
+            "description": "retrieve the current server version",
+            "schema": {
+              "$ref": "#/definitions/version"
             }
           }
         }
