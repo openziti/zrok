@@ -97,7 +97,23 @@ func init() {
     "accountResponse": {
       "type": "object",
       "properties": {
-        "apiToken": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "enableRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "enableResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
           "type": "string"
         }
       }
@@ -192,7 +208,23 @@ func init() {
     "accountResponse": {
       "type": "object",
       "properties": {
-        "apiToken": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "enableRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "enableResponse": {
+      "type": "object",
+      "properties": {
+        "identity": {
           "type": "string"
         }
       }

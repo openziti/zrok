@@ -12,27 +12,27 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// AccountResponse account response
+// EnableRequest enable request
 //
-// swagger:model accountResponse
-type AccountResponse struct {
+// swagger:model enableRequest
+type EnableRequest struct {
 
 	// token
 	Token string `json:"token,omitempty"`
 }
 
-// Validate validates this account response
-func (m *AccountResponse) Validate(formats strfmt.Registry) error {
+// Validate validates this enable request
+func (m *EnableRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this account response based on context it is used
-func (m *AccountResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this enable request based on context it is used
+func (m *EnableRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *AccountResponse) MarshalBinary() ([]byte, error) {
+func (m *EnableRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -40,8 +40,8 @@ func (m *AccountResponse) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *AccountResponse) UnmarshalBinary(b []byte) error {
-	var res AccountResponse
+func (m *EnableRequest) UnmarshalBinary(b []byte) error {
+	var res EnableRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
