@@ -7,8 +7,10 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations"
+	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var str *store.Store
@@ -26,9 +28,8 @@ func Run(cfg *Config) error {
 	}
 
 	api := operations.NewZrokAPI(swaggerSpec)
-	api.MetadataVersionHandler = metadata.VersionHandlerFunc(func(_ metadata.VersionParams) middleware.Responder {
-		return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "v0.0.0; sk3tch"})
-	})
+	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
+	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 
 	server := rest_zrok_server.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
@@ -39,4 +40,19 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "api server error")
 	}
 	return nil
+}
+
+func versionHandler(_ metadata.VersionParams) middleware.Responder {
+	return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "v0.0.0; sk3tch"})
+}
+
+func createAccountHandler(params identity.CreateAccountParams) middleware.Responder {
+	logrus.Infof("received account request for username '%v'", params.Body.Username)
+	apiToken, err := generateApiToken()
+	if err != nil {
+		return middleware.Error(500, err.Error())
+	}
+	return identity.NewCreateAccountCreated().WithPayload(&rest_model.AccountResponse{
+		APIToken: apiToken,
+	})
 }

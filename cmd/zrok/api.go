@@ -1,10 +1,6 @@
 package main
 
 import (
-	"github.com/go-openapi/runtime"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/strfmt"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_client"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/metadata"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -21,13 +17,10 @@ var apiCmd = &cobra.Command{
 }
 
 var apiVersionCmd = &cobra.Command{
-	Use:   "version <endpoint>",
+	Use:   "version",
 	Short: "Get API version",
 	Run: func(_ *cobra.Command, args []string) {
-		transport := httptransport.New(args[0], "", nil)
-		transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
-		transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
-		zrok := rest_zrok_client.New(transport, strfmt.Default)
+		zrok := newZrokClient()
 		resp, err := zrok.Metadata.Version(metadata.NewVersionParams())
 		if err != nil {
 			panic(err)

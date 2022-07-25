@@ -2,8 +2,6 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
-	"github.com/openziti-test-kitchen/zrok/controller"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/http"
 	"github.com/openziti-test-kitchen/zrok/proxy"
 	"github.com/sirupsen/logrus"
@@ -16,7 +14,7 @@ import (
 func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
-	rootCmd.AddCommand(controllerCmd)
+	rootCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "localhost:10888", "zrok endpoint address")
 	rootCmd.AddCommand(httpCmd)
 	rootCmd.AddCommand(proxyCmd)
 }
@@ -31,23 +29,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 var verbose bool
-
-var controllerCmd = &cobra.Command{
-	Use:     "controller <configPath>",
-	Short:   "Start a zrok controller",
-	Aliases: []string{"ctrl"},
-	Run: func(_ *cobra.Command, args []string) {
-		if err := controller.Run(&controller.Config{
-			Host: "0.0.0.0",
-			Port: 10888,
-			Store: &store.Config{
-				Path: "zrok.db",
-			},
-		}); err != nil {
-			panic(err)
-		}
-	},
-}
+var endpoint string
 
 var httpCmd = &cobra.Command{
 	Use:   "http <identity>",
