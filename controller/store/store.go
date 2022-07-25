@@ -9,7 +9,14 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
+	"time"
 )
+
+type Model struct {
+	Id        int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
 
 type Config struct {
 	Path string
