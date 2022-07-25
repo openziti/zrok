@@ -56,6 +56,7 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 
 	token, err := generateApiToken()
 	if err != nil {
+		logrus.Errorf("error generating api token: %v", err)
 		return middleware.Error(500, err.Error())
 	}
 
@@ -66,12 +67,14 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 	}
 	tx, err := str.Begin()
 	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
 		return middleware.Error(500, err.Error())
 	}
 	id, err := str.CreateAccount(a, tx)
 	if err != nil {
+		logrus.Errorf("error creating account: %v", err)
 		_ = tx.Rollback()
-		return middleware.Error(500, err.Error())
+		return middleware.Error(400, err.Error())
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error comitting: %v", err)

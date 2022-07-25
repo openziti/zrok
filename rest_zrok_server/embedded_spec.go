@@ -55,6 +55,12 @@ func init() {
             "schema": {
               "$ref": "#/definitions/accountResponse"
             }
+          },
+          "400": {
+            "description": "account not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -144,6 +150,12 @@ func init() {
             "schema": {
               "$ref": "#/definitions/accountResponse"
             }
+          },
+          "400": {
+            "description": "account not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

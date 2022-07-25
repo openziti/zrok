@@ -56,3 +56,51 @@ func (o *CreateAccountCreated) WriteResponse(rw http.ResponseWriter, producer ru
 		}
 	}
 }
+
+// CreateAccountBadRequestCode is the HTTP code returned for type CreateAccountBadRequest
+const CreateAccountBadRequestCode int = 400
+
+/*CreateAccountBadRequest account not created (already exists)
+
+swagger:response createAccountBadRequest
+*/
+type CreateAccountBadRequest struct {
+}
+
+// NewCreateAccountBadRequest creates CreateAccountBadRequest with default headers values
+func NewCreateAccountBadRequest() *CreateAccountBadRequest {
+
+	return &CreateAccountBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *CreateAccountBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
+// CreateAccountInternalServerErrorCode is the HTTP code returned for type CreateAccountInternalServerError
+const CreateAccountInternalServerErrorCode int = 500
+
+/*CreateAccountInternalServerError internal server error
+
+swagger:response createAccountInternalServerError
+*/
+type CreateAccountInternalServerError struct {
+}
+
+// NewCreateAccountInternalServerError creates CreateAccountInternalServerError with default headers values
+func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
+
+	return &CreateAccountInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *CreateAccountInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
+}

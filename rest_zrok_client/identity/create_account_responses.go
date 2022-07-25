@@ -29,6 +29,18 @@ func (o *CreateAccountReader) ReadResponse(response runtime.ClientResponse, cons
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewCreateAccountBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 500:
+		result := NewCreateAccountInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -62,6 +74,48 @@ func (o *CreateAccountCreated) readResponse(response runtime.ClientResponse, con
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewCreateAccountBadRequest creates a CreateAccountBadRequest with default headers values
+func NewCreateAccountBadRequest() *CreateAccountBadRequest {
+	return &CreateAccountBadRequest{}
+}
+
+/* CreateAccountBadRequest describes a response with status code 400, with default header values.
+
+account not created (already exists)
+*/
+type CreateAccountBadRequest struct {
+}
+
+func (o *CreateAccountBadRequest) Error() string {
+	return fmt.Sprintf("[POST /account][%d] createAccountBadRequest ", 400)
+}
+
+func (o *CreateAccountBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewCreateAccountInternalServerError creates a CreateAccountInternalServerError with default headers values
+func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
+	return &CreateAccountInternalServerError{}
+}
+
+/* CreateAccountInternalServerError describes a response with status code 500, with default header values.
+
+internal server error
+*/
+type CreateAccountInternalServerError struct {
+}
+
+func (o *CreateAccountInternalServerError) Error() string {
+	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError ", 500)
+}
+
+func (o *CreateAccountInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
