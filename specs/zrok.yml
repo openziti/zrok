@@ -23,6 +23,25 @@ paths:
           description: account not created (already exists)
         500:
           description: internal server error
+  /enable:
+    post:
+      tags:
+        - identity
+      operationId: enable
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/enableRequest"
+      responses:
+        201:
+          description: environment enabled
+          schema:
+            $ref: "#/definitions/enableResponse"
+        404:
+          description: account not found
+        500:
+          description: internal server error
   /version:
     get:
       tags:

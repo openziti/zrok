@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	CreateAccount(params *CreateAccountParams, opts ...ClientOption) (*CreateAccountCreated, error)
 
+	Enable(params *EnableParams, opts ...ClientOption) (*EnableCreated, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -70,6 +72,44 @@ func (a *Client) CreateAccount(params *CreateAccountParams, opts ...ClientOption
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for createAccount: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  Enable enable API
+*/
+func (a *Client) Enable(params *EnableParams, opts ...ClientOption) (*EnableCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewEnableParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "enable",
+		Method:             "POST",
+		PathPattern:        "/enable",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &EnableReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*EnableCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for enable: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

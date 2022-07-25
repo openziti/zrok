@@ -48,6 +48,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
 		}),
+		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams) middleware.Responder {
+			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
+		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
@@ -89,6 +92,8 @@ type ZrokAPI struct {
 
 	// IdentityCreateAccountHandler sets the operation handler for the create account operation
 	IdentityCreateAccountHandler identity.CreateAccountHandler
+	// IdentityEnableHandler sets the operation handler for the enable operation
+	IdentityEnableHandler identity.EnableHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -170,6 +175,9 @@ func (o *ZrokAPI) Validate() error {
 
 	if o.IdentityCreateAccountHandler == nil {
 		unregistered = append(unregistered, "identity.CreateAccountHandler")
+	}
+	if o.IdentityEnableHandler == nil {
+		unregistered = append(unregistered, "identity.EnableHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -266,6 +274,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

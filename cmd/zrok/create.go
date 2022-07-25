@@ -15,7 +15,7 @@ func init() {
 
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "create objects",
+	Short: "Create objects",
 }
 
 var createAccountCmd = &cobra.Command{

@@ -65,6 +65,34 @@ func init() {
         }
       }
     },
+    "/enable": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "enable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enableRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "environment enabled",
+            "schema": {
+              "$ref": "#/definitions/enableResponse"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -169,6 +197,34 @@ func init() {
           },
           "400": {
             "description": "account not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/enable": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "enable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enableRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "environment enabled",
+            "schema": {
+              "$ref": "#/definitions/enableResponse"
+            }
           },
           "500": {
             "description": "internal server error"
