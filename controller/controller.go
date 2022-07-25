@@ -82,7 +82,7 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 
 	logrus.Infof("account created with id = '%v'", id)
 	return identity.NewCreateAccountCreated().WithPayload(&rest_model.AccountResponse{
-		APIToken: token,
+		Token: token,
 	})
 }
 

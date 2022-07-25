@@ -49,6 +49,6 @@ var createAccountCmd = &cobra.Command{
 			panic(err)
 		}
 
-		logrus.Infof("api token: %v", resp.Payload.APIToken)
+		logrus.Infof("api token: %v", resp.Payload.Token)
 	},
 }
