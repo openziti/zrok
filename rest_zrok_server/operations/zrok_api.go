@@ -19,6 +19,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
 )
 
@@ -46,6 +47,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		MetadataGetHandler: metadata.GetHandlerFunc(func(params metadata.GetParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Get has not yet been implemented")
+		}),
+		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
+			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
 		}),
 	}
 }
@@ -85,6 +89,8 @@ type ZrokAPI struct {
 
 	// MetadataGetHandler sets the operation handler for the get operation
 	MetadataGetHandler metadata.GetHandler
+	// IdentityCreateAccountHandler sets the operation handler for the create account operation
+	IdentityCreateAccountHandler identity.CreateAccountHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -164,6 +170,9 @@ func (o *ZrokAPI) Validate() error {
 
 	if o.MetadataGetHandler == nil {
 		unregistered = append(unregistered, "metadata.GetHandler")
+	}
+	if o.IdentityCreateAccountHandler == nil {
+		unregistered = append(unregistered, "identity.CreateAccountHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -257,6 +266,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"][""] = metadata.NewGet(o.context, o.MetadataGetHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

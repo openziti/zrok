@@ -2,6 +2,7 @@ info:
   description: zrok client access
   title: zrok
   version: 1.0.0
+
 paths:
   /:
     get:
@@ -12,13 +13,41 @@ paths:
           description: retrieve the current server version
           schema:
             $ref: "#/definitions/version"
+  /account:
+    post:
+      tags:
+        - identity
+      operationId: createAccount
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/accountRequest"
+      responses:
+        201:
+          description: account created
+          schema:
+            $ref: "#/definitions/accountResponse"
+
 definitions:
   version:
     type: object
     properties:
       version:
         type: string
-        minLength: 1
+  accountRequest:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+  accountResponse:
+    type: object
+    properties:
+      apiToken:
+        type: string
+
 produces:
 - application/zrok.v1+json
 consumes:

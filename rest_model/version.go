@@ -8,10 +8,8 @@ package rest_model
 import (
 	"context"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // Version version
@@ -20,33 +18,11 @@ import (
 type Version struct {
 
 	// version
-	// Min Length: 1
 	Version string `json:"version,omitempty"`
 }
 
 // Validate validates this version
 func (m *Version) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateVersion(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Version) validateVersion(formats strfmt.Registry) error {
-	if swag.IsZero(m.Version) { // not required
-		return nil
-	}
-
-	if err := validate.MinLength("version", "body", m.Version, 1); err != nil {
-		return err
-	}
-
 	return nil
 }
 

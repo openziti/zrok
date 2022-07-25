@@ -48,15 +48,58 @@ func init() {
           }
         }
       }
+    },
+    "/account": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "createAccount",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/accountRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "account created",
+            "schema": {
+              "$ref": "#/definitions/accountResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "accountRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "accountResponse": {
+      "type": "object",
+      "properties": {
+        "apiToken": {
+          "type": "string"
+        }
+      }
+    },
     "version": {
       "type": "object",
       "properties": {
         "version": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         }
       }
     }
@@ -93,15 +136,58 @@ func init() {
           }
         }
       }
+    },
+    "/account": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "createAccount",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/accountRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "account created",
+            "schema": {
+              "$ref": "#/definitions/accountResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "accountRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "accountResponse": {
+      "type": "object",
+      "properties": {
+        "apiToken": {
+          "type": "string"
+        }
+      }
+    },
     "version": {
       "type": "object",
       "properties": {
         "version": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         }
       }
     }
