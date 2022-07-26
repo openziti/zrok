@@ -17,6 +17,9 @@ import (
 // swagger:model enableResponse
 type EnableResponse struct {
 
+	// cfg
+	Cfg string `json:"cfg,omitempty"`
+
 	// identity
 	Identity string `json:"identity,omitempty"`
 }

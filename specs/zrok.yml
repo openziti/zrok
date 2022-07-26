@@ -81,6 +81,8 @@ definitions:
     properties:
       identity:
         type: string
+      cfg:
+        type: string
 
 produces:
 - application/zrok.v1+json

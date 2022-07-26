@@ -87,6 +87,9 @@ func init() {
               "$ref": "#/definitions/enableResponse"
             }
           },
+          "404": {
+            "description": "account not found"
+          },
           "500": {
             "description": "internal server error"
           }
@@ -141,6 +144,9 @@ func init() {
     "enableResponse": {
       "type": "object",
       "properties": {
+        "cfg": {
+          "type": "string"
+        },
         "identity": {
           "type": "string"
         }
@@ -226,6 +232,9 @@ func init() {
               "$ref": "#/definitions/enableResponse"
             }
           },
+          "404": {
+            "description": "account not found"
+          },
           "500": {
             "description": "internal server error"
           }
@@ -280,6 +289,9 @@ func init() {
     "enableResponse": {
       "type": "object",
       "properties": {
+        "cfg": {
+          "type": "string"
+        },
         "identity": {
           "type": "string"
         }

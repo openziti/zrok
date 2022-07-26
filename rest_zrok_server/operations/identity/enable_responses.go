@@ -57,6 +57,30 @@ func (o *EnableCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	}
 }
 
+// EnableNotFoundCode is the HTTP code returned for type EnableNotFound
+const EnableNotFoundCode int = 404
+
+/*EnableNotFound account not found
+
+swagger:response enableNotFound
+*/
+type EnableNotFound struct {
+}
+
+// NewEnableNotFound creates EnableNotFound with default headers values
+func NewEnableNotFound() *EnableNotFound {
+
+	return &EnableNotFound{}
+}
+
+// WriteResponse to the client
+func (o *EnableNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // EnableInternalServerErrorCode is the HTTP code returned for type EnableInternalServerError
 const EnableInternalServerErrorCode int = 500
 

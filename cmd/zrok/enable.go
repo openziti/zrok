@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/openziti-test-kitchen/zrok/rest_model"
 	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/identity"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -29,6 +31,16 @@ func enable(_ *cobra.Command, args []string) {
 		Token: args[0],
 	}
 	resp, err := zrok.Identity.Enable(req)
+	if err != nil {
+		panic(err)
+	}
+
+	cfgFile, err := os.Create(fmt.Sprintf("%v.json", resp.Payload.Identity))
+	if err != nil {
+		panic(err)
+	}
+	defer func() { _ = cfgFile.Close() }()
+	_, err = cfgFile.Write([]byte(resp.Payload.Cfg))
 	if err != nil {
 		panic(err)
 	}

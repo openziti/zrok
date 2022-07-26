@@ -29,6 +29,12 @@ func (o *EnableReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return result, nil
+	case 404:
+		result := NewEnableNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewEnableInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -68,6 +74,27 @@ func (o *EnableCreated) readResponse(response runtime.ClientResponse, consumer r
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewEnableNotFound creates a EnableNotFound with default headers values
+func NewEnableNotFound() *EnableNotFound {
+	return &EnableNotFound{}
+}
+
+/* EnableNotFound describes a response with status code 404, with default header values.
+
+account not found
+*/
+type EnableNotFound struct {
+}
+
+func (o *EnableNotFound) Error() string {
+	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
+}
+
+func (o *EnableNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

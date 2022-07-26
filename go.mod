@@ -16,6 +16,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/michaelquigley/pfxlog v0.6.9
 	github.com/openziti/edge v0.22.39
+	github.com/openziti/foundation/v2 v2.0.1
 	github.com/openziti/sdk-golang v0.16.103
 	github.com/pkg/errors v0.9.1
 	github.com/rubenv/sql-migrate v1.1.2
@@ -25,6 +26,7 @@ require (
 )
 
 require (
+	github.com/Jeffail/gabs v1.4.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
@@ -51,7 +53,6 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/openziti/channel v0.18.58 // indirect
-	github.com/openziti/foundation/v2 v2.0.1 // indirect
 	github.com/openziti/identity v1.0.5 // indirect
 	github.com/openziti/metrics v1.0.2 // indirect
 	github.com/openziti/transport/v2 v2.0.20 // indirect

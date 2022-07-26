@@ -13,3 +13,11 @@ func generateApiToken() (string, error) {
 	}
 	return hex.EncodeToString(bytes), nil
 }
+
+func generateIdentityId() (string, error) {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", errors.Wrap(err, "error generating random identity id")
+	}
+	return hex.EncodeToString(bytes), nil
+}
