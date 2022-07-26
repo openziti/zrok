@@ -4,12 +4,12 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_client"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 )
 
-func newZrokClient() *rest_zrok_client.Zrok {
+func newZrokClient() *rest_client_zrok.Zrok {
 	transport := httptransport.New(endpoint, "", nil)
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
-	return rest_zrok_client.New(transport, strfmt.Default)
+	return rest_client_zrok.New(transport, strfmt.Default)
 }

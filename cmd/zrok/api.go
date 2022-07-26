@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

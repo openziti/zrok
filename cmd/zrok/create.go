@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/openziti-test-kitchen/zrok/rest_model"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/foundation/v2/term"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -40,7 +40,7 @@ var createAccountCmd = &cobra.Command{
 
 		zrok := newZrokClient()
 		req := identity.NewCreateAccountParams()
-		req.Body = &rest_model.AccountRequest{
+		req.Body = &rest_model_zrok.AccountRequest{
 			Username: username,
 			Password: password,
 		}

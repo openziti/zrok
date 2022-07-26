@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -44,7 +44,7 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 	}
 
 	logrus.Infof("account created with id = '%v'", id)
-	return identity.NewCreateAccountCreated().WithPayload(&rest_model.AccountResponse{
+	return identity.NewCreateAccountCreated().WithPayload(&rest_model_zrok.AccountResponse{
 		Token: token,
 	})
 }

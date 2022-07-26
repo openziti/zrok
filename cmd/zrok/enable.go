@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/rest_model"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_client/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -27,7 +27,7 @@ func enable(_ *cobra.Command, args []string) {
 
 	zrok := newZrokClient()
 	req := identity.NewEnableParams()
-	req.Body = &rest_model.EnableRequest{
+	req.Body = &rest_model_zrok.EnableRequest{
 		Token: args[0],
 	}
 	resp, err := zrok.Identity.Enable(req)

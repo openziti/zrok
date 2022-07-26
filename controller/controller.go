@@ -4,11 +4,11 @@ import (
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/identity"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
-	swaggerSpec, err := loads.Embedded(rest_zrok_server.SwaggerJSON, rest_zrok_server.FlatSwaggerJSON)
+	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {
 		return errors.Wrap(err, "error loading embedded swagger spec")
 	}
@@ -31,7 +31,7 @@ func Run(cfg *Config) error {
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
 
-	server := rest_zrok_server.NewServer(api)
+	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
 	server.Host = cfg.Host
 	server.Port = cfg.Port
@@ -43,5 +43,5 @@ func Run(cfg *Config) error {
 }
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewGetOK().WithPayload(&rest_model.Version{Version: "v0.0.0; sk3tch"})
+	return metadata.NewVersionOK().WithPayload(&rest_model_zrok.Version{Version: "v0.0.1; sk3tch"})
 }

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model"
-	"github.com/openziti-test-kitchen/zrok/rest_zrok_server/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti/edge/rest_management_api_client"
 	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
 	rest_model_edge "github.com/openziti/edge/rest_model"
@@ -61,7 +61,7 @@ func enableHandler(params identity.EnableParams) middleware.Responder {
 		panic(err)
 	}
 
-	resp := identity.NewEnableCreated().WithPayload(&rest_model.EnableResponse{
+	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,
 	})
 
