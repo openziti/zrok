@@ -43,5 +43,5 @@ func Run(cfg *Config) error {
 }
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewVersionOK().WithPayload(&rest_model_zrok.Version{Version: "v0.0.1; sk3tch"})
+	return metadata.NewVersionOK().WithPayload(&rest_model_zrok.Version{Version: "v0.0.1; sk3tc4"})
 }

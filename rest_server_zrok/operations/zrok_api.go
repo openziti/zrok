@@ -21,6 +21,7 @@ import (
 
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 )
 
 // NewZrokAPI creates a new Zrok instance
@@ -50,6 +51,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
+		}),
+		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams) middleware.Responder {
+			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
@@ -94,6 +98,8 @@ type ZrokAPI struct {
 	IdentityCreateAccountHandler identity.CreateAccountHandler
 	// IdentityEnableHandler sets the operation handler for the enable operation
 	IdentityEnableHandler identity.EnableHandler
+	// TunnelTunnelHandler sets the operation handler for the tunnel operation
+	TunnelTunnelHandler tunnel.TunnelHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -178,6 +184,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.IdentityEnableHandler == nil {
 		unregistered = append(unregistered, "identity.EnableHandler")
+	}
+	if o.TunnelTunnelHandler == nil {
+		unregistered = append(unregistered, "tunnel.TunnelHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -278,6 +287,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/tunnel"] = tunnel.NewTunnel(o.context, o.TunnelTunnelHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

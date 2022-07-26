@@ -42,6 +42,21 @@ paths:
           description: account not found
         500:
           description: internal server error
+  /tunnel:
+    post:
+      tags:
+        - tunnel
+      operationId: tunnel
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/tunnelRequest"
+      responses:
+        201:
+          description: tunnel created
+          schema:
+            $ref: "#/definitions/tunnelResponse"
   /version:
     get:
       tags:
@@ -82,6 +97,18 @@ definitions:
       identity:
         type: string
       cfg:
+        type: string
+  tunnelRequest:
+    type: object
+    properties:
+      token:
+        type: string
+      endpoint:
+        type: string
+  tunnelResponse:
+    type: object
+    properties:
+      service:
         type: string
 
 produces:

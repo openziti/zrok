@@ -12,6 +12,7 @@ import (
 
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
 )
 
 // Default zrok HTTP client.
@@ -58,6 +59,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 	cli.Transport = transport
 	cli.Identity = identity.New(transport, formats)
 	cli.Metadata = metadata.New(transport, formats)
+	cli.Tunnel = tunnel.New(transport, formats)
 	return cli
 }
 
@@ -106,6 +108,8 @@ type Zrok struct {
 
 	Metadata metadata.ClientService
 
+	Tunnel tunnel.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -114,4 +118,5 @@ func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Identity.SetTransport(transport)
 	c.Metadata.SetTransport(transport)
+	c.Tunnel.SetTransport(transport)
 }

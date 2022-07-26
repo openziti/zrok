@@ -96,6 +96,31 @@ func init() {
         }
       }
     },
+    "/tunnel": {
+      "post": {
+        "tags": [
+          "tunnel"
+        ],
+        "operationId": "tunnel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/tunnelRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "tunnel created",
+            "schema": {
+              "$ref": "#/definitions/tunnelResponse"
+            }
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -148,6 +173,25 @@ func init() {
           "type": "string"
         },
         "identity": {
+          "type": "string"
+        }
+      }
+    },
+    "tunnelRequest": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "tunnelResponse": {
+      "type": "object",
+      "properties": {
+        "service": {
           "type": "string"
         }
       }
@@ -241,6 +285,31 @@ func init() {
         }
       }
     },
+    "/tunnel": {
+      "post": {
+        "tags": [
+          "tunnel"
+        ],
+        "operationId": "tunnel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/tunnelRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "tunnel created",
+            "schema": {
+              "$ref": "#/definitions/tunnelResponse"
+            }
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -293,6 +362,25 @@ func init() {
           "type": "string"
         },
         "identity": {
+          "type": "string"
+        }
+      }
+    },
+    "tunnelRequest": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "tunnelResponse": {
+      "type": "object",
+      "properties": {
+        "service": {
           "type": "string"
         }
       }
