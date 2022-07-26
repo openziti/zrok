@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -18,10 +19,18 @@ func Run(cfg *Config) error {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := util.NewProxy("http://zrok")
+	proxy, err := util.NewServiceProxy(&resolver{})
 	if err != nil {
 		return err
 	}
 	proxy.Transport = zTransport
 	return http.ListenAndServe(cfg.Address, util.NewProxyHandler(proxy))
+}
+
+type resolver struct {
+}
+
+func (r *resolver) Service(host string) string {
+	logrus.Infof("host = '%v'", host)
+	return "zrok"
 }
