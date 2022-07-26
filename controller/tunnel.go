@@ -51,14 +51,15 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 	}
 	logrus.Infof("created service '%v'", serviceId)
 
-	// Service Policy
+	// Service Policy (Bind)
 	svcpIdRoles := []string{fmt.Sprintf("@%v", params.Body.Identity)}
+	svcpName := fmt.Sprintf("%v-bind", serviceId)
 	svcpPcRoles := []string{}
 	svcpSvcRoles := []string{fmt.Sprintf("@%v", svcResp.Payload.Data.ID)}
 	svcpDialBind := rest_model.DialBindBind
 	svcp := &rest_model.ServicePolicyCreate{
 		IdentityRoles:     svcpIdRoles,
-		Name:              &serviceId,
+		Name:              &svcpName,
 		PostureCheckRoles: svcpPcRoles,
 		Semantic:          &semantic,
 		ServiceRoles:      svcpSvcRoles,
@@ -74,7 +75,31 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 		logrus.Error(err)
 		return middleware.Error(500, err.Error())
 	}
-	logrus.Infof("created service policy '%v'", serviceId)
+	logrus.Infof("created service policy '%v' (bind)", serviceId)
+
+	// Service Policy (Dial)
+	svcpIdRoles = []string{"@PyB606.S."} // @proxy
+	svcpName = fmt.Sprintf("%v-dial", serviceId)
+	svcpDialBind = rest_model.DialBindDial
+	svcp = &rest_model.ServicePolicyCreate{
+		IdentityRoles:     svcpIdRoles,
+		Name:              &svcpName,
+		PostureCheckRoles: svcpPcRoles,
+		Semantic:          &semantic,
+		ServiceRoles:      svcpSvcRoles,
+		Type:              &svcpDialBind,
+	}
+	svcpParams = &service_policy.CreateServicePolicyParams{
+		Policy:  svcp,
+		Context: context.Background(),
+	}
+	svcpParams.SetTimeout(30 * time.Second)
+	_, err = edge.ServicePolicy.CreateServicePolicy(svcpParams, nil)
+	if err != nil {
+		logrus.Error(err)
+		return middleware.Error(500, err.Error())
+	}
+	logrus.Infof("created service policy '%v' (dial)", serviceId)
 
 	// Service Edge Router Policy
 	serpErRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
