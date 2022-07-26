@@ -9,6 +9,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/pkg/errors"
 )
 
@@ -30,6 +31,7 @@ func Run(cfg *Config) error {
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
+	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()

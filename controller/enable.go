@@ -3,7 +3,6 @@ package controller
 import (
 	"bytes"
 	"context"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
@@ -13,10 +12,8 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
 	rest_model_edge "github.com/openziti/edge/rest_model"
-	"github.com/openziti/edge/rest_util"
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -38,27 +35,20 @@ func enableHandler(params identity.EnableParams) middleware.Responder {
 	}
 	logrus.Infof("found account '%v'", a.Username)
 
-	ctrlAddress := "https://linux:1280"
-	caCerts, err := rest_util.GetControllerWellKnownCas(ctrlAddress)
+	client, err := edgeClient()
 	if err != nil {
-		panic(errors.Wrap(err, "error getting cas"))
-	}
-	caPool := x509.NewCertPool()
-	for _, ca := range caCerts {
-		caPool.AddCert(ca)
-	}
-	client, err := rest_util.NewEdgeManagementClientWithUpdb("admin", "admin", ctrlAddress, caPool)
-	if err != nil {
-		panic(err)
+		logrus.Errorf("error getting edge client: %v", err)
+		return middleware.Error(500, err.Error())
 	}
 	ident, err := createIdentity(a, client)
 	if err != nil {
 		logrus.Error(err)
-		panic(err)
+		return middleware.Error(500, err.Error())
 	}
 	cfg, err := enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
-		panic(err)
+		logrus.Error(err)
+		return middleware.Error(500, err.Error())
 	}
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
@@ -79,7 +69,7 @@ func enableHandler(params identity.EnableParams) middleware.Responder {
 
 func createIdentity(a *store.Account, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
-	iId, err := generateIdentityId()
+	iId, err := randomId()
 	if err != nil {
 		return nil, err
 	}
