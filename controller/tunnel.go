@@ -8,6 +8,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
+	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/openziti/edge/rest_model"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -26,6 +27,8 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 		return middleware.Error(500, err.Error())
 	}
 	logrus.Infof("using service '%v'", serviceId)
+
+	semantic := rest_model.SemanticAllOf
 
 	// Service
 	svcConfigs := make([]string, 0)
@@ -47,14 +50,39 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 	}
 	logrus.Infof("created service '%v'", serviceId)
 
+	// Service Policy
+	svcpIdRoles := []string{fmt.Sprintf("@%v", params.Body.Identity)}
+	svcpPcRoles := []string{}
+	svcpSvcRoles := []string{fmt.Sprintf("@%v", svcResp.Payload.Data.ID)}
+	svcpDialBind := rest_model.DialBindBind
+	svcp := &rest_model.ServicePolicyCreate{
+		IdentityRoles:     svcpIdRoles,
+		Name:              &serviceId,
+		PostureCheckRoles: svcpPcRoles,
+		Semantic:          &semantic,
+		ServiceRoles:      svcpSvcRoles,
+		Type:              &svcpDialBind,
+	}
+	svcpParams := &service_policy.CreateServicePolicyParams{
+		Policy:  svcp,
+		Context: context.Background(),
+	}
+	svcpParams.SetTimeout(30 * time.Second)
+	_, err = edge.ServicePolicy.CreateServicePolicy(svcpParams, nil)
+	if err != nil {
+		logrus.Error(err)
+		return middleware.Error(500, err.Error())
+	}
+	logrus.Infof("created service policy '%v'", serviceId)
+
 	// Service Edge Router Policy
 	serpErRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
-	serpSemantic := rest_model.SemanticAllOf
+
 	serpSvcRoles := []string{fmt.Sprintf("@%v", svcResp.Payload.Data.ID)}
 	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
 		EdgeRouterRoles: serpErRoles,
 		Name:            &serviceId,
-		Semantic:        &serpSemantic,
+		Semantic:        &semantic,
 		ServiceRoles:    serpSvcRoles,
 	}
 	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{

@@ -13,7 +13,7 @@ var httpCmd = &cobra.Command{
 	Short: "Start an http terminator",
 	Args:  cobra.ExactArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		idCfg, err := zrokdir.IdentityFile()
+		idCfg, err := zrokdir.IdentityConfigFile()
 		if err != nil {
 			panic(err)
 		}
@@ -21,7 +21,7 @@ var httpCmd = &cobra.Command{
 			IdentityPath:    idCfg,
 			EndpointAddress: args[0],
 		}
-		token, err := zrokdir.ReadToken()
+		id, err := zrokdir.ReadIdentityId()
 		if err != nil {
 			panic(err)
 		}
@@ -30,7 +30,7 @@ var httpCmd = &cobra.Command{
 		req := tunnel.NewTunnelParams()
 		req.Body = &rest_model_zrok.TunnelRequest{
 			Endpoint: cfg.EndpointAddress,
-			Token:    token,
+			Identity: id,
 		}
 		resp, err := zrok.Tunnel.Tunnel(req)
 		if err != nil {

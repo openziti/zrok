@@ -183,7 +183,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "token": {
+        "identity": {
           "type": "string"
         }
       }
@@ -372,7 +372,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "token": {
+        "identity": {
           "type": "string"
         }
       }

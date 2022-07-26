@@ -28,8 +28,31 @@ func WriteToken(token string) error {
 	return nil
 }
 
-func WriteIdentity(data string) error {
-	path, err := IdentityFile()
+func ReadIdentityId() (string, error) {
+	path, err := IdentityIdFile()
+	if err != nil {
+		return "", err
+	}
+	id, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func WriteIdentityId(id string) error {
+	path, err := IdentityIdFile()
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(path, []byte(id), os.FileMode(400)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func WriteIdentityConfig(data string) error {
+	path, err := IdentityConfigFile()
 	if err != nil {
 		return err
 	}
@@ -39,7 +62,15 @@ func WriteIdentity(data string) error {
 	return nil
 }
 
-func IdentityFile() (string, error) {
+func IdentityIdFile() (string, error) {
+	zrok, err := zrokDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrok, "identity.id"), nil
+}
+
+func IdentityConfigFile() (string, error) {
 	zrok, err := zrokDir()
 	if err != nil {
 		return "", err

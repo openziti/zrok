@@ -20,8 +20,8 @@ type TunnelRequest struct {
 	// endpoint
 	Endpoint string `json:"endpoint,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// identity
+	Identity string `json:"identity,omitempty"`
 }
 
 // Validate validates this tunnel request

@@ -101,7 +101,7 @@ definitions:
   tunnelRequest:
     type: object
     properties:
-      token:
+      identity:
         type: string
       endpoint:
         type: string

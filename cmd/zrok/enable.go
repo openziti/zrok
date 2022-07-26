@@ -34,7 +34,10 @@ func enable(_ *cobra.Command, args []string) {
 	if err := zrokdir.WriteToken(token); err != nil {
 		panic(err)
 	}
-	if err := zrokdir.WriteIdentity(resp.Payload.Cfg); err != nil {
+	if err := zrokdir.WriteIdentityId(resp.Payload.Identity); err != nil {
+		panic(err)
+	}
+	if err := zrokdir.WriteIdentityConfig(resp.Payload.Cfg); err != nil {
 		panic(err)
 	}
 	logrus.Infof("enabled, identity = '%v'", resp.Payload.Identity)
