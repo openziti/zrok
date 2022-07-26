@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 )
 
 func Run(cfg *Config) error {
@@ -32,5 +33,9 @@ type resolver struct {
 
 func (r *resolver) Service(host string) string {
 	logrus.Infof("host = '%v'", host)
+	tokens := strings.Split(host, ".")
+	if len(tokens) > 0 {
+		return tokens[0]
+	}
 	return "zrok"
 }
