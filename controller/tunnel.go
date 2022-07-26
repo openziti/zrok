@@ -6,6 +6,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
+	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
@@ -77,7 +78,6 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 
 	// Service Edge Router Policy
 	serpErRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
-
 	serpSvcRoles := []string{fmt.Sprintf("@%v", svcResp.Payload.Data.ID)}
 	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
 		EdgeRouterRoles: serpErRoles,
@@ -96,6 +96,27 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 		return middleware.Error(500, err.Error())
 	}
 	logrus.Infof("created service edge router policy '%v'", serviceId)
+
+	// Edge Router Policy
+	erpErRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
+	erpIdRoles := []string{fmt.Sprintf("@%v", params.Body.Identity)}
+	erp := &rest_model.EdgeRouterPolicyCreate{
+		EdgeRouterRoles: erpErRoles,
+		IdentityRoles:   erpIdRoles,
+		Name:            &serviceId,
+		Semantic:        &semantic,
+	}
+	erpParams := &edge_router_policy.CreateEdgeRouterPolicyParams{
+		Policy:  erp,
+		Context: context.Background(),
+	}
+	erpParams.SetTimeout(30 * time.Second)
+	_, err = edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(erpParams, nil)
+	if err != nil {
+		logrus.Error(err)
+		return middleware.Error(500, err.Error())
+	}
+	logrus.Infof("created edge router policy '%v'", serviceId)
 
 	resp := tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		Service: serviceId,
