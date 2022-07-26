@@ -18,12 +18,12 @@ func Run(cfg *Config) error {
 	if err != nil {
 		return errors.Wrap(err, "error loading config")
 	}
-	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions("zrok", &options)
+	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions(cfg.Service, &options)
 	if err != nil {
 		return errors.Wrap(err, "error listening")
 	}
 
-	proxy, err := util.NewProxy("http://localhost:3000")
+	proxy, err := util.NewProxy(cfg.EndpointAddress)
 	if err != nil {
 		return err
 	}
