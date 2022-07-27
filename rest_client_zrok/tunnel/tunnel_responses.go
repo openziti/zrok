@@ -29,6 +29,12 @@ func (o *TunnelReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return result, nil
+	case 500:
+		result := NewTunnelInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -62,6 +68,27 @@ func (o *TunnelCreated) readResponse(response runtime.ClientResponse, consumer r
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewTunnelInternalServerError creates a TunnelInternalServerError with default headers values
+func NewTunnelInternalServerError() *TunnelInternalServerError {
+	return &TunnelInternalServerError{}
+}
+
+/* TunnelInternalServerError describes a response with status code 500, with default header values.
+
+internal server error
+*/
+type TunnelInternalServerError struct {
+}
+
+func (o *TunnelInternalServerError) Error() string {
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelInternalServerError ", 500)
+}
+
+func (o *TunnelInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

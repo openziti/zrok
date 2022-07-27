@@ -20,7 +20,6 @@ func untunnelHandler(params tunnel.UntunnelParams) middleware.Responder {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
-
 	svcName := params.Body.Service
 	if err := deleteEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)

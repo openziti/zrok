@@ -56,3 +56,27 @@ func (o *TunnelCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 		}
 	}
 }
+
+// TunnelInternalServerErrorCode is the HTTP code returned for type TunnelInternalServerError
+const TunnelInternalServerErrorCode int = 500
+
+/*TunnelInternalServerError internal server error
+
+swagger:response tunnelInternalServerError
+*/
+type TunnelInternalServerError struct {
+}
+
+// NewTunnelInternalServerError creates TunnelInternalServerError with default headers values
+func NewTunnelInternalServerError() *TunnelInternalServerError {
+
+	return &TunnelInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *TunnelInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
+}

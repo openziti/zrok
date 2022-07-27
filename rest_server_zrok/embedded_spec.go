@@ -117,6 +117,9 @@ func init() {
             "schema": {
               "$ref": "#/definitions/tunnelResponse"
             }
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -339,6 +342,9 @@ func init() {
             "schema": {
               "$ref": "#/definitions/tunnelResponse"
             }
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

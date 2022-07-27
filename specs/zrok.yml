@@ -57,6 +57,8 @@ paths:
           description: tunnel created
           schema:
             $ref: "#/definitions/tunnelResponse"
+        500:
+          description: internal server error
   /untunnel:
     delete:
       tags:

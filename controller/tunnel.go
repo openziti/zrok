@@ -20,39 +20,34 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
-
 	svcName, err := randomId()
 	if err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
 	svcId, err := createService(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
 	envId := params.Body.Identity
-
 	if err := createServicePolicyBind(svcName, svcId, envId, edge); err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
-
 	if err := createServicePolicyDial(svcName, svcId, edge); err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
-
 	if err := createServiceEdgeRouterPolicy(svcName, svcId, edge); err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
-
 	if err := createEdgeRouterPolicy(svcName, envId, edge); err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return tunnel.NewTunnelInternalServerError()
 	}
 
 	logrus.Infof("allocated service '%v'", svcName)
