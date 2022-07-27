@@ -82,13 +82,22 @@ func NewTunnelInternalServerError() *TunnelInternalServerError {
 internal server error
 */
 type TunnelInternalServerError struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 func (o *TunnelInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /tunnel][%d] tunnelInternalServerError ", 500)
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelInternalServerError  %+v", 500, o.Payload)
+}
+func (o *TunnelInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *TunnelInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

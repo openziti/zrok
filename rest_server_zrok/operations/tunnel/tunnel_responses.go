@@ -65,6 +65,11 @@ const TunnelInternalServerErrorCode int = 500
 swagger:response tunnelInternalServerError
 */
 type TunnelInternalServerError struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewTunnelInternalServerError creates TunnelInternalServerError with default headers values
@@ -73,10 +78,23 @@ func NewTunnelInternalServerError() *TunnelInternalServerError {
 	return &TunnelInternalServerError{}
 }
 
+// WithPayload adds the payload to the tunnel internal server error response
+func (o *TunnelInternalServerError) WithPayload(payload rest_model_zrok.ErrorMessage) *TunnelInternalServerError {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the tunnel internal server error response
+func (o *TunnelInternalServerError) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *TunnelInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(500)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }

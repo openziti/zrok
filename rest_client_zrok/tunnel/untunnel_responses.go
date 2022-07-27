@@ -7,9 +7,12 @@ package tunnel
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // UntunnelReader is a Reader for the Untunnel structure.
@@ -68,13 +71,22 @@ func NewUntunnelInternalServerError() *UntunnelInternalServerError {
 internal server error
 */
 type UntunnelInternalServerError struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 func (o *UntunnelInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelInternalServerError  %+v", 500, o.Payload)
+}
+func (o *UntunnelInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *UntunnelInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

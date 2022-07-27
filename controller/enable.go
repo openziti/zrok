@@ -22,33 +22,33 @@ func enableHandler(params identity.EnableParams) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return middleware.Error(500, err.Error())
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	a, err := str.FindAccountWithToken(params.Body.Token, tx)
 	if err != nil {
 		logrus.Errorf("error finding account: %v", err)
-		return middleware.Error(500, err.Error())
+		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if a == nil {
 		logrus.Errorf("account not found: %v", err)
-		return middleware.Error(404, err.Error())
+		return identity.NewEnableNotFound()
 	}
 	logrus.Infof("found account '%v'", a.Username)
 
 	client, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
-		return middleware.Error(500, err.Error())
+		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	ident, err := createIdentity(a, client)
 	if err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	cfg, err := enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
 		logrus.Error(err)
-		return middleware.Error(500, err.Error())
+		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
@@ -73,24 +73,24 @@ func createIdentity(a *store.Account, client *rest_management_api_client.ZitiEdg
 	if err != nil {
 		return nil, err
 	}
-	iName := fmt.Sprintf("%v-%v", a.Username, iId)
-	iType := rest_model_edge.IdentityTypeUser
+	name := fmt.Sprintf("%v-%v", a.Username, iId)
+	identityType := rest_model_edge.IdentityTypeUser
 	i := &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
 		IsAdmin:             &iIsAdmin,
-		Name:                &iName,
+		Name:                &name,
 		RoleAttributes:      nil,
 		ServiceHostingCosts: nil,
 		Tags:                nil,
-		Type:                &iType,
+		Type:                &identityType,
 	}
-	p := identity_edge.NewCreateIdentityParams()
-	p.Identity = i
-	ident, err := client.Identity.CreateIdentity(p, nil)
+	req := identity_edge.NewCreateIdentityParams()
+	req.Identity = i
+	resp, err := client.Identity.CreateIdentity(req, nil)
 	if err != nil {
 		return nil, err
 	}
-	return ident, nil
+	return resp, nil
 }
 
 func enrollIdentity(id string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {

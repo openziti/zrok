@@ -57,10 +57,16 @@ func init() {
             }
           },
           "400": {
-            "description": "account not created (already exists)"
+            "description": "account not created (already exists)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -91,7 +97,10 @@ func init() {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -119,7 +128,10 @@ func init() {
             }
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -144,7 +156,10 @@ func init() {
             "description": "tunnel removed"
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -204,6 +219,9 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "errorMessage": {
+      "type": "string"
     },
     "tunnelRequest": {
       "type": "object",
@@ -282,10 +300,16 @@ func init() {
             }
           },
           "400": {
-            "description": "account not created (already exists)"
+            "description": "account not created (already exists)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -316,7 +340,10 @@ func init() {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -344,7 +371,10 @@ func init() {
             }
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -369,7 +399,10 @@ func init() {
             "description": "tunnel removed"
           },
           "500": {
-            "description": "internal server error"
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -429,6 +462,9 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "errorMessage": {
+      "type": "string"
     },
     "tunnelRequest": {
       "type": "object",

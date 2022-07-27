@@ -88,13 +88,22 @@ func NewCreateAccountBadRequest() *CreateAccountBadRequest {
 account not created (already exists)
 */
 type CreateAccountBadRequest struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 func (o *CreateAccountBadRequest) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountBadRequest ", 400)
+	return fmt.Sprintf("[POST /account][%d] createAccountBadRequest  %+v", 400, o.Payload)
+}
+func (o *CreateAccountBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *CreateAccountBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
@@ -109,13 +118,22 @@ func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
 internal server error
 */
 type CreateAccountInternalServerError struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 func (o *CreateAccountInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError ", 500)
+	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError  %+v", 500, o.Payload)
+}
+func (o *CreateAccountInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *CreateAccountInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

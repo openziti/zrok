@@ -65,6 +65,11 @@ const CreateAccountBadRequestCode int = 400
 swagger:response createAccountBadRequest
 */
 type CreateAccountBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewCreateAccountBadRequest creates CreateAccountBadRequest with default headers values
@@ -73,12 +78,25 @@ func NewCreateAccountBadRequest() *CreateAccountBadRequest {
 	return &CreateAccountBadRequest{}
 }
 
+// WithPayload adds the payload to the create account bad request response
+func (o *CreateAccountBadRequest) WithPayload(payload rest_model_zrok.ErrorMessage) *CreateAccountBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create account bad request response
+func (o *CreateAccountBadRequest) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *CreateAccountBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // CreateAccountInternalServerErrorCode is the HTTP code returned for type CreateAccountInternalServerError
@@ -89,6 +107,11 @@ const CreateAccountInternalServerErrorCode int = 500
 swagger:response createAccountInternalServerError
 */
 type CreateAccountInternalServerError struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewCreateAccountInternalServerError creates CreateAccountInternalServerError with default headers values
@@ -97,10 +120,23 @@ func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
 	return &CreateAccountInternalServerError{}
 }
 
+// WithPayload adds the payload to the create account internal server error response
+func (o *CreateAccountInternalServerError) WithPayload(payload rest_model_zrok.ErrorMessage) *CreateAccountInternalServerError {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create account internal server error response
+func (o *CreateAccountInternalServerError) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *CreateAccountInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(500)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }

@@ -16,12 +16,6 @@ import (
 var str *store.Store
 
 func Run(cfg *Config) error {
-	if v, err := store.Open(cfg.Store); err == nil {
-		str = v
-	} else {
-		return errors.Wrap(err, "error opening store")
-	}
-
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {
 		return errors.Wrap(err, "error loading embedded swagger spec")
@@ -33,6 +27,12 @@ func Run(cfg *Config) error {
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
 	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
+
+	if v, err := store.Open(cfg.Store); err == nil {
+		str = v
+	} else {
+		return errors.Wrap(err, "error opening store")
+	}
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()

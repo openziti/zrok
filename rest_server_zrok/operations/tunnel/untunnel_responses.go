@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // UntunnelOKCode is the HTTP code returned for type UntunnelOK
@@ -43,6 +45,11 @@ const UntunnelInternalServerErrorCode int = 500
 swagger:response untunnelInternalServerError
 */
 type UntunnelInternalServerError struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewUntunnelInternalServerError creates UntunnelInternalServerError with default headers values
@@ -51,10 +58,23 @@ func NewUntunnelInternalServerError() *UntunnelInternalServerError {
 	return &UntunnelInternalServerError{}
 }
 
+// WithPayload adds the payload to the untunnel internal server error response
+func (o *UntunnelInternalServerError) WithPayload(payload rest_model_zrok.ErrorMessage) *UntunnelInternalServerError {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the untunnel internal server error response
+func (o *UntunnelInternalServerError) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *UntunnelInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(500)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }

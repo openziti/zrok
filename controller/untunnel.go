@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
@@ -39,7 +40,7 @@ func untunnelHandler(params tunnel.UntunnelParams) middleware.Responder {
 	}
 	if err := deleteService(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	logrus.Infof("deallocated service '%v'", svcName)

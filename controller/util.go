@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"crypto/rand"
 	"crypto/x509"
+	"encoding/hex"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
+	"github.com/pkg/errors"
 )
 
 func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
@@ -17,4 +20,20 @@ func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
 		caPool.AddCert(ca)
 	}
 	return rest_util.NewEdgeManagementClientWithUpdb("admin", "admin", ctrlAddress, caPool)
+}
+
+func generateApiToken() (string, error) {
+	bytes := make([]byte, 64)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", errors.Wrap(err, "error generating random api token")
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
+func randomId() (string, error) {
+	bytes := make([]byte, 8)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", errors.Wrap(err, "error generating random identity id")
+	}
+	return hex.EncodeToString(bytes), nil
 }

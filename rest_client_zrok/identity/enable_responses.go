@@ -109,13 +109,22 @@ func NewEnableInternalServerError() *EnableInternalServerError {
 internal server error
 */
 type EnableInternalServerError struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 func (o *EnableInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError ", 500)
+	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError  %+v", 500, o.Payload)
+}
+func (o *EnableInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *EnableInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
