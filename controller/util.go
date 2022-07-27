@@ -4,10 +4,26 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
+
+func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
+	logrus.Infof("authenticating")
+	tx, err := Str.Begin()
+	if err != nil {
+		return nil, err
+	}
+	if a, err := Str.FindAccountWithToken(token, tx); err == nil {
+		principal := rest_model_zrok.Principal(a.Token)
+		return &principal, nil
+	} else {
+		return nil, errors.Wrap(err, "error authenticating")
+	}
+}
 
 func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
 	ctrlAddress := "https://linux:1280"

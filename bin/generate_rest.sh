@@ -15,7 +15,7 @@ zrokDir=$(realpath "$scriptDir/..")
 zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
 echo "...generating zrok server"
-swagger generate server -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
+swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
 
 echo "...generating zrok client"
-swagger generate client -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"
+swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"

@@ -27,12 +27,12 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 		Password: hashPassword(params.Body.Password),
 		Token:    token,
 	}
-	tx, err := str.Begin()
+	tx, err := Str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	id, err := str.CreateAccount(a, tx)
+	id, err := Str.CreateAccount(a, tx)
 	if err != nil {
 		logrus.Errorf("error creating account: %v", err)
 		_ = tx.Rollback()

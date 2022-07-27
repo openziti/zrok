@@ -73,19 +73,15 @@ func init() {
     },
     "/enable": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "identity"
         ],
         "operationId": "enable",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/enableRequest"
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "environment enabled",
@@ -201,14 +197,6 @@ func init() {
         }
       }
     },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "enableResponse": {
       "type": "object",
       "properties": {
@@ -221,6 +209,9 @@ func init() {
       }
     },
     "errorMessage": {
+      "type": "string"
+    },
+    "principal": {
       "type": "string"
     },
     "tunnelRequest": {
@@ -251,12 +242,14 @@ func init() {
       }
     },
     "version": {
-      "type": "object",
-      "properties": {
-        "version": {
-          "type": "string"
-        }
-      }
+      "type": "string"
+    }
+  },
+  "securityDefinitions": {
+    "key": {
+      "type": "apiKey",
+      "name": "x-token",
+      "in": "header"
     }
   }
 }`))
@@ -316,19 +309,15 @@ func init() {
     },
     "/enable": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "identity"
         ],
         "operationId": "enable",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/enableRequest"
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "environment enabled",
@@ -444,14 +433,6 @@ func init() {
         }
       }
     },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "enableResponse": {
       "type": "object",
       "properties": {
@@ -464,6 +445,9 @@ func init() {
       }
     },
     "errorMessage": {
+      "type": "string"
+    },
+    "principal": {
       "type": "string"
     },
     "tunnelRequest": {
@@ -494,12 +478,14 @@ func init() {
       }
     },
     "version": {
-      "type": "object",
-      "properties": {
-        "version": {
-          "type": "string"
-        }
-      }
+      "type": "string"
+    }
+  },
+  "securityDefinitions": {
+    "key": {
+      "type": "apiKey",
+      "name": "x-token",
+      "in": "header"
     }
   }
 }`))

@@ -1,8 +1,8 @@
 package main
 
 import (
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -23,11 +23,9 @@ func enable(_ *cobra.Command, args []string) {
 	token := args[0]
 
 	zrok := newZrokClient()
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := identity.NewEnableParams()
-	req.Body = &rest_model_zrok.EnableRequest{
-		Token: token,
-	}
-	resp, err := zrok.Identity.Enable(req)
+	resp, err := zrok.Identity.Enable(req, auth)
 	if err != nil {
 		panic(err)
 	}

@@ -32,7 +32,7 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	CreateAccount(params *CreateAccountParams, opts ...ClientOption) (*CreateAccountCreated, error)
 
-	Enable(params *EnableParams, opts ...ClientOption) (*EnableCreated, error)
+	Enable(params *EnableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnableCreated, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -78,7 +78,7 @@ func (a *Client) CreateAccount(params *CreateAccountParams, opts ...ClientOption
 /*
   Enable enable API
 */
-func (a *Client) Enable(params *EnableParams, opts ...ClientOption) (*EnableCreated, error) {
+func (a *Client) Enable(params *EnableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnableCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewEnableParams()
@@ -92,6 +92,7 @@ func (a *Client) Enable(params *EnableParams, opts ...ClientOption) (*EnableCrea
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &EnableReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

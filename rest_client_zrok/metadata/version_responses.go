@@ -44,22 +44,20 @@ func NewVersionOK() *VersionOK {
 retrieve the current server version
 */
 type VersionOK struct {
-	Payload *rest_model_zrok.Version
+	Payload rest_model_zrok.Version
 }
 
 func (o *VersionOK) Error() string {
 	return fmt.Sprintf("[GET /version][%d] versionOK  %+v", 200, o.Payload)
 }
-func (o *VersionOK) GetPayload() *rest_model_zrok.Version {
+func (o *VersionOK) GetPayload() rest_model_zrok.Version {
 	return o.Payload
 }
 
 func (o *VersionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.Version)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

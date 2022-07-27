@@ -4,7 +4,6 @@ import (
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
@@ -13,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var str *store.Store
+var Str *store.Store
 
 func Run(cfg *Config) error {
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
@@ -22,6 +21,7 @@ func Run(cfg *Config) error {
 	}
 
 	api := operations.NewZrokAPI(swaggerSpec)
+	api.KeyAuth = ZrokAuthenticate
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
@@ -29,7 +29,7 @@ func Run(cfg *Config) error {
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
 
 	if v, err := store.Open(cfg.Store); err == nil {
-		str = v
+		Str = v
 	} else {
 		return errors.Wrap(err, "error opening store")
 	}
@@ -46,5 +46,5 @@ func Run(cfg *Config) error {
 }
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewVersionOK().WithPayload(&rest_model_zrok.Version{Version: "v0.0.1; sk3tc4"})
+	return metadata.NewVersionOK().WithPayload("v0.0.2")
 }

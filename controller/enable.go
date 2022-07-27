@@ -18,13 +18,13 @@ import (
 	"time"
 )
 
-func enableHandler(params identity.EnableParams) middleware.Responder {
-	tx, err := str.Begin()
+func enableHandler(_ identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	tx, err := Str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	a, err := str.FindAccountWithToken(params.Body.Token, tx)
+	a, err := Str.FindAccountWithToken(string(*principal), tx)
 	if err != nil {
 		logrus.Errorf("error finding account: %v", err)
 		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))

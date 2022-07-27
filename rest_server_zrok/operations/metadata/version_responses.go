@@ -25,7 +25,7 @@ type VersionOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.Version `json:"body,omitempty"`
+	Payload rest_model_zrok.Version `json:"body,omitempty"`
 }
 
 // NewVersionOK creates VersionOK with default headers values
@@ -35,13 +35,13 @@ func NewVersionOK() *VersionOK {
 }
 
 // WithPayload adds the payload to the version o k response
-func (o *VersionOK) WithPayload(payload *rest_model_zrok.Version) *VersionOK {
+func (o *VersionOK) WithPayload(payload rest_model_zrok.Version) *VersionOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the version o k response
-func (o *VersionOK) SetPayload(payload *rest_model_zrok.Version) {
+func (o *VersionOK) SetPayload(payload rest_model_zrok.Version) {
 	o.Payload = payload
 }
 
@@ -49,10 +49,8 @@ func (o *VersionOK) SetPayload(payload *rest_model_zrok.Version) {
 func (o *VersionOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }

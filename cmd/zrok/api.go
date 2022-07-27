@@ -25,6 +25,6 @@ var apiVersionCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		logrus.Infof("found api version [%v]", resp.Payload.Version)
+		logrus.Infof("found api version [%v]", resp.Payload)
 	},
 }

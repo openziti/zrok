@@ -19,6 +19,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
@@ -49,7 +50,7 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
 		}),
-		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams) middleware.Responder {
+		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams) middleware.Responder {
@@ -61,6 +62,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
+
+		// Applies when the "x-token" header is set
+		KeyAuth: func(token string) (*rest_model_zrok.Principal, error) {
+			return nil, errors.NotImplemented("api key auth (key) x-token from header param [x-token] has not yet been implemented")
+		},
+		// default authorizer is authorized meaning no requests are blocked
+		APIAuthorizer: security.Authorized(),
 	}
 }
 
@@ -96,6 +104,13 @@ type ZrokAPI struct {
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/zrok.v1+json
 	JSONProducer runtime.Producer
+
+	// KeyAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key x-token provided in the header
+	KeyAuth func(string) (*rest_model_zrok.Principal, error)
+
+	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
+	APIAuthorizer runtime.Authorizer
 
 	// IdentityCreateAccountHandler sets the operation handler for the create account operation
 	IdentityCreateAccountHandler identity.CreateAccountHandler
@@ -184,6 +199,10 @@ func (o *ZrokAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.KeyAuth == nil {
+		unregistered = append(unregistered, "XTokenAuth")
+	}
+
 	if o.IdentityCreateAccountHandler == nil {
 		unregistered = append(unregistered, "identity.CreateAccountHandler")
 	}
@@ -214,12 +233,23 @@ func (o *ZrokAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *h
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
 func (o *ZrokAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
-	return nil
+	result := make(map[string]runtime.Authenticator)
+	for name := range schemes {
+		switch name {
+		case "key":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
+				return o.KeyAuth(token)
+			})
+
+		}
+	}
+	return result
 }
 
 // Authorizer returns the registered authorizer
 func (o *ZrokAPI) Authorizer() runtime.Authorizer {
-	return nil
+	return o.APIAuthorizer
 }
 
 // ConsumersFor gets the consumers for the specified media types.

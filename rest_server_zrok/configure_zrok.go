@@ -24,7 +24,6 @@ func configureAPI(api *operations.ZrokAPI) http.Handler {
 	api.UseSwaggerUI()
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
-
 	api.PreServerShutdown = func() {}
 
 	api.ServerShutdown = func() {}
