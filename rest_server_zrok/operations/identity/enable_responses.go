@@ -57,6 +57,30 @@ func (o *EnableCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	}
 }
 
+// EnableUnauthorizedCode is the HTTP code returned for type EnableUnauthorized
+const EnableUnauthorizedCode int = 401
+
+/*EnableUnauthorized invalid api key
+
+swagger:response enableUnauthorized
+*/
+type EnableUnauthorized struct {
+}
+
+// NewEnableUnauthorized creates EnableUnauthorized with default headers values
+func NewEnableUnauthorized() *EnableUnauthorized {
+
+	return &EnableUnauthorized{}
+}
+
+// WriteResponse to the client
+func (o *EnableUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(401)
+}
+
 // EnableNotFoundCode is the HTTP code returned for type EnableNotFound
 const EnableNotFoundCode int = 404
 

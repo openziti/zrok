@@ -89,6 +89,9 @@ func init() {
               "$ref": "#/definitions/enableResponse"
             }
           },
+          "401": {
+            "description": "invalid api key"
+          },
           "404": {
             "description": "account not found"
           },
@@ -324,6 +327,9 @@ func init() {
             "schema": {
               "$ref": "#/definitions/enableResponse"
             }
+          },
+          "401": {
+            "description": "invalid api key"
           },
           "404": {
             "description": "account not found"

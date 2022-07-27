@@ -45,6 +45,8 @@ paths:
           description: environment enabled
           schema:
             $ref: "#/definitions/enableResponse"
+        401:
+          description: invalid api key
         404:
           description: account not found
         500:

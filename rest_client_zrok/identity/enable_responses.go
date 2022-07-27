@@ -29,6 +29,12 @@ func (o *EnableReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return result, nil
+	case 401:
+		result := NewEnableUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewEnableNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -74,6 +80,27 @@ func (o *EnableCreated) readResponse(response runtime.ClientResponse, consumer r
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewEnableUnauthorized creates a EnableUnauthorized with default headers values
+func NewEnableUnauthorized() *EnableUnauthorized {
+	return &EnableUnauthorized{}
+}
+
+/* EnableUnauthorized describes a response with status code 401, with default header values.
+
+invalid api key
+*/
+type EnableUnauthorized struct {
+}
+
+func (o *EnableUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
+}
+
+func (o *EnableUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

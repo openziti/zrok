@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
+	errors2 "github.com/go-openapi/errors"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
@@ -21,7 +22,7 @@ func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
 		principal := rest_model_zrok.Principal(a.Token)
 		return &principal, nil
 	} else {
-		return nil, errors.Wrap(err, "error authenticating")
+		return nil, errors2.New(401, "invalid api key")
 	}
 }
 
