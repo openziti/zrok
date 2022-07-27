@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCreated, error)
 
+	Untunnel(params *UntunnelParams, opts ...ClientOption) (*UntunnelOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -70,6 +72,44 @@ func (a *Client) Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCrea
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for tunnel: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  Untunnel untunnel API
+*/
+func (a *Client) Untunnel(params *UntunnelParams, opts ...ClientOption) (*UntunnelOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUntunnelParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "untunnel",
+		Method:             "DELETE",
+		PathPattern:        "/untunnel",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UntunnelReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UntunnelOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for untunnel: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

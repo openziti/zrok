@@ -121,6 +121,31 @@ func init() {
         }
       }
     },
+    "/untunnel": {
+      "delete": {
+        "tags": [
+          "tunnel"
+        ],
+        "operationId": "untunnel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/untunnelRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "tunnel removed"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -189,6 +214,14 @@ func init() {
       }
     },
     "tunnelResponse": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string"
+        }
+      }
+    },
+    "untunnelRequest": {
       "type": "object",
       "properties": {
         "service": {
@@ -310,6 +343,31 @@ func init() {
         }
       }
     },
+    "/untunnel": {
+      "delete": {
+        "tags": [
+          "tunnel"
+        ],
+        "operationId": "untunnel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/untunnelRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "tunnel removed"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -378,6 +436,14 @@ func init() {
       }
     },
     "tunnelResponse": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string"
+        }
+      }
+    },
+    "untunnelRequest": {
       "type": "object",
       "properties": {
         "service": {

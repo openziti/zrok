@@ -55,6 +55,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
+		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams) middleware.Responder {
+			return middleware.NotImplemented("operation tunnel.Untunnel has not yet been implemented")
+		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
@@ -100,6 +103,8 @@ type ZrokAPI struct {
 	IdentityEnableHandler identity.EnableHandler
 	// TunnelTunnelHandler sets the operation handler for the tunnel operation
 	TunnelTunnelHandler tunnel.TunnelHandler
+	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
+	TunnelUntunnelHandler tunnel.UntunnelHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -187,6 +192,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.TunnelTunnelHandler == nil {
 		unregistered = append(unregistered, "tunnel.TunnelHandler")
+	}
+	if o.TunnelUntunnelHandler == nil {
+		unregistered = append(unregistered, "tunnel.UntunnelHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -291,6 +299,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/tunnel"] = tunnel.NewTunnel(o.context, o.TunnelTunnelHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/untunnel"] = tunnel.NewUntunnel(o.context, o.TunnelUntunnelHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
