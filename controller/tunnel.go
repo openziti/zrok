@@ -28,8 +28,6 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 		logrus.Error(err)
 		return middleware.Error(500, err.Error())
 	}
-	logrus.Infof("allocated service '%v'", svcName)
-
 	svcId, err := createService(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
@@ -56,6 +54,8 @@ func tunnelHandler(params tunnel.TunnelParams) middleware.Responder {
 		logrus.Error(err)
 		return middleware.Error(500, err.Error())
 	}
+
+	logrus.Infof("allocated service '%v'", svcName)
 
 	resp := tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		Service: svcName,
@@ -104,11 +104,11 @@ func createServicePolicyBind(svcName, svcId, envId string, edge *rest_management
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
-	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service policy '%v'", name)
+	logrus.Infof("created service policy '%v'", resp.Payload.Data.ID)
 	return nil
 }
 
@@ -132,11 +132,11 @@ func createServicePolicyDial(svcName, svcId string, edge *rest_management_api_cl
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
-	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service policy '%v'", name)
+	logrus.Infof("created service policy '%v'", resp.Payload.Data.ID)
 	return nil
 }
 
@@ -155,11 +155,11 @@ func createServiceEdgeRouterPolicy(svcName, svcId string, edge *rest_management_
 		Context: context.Background(),
 	}
 	serpParams.SetTimeout(30 * time.Second)
-	_, err := edge.ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(serpParams, nil)
+	resp, err := edge.ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(serpParams, nil)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service edge router policy '%v'", svcName)
+	logrus.Infof("created service edge router policy '%v'", resp.Payload.Data.ID)
 	return nil
 }
 
@@ -178,10 +178,10 @@ func createEdgeRouterPolicy(svcName, envId string, edge *rest_management_api_cli
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
-	_, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
+	resp, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created edge router policy '%v'", svcName)
+	logrus.Infof("created edge router policy '%v'", resp.Payload.Data.ID)
 	return nil
 }
