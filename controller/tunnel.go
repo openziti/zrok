@@ -173,12 +173,12 @@ func createEdgeRouterPolicy(svcName, envId string, edge *rest_management_api_cli
 		Name:            &svcName,
 		Semantic:        &semantic,
 	}
-	erpParams := &edge_router_policy.CreateEdgeRouterPolicyParams{
+	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
 		Policy:  erp,
 		Context: context.Background(),
 	}
-	erpParams.SetTimeout(30 * time.Second)
-	_, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(erpParams, nil)
+	req.SetTimeout(30 * time.Second)
+	_, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
 	if err != nil {
 		return err
 	}

@@ -32,6 +32,7 @@ func Run(cfg *Config) error {
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
 	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
+	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()

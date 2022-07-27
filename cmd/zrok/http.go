@@ -61,4 +61,13 @@ func handleHttp(_ *cobra.Command, args []string) {
 
 func cleanupHttp(cfg *http.Config, zrok *rest_client_zrok.Zrok) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
+	req := tunnel.NewUntunnelParams()
+	req.Body = &rest_model_zrok.UntunnelRequest{
+		Service: cfg.Service,
+	}
+	if _, err := zrok.Tunnel.Untunnel(req); err == nil {
+		logrus.Infof("shutdown complete")
+	} else {
+		logrus.Errorf("error shutting down: %v", err)
+	}
 }
