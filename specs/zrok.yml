@@ -123,7 +123,14 @@ definitions:
   errorMessage:
     type: string
   principal:
-    type: string
+    type: object
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+      token:
+        type: string
   tunnelRequest:
     type: object
     properties:

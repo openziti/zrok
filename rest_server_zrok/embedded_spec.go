@@ -215,7 +215,18 @@ func init() {
       "type": "string"
     },
     "principal": {
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "token": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
     },
     "tunnelRequest": {
       "type": "object",
@@ -454,7 +465,18 @@ func init() {
       "type": "string"
     },
     "principal": {
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "token": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
     },
     "tunnelRequest": {
       "type": "object",

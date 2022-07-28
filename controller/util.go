@@ -19,7 +19,11 @@ func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
 		return nil, err
 	}
 	if a, err := Str.FindAccountWithToken(token, tx); err == nil {
-		principal := rest_model_zrok.Principal(a.Token)
+		principal := rest_model_zrok.Principal{
+			ID:       int64(a.Id),
+			Token:    a.Token,
+			Username: a.Username,
+		}
 		return &principal, nil
 	} else {
 		return nil, errors2.New(401, "invalid api key")
