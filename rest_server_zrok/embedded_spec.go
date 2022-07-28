@@ -106,6 +106,11 @@ func init() {
     },
     "/tunnel": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "tunnel"
         ],
@@ -137,6 +142,11 @@ func init() {
     },
     "/untunnel": {
       "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "tunnel"
         ],
@@ -356,6 +366,11 @@ func init() {
     },
     "/tunnel": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "tunnel"
         ],
@@ -387,6 +402,11 @@ func init() {
     },
     "/untunnel": {
       "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "tunnel"
         ],

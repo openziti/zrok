@@ -15,7 +15,8 @@ import (
 	"time"
 )
 
-func untunnelHandler(params tunnel.UntunnelParams) middleware.Responder {
+func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	logrus.Infof("untunneling for '%v' (%v)", principal.Username, principal.Token)
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)

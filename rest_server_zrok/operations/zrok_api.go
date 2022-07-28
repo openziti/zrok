@@ -53,10 +53,10 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
-		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams) middleware.Responder {
+		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
-		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams) middleware.Responder {
+		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Untunnel has not yet been implemented")
 		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {

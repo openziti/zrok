@@ -30,9 +30,9 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCreated, error)
+	Tunnel(params *TunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*TunnelCreated, error)
 
-	Untunnel(params *UntunnelParams, opts ...ClientOption) (*UntunnelOK, error)
+	Untunnel(params *UntunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UntunnelOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -40,7 +40,7 @@ type ClientService interface {
 /*
   Tunnel tunnel API
 */
-func (a *Client) Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCreated, error) {
+func (a *Client) Tunnel(params *TunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*TunnelCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewTunnelParams()
@@ -54,6 +54,7 @@ func (a *Client) Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCrea
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &TunnelReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -78,7 +79,7 @@ func (a *Client) Tunnel(params *TunnelParams, opts ...ClientOption) (*TunnelCrea
 /*
   Untunnel untunnel API
 */
-func (a *Client) Untunnel(params *UntunnelParams, opts ...ClientOption) (*UntunnelOK, error) {
+func (a *Client) Untunnel(params *UntunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UntunnelOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUntunnelParams()
@@ -92,6 +93,7 @@ func (a *Client) Untunnel(params *UntunnelParams, opts ...ClientOption) (*Untunn
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &UntunnelReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

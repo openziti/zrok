@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/http"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
@@ -33,14 +35,19 @@ func handleHttp(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+	token, err := zrokdir.ReadToken()
+	if err != nil {
+		panic(err)
+	}
 
 	zrok := newZrokClient()
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := tunnel.NewTunnelParams()
 	req.Body = &rest_model_zrok.TunnelRequest{
 		Endpoint: cfg.EndpointAddress,
 		Identity: id,
 	}
-	resp, err := zrok.Tunnel.Tunnel(req)
+	resp, err := zrok.Tunnel.Tunnel(req, auth)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +57,7 @@ func handleHttp(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanupHttp(cfg, zrok)
+		cleanupHttp(cfg, zrok, auth)
 		os.Exit(1)
 	}()
 
@@ -59,13 +66,13 @@ func handleHttp(_ *cobra.Command, args []string) {
 	}
 }
 
-func cleanupHttp(cfg *http.Config, zrok *rest_client_zrok.Zrok) {
+func cleanupHttp(cfg *http.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{
 		Service: cfg.Service,
 	}
-	if _, err := zrok.Tunnel.Untunnel(req); err == nil {
+	if _, err := zrok.Tunnel.Untunnel(req, auth); err == nil {
 		logrus.Infof("shutdown complete")
 	} else {
 		logrus.Errorf("error shutting down: %v", err)

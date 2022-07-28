@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // TunnelHandlerFunc turns a function with the right signature into a tunnel handler
-type TunnelHandlerFunc func(TunnelParams) middleware.Responder
+type TunnelHandlerFunc func(TunnelParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn TunnelHandlerFunc) Handle(params TunnelParams) middleware.Responder {
-	return fn(params)
+func (fn TunnelHandlerFunc) Handle(params TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	return fn(params, principal)
 }
 
 // TunnelHandler interface for that can handle valid tunnel params
 type TunnelHandler interface {
-	Handle(TunnelParams) middleware.Responder
+	Handle(TunnelParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
 // NewTunnel creates a new http.Handler for the tunnel operation
@@ -45,12 +47,25 @@ func (o *Tunnel) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewTunnelParams()
+	uprinc, aCtx, err := o.Context.Authorize(r, route)
+	if err != nil {
+		o.Context.Respond(rw, r, route.Produces, route, err)
+		return
+	}
+	if aCtx != nil {
+		*r = *aCtx
+	}
+	var principal *rest_model_zrok.Principal
+	if uprinc != nil {
+		principal = uprinc.(*rest_model_zrok.Principal) // this is really a rest_model_zrok.Principal, I promise
+	}
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
-	res := o.Handler.Handle(Params) // actually handle the request
+	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
