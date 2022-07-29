@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -33,6 +34,23 @@ func enableHandler(_ identity.EnableParams, principal *rest_model_zrok.Principal
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	iid, err := str.CreateIdentity(int(principal.ID), &store.Identity{ZitiId: ident.Payload.Data.ID}, tx)
+	if err != nil {
+		logrus.Errorf("error storing created identity: %v", err)
+		_ = tx.Rollback()
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	if err := tx.Commit(); err != nil {
+		logrus.Errorf("error committing: %v", err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, iid, principal.Username)
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,

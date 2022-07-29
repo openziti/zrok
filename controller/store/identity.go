@@ -11,12 +11,12 @@ type Identity struct {
 	ZitiId    string
 }
 
-func (self *Store) CreateIdentity(accountId int, svc *Service, tx *sqlx.Tx) (int, error) {
+func (self *Store) CreateIdentity(accountId int, i *Identity, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into identities (account_id, ziti_id) values (?, ?)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing identities insert statement")
 	}
-	res, err := stmt.Exec(accountId, svc.ZitiId)
+	res, err := stmt.Exec(accountId, i.ZitiId)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing identities insert statement")
 	}
