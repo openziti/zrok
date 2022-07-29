@@ -9,14 +9,15 @@ type Service struct {
 	Model
 	AccountId int
 	ZitiId    string
+	Endpoint  string
 }
 
 func (self *Store) CreateService(accountId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (account_id, ziti_id) values (?, ?)")
+	stmt, err := tx.Prepare("insert into services (account_id, ziti_id, endpoint) values (?, ?, ?)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
-	res, err := stmt.Exec(accountId, svc.ZitiId)
+	res, err := stmt.Exec(accountId, svc.ZitiId, svc.Endpoint)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
