@@ -59,17 +59,22 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 		logrus.Errorf("error finding services for account: %v", err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+	changed := false
 	for _, svc := range svcs {
 		if svc.ZitiId == svcId {
-			if err := str.DeactivateService(svc.Id, tx); err != nil {
+			svc.Active = false
+			if err := str.UpdateService(svc, tx); err != nil {
 				logrus.Errorf("error deactivating service '%v': %v", svcId, err)
 				return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 			}
-			if err := tx.Commit(); err != nil {
-				logrus.Errorf("error committing: %v", err)
-				return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-			}
+			changed = true
 			logrus.Infof("deactivated service '%v'", svcId)
+		}
+	}
+	if changed {
+		if err := tx.Commit(); err != nil {
+			logrus.Errorf("error committing: %v", err)
+			return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 		}
 	}
 

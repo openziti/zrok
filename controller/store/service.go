@@ -53,14 +53,15 @@ func (self *Store) FindServicesForAccount(accountId int, tx *sqlx.Tx) ([]*Servic
 	return svcs, nil
 }
 
-func (self *Store) DeactivateService(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update services set active=false where id = ?")
+func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
+	sql := "update services set ziti_id = ?, endpoint = ?, active = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
+	stmt, err := tx.Prepare(sql)
 	if err != nil {
-		return errors.Wrap(err, "error preparing services deactivate statement")
+		return errors.Wrap(err, "error preparing services update statement")
 	}
-	_, err = stmt.Exec(id)
+	_, err = stmt.Exec(svc.ZitiId, svc.Endpoint, svc.Active, svc.Id)
 	if err != nil {
-		return errors.Wrap(err, "error executing services deactivate statement")
+		return errors.Wrap(err, "error executing services update statement")
 	}
 	return nil
 }
