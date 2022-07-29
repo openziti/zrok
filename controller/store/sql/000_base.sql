@@ -21,9 +21,10 @@ create table accounts (
 --
 create table services (
   id            integer             primary key,
-  name          string              not null unique,
+  account_id    integer             constraint fk_accounts_service references accounts on delete cascade,
+  ziti_id       string              not null unique,
   created_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-  
-  constraint chk_name check (name <> '')
+
+  constraint chk_name check (ziti_id <> '')
 );
