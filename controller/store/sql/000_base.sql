@@ -23,8 +23,9 @@ create table identities (
     id          integer             primary key,
     account_id  integer             constraint fk_accounts_identities references accounts on delete cascade,
     ziti_id     string              not null unique,
-    created_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-    updated_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
+    active      boolean             not null,
+    created_at  datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
+    updated_at  datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 
     constraint chk_ziti_id check (ziti_id <> '')
 );
@@ -37,6 +38,7 @@ create table services (
   account_id    integer             constraint fk_accounts_services references accounts on delete cascade,
   ziti_id       string              not null unique,
   endpoint      string,
+  active        boolean             not null,
   created_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at    datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 

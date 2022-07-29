@@ -9,10 +9,11 @@ type Identity struct {
 	Model
 	AccountId int
 	ZitiId    string
+	Active    bool
 }
 
 func (self *Store) CreateIdentity(accountId int, i *Identity, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into identities (account_id, ziti_id) values (?, ?)")
+	stmt, err := tx.Prepare("insert into identities (account_id, ziti_id, active) values (?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing identities insert statement")
 	}

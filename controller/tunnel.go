@@ -25,6 +25,7 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 		logrus.Errorf("error starting transaction: %v", err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+	defer func() { _ = tx.Rollback() }()
 
 	edge, err := edgeClient()
 	if err != nil {

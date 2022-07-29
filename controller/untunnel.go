@@ -17,34 +17,61 @@ import (
 
 func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	logrus.Infof("untunneling for '%v' (%v)", principal.Username, principal.Token)
+
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	svcName := params.Body.Service
 	if err := deleteEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := deleteServicePolicyDial(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := deleteServicePolicyBind(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError()
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	if err := deleteService(svcName, edge); err != nil {
+	svcId, err := deleteService(svcName, edge)
+	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	logrus.Infof("deallocated service '%v'", svcName)
+
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	defer func() { _ = tx.Rollback() }()
+	svcs, err := str.FindServicesForAccount(int(principal.ID), tx)
+	if err != nil {
+		logrus.Errorf("error finding services for account: %v", err)
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	for _, svc := range svcs {
+		if svc.ZitiId == svcId {
+			if err := str.DeactivateService(svc.Id, tx); err != nil {
+				logrus.Errorf("error deactivating service '%v': %v", svcId, err)
+				return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			}
+			if err := tx.Commit(); err != nil {
+				logrus.Errorf("error committing: %v", err)
+				return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			}
+			logrus.Infof("deactivated service '%v'", svcId)
+		}
+	}
 
 	return tunnel.NewUntunnelOK()
 }
@@ -155,7 +182,7 @@ func deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdg
 	return nil
 }
 
-func deleteService(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func deleteService(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
@@ -168,7 +195,7 @@ func deleteService(svcName string, edge *rest_management_api_client.ZitiEdgeMana
 	listReq.SetTimeout(30 * time.Second)
 	listResp, err := edge.Service.ListServices(listReq, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if len(listResp.Payload.Data) == 1 {
 		svcId := *(listResp.Payload.Data[0].ID)
@@ -179,11 +206,12 @@ func deleteService(svcName string, edge *rest_management_api_client.ZitiEdgeMana
 		req.SetTimeout(30 * time.Second)
 		_, err := edge.Service.DeleteService(req, nil)
 		if err != nil {
-			return err
+			return "", err
 		}
 		logrus.Infof("deleted service '%v'", svcId)
+		return svcId, nil
 	} else {
 		logrus.Infof("did not find a service")
 	}
-	return nil
+	return "", nil
 }

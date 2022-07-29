@@ -10,10 +10,11 @@ type Service struct {
 	AccountId int
 	ZitiId    string
 	Endpoint  string
+	Active    bool
 }
 
 func (self *Store) CreateService(accountId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (account_id, ziti_id, endpoint) values (?, ?, ?)")
+	stmt, err := tx.Prepare("insert into services (account_id, ziti_id, endpoint, active) values (?, ?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
@@ -50,6 +51,18 @@ func (self *Store) FindServicesForAccount(accountId int, tx *sqlx.Tx) ([]*Servic
 		svcs = append(svcs, svc)
 	}
 	return svcs, nil
+}
+
+func (self *Store) DeactivateService(id int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("update services set active=false where id = ?")
+	if err != nil {
+		return errors.Wrap(err, "error preparing services deactivate statement")
+	}
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "error executing services deactivate statement")
+	}
+	return nil
 }
 
 func (self *Store) DeleteService(id int, tx *sqlx.Tx) error {
