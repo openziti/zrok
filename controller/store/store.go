@@ -54,6 +54,7 @@ func (self *Store) migrate() error {
 		FileSystem: sql.Fs,
 		Root:       "/",
 	}
+	migrate.SetTable("migrations")
 	n, err := migrate.Exec(self.db.DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
 		return errors.Wrap(err, "error running migrations")
