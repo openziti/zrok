@@ -14,11 +14,11 @@ import (
 
 func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
 	logrus.Infof("authenticating")
-	tx, err := Str.Begin()
+	tx, err := str.Begin()
 	if err != nil {
 		return nil, err
 	}
-	if a, err := Str.FindAccountWithToken(token, tx); err == nil {
+	if a, err := str.FindAccountWithToken(token, tx); err == nil {
 		principal := rest_model_zrok.Principal{
 			ID:       int64(a.Id),
 			Token:    a.Token,

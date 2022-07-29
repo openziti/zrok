@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var Str *store.Store
+var str *store.Store
 
 func Run(cfg *Config) error {
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
@@ -29,7 +29,7 @@ func Run(cfg *Config) error {
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
 
 	if v, err := store.Open(cfg.Store); err == nil {
-		Str = v
+		str = v
 	} else {
 		return errors.Wrap(err, "error opening store")
 	}
