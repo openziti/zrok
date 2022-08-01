@@ -157,7 +157,7 @@ func createServicePolicyDial(svcName, svcId string, edge *rest_management_api_cl
 }
 
 func createServiceEdgeRouterPolicy(svcName, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	edgeRouterRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
+	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
 	serviceRoles := []string{fmt.Sprintf("@%v", svcId)}
 	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
@@ -180,7 +180,7 @@ func createServiceEdgeRouterPolicy(svcName, svcId string, edge *rest_management_
 }
 
 func createEdgeRouterPolicy(svcName, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	edgeRouterRoles := []string{"@tDnhG8jkG9"} // @linux-edge-router
+	edgeRouterRoles := []string{"#all"}
 	identityRoles := []string{fmt.Sprintf("@%v", envId)}
 	semantic := rest_model.SemanticAllOf
 	erp := &rest_model.EdgeRouterPolicyCreate{
