@@ -37,6 +37,48 @@ func (o *UntunnelOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 	rw.WriteHeader(200)
 }
 
+// UntunnelNotFoundCode is the HTTP code returned for type UntunnelNotFound
+const UntunnelNotFoundCode int = 404
+
+/*UntunnelNotFound not found
+
+swagger:response untunnelNotFound
+*/
+type UntunnelNotFound struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewUntunnelNotFound creates UntunnelNotFound with default headers values
+func NewUntunnelNotFound() *UntunnelNotFound {
+
+	return &UntunnelNotFound{}
+}
+
+// WithPayload adds the payload to the untunnel not found response
+func (o *UntunnelNotFound) WithPayload(payload rest_model_zrok.ErrorMessage) *UntunnelNotFound {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the untunnel not found response
+func (o *UntunnelNotFound) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *UntunnelNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(404)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // UntunnelInternalServerErrorCode is the HTTP code returned for type UntunnelInternalServerError
 const UntunnelInternalServerErrorCode int = 500
 

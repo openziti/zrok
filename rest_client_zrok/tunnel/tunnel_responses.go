@@ -29,6 +29,12 @@ func (o *TunnelReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return result, nil
+	case 401:
+		result := NewTunnelUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewTunnelInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +72,36 @@ func (o *TunnelCreated) readResponse(response runtime.ClientResponse, consumer r
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewTunnelUnauthorized creates a TunnelUnauthorized with default headers values
+func NewTunnelUnauthorized() *TunnelUnauthorized {
+	return &TunnelUnauthorized{}
+}
+
+/* TunnelUnauthorized describes a response with status code 401, with default header values.
+
+invalid environment identity
+*/
+type TunnelUnauthorized struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+func (o *TunnelUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelUnauthorized  %+v", 401, o.Payload)
+}
+func (o *TunnelUnauthorized) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *TunnelUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

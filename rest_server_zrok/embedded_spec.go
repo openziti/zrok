@@ -131,6 +131,12 @@ func init() {
               "$ref": "#/definitions/tunnelResponse"
             }
           },
+          "401": {
+            "description": "invalid environment identity",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -163,6 +169,12 @@ func init() {
         "responses": {
           "200": {
             "description": "tunnel removed"
+          },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",
@@ -391,6 +403,12 @@ func init() {
               "$ref": "#/definitions/tunnelResponse"
             }
           },
+          "401": {
+            "description": "invalid environment identity",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -423,6 +441,12 @@ func init() {
         "responses": {
           "200": {
             "description": "tunnel removed"
+          },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",

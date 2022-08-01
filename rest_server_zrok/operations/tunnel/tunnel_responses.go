@@ -57,6 +57,48 @@ func (o *TunnelCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	}
 }
 
+// TunnelUnauthorizedCode is the HTTP code returned for type TunnelUnauthorized
+const TunnelUnauthorizedCode int = 401
+
+/*TunnelUnauthorized invalid environment identity
+
+swagger:response tunnelUnauthorized
+*/
+type TunnelUnauthorized struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewTunnelUnauthorized creates TunnelUnauthorized with default headers values
+func NewTunnelUnauthorized() *TunnelUnauthorized {
+
+	return &TunnelUnauthorized{}
+}
+
+// WithPayload adds the payload to the tunnel unauthorized response
+func (o *TunnelUnauthorized) WithPayload(payload rest_model_zrok.ErrorMessage) *TunnelUnauthorized {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the tunnel unauthorized response
+func (o *TunnelUnauthorized) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *TunnelUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(401)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // TunnelInternalServerErrorCode is the HTTP code returned for type TunnelInternalServerError
 const TunnelInternalServerErrorCode int = 500
 

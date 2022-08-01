@@ -27,6 +27,25 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 	}
 	defer func() { _ = tx.Rollback() }()
 
+	envId := params.Body.Identity
+	if is, err := str.FindIdentitiesForAccount(int(principal.ID), tx); err == nil {
+		found := false
+		for _, i := range is {
+			if i.ZitiId == envId {
+				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Username)
+				found = true
+				break
+			}
+		}
+		if !found {
+			logrus.Errorf("identity '%v' not found for user '%v'", envId, principal.Username)
+			return tunnel.NewTunnelUnauthorized().WithPayload("bad environment identity")
+		}
+	} else {
+		logrus.Errorf("error finding identities for account '%v'", principal.Username)
+		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
@@ -42,7 +61,6 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	envId := params.Body.Identity
 	if err := createServicePolicyBind(svcName, svcId, envId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))

@@ -29,6 +29,12 @@ func (o *UntunnelReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return result, nil
+	case 404:
+		result := NewUntunnelNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewUntunnelInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -57,6 +63,36 @@ func (o *UntunnelOK) Error() string {
 }
 
 func (o *UntunnelOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewUntunnelNotFound creates a UntunnelNotFound with default headers values
+func NewUntunnelNotFound() *UntunnelNotFound {
+	return &UntunnelNotFound{}
+}
+
+/* UntunnelNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type UntunnelNotFound struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+func (o *UntunnelNotFound) Error() string {
+	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelNotFound  %+v", 404, o.Payload)
+}
+func (o *UntunnelNotFound) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *UntunnelNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

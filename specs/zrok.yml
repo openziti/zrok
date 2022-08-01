@@ -70,6 +70,10 @@ paths:
           description: tunnel created
           schema:
             $ref: "#/definitions/tunnelResponse"
+        401:
+          description: invalid environment identity
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
           schema:
@@ -89,6 +93,10 @@ paths:
       responses:
         200:
           description: tunnel removed
+        404:
+          description: not found
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
           schema:
