@@ -25,4 +25,4 @@ echo "...generating zrok client"
 swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"
 
 echo "...generating js client"
-openapi -s specs/zrok.yml -o ui/api -l js
+openapi -s specs/zrok.yml -o ui/src/api -l js

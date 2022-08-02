@@ -14,7 +14,7 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 	logrus.Infof("received account request for username '%v'", params.Body.Username)
 	if params.Body == nil || params.Body.Username == "" || params.Body.Password == "" {
 		logrus.Errorf("missing username or password")
-		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage("missing username or password"))
+		return identity.NewCreateAccountBadRequest().WithPayload("missing username or password")
 	}
 
 	token, err := generateApiToken()

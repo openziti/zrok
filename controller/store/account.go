@@ -36,6 +36,14 @@ func (self *Store) GetAccount(id int, tx *sqlx.Tx) (*Account, error) {
 	return a, nil
 }
 
+func (self *Store) FindAccountWithUsername(username string, tx *sqlx.Tx) (*Account, error) {
+	a := &Account{}
+	if err := tx.QueryRowx("select * from accounts where username = ?", username).StructScan(a); err != nil {
+		return nil, errors.Wrap(err, "error selecting account by username")
+	}
+	return a, nil
+}
+
 func (self *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
 	if err := tx.QueryRowx("select * from accounts where token = ?", token).StructScan(a); err != nil {

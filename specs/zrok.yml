@@ -55,6 +55,23 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+  /login:
+    post:
+      tags:
+        - identity
+      operationId: login
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/loginRequest"
+      responses:
+        200:
+          description: login successful
+          schema:
+            $ref: "#/definitions/loginResponse"
+        401:
+          description: invalid login
   /tunnel:
     post:
       tags:
@@ -135,6 +152,15 @@ definitions:
       cfg:
         type: string
   errorMessage:
+    type: string
+  loginRequest:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  loginResponse:
     type: string
   principal:
     type: object

@@ -105,6 +105,34 @@ func init() {
         }
       }
     },
+    "/login": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/loginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login successful",
+            "schema": {
+              "$ref": "#/definitions/loginResponse"
+            }
+          },
+          "401": {
+            "description": "invalid login"
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -235,6 +263,20 @@ func init() {
       }
     },
     "errorMessage": {
+      "type": "string"
+    },
+    "loginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "loginResponse": {
       "type": "string"
     },
     "principal": {
@@ -378,6 +420,34 @@ func init() {
         }
       }
     },
+    "/login": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/loginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login successful",
+            "schema": {
+              "$ref": "#/definitions/loginResponse"
+            }
+          },
+          "401": {
+            "description": "invalid login"
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -508,6 +578,20 @@ func init() {
       }
     },
     "errorMessage": {
+      "type": "string"
+    },
+    "loginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "loginResponse": {
       "type": "string"
     },
     "principal": {

@@ -53,6 +53,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
+		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
+			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
+		}),
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
@@ -116,6 +119,8 @@ type ZrokAPI struct {
 	IdentityCreateAccountHandler identity.CreateAccountHandler
 	// IdentityEnableHandler sets the operation handler for the enable operation
 	IdentityEnableHandler identity.EnableHandler
+	// IdentityLoginHandler sets the operation handler for the login operation
+	IdentityLoginHandler identity.LoginHandler
 	// TunnelTunnelHandler sets the operation handler for the tunnel operation
 	TunnelTunnelHandler tunnel.TunnelHandler
 	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
@@ -208,6 +213,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.IdentityEnableHandler == nil {
 		unregistered = append(unregistered, "identity.EnableHandler")
+	}
+	if o.IdentityLoginHandler == nil {
+		unregistered = append(unregistered, "identity.LoginHandler")
 	}
 	if o.TunnelTunnelHandler == nil {
 		unregistered = append(unregistered, "tunnel.TunnelHandler")
@@ -325,6 +333,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/login"] = identity.NewLogin(o.context, o.IdentityLoginHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

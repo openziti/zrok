@@ -22,9 +22,10 @@ func Run(cfg *Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = ZrokAuthenticate
-	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
+	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
+	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
 

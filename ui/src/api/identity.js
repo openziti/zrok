@@ -23,6 +23,21 @@ export function enable() {
   return gateway.request(enableOperation)
 }
 
+/**
+ * @param {{password: string, email: string}} options Optional options
+ * @param {module:types.loginRequest} [options.body] 
+ * @return {Promise<module:types.loginResponse>} login successful
+ */
+export function login(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(loginOperation, parameters)
+}
+
 const createAccountOperation = {
   path: '/account',
   contentTypes: ['application/zrok.v1+json'],
@@ -37,4 +52,10 @@ const enableOperation = {
       id: 'key'
     }
   ]
+}
+
+const loginOperation = {
+  path: '/login',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post'
 }
