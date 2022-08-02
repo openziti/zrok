@@ -25,6 +25,7 @@ func Run(cfg *Config) error {
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
 	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
 	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
+	api.MetadataListIdentitiesHandler = metadata.ListIdentitiesHandlerFunc(listIdentitiesHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)

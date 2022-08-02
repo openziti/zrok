@@ -24,7 +24,7 @@ export function enable() {
 }
 
 /**
- * @param {{password: string, email: string}} options Optional options
+ * @param {object} options Optional options
  * @param {module:types.loginRequest} [options.body] 
  * @return {Promise<module:types.loginResponse>} login successful
  */

@@ -25,6 +25,16 @@
  */
 
 /**
+ * @typedef identity
+ * @memberof module:types
+ * 
+ * @property {string} zitiId 
+ * @property {boolean} active 
+ * @property {string} createdAt 
+ * @property {string} updatedAt 
+ */
+
+/**
  * @typedef loginRequest
  * @memberof module:types
  * 

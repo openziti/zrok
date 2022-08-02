@@ -105,6 +105,33 @@ func init() {
         }
       }
     },
+    "/listIdentities": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listIdentities",
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/identities"
+            }
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -264,6 +291,29 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "identities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/identity"
+      }
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "zitiId": {
+          "type": "string"
+        }
+      }
     },
     "loginRequest": {
       "type": "object",
@@ -420,6 +470,33 @@ func init() {
         }
       }
     },
+    "/listIdentities": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listIdentities",
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/identities"
+            }
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -579,6 +656,29 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "identities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/identity"
+      }
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "zitiId": {
+          "type": "string"
+        }
+      }
     },
     "loginRequest": {
       "type": "object",

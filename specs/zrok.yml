@@ -55,6 +55,22 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+  /listIdentities:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listIdentities
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: "#/definitions/identities"
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
   /login:
     post:
       tags:
@@ -153,6 +169,21 @@ definitions:
         type: string
   errorMessage:
     type: string
+  identities:
+    type: array
+    items:
+      $ref: "#/definitions/identity"
+  identity:
+    type: object
+    properties:
+      zitiId:
+        type: string
+      active:
+        type: boolean
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
   loginRequest:
     type: object
     properties:
