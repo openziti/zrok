@@ -7,7 +7,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func listIdentitiesHandler(params metadata.ListIdentitiesParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("principal: %v", principal.Username)
-	return metadata.NewListIdentitiesOK()
+func listIdentitiesHandler(_ metadata.ListIdentitiesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return metadata.NewListIdentitiesInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	defer func() { _ = tx.Rollback() }()
+	ids, err := str.FindIdentitiesForAccount(int(principal.ID), tx)
+	if err != nil {
+		logrus.Errorf("error finding identities for '%v': %v", principal.Username, err)
+		return metadata.NewListIdentitiesInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	var out rest_model_zrok.Identities
+	for _, id := range ids {
+		out = append(out, &rest_model_zrok.Identity{
+			Active:    id.Active,
+			CreatedAt: id.CreatedAt.String(),
+			UpdatedAt: id.UpdatedAt.String(),
+			ZitiID:    id.ZitiId,
+		})
+	}
+	return metadata.NewListIdentitiesOK().WithPayload(out)
 }
