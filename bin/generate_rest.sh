@@ -3,8 +3,12 @@
 set -euo pipefail
 
 command -v swagger >/dev/null 2>&1 || {
-  echo >&2 "Command 'swagger' not installed. See: https://github.com/go-swagger/go-swagger for installation"
+  echo >&2 "command 'swagger' not installed. see: https://github.com/go-swagger/go-swagger for installation"
   exit 1
+}
+
+command -v openapi >/dev/null 2>&1 || {
+  echo >&2 "command 'openapi' not installed. see: https://www.npmjs.com/package/openapi-client for installation"
 }
 
 scriptPath=$(realpath $0)
@@ -19,3 +23,6 @@ swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_serv
 
 echo "...generating zrok client"
 swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"
+
+echo "...generating js client"
+openapi -s specs/zrok.yml -o ui/api -l js

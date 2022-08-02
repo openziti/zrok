@@ -35,5 +35,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:10888"
+  "proxy": "http://localhost:10888",
+  "devDependencies": {
+    "openapi-client": "^1.0.5"
+  }
 }
