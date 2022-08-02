@@ -25,15 +25,27 @@ const App = () => {
 
     return (
         <div className="zrok">
-            <header className="zrok-header">
-                <h1>zrok</h1>
-                <Version/>
-                <Identities user={user}/>
-                <Logout user={user} logout={() => {
-                    setUser(null);
-                    localStorage.clear();
-                }}/>
-            </header>
+            <div className="container">
+                <div className="header">
+                    <img src="ziggy.png" width="100px"/>
+                    <p className="title">zrok</p>
+                    <div class="header-left">
+                        <div>
+                            <Logout user={user} logout={() => {
+                                setUser(null);
+                                localStorage.clear();
+                            }}/>
+                        </div>
+                        <div>
+                            <Version/>
+                        </div>
+                    </div>
+                </div>
+                <div className="main">
+
+                    <Identities user={user}/>
+                </div>
+            </div>
         </div>
     );
 }

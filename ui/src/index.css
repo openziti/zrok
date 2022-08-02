@@ -1,8 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -14,4 +12,37 @@ code {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Russo One', sans-serif;
+}
+
+.title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 3em;
+}
+
+.container {
+  display: grid;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.header {
+  background-color: #3c2693;
+  color: white;
+  padding-left: 2em;
+  padding-right: 2em;
+  display: flex;
+}
+
+.header-left {
+  width: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: right;
+}
+.header-left div {
+  text-align: right;
+}
+
+.main {
+  padding: 2em;
 }

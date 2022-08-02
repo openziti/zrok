@@ -4,7 +4,7 @@ const Logout = (props) => {
     }
 
     return (
-        <button onClick={onClick}>Log Out {props.user.email}</button>
+        <a onClick={onClick}>[x] {props.user.email}</a>
     );
 }
 
