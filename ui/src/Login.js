@@ -7,13 +7,17 @@ const Login = (props) => {
 
     const handleSubmit = async e => {
         e.preventDefault()
+
         identity.login({body: {"email": email, "password": password}})
             .then(resp => {
                 if(!resp.error) {
-                    props.loginSuccess({
-                        email: email,
-                        token: resp.token
-                    })
+                    let user = {
+                        "email": email,
+                        "token": resp.data
+                    }
+                    props.loginSuccess(user)
+                    localStorage.setItem('user', JSON.stringify(user))
+                    console.log(user)
                     console.log('login succeeded', resp)
                 } else {
                     console.log('login failed')

@@ -2,7 +2,7 @@ import Login from './Login';
 import Logout from './Logout';
 import Version from './Version';
 import * as gateway from "./api/gateway";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 gateway.init({
    url: '/api/v1'
@@ -10,6 +10,14 @@ gateway.init({
 
 const App = () => {
     const [user, setUser] = useState();
+
+    useEffect(() => {
+        const localUser = localStorage.getItem("user")
+        if(localUser) {
+            setUser(JSON.parse(localUser))
+            console.log('reloaded user', localUser)
+        }
+    }, []);
 
     if (!user) {
         return (
