@@ -31,6 +31,7 @@ const App = () => {
                 <Identities user={user}/>
                 <Logout user={user} logout={() => {
                     setUser(null);
+                    localStorage.clear();
                 }}/>
             </header>
         </div>
