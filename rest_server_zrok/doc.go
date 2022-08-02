@@ -6,7 +6,7 @@
 //  Schemes:
 //    http
 //  Host: localhost
-//  BasePath: /
+//  BasePath: /api/v1
 //  Version: 1.0.0
 //
 //  Consumes:

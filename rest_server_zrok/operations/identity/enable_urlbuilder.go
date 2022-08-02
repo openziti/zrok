@@ -38,6 +38,9 @@ func (o *EnableURL) Build() (*url.URL, error) {
 	var _path = "/enable"
 
 	_basePath := o._basePath
+	if _basePath == "" {
+		_basePath = "/api/v1"
+	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	return &_result, nil

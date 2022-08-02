@@ -38,6 +38,9 @@ func (o *UntunnelURL) Build() (*url.URL, error) {
 	var _path = "/untunnel"
 
 	_basePath := o._basePath
+	if _basePath == "" {
+		_basePath = "/api/v1"
+	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	return &_result, nil

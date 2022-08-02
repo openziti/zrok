@@ -3,6 +3,8 @@ info:
   title: zrok
   version: 1.0.0
 
+basePath: /api/v1
+
 securityDefinitions:
   key:
     type: apiKey

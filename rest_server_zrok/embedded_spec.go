@@ -33,6 +33,7 @@ func init() {
     "title": "zrok",
     "version": "1.0.0"
   },
+  "basePath": "/api/v1",
   "paths": {
     "/account": {
       "post": {
@@ -305,6 +306,7 @@ func init() {
     "title": "zrok",
     "version": "1.0.0"
   },
+  "basePath": "/api/v1",
   "paths": {
     "/account": {
       "post": {

@@ -8,7 +8,7 @@ import (
 )
 
 func newZrokClient() *rest_client_zrok.Zrok {
-	transport := httptransport.New(endpoint, "", nil)
+	transport := httptransport.New(endpoint, "/api/v1", nil)
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 	return rest_client_zrok.New(transport, strfmt.Default)
