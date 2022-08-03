@@ -108,7 +108,7 @@ paths:
         200:
           description: overview returned
           schema:
-            $ref: "#/definitions/environmentServices"
+            $ref: "#/definitions/environmentServicesList"
         500:
           description: internal server error
           schema:
@@ -224,6 +224,10 @@ definitions:
       updatedAt:
         type: string
 
+  environmentServicesList:
+    type: array
+    items:
+      $ref: "#/definitions/environmentServices"
   environmentServices:
     type: object
     properties:

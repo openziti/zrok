@@ -50,22 +50,20 @@ func NewOverviewOK() *OverviewOK {
 overview returned
 */
 type OverviewOK struct {
-	Payload *rest_model_zrok.EnvironmentServices
+	Payload rest_model_zrok.EnvironmentServicesList
 }
 
 func (o *OverviewOK) Error() string {
 	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
 }
-func (o *OverviewOK) GetPayload() *rest_model_zrok.EnvironmentServices {
+func (o *OverviewOK) GetPayload() rest_model_zrok.EnvironmentServicesList {
 	return o.Payload
 }
 
 func (o *OverviewOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.EnvironmentServices)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

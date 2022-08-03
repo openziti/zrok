@@ -184,7 +184,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServices"
+              "$ref": "#/definitions/environmentServicesList"
             }
           },
           "500": {
@@ -371,6 +371,12 @@ func init() {
         "services": {
           "$ref": "#/definitions/services"
         }
+      }
+    },
+    "environmentServicesList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/environmentServices"
       }
     },
     "environments": {
@@ -645,7 +651,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServices"
+              "$ref": "#/definitions/environmentServicesList"
             }
           },
           "500": {
@@ -832,6 +838,12 @@ func init() {
         "services": {
           "$ref": "#/definitions/services"
         }
+      }
+    },
+    "environmentServicesList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/environmentServices"
       }
     },
     "environments": {

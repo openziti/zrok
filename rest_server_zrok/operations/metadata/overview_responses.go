@@ -25,7 +25,7 @@ type OverviewOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.EnvironmentServices `json:"body,omitempty"`
+	Payload rest_model_zrok.EnvironmentServicesList `json:"body,omitempty"`
 }
 
 // NewOverviewOK creates OverviewOK with default headers values
@@ -35,13 +35,13 @@ func NewOverviewOK() *OverviewOK {
 }
 
 // WithPayload adds the payload to the overview o k response
-func (o *OverviewOK) WithPayload(payload *rest_model_zrok.EnvironmentServices) *OverviewOK {
+func (o *OverviewOK) WithPayload(payload rest_model_zrok.EnvironmentServicesList) *OverviewOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the overview o k response
-func (o *OverviewOK) SetPayload(payload *rest_model_zrok.EnvironmentServices) {
+func (o *OverviewOK) SetPayload(payload rest_model_zrok.EnvironmentServicesList) {
 	o.Payload = payload
 }
 
@@ -49,11 +49,14 @@ func (o *OverviewOK) SetPayload(payload *rest_model_zrok.EnvironmentServices) {
 func (o *OverviewOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if payload == nil {
+		// return empty array
+		payload = rest_model_zrok.EnvironmentServicesList{}
+	}
+
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }
 

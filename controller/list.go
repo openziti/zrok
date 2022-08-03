@@ -16,7 +16,7 @@ func listEnvironmentsHandler(_ metadata.ListEnvironmentsParams, principal *rest_
 	defer func() { _ = tx.Rollback() }()
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
-		logrus.Errorf("error finding identities for '%v': %v", principal.Username, err)
+		logrus.Errorf("error finding environments for '%v': %v", principal.Username, err)
 		return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	var out rest_model_zrok.Environments
