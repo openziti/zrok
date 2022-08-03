@@ -9,7 +9,7 @@ const Logout = (props) => {
     }
 
     return (
-        <a onClick={onClick}><Icon path={logoutIcon} size={1}/> {props.user.email}</a>
+        <button className="logoutButton" onClick={onClick} aria-label={"log out"}><Icon path={logoutIcon} size={.7}/></button>
     );
 }
 

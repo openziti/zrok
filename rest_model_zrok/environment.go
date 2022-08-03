@@ -12,10 +12,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Identity identity
+// Environment environment
 //
-// swagger:model identity
-type Identity struct {
+// swagger:model environment
+type Environment struct {
 
 	// active
 	Active bool `json:"active,omitempty"`
@@ -30,18 +30,18 @@ type Identity struct {
 	ZitiID string `json:"zitiId,omitempty"`
 }
 
-// Validate validates this identity
-func (m *Identity) Validate(formats strfmt.Registry) error {
+// Validate validates this environment
+func (m *Environment) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this identity based on context it is used
-func (m *Identity) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this environment based on context it is used
+func (m *Environment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Identity) MarshalBinary() ([]byte, error) {
+func (m *Environment) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -49,8 +49,8 @@ func (m *Identity) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Identity) UnmarshalBinary(b []byte) error {
-	var res Identity
+func (m *Environment) UnmarshalBinary(b []byte) error {
+	var res Environment
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

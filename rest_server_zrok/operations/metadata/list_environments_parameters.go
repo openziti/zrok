@@ -12,19 +12,19 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-// NewListIdentitiesParams creates a new ListIdentitiesParams object
+// NewListEnvironmentsParams creates a new ListEnvironmentsParams object
 //
 // There are no default values defined in the spec.
-func NewListIdentitiesParams() ListIdentitiesParams {
+func NewListEnvironmentsParams() ListEnvironmentsParams {
 
-	return ListIdentitiesParams{}
+	return ListEnvironmentsParams{}
 }
 
-// ListIdentitiesParams contains all the bound params for the list identities operation
+// ListEnvironmentsParams contains all the bound params for the list environments operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters listIdentities
-type ListIdentitiesParams struct {
+// swagger:parameters listEnvironments
+type ListEnvironmentsParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -33,8 +33,8 @@ type ListIdentitiesParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewListIdentitiesParams() beforehand.
-func (o *ListIdentitiesParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewListEnvironmentsParams() beforehand.
+func (o *ListEnvironmentsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r

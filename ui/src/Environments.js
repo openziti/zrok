@@ -2,8 +2,8 @@ import {useEffect, useState} from "react";
 import * as metadata from './api/metadata';
 import DataTable from 'react-data-table-component';
 
-const Identities = (props) => {
-    const [identities, setIdentities] = useState([])
+const Environments = (props) => {
+    const [environments, setEnvironments] = useState([])
 
     const columns = [
         {
@@ -30,8 +30,8 @@ const Identities = (props) => {
 
     useEffect(() => {
         let mounted = true;
-        metadata.listIdentities().then((resp) => {
-            setIdentities(resp.data)
+        metadata.listEnvironments().then((resp) => {
+            setEnvironments(resp.data)
             console.log(resp.data);
         })
         return () => { mounted = false; }
@@ -39,12 +39,12 @@ const Identities = (props) => {
 
     return (
         <div>
-            <h1>Identities</h1>
-            { identities && identities.length > 0 && (
+            <h1>Environments</h1>
+            { environments && environments.length > 0 && (
                 <div>
                     <DataTable
                         columns={columns}
-                        data={identities}
+                        data={environments}
                         defaultSortFieldId={1}
                     />
                 </div>
@@ -53,4 +53,4 @@ const Identities = (props) => {
     )
 };
 
-export default Identities;
+export default Environments;

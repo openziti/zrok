@@ -14,13 +14,13 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Identities identities
+// Environments environments
 //
-// swagger:model identities
-type Identities []*Identity
+// swagger:model environments
+type Environments []*Environment
 
-// Validate validates this identities
-func (m Identities) Validate(formats strfmt.Registry) error {
+// Validate validates this environments
+func (m Environments) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {
@@ -47,8 +47,8 @@ func (m Identities) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this identities based on the context it is used
-func (m Identities) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this environments based on the context it is used
+func (m Environments) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {

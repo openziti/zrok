@@ -25,7 +25,7 @@
  */
 
 /**
- * @typedef identity
+ * @typedef environment
  * @memberof module:types
  * 
  * @property {string} zitiId 

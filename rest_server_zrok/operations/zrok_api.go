@@ -53,8 +53,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
-		MetadataListIdentitiesHandler: metadata.ListIdentitiesHandlerFunc(func(params metadata.ListIdentitiesParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metadata.ListIdentities has not yet been implemented")
+		MetadataListEnvironmentsHandler: metadata.ListEnvironmentsHandlerFunc(func(params metadata.ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListEnvironments has not yet been implemented")
 		}),
 		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
@@ -122,8 +122,8 @@ type ZrokAPI struct {
 	IdentityCreateAccountHandler identity.CreateAccountHandler
 	// IdentityEnableHandler sets the operation handler for the enable operation
 	IdentityEnableHandler identity.EnableHandler
-	// MetadataListIdentitiesHandler sets the operation handler for the list identities operation
-	MetadataListIdentitiesHandler metadata.ListIdentitiesHandler
+	// MetadataListEnvironmentsHandler sets the operation handler for the list environments operation
+	MetadataListEnvironmentsHandler metadata.ListEnvironmentsHandler
 	// IdentityLoginHandler sets the operation handler for the login operation
 	IdentityLoginHandler identity.LoginHandler
 	// TunnelTunnelHandler sets the operation handler for the tunnel operation
@@ -219,8 +219,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.IdentityEnableHandler == nil {
 		unregistered = append(unregistered, "identity.EnableHandler")
 	}
-	if o.MetadataListIdentitiesHandler == nil {
-		unregistered = append(unregistered, "metadata.ListIdentitiesHandler")
+	if o.MetadataListEnvironmentsHandler == nil {
+		unregistered = append(unregistered, "metadata.ListEnvironmentsHandler")
 	}
 	if o.IdentityLoginHandler == nil {
 		unregistered = append(unregistered, "identity.LoginHandler")
@@ -344,7 +344,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/listIdentities"] = metadata.NewListIdentities(o.context, o.MetadataListIdentitiesHandler)
+	o.handlers["GET"]["/listEnvironments"] = metadata.NewListEnvironments(o.context, o.MetadataListEnvironmentsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

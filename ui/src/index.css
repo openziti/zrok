@@ -14,11 +14,6 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Russo One', sans-serif;
 }
 
-.title {
-  font-family: 'Russo One', sans-serif;
-  font-size: 3em;
-  margin-left: 0.53em;
-}
 
 .container {
   display: grid;
@@ -32,17 +27,46 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 2em;
   padding-right: 2em;
   display: flex;
+  align-items: center;
   border-radius: 0 0 25px 25px;
 }
-
-.header-left {
+.header-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 3em;
+  margin-left: 0.53em;
+}
+.header-status {
   width: 100%;
   display: grid;
-  align-items: center;
+  padding-bottom: 1em;
+  grid-row-start: 2;
+}
+.header-status div p {
+  font-size: 75%;
+}
+.header-status div {
+  text-align: right;
+}
+.header-controls {
+  display: flex;
+  grid-row-start: 2;
   justify-content: right;
 }
-.header-left div {
-  text-align: right;
+.header-controls button {
+  margin-left: 30px;
+  display: flex;
+  align-items: center;
+  background-color: #5241a8;
+  border-radius: 5px 5px 5px 5px;
+  border: 1px solid #846fec;
+  color: lightgray;
+  padding: 5px;
+  width: 60px;
+  justify-content: center;
+}
+.header-controls button:hover {
+  color: white;
+  border-color: white;
 }
 
 .main {

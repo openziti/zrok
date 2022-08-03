@@ -2,7 +2,9 @@ import Login from './Login';
 import Logout from './Logout';
 import Version from './Version';
 import {useEffect, useState} from "react";
-import Identities from "./Identities";
+import Environments from "./Environments";
+import Icon from '@mdi/react';
+import { mdiCloud } from '@mdi/js';
 
 const App = () => {
     const [user, setUser] = useState();
@@ -25,22 +27,24 @@ const App = () => {
         <div className="zrok">
             <div className="container">
                 <div className="header">
-                    <img src="ziggy.svg" width="65px"/>
-                    <p className="title">zrok</p>
-                    <div className="header-left">
+                    <img alt="ziggy goes to space" src="ziggy.svg" width="65px"/>
+                    <p className="header-title">zrok</p>
+                    <div className={"header-status"}>
                         <div>
+                            <p>{user.email}</p>
+                            <Version/>
+                        </div>
+                        <div className={"header-controls"}>
+                            <button className={"logoutButton"}><Icon path={mdiCloud} size={0.7}/></button>
                             <Logout user={user} logout={() => {
                                 setUser(null);
                                 localStorage.clear();
                             }}/>
                         </div>
-                        <div>
-                            <Version/>
-                        </div>
                     </div>
                 </div>
                 <div className="main">
-                    <Identities user={user}/>
+                    <Environments user={user}/>
                 </div>
             </div>
         </div>

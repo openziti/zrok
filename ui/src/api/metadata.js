@@ -4,8 +4,8 @@ import * as gateway from './gateway'
 
 /**
  */
-export function listIdentities() {
-  return gateway.request(listIdentitiesOperation)
+export function listEnvironments() {
+  return gateway.request(listEnvironmentsOperation)
 }
 
 /**
@@ -14,8 +14,8 @@ export function version() {
   return gateway.request(versionOperation)
 }
 
-const listIdentitiesOperation = {
-  path: '/listIdentities',
+const listEnvironmentsOperation = {
+  path: '/listEnvironments',
   method: 'get',
   security: [
     {

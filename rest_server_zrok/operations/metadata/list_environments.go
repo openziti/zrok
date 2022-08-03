@@ -13,40 +13,40 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
-// ListIdentitiesHandlerFunc turns a function with the right signature into a list identities handler
-type ListIdentitiesHandlerFunc func(ListIdentitiesParams, *rest_model_zrok.Principal) middleware.Responder
+// ListEnvironmentsHandlerFunc turns a function with the right signature into a list environments handler
+type ListEnvironmentsHandlerFunc func(ListEnvironmentsParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn ListIdentitiesHandlerFunc) Handle(params ListIdentitiesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (fn ListEnvironmentsHandlerFunc) Handle(params ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	return fn(params, principal)
 }
 
-// ListIdentitiesHandler interface for that can handle valid list identities params
-type ListIdentitiesHandler interface {
-	Handle(ListIdentitiesParams, *rest_model_zrok.Principal) middleware.Responder
+// ListEnvironmentsHandler interface for that can handle valid list environments params
+type ListEnvironmentsHandler interface {
+	Handle(ListEnvironmentsParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
-// NewListIdentities creates a new http.Handler for the list identities operation
-func NewListIdentities(ctx *middleware.Context, handler ListIdentitiesHandler) *ListIdentities {
-	return &ListIdentities{Context: ctx, Handler: handler}
+// NewListEnvironments creates a new http.Handler for the list environments operation
+func NewListEnvironments(ctx *middleware.Context, handler ListEnvironmentsHandler) *ListEnvironments {
+	return &ListEnvironments{Context: ctx, Handler: handler}
 }
 
-/* ListIdentities swagger:route GET /listIdentities metadata listIdentities
+/* ListEnvironments swagger:route GET /listEnvironments metadata listEnvironments
 
-ListIdentities list identities API
+ListEnvironments list environments API
 
 */
-type ListIdentities struct {
+type ListEnvironments struct {
 	Context *middleware.Context
-	Handler ListIdentitiesHandler
+	Handler ListEnvironmentsHandler
 }
 
-func (o *ListIdentities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *ListEnvironments) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewListIdentitiesParams()
+	var Params = NewListEnvironmentsParams()
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)

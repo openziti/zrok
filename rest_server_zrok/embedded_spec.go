@@ -105,7 +105,7 @@ func init() {
         }
       }
     },
-    "/listIdentities": {
+    "/listEnvironments": {
       "get": {
         "security": [
           {
@@ -115,12 +115,12 @@ func init() {
         "tags": [
           "metadata"
         ],
-        "operationId": "listIdentities",
+        "operationId": "listEnvironments",
         "responses": {
           "200": {
             "description": "success",
             "schema": {
-              "$ref": "#/definitions/identities"
+              "$ref": "#/definitions/environments"
             }
           },
           "500": {
@@ -289,16 +289,7 @@ func init() {
         }
       }
     },
-    "errorMessage": {
-      "type": "string"
-    },
-    "identities": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/identity"
-      }
-    },
-    "identity": {
+    "environment": {
       "type": "object",
       "properties": {
         "active": {
@@ -314,6 +305,15 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "environments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/environment"
+      }
+    },
+    "errorMessage": {
+      "type": "string"
     },
     "loginRequest": {
       "type": "object",
@@ -470,7 +470,7 @@ func init() {
         }
       }
     },
-    "/listIdentities": {
+    "/listEnvironments": {
       "get": {
         "security": [
           {
@@ -480,12 +480,12 @@ func init() {
         "tags": [
           "metadata"
         ],
-        "operationId": "listIdentities",
+        "operationId": "listEnvironments",
         "responses": {
           "200": {
             "description": "success",
             "schema": {
-              "$ref": "#/definitions/identities"
+              "$ref": "#/definitions/environments"
             }
           },
           "500": {
@@ -654,16 +654,7 @@ func init() {
         }
       }
     },
-    "errorMessage": {
-      "type": "string"
-    },
-    "identities": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/identity"
-      }
-    },
-    "identity": {
+    "environment": {
       "type": "object",
       "properties": {
         "active": {
@@ -679,6 +670,15 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "environments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/environment"
+      }
+    },
+    "errorMessage": {
+      "type": "string"
     },
     "loginRequest": {
       "type": "object",

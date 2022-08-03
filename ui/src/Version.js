@@ -17,7 +17,7 @@ const Version = () => {
     }, []);
 
     return (
-        <h2>{v}</h2>
+        <p>{v}</p>
     );
 }
 
