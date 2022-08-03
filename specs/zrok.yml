@@ -97,6 +97,21 @@ paths:
         401:
           description: invalid login
 
+  /overview:
+    get:
+      tags:
+        - metadata
+      operationId: overview
+      responses:
+        200:
+          description: overview returned
+          schema:
+            $ref: "#/definitions/environmentServices"
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
+
   /tunnel:
     post:
       tags:
@@ -207,6 +222,14 @@ definitions:
       updatedAt:
         type: string
 
+  environmentServices:
+    type: object
+    properties:
+      environment:
+        $ref: "#/definitions/environment"
+      services:
+        $ref: "#/definitions/services"
+
   errorMessage:
     type: string
 
@@ -228,6 +251,24 @@ definitions:
       username:
         type: string
       token:
+        type: string
+
+  services:
+    type: array
+    items:
+      $ref: "#/definitions/service"
+  service:
+    type: object
+    properties:
+      zitiServiceId:
+        type: string
+      endpoint:
+        type: string
+      active:
+        type: boolean
+      createdAt:
+        type: string
+      updatedAt:
         type: string
 
   tunnelRequest:

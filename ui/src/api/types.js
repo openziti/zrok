@@ -46,6 +46,14 @@
  */
 
 /**
+ * @typedef environmentServices
+ * @memberof module:types
+ * 
+ * @property {module:types.environment} environment 
+ * @property {module:types.services} services 
+ */
+
+/**
  * @typedef loginRequest
  * @memberof module:types
  * 
@@ -60,6 +68,17 @@
  * @property {number} id 
  * @property {string} username 
  * @property {string} token 
+ */
+
+/**
+ * @typedef service
+ * @memberof module:types
+ * 
+ * @property {string} zitiServiceId 
+ * @property {string} endpoint 
+ * @property {boolean} active 
+ * @property {string} createdAt 
+ * @property {string} updatedAt 
  */
 
 /**

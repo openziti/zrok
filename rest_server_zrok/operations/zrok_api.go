@@ -59,6 +59,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
 		}),
+		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
+		}),
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
@@ -126,6 +129,8 @@ type ZrokAPI struct {
 	MetadataListEnvironmentsHandler metadata.ListEnvironmentsHandler
 	// IdentityLoginHandler sets the operation handler for the login operation
 	IdentityLoginHandler identity.LoginHandler
+	// MetadataOverviewHandler sets the operation handler for the overview operation
+	MetadataOverviewHandler metadata.OverviewHandler
 	// TunnelTunnelHandler sets the operation handler for the tunnel operation
 	TunnelTunnelHandler tunnel.TunnelHandler
 	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
@@ -224,6 +229,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.IdentityLoginHandler == nil {
 		unregistered = append(unregistered, "identity.LoginHandler")
+	}
+	if o.MetadataOverviewHandler == nil {
+		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
 	if o.TunnelTunnelHandler == nil {
 		unregistered = append(unregistered, "tunnel.TunnelHandler")
@@ -349,6 +357,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/login"] = identity.NewLogin(o.context, o.IdentityLoginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/overview"] = metadata.NewOverview(o.context, o.MetadataOverviewHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

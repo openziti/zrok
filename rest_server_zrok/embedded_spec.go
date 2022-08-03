@@ -169,6 +169,28 @@ func init() {
         }
       }
     },
+    "/overview": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "overview",
+        "responses": {
+          "200": {
+            "description": "overview returned",
+            "schema": {
+              "$ref": "#/definitions/environmentServices"
+            }
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -335,6 +357,17 @@ func init() {
         }
       }
     },
+    "environmentServices": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "services": {
+          "$ref": "#/definitions/services"
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "items": {
@@ -370,6 +403,32 @@ func init() {
         "username": {
           "type": "string"
         }
+      }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "zitiServiceId": {
+          "type": "string"
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/service"
       }
     },
     "tunnelRequest": {
@@ -563,6 +622,28 @@ func init() {
         }
       }
     },
+    "/overview": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "overview",
+        "responses": {
+          "200": {
+            "description": "overview returned",
+            "schema": {
+              "$ref": "#/definitions/environmentServices"
+            }
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -729,6 +810,17 @@ func init() {
         }
       }
     },
+    "environmentServices": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "services": {
+          "$ref": "#/definitions/services"
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "items": {
@@ -764,6 +856,32 @@ func init() {
         "username": {
           "type": "string"
         }
+      }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "zitiServiceId": {
+          "type": "string"
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/service"
       }
     },
     "tunnelRequest": {

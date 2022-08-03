@@ -10,6 +10,12 @@ export function listEnvironments() {
 
 /**
  */
+export function overview() {
+  return gateway.request(overviewOperation)
+}
+
+/**
+ */
 export function version() {
   return gateway.request(versionOperation)
 }
@@ -22,6 +28,11 @@ const listEnvironmentsOperation = {
       id: 'key'
     }
   ]
+}
+
+const overviewOperation = {
+  path: '/overview',
+  method: 'get'
 }
 
 const versionOperation = {
