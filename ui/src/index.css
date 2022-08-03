@@ -17,6 +17,7 @@ h1, h2, h3, h4, h5, h6 {
 .title {
   font-family: 'Russo One', sans-serif;
   font-size: 3em;
+  margin-left: 0.53em;
 }
 
 .container {
@@ -26,11 +27,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .header {
-  background-color: #3c2693;
+  background-color: #3b2693;
   color: white;
   padding-left: 2em;
   padding-right: 2em;
   display: flex;
+  border-radius: 0 0 25px 25px;
 }
 
 .header-left {
@@ -45,4 +47,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .main {
   padding: 2em;
+}
+
+.rdt_TableCol_Sortable div {
+  font-family: 'Russo One', sans-serif;
+  font-size: 1.25em;
 }

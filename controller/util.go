@@ -9,11 +9,9 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
-	logrus.Infof("authenticating")
 	tx, err := str.Begin()
 	if err != nil {
 		return nil, err

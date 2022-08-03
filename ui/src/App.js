@@ -17,9 +17,7 @@ const App = () => {
 
     if (!user) {
         return (
-            <Login
-                loginSuccess={setUser}
-            />
+            <Login loginSuccess={setUser}/>
         );
     }
 
@@ -27,9 +25,9 @@ const App = () => {
         <div className="zrok">
             <div className="container">
                 <div className="header">
-                    <img src="ziggy.png" width="100px"/>
+                    <img src="ziggy.svg" width="65px"/>
                     <p className="title">zrok</p>
-                    <div class="header-left">
+                    <div className="header-left">
                         <div>
                             <Logout user={user} logout={() => {
                                 setUser(null);
@@ -42,7 +40,6 @@ const App = () => {
                     </div>
                 </div>
                 <div className="main">
-
                     <Identities user={user}/>
                 </div>
             </div>

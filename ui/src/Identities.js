@@ -39,12 +39,13 @@ const Identities = (props) => {
 
     return (
         <div>
-            <h3>Identities</h3>
+            <h1>Identities</h1>
             { identities && identities.length > 0 && (
                 <div>
                     <DataTable
                         columns={columns}
                         data={identities}
+                        defaultSortFieldId={1}
                     />
                 </div>
             )}
