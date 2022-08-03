@@ -20,14 +20,23 @@ type Environment struct {
 	// active
 	Active bool `json:"active,omitempty"`
 
+	// address
+	Address string `json:"address,omitempty"`
+
 	// created at
 	CreatedAt string `json:"createdAt,omitempty"`
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// host
+	Host string `json:"host,omitempty"`
 
 	// updated at
 	UpdatedAt string `json:"updatedAt,omitempty"`
 
-	// ziti Id
-	ZitiID string `json:"zitiId,omitempty"`
+	// ziti identity Id
+	ZitiIdentityID string `json:"zitiIdentityId,omitempty"`
 }
 
 // Validate validates this environment

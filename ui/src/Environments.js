@@ -7,8 +7,8 @@ const Environments = (props) => {
 
     const columns = [
         {
-            name: 'Ziti ID',
-            selector: row => row.zitiId,
+            name: 'Ziti Identity',
+            selector: row => row.zitiIdentityId,
             sortable: true,
         },
         {

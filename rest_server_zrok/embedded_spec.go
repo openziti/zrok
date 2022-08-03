@@ -295,13 +295,22 @@ func init() {
         "active": {
           "type": "boolean"
         },
+        "address": {
+          "type": "string"
+        },
         "createdAt": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "host": {
           "type": "string"
         },
         "updatedAt": {
           "type": "string"
         },
-        "zitiId": {
+        "zitiIdentityId": {
           "type": "string"
         }
       }
@@ -660,13 +669,22 @@ func init() {
         "active": {
           "type": "boolean"
         },
+        "address": {
+          "type": "string"
+        },
         "createdAt": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "host": {
           "type": "string"
         },
         "updatedAt": {
           "type": "string"
         },
-        "zitiId": {
+        "zitiIdentityId": {
           "type": "string"
         }
       }

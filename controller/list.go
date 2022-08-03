@@ -22,10 +22,10 @@ func listEnvironmentsHandler(_ metadata.ListEnvironmentsParams, principal *rest_
 	var out rest_model_zrok.Environments
 	for _, env := range envs {
 		out = append(out, &rest_model_zrok.Environment{
-			Active:    env.Active,
-			CreatedAt: env.CreatedAt.String(),
-			UpdatedAt: env.UpdatedAt.String(),
-			ZitiID:    env.ZitiIdentityId,
+			Active:         env.Active,
+			CreatedAt:      env.CreatedAt.String(),
+			UpdatedAt:      env.UpdatedAt.String(),
+			ZitiIdentityID: env.ZitiIdentityId,
 		})
 	}
 	return metadata.NewListEnvironmentsOK().WithPayload(out)

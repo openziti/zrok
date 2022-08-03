@@ -28,7 +28,10 @@
  * @typedef environment
  * @memberof module:types
  * 
- * @property {string} zitiId 
+ * @property {string} description 
+ * @property {string} host 
+ * @property {string} address 
+ * @property {string} zitiIdentityId 
  * @property {boolean} active 
  * @property {string} createdAt 
  * @property {string} updatedAt 

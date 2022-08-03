@@ -180,7 +180,13 @@ definitions:
   environment:
     type: object
     properties:
-      zitiId:
+      description:
+        type: string
+      host:
+        type: string
+      address:
+        type: string
+      zitiIdentityId:
         type: string
       active:
         type: boolean
