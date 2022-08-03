@@ -10,7 +10,7 @@ const Login = (props) => {
 
         identity.login({body: {"email": email, "password": password}})
             .then(resp => {
-                if(!resp.error) {
+                if (!resp.error) {
                     let user = {
                         "email": email,
                         "token": resp.data
@@ -29,16 +29,18 @@ const Login = (props) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label htmlFor="email">email: </label>
-            <input type="text" value={email} placeholder="enter an email" onChange={({ target }) => setEmail(target.value)}/>
-            <div>
-                <label htmlFor="password">password: </label>
-                <input type="password" value={password} placeholder="enter a password" onChange={({ target }) => setPassword(target.value)}/>
-            </div>
-            <button type="submit">Log In</button>
-        </form>
-    );
+        <div className={"login"}>
+            <img src={"ziggy.svg"} width={200}/>
+            <h1>zrok</h1>
+            <form onSubmit={handleSubmit}>
+                <fieldset>
+                    <legend>Log In</legend>
+                    <p><label htmlFor="email">email: </label><input type="text" value={email} placeholder="enter an email" onChange={({target}) => setEmail(target.value)}/></p>
+                    <p><label htmlFor="password">password: </label><input type="password" value={password} placeholder="enter a password" onChange={({target}) => setPassword(target.value)}/><button type="submit">Log In</button></p>
+                </fieldset>
+            </form>
+        </div>
+    )
 }
 
 export default Login;
