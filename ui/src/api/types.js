@@ -100,5 +100,6 @@
  * @typedef untunnelRequest
  * @memberof module:types
  * 
+ * @property {string} zitiIdentityId 
  * @property {string} service 
  */

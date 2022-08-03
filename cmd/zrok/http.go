@@ -61,7 +61,7 @@ func handleHttp(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanupHttp(cfg, zrok, auth)
+		cleanupHttp(id, cfg, zrok, auth)
 		os.Exit(1)
 	}()
 
@@ -70,11 +70,12 @@ func handleHttp(_ *cobra.Command, args []string) {
 	}
 }
 
-func cleanupHttp(cfg *http.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func cleanupHttp(id string, cfg *http.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{
-		Service: cfg.Service,
+		ZitiIdentityID: id,
+		Service:        cfg.Service,
 	}
 	if _, err := zrok.Tunnel.Untunnel(req, auth); err == nil {
 		logrus.Infof("shutdown complete")

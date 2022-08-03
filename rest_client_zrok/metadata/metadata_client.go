@@ -32,7 +32,7 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	ListEnvironments(params *ListEnvironmentsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListEnvironmentsOK, error)
 
-	Overview(params *OverviewParams, opts ...ClientOption) (*OverviewOK, error)
+	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
 
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
@@ -81,7 +81,7 @@ func (a *Client) ListEnvironments(params *ListEnvironmentsParams, authInfo runti
 /*
   Overview overview API
 */
-func (a *Client) Overview(params *OverviewParams, opts ...ClientOption) (*OverviewOK, error) {
+func (a *Client) Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewOverviewParams()
@@ -95,6 +95,7 @@ func (a *Client) Overview(params *OverviewParams, opts ...ClientOption) (*Overvi
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &OverviewReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

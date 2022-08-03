@@ -101,6 +101,8 @@ paths:
     get:
       tags:
         - metadata
+      security:
+        - key: []
       operationId: overview
       responses:
         200:
@@ -287,6 +289,8 @@ definitions:
   untunnelRequest:
     type: object
     properties:
+      zitiIdentityId:
+        type: string
       service:
         type: string
 

@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // OverviewHandlerFunc turns a function with the right signature into a overview handler
-type OverviewHandlerFunc func(OverviewParams) middleware.Responder
+type OverviewHandlerFunc func(OverviewParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn OverviewHandlerFunc) Handle(params OverviewParams) middleware.Responder {
-	return fn(params)
+func (fn OverviewHandlerFunc) Handle(params OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	return fn(params, principal)
 }
 
 // OverviewHandler interface for that can handle valid overview params
 type OverviewHandler interface {
-	Handle(OverviewParams) middleware.Responder
+	Handle(OverviewParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
 // NewOverview creates a new http.Handler for the overview operation
@@ -45,12 +47,25 @@ func (o *Overview) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewOverviewParams()
+	uprinc, aCtx, err := o.Context.Authorize(r, route)
+	if err != nil {
+		o.Context.Respond(rw, r, route.Produces, route, err)
+		return
+	}
+	if aCtx != nil {
+		*r = *aCtx
+	}
+	var principal *rest_model_zrok.Principal
+	if uprinc != nil {
+		principal = uprinc.(*rest_model_zrok.Principal) // this is really a rest_model_zrok.Principal, I promise
+	}
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
-	res := o.Handler.Handle(Params) // actually handle the request
+	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

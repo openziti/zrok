@@ -19,6 +19,9 @@ type UntunnelRequest struct {
 
 	// service
 	Service string `json:"service,omitempty"`
+
+	// ziti identity Id
+	ZitiIdentityID string `json:"zitiIdentityId,omitempty"`
 }
 
 // Validate validates this untunnel request

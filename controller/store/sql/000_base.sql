@@ -38,7 +38,7 @@ create table environments (
 --
 create table services (
   id                    integer             primary key,
-  account_id            integer             constraint fk_accounts_services references accounts on delete cascade,
+  environment_id        integer             constraint fk_environments_services references environments on delete cascade,
   ziti_service_id       string              not null unique,
   endpoint              string,
   active                boolean             not null,

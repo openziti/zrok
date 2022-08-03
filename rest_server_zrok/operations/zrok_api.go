@@ -59,7 +59,7 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
 		}),
-		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams) middleware.Responder {
+		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {

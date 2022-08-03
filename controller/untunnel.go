@@ -38,8 +38,26 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+	var senv *store.Environment
+	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
+		for _, env := range envs {
+			if env.ZitiIdentityId == params.Body.ZitiIdentityID {
+				senv = env
+				break
+			}
+		}
+		if senv == nil {
+			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZitiIdentityID, principal.Username)
+			logrus.Error(err)
+			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		}
+	} else {
+		logrus.Errorf("error finding environments for account '%v': %v", principal.Username, err)
+		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+
 	var ssvc *store.Service
-	if svcs, err := str.FindServicesForAccount(int(principal.ID), tx); err == nil {
+	if svcs, err := str.FindServicesForEnvironment(senv.Id, tx); err == nil {
 		for _, svc := range svcs {
 			if svc.ZitiServiceId == svcId {
 				ssvc = svc
@@ -52,7 +70,7 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 		}
 	} else {
-		logrus.Errorf("error finding services for account '%v'", principal.Username)
+		logrus.Errorf("error finding services for account '%v': %v", principal.Username, err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 

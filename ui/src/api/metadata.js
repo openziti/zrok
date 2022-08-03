@@ -32,7 +32,12 @@ const listEnvironmentsOperation = {
 
 const overviewOperation = {
   path: '/overview',
-  method: 'get'
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const versionOperation = {

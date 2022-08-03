@@ -7,18 +7,18 @@ import (
 
 type Service struct {
 	Model
-	AccountId     int
+	EnvId         int
 	ZitiServiceId string
 	Endpoint      string
 	Active        bool
 }
 
-func (self *Store) CreateService(accountId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (account_id, ziti_service_id, endpoint, active) values (?, ?, ?, true)")
+func (self *Store) CreateService(envId int, svc *Service, tx *sqlx.Tx) (int, error) {
+	stmt, err := tx.Prepare("insert into services (environment_id, ziti_service_id, endpoint, active) values (?, ?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
-	res, err := stmt.Exec(accountId, svc.ZitiServiceId, svc.Endpoint)
+	res, err := stmt.Exec(envId, svc.ZitiServiceId, svc.Endpoint)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
@@ -37,10 +37,10 @@ func (self *Store) GetService(id int, tx *sqlx.Tx) (*Service, error) {
 	return svc, nil
 }
 
-func (self *Store) FindServicesForAccount(accountId int, tx *sqlx.Tx) ([]*Service, error) {
-	rows, err := tx.Queryx("select services.* from services where account_id = ?", accountId)
+func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Service, error) {
+	rows, err := tx.Queryx("select services.* from services where environment_id = ?", envId)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting services by account id")
+		return nil, errors.Wrap(err, "error selecting services by environment id")
 	}
 	var svcs []*Service
 	for rows.Next() {

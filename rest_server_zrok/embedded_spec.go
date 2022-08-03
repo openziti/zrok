@@ -171,6 +171,11 @@ func init() {
     },
     "/overview": {
       "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "metadata"
         ],
@@ -454,6 +459,9 @@ func init() {
       "type": "object",
       "properties": {
         "service": {
+          "type": "string"
+        },
+        "zitiIdentityId": {
           "type": "string"
         }
       }
@@ -624,6 +632,11 @@ func init() {
     },
     "/overview": {
       "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "metadata"
         ],
@@ -907,6 +920,9 @@ func init() {
       "type": "object",
       "properties": {
         "service": {
+          "type": "string"
+        },
+        "zitiIdentityId": {
           "type": "string"
         }
       }
