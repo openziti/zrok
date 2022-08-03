@@ -7,7 +7,7 @@ import (
 
 type Service struct {
 	Model
-	EnvId         int
+	EnvironmentId int
 	ZitiServiceId string
 	Endpoint      string
 	Active        bool

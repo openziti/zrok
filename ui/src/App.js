@@ -1,5 +1,6 @@
 import Login from './Login';
 import Logout from './Logout';
+import Network from './Network';
 import Version from './Version';
 import {useEffect, useState} from "react";
 import Environments from "./Environments";
@@ -44,6 +45,7 @@ const App = () => {
                     </div>
                 </div>
                 <div className="main">
+                    <Network />
                     <Environments user={user}/>
                 </div>
             </div>
