@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-func enableHandler(_ identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
@@ -42,7 +42,7 @@ func enableHandler(_ identity.EnableParams, principal *rest_model_zrok.Principal
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	iid, err := str.CreateIdentity(int(principal.ID), &store.Identity{ZitiId: ident.Payload.Data.ID}, tx)
+	iid, err := str.CreateEnvironment(int(principal.ID), &store.Environment{ZitiIdentityId: ident.Payload.Data.ID}, tx)
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)
 		_ = tx.Rollback()

@@ -91,10 +91,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-left: 30px;
   display: flex;
   align-items: center;
-  background-color: #222;
+  background-color: #30205d;
   border-radius: 5px 5px 5px 5px;
-  border: 1px solid #846fec;
-  color: #846fec;
+  border: 1px solid #7733ff;
+  color: #7733ff;
   padding: 5px;
   width: 100px;
   justify-content: center;

@@ -7,18 +7,18 @@ import (
 
 type Service struct {
 	Model
-	AccountId int
-	ZitiId    string
-	Endpoint  string
-	Active    bool
+	AccountId     int
+	ZitiServiceId string
+	Endpoint      string
+	Active        bool
 }
 
 func (self *Store) CreateService(accountId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (account_id, ziti_id, endpoint, active) values (?, ?, ?, true)")
+	stmt, err := tx.Prepare("insert into services (account_id, ziti_service_id, endpoint, active) values (?, ?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
-	res, err := stmt.Exec(accountId, svc.ZitiId, svc.Endpoint)
+	res, err := stmt.Exec(accountId, svc.ZitiServiceId, svc.Endpoint)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
@@ -54,12 +54,12 @@ func (self *Store) FindServicesForAccount(accountId int, tx *sqlx.Tx) ([]*Servic
 }
 
 func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
-	sql := "update services set ziti_id = ?, endpoint = ?, active = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
+	sql := "update services set ziti_service_id = ?, endpoint = ?, active = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing services update statement")
 	}
-	_, err = stmt.Exec(svc.ZitiId, svc.Endpoint, svc.Active, svc.Id)
+	_, err = stmt.Exec(svc.ZitiServiceId, svc.Endpoint, svc.Active, svc.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing services update statement")
 	}

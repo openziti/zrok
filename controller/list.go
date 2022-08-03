@@ -14,18 +14,18 @@ func listEnvironmentsHandler(_ metadata.ListEnvironmentsParams, principal *rest_
 		return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	defer func() { _ = tx.Rollback() }()
-	ids, err := str.FindIdentitiesForAccount(int(principal.ID), tx)
+	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
 		logrus.Errorf("error finding identities for '%v': %v", principal.Username, err)
 		return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	var out rest_model_zrok.Environments
-	for _, id := range ids {
+	for _, env := range envs {
 		out = append(out, &rest_model_zrok.Environment{
-			Active:    id.Active,
-			CreatedAt: id.CreatedAt.String(),
-			UpdatedAt: id.UpdatedAt.String(),
-			ZitiID:    id.ZitiId,
+			Active:    env.Active,
+			CreatedAt: env.CreatedAt.String(),
+			UpdatedAt: env.UpdatedAt.String(),
+			ZitiID:    env.ZitiIdentityId,
 		})
 	}
 	return metadata.NewListEnvironmentsOK().WithPayload(out)

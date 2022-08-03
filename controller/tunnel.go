@@ -28,21 +28,21 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 	defer func() { _ = tx.Rollback() }()
 
 	envId := params.Body.Identity
-	if is, err := str.FindIdentitiesForAccount(int(principal.ID), tx); err == nil {
+	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
-		for _, i := range is {
-			if i.ZitiId == envId {
+		for _, env := range envs {
+			if env.ZitiIdentityId == envId {
 				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Username)
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("identity '%v' not found for user '%v'", envId, principal.Username)
+			logrus.Errorf("environment '%v' not found for user '%v'", envId, principal.Username)
 			return tunnel.NewTunnelUnauthorized().WithPayload("bad environment identity")
 		}
 	} else {
-		logrus.Errorf("error finding identities for account '%v'", principal.Username)
+		logrus.Errorf("error finding environments for account '%v'", principal.Username)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
@@ -80,7 +80,7 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 
 	logrus.Infof("allocated service '%v'", svcName)
 
-	sid, err := str.CreateService(int(principal.ID), &store.Service{ZitiId: svcId, Endpoint: params.Body.Endpoint}, tx)
+	sid, err := str.CreateService(int(principal.ID), &store.Service{ZitiServiceId: svcId, Endpoint: params.Body.Endpoint}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
 		_ = tx.Rollback()

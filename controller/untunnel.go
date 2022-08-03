@@ -41,7 +41,7 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 	var ssvc *store.Service
 	if svcs, err := str.FindServicesForAccount(int(principal.ID), tx); err == nil {
 		for _, svc := range svcs {
-			if svc.ZitiId == svcId {
+			if svc.ZitiServiceId == svcId {
 				ssvc = svc
 				break
 			}
