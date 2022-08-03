@@ -7,6 +7,21 @@ const Environments = (props) => {
 
     const columns = [
         {
+            name: 'Host',
+            selector: row => row.host,
+            sortable: true,
+        },
+        {
+            name: 'Address',
+            selector: row => row.address,
+            sortable: true,
+        },
+        {
+            name: 'Description',
+            selector: row => row.description,
+            sortable: true,
+        },
+        {
             name: 'Ziti Identity',
             selector: row => row.zitiIdentityId,
             sortable: true,
@@ -16,16 +31,6 @@ const Environments = (props) => {
             selector: row => row.active ? 'Active' : 'Inactive',
             sortable: true,
         },
-        {
-            name: 'Created At',
-            selector: row => row.createdAt,
-            sortable: true,
-        },
-        {
-            name: 'Updated At',
-            selector: row => row.updatedAt,
-            sortable: true,
-        }
     ]
 
     useEffect(() => {

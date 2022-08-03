@@ -83,6 +83,15 @@ func init() {
           "identity"
         ],
         "operationId": "enable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enableRequest"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "environment enabled",
@@ -278,6 +287,17 @@ func init() {
         }
       }
     },
+    "enableRequest": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        }
+      }
+    },
     "enableResponse": {
       "type": "object",
       "properties": {
@@ -358,7 +378,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "identity": {
+        "zitiIdentityId": {
           "type": "string"
         }
       }
@@ -457,6 +477,15 @@ func init() {
           "identity"
         ],
         "operationId": "enable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enableRequest"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "environment enabled",
@@ -652,6 +681,17 @@ func init() {
         }
       }
     },
+    "enableRequest": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        }
+      }
+    },
     "enableResponse": {
       "type": "object",
       "properties": {
@@ -732,7 +772,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "identity": {
+        "zitiIdentityId": {
           "type": "string"
         }
       }

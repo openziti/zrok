@@ -27,7 +27,7 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	envId := params.Body.Identity
+	envId := params.Body.ZitiIdentityID
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
 		for _, env := range envs {
@@ -80,7 +80,10 @@ func tunnelHandler(params tunnel.TunnelParams, principal *rest_model_zrok.Princi
 
 	logrus.Infof("allocated service '%v'", svcName)
 
-	sid, err := str.CreateService(int(principal.ID), &store.Service{ZitiServiceId: svcId, Endpoint: params.Body.Endpoint}, tx)
+	sid, err := str.CreateService(int(principal.ID), &store.Service{
+		ZitiServiceId: svcId,
+		Endpoint:      params.Body.Endpoint,
+	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
 		_ = tx.Rollback()

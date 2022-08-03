@@ -43,6 +43,11 @@ paths:
       security:
         - key: []
       operationId: enable
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/enableRequest"
       responses:
         201:
           description: environment enabled
@@ -165,6 +170,13 @@ definitions:
       token:
         type: string
 
+  enableRequest:
+    type: object
+    properties:
+      description:
+        type: string
+      host:
+        type: string
   enableResponse:
     type: object
     properties:
@@ -221,7 +233,7 @@ definitions:
   tunnelRequest:
     type: object
     properties:
-      identity:
+      zitiIdentityId:
         type: string
       endpoint:
         type: string

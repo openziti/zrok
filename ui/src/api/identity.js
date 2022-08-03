@@ -18,9 +18,18 @@ export function createAccount(options) {
 }
 
 /**
+ * @param {object} options Optional options
+ * @param {module:types.enableRequest} [options.body] 
+ * @return {Promise<module:types.enableResponse>} environment enabled
  */
-export function enable() {
-  return gateway.request(enableOperation)
+export function enable(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(enableOperation, parameters)
 }
 
 /**
@@ -46,6 +55,7 @@ const createAccountOperation = {
 
 const enableOperation = {
   path: '/enable',
+  contentTypes: ['application/zrok.v1+json'],
   method: 'post',
   security: [
     {

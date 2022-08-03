@@ -17,6 +17,14 @@
  */
 
 /**
+ * @typedef enableRequest
+ * @memberof module:types
+ * 
+ * @property {string} description 
+ * @property {string} host 
+ */
+
+/**
  * @typedef enableResponse
  * @memberof module:types
  * 
@@ -58,7 +66,7 @@
  * @typedef tunnelRequest
  * @memberof module:types
  * 
- * @property {string} identity 
+ * @property {string} zitiIdentityId 
  * @property {string} endpoint 
  */
 

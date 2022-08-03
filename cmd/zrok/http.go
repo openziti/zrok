@@ -15,6 +15,10 @@ import (
 	"syscall"
 )
 
+func init() {
+	rootCmd.AddCommand(httpCmd)
+}
+
 var httpCmd = &cobra.Command{
 	Use:   "http <endpoint>",
 	Short: "Start an http terminator",
@@ -44,8 +48,8 @@ func handleHttp(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := tunnel.NewTunnelParams()
 	req.Body = &rest_model_zrok.TunnelRequest{
-		Endpoint: cfg.EndpointAddress,
-		Identity: id,
+		ZitiIdentityID: id,
+		Endpoint:       cfg.EndpointAddress,
 	}
 	resp, err := zrok.Tunnel.Tunnel(req, auth)
 	if err != nil {

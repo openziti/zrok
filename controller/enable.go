@@ -15,6 +15,7 @@ import (
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -42,7 +43,14 @@ func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Prin
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	iid, err := str.CreateEnvironment(int(principal.ID), &store.Environment{ZitiIdentityId: ident.Payload.Data.ID}, tx)
+	addrTokens := strings.Split(params.HTTPRequest.RemoteAddr, ":")
+	addr := addrTokens[0]
+	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
+		Description:    params.Body.Description,
+		Host:           params.Body.Host,
+		Address:        addr,
+		ZitiIdentityId: ident.Payload.Data.ID,
+	}, tx)
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)
 		_ = tx.Rollback()
@@ -52,7 +60,7 @@ func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Prin
 		logrus.Errorf("error committing: %v", err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, iid, principal.Username)
+	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, envId, principal.Username)
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,

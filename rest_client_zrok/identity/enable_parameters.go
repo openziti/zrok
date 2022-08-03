@@ -14,6 +14,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // NewEnableParams creates a new EnableParams object,
@@ -58,6 +60,10 @@ func NewEnableParamsWithHTTPClient(client *http.Client) *EnableParams {
    Typically these are written to a http.Request.
 */
 type EnableParams struct {
+
+	// Body.
+	Body *rest_model_zrok.EnableRequest
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -111,6 +117,17 @@ func (o *EnableParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithBody adds the body to the enable params
+func (o *EnableParams) WithBody(body *rest_model_zrok.EnableRequest) *EnableParams {
+	o.SetBody(body)
+	return o
+}
+
+// SetBody adds the body to the enable params
+func (o *EnableParams) SetBody(body *rest_model_zrok.EnableRequest) {
+	o.Body = body
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *EnableParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -118,6 +135,11 @@ func (o *EnableParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return err
 	}
 	var res []error
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
+		}
+	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
