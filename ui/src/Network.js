@@ -46,21 +46,23 @@ function buildGraph(overview) {
             draggable: true
         });
         id++
-        item.services.forEach((item) => {
-            out.nodes.push({
-                id: '' + id,
-                data: {label: 'Service: ' + item.zitiServiceId},
-                position: {x: (id * 25), y: 0},
-                draggable: true
-            })
-            out.edges.push({
-                id: 'e' + envId + '-' + id,
-                source: '' + id,
-                target: '' + envId,
-                animated: true
-            })
-            id++
-        });
+        if(item.services != null) {
+            item.services.forEach((item) => {
+                out.nodes.push({
+                    id: '' + id,
+                    data: {label: 'Service: ' + item.zitiServiceId},
+                    position: {x: (id * 25), y: 0},
+                    draggable: true
+                })
+                out.edges.push({
+                    id: 'e' + envId + '-' + id,
+                    source: '' + id,
+                    target: '' + envId,
+                    animated: true
+                })
+                id++
+            });
+        }
     });
     return out
 }
