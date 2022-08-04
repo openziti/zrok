@@ -26,7 +26,6 @@ function getAuthorization(security) {
 function getApiKey() {
     const localUser = JSON.parse(localStorage.getItem("user"))
     if(localUser) {
-        console.log('getApiKey', localUser.token)
         return Promise.resolve({ apiKey: localUser.token });
     } else {
         throw new Error("token not available");
