@@ -19,7 +19,7 @@ const Environments = (props) => {
             sortable: true,
         },
         {
-            name: 'Ziti Identity',
+            name: 'Identity',
             selector: row => row.environment.zitiIdentityId,
             sortable: true,
         },

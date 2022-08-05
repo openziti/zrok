@@ -13,7 +13,7 @@ const Services = (props) => {
 			sortable: true,
 		},
 		{
-			name: 'Service Id',
+			name: 'Service',
 			selector: row => row.zitiServiceId,
 			sortable: true,
 		},
