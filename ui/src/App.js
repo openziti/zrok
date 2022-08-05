@@ -46,7 +46,6 @@ const App = () => {
                 </div>
                 <div className="main">
                     <Network />
-                    <Environments user={user}/>
                 </div>
             </div>
         </div>

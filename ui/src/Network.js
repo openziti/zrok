@@ -1,9 +1,11 @@
+import Environments from './Environments';
 import * as metadata from './api/metadata';
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import ReactFlow, {isNode, useNodesState} from "react-flow-renderer";
 import dagre from 'dagre';
 
-const Network = (props) => {
+const Network = () => {
+    const [overview, setOverview] = useState([]);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useState([]);
 
@@ -11,6 +13,8 @@ const Network = (props) => {
         let mounted = true
         let interval = setInterval(() => {
             metadata.overview().then(resp => {
+                setOverview(resp.data)
+
                 let g = buildGraph(resp.data)
                 setNodes(getLayout(g))
                 setEdges(g.edges)
@@ -23,12 +27,17 @@ const Network = (props) => {
     }, [])
 
     return (
-        <div className={"network"}>
-            <h1>Network</h1>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
+        <div>
+            <div className={"network"}>
+                <h1>Network</h1>
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={onNodesChange}
+                />
+            </div>
+            <Environments
+                overview={overview}
             />
         </div>
     )
