@@ -9,10 +9,11 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	user2 "os/user"
 )
 
 func init() {
-	enableCmd.Flags().StringVarP(&enableDescription, "description", "d", "", "Description of this environment")
+	enableCmd.Flags().StringVarP(&enableDescription, "description", "d", "<user>@<hostname>", "Description of this environment")
 	rootCmd.AddCommand(enableCmd)
 }
 
@@ -27,9 +28,17 @@ var enableDescription string
 func enable(_ *cobra.Command, args []string) {
 	token := args[0]
 
-	thisHost, err := getHost()
+	hostName, hostDetail, err := getHost()
 	if err != nil {
 		panic(err)
+	}
+	user, err := user2.Current()
+	if err != nil {
+		panic(err)
+	}
+	hostDetail = fmt.Sprintf("%v; %v", user.Username, hostDetail)
+	if enableDescription == "<user>@<hostname>" {
+		enableDescription = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
 
 	zrok := newZrokClient()
@@ -37,7 +46,7 @@ func enable(_ *cobra.Command, args []string) {
 	req := identity.NewEnableParams()
 	req.Body = &rest_model_zrok.EnableRequest{
 		Description: enableDescription,
-		Host:        thisHost,
+		Host:        hostDetail,
 	}
 	resp, err := zrok.Identity.Enable(req, auth)
 	if err != nil {
@@ -55,12 +64,12 @@ func enable(_ *cobra.Command, args []string) {
 	logrus.Infof("enabled, identity = '%v'", resp.Payload.Identity)
 }
 
-func getHost() (string, error) {
+func getHost() (string, string, error) {
 	info, err := host.Info()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	thisHost := fmt.Sprintf("%v; %v; %v; %v; %v; %v; %v",
 		info.Hostname, info.OS, info.Platform, info.PlatformFamily, info.PlatformVersion, info.KernelVersion, info.KernelArch)
-	return thisHost, nil
+	return info.Hostname, thisHost, nil
 }
