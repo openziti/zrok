@@ -18,8 +18,8 @@ const Services = (props) => {
 			sortable: true,
 		},
 		{
-			name: 'Active',
-			selector: row => row.active,
+			name: 'Updated',
+			selector: row => row.updatedAt,
 			sortable: true
 		}
 	]

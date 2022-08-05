@@ -38,7 +38,6 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			},
 		}
 		for _, svc := range svcs {
-			logrus.Infof("active = %t", svc.Active)
 			es.Services = append(es.Services, &rest_model_zrok.Service{
 				Active:        svc.Active,
 				CreatedAt:     svc.CreatedAt.String(),
