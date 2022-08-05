@@ -1,4 +1,5 @@
 import DataTable from 'react-data-table-component';
+import Services from './Services';
 
 const Environments = (props) => {
     const columns = [
@@ -29,6 +30,9 @@ const Environments = (props) => {
         },
     ]
 
+    const servicesComponent = ({ data }) => <Services services={data.services} />
+    const servicesExpanded = row => row.services != null && row.services.length > 0
+
     return (
         <div>
             <h2>Environments</h2>
@@ -38,6 +42,9 @@ const Environments = (props) => {
                         columns={columns}
                         data={props.overview}
                         defaultSortFieldId={1}
+                        expandableRows
+                        expandableRowsComponent={servicesComponent}
+                        expandableRowExpanded={servicesExpanded}
                     />
                 </div>
             )}
