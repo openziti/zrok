@@ -16,13 +16,32 @@ const Services = (props) => {
 			name: 'Service Id',
 			selector: row => row.zitiServiceId,
 			sortable: true,
+		},
+		{
+			name: 'Active',
+			selector: row => row.active,
+			sortable: true
+		}
+	]
+
+	const conditionalRowStyles = [
+		{
+			when: row => !row.active,
+			style: {
+				display: 'none'
+			}
 		}
 	]
 
 	return (
 		<div className={"nested-services"}>
 			{ props.services && props.services.length > 0 && (
-				<DataTable columns={columns} data={props.services} defaultSortFieldId={1}/>
+				<DataTable
+					columns={columns}
+					data={props.services}
+					defaultSortFieldId={1}
+					conditionalRowStyles={conditionalRowStyles}
+				/>
 			)}
 		</div>
 	)
