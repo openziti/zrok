@@ -1,23 +1,19 @@
 import * as metadata from './api/metadata';
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
-import ForceGraph2D from 'react-force-graph-2d';
-
-let g1 = {}
+import ReactFlow, {isNode, useNodesState} from "react-flow-renderer";
+import dagre from 'dagre';
 
 const Network = (props) => {
-    const ref = useRef();
-    const [graph, setGraph] = useState({nodes: [], links: []})
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges] = useState([]);
 
     useEffect(() => {
         let mounted = true
-        let g1 = graph
         let interval = setInterval(() => {
             metadata.overview().then(resp => {
                 let g = buildGraph(resp.data)
-                if(!compareGraphs(g, g1)) {
-                    setGraph(g)
-                    g1 = g
-                }
+                setNodes(getLayout(g))
+                setEdges(g.edges)
             })
         }, 1000)
         return () => {
@@ -29,34 +25,10 @@ const Network = (props) => {
     return (
         <div className={"network"}>
             <h1>Network</h1>
-            <ForceGraph2D
-                ref={ref}
-                width={1024}
-                height={300}
-                graphData={graph}
-                nodeDefaultSize={[100, 50]}
-                nodeCanvasObject={(node, ctx, globalScale) => {
-                    const label = node.name;
-                    const fontSize = 12/globalScale;
-                    ctx.font = `${fontSize}px JetBrains Mono`;
-                    const textWidth = ctx.measureText(label).width;
-                    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 2.2); // some padding
-
-                    ctx.fillStyle = '#3b2693';
-                    ctx.strokeStyle = '#3b2693'
-                    ctx.lineWidth = 0.5
-                    ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
-
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = 'white';
-                    ctx.fillText(label, node.x, node.y);
-
-                    node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
-                }}
-                onEngineStop={() => {
-                    ref.current.zoomToFit(200);
-                }}
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
             />
         </div>
     )
@@ -65,24 +37,34 @@ const Network = (props) => {
 function buildGraph(overview) {
     let out = {
         nodes: [],
-        links: []
+        edges: []
     }
+    let id = 1
     overview.forEach((item) => {
+        let envId = id
         out.nodes.push({
-            id: item.environment.zitiIdentityId,
-            name: 'Environment: ' + item.environment.zitiIdentityId
+            id: '' + envId,
+            data: {label: 'Environment: ' + item.environment.zitiIdentityId},
+            position: {x: (id * 25), y: 0},
+            draggable: true
         });
+        id++
         if(item.services != null) {
-            item.services.forEach((svc) => {
-                if(svc.active) {
+            item.services.forEach((item) => {
+                if(item.active) {
                     out.nodes.push({
-                        id: svc.zitiServiceId,
-                        name: 'Service: ' + svc.zitiServiceId
+                        id: '' + id,
+                        data: {label: 'Service: ' + item.zitiServiceId},
+                        position: {x: (id * 25), y: 0},
+                        draggable: true
                     })
-                    out.links.push({
-                        source: item.environment.zitiIdentityId,
-                        target: svc.zitiServiceId
+                    out.edges.push({
+                        id: 'e' + envId + '-' + id,
+                        source: '' + envId,
+                        target: '' + id,
+                        animated: true
                     })
+                    id++
                 }
             });
         }
@@ -90,18 +72,33 @@ function buildGraph(overview) {
     return out
 }
 
-function compareGraphs(g, g1) {
-    if(g.nodes.length !== g1.nodes.length) return false;
-    for(let i = 0; i < g.nodes.length; i++) {
-        if(!compareNodes(g.nodes[i], g1.nodes[i])) return false;
-    }
-    return true
+const nodeWidth = 215;
+const nodeHeight = 75;
+
+function getLayout(overview) {
+    const dagreGraph = new dagre.graphlib.Graph();
+    dagreGraph.setGraph({ rankdir: 'TB' });
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+    overview.nodes.forEach((n) => {
+        dagreGraph.setNode(n.id, { width: nodeWidth, height: nodeHeight });
+    })
+    overview.edges.forEach((e) => {
+        dagreGraph.setEdge(e.source, e.target);
+    })
+    dagre.layout(dagreGraph);
+
+    return overview.nodes.map((n) => {
+        const nodeWithPosition = dagreGraph.node(n.id);
+        n.targetPosition = 'top';
+        n.sourcePosition = 'bottom';
+        n.position = {
+            x: nodeWithPosition.x - (nodeWidth / 2) + (Math.random() / 1000) + 50,
+            y: nodeWithPosition.y - (nodeHeight / 2) + 50,
+        }
+        return n;
+    });
 }
 
-function compareNodes(n, n1) {
-    if(n.id !== n1.id) return false;
-    if(n.name !== n1.name) return false;
-    return true;
-}
 
 export default Network;

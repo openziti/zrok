@@ -118,3 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 .network {
   height: 400px;
 }
+
+.react-flow__attribution {
+  display: none;
+}
