@@ -13,13 +13,28 @@ const Network = () => {
 
     useEffect(() => {
         let mounted = true
-        let interval = setInterval(() => {
-            metadata.overview().then(resp => {
+        metadata.overview().then(resp => {
+            if(mounted) {
                 setOverview(resp.data)
 
                 let g = buildGraph(resp.data)
                 setNodes(getLayout(g))
                 setEdges(g.edges)
+            }
+        });
+    })
+
+    useEffect(() => {
+        let mounted = true
+        let interval = setInterval(() => {
+            metadata.overview().then(resp => {
+                if(mounted) {
+                    setOverview(resp.data)
+
+                    let g = buildGraph(resp.data)
+                    setNodes(getLayout(g))
+                    setEdges(g.edges)
+                }
             })
         }, 1000)
         return () => {
