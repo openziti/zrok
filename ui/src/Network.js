@@ -3,6 +3,8 @@ import * as metadata from './api/metadata';
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import ReactFlow, {isNode, useNodesState} from "react-flow-renderer";
 import dagre from 'dagre';
+import { mdiDesktopClassic, mdiAccessPointNetwork } from '@mdi/js';
+import Icon from "@mdi/react";
 
 const Network = () => {
     const [overview, setOverview] = useState([]);
@@ -53,8 +55,10 @@ function buildGraph(overview) {
         let envId = id
         out.nodes.push({
             id: '' + envId,
-            data: {label: 'Environment: ' + item.environment.zitiIdentityId},
-            position: {x: (id * 25), y: 0},
+            data: { label: <div><Icon path={mdiDesktopClassic} size={0.75} className={"flowNode"}/> { item.environment.description } </div> },
+            position: { x: (id * 25), y: 0 },
+            style: { width: 'fit-content', backgroundColor: '#aaa', color: 'white' },
+            type: 'input',
             draggable: true
         });
         id++
@@ -63,8 +67,10 @@ function buildGraph(overview) {
                 if(item.active) {
                     out.nodes.push({
                         id: '' + id,
-                        data: {label: 'Service: ' + item.zitiServiceId},
+                        data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.endpoint }</div>},
                         position: {x: (id * 25), y: 0},
+                        style: { width: 'fit-content', backgroundColor: '#9367ef', color: 'white' },
+                        type: 'output',
                         draggable: true
                     })
                     out.edges.push({

@@ -4,6 +4,11 @@ import Services from './Services';
 const Environments = (props) => {
     const columns = [
         {
+            name: 'Description',
+            selector: row => row.environment.description,
+            sortable: true,
+        },
+        {
             name: 'Host',
             selector: row => row.environment.host,
             sortable: true,
@@ -11,11 +16,6 @@ const Environments = (props) => {
         {
             name: 'Address',
             selector: row => row.environment.address,
-            sortable: true,
-        },
-        {
-            name: 'Description',
-            selector: row => row.environment.description,
             sortable: true,
         },
         {

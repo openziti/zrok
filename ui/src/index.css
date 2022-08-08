@@ -126,3 +126,7 @@ h1, h2, h3, h4, h5, h6 {
 .nested-services {
   padding-left: 10em;
 }
+
+svg.flowNode {
+  vertical-align: middle;
+}
