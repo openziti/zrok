@@ -1,0 +1,9 @@
+endpoint:
+  host:             0.0.0.0
+  port:             10888
+
+proxy:
+  url_template:     "http://{id}.zrok.quigley.com:10111/"
+
+store:
+  path:             zrok.db
