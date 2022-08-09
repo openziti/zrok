@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/http"
@@ -9,6 +8,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/pterm/pterm"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -58,8 +58,6 @@ func handleHttp(_ *cobra.Command, args []string) {
 	}
 	cfg.Service = resp.Payload.Service
 
-	fmt.Printf("\nAccess your proxied endpoint at the following URL:\n\n%v\n\n", resp.Payload.ProxyEndpoint)
-
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -68,7 +66,18 @@ func handleHttp(_ *cobra.Command, args []string) {
 		os.Exit(1)
 	}()
 
-	if err := http.Run(cfg); err != nil {
+	httpProxy, err := http.New(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	area, _ := pterm.DefaultArea.Start()
+	area.Clear()
+
+	title := pterm.DefaultBox.WithTopPadding(1).WithBottomPadding(1).WithLeftPadding(10).WithRightPadding(10).WithTitle("access your service at").Sprintf("%v", resp.Payload.ProxyEndpoint)
+	area.Update(title)
+
+	if err := httpProxy.Run(); err != nil {
 		panic(err)
 	}
 }

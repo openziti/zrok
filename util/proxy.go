@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"sync/atomic"
 )
 
 type ProxyServiceResolver interface {
@@ -23,7 +24,7 @@ func NewProxy(target string) (*httputil.ReverseProxy, error) {
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
-		logrus.Infof("-> %v", req.URL.String())
+		logrus.Debugf("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
@@ -41,7 +42,7 @@ func NewServiceProxy(p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
-		logrus.Infof("-> %v", req.URL.String())
+		logrus.Debugf("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
@@ -55,11 +56,24 @@ func NewServiceProxy(p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
 }
 
 type proxyHandler struct {
-	proxy *httputil.ReverseProxy
+	proxy    *httputil.ReverseProxy
+	requests int32
 }
 
 func NewProxyHandler(proxy *httputil.ReverseProxy) *proxyHandler {
-	return &proxyHandler{proxy}
+	handler := &proxyHandler{proxy: proxy}
+
+	director := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		atomic.AddInt32(&handler.requests, 1)
+		director(req)
+	}
+
+	return handler
+}
+
+func (self *proxyHandler) Requests() int32 {
+	return atomic.LoadInt32(&self.requests)
 }
 
 func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +97,8 @@ func hostTargetReverseProxy(r ProxyServiceResolver) *httputil.ReverseProxy {
 				// explicitly disable User-Agent so it's not set to default value
 				req.Header.Set("User-Agent", "")
 			}
+		} else {
+			logrus.Errorf("error proxying: %v", err)
 		}
 	}
 	return &httputil.ReverseProxy{Director: director}
