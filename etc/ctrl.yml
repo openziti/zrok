@@ -3,7 +3,7 @@ endpoint:
   port:             10888
 
 proxy:
-  url_template:     "http://{id}.zrok.quigley.com:10111/"
+  url_template:     "http://{svcName}.zrok.quigley.com:10111/"
 
 store:
   path:             zrok.db

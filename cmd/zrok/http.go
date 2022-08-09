@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/http"
@@ -56,6 +57,8 @@ func handleHttp(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	cfg.Service = resp.Payload.Service
+
+	fmt.Printf("\nAccess your proxied endpoint at the following URL:\n\n%v\n\n", resp.Payload.ProxyEndpoint)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
