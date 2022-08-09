@@ -20,7 +20,7 @@ func Run(cfg *Config) error {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := util.NewServiceProxy(&resolver{})
+	proxy, err := NewServiceProxy(&resolver{})
 	if err != nil {
 		return err
 	}

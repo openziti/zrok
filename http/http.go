@@ -30,7 +30,7 @@ func New(cfg *Config) (*httpProxy, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	proxy, err := util.NewProxy(cfg.EndpointAddress)
+	proxy, err := NewProxy(cfg.EndpointAddress)
 	if err != nil {
 		return nil, err
 	}
