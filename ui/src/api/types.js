@@ -93,6 +93,7 @@
  * @typedef tunnelResponse
  * @memberof module:types
  * 
+ * @property {string} proxyEndpoint 
  * @property {string} service 
  */
 

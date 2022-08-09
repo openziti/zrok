@@ -145,6 +145,7 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
   /version:
     get:
       tags:
@@ -270,6 +271,8 @@ definitions:
   tunnelResponse:
     type: object
     properties:
+      proxyEndpoint:
+        type: string
       service:
         type: string
 

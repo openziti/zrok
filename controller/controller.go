@@ -27,7 +27,7 @@ func Run(cfg *Config) error {
 	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
-	api.TunnelTunnelHandler = tunnel.TunnelHandlerFunc(tunnelHandler)
+	api.TunnelTunnelHandler = newTunnelHandler(cfg)
 	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
 
 	if v, err := store.Open(cfg.Store); err == nil {

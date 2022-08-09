@@ -17,6 +17,9 @@ import (
 // swagger:model tunnelResponse
 type TunnelResponse struct {
 
+	// proxy endpoint
+	ProxyEndpoint string `json:"proxyEndpoint,omitempty"`
+
 	// service
 	Service string `json:"service,omitempty"`
 }

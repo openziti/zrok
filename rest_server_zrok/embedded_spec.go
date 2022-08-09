@@ -429,6 +429,9 @@ func init() {
     "tunnelResponse": {
       "type": "object",
       "properties": {
+        "proxyEndpoint": {
+          "type": "string"
+        },
         "service": {
           "type": "string"
         }
@@ -869,6 +872,9 @@ func init() {
     "tunnelResponse": {
       "type": "object",
       "properties": {
+        "proxyEndpoint": {
+          "type": "string"
+        },
         "service": {
           "type": "string"
         }
