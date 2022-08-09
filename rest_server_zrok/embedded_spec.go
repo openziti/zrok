@@ -114,33 +114,6 @@ func init() {
         }
       }
     },
-    "/listEnvironments": {
-      "get": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "metadata"
-        ],
-        "operationId": "listEnvironments",
-        "responses": {
-          "200": {
-            "description": "success",
-            "schema": {
-              "$ref": "#/definitions/environments"
-            }
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      }
-    },
     "/login": {
       "post": {
         "tags": [
@@ -571,33 +544,6 @@ func init() {
           },
           "404": {
             "description": "account not found"
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      }
-    },
-    "/listEnvironments": {
-      "get": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "metadata"
-        ],
-        "operationId": "listEnvironments",
-        "responses": {
-          "200": {
-            "description": "success",
-            "schema": {
-              "$ref": "#/definitions/environments"
-            }
           },
           "500": {
             "description": "internal server error",
