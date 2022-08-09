@@ -142,7 +142,7 @@ func handleHttp(_ *cobra.Command, args []string) {
 			for len(requestData) > w-17 {
 				requestData = requestData[1:]
 			}
-			spk.Title = fmt.Sprintf(" requests (%0.2f) ", currentRequests)
+			spk.Title = fmt.Sprintf(" requests (%d) ", int(currentRequests))
 			spk.Data = requestData
 			ui.Render(p, slg)
 		}
