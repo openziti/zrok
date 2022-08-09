@@ -39,8 +39,8 @@ func Run(cfg *Config) error {
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
-	server.Host = cfg.Host
-	server.Port = cfg.Port
+	server.Host = cfg.Endpoint.Host
+	server.Port = cfg.Endpoint.Port
 	server.ConfigureAPI()
 	if err := server.Serve(); err != nil {
 		return errors.Wrap(err, "api server error")

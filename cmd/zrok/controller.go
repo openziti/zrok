@@ -43,8 +43,10 @@ func (cmd *controllerCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 	if err := controller.Run(&controller.Config{
-		Host:  host,
-		Port:  port,
+		Endpoint: controller.EndpointConfig{
+			Host: host,
+			Port: port,
+		},
 		Store: &store.Config{Path: cmd.dbPath},
 	}); err != nil {
 		panic(err)
