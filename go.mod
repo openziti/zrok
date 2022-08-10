@@ -19,8 +19,8 @@ require (
 	github.com/michaelquigley/pfxlog v0.6.9
 	github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d
 	github.com/openziti/edge v0.22.39
-	github.com/openziti/foundation/v2 v2.0.1
-	github.com/openziti/sdk-golang v0.16.103
+	github.com/openziti/foundation/v2 v2.0.2
+	github.com/openziti/sdk-golang v0.16.105
 	github.com/pkg/errors v0.9.1
 	github.com/rubenv/sql-migrate v1.1.2
 	github.com/shirou/gopsutil/v3 v3.22.7
@@ -60,7 +60,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/openziti/channel v0.18.58 // indirect
 	github.com/openziti/identity v1.0.5 // indirect
-	github.com/openziti/metrics v1.0.2 // indirect
+	github.com/openziti/metrics v1.0.3 // indirect
 	github.com/openziti/transport/v2 v2.0.20 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.0 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20220111122524-cb78842db373 // indirect
@@ -77,7 +77,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

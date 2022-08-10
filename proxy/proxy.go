@@ -16,7 +16,7 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error loading config")
 	}
 	zCtx := ziti.NewContextWithConfig(zCfg)
-	zDialCtx := util.ZitiDialContext{Context: zCtx}
+	zDialCtx := ZitiDialContext{Context: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
