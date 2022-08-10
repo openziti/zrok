@@ -1,3 +1,9 @@
+#    _____ __ ___ | | __
+#   |_  / '__/ _ \| |/ /
+#    / /| | | (_) |   <
+#   /___|_|  \___/|_|\_\
+# controller configuration
+
 endpoint:
   host:             0.0.0.0
   port:             10888
@@ -5,6 +11,7 @@ endpoint:
 proxy:
   url_template:     "http://{svcName}.zrok.quigley.com:10111/"
   identities:
+    # this is the identity(ies) used by your 'zrok proxy' instance(s)
     - "-zbBF8eVb-"
 
 store:
