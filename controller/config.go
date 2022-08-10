@@ -19,6 +19,7 @@ type EndpointConfig struct {
 
 type ProxyConfig struct {
 	UrlTemplate string
+	Identities  []string
 }
 
 func LoadConfig(path string) (*Config, error) {

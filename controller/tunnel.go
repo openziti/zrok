@@ -160,7 +160,11 @@ func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string,
 }
 
 func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	identityRoles := []string{"@PyB606.S."} // @proxy
+	var identityRoles []string
+	for _, proxyIdentity := range self.cfg.Proxy.Identities {
+		identityRoles = append(identityRoles, "@"+proxyIdentity)
+		logrus.Infof("added proxy identity role '%v'", proxyIdentity)
+	}
 	name := fmt.Sprintf("%v-dial", svcName)
 	postureCheckRoles := []string{}
 	semantic := rest_model.SemanticAllOf
