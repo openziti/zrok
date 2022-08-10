@@ -6,9 +6,18 @@ import (
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"time"
 )
+
+type Config struct {
+	IdentityPath    string
+	EndpointAddress string
+	Service         string
+}
 
 type httpProxy struct {
 	Requests func() int32
@@ -48,4 +57,24 @@ func (p *httpProxy) Run() error {
 		return err
 	}
 	return nil
+}
+
+func NewProxy(target string) (*httputil.ReverseProxy, error) {
+	targetURL, err := url.Parse(target)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+	director := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		director(req)
+		logrus.Debugf("-> %v", req.URL.String())
+		req.Header.Set("X-Proxy", "zrok")
+	}
+	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		logrus.Errorf("error proxying: %v", err)
+	}
+
+	return proxy, nil
 }
