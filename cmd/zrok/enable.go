@@ -13,19 +13,27 @@ import (
 )
 
 func init() {
-	enableCmd.Flags().StringVarP(&enableDescription, "description", "d", "<user>@<hostname>", "Description of this environment")
-	rootCmd.AddCommand(enableCmd)
+	rootCmd.AddCommand(newEnableCommand().cmd)
 }
 
-var enableCmd = &cobra.Command{
-	Use:   "enable <token>",
-	Short: "Enable an environment for zrok",
-	Args:  cobra.ExactArgs(1),
-	Run:   enable,
+type enableCommand struct {
+	description string
+	cmd         *cobra.Command
 }
-var enableDescription string
 
-func enable(_ *cobra.Command, args []string) {
+func newEnableCommand() *enableCommand {
+	cmd := &cobra.Command{
+		Use:   "enable <token>",
+		Short: "Enable an environment for zrok",
+		Args:  cobra.ExactArgs(1),
+	}
+	command := &enableCommand{cmd: cmd}
+	cmd.Flags().StringVarP(&command.description, "description", "d", "<user>@<hostname>", "Description of this environment")
+	cmd.Run = command.run
+	return command
+}
+
+func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	token := args[0]
 
 	hostName, hostDetail, err := getHost()
@@ -37,15 +45,15 @@ func enable(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	hostDetail = fmt.Sprintf("%v; %v", user.Username, hostDetail)
-	if enableDescription == "<user>@<hostname>" {
-		enableDescription = fmt.Sprintf("%v@%v", user.Username, hostName)
+	if cmd.description == "<user>@<hostname>" {
+		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
 
 	zrok := newZrokClient()
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := identity.NewEnableParams()
 	req.Body = &rest_model_zrok.EnableRequest{
-		Description: enableDescription,
+		Description: cmd.description,
 		Host:        hostDetail,
 	}
 	resp, err := zrok.Identity.Enable(req, auth)

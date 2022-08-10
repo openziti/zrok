@@ -10,8 +10,7 @@ func init() {
 }
 
 type controllerCommand struct {
-	dbPath string
-	cmd    *cobra.Command
+	cmd *cobra.Command
 }
 
 func newControllerCommand() *controllerCommand {
@@ -21,9 +20,7 @@ func newControllerCommand() *controllerCommand {
 		Aliases: []string{"ctrl"},
 		Args:    cobra.ExactArgs(1),
 	}
-	command := &controllerCommand{
-		cmd: cmd,
-	}
+	command := &controllerCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
