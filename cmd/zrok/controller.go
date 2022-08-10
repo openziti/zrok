@@ -21,11 +21,11 @@ func newControllerCommand() *controllerCommand {
 		Aliases: []string{"ctrl"},
 		Args:    cobra.ExactArgs(1),
 	}
-	ccmd := &controllerCommand{
+	command := &controllerCommand{
 		cmd: cmd,
 	}
-	cmd.Run = ccmd.run
-	return ccmd
+	cmd.Run = command.run
+	return command
 }
 
 func (cmd *controllerCommand) run(_ *cobra.Command, args []string) {
