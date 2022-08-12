@@ -17,7 +17,15 @@ import (
 	"time"
 )
 
-func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
+type untunnelHandler struct {
+	cfg *Config
+}
+
+func newUntunnelHandler(cfg *Config) *untunnelHandler {
+	return &untunnelHandler{cfg: cfg}
+}
+
+func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	logrus.Infof("untunneling for '%v' (%v)", principal.Username, principal.Token)
 
 	tx, err := str.Begin()
@@ -27,13 +35,13 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := edgeClient()
+	edge, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	svcName := params.Body.Service
-	svcId, err := findServiceId(svcName, edge)
+	svcId, err := self.findServiceId(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -74,23 +82,23 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	if err := deleteEdgeRouterPolicy(svcName, edge); err != nil {
+	if err := self.deleteEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	if err := deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
+	if err := self.deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	if err := deleteServicePolicyDial(svcName, edge); err != nil {
+	if err := self.deleteServicePolicyDial(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	if err := deleteServicePolicyBind(svcName, edge); err != nil {
+	if err := self.deleteServicePolicyBind(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	if err := deleteService(svcId, edge); err != nil {
+	if err := self.deleteService(svcId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
@@ -110,7 +118,7 @@ func untunnelHandler(params tunnel.UntunnelParams, principal *rest_model_zrok.Pr
 	return tunnel.NewUntunnelOK()
 }
 
-func findServiceId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+func (_ *untunnelHandler) findServiceId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
@@ -131,7 +139,7 @@ func findServiceId(svcName string, edge *rest_management_api_client.ZitiEdgeMana
 	return "", errors.Errorf("service '%v' not found", svcName)
 }
 
-func deleteEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (_ *untunnelHandler) deleteEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
@@ -164,7 +172,7 @@ func deleteEdgeRouterPolicy(svcName string, edge *rest_management_api_client.Zit
 	return nil
 }
 
-func deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (_ *untunnelHandler) deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
@@ -197,15 +205,15 @@ func deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_cli
 	return nil
 }
 
-func deleteServicePolicyBind(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(fmt.Sprintf("name=\"%v-bind\"", svcName), edge)
+func (self *untunnelHandler) deleteServicePolicyBind(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return self.deleteServicePolicy(fmt.Sprintf("name=\"%v-bind\"", svcName), edge)
 }
 
-func deleteServicePolicyDial(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(fmt.Sprintf("name=\"%v-dial\"", svcName), edge)
+func (self *untunnelHandler) deleteServicePolicyDial(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return self.deleteServicePolicy(fmt.Sprintf("name=\"%v-dial\"", svcName), edge)
 }
 
-func deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (_ *untunnelHandler) deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &service_policy.ListServicePoliciesParams{
@@ -237,7 +245,7 @@ func deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdg
 	return nil
 }
 
-func deleteService(svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (_ *untunnelHandler) deleteService(svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	req := &service.DeleteServiceParams{
 		ID:      svcId,
 		Context: context.Background(),

@@ -19,7 +19,15 @@ import (
 	"time"
 )
 
-func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+type enableHandler struct {
+	cfg *Config
+}
+
+func newEnableHandler(cfg *Config) *enableHandler {
+	return &enableHandler{cfg: cfg}
+}
+
+func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
@@ -27,17 +35,17 @@ func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Prin
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	client, err := edgeClient()
+	client, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	ident, err := createIdentity(principal.Username, client)
+	ident, err := self.createIdentity(principal.Username, client)
 	if err != nil {
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	cfg, err := enrollIdentity(ident.Payload.Data.ID, client)
+	cfg, err := self.enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -78,7 +86,7 @@ func enableHandler(params identity.EnableParams, principal *rest_model_zrok.Prin
 	return resp
 }
 
-func createIdentity(username string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+func (_ *enableHandler) createIdentity(username string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
 	iId, err := randomId()
 	if err != nil {
@@ -104,7 +112,7 @@ func createIdentity(username string, client *rest_management_api_client.ZitiEdge
 	return resp, nil
 }
 
-func enrollIdentity(id string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
+func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
 	p := &identity_edge.DetailIdentityParams{
 		Context: context.Background(),
 		ID:      id,

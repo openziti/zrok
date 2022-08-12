@@ -16,3 +16,8 @@ proxy:
 
 store:
   path:             zrok.db
+
+ziti:
+  api_endpoint:     "https://127.0.0.1:1280"
+  username:         admin
+  password:         admin

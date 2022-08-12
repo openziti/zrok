@@ -8,7 +8,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/pkg/errors"
 )
 
@@ -23,12 +22,12 @@ func Run(cfg *Config) error {
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = ZrokAuthenticate
 	api.IdentityCreateAccountHandler = identity.CreateAccountHandlerFunc(createAccountHandler)
-	api.IdentityEnableHandler = identity.EnableHandlerFunc(enableHandler)
+	api.IdentityEnableHandler = newEnableHandler(cfg)
 	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.TunnelTunnelHandler = newTunnelHandler(cfg)
-	api.TunnelUntunnelHandler = tunnel.UntunnelHandlerFunc(untunnelHandler)
+	api.TunnelUntunnelHandler = newUntunnelHandler(cfg)
 
 	if v, err := store.Open(cfg.Store); err == nil {
 		str = v
