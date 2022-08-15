@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
+	"github.com/openziti/edge/rest_model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -45,6 +46,20 @@ func ensureZrokAuthConfigType(edge *rest_management_api_client.ZitiEdgeManagemen
 	if err != nil {
 		return err
 	}
-	logrus.Infof("found %d zrok.auth.v1 config types", len(listResp.Payload.Data))
+	if len(listResp.Payload.Data) < 1 {
+		name := "zrok.auth.v1"
+		ct := &rest_model.ConfigTypeCreate{Name: &name}
+		createReq := &config.CreateConfigTypeParams{ConfigType: ct}
+		createReq.SetTimeout(30 * time.Second)
+		createResp, err := edge.Config.CreateConfigType(createReq, nil)
+		if err != nil {
+			return err
+		}
+		logrus.Infof("created 'zrok.auth.v1' config type with id '%v'", createResp.Payload.Data.ID)
+	} else if len(listResp.Payload.Data) > 1 {
+		return errors.Errorf("found %d 'zrok.auth.v1' config types; expected 0 or 1", len(listResp.Payload.Data))
+	} else {
+		logrus.Infof("found 'zrok.auth.v1' config type with id '%v'", *(listResp.Payload.Data[0].ID))
+	}
 	return nil
 }
