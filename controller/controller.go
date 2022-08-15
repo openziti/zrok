@@ -29,6 +29,10 @@ func Run(cfg *Config) error {
 	api.TunnelTunnelHandler = newTunnelHandler(cfg)
 	api.TunnelUntunnelHandler = newUntunnelHandler(cfg)
 
+	if err := controllerStartup(cfg); err != nil {
+		return err
+	}
+
 	if v, err := store.Open(cfg.Store); err == nil {
 		str = v
 	} else {
