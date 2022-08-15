@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var zrokAuthV1Id string
+
 func controllerStartup(cfg *Config) error {
 	if err := inspectZiti(cfg); err != nil {
 		return err
@@ -56,10 +58,12 @@ func ensureZrokAuthConfigType(edge *rest_management_api_client.ZitiEdgeManagemen
 			return err
 		}
 		logrus.Infof("created 'zrok.auth.v1' config type with id '%v'", createResp.Payload.Data.ID)
+		zrokAuthV1Id = createResp.Payload.Data.ID
 	} else if len(listResp.Payload.Data) > 1 {
 		return errors.Errorf("found %d 'zrok.auth.v1' config types; expected 0 or 1", len(listResp.Payload.Data))
 	} else {
 		logrus.Infof("found 'zrok.auth.v1' config type with id '%v'", *(listResp.Payload.Data[0].ID))
+		zrokAuthV1Id = *(listResp.Payload.Data[0].ID)
 	}
 	return nil
 }

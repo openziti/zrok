@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
@@ -65,7 +67,12 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	svcId, err := self.createService(svcName, edge)
+	cfgId, err := self.createConfig(edge)
+	if err != nil {
+		logrus.Error(err)
+		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	svcId, err := self.createService(svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -110,8 +117,29 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	})
 }
 
-func (self *tunnelHandler) createService(name string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
-	configs := make([]string, 0)
+func (self *tunnelHandler) createConfig(edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+	cfg := &model.ZrokAuth{Hello: "World"}
+	name := "zrok.auth.v1"
+	cfgCrt := &rest_model.ConfigCreate{
+		ConfigTypeID: &zrokAuthV1Id,
+		Data:         cfg,
+		Name:         &name,
+	}
+	cfgReq := &config.CreateConfigParams{
+		Config:  cfgCrt,
+		Context: context.Background(),
+	}
+	cfgReq.SetTimeout(30 * time.Second)
+	cfgResp, err := edge.Config.CreateConfig(cfgReq, nil)
+	if err != nil {
+		return "", err
+	}
+	logrus.Infof("created config '%v'", cfgResp.Payload.Data.ID)
+	return cfgResp.Payload.Data.ID, nil
+}
+
+func (self *tunnelHandler) createService(name, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+	configs := []string{cfgId}
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		Configs:            configs,
