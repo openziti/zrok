@@ -25,6 +25,7 @@ func Run(cfg *Config) error {
 	if err != nil {
 		return errors.Wrap(err, "error loading config")
 	}
+	zCfg.ConfigTypes = []string{"zrok.auth.v1"}
 	zCtx := ziti.NewContextWithConfig(zCfg)
 	zDialCtx := ZitiDialContext{Context: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
@@ -54,15 +55,20 @@ type ZitiDialContext struct {
 }
 
 func (self *ZitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
-	service := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	_, found := self.Context.GetService(service)
+	svcName := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
+	svc, found := self.Context.GetService(svcName)
 	if !found {
-		logrus.Infof("service '%v' not cached; refreshing", service)
+		logrus.Infof("service '%v' not cached; refreshing", svcName)
 		if err := self.Context.RefreshServices(); err != nil {
 			return nil, errors.Wrap(err, "error refreshing services")
 		}
+		svc, found = self.Context.GetService(svcName)
+		if !found {
+			return nil, errors.Errorf("no such service '%v'", svcName)
+		}
 	}
-	return self.Context.Dial(service)
+	logrus.Info(svc.Configs)
+	return self.Context.Dial(svcName)
 }
 
 type ProxyServiceResolver interface {
