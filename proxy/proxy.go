@@ -7,6 +7,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -32,7 +33,7 @@ func Run(cfg *Config) error {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := NewServiceProxy(&resolver{})
+	proxy, err := NewServiceProxy(zCtx, &resolver{})
 	if err != nil {
 		return err
 	}
@@ -57,18 +58,6 @@ type ZitiDialContext struct {
 
 func (self *ZitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
 	svcName := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	svc, found := self.Context.GetService(svcName)
-	if !found {
-		logrus.Infof("service '%v' not cached; refreshing", svcName)
-		if err := self.Context.RefreshServices(); err != nil {
-			return nil, errors.Wrap(err, "error refreshing services")
-		}
-		svc, found = self.Context.GetService(svcName)
-		if !found {
-			return nil, errors.Errorf("no such service '%v'", svcName)
-		}
-	}
-	logrus.Info(svc.Configs)
 	return self.Context.Dial(svcName)
 }
 
@@ -76,8 +65,8 @@ type ProxyServiceResolver interface {
 	Service(host string) string
 }
 
-func NewServiceProxy(p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
-	proxy := hostTargetReverseProxy(p)
+func NewServiceProxy(ctx ziti.Context, p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
+	proxy := hostTargetReverseProxy(ctx, p)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
@@ -94,25 +83,32 @@ func NewServiceProxy(p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
 	return proxy, nil
 }
 
-func hostTargetReverseProxy(r ProxyServiceResolver) *httputil.ReverseProxy {
+func hostTargetReverseProxy(ctx ziti.Context, r ProxyServiceResolver) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		targetSvc := r.Service(req.Host)
-		if target, err := url.Parse(fmt.Sprintf("http://%v", targetSvc)); err == nil {
-			targetQuery := target.RawQuery
-			req.URL.Scheme = target.Scheme
-			req.URL.Host = target.Host
-			req.URL.Path, req.URL.RawPath = joinURLPath(target, req.URL)
-			if targetQuery == "" || req.URL.RawQuery == "" {
-				req.URL.RawQuery = targetQuery + req.URL.RawQuery
+		if svc, found := getRefreshedService(targetSvc, ctx); found {
+			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+				logrus.Infof("auth model: %v", cfg)
 			} else {
-				req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+				logrus.Warn("no config!")
 			}
-			if _, ok := req.Header["User-Agent"]; !ok {
-				// explicitly disable User-Agent so it's not set to default value
-				req.Header.Set("User-Agent", "")
+			if target, err := url.Parse(fmt.Sprintf("http://%v", targetSvc)); err == nil {
+				targetQuery := target.RawQuery
+				req.URL.Scheme = target.Scheme
+				req.URL.Host = target.Host
+				req.URL.Path, req.URL.RawPath = joinURLPath(target, req.URL)
+				if targetQuery == "" || req.URL.RawQuery == "" {
+					req.URL.RawQuery = targetQuery + req.URL.RawQuery
+				} else {
+					req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+				}
+				if _, ok := req.Header["User-Agent"]; !ok {
+					// explicitly disable User-Agent so it's not set to default value
+					req.Header.Set("User-Agent", "")
+				}
+			} else {
+				logrus.Errorf("error proxying: %v", err)
 			}
-		} else {
-			logrus.Errorf("error proxying: %v", err)
 		}
 	}
 	return &httputil.ReverseProxy{Director: director}
@@ -149,4 +145,16 @@ func singleJoiningSlash(a, b string) string {
 		return a + "/" + b
 	}
 	return a + b
+}
+
+func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
+	svc, found := ctx.GetService(name)
+	if !found {
+		if err := ctx.RefreshServices(); err != nil {
+			logrus.Errorf("error refreshing services: %v", err)
+			return nil, false
+		}
+		return ctx.GetService(name)
+	}
+	return svc, found
 }
