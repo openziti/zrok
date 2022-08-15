@@ -8,6 +8,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
@@ -97,6 +98,10 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	if err := self.deleteServicePolicyBind(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	if err := self.deleteConfig(svcName, edge); err != nil {
+		logrus.Error(err)
+		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := self.deleteService(svcId, edge); err != nil {
 		logrus.Error(err)
@@ -241,6 +246,36 @@ func (_ *untunnelHandler) deleteServicePolicy(filter string, edge *rest_manageme
 		logrus.Infof("deleted service policy '%v'", spId)
 	} else {
 		logrus.Infof("did not find a service policy")
+	}
+	return nil
+}
+
+func (_ *untunnelHandler) deleteConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("name=\"%v\"", svcName)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &config.ListConfigsParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Config.ListConfigs(listReq, nil)
+	if err != nil {
+		return err
+	}
+	for _, cfg := range listResp.Payload.Data {
+		deleteReq := &config.DeleteConfigParams{
+			ID:      *cfg.ID,
+			Context: context.Background(),
+		}
+		deleteReq.SetTimeout(30 * time.Second)
+		_, err := edge.Config.DeleteConfig(deleteReq, nil)
+		if err != nil {
+			return err
+		}
+		logrus.Infof("deleted config '%v'", *cfg.ID)
 	}
 	return nil
 }
