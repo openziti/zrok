@@ -118,9 +118,9 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 }
 
 func (self *tunnelHandler) createConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
-	cfg := &model.ZrokAuth{Hello: "World"}
+	cfg := &model.ProxyConfig{AuthScheme: model.None}
 	cfgCrt := &rest_model.ConfigCreate{
-		ConfigTypeID: &zrokAuthV1Id,
+		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
 		Name:         &svcName,
 	}

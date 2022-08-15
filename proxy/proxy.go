@@ -3,6 +3,7 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -25,7 +26,7 @@ func Run(cfg *Config) error {
 	if err != nil {
 		return errors.Wrap(err, "error loading config")
 	}
-	zCfg.ConfigTypes = []string{"zrok.auth.v1"}
+	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
 	zDialCtx := ZitiDialContext{Context: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
