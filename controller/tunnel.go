@@ -67,7 +67,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	cfgId, err := self.createConfig(edge)
+	cfgId, err := self.createConfig(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -117,13 +117,12 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	})
 }
 
-func (self *tunnelHandler) createConfig(edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+func (self *tunnelHandler) createConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
 	cfg := &model.ZrokAuth{Hello: "World"}
-	name := "zrok.auth.v1"
 	cfgCrt := &rest_model.ConfigCreate{
 		ConfigTypeID: &zrokAuthV1Id,
 		Data:         cfg,
-		Name:         &name,
+		Name:         &svcName,
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
