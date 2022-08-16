@@ -67,7 +67,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	cfgId, err := self.createConfig(svcName, edge)
+	cfgId, err := self.createConfig(svcName, params, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -117,8 +117,20 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	})
 }
 
-func (self *tunnelHandler) createConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
-	cfg := &model.ProxyConfig{AuthScheme: model.None}
+func (self *tunnelHandler) createConfig(svcName string, params tunnel.TunnelParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+	authScheme, err := model.ParseAuthScheme(params.Body.AuthScheme)
+	if err != nil {
+		return "", err
+	}
+	cfg := &model.ProxyConfig{
+		AuthScheme: authScheme,
+	}
+	if cfg.AuthScheme == model.Basic {
+		cfg.BasicAuth = &model.BasicAuth{}
+		for _, authUser := range params.Body.AuthUsers {
+			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &model.AuthUser{Username: authUser.Username, Password: authUser.Password})
+		}
+	}
 	cfgCrt := &rest_model.ConfigCreate{
 		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
