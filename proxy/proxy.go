@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"context"
-	"crypto/subtle"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
@@ -39,12 +38,7 @@ func Run(cfg *Config) error {
 		return err
 	}
 	proxy.Transport = zTransport
-	users := &model.BasicAuth{
-		Users: []*model.AuthUser{
-			{Username: "hello", Password: "world"},
-		},
-	}
-	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), users, "zrok", &resolver{}, zCtx))
+	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), "zrok", &resolver{}, zCtx))
 }
 
 type resolver struct{}
@@ -165,38 +159,74 @@ func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
 	return svc, found
 }
 
-func basicAuth(handler http.Handler, users *model.BasicAuth, realm string, rslv ProxyServiceResolver, ctx ziti.Context) http.HandlerFunc {
+func basicAuth(handler http.Handler, realm string, rslv ProxyServiceResolver, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		svcName := rslv.Service(r.Host)
 		if svc, found := getRefreshedService(svcName, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				if scheme, found := cfg["auth_scheme"]; found {
 					switch scheme {
-					case model.None:
+					case string(model.None):
+						logrus.Infof("auth scheme none '%v'", svcName)
 						handler.ServeHTTP(w, r)
 						return
 
-					case model.Basic:
+					case string(model.Basic):
+						logrus.Infof("auth scheme basic '%v", svcName)
 						inUser, inPass, ok := r.BasicAuth()
 						if !ok {
 							writeUnauthorizedResponse(w, realm)
 							return
 						}
 						authed := false
-						for _, v := range users.Users {
-							if subtle.ConstantTimeCompare([]byte(inUser), []byte(v.Username)) == 1 && subtle.ConstantTimeCompare([]byte(inPass), []byte(v.Password)) == 1 {
-								authed = true
-								break
+						if v, found := cfg["basic_auth"]; found {
+							if basicAuth, ok := v.(map[string]interface{}); ok {
+								if v, found := basicAuth["users"]; found {
+									if arr, ok := v.([]interface{}); ok {
+										for _, v := range arr {
+											if um, ok := v.(map[string]interface{}); ok {
+												username := ""
+												if v, found := um["username"]; found {
+													if un, ok := v.(string); ok {
+														username = un
+													}
+												}
+												password := ""
+												if v, found := um["password"]; found {
+													if pw, ok := v.(string); ok {
+														password = pw
+													}
+												}
+												if username == inUser && password == inPass {
+													authed = true
+													break
+												}
+											}
+										}
+									}
+								}
 							}
 						}
+
 						if !authed {
 							writeUnauthorizedResponse(w, realm)
 							return
 						}
 						handler.ServeHTTP(w, r)
+
+					default:
+						logrus.Infof("invalid auth scheme '%v'", scheme)
+						writeUnauthorizedResponse(w, realm)
+						return
 					}
+				} else {
+					logrus.Infof("no auth scheme for '%v'", svcName)
 				}
+			} else {
+				logrus.Infof("no proxy config for '%v'", svcName)
 			}
+		} else {
+			logrus.Infof("service '%v' not found", svcName)
 		}
 	}
 }
