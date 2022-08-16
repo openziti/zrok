@@ -171,6 +171,14 @@ definitions:
       token:
         type: string
 
+  authUser:
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+
   enableRequest:
     type: object
     properties:
@@ -268,6 +276,12 @@ definitions:
         type: string
       endpoint:
         type: string
+      authScheme:
+        type: string
+      authUsers:
+        type: array
+        items:
+          $ref: "#/definitions/authUser"
   tunnelResponse:
     type: object
     properties:

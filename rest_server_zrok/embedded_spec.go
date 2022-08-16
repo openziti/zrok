@@ -287,6 +287,17 @@ func init() {
         }
       }
     },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
     "enableRequest": {
       "type": "object",
       "properties": {
@@ -418,6 +429,15 @@ func init() {
     "tunnelRequest": {
       "type": "object",
       "properties": {
+        "authScheme": {
+          "type": "string"
+        },
+        "authUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authUser"
+          }
+        },
         "endpoint": {
           "type": "string"
         },
@@ -730,6 +750,17 @@ func init() {
         }
       }
     },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
     "enableRequest": {
       "type": "object",
       "properties": {
@@ -861,6 +892,15 @@ func init() {
     "tunnelRequest": {
       "type": "object",
       "properties": {
+        "authScheme": {
+          "type": "string"
+        },
+        "authUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authUser"
+          }
+        },
         "endpoint": {
           "type": "string"
         },

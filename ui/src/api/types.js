@@ -17,6 +17,14 @@
  */
 
 /**
+ * @typedef authUser
+ * @memberof module:types
+ * 
+ * @property {string} username 
+ * @property {string} password 
+ */
+
+/**
  * @typedef enableRequest
  * @memberof module:types
  * 
@@ -87,6 +95,8 @@
  * 
  * @property {string} zitiIdentityId 
  * @property {string} endpoint 
+ * @property {string} authScheme 
+ * @property {module:types.authUser[]} authUsers 
  */
 
 /**

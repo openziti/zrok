@@ -7,7 +7,9 @@ package rest_model_zrok
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -16,6 +18,12 @@ import (
 //
 // swagger:model tunnelRequest
 type TunnelRequest struct {
+
+	// auth scheme
+	AuthScheme string `json:"authScheme,omitempty"`
+
+	// auth users
+	AuthUsers []*AuthUser `json:"authUsers"`
 
 	// endpoint
 	Endpoint string `json:"endpoint,omitempty"`
@@ -26,11 +34,75 @@ type TunnelRequest struct {
 
 // Validate validates this tunnel request
 func (m *TunnelRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAuthUsers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this tunnel request based on context it is used
+func (m *TunnelRequest) validateAuthUsers(formats strfmt.Registry) error {
+	if swag.IsZero(m.AuthUsers) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.AuthUsers); i++ {
+		if swag.IsZero(m.AuthUsers[i]) { // not required
+			continue
+		}
+
+		if m.AuthUsers[i] != nil {
+			if err := m.AuthUsers[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("authUsers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this tunnel request based on the context it is used
 func (m *TunnelRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAuthUsers(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TunnelRequest) contextValidateAuthUsers(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.AuthUsers); i++ {
+
+		if m.AuthUsers[i] != nil {
+			if err := m.AuthUsers[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("authUsers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
