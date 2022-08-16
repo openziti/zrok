@@ -44,7 +44,7 @@ func Run(cfg *Config) error {
 			{Username: "hello", Password: "world"},
 		},
 	}
-	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), users, "zrok"))
+	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), users, "zrok", &resolver{}, zCtx))
 }
 
 type resolver struct{}
@@ -165,28 +165,39 @@ func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
 	return svc, found
 }
 
-func basicAuth(handler http.Handler, users *model.BasicAuth, realm string) http.HandlerFunc {
+func basicAuth(handler http.Handler, users *model.BasicAuth, realm string, rslv ProxyServiceResolver, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		inUser, inPass, ok := r.BasicAuth()
-		if !ok {
-			writeUnauthorizedResponse(w, realm)
-			return
-		}
+		svcName := rslv.Service(r.Host)
+		if svc, found := getRefreshedService(svcName, ctx); found {
+			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+				if scheme, found := cfg["auth_scheme"]; found {
+					switch scheme {
+					case model.None:
+						handler.ServeHTTP(w, r)
+						return
 
-		authed := false
-		for _, v := range users.Users {
-			if subtle.ConstantTimeCompare([]byte(inUser), []byte(v.Username)) == 1 && subtle.ConstantTimeCompare([]byte(inPass), []byte(v.Password)) == 1 {
-				authed = true
-				break
+					case model.Basic:
+						inUser, inPass, ok := r.BasicAuth()
+						if !ok {
+							writeUnauthorizedResponse(w, realm)
+							return
+						}
+						authed := false
+						for _, v := range users.Users {
+							if subtle.ConstantTimeCompare([]byte(inUser), []byte(v.Username)) == 1 && subtle.ConstantTimeCompare([]byte(inPass), []byte(v.Password)) == 1 {
+								authed = true
+								break
+							}
+						}
+						if !authed {
+							writeUnauthorizedResponse(w, realm)
+							return
+						}
+						handler.ServeHTTP(w, r)
+					}
+				}
 			}
 		}
-
-		if !authed {
-			writeUnauthorizedResponse(w, realm)
-			return
-		}
-
-		handler.ServeHTTP(w, r)
 	}
 }
 
