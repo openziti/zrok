@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	tb "github.com/nsf/termbox-go"
 	"github.com/openziti-test-kitchen/zrok/http"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
@@ -41,13 +45,11 @@ func newHttpCommand() *httpCommand {
 }
 
 func (self *httpCommand) run(_ *cobra.Command, args []string) {
-	/*
-		if err := ui.Init(); err != nil {
-			panic(err)
-		}
-		defer ui.Close()
-		tb.SetInputMode(tb.InputEsc)
-	*/
+	if err := ui.Init(); err != nil {
+		panic(err)
+	}
+	defer ui.Close()
+	tb.SetInputMode(tb.InputEsc)
 
 	idCfg, err := zrokdir.IdentityConfigFile()
 	if err != nil {
@@ -111,69 +113,64 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	/*
-		ui.Clear()
-		w, h := ui.TerminalDimensions()
+	ui.Clear()
+	w, h := ui.TerminalDimensions()
 
-		p := widgets.NewParagraph()
-		p.Border = true
-		p.Title = " access your zrok service "
-		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.ProxyEndpoint))/2)-1), resp.Payload.ProxyEndpoint)
-		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
-		p.PaddingTop = 1
-		p.SetRect(5, 5, w-10, 10)
+	p := widgets.NewParagraph()
+	p.Border = true
+	p.Title = " access your zrok service "
+	p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.ProxyEndpoint))/2)-1), resp.Payload.ProxyEndpoint)
+	p.TextStyle = ui.Style{Fg: ui.ColorWhite}
+	p.PaddingTop = 1
+	p.SetRect(5, 5, w-10, 10)
 
-		lastRequests := float64(0)
-		var requestData []float64
-		spk := widgets.NewSparkline()
-		spk.Title = " requests "
-		spk.Data = requestData
-		spk.LineColor = ui.ColorCyan
+	lastRequests := float64(0)
+	var requestData []float64
+	spk := widgets.NewSparkline()
+	spk.Title = " requests "
+	spk.Data = requestData
+	spk.LineColor = ui.ColorCyan
 
-		slg := widgets.NewSparklineGroup(spk)
-		slg.SetRect(5, 11, w-10, h-5)
+	slg := widgets.NewSparklineGroup(spk)
+	slg.SetRect(5, 11, w-10, h-5)
 
-		ui.Render(p, slg)
+	ui.Render(p, slg)
 
-		ticker := time.NewTicker(time.Second).C
-		uiEvents := ui.PollEvents()
-		for {
-			select {
-			case e := <-uiEvents:
-				switch e.Type {
-				case ui.ResizeEvent:
-					ui.Clear()
-					w, h = ui.TerminalDimensions()
-					p.SetRect(5, 5, w-10, 10)
-					slg.SetRect(5, 11, w-10, h-5)
-					ui.Render(p, slg)
-
-				case ui.KeyboardEvent:
-					switch e.ID {
-					case "q", "<C-c>":
-						ui.Close()
-						cleanupHttp(id, cfg, zrok, auth)
-						os.Exit(0)
-					}
-				}
-
-			case <-ticker:
-				currentRequests := float64(httpProxy.Requests())
-				deltaRequests := currentRequests - lastRequests
-				requestData = append(requestData, deltaRequests)
-				lastRequests = currentRequests
-				requestData = append(requestData, deltaRequests)
-				for len(requestData) > w-17 {
-					requestData = requestData[1:]
-				}
-				spk.Title = fmt.Sprintf(" requests (%d) ", int(currentRequests))
-				spk.Data = requestData
-				ui.Render(p, slg)
-			}
-		}
-	*/
+	ticker := time.NewTicker(time.Second).C
+	uiEvents := ui.PollEvents()
 	for {
-		time.Sleep(30 * time.Second)
+		select {
+		case e := <-uiEvents:
+			switch e.Type {
+			case ui.ResizeEvent:
+				ui.Clear()
+				w, h = ui.TerminalDimensions()
+				p.SetRect(5, 5, w-10, 10)
+				slg.SetRect(5, 11, w-10, h-5)
+				ui.Render(p, slg)
+
+			case ui.KeyboardEvent:
+				switch e.ID {
+				case "q", "<C-c>":
+					ui.Close()
+					cleanupHttp(id, cfg, zrok, auth)
+					os.Exit(0)
+				}
+			}
+
+		case <-ticker:
+			currentRequests := float64(httpProxy.Requests())
+			deltaRequests := currentRequests - lastRequests
+			requestData = append(requestData, deltaRequests)
+			lastRequests = currentRequests
+			requestData = append(requestData, deltaRequests)
+			for len(requestData) > w-17 {
+				requestData = requestData[1:]
+			}
+			spk.Title = fmt.Sprintf(" requests (%d) ", int(currentRequests))
+			spk.Data = requestData
+			ui.Render(p, slg)
+		}
 	}
 }
 
