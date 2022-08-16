@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"context"
+	"crypto/subtle"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
@@ -38,7 +39,12 @@ func Run(cfg *Config) error {
 		return err
 	}
 	proxy.Transport = zTransport
-	return http.ListenAndServe(cfg.Address, util.NewProxyHandler(proxy))
+	users := &model.BasicAuth{
+		Users: []*model.AuthUser{
+			{Username: "hello", Password: "world"},
+		},
+	}
+	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), users, "zrok"))
 }
 
 type resolver struct{}
@@ -157,4 +163,35 @@ func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
 		return ctx.GetService(name)
 	}
 	return svc, found
+}
+
+func basicAuth(handler http.Handler, users *model.BasicAuth, realm string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		inUser, inPass, ok := r.BasicAuth()
+		if !ok {
+			writeUnauthorizedResponse(w, realm)
+			return
+		}
+
+		authed := false
+		for _, v := range users.Users {
+			if subtle.ConstantTimeCompare([]byte(inUser), []byte(v.Username)) == 1 && subtle.ConstantTimeCompare([]byte(inPass), []byte(v.Password)) == 1 {
+				authed = true
+				break
+			}
+		}
+
+		if !authed {
+			writeUnauthorizedResponse(w, realm)
+			return
+		}
+
+		handler.ServeHTTP(w, r)
+	}
+}
+
+func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+	w.WriteHeader(401)
+	w.Write([]byte("No Authorization\n"))
 }

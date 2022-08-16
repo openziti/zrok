@@ -12,3 +12,12 @@ const (
 type ProxyConfig struct {
 	AuthScheme AuthScheme `json:"auth_scheme"`
 }
+
+type BasicAuth struct {
+	Users []*AuthUser
+}
+
+type AuthUser struct {
+	Username string
+	Password string
+}
