@@ -7,7 +7,7 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	tb "github.com/nsf/termbox-go"
-	"github.com/openziti-test-kitchen/zrok/http"
+	"github.com/openziti-test-kitchen/zrok/endpoints/bind"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
@@ -59,7 +59,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	cfg := &http.Config{
+	cfg := &bind.Config{
 		IdentityPath:    idCfg,
 		EndpointAddress: args[0],
 	}
@@ -106,7 +106,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	httpProxy, err := http.New(cfg)
+	httpProxy, err := bind.NewHTTP(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -185,7 +185,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func cleanupHttp(id string, cfg *http.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func cleanupHttp(id string, cfg *bind.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{

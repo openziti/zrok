@@ -1,4 +1,4 @@
-package http
+package bind
 
 import (
 	"github.com/openziti-test-kitchen/zrok/util"
@@ -19,13 +19,13 @@ type Config struct {
 	Service         string
 }
 
-type httpProxy struct {
+type httpBind struct {
 	Requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
 
-func New(cfg *Config) (*httpProxy, error) {
+func NewHTTP(cfg *Config) (*httpBind, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
@@ -39,27 +39,27 @@ func New(cfg *Config) (*httpProxy, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	proxy, err := NewProxy(cfg.EndpointAddress)
+	proxy, err := newReverseProxy(cfg.EndpointAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	handler := util.NewProxyHandler(proxy)
-	return &httpProxy{
+	return &httpBind{
 		Requests: handler.Requests,
 		listener: listener,
 		handler:  handler,
 	}, nil
 }
 
-func (p *httpProxy) Run() error {
+func (p *httpBind) Run() error {
 	if err := http.Serve(p.listener, p.handler); err != nil {
 		return err
 	}
 	return nil
 }
 
-func NewProxy(target string) (*httputil.ReverseProxy, error) {
+func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
 	targetURL, err := url.Parse(target)
 	if err != nil {
 		return nil, err
