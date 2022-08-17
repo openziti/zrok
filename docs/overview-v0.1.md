@@ -2,11 +2,12 @@
 
 ## What Is `zrok`?
 
-`zrok` is a super-lightweight tool for providing on-demand access to dark, unreachable resources. The super-power of `zrok` is its ability to provide a single-step solution to enabling network connectivity. From an end-user perspective, `zrok` is a tool packaged as a single executable, which can be used as a shim to quickly create public endpoints for dark resources.
+`zrok` is a super-lightweight tool for providing on-demand access to dark, unreachable resources. 
+The super-power of `zrok` is providing a single-step solution to creating ephemeral network connectivity. From an end-user perspective, `zrok` is a tool packaged as a single executable, which can be used as a "shim" to quickly create public endpoints for dark resources.
 
-`zrok` is also a service (can be self-hosted) and runs on top of an OpenZiti network. The service provides one or more listening endpoints (typically on the public internet), that are designed to dynamically expose endpoints (HTTP-only, as of v0.1.x), as requested by the end-user `zrok` tooling.
+`zrok` is also a service (which can be self-hosted) and runs on top of any OpenZiti network. The service provides one or more listening endpoints (typically on the public internet), that are designed to dynamically expose endpoints (HTTP(S)-only, as of v0.1.x), as requested by the end-user `zrok` tooling.
 
-`zrok` listening endpoints, and `zrok` terminating endpoints are typically used together to create the streamlined, simple connectivity solution for dark services. But listening endpoints and the terminating endpoints can be used orthogonally, interoperating with other Ziti SDK clients.
+`zrok` listening endpoints, and `zrok` terminating endpoints are typically used together to create the streamlined, ephemeral connectivity solution for dark services. But listening endpoints and the terminating endpoints can be used orthogonally, interoperating with other Ziti SDK clients.
 
 ### The Primary Use Case
 
