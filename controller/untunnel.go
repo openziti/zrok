@@ -9,7 +9,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
-	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
@@ -83,10 +82,6 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	if err := self.deleteEdgeRouterPolicy(svcName, edge); err != nil {
-		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
 	if err := self.deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -142,39 +137,6 @@ func (_ *untunnelHandler) findServiceId(svcName string, edge *rest_management_ap
 		return *(listResp.Payload.Data[0].ID), nil
 	}
 	return "", errors.Errorf("service '%v' not found", svcName)
-}
-
-func (_ *untunnelHandler) deleteEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"%v\"", svcName)
-	limit := int64(1)
-	offset := int64(0)
-	listReq := &edge_router_policy.ListEdgeRouterPoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.EdgeRouterPolicy.ListEdgeRouterPolicies(listReq, nil)
-	if err != nil {
-		return err
-	}
-	if len(listResp.Payload.Data) == 1 {
-		erpId := *(listResp.Payload.Data[0].ID)
-		req := &edge_router_policy.DeleteEdgeRouterPolicyParams{
-			ID:      erpId,
-			Context: context.Background(),
-		}
-		req.SetTimeout(30 * time.Second)
-		_, err := edge.EdgeRouterPolicy.DeleteEdgeRouterPolicy(req, nil)
-		if err != nil {
-			return err
-		}
-		logrus.Infof("deleted edge router policy '%v'", erpId)
-	} else {
-		logrus.Infof("did not find an edge router policy")
-	}
-	return nil
 }
 
 func (_ *untunnelHandler) deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {

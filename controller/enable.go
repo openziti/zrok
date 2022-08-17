@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
@@ -47,6 +48,10 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	}
 	cfg, err := self.enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
+		logrus.Error(err)
+		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	if err := self.createEdgeRouterPolicy(ident.Payload.Data.ID, client); err != nil {
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
@@ -135,4 +140,28 @@ func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_cl
 		return nil, err
 	}
 	return conf, nil
+}
+
+func (_ *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	edgeRouterRoles := []string{"#all"}
+	identityRoles := []string{fmt.Sprintf("@%v", id)}
+	name := fmt.Sprintf("zrok-%v", id)
+	semantic := rest_model_edge.SemanticAllOf
+	erp := &rest_model_edge.EdgeRouterPolicyCreate{
+		EdgeRouterRoles: edgeRouterRoles,
+		IdentityRoles:   identityRoles,
+		Name:            &name,
+		Semantic:        &semantic,
+	}
+	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
+		Policy:  erp,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	resp, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("created edge router policy '%v'", resp.Payload.Data.ID)
+	return nil
 }

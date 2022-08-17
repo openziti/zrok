@@ -10,7 +10,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
-	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
@@ -86,10 +85,6 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := self.createServiceEdgeRouterPolicy(svcName, svcId, edge); err != nil {
-		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
-	if err := self.createEdgeRouterPolicy(svcName, envId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
@@ -250,29 +245,6 @@ func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, 
 		return err
 	}
 	logrus.Infof("created service edge router policy '%v'", resp.Payload.Data.ID)
-	return nil
-}
-
-func (self *tunnelHandler) createEdgeRouterPolicy(svcName, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	edgeRouterRoles := []string{"#all"}
-	identityRoles := []string{fmt.Sprintf("@%v", envId)}
-	semantic := rest_model.SemanticAllOf
-	erp := &rest_model.EdgeRouterPolicyCreate{
-		EdgeRouterRoles: edgeRouterRoles,
-		IdentityRoles:   identityRoles,
-		Name:            &svcName,
-		Semantic:        &semantic,
-	}
-	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
-		Policy:  erp,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	resp, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
-	if err != nil {
-		return err
-	}
-	logrus.Infof("created edge router policy '%v'", resp.Payload.Data.ID)
 	return nil
 }
 
