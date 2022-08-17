@@ -49,7 +49,7 @@ When the user runs `zrok enable` from their shell, here's what happens:
 
 1. The `zrok enable` client reaches out with an enable request to the `zrok` controller.
 2. The `zrok` controller creates a new Ziti identity for the environment, enrolls it, and returns the entire SDK configuration back to the `zrok enable` client.
-3. The `zrok enable` client then stores the Ziti identity a few other housekeeping details in the user's `~/.zrok` folder (we refer to this as `zrokdir`, conceptually in the code).
+3. The `zrok enable` client then stores the Ziti identity along with a few other housekeeping details in the user's `~/.zrok` folder (we refer to this as `zrokdir`, conceptually in the code).
 4. With the Ziti identity and configuration details stored in the user's `zrokdir`, the user is then able to create any number of binding endpoints using the `zrok http` command.
 5. The `zrok` controller creates an edge router policy associating the new Ziti identity with `#all` edge routers.
 
