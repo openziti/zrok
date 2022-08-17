@@ -69,7 +69,7 @@ When a `zrok` user issues a `zrok http` command for an endpoint, here's what hap
 
 When the user terminates the `zrok http` client, these resources are removed from the Ziti network.
 
-### HTTP Client Flow
+### `zrok proxy` and HTTP Clients
 
 When `zrok http` exposes a service and returns a URL, that URL is designed to be sent to a `zrok` listening endpoint (`zrok proxy`, currently). The `zrok proxy` is a stateless SDK client with an HTTP(S) listener exposed to the public internet.
 
