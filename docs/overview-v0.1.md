@@ -27,7 +27,7 @@ $ zrok http http://localhost:3000
 `zrok` will then give them a public URL, like this:
 
 ```
-http://d9121e7cdfd2dd2f.zrok.quigley.com:10111/
+http://d9121e7cdfd2dd2f.zrok.io/
 ```
 
 This URL can be shared with anyone, anywhere, allowing access to the developer's application as long as the developer is running the `zrok http` command. Simply ending that process will destroy all of the public access, and clean up the associated resources in the underlying Ziti environment.
