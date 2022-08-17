@@ -41,6 +41,7 @@ At a high level, the `zrok` stack looks like this:
 
 Let's discuss a couple of the flows through the above use case and talk about what's happening.
 
+
 ### The `zrok enable` Flow
 
 When a new `zrok` user signs up for an account, they are issued a "secret token". This secret token is used to enable shell access to `zrok http` from the command line.
@@ -48,10 +49,12 @@ When a new `zrok` user signs up for an account, they are issued a "secret token"
 When the user runs `zrok enable` from their shell, here's what happens:
 
 1. The `zrok enable` client reaches out with an enable request to the `zrok` controller.
-2. The `zrok` controller creates a new Ziti identity for the environment, enrolls it, and returns the entire SDK configuration back to the `zrok enable` client.
-3. The `zrok enable` client then stores the Ziti identity along with a few other housekeeping details in the user's `~/.zrok` folder (we refer to this as `zrokdir`, conceptually in the code).
-4. With the Ziti identity and configuration details stored in the user's `zrokdir`, the user is then able to create any number of binding endpoints using the `zrok http` command.
-5. The `zrok` controller creates an edge router policy associating the new Ziti identity with `#all` edge routers.
+2. The `zrok` controller creates a new Ziti identity for the environment and enrolls it.
+3. The `zrok` controller creates an edge router policy associating the new Ziti identity with `#all` edge routers.
+4. The `zrok` controller returns the entire SDK configuration back to the `zrok enable` client.
+5. The `zrok enable` client then stores the Ziti identity along with a few other housekeeping details in the user's `~/.zrok` folder (we refer to this as `zrokdir`, conceptually in the code).
+6. With the Ziti identity and configuration details stored in the user's `zrokdir`, the user is then able to create any number of binding endpoints using the `zrok http` command.
+
 
 ### The `zrok http` Flow
 
@@ -69,6 +72,7 @@ When a `zrok` user issues a `zrok http` command for an endpoint, here's what hap
 10. The `zrok http` client then binds the Ziti service with an SDK client, and begins reverse-proxying traffic received from Ziti across to the dark service.
 
 When the user terminates the `zrok http` client, these resources are removed from the Ziti network.
+
 
 ### `zrok proxy` and HTTP Clients
 
