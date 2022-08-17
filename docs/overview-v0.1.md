@@ -56,7 +56,7 @@ When the user runs `zrok enable` from their shell, here's what happens:
 
 When a `zrok` user issues a `zrok http` command for an endpoint, here's what happens:
 
-1. The `zrok http` client gathers the necessary identity details from the `zrokdir`.
+1. The `zrok http` client gathers the necessary identity details from the `zrokdir` (this was all staged during `zrok enable`).
 2. The `zrok http` client reaches out to the `zrok` controller with an authenticated `tunnel` request, asking to have a new endpoint binding created.
 3. The `zrok` controller allocates a new "service name" for the binding.
 4. The `zrok` controller creates a `zrok.proxy.v1` configuration describing the user's requested authentication details (currently: `none` or `basic`).
