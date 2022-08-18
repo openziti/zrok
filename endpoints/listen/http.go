@@ -22,10 +22,16 @@ type Config struct {
 	Address      string
 }
 
-func Run(cfg *Config) error {
+type httpListen struct {
+	cfg     *Config
+	zCtx    ziti.Context
+	handler http.Handler
+}
+
+func NewHTTP(cfg *Config) (*httpListen, error) {
 	zCfg, err := config.NewFromFile(cfg.IdentityPath)
 	if err != nil {
-		return errors.Wrap(err, "error loading config")
+		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
@@ -35,21 +41,20 @@ func Run(cfg *Config) error {
 
 	proxy, err := NewServiceProxy(zCtx, &resolver{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	proxy.Transport = zTransport
-	return http.ListenAndServe(cfg.Address, basicAuth(util.NewProxyHandler(proxy), "zrok", &resolver{}, zCtx))
+
+	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", &resolver{}, zCtx)
+	return &httpListen{
+		cfg:     cfg,
+		zCtx:    zCtx,
+		handler: handler,
+	}, nil
 }
 
-type resolver struct{}
-
-func (r *resolver) Service(host string) string {
-	logrus.Debugf("host = '%v'", host)
-	tokens := strings.Split(host, ".")
-	if len(tokens) > 0 {
-		return tokens[0]
-	}
-	return "zrok"
+func (self *httpListen) Run() error {
+	return http.ListenAndServe(self.cfg.Address, self.handler)
 }
 
 type ZitiDialContext struct {
@@ -235,4 +240,15 @@ func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
 	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
 	w.WriteHeader(401)
 	w.Write([]byte("No Authorization\n"))
+}
+
+type resolver struct{}
+
+func (r *resolver) Service(host string) string {
+	logrus.Debugf("host = '%v'", host)
+	tokens := strings.Split(host, ".")
+	if len(tokens) > 0 {
+		return tokens[0]
+	}
+	return "zrok"
 }

@@ -20,6 +20,7 @@ type Config struct {
 }
 
 type httpBind struct {
+	cfg      *Config
 	Requests func() int32
 	listener edge.Listener
 	handler  http.Handler
@@ -46,14 +47,15 @@ func NewHTTP(cfg *Config) (*httpBind, error) {
 
 	handler := util.NewProxyHandler(proxy)
 	return &httpBind{
+		cfg:      cfg,
 		Requests: handler.Requests,
 		listener: listener,
 		handler:  handler,
 	}, nil
 }
 
-func (p *httpBind) Run() error {
-	if err := http.Serve(p.listener, p.handler); err != nil {
+func (self *httpBind) Run() error {
+	if err := http.Serve(self.listener, self.handler); err != nil {
 		return err
 	}
 	return nil
