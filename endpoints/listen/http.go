@@ -35,17 +35,17 @@ func NewHTTP(cfg *Config) (*httpListen, error) {
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
-	zDialCtx := ZitiDialContext{Context: zCtx}
+	zDialCtx := zitiDialContext{ctx: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := NewServiceProxy(zCtx, &resolver{})
+	proxy, err := NewServiceProxy(zCtx)
 	if err != nil {
 		return nil, err
 	}
 	proxy.Transport = zTransport
 
-	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", &resolver{}, zCtx)
+	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", zCtx)
 	return &httpListen{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -57,21 +57,17 @@ func (self *httpListen) Run() error {
 	return http.ListenAndServe(self.cfg.Address, self.handler)
 }
 
-type ZitiDialContext struct {
-	Context ziti.Context
+type zitiDialContext struct {
+	ctx ziti.Context
 }
 
-func (self *ZitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
+func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
 	svcName := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	return self.Context.Dial(svcName)
+	return self.ctx.Dial(svcName)
 }
 
-type ProxyServiceResolver interface {
-	Service(host string) string
-}
-
-func NewServiceProxy(ctx ziti.Context, p ProxyServiceResolver) (*httputil.ReverseProxy, error) {
-	proxy := hostTargetReverseProxy(ctx, p)
+func NewServiceProxy(ctx ziti.Context) (*httputil.ReverseProxy, error) {
+	proxy := hostTargetReverseProxy(ctx)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
@@ -88,9 +84,9 @@ func NewServiceProxy(ctx ziti.Context, p ProxyServiceResolver) (*httputil.Revers
 	return proxy, nil
 }
 
-func hostTargetReverseProxy(ctx ziti.Context, r ProxyServiceResolver) *httputil.ReverseProxy {
+func hostTargetReverseProxy(ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetSvc := r.Service(req.Host)
+		targetSvc := resolveService(req.Host)
 		if svc, found := getRefreshedService(targetSvc, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				logrus.Infof("auth model: %v", cfg)
@@ -152,21 +148,9 @@ func singleJoiningSlash(a, b string) string {
 	return a + b
 }
 
-func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
-	svc, found := ctx.GetService(name)
-	if !found {
-		if err := ctx.RefreshServices(); err != nil {
-			logrus.Errorf("error refreshing services: %v", err)
-			return nil, false
-		}
-		return ctx.GetService(name)
-	}
-	return svc, found
-}
-
-func basicAuth(handler http.Handler, realm string, rslv ProxyServiceResolver, ctx ziti.Context) http.HandlerFunc {
+func basicAuth(handler http.Handler, realm string, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		svcName := rslv.Service(r.Host)
+		svcName := resolveService(r.Host)
 		if svc, found := getRefreshedService(svcName, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				if scheme, found := cfg["auth_scheme"]; found {
@@ -242,13 +226,23 @@ func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
 	w.Write([]byte("No Authorization\n"))
 }
 
-type resolver struct{}
-
-func (r *resolver) Service(host string) string {
+func resolveService(host string) string {
 	logrus.Debugf("host = '%v'", host)
 	tokens := strings.Split(host, ".")
 	if len(tokens) > 0 {
 		return tokens[0]
 	}
 	return "zrok"
+}
+
+func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
+	svc, found := ctx.GetService(name)
+	if !found {
+		if err := ctx.RefreshServices(); err != nil {
+			logrus.Errorf("error refreshing services: %v", err)
+			return nil, false
+		}
+		return ctx.GetService(name)
+	}
+	return svc, found
 }
