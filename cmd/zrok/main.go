@@ -13,6 +13,7 @@ func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
 	rootCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "localhost:10888", "zrok endpoint address")
+	rootCmd.AddCommand(httpCmd)
 }
 
 var rootCmd = &cobra.Command{
@@ -26,6 +27,11 @@ var rootCmd = &cobra.Command{
 }
 var verbose bool
 var endpoint string
+
+var httpCmd = &cobra.Command{
+	Use:   "http",
+	Short: "HTTP endpoint operations",
+}
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {

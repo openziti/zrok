@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newHttpBindCommand().cmd)
+	httpCmd.AddCommand(newHttpBindCommand().cmd)
 }
 
 type httpBindCommand struct {
@@ -35,8 +35,8 @@ type httpBindCommand struct {
 
 func newHttpBindCommand() *httpBindCommand {
 	cmd := &cobra.Command{
-		Use:   "http <endpoint>",
-		Short: "Start an HTTP terminator",
+		Use:   "bind <endpoint>",
+		Short: "Create an HTTP binding",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &httpBindCommand{cmd: cmd}
