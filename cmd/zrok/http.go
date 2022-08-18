@@ -24,29 +24,29 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newHttpCommand().cmd)
+	rootCmd.AddCommand(newHttpBindCommand().cmd)
 }
 
-type httpCommand struct {
+type httpBindCommand struct {
 	service   bool
 	basicAuth []string
 	cmd       *cobra.Command
 }
 
-func newHttpCommand() *httpCommand {
+func newHttpBindCommand() *httpBindCommand {
 	cmd := &cobra.Command{
 		Use:   "http <endpoint>",
 		Short: "Start an HTTP terminator",
 		Args:  cobra.ExactArgs(1),
 	}
-	command := &httpCommand{cmd: cmd}
+	command := &httpBindCommand{cmd: cmd}
 	cmd.Flags().BoolVarP(&command.service, "service", "s", false, "Disable TUI 'chrome' for service operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Run = command.run
 	return command
 }
 
-func (self *httpCommand) run(_ *cobra.Command, args []string) {
+func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 	if !self.service {
 		if err := ui.Init(); err != nil {
 			panic(err)
@@ -102,7 +102,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanupHttp(id, cfg, zrok, auth)
+		self.destroy(id, cfg, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -158,7 +158,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 					switch e.ID {
 					case "q", "<C-c>":
 						ui.Close()
-						cleanupHttp(id, cfg, zrok, auth)
+						self.destroy(id, cfg, zrok, auth)
 						os.Exit(0)
 					}
 				}
@@ -185,7 +185,7 @@ func (self *httpCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func cleanupHttp(id string, cfg *bind.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (self *httpBindCommand) destroy(id string, cfg *bind.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{
