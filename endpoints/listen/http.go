@@ -71,7 +71,6 @@ func NewServiceProxy(ctx ziti.Context) (*httputil.ReverseProxy, error) {
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
-		logrus.Debugf("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
@@ -89,11 +88,13 @@ func hostTargetReverseProxy(ctx ziti.Context) *httputil.ReverseProxy {
 		targetSvc := resolveService(req.Host)
 		if svc, found := getRefreshedService(targetSvc, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
-				logrus.Infof("auth model: %v", cfg)
+				logrus.Debugf("auth model: %v", cfg)
 			} else {
 				logrus.Warn("no config!")
 			}
 			if target, err := url.Parse(fmt.Sprintf("http://%v", targetSvc)); err == nil {
+				logrus.Infof("[%v] -> %v", targetSvc, req.URL)
+
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme
 				req.URL.Host = target.Host
@@ -156,12 +157,12 @@ func basicAuth(handler http.Handler, realm string, ctx ziti.Context) http.Handle
 				if scheme, found := cfg["auth_scheme"]; found {
 					switch scheme {
 					case string(model.None):
-						logrus.Infof("auth scheme none '%v'", svcName)
+						logrus.Debugf("auth scheme none '%v'", svcName)
 						handler.ServeHTTP(w, r)
 						return
 
 					case string(model.Basic):
-						logrus.Infof("auth scheme basic '%v", svcName)
+						logrus.Debugf("auth scheme basic '%v", svcName)
 						inUser, inPass, ok := r.BasicAuth()
 						if !ok {
 							writeUnauthorizedResponse(w, realm)
