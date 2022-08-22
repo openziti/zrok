@@ -63,20 +63,16 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 		IdentityPath:    idCfg,
 		EndpointAddress: args[0],
 	}
-	id, err := zrokdir.ReadIdentityId()
-	if err != nil {
-		panic(err)
-	}
-	token, err := zrokdir.ReadToken()
+	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
 		panic(err)
 	}
 
 	zrok := newZrokClient()
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
 	req := tunnel.NewTunnelParams()
 	req.Body = &rest_model_zrok.TunnelRequest{
-		ZitiIdentityID: id,
+		ZitiIdentityID: env.ZitiIdentityId,
 		Endpoint:       cfg.EndpointAddress,
 		AuthScheme:     string(model.None),
 	}
@@ -102,7 +98,7 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		self.destroy(id, cfg, zrok, auth)
+		self.destroy(env.ZitiIdentityId, cfg, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -158,7 +154,7 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 					switch e.ID {
 					case "q", "<C-c>":
 						ui.Close()
-						self.destroy(id, cfg, zrok, auth)
+						self.destroy(env.ZitiIdentityId, cfg, zrok, auth)
 						os.Exit(0)
 					}
 				}

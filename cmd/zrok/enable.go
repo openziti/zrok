@@ -60,10 +60,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	if err := zrokdir.WriteToken(token); err != nil {
-		panic(err)
-	}
-	if err := zrokdir.WriteIdentityId(resp.Payload.Identity); err != nil {
+	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity}); err != nil {
 		panic(err)
 	}
 	if err := zrokdir.WriteIdentityConfig(resp.Payload.Cfg); err != nil {

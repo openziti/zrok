@@ -1,52 +1,46 @@
 package zrokdir
 
 import (
+	"encoding/json"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 )
 
-func ReadToken() (string, error) {
-	path, err := tokenFile()
-	if err != nil {
-		return "", err
-	}
-	token, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(token), nil
+type Environment struct {
+	ZrokToken      string `json:"zrok_token"`
+	ZitiIdentityId string `json:"ziti_identity"`
 }
 
-func WriteToken(token string) error {
-	path, err := tokenFile()
+func LoadEnvironment() (*Environment, error) {
+	ef, err := environmentFile()
 	if err != nil {
-		return err
+		return nil, errors.Wrap(err, "error getting environment file")
 	}
-	if err := os.WriteFile(path, []byte(token), os.FileMode(400)); err != nil {
-		return err
+	data, err := os.ReadFile(ef)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error reading environment file '%v'", ef)
 	}
-	return nil
+	env := &Environment{}
+	if err := json.Unmarshal(data, env); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling environment file '%v'", ef)
+	}
+	return env, nil
 }
 
-func ReadIdentityId() (string, error) {
-	path, err := IdentityIdFile()
+func SaveEnvironment(env *Environment) error {
+	logrus.Infof("saving environment")
+	data, err := json.MarshalIndent(env, "", "  ")
 	if err != nil {
-		return "", err
+		return errors.Wrap(err, "error marshaling environment")
 	}
-	id, err := os.ReadFile(path)
+	ef, err := environmentFile()
 	if err != nil {
-		return "", err
+		return errors.Wrap(err, "error getting environment file")
 	}
-	return string(id), nil
-}
-
-func WriteIdentityId(id string) error {
-	path, err := IdentityIdFile()
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(path, []byte(id), os.FileMode(400)); err != nil {
-		return err
+	if err := os.WriteFile(ef, data, os.FileMode(0600)); err != nil {
+		return errors.Wrap(err, "error saving environment file")
 	}
 	return nil
 }
@@ -62,14 +56,6 @@ func WriteIdentityConfig(data string) error {
 	return nil
 }
 
-func IdentityIdFile() (string, error) {
-	zrok, err := zrokDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(zrok, "identity.id"), nil
-}
-
 func IdentityConfigFile() (string, error) {
 	zrok, err := zrokDir()
 	if err != nil {
@@ -78,12 +64,12 @@ func IdentityConfigFile() (string, error) {
 	return filepath.Join(zrok, "identity.json"), nil
 }
 
-func tokenFile() (string, error) {
-	zrok, err := zrokDir()
+func environmentFile() (string, error) {
+	zrd, err := zrokDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(zrok, "token"), nil
+	return filepath.Join(zrd, "environment.json"), nil
 }
 
 func zrokDir() (string, error) {
