@@ -63,7 +63,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity}); err != nil {
 		panic(err)
 	}
-	if err := zrokdir.WriteIdentityConfig(resp.Payload.Cfg); err != nil {
+	if err := zrokdir.WriteZitiIdentity("environment", resp.Payload.Cfg); err != nil {
 		panic(err)
 	}
 	logrus.Infof("enabled, identity = '%v'", resp.Payload.Identity)

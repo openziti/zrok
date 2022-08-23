@@ -55,17 +55,17 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 		tb.SetInputMode(tb.InputEsc)
 	}
 
-	idCfg, err := zrokdir.IdentityConfigFile()
+	env, err := zrokdir.LoadEnvironment()
+	if err != nil {
+		panic(err)
+	}
+	zif, err := zrokdir.ZitiIdentityFile("environment")
 	if err != nil {
 		panic(err)
 	}
 	cfg := &bind.Config{
-		IdentityPath:    idCfg,
+		IdentityPath:    zif,
 		EndpointAddress: args[0],
-	}
-	env, err := zrokdir.LoadEnvironment()
-	if err != nil {
-		panic(err)
 	}
 
 	zrok := newZrokClient()
