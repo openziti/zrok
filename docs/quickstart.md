@@ -19,6 +19,9 @@ $ ziti edge enroll -j ~/.zrok/proxy.jwt -o ~/.zrok/proxy.json
 INFO    generating 4096 bit RSA key                  
 INFO    enrolled successfully. identity file written to: proxy.json
 ```
+
+Don't forget to add an edge router policy granting access to the `@proxy` router to `#all` routers.
+
 ## start zrok resources
 
 adjust `ctrl.yml` (or create a copy for your environment).
