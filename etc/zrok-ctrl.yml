@@ -6,18 +6,17 @@
 
 endpoint:
   host:             0.0.0.0
-  port:             10888
+  port:             8080
 
 proxy:
-  url_template:     "http://{svcName}.zrok.quigley.com:10111/"
+  url_template:     "http://{svcName}.in.zrok.io:8080/"
   identities:
-    # this is the identity(ies) used by your 'zrok proxy' instance(s)
-    - "-zbBF8eVb-"
+    - "yvnhjvzEd"
 
 store:
-  path:             zrok.db
+  path:             /home/ubuntu/local/etc/zrok.io/db/zrok.db
 
 ziti:
-  api_endpoint:     "https://127.0.0.1:1280"
+  api_endpoint:     "https://10.0.0.41:1280"
   username:         admin
   password:         admin
