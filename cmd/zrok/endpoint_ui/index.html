@@ -27,15 +27,15 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                height: 50vh;
+                height: 600px;
                 justify-content: center;
             }
             #banner h1 {
                 font-size: 64pt;
             }
             #info {
-                margin-left: 25px;
-                margin-right: 25px;
+                margin-left: 50px;
+                margin-right: 50px;
             }
         </style>
     </head>
@@ -43,10 +43,11 @@
         <div id="root">
             <div id="banner">
                 <img src="ziggy.svg" width="200"/>
-                <h1>zrok</h1>
+                <h1>zrok test endpoint</h1>
             </div>
             <div id="info">
-                <p>This is an HTTP server running at address:</p>
+                <h2>The Current Now is {{ .Now }}</h2>
+                <p>This host has these IP addresses: {{ .Ips }}</p>
             </div>
         </div>
     </body>
