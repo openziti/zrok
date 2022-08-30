@@ -33,23 +33,29 @@
             #banner h1 {
                 font-size: 64pt;
             }
+            #container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
             #info {
-                margin-left: 50px;
-                margin-right: 50px;
+                width: 920px;
             }
         </style>
     </head>
     <body>
         <div id="root">
             <div id="banner">
-                <img src="ziggy.svg" width="200"/>
+                <img src="ziggy.svg" width="200" height="343.38"/>
                 <h1>zrok test endpoint</h1>
             </div>
-            <div id="info">
-                <h2>The Current Now is {{ .Now }}</h2>
-                <p>The current <code>HOST</code> header: {{ .Host }}</p>
-                <p>The remote host making the request: {{ .Remote }}</p>
-                <p>This host has these IP addresses: {{ .Ips }}</p>
+            <div id="container">
+                <div id="info">
+                    <h2>The Current Now is {{ .Now }}</h2>
+                    <p>The current 'HOST' header: {{ .Host }}</p>
+                    <p>The remote host making the request: {{ .Remote }}</p>
+                    <p>This host has these IP addresses: {{ .Ips }}</p>
+                </div>
             </div>
         </div>
     </body>
