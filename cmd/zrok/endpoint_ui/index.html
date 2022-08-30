@@ -47,6 +47,8 @@
             </div>
             <div id="info">
                 <h2>The Current Now is {{ .Now }}</h2>
+                <p>The current <code>HOST</code> header: {{ .Host }}</p>
+                <p>The remote host making the request: {{ .Remote }}</p>
                 <p>This host has these IP addresses: {{ .Ips }}</p>
             </div>
         </div>

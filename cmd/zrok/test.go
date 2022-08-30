@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/opentracing/opentracing-go/log"
 	"github.com/openziti-test-kitchen/zrok/cmd/zrok/endpoint_ui"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"html/template"
 	"net"
@@ -56,8 +57,11 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 }
 
 func (cmd *testEndpointCommand) handleIndex(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("%v {%v} -> /index.html", r.RemoteAddr, r.Host)
 	ed := &endpointData{
-		Now: time.Now(),
+		Now:    time.Now(),
+		Host:   r.Host,
+		Remote: r.RemoteAddr,
 	}
 	ed.getIps()
 	if err := cmd.t.Execute(w, ed); err != nil {
@@ -66,8 +70,10 @@ func (cmd *testEndpointCommand) handleIndex(w http.ResponseWriter, r *http.Reque
 }
 
 type endpointData struct {
-	Now time.Time
-	Ips string
+	Now    time.Time
+	Host   string
+	Remote string
+	Ips    string
 }
 
 func (ed *endpointData) getIps() {
