@@ -47,16 +47,14 @@ func newTestEndpointCommand() *testEndpointCommand {
 }
 
 func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
-	fs := http.FileServer(http.FS(endpoint_ui.FS))
-	http.HandleFunc("/", cmd.handleIndex)
-	http.HandleFunc("/index.html", cmd.handleIndex)
-	http.Handle("/ziggy.svg", fs)
+	http.HandleFunc("/", cmd.serveIndex)
+	http.HandleFunc("/index.html", cmd.serveIndex)
 	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
 		panic(err)
 	}
 }
 
-func (cmd *testEndpointCommand) handleIndex(w http.ResponseWriter, r *http.Request) {
+func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("%v {%v} -> /index.html", r.RemoteAddr, r.Host)
 	ed := &endpointData{
 		Now:    time.Now(),
