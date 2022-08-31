@@ -173,7 +173,7 @@ func (_ *untunnelHandler) deleteServiceEdgeRouterPolicy(svcName string, edge *re
 }
 
 func (self *untunnelHandler) deleteServicePolicyBind(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return self.deleteServicePolicy(fmt.Sprintf("name=\"%v-bind\"", svcName), edge)
+	return self.deleteServicePolicy(fmt.Sprintf("name=\"%v-backend\"", svcName), edge)
 }
 
 func (self *untunnelHandler) deleteServicePolicyDial(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {

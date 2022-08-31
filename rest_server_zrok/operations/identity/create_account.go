@@ -45,7 +45,7 @@ func (o *CreateAccount) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewCreateAccountParams()
-	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
+	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // backend params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}

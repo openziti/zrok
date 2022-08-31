@@ -7,7 +7,7 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	tb "github.com/nsf/termbox-go"
-	"github.com/openziti-test-kitchen/zrok/endpoints/bind"
+	"github.com/openziti-test-kitchen/zrok/endpoints/backend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
@@ -24,30 +24,31 @@ import (
 )
 
 func init() {
-	httpCmd.AddCommand(newHttpBindCommand().cmd)
+	httpCmd.AddCommand(newHttpBackendCommand().cmd)
 }
 
-type httpBindCommand struct {
-	service   bool
+type httpBackendCommand struct {
+	quiet     bool
 	basicAuth []string
 	cmd       *cobra.Command
 }
 
-func newHttpBindCommand() *httpBindCommand {
+func newHttpBackendCommand() *httpBackendCommand {
 	cmd := &cobra.Command{
-		Use:   "bind <endpoint>",
-		Short: "Create an HTTP binding",
-		Args:  cobra.ExactArgs(1),
+		Use:     "backend <targetEndpoint>",
+		Aliases: []string{"be"},
+		Short:   "Create an HTTP binding",
+		Args:    cobra.ExactArgs(1),
 	}
-	command := &httpBindCommand{cmd: cmd}
-	cmd.Flags().BoolVarP(&command.service, "service", "s", false, "Disable TUI 'chrome' for service operation")
+	command := &httpBackendCommand{cmd: cmd}
+	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Run = command.run
 	return command
 }
 
-func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
-	if !self.service {
+func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
+	if !self.quiet {
 		if err := ui.Init(); err != nil {
 			panic(err)
 		}
@@ -63,7 +64,7 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	cfg := &bind.Config{
+	cfg := &backend.Config{
 		IdentityPath:    zif,
 		EndpointAddress: args[0],
 	}
@@ -102,7 +103,7 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	httpProxy, err := bind.NewHTTP(cfg)
+	httpProxy, err := backend.NewHTTP(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -113,13 +114,13 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	if !self.service {
+	if !self.quiet {
 		ui.Clear()
 		w, h := ui.TerminalDimensions()
 
 		p := widgets.NewParagraph()
 		p.Border = true
-		p.Title = " access your zrok service "
+		p.Title = " access your zrok quiet "
 		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.ProxyEndpoint))/2)-1), resp.Payload.ProxyEndpoint)
 		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
 		p.PaddingTop = 1
@@ -175,13 +176,13 @@ func (self *httpBindCommand) run(_ *cobra.Command, args []string) {
 		}
 	} else {
 		for {
-			logrus.Infof("access your zrok service: %v", resp.Payload.ProxyEndpoint)
+			logrus.Infof("access your zrok quiet: %v", resp.Payload.ProxyEndpoint)
 			time.Sleep(30 * time.Second)
 		}
 	}
 }
 
-func (self *httpBindCommand) destroy(id string, cfg *bind.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (self *httpBackendCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{

@@ -168,7 +168,7 @@ func (self *tunnelHandler) createService(name, cfgId string, edge *rest_manageme
 func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{fmt.Sprintf("@%v", envId)}
-	name := fmt.Sprintf("%v-bind", svcName)
+	name := fmt.Sprintf("%v-backend", svcName)
 	postureCheckRoles := []string{}
 	serviceRoles := []string{fmt.Sprintf("@%v", svcId)}
 	dialBind := rest_model.DialBindBind

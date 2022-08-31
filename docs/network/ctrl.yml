@@ -152,19 +152,19 @@ edge:
 
 # web
 # Defines webListeners that will be hosted by the controller. Each webListener can host many APIs and be bound to many
-# bind points.
+# backend points.
 web:
   # name - required
   # Provides a name for this listener, used for logging output. Not required to be unique, but is highly suggested.
   - name: client-management
     # bindPoints - required
-    # One or more bind points are required. A bind point specifies an interface (interface:port string) that defines
-    # where on the host machine the webListener will listen and the address (host:port) that should be used to
+    # One or more backend points are required. A backend point specifies an interface (interface:port string) that defines
+    # where on the host machine the webListener will frontend and the address (host:port) that should be used to
     # publicly address the webListener(i.e. mydomain.com, localhost, 127.0.0.1). This public address may be used for
     # incoming address resolution as well as used in responses in the API.
     bindPoints:
       #interface - required
-      # A host:port string on which network interface to listen on. 0.0.0.0 will listen on all interfaces
+      # A host:port string on which network interface to frontend on. 0.0.0.0 will frontend on all interfaces
       - interface: 0.0.0.0:1280
         # address - required
         # The public address that external incoming requests will be able to resolve. Used in request processing and
@@ -206,7 +206,7 @@ web:
     # Allows one or more APIs to be bound to this webListener
     apis:
       # binding - required
-      # Specifies an API to bind to this webListener. Built-in APIs are
+      # Specifies an API to backend to this webListener. Built-in APIs are
       #   - edge-management
       #   - edge-client
       #   - fabric-management
