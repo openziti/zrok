@@ -210,13 +210,13 @@ func basicAuth(handler http.Handler, realm string, ctx ziti.Context) http.Handle
 						return
 					}
 				} else {
-					logrus.Infof("no auth scheme for '%v'", svcName)
+					logrus.Infof("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
 				}
 			} else {
-				logrus.Infof("no proxy config for '%v'", svcName)
+				logrus.Infof("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
 			}
 		} else {
-			logrus.Infof("service '%v' not found", svcName)
+			logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
 		}
 	}
 }
