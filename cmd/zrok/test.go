@@ -56,22 +56,28 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("%v {%v} -> /index.html", r.RemoteAddr, r.Host)
-	ed := &endpointData{
-		Now:    time.Now(),
-		Host:   r.Host,
-		Remote: r.RemoteAddr,
-	}
-	ed.getIps()
-	if err := cmd.t.Execute(w, ed); err != nil {
+	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
 		log.Error(err)
 	}
 }
 
 type endpointData struct {
-	Now    time.Time
-	Host   string
-	Remote string
-	Ips    string
+	Now     time.Time
+	Host    string
+	Headers map[string][]string
+	Remote  string
+	Ips     string
+}
+
+func newEndpointData(r *http.Request) *endpointData {
+	ed := &endpointData{
+		Now:     time.Now(),
+		Host:    r.Host,
+		Headers: r.Header,
+		Remote:  r.RemoteAddr,
+	}
+	ed.getIps()
+	return ed
 }
 
 func (ed *endpointData) getIps() {
