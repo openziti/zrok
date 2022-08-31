@@ -16,11 +16,18 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Russo One', sans-serif;
         }
-
+        table {
+            table-layout: fixed;
+        }
+        td {
+            width: 80%;
+        }
+        td:first-child {
+            width: 20%;
+        }
         #banner {
             background-color: #3b2693;
             text-align: center;
@@ -32,17 +39,14 @@
             height: 600px;
             justify-content: center;
         }
-
         #banner h1 {
             font-size: 64pt;
         }
-
         #container {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         #info {
             width: 920px;
         }
@@ -379,18 +383,18 @@
         <div id="info">
             <h2>{{ .Now }}</h2>
 
-            <h3>Local:</h3>
+            <h3>This Endpoint:</h3>
             <table>
-                <tr><td>Host Header</td><td>{{ .Host }}</td></tr>
-                <tr><td>Remote Address</td><td>{{ .Remote }}</td></tr>
-                <tr><td>Local IP Addresses</td><td>{{ .Ips }}</td></tr>
+                <tr><td class="td-key">Host Header</td><td>{{ .Host }}</td></tr>
+                <tr><td class="td-key">Remote Address</td><td>{{ .Remote }}</td></tr>
+                <tr><td class="td-key">Local IP Addresses</td><td>{{ .Ips }}</td></tr>
             </table>
 
-            <h3>Headers:</h3>
+            <h3>Extended Headers:</h3>
             <table>
                 {{ range $header, $value := .Headers }}
                 <tr>
-                    <td>{{ $header }}</td>
+                    <td class="td-key">{{ $header }}</td>
                     <td>
                         {{ range $v := $value }}
                             {{ $v }}
