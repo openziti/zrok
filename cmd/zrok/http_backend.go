@@ -120,7 +120,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 
 		p := widgets.NewParagraph()
 		p.Border = true
-		p.Title = " access your zrok service: "
+		p.Title = " access your zrok service "
 		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.ProxyEndpoint))/2)-1), resp.Payload.ProxyEndpoint)
 		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
 		p.PaddingTop = 1
@@ -175,8 +175,8 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
+		logrus.Infof("access your zrok service: %v", resp.Payload.ProxyEndpoint)
 		for {
-			logrus.Infof("access your zrok quiet: %v", resp.Payload.ProxyEndpoint)
 			time.Sleep(30 * time.Second)
 		}
 	}

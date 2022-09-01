@@ -17,8 +17,8 @@ func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	apiEndpointDefault := os.Getenv("ZROK_API_ENDPOINT")
-	if apiEndpoint == "" {
-		apiEndpoint = "api.zrok.io"
+	if apiEndpointDefault == "" {
+		apiEndpointDefault = "api.zrok.io"
 	}
 	rootCmd.PersistentFlags().StringVarP(&apiEndpoint, "endpoint", "e", apiEndpointDefault, "zrok API endpoint address")
 	rootCmd.AddCommand(httpCmd)
