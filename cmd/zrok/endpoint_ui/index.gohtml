@@ -55,7 +55,7 @@
 <body>
 <div id="root">
     <div id="banner">
-        <svg id="ziggy" viewBox="0 0 21.9 37.6" style="width: 200px; height: 343.38px; padding-bottom: 2%;">
+        <svg id="ziggy" viewBox="0 0 21.9 37.6" style="width: 200px; height: 343.38px;">
             <style type="text/css">
                 .st0 {
                     fill: #FFFFFF;
@@ -392,16 +392,18 @@
 
             <h3>Extended Headers:</h3>
             <table>
-                {{ range $header, $value := .Headers }}
-                <tr>
-                    <td class="td-key">{{ $header }}</td>
-                    <td>
-                        {{ range $v := $value }}
-                            {{ $v }}
-                        {{ end }}
-                    </td>
-                </tr>
-                {{ end }}
+                <tbody>
+                    {{ range $header, $value := .Headers }}
+                    <tr>
+                        <td class="td-key">{{ $header }}</td>
+                        <td>
+                            {{ range $v := $value }}
+                                {{ $v }}
+                            {{ end }}
+                        </td>
+                    </tr>
+                    {{ end }}
+                </tbody>
             </table>
         </div>
     </div>
