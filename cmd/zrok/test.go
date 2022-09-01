@@ -37,7 +37,7 @@ func newTestEndpointCommand() *testEndpointCommand {
 	}
 	command := &testEndpointCommand{cmd: cmd}
 	var err error
-	if command.t, err = template.ParseFS(endpoint_ui.FS, "index.html"); err != nil {
+	if command.t, err = template.ParseFS(endpoint_ui.FS, "index.gohtml"); err != nil {
 		panic(err)
 	}
 	cmd.Flags().StringVarP(&command.address, "address", "a", "0.0.0.0", "The address for the HTTP listener")
@@ -48,14 +48,13 @@ func newTestEndpointCommand() *testEndpointCommand {
 
 func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 	http.HandleFunc("/", cmd.serveIndex)
-	http.HandleFunc("/index.html", cmd.serveIndex)
 	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
 		panic(err)
 	}
 }
 
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("%v {%v} -> /index.html", r.RemoteAddr, r.Host)
+	logrus.Infof("%v {%v} -> /index.gohtml", r.RemoteAddr, r.Host)
 	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
 		log.Error(err)
 	}

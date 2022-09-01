@@ -21,12 +21,15 @@
         }
         table {
             table-layout: fixed;
+            width: 100%;
         }
-        td {
+        td:last-child {
             width: 80%;
+            overflow: clip;
         }
         td:first-child {
             width: 20%;
+            overflow: auto;
         }
         #banner {
             background-color: #3b2693;

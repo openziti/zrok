@@ -21,7 +21,7 @@ func StaticBuilder(handler http.Handler) http.Handler {
 		logrus.Debugf("directing '%v' to static handler", r.URL.Path)
 
 		staticPath := "build"
-		indexPath := "index.html"
+		indexPath := "index.gohtml"
 
 		// get the absolute path to prevent directory traversal
 		path, err := filepath.Abs(r.URL.Path)
@@ -35,7 +35,7 @@ func StaticBuilder(handler http.Handler) http.Handler {
 
 		_, err = FS.Open(path)
 		if os.IsNotExist(err) {
-			// file does not exist, serve index.html
+			// file does not exist, serve index.gohtml
 			index, err := FS.ReadFile(filepath.Join(staticPath, indexPath))
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

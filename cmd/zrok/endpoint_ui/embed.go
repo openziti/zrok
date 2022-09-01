@@ -2,5 +2,5 @@ package endpoint_ui
 
 import "embed"
 
-//go:embed index.html
+//go:embed index.gohtml
 var FS embed.FS
