@@ -61,22 +61,34 @@ func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Reques
 }
 
 type endpointData struct {
-	Now     time.Time
-	Host    string
-	Headers map[string][]string
-	Remote  string
-	Ips     string
+	Now        time.Time
+	RemoteAddr string
+	Host       string
+	HostDetail string
+	Ips        string
+	HostHeader string
+	Headers    map[string][]string
 }
 
 func newEndpointData(r *http.Request) *endpointData {
 	ed := &endpointData{
-		Now:     time.Now(),
-		Host:    r.Host,
-		Headers: r.Header,
-		Remote:  r.RemoteAddr,
+		Now:        time.Now(),
+		HostHeader: r.Host,
+		Headers:    r.Header,
+		RemoteAddr: r.RemoteAddr,
 	}
+	ed.getHostInfo()
 	ed.getIps()
 	return ed
+}
+
+func (ed *endpointData) getHostInfo() {
+	host, hostDetail, err := getHost()
+	if err != nil {
+		logrus.Errorf("error getting host detail: %v", err)
+	}
+	ed.Host = host
+	ed.HostDetail = hostDetail
 }
 
 func (ed *endpointData) getIps() {

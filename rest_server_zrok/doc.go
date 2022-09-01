@@ -5,7 +5,7 @@
 //  zrok client access
 //  Schemes:
 //    http
-//  Host: localhost
+//  HostHeader: localhost
 //  BasePath: /api/v1
 //  Version: 1.0.0
 //
