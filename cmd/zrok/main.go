@@ -15,8 +15,8 @@ import (
 
 func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
-	rootCmd.PersistentFlags().StringVarP(&endpoint, "endpoint", "e", "localhost:10888", "zrok endpoint address")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	rootCmd.PersistentFlags().StringVarP(&apiEndpoint, "endpoint", "e", "api.zrok.io", "zrok API endpoint address")
 	rootCmd.AddCommand(httpCmd)
 }
 
@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 var verbose bool
-var endpoint string
+var apiEndpoint string
 
 var httpCmd = &cobra.Command{
 	Use:   "http",
@@ -44,7 +44,7 @@ func main() {
 }
 
 func newZrokClient() *rest_client_zrok.Zrok {
-	transport := httptransport.New(endpoint, "/api/v1", nil)
+	transport := httptransport.New(apiEndpoint, "/api/v1", []string{"https", "http"})
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 	return rest_client_zrok.New(transport, strfmt.Default)

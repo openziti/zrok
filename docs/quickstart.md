@@ -6,7 +6,7 @@
 $ source /dev/stdin <<< "$(wget -qO- https://raw.githubusercontent.com/openziti/ziti/release-next/quickstart/docker/image/ziti-cli-functions.sh)"; expressInstall
 ```
 
-## configure proxy identity
+## configure frontend identity
 
 ```
 $ ziti edge create identity device -o ~/.zrok/proxy.jwt proxy
@@ -20,7 +20,9 @@ INFO    generating 4096 bit RSA key
 INFO    enrolled successfully. identity file written to: proxy.json
 ```
 
-Don't forget to add an edge router policy granting access to the `@proxy` router to `#all` routers.
+```
+$ ziti edge create erp --edge-router-roles "#all" --identity-roles @proxy
+```
 
 ## start zrok resources
 
