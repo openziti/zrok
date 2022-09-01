@@ -45,7 +45,8 @@ func NewOverviewOK() *OverviewOK {
 	return &OverviewOK{}
 }
 
-/* OverviewOK describes a response with status code 200, with default header values.
+/*
+OverviewOK describes a response with status code 200, with default header values.
 
 overview returned
 */
@@ -53,9 +54,39 @@ type OverviewOK struct {
 	Payload rest_model_zrok.EnvironmentServicesList
 }
 
+// IsSuccess returns true when this overview o k response has a 2xx status code
+func (o *OverviewOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this overview o k response has a 3xx status code
+func (o *OverviewOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this overview o k response has a 4xx status code
+func (o *OverviewOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this overview o k response has a 5xx status code
+func (o *OverviewOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this overview o k response a status code equal to that given
+func (o *OverviewOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *OverviewOK) Error() string {
 	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
 }
+
+func (o *OverviewOK) String() string {
+	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
+}
+
 func (o *OverviewOK) GetPayload() rest_model_zrok.EnvironmentServicesList {
 	return o.Payload
 }
@@ -75,7 +106,8 @@ func NewOverviewInternalServerError() *OverviewInternalServerError {
 	return &OverviewInternalServerError{}
 }
 
-/* OverviewInternalServerError describes a response with status code 500, with default header values.
+/*
+OverviewInternalServerError describes a response with status code 500, with default header values.
 
 internal server error
 */
@@ -83,9 +115,39 @@ type OverviewInternalServerError struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this overview internal server error response has a 2xx status code
+func (o *OverviewInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this overview internal server error response has a 3xx status code
+func (o *OverviewInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this overview internal server error response has a 4xx status code
+func (o *OverviewInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this overview internal server error response has a 5xx status code
+func (o *OverviewInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this overview internal server error response a status code equal to that given
+func (o *OverviewInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
 func (o *OverviewInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
 }
+
+func (o *OverviewInternalServerError) String() string {
+	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
+}
+
 func (o *OverviewInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }

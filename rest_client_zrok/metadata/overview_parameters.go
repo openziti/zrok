@@ -52,10 +52,12 @@ func NewOverviewParamsWithHTTPClient(client *http.Client) *OverviewParams {
 	}
 }
 
-/* OverviewParams contains all the parameters to send to the API endpoint
-   for the overview operation.
+/*
+OverviewParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the overview operation.
+
+	Typically these are written to a http.Request.
 */
 type OverviewParams struct {
 	timeout    time.Duration

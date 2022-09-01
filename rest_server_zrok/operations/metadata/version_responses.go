@@ -16,7 +16,8 @@ import (
 // VersionOKCode is the HTTP code returned for type VersionOK
 const VersionOKCode int = 200
 
-/*VersionOK retrieve the current server version
+/*
+VersionOK retrieve the current server version
 
 swagger:response versionOK
 */

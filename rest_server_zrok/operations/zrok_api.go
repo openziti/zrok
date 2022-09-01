@@ -50,6 +50,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
 		}),
+		IdentityDisableHandler: identity.DisableHandlerFunc(func(params identity.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation identity.Disable has not yet been implemented")
+		}),
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
@@ -120,6 +123,8 @@ type ZrokAPI struct {
 
 	// IdentityCreateAccountHandler sets the operation handler for the create account operation
 	IdentityCreateAccountHandler identity.CreateAccountHandler
+	// IdentityDisableHandler sets the operation handler for the disable operation
+	IdentityDisableHandler identity.DisableHandler
 	// IdentityEnableHandler sets the operation handler for the enable operation
 	IdentityEnableHandler identity.EnableHandler
 	// IdentityLoginHandler sets the operation handler for the login operation
@@ -215,6 +220,9 @@ func (o *ZrokAPI) Validate() error {
 
 	if o.IdentityCreateAccountHandler == nil {
 		unregistered = append(unregistered, "identity.CreateAccountHandler")
+	}
+	if o.IdentityDisableHandler == nil {
+		unregistered = append(unregistered, "identity.DisableHandler")
 	}
 	if o.IdentityEnableHandler == nil {
 		unregistered = append(unregistered, "identity.EnableHandler")
@@ -337,6 +345,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/disable"] = identity.NewDisable(o.context, o.IdentityDisableHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

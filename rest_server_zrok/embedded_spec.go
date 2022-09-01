@@ -72,6 +72,42 @@ func init() {
         }
       }
     },
+    "/disable": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "identity"
+        ],
+        "operationId": "disable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/disableRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment disabled"
+          },
+          "401": {
+            "description": "invalid environment"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/enable": {
       "post": {
         "security": [
@@ -294,6 +330,14 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "disableRequest": {
+      "type": "object",
+      "properties": {
+        "identity": {
           "type": "string"
         }
       }
@@ -535,6 +579,42 @@ func init() {
         }
       }
     },
+    "/disable": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "identity"
+        ],
+        "operationId": "disable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/disableRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment disabled"
+          },
+          "401": {
+            "description": "invalid environment"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/enable": {
       "post": {
         "security": [
@@ -757,6 +837,14 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "disableRequest": {
+      "type": "object",
+      "properties": {
+        "identity": {
           "type": "string"
         }
       }

@@ -13,40 +13,40 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
-// EnableHandlerFunc turns a function with the right signature into a enable handler
-type EnableHandlerFunc func(EnableParams, *rest_model_zrok.Principal) middleware.Responder
+// DisableHandlerFunc turns a function with the right signature into a disable handler
+type DisableHandlerFunc func(DisableParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn EnableHandlerFunc) Handle(params EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (fn DisableHandlerFunc) Handle(params DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	return fn(params, principal)
 }
 
-// EnableHandler interface for that can handle valid enable params
-type EnableHandler interface {
-	Handle(EnableParams, *rest_model_zrok.Principal) middleware.Responder
+// DisableHandler interface for that can handle valid disable params
+type DisableHandler interface {
+	Handle(DisableParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
-// NewEnable creates a new http.Handler for the enable operation
-func NewEnable(ctx *middleware.Context, handler EnableHandler) *Enable {
-	return &Enable{Context: ctx, Handler: handler}
+// NewDisable creates a new http.Handler for the disable operation
+func NewDisable(ctx *middleware.Context, handler DisableHandler) *Disable {
+	return &Disable{Context: ctx, Handler: handler}
 }
 
 /*
-	Enable swagger:route POST /enable identity enable
+	Disable swagger:route POST /disable identity disable
 
-Enable enable API
+Disable disable API
 */
-type Enable struct {
+type Disable struct {
 	Context *middleware.Context
-	Handler EnableHandler
+	Handler DisableHandler
 }
 
-func (o *Enable) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *Disable) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewEnableParams()
+	var Params = NewDisableParams()
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)

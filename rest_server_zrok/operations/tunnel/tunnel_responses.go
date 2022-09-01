@@ -16,7 +16,8 @@ import (
 // TunnelCreatedCode is the HTTP code returned for type TunnelCreated
 const TunnelCreatedCode int = 201
 
-/*TunnelCreated tunnel created
+/*
+TunnelCreated tunnel created
 
 swagger:response tunnelCreated
 */
@@ -60,7 +61,8 @@ func (o *TunnelCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 // TunnelUnauthorizedCode is the HTTP code returned for type TunnelUnauthorized
 const TunnelUnauthorizedCode int = 401
 
-/*TunnelUnauthorized invalid environment identity
+/*
+TunnelUnauthorized invalid environment identity
 
 swagger:response tunnelUnauthorized
 */
@@ -102,7 +104,8 @@ func (o *TunnelUnauthorized) WriteResponse(rw http.ResponseWriter, producer runt
 // TunnelInternalServerErrorCode is the HTTP code returned for type TunnelInternalServerError
 const TunnelInternalServerErrorCode int = 500
 
-/*TunnelInternalServerError internal server error
+/*
+TunnelInternalServerError internal server error
 
 swagger:response tunnelInternalServerError
 */

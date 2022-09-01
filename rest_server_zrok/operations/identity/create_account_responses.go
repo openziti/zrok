@@ -16,7 +16,8 @@ import (
 // CreateAccountCreatedCode is the HTTP code returned for type CreateAccountCreated
 const CreateAccountCreatedCode int = 201
 
-/*CreateAccountCreated account created
+/*
+CreateAccountCreated account created
 
 swagger:response createAccountCreated
 */
@@ -60,7 +61,8 @@ func (o *CreateAccountCreated) WriteResponse(rw http.ResponseWriter, producer ru
 // CreateAccountBadRequestCode is the HTTP code returned for type CreateAccountBadRequest
 const CreateAccountBadRequestCode int = 400
 
-/*CreateAccountBadRequest account not created (already exists)
+/*
+CreateAccountBadRequest account not created (already exists)
 
 swagger:response createAccountBadRequest
 */
@@ -102,7 +104,8 @@ func (o *CreateAccountBadRequest) WriteResponse(rw http.ResponseWriter, producer
 // CreateAccountInternalServerErrorCode is the HTTP code returned for type CreateAccountInternalServerError
 const CreateAccountInternalServerErrorCode int = 500
 
-/*CreateAccountInternalServerError internal server error
+/*
+CreateAccountInternalServerError internal server error
 
 swagger:response createAccountInternalServerError
 */

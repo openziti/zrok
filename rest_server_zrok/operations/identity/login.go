@@ -29,10 +29,10 @@ func NewLogin(ctx *middleware.Context, handler LoginHandler) *Login {
 	return &Login{Context: ctx, Handler: handler}
 }
 
-/* Login swagger:route POST /login identity login
+/*
+	Login swagger:route POST /login identity login
 
 Login login API
-
 */
 type Login struct {
 	Context *middleware.Context
@@ -45,7 +45,7 @@ func (o *Login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewLoginParams()
-	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // backend params
+	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}

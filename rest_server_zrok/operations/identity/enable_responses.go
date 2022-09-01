@@ -16,7 +16,8 @@ import (
 // EnableCreatedCode is the HTTP code returned for type EnableCreated
 const EnableCreatedCode int = 201
 
-/*EnableCreated environment enabled
+/*
+EnableCreated environment enabled
 
 swagger:response enableCreated
 */
@@ -60,7 +61,8 @@ func (o *EnableCreated) WriteResponse(rw http.ResponseWriter, producer runtime.P
 // EnableUnauthorizedCode is the HTTP code returned for type EnableUnauthorized
 const EnableUnauthorizedCode int = 401
 
-/*EnableUnauthorized invalid api key
+/*
+EnableUnauthorized invalid api key
 
 swagger:response enableUnauthorized
 */
@@ -84,7 +86,8 @@ func (o *EnableUnauthorized) WriteResponse(rw http.ResponseWriter, producer runt
 // EnableNotFoundCode is the HTTP code returned for type EnableNotFound
 const EnableNotFoundCode int = 404
 
-/*EnableNotFound account not found
+/*
+EnableNotFound account not found
 
 swagger:response enableNotFound
 */
@@ -108,7 +111,8 @@ func (o *EnableNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.
 // EnableInternalServerErrorCode is the HTTP code returned for type EnableInternalServerError
 const EnableInternalServerErrorCode int = 500
 
-/*EnableInternalServerError internal server error
+/*
+EnableInternalServerError internal server error
 
 swagger:response enableInternalServerError
 */

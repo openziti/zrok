@@ -34,6 +34,21 @@ export function enable(options) {
 
 /**
  * @param {object} options Optional options
+ * @param {module:types.disableRequest} [options.body] 
+ * @return {Promise<object>} environment disabled
+ */
+export function disable(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(disableOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.loginRequest} [options.body] 
  * @return {Promise<module:types.loginResponse>} login successful
  */
@@ -55,6 +70,17 @@ const createAccountOperation = {
 
 const enableOperation = {
   path: '/enable',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const disableOperation = {
+  path: '/disable',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
   security: [

@@ -16,7 +16,8 @@ import (
 // OverviewOKCode is the HTTP code returned for type OverviewOK
 const OverviewOKCode int = 200
 
-/*OverviewOK overview returned
+/*
+OverviewOK overview returned
 
 swagger:response overviewOK
 */
@@ -63,7 +64,8 @@ func (o *OverviewOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 // OverviewInternalServerErrorCode is the HTTP code returned for type OverviewInternalServerError
 const OverviewInternalServerErrorCode int = 500
 
-/*OverviewInternalServerError internal server error
+/*
+OverviewInternalServerError internal server error
 
 swagger:response overviewInternalServerError
 */

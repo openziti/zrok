@@ -38,7 +38,7 @@ type ClientService interface {
 }
 
 /*
-  Overview overview API
+Overview overview API
 */
 func (a *Client) Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error) {
 	// TODO: Validate the params before sending
@@ -77,7 +77,7 @@ func (a *Client) Overview(params *OverviewParams, authInfo runtime.ClientAuthInf
 }
 
 /*
-  Version version API
+Version version API
 */
 func (a *Client) Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error) {
 	// TODO: Validate the params before sending

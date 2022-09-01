@@ -19,7 +19,7 @@ import (
 var Default = NewHTTPClient(nil)
 
 const (
-	// DefaultHost is the default HostHeader
+	// DefaultHost is the default Host
 	// found in Meta (info) section of spec file
 	DefaultHost string = "localhost"
 	// DefaultBasePath is the default BasePath

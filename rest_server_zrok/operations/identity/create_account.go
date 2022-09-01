@@ -29,10 +29,10 @@ func NewCreateAccount(ctx *middleware.Context, handler CreateAccountHandler) *Cr
 	return &CreateAccount{Context: ctx, Handler: handler}
 }
 
-/* CreateAccount swagger:route POST /account identity createAccount
+/*
+	CreateAccount swagger:route POST /account identity createAccount
 
 CreateAccount create account API
-
 */
 type CreateAccount struct {
 	Context *middleware.Context
@@ -45,7 +45,7 @@ func (o *CreateAccount) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewCreateAccountParams()
-	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // backend params
+	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}

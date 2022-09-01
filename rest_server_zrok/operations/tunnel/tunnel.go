@@ -31,10 +31,10 @@ func NewTunnel(ctx *middleware.Context, handler TunnelHandler) *Tunnel {
 	return &Tunnel{Context: ctx, Handler: handler}
 }
 
-/* Tunnel swagger:route POST /tunnel tunnel tunnel
+/*
+	Tunnel swagger:route POST /tunnel tunnel tunnel
 
 Tunnel tunnel API
-
 */
 type Tunnel struct {
 	Context *middleware.Context
@@ -60,7 +60,7 @@ func (o *Tunnel) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		principal = uprinc.(*rest_model_zrok.Principal) // this is really a rest_model_zrok.Principal, I promise
 	}
 
-	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // backend params
+	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}

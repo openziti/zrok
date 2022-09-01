@@ -16,7 +16,8 @@ import (
 // UntunnelOKCode is the HTTP code returned for type UntunnelOK
 const UntunnelOKCode int = 200
 
-/*UntunnelOK tunnel removed
+/*
+UntunnelOK tunnel removed
 
 swagger:response untunnelOK
 */
@@ -40,7 +41,8 @@ func (o *UntunnelOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 // UntunnelNotFoundCode is the HTTP code returned for type UntunnelNotFound
 const UntunnelNotFoundCode int = 404
 
-/*UntunnelNotFound not found
+/*
+UntunnelNotFound not found
 
 swagger:response untunnelNotFound
 */
@@ -82,7 +84,8 @@ func (o *UntunnelNotFound) WriteResponse(rw http.ResponseWriter, producer runtim
 // UntunnelInternalServerErrorCode is the HTTP code returned for type UntunnelInternalServerError
 const UntunnelInternalServerErrorCode int = 500
 
-/*UntunnelInternalServerError internal server error
+/*
+UntunnelInternalServerError internal server error
 
 swagger:response untunnelInternalServerError
 */

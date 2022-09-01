@@ -57,7 +57,8 @@ func NewEnableCreated() *EnableCreated {
 	return &EnableCreated{}
 }
 
-/* EnableCreated describes a response with status code 201, with default header values.
+/*
+EnableCreated describes a response with status code 201, with default header values.
 
 environment enabled
 */
@@ -65,9 +66,39 @@ type EnableCreated struct {
 	Payload *rest_model_zrok.EnableResponse
 }
 
+// IsSuccess returns true when this enable created response has a 2xx status code
+func (o *EnableCreated) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this enable created response has a 3xx status code
+func (o *EnableCreated) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this enable created response has a 4xx status code
+func (o *EnableCreated) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this enable created response has a 5xx status code
+func (o *EnableCreated) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this enable created response a status code equal to that given
+func (o *EnableCreated) IsCode(code int) bool {
+	return code == 201
+}
+
 func (o *EnableCreated) Error() string {
 	return fmt.Sprintf("[POST /enable][%d] enableCreated  %+v", 201, o.Payload)
 }
+
+func (o *EnableCreated) String() string {
+	return fmt.Sprintf("[POST /enable][%d] enableCreated  %+v", 201, o.Payload)
+}
+
 func (o *EnableCreated) GetPayload() *rest_model_zrok.EnableResponse {
 	return o.Payload
 }
@@ -89,14 +120,44 @@ func NewEnableUnauthorized() *EnableUnauthorized {
 	return &EnableUnauthorized{}
 }
 
-/* EnableUnauthorized describes a response with status code 401, with default header values.
+/*
+EnableUnauthorized describes a response with status code 401, with default header values.
 
 invalid api key
 */
 type EnableUnauthorized struct {
 }
 
+// IsSuccess returns true when this enable unauthorized response has a 2xx status code
+func (o *EnableUnauthorized) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this enable unauthorized response has a 3xx status code
+func (o *EnableUnauthorized) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this enable unauthorized response has a 4xx status code
+func (o *EnableUnauthorized) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this enable unauthorized response has a 5xx status code
+func (o *EnableUnauthorized) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this enable unauthorized response a status code equal to that given
+func (o *EnableUnauthorized) IsCode(code int) bool {
+	return code == 401
+}
+
 func (o *EnableUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
+}
+
+func (o *EnableUnauthorized) String() string {
 	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
 }
 
@@ -110,14 +171,44 @@ func NewEnableNotFound() *EnableNotFound {
 	return &EnableNotFound{}
 }
 
-/* EnableNotFound describes a response with status code 404, with default header values.
+/*
+EnableNotFound describes a response with status code 404, with default header values.
 
 account not found
 */
 type EnableNotFound struct {
 }
 
+// IsSuccess returns true when this enable not found response has a 2xx status code
+func (o *EnableNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this enable not found response has a 3xx status code
+func (o *EnableNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this enable not found response has a 4xx status code
+func (o *EnableNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this enable not found response has a 5xx status code
+func (o *EnableNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this enable not found response a status code equal to that given
+func (o *EnableNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *EnableNotFound) Error() string {
+	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
+}
+
+func (o *EnableNotFound) String() string {
 	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
 }
 
@@ -131,7 +222,8 @@ func NewEnableInternalServerError() *EnableInternalServerError {
 	return &EnableInternalServerError{}
 }
 
-/* EnableInternalServerError describes a response with status code 500, with default header values.
+/*
+EnableInternalServerError describes a response with status code 500, with default header values.
 
 internal server error
 */
@@ -139,9 +231,39 @@ type EnableInternalServerError struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this enable internal server error response has a 2xx status code
+func (o *EnableInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this enable internal server error response has a 3xx status code
+func (o *EnableInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this enable internal server error response has a 4xx status code
+func (o *EnableInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this enable internal server error response has a 5xx status code
+func (o *EnableInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this enable internal server error response a status code equal to that given
+func (o *EnableInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
 func (o *EnableInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError  %+v", 500, o.Payload)
 }
+
+func (o *EnableInternalServerError) String() string {
+	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError  %+v", 500, o.Payload)
+}
+
 func (o *EnableInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }

@@ -2,18 +2,18 @@
 
 // Package rest_server_zrok zrok
 //
-//  zrok client access
-//  Schemes:
-//    http
-//  HostHeader: localhost
-//  BasePath: /api/v1
-//  Version: 1.0.0
+//	zrok client access
+//	Schemes:
+//	  http
+//	Host: localhost
+//	BasePath: /api/v1
+//	Version: 1.0.0
 //
-//  Consumes:
-//    - application/zrok.v1+json
+//	Consumes:
+//	  - application/zrok.v1+json
 //
-//  Produces:
-//    - application/zrok.v1+json
+//	Produces:
+//	  - application/zrok.v1+json
 //
 // swagger:meta
 package rest_server_zrok

@@ -38,7 +38,7 @@ type ClientService interface {
 }
 
 /*
-  Tunnel tunnel API
+Tunnel tunnel API
 */
 func (a *Client) Tunnel(params *TunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*TunnelCreated, error) {
 	// TODO: Validate the params before sending
@@ -77,7 +77,7 @@ func (a *Client) Tunnel(params *TunnelParams, authInfo runtime.ClientAuthInfoWri
 }
 
 /*
-  Untunnel untunnel API
+Untunnel untunnel API
 */
 func (a *Client) Untunnel(params *UntunnelParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UntunnelOK, error) {
 	// TODO: Validate the params before sending

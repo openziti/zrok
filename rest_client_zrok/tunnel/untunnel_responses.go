@@ -51,14 +51,44 @@ func NewUntunnelOK() *UntunnelOK {
 	return &UntunnelOK{}
 }
 
-/* UntunnelOK describes a response with status code 200, with default header values.
+/*
+UntunnelOK describes a response with status code 200, with default header values.
 
 tunnel removed
 */
 type UntunnelOK struct {
 }
 
+// IsSuccess returns true when this untunnel o k response has a 2xx status code
+func (o *UntunnelOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this untunnel o k response has a 3xx status code
+func (o *UntunnelOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this untunnel o k response has a 4xx status code
+func (o *UntunnelOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this untunnel o k response has a 5xx status code
+func (o *UntunnelOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this untunnel o k response a status code equal to that given
+func (o *UntunnelOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *UntunnelOK) Error() string {
+	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelOK ", 200)
+}
+
+func (o *UntunnelOK) String() string {
 	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelOK ", 200)
 }
 
@@ -72,7 +102,8 @@ func NewUntunnelNotFound() *UntunnelNotFound {
 	return &UntunnelNotFound{}
 }
 
-/* UntunnelNotFound describes a response with status code 404, with default header values.
+/*
+UntunnelNotFound describes a response with status code 404, with default header values.
 
 not found
 */
@@ -80,9 +111,39 @@ type UntunnelNotFound struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this untunnel not found response has a 2xx status code
+func (o *UntunnelNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this untunnel not found response has a 3xx status code
+func (o *UntunnelNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this untunnel not found response has a 4xx status code
+func (o *UntunnelNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this untunnel not found response has a 5xx status code
+func (o *UntunnelNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this untunnel not found response a status code equal to that given
+func (o *UntunnelNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *UntunnelNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelNotFound  %+v", 404, o.Payload)
 }
+
+func (o *UntunnelNotFound) String() string {
+	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelNotFound  %+v", 404, o.Payload)
+}
+
 func (o *UntunnelNotFound) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }
@@ -102,7 +163,8 @@ func NewUntunnelInternalServerError() *UntunnelInternalServerError {
 	return &UntunnelInternalServerError{}
 }
 
-/* UntunnelInternalServerError describes a response with status code 500, with default header values.
+/*
+UntunnelInternalServerError describes a response with status code 500, with default header values.
 
 internal server error
 */
@@ -110,9 +172,39 @@ type UntunnelInternalServerError struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this untunnel internal server error response has a 2xx status code
+func (o *UntunnelInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this untunnel internal server error response has a 3xx status code
+func (o *UntunnelInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this untunnel internal server error response has a 4xx status code
+func (o *UntunnelInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this untunnel internal server error response has a 5xx status code
+func (o *UntunnelInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this untunnel internal server error response a status code equal to that given
+func (o *UntunnelInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
 func (o *UntunnelInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelInternalServerError  %+v", 500, o.Payload)
 }
+
+func (o *UntunnelInternalServerError) String() string {
+	return fmt.Sprintf("[DELETE /untunnel][%d] untunnelInternalServerError  %+v", 500, o.Payload)
+}
+
 func (o *UntunnelInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }

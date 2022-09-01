@@ -51,7 +51,8 @@ func NewTunnelCreated() *TunnelCreated {
 	return &TunnelCreated{}
 }
 
-/* TunnelCreated describes a response with status code 201, with default header values.
+/*
+TunnelCreated describes a response with status code 201, with default header values.
 
 tunnel created
 */
@@ -59,9 +60,39 @@ type TunnelCreated struct {
 	Payload *rest_model_zrok.TunnelResponse
 }
 
+// IsSuccess returns true when this tunnel created response has a 2xx status code
+func (o *TunnelCreated) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this tunnel created response has a 3xx status code
+func (o *TunnelCreated) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this tunnel created response has a 4xx status code
+func (o *TunnelCreated) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this tunnel created response has a 5xx status code
+func (o *TunnelCreated) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this tunnel created response a status code equal to that given
+func (o *TunnelCreated) IsCode(code int) bool {
+	return code == 201
+}
+
 func (o *TunnelCreated) Error() string {
 	return fmt.Sprintf("[POST /tunnel][%d] tunnelCreated  %+v", 201, o.Payload)
 }
+
+func (o *TunnelCreated) String() string {
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelCreated  %+v", 201, o.Payload)
+}
+
 func (o *TunnelCreated) GetPayload() *rest_model_zrok.TunnelResponse {
 	return o.Payload
 }
@@ -83,7 +114,8 @@ func NewTunnelUnauthorized() *TunnelUnauthorized {
 	return &TunnelUnauthorized{}
 }
 
-/* TunnelUnauthorized describes a response with status code 401, with default header values.
+/*
+TunnelUnauthorized describes a response with status code 401, with default header values.
 
 invalid environment identity
 */
@@ -91,9 +123,39 @@ type TunnelUnauthorized struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this tunnel unauthorized response has a 2xx status code
+func (o *TunnelUnauthorized) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this tunnel unauthorized response has a 3xx status code
+func (o *TunnelUnauthorized) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this tunnel unauthorized response has a 4xx status code
+func (o *TunnelUnauthorized) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this tunnel unauthorized response has a 5xx status code
+func (o *TunnelUnauthorized) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this tunnel unauthorized response a status code equal to that given
+func (o *TunnelUnauthorized) IsCode(code int) bool {
+	return code == 401
+}
+
 func (o *TunnelUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /tunnel][%d] tunnelUnauthorized  %+v", 401, o.Payload)
 }
+
+func (o *TunnelUnauthorized) String() string {
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelUnauthorized  %+v", 401, o.Payload)
+}
+
 func (o *TunnelUnauthorized) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }
@@ -113,7 +175,8 @@ func NewTunnelInternalServerError() *TunnelInternalServerError {
 	return &TunnelInternalServerError{}
 }
 
-/* TunnelInternalServerError describes a response with status code 500, with default header values.
+/*
+TunnelInternalServerError describes a response with status code 500, with default header values.
 
 internal server error
 */
@@ -121,9 +184,39 @@ type TunnelInternalServerError struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this tunnel internal server error response has a 2xx status code
+func (o *TunnelInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this tunnel internal server error response has a 3xx status code
+func (o *TunnelInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this tunnel internal server error response has a 4xx status code
+func (o *TunnelInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this tunnel internal server error response has a 5xx status code
+func (o *TunnelInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this tunnel internal server error response a status code equal to that given
+func (o *TunnelInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
 func (o *TunnelInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /tunnel][%d] tunnelInternalServerError  %+v", 500, o.Payload)
 }
+
+func (o *TunnelInternalServerError) String() string {
+	return fmt.Sprintf("[POST /tunnel][%d] tunnelInternalServerError  %+v", 500, o.Payload)
+}
+
 func (o *TunnelInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }

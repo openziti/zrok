@@ -54,10 +54,12 @@ func NewTunnelParamsWithHTTPClient(client *http.Client) *TunnelParams {
 	}
 }
 
-/* TunnelParams contains all the parameters to send to the API endpoint
-   for the tunnel operation.
+/*
+TunnelParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the tunnel operation.
+
+	Typically these are written to a http.Request.
 */
 type TunnelParams struct {
 

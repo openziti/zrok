@@ -45,7 +45,8 @@ func NewLoginOK() *LoginOK {
 	return &LoginOK{}
 }
 
-/* LoginOK describes a response with status code 200, with default header values.
+/*
+LoginOK describes a response with status code 200, with default header values.
 
 login successful
 */
@@ -53,9 +54,39 @@ type LoginOK struct {
 	Payload rest_model_zrok.LoginResponse
 }
 
+// IsSuccess returns true when this login o k response has a 2xx status code
+func (o *LoginOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this login o k response has a 3xx status code
+func (o *LoginOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this login o k response has a 4xx status code
+func (o *LoginOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this login o k response has a 5xx status code
+func (o *LoginOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this login o k response a status code equal to that given
+func (o *LoginOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *LoginOK) Error() string {
 	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
 }
+
+func (o *LoginOK) String() string {
+	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
+}
+
 func (o *LoginOK) GetPayload() rest_model_zrok.LoginResponse {
 	return o.Payload
 }
@@ -75,14 +106,44 @@ func NewLoginUnauthorized() *LoginUnauthorized {
 	return &LoginUnauthorized{}
 }
 
-/* LoginUnauthorized describes a response with status code 401, with default header values.
+/*
+LoginUnauthorized describes a response with status code 401, with default header values.
 
 invalid login
 */
 type LoginUnauthorized struct {
 }
 
+// IsSuccess returns true when this login unauthorized response has a 2xx status code
+func (o *LoginUnauthorized) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this login unauthorized response has a 3xx status code
+func (o *LoginUnauthorized) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this login unauthorized response has a 4xx status code
+func (o *LoginUnauthorized) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this login unauthorized response has a 5xx status code
+func (o *LoginUnauthorized) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this login unauthorized response a status code equal to that given
+func (o *LoginUnauthorized) IsCode(code int) bool {
+	return code == 401
+}
+
 func (o *LoginUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
+}
+
+func (o *LoginUnauthorized) String() string {
 	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
 }
 

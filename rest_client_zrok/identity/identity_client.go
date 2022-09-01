@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	CreateAccount(params *CreateAccountParams, opts ...ClientOption) (*CreateAccountCreated, error)
 
+	Disable(params *DisableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DisableOK, error)
+
 	Enable(params *EnableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnableCreated, error)
 
 	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
@@ -40,7 +42,7 @@ type ClientService interface {
 }
 
 /*
-  CreateAccount create account API
+CreateAccount create account API
 */
 func (a *Client) CreateAccount(params *CreateAccountParams, opts ...ClientOption) (*CreateAccountCreated, error) {
 	// TODO: Validate the params before sending
@@ -78,7 +80,46 @@ func (a *Client) CreateAccount(params *CreateAccountParams, opts ...ClientOption
 }
 
 /*
-  Enable enable API
+Disable disable API
+*/
+func (a *Client) Disable(params *DisableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DisableOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDisableParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "disable",
+		Method:             "POST",
+		PathPattern:        "/disable",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DisableReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DisableOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for disable: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+Enable enable API
 */
 func (a *Client) Enable(params *EnableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnableCreated, error) {
 	// TODO: Validate the params before sending
@@ -117,7 +158,7 @@ func (a *Client) Enable(params *EnableParams, authInfo runtime.ClientAuthInfoWri
 }
 
 /*
-  Login login API
+Login login API
 */
 func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error) {
 	// TODO: Validate the params before sending

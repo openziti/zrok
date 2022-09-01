@@ -41,6 +41,13 @@
  */
 
 /**
+ * @typedef disableRequest
+ * @memberof module:types
+ * 
+ * @property {string} identity 
+ */
+
+/**
  * @typedef environment
  * @memberof module:types
  * 

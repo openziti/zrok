@@ -54,10 +54,12 @@ func NewUntunnelParamsWithHTTPClient(client *http.Client) *UntunnelParams {
 	}
 }
 
-/* UntunnelParams contains all the parameters to send to the API endpoint
-   for the untunnel operation.
+/*
+UntunnelParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the untunnel operation.
+
+	Typically these are written to a http.Request.
 */
 type UntunnelParams struct {
 

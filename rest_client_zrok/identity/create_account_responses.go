@@ -51,7 +51,8 @@ func NewCreateAccountCreated() *CreateAccountCreated {
 	return &CreateAccountCreated{}
 }
 
-/* CreateAccountCreated describes a response with status code 201, with default header values.
+/*
+CreateAccountCreated describes a response with status code 201, with default header values.
 
 account created
 */
@@ -59,9 +60,39 @@ type CreateAccountCreated struct {
 	Payload *rest_model_zrok.AccountResponse
 }
 
+// IsSuccess returns true when this create account created response has a 2xx status code
+func (o *CreateAccountCreated) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this create account created response has a 3xx status code
+func (o *CreateAccountCreated) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create account created response has a 4xx status code
+func (o *CreateAccountCreated) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this create account created response has a 5xx status code
+func (o *CreateAccountCreated) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create account created response a status code equal to that given
+func (o *CreateAccountCreated) IsCode(code int) bool {
+	return code == 201
+}
+
 func (o *CreateAccountCreated) Error() string {
 	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
 }
+
+func (o *CreateAccountCreated) String() string {
+	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
+}
+
 func (o *CreateAccountCreated) GetPayload() *rest_model_zrok.AccountResponse {
 	return o.Payload
 }
@@ -83,7 +114,8 @@ func NewCreateAccountBadRequest() *CreateAccountBadRequest {
 	return &CreateAccountBadRequest{}
 }
 
-/* CreateAccountBadRequest describes a response with status code 400, with default header values.
+/*
+CreateAccountBadRequest describes a response with status code 400, with default header values.
 
 account not created (already exists)
 */
@@ -91,9 +123,39 @@ type CreateAccountBadRequest struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this create account bad request response has a 2xx status code
+func (o *CreateAccountBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create account bad request response has a 3xx status code
+func (o *CreateAccountBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create account bad request response has a 4xx status code
+func (o *CreateAccountBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this create account bad request response has a 5xx status code
+func (o *CreateAccountBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create account bad request response a status code equal to that given
+func (o *CreateAccountBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
 func (o *CreateAccountBadRequest) Error() string {
 	return fmt.Sprintf("[POST /account][%d] createAccountBadRequest  %+v", 400, o.Payload)
 }
+
+func (o *CreateAccountBadRequest) String() string {
+	return fmt.Sprintf("[POST /account][%d] createAccountBadRequest  %+v", 400, o.Payload)
+}
+
 func (o *CreateAccountBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }
@@ -113,7 +175,8 @@ func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
 	return &CreateAccountInternalServerError{}
 }
 
-/* CreateAccountInternalServerError describes a response with status code 500, with default header values.
+/*
+CreateAccountInternalServerError describes a response with status code 500, with default header values.
 
 internal server error
 */
@@ -121,9 +184,39 @@ type CreateAccountInternalServerError struct {
 	Payload rest_model_zrok.ErrorMessage
 }
 
+// IsSuccess returns true when this create account internal server error response has a 2xx status code
+func (o *CreateAccountInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create account internal server error response has a 3xx status code
+func (o *CreateAccountInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create account internal server error response has a 4xx status code
+func (o *CreateAccountInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this create account internal server error response has a 5xx status code
+func (o *CreateAccountInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this create account internal server error response a status code equal to that given
+func (o *CreateAccountInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
 func (o *CreateAccountInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError  %+v", 500, o.Payload)
 }
+
+func (o *CreateAccountInternalServerError) String() string {
+	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError  %+v", 500, o.Payload)
+}
+
 func (o *CreateAccountInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 	return o.Payload
 }
