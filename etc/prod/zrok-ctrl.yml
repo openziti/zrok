@@ -9,12 +9,12 @@ endpoint:
   port:             8080
 
 proxy:
-  url_template:     "http://{svcName}.in.zrok.io:8080/"
+  url_template:     "https://{svcName}.in.zrok.io/"
   identities:
-    - "yvnhjvzEd"
+    - "e6gMfeD4y"
 
 store:
-  path:             /home/ubuntu/local/etc/zrok.io/db/zrok.db
+  path:             /home/ubuntu/local/etc/zrok.io/db/zrok-ctrl.db
 
 ziti:
   api_endpoint:     "https://10.0.0.41:1280"

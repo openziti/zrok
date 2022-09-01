@@ -24,7 +24,7 @@ listeners:
   - binding: edge
     address: tls:0.0.0.0:3022
     options:
-      advertise: api.zrok.io:3022
+      advertise: ziti.zrok.io:3022
       connectTimeoutMs: 1000
       getSessionTimeout: 60s
   - binding: tunnel
@@ -41,7 +41,7 @@ edge:
     organizationalUnit: Ziti
     sans:
       dns:
-        - api.zrok.io
+        - ziti.zrok.io
         - localhost
       ip:
         - "10.0.0.41"
