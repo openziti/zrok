@@ -6,6 +6,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,6 +35,11 @@ func newEnableCommand() *enableCommand {
 }
 
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
+	env, err := zrokdir.LoadEnvironment()
+	if err == nil {
+		panic(errors.Errorf("environment '%v' already enabled!", env.ZitiIdentityId))
+	}
+
 	token := args[0]
 
 	hostName, hostDetail, err := getHost()
