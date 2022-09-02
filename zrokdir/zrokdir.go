@@ -13,6 +13,17 @@ type Environment struct {
 	ZitiIdentityId string `json:"ziti_identity"`
 }
 
+func Delete() error {
+	path, err := zrokDir()
+	if err != nil {
+		return err
+	}
+	if err := os.RemoveAll(path); err != nil {
+		return err
+	}
+	return nil
+}
+
 func LoadEnvironment() (*Environment, error) {
 	ef, err := environmentFile()
 	if err != nil {

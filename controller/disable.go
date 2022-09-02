@@ -35,7 +35,7 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 		logrus.Errorf("identity check failed: %v", err)
 		return identity.NewDisableUnauthorized()
 	}
-	if err := self.removeEnvironment(envId, tx); err == nil {
+	if err := self.removeEnvironment(envId, tx); err != nil {
 		logrus.Errorf("error removing environment: %v", err)
 		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
