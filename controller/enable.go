@@ -33,7 +33,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	client, err := edgeClient(self.cfg.Ziti)
