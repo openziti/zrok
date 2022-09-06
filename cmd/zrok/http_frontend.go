@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/endpoints/frontend"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -10,28 +12,30 @@ func init() {
 }
 
 type httpFrontendCommand struct {
-	endpoint string
-	cmd      *cobra.Command
+	cmd *cobra.Command
 }
 
 func newHttpFrontendCommand() *httpFrontendCommand {
 	cmd := &cobra.Command{
-		Use:     "frontend <zitiIdentity>",
+		Use:     "frontend [<configPath>]",
 		Aliases: []string{"fe"},
 		Short:   "Create an HTTP frontend",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.RangeArgs(0, 1),
 	}
 	command := &httpFrontendCommand{cmd: cmd}
-	cmd.Flags().StringVarP(&command.endpoint, "endpoint", "e", "0.0.0.0:10180", "Bind address for HTTP frontend")
 	cmd.Run = command.run
 	return command
 }
 
 func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
-	httpListener, err := frontend.NewHTTP(&frontend.Config{
-		IdentityPath: args[0],
-		Address:      self.endpoint,
-	})
+	cfg := frontend.DefaultConfig()
+	if len(args) == 1 {
+		if err := cfg.Load(args[0]); err != nil {
+			panic(err)
+		}
+	}
+	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	httpListener, err := frontend.NewHTTP(cfg)
 	if err != nil {
 		panic(err)
 	}

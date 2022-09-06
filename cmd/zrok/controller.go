@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/controller"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -30,6 +32,7 @@ func (cmd *controllerCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
 	if err := controller.Run(cfg); err != nil {
 		panic(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
+	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
@@ -17,11 +18,6 @@ import (
 	"strings"
 )
 
-type Config struct {
-	IdentityPath string
-	Address      string
-}
-
 type httpListen struct {
 	cfg     *Config
 	zCtx    ziti.Context
@@ -29,7 +25,11 @@ type httpListen struct {
 }
 
 func NewHTTP(cfg *Config) (*httpListen, error) {
-	zCfg, err := config.NewFromFile(cfg.IdentityPath)
+	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.Identity)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.Identity)
+	}
+	zCfg, err := config.NewFromFile(zCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
