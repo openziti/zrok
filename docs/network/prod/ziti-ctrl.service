@@ -5,10 +5,11 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu
-ExecStart=/home/ubuntu/local/ziti/ziti-controller run /home/ubuntu/local/etc/zrok.io/ziti-ctrl.yml
+ExecStart=/home/ubuntu/local/ziti/bin/ziti-controller run /home/ubuntu/local/etc/zrok.io/ziti-ctrl.yml
 Restart=always
 RestartSec=2
 LimitNOFILE=65535
+Environment="PFXLOG_NO_JSON=true"
 
 [Install]
 WantedBy=multi-user.target
