@@ -1,0 +1,14 @@
+[Unit]
+Description=zrok-http-frontend
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/home/ubuntu/local/zrok/bin/zrok http frontend /home/ubuntu/.zrok/frontend.json
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
