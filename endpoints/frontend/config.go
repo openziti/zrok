@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	Identity string
-	Address  string
+	Identity  string
+	Address   string
+	HostMatch string
 }
 
 func DefaultConfig() *Config {

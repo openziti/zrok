@@ -39,13 +39,13 @@ func NewHTTP(cfg *Config) (*httpListen, error) {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := NewServiceProxy(zCtx)
+	proxy, err := newServiceProxy(cfg, zCtx)
 	if err != nil {
 		return nil, err
 	}
 	proxy.Transport = zTransport
 
-	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", zCtx)
+	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
 	return &httpListen{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -66,8 +66,8 @@ func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net
 	return self.ctx.Dial(svcName)
 }
 
-func NewServiceProxy(ctx ziti.Context) (*httputil.ReverseProxy, error) {
-	proxy := hostTargetReverseProxy(ctx)
+func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
+	proxy := hostTargetReverseProxy(cfg, ctx)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
@@ -83,9 +83,9 @@ func NewServiceProxy(ctx ziti.Context) (*httputil.ReverseProxy, error) {
 	return proxy, nil
 }
 
-func hostTargetReverseProxy(ctx ziti.Context) *httputil.ReverseProxy {
+func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetSvc := resolveService(req.Host)
+		targetSvc := resolveService(cfg.HostMatch, req.Host)
 		if svc, found := getRefreshedService(targetSvc, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
@@ -149,74 +149,78 @@ func singleJoiningSlash(a, b string) string {
 	return a + b
 }
 
-func basicAuth(handler http.Handler, realm string, ctx ziti.Context) http.HandlerFunc {
+func basicAuth(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		svcName := resolveService(r.Host)
-		if svc, found := getRefreshedService(svcName, ctx); found {
-			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
-				if scheme, found := cfg["auth_scheme"]; found {
-					switch scheme {
-					case string(model.None):
-						logrus.Debugf("auth scheme none '%v'", svcName)
-						handler.ServeHTTP(w, r)
-						return
-
-					case string(model.Basic):
-						logrus.Debugf("auth scheme basic '%v", svcName)
-						inUser, inPass, ok := r.BasicAuth()
-						if !ok {
-							writeUnauthorizedResponse(w, realm)
+		svcName := resolveService(cfg.HostMatch, r.Host)
+		if svcName != "" {
+			if svc, found := getRefreshedService(svcName, ctx); found {
+				if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+					if scheme, found := cfg["auth_scheme"]; found {
+						switch scheme {
+						case string(model.None):
+							logrus.Debugf("auth scheme none '%v'", svcName)
+							handler.ServeHTTP(w, r)
 							return
-						}
-						authed := false
-						if v, found := cfg["basic_auth"]; found {
-							if basicAuth, ok := v.(map[string]interface{}); ok {
-								if v, found := basicAuth["users"]; found {
-									if arr, ok := v.([]interface{}); ok {
-										for _, v := range arr {
-											if um, ok := v.(map[string]interface{}); ok {
-												username := ""
-												if v, found := um["username"]; found {
-													if un, ok := v.(string); ok {
-														username = un
+
+						case string(model.Basic):
+							logrus.Debugf("auth scheme basic '%v", svcName)
+							inUser, inPass, ok := r.BasicAuth()
+							if !ok {
+								writeUnauthorizedResponse(w, realm)
+								return
+							}
+							authed := false
+							if v, found := cfg["basic_auth"]; found {
+								if basicAuth, ok := v.(map[string]interface{}); ok {
+									if v, found := basicAuth["users"]; found {
+										if arr, ok := v.([]interface{}); ok {
+											for _, v := range arr {
+												if um, ok := v.(map[string]interface{}); ok {
+													username := ""
+													if v, found := um["username"]; found {
+														if un, ok := v.(string); ok {
+															username = un
+														}
 													}
-												}
-												password := ""
-												if v, found := um["password"]; found {
-													if pw, ok := v.(string); ok {
-														password = pw
+													password := ""
+													if v, found := um["password"]; found {
+														if pw, ok := v.(string); ok {
+															password = pw
+														}
 													}
-												}
-												if username == inUser && password == inPass {
-													authed = true
-													break
+													if username == inUser && password == inPass {
+														authed = true
+														break
+													}
 												}
 											}
 										}
 									}
 								}
 							}
-						}
 
-						if !authed {
+							if !authed {
+								writeUnauthorizedResponse(w, realm)
+								return
+							}
+							handler.ServeHTTP(w, r)
+
+						default:
+							logrus.Infof("invalid auth scheme '%v'", scheme)
 							writeUnauthorizedResponse(w, realm)
 							return
 						}
-						handler.ServeHTTP(w, r)
-
-					default:
-						logrus.Infof("invalid auth scheme '%v'", scheme)
-						writeUnauthorizedResponse(w, realm)
-						return
+					} else {
+						logrus.Infof("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
 					}
 				} else {
-					logrus.Infof("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
+					logrus.Infof("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
 				}
 			} else {
-				logrus.Infof("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
+				logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
 			}
 		} else {
-			logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
+			logrus.Warnf("host '%v' did not match host match", r.Host)
 		}
 	}
 }
@@ -227,13 +231,15 @@ func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
 	w.Write([]byte("No Authorization\n"))
 }
 
-func resolveService(host string) string {
+func resolveService(hostMatch string, host string) string {
 	logrus.Debugf("host = '%v'", host)
-	tokens := strings.Split(host, ".")
-	if len(tokens) > 0 {
-		return tokens[0]
+	if hostMatch == "" || strings.Contains(hostMatch, host) {
+		tokens := strings.Split(host, ".")
+		if len(tokens) > 0 {
+			return tokens[0]
+		}
 	}
-	return "zrok"
+	return ""
 }
 
 func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
