@@ -13,3 +13,4 @@ Environment="PFXLOG_NO_JSON=true"
 
 [Install]
 WantedBy=multi-user.target
+
