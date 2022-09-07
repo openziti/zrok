@@ -3,6 +3,7 @@ package frontend
 import (
 	"context"
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/endpoints/frontend/health_ui"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -45,7 +46,7 @@ func NewHTTP(cfg *Config) (*httpListen, error) {
 	}
 	proxy.Transport = zTransport
 
-	handler := basicAuth(util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
+	handler := authHandler(util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
 	return &httpListen{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -149,7 +150,7 @@ func singleJoiningSlash(a, b string) string {
 	return a + b
 }
 
-func basicAuth(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
+func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		svcName := resolveService(cfg.HostMatch, r.Host)
 		if svcName != "" {
@@ -203,6 +204,7 @@ func basicAuth(handler http.Handler, realm string, cfg *Config, ctx ziti.Context
 								writeUnauthorizedResponse(w, realm)
 								return
 							}
+
 							handler.ServeHTTP(w, r)
 
 						default:
@@ -220,7 +222,8 @@ func basicAuth(handler http.Handler, realm string, cfg *Config, ctx ziti.Context
 				logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
 			}
 		} else {
-			logrus.Warnf("host '%v' did not match host match", r.Host)
+			logrus.Warnf("host '%v' did not match host match, returning health check", r.Host)
+			health_ui.WriteHealthOk(w)
 		}
 	}
 }
@@ -233,7 +236,7 @@ func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
 
 func resolveService(hostMatch string, host string) string {
 	logrus.Debugf("host = '%v'", host)
-	if hostMatch == "" || strings.Contains(hostMatch, host) {
+	if hostMatch == "" || strings.Contains(host, hostMatch) {
 		tokens := strings.Split(host, ".")
 		if len(tokens) > 0 {
 			return tokens[0]
