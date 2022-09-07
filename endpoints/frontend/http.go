@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/endpoints/frontend/health_ui"
+	"github.com/openziti-test-kitchen/zrok/endpoints/frontend/notfound_ui"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -214,12 +215,15 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 						}
 					} else {
 						logrus.Infof("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
+						notfound_ui.WriteNotFound(w)
 					}
 				} else {
 					logrus.Infof("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
+					notfound_ui.WriteNotFound(w)
 				}
 			} else {
 				logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
+				notfound_ui.WriteNotFound(w)
 			}
 		} else {
 			logrus.Warnf("host '%v' did not match host match, returning health check", r.Host)
