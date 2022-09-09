@@ -31,6 +31,11 @@ type EmailConfig struct {
 	Password string
 }
 
+type RegistrationConfig struct {
+	EmailFrom         string
+	VerifyUrlTemplate string
+}
+
 type ZitiConfig struct {
 	ApiEndpoint string
 	Username    string
