@@ -52,5 +52,5 @@ func Run(cfg *Config) error {
 }
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewVersionOK().WithPayload("v0.1.0")
+	return metadata.NewVersionOK().WithPayload("v0.2.0")
 }
