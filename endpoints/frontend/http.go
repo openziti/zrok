@@ -215,19 +215,19 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 							return
 						}
 					} else {
-						logrus.Infof("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
+						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
 						notfound_ui.WriteNotFound(w)
 					}
 				} else {
-					logrus.Infof("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
+					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
 					notfound_ui.WriteNotFound(w)
 				}
 			} else {
-				logrus.Infof("%v -> service '%v' not found", r.RemoteAddr, svcName)
+				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcName)
 				notfound_ui.WriteNotFound(w)
 			}
 		} else {
-			logrus.Warnf("host '%v' did not match host match, returning health check", r.Host)
+			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
 			health_ui.WriteHealthOk(w)
 		}
 	}
