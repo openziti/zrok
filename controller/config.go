@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Endpoint *EndpointConfig
 	Proxy    *ProxyConfig
+	Email    *EmailConfig
 	Store    *store.Config
 	Ziti     *ZitiConfig
 }
@@ -21,6 +22,13 @@ type EndpointConfig struct {
 type ProxyConfig struct {
 	UrlTemplate string
 	Identities  []string
+}
+
+type EmailConfig struct {
+	Host     string
+	Port     uint16
+	Username string
+	Password string
 }
 
 type ZitiConfig struct {
