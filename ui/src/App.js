@@ -1,11 +1,9 @@
 import Login from './Login';
 import Logout from './Logout';
 import Network from './Network';
+import Token from './Token';
 import Version from './Version';
 import {useEffect, useState} from "react";
-import Environments from "./Environments";
-import Icon from '@mdi/react';
-import { mdiCloud } from '@mdi/js';
 
 const App = () => {
     const [user, setUser] = useState();
@@ -24,6 +22,11 @@ const App = () => {
         );
     }
 
+    const logout = () => {
+        setUser(null);
+        localStorage.clear();
+    }
+
     return (
         <div className="zrok">
             <div className="container">
@@ -36,11 +39,8 @@ const App = () => {
                             <Version/>
                         </div>
                         <div className={"header-controls"}>
-                            <button className={"logoutButton"}><Icon path={mdiCloud} size={0.7}/></button>
-                            <Logout user={user} logout={() => {
-                                setUser(null);
-                                localStorage.clear();
-                            }}/>
+                            <Token user={user}/>
+                            <Logout user={user} logout={logout}/>
                         </div>
                     </div>
                 </div>

@@ -127,6 +127,10 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 10em;
 }
 
+.popover {
+  padding: 0 25px;
+}
+
 svg.flowNode {
   vertical-align: middle;
 }

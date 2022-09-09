@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
     "@mdi/js": "^7.0.96",
     "@mdi/react": "^1.6.1",
+    "@mui/material": "^5.10.4",
     "dagre": "^0.8.5",
     "eslint-config-react-app": "^7.0.1",
     "react": "^18.2.0",
@@ -38,5 +41,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:10888"
+  "proxy": "http://localhost:18080"
 }
