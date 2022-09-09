@@ -11,6 +11,10 @@ The `v0.1` versions of `zrok` had an open-access `zrok create account` that allo
 * An email is sent to the address offering a link with the request token, allowing the user to create the account.
 * The account request is marked complete.
 
+### Invitations for Others
+
+This open `zrok create account` command will allow any user to send a `zrok` invitation to any user with a valid email address.
+
 ### Garbage Collection
 
 An background garbage collector in the controller scans the account requests, looking for unused requests, which are removed after a configurable amount of time.
