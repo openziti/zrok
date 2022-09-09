@@ -55,7 +55,10 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
 
-	zrok := newZrokClient()
+	zrok, err := newZrokClient()
+	if err != nil {
+		panic(err)
+	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := identity.NewEnableParams()
 	req.Body = &rest_model_zrok.EnableRequest{

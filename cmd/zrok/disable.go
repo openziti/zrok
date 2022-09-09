@@ -33,7 +33,10 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	zrok := newZrokClient()
+	zrok, err := newZrokClient()
+	if err != nil {
+		panic(err)
+	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
 	req := identity.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{

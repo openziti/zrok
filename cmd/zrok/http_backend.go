@@ -69,7 +69,10 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		EndpointAddress: args[0],
 	}
 
-	zrok := newZrokClient()
+	zrok, err := newZrokClient()
+	if err != nil {
+		panic(err)
+	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
 	req := tunnel.NewTunnelParams()
 	req.Body = &rest_model_zrok.TunnelRequest{

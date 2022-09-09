@@ -6,8 +6,10 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +20,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	apiEndpointDefault := os.Getenv("ZROK_API_ENDPOINT")
 	if apiEndpointDefault == "" {
-		apiEndpointDefault = "api.zrok.io"
+		apiEndpointDefault = "https://api.zrok.io"
 	}
 	rootCmd.PersistentFlags().StringVarP(&apiEndpoint, "endpoint", "e", apiEndpointDefault, "zrok API endpoint address")
 	rootCmd.AddCommand(httpCmd)
@@ -47,9 +49,13 @@ func main() {
 	}
 }
 
-func newZrokClient() *rest_client_zrok.Zrok {
-	transport := httptransport.New(apiEndpoint, "/api/v1", []string{"https", "http"})
+func newZrokClient() (*rest_client_zrok.Zrok, error) {
+	apiUrl, err := url.Parse(apiEndpoint)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", apiEndpoint)
+	}
+	transport := httptransport.New(apiUrl.Host, "/api/v1", []string{apiUrl.Scheme})
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
-	return rest_client_zrok.New(transport, strfmt.Default)
+	return rest_client_zrok.New(transport, strfmt.Default), nil
 }

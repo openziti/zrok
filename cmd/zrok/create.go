@@ -50,7 +50,10 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 		panic("confirmed password mismatch")
 	}
 
-	zrok := newZrokClient()
+	zrok, err := newZrokClient()
+	if err != nil {
+		panic(err)
+	}
 	req := identity.NewCreateAccountParams()
 	req.Body = &rest_model_zrok.AccountRequest{
 		Email:    email,
