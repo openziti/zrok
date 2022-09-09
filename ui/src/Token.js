@@ -29,7 +29,7 @@ const Token = (props) => {
                 }}
             >
                 <div className={"popover"}>
-                    <p>Use the following token to <code>zrok enable</code> your shell:</p>
+                    <p>Use the following token to <strong>zrok enable</strong> your shell:</p>
                     <pre>
                         {props.user.token}
                     </pre>
