@@ -34,7 +34,7 @@ func newCreateAccountCommand() *createAccountCommand {
 }
 
 func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
-	username, err := term.Prompt("New Username: ")
+	email, err := term.Prompt("New Email: ")
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 	zrok := newZrokClient()
 	req := identity.NewCreateAccountParams()
 	req.Body = &rest_model_zrok.AccountRequest{
-		Username: username,
+		Email:    email,
 		Password: password,
 	}
 	resp, err := zrok.Identity.CreateAccount(req)

@@ -26,7 +26,7 @@ func newUntunnelHandler(cfg *Config) *untunnelHandler {
 }
 
 func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("untunneling for '%v' (%v)", principal.Username, principal.Token)
+	logrus.Infof("untunneling for '%v' (%v)", principal.Email, principal.Token)
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -55,12 +55,12 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 			}
 		}
 		if senv == nil {
-			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZitiIdentityID, principal.Username)
+			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZitiIdentityID, principal.Email)
 			logrus.Error(err)
 			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 		}
 	} else {
-		logrus.Errorf("error finding environments for account '%v': %v", principal.Username, err)
+		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
@@ -73,12 +73,12 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 			}
 		}
 		if ssvc == nil {
-			err := errors.Errorf("service with id '%v' not found for '%v'", svcId, principal.Username)
+			err := errors.Errorf("service with id '%v' not found for '%v'", svcId, principal.Email)
 			logrus.Error(err)
 			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 		}
 	} else {
-		logrus.Errorf("error finding services for account '%v': %v", principal.Username, err)
+		logrus.Errorf("error finding services for account '%v': %v", principal.Email, err)
 		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 

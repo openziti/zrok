@@ -183,7 +183,7 @@ definitions:
   accountRequest:
     type: object
     properties:
-      username:
+      email:
         type: string
       password:
         type: string
@@ -274,7 +274,7 @@ definitions:
     properties:
       id:
         type: integer
-      username:
+      email:
         type: string
       token:
         type: string

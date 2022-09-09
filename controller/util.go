@@ -19,9 +19,9 @@ func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
 	defer func() { _ = tx.Rollback() }()
 	if a, err := str.FindAccountWithToken(token, tx); err == nil {
 		principal := rest_model_zrok.Principal{
-			ID:       int64(a.Id),
-			Token:    a.Token,
-			Username: a.Username,
+			ID:    int64(a.Id),
+			Token: a.Token,
+			Email: a.Email,
 		}
 		return &principal, nil
 	} else {

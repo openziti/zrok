@@ -307,10 +307,10 @@ func init() {
     "accountRequest": {
       "type": "object",
       "properties": {
-        "password": {
+        "email": {
           "type": "string"
         },
-        "username": {
+        "password": {
           "type": "string"
         }
       }
@@ -433,13 +433,13 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "email": {
+          "type": "string"
+        },
         "id": {
           "type": "integer"
         },
         "token": {
-          "type": "string"
-        },
-        "username": {
           "type": "string"
         }
       }
@@ -814,10 +814,10 @@ func init() {
     "accountRequest": {
       "type": "object",
       "properties": {
-        "password": {
+        "email": {
           "type": "string"
         },
-        "username": {
+        "password": {
           "type": "string"
         }
       }
@@ -940,13 +940,13 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "email": {
+          "type": "string"
+        },
         "id": {
           "type": "integer"
         },
         "token": {
-          "type": "string"
-        },
-        "username": {
           "type": "string"
         }
       }

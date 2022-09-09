@@ -17,14 +17,14 @@ import (
 // swagger:model principal
 type Principal struct {
 
+	// email
+	Email string `json:"email,omitempty"`
+
 	// id
 	ID int64 `json:"id,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`
-
-	// username
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this principal

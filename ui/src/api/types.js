@@ -5,7 +5,7 @@
  * @typedef accountRequest
  * @memberof module:types
  * 
- * @property {string} username 
+ * @property {string} email 
  * @property {string} password 
  */
 
@@ -81,7 +81,7 @@
  * @memberof module:types
  * 
  * @property {number} id 
- * @property {string} username 
+ * @property {string} email 
  * @property {string} token 
  */
 

@@ -41,7 +41,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		logrus.Errorf("error getting edge client: %v", err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	ident, err := self.createIdentity(principal.Username, client)
+	ident, err := self.createIdentity(principal.Email, client)
 	if err != nil {
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -73,7 +73,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		logrus.Errorf("error committing: %v", err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, envId, principal.Username)
+	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, envId, principal.Email)
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,
@@ -91,13 +91,13 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	return resp
 }
 
-func (_ *enableHandler) createIdentity(username string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+func (_ *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
 	iId, err := randomId()
 	if err != nil {
 		return nil, err
 	}
-	name := fmt.Sprintf("%v-%v", username, iId)
+	name := fmt.Sprintf("%v-%v", email, iId)
 	identityType := rest_model_edge.IdentityTypeUser
 	i := &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},

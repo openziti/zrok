@@ -28,7 +28,7 @@ func newTunnelHandler(cfg *Config) *tunnelHandler {
 }
 
 func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("tunneling for '%v' (%v)", principal.Username, principal.Token)
+	logrus.Infof("tunneling for '%v' (%v)", principal.Email, principal.Token)
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -42,17 +42,17 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		found := false
 		for _, env := range envs {
 			if env.ZitiIdentityId == envId {
-				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Username)
+				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Email)
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envId, principal.Username)
+			logrus.Errorf("environment '%v' not found for user '%v'", envId, principal.Email)
 			return tunnel.NewTunnelUnauthorized().WithPayload("bad environment identity")
 		}
 	} else {
-		logrus.Errorf("error finding environments for account '%v'", principal.Username)
+		logrus.Errorf("error finding environments for account '%v'", principal.Email)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
@@ -104,7 +104,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Errorf("error committing service record: %v", err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcId, sid, principal.Username)
+	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcId, sid, principal.Email)
 
 	return tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		ProxyEndpoint: self.proxyUrl(svcName),

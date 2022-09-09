@@ -17,11 +17,11 @@ import (
 // swagger:model accountRequest
 type AccountRequest struct {
 
+	// email
+	Email string `json:"email,omitempty"`
+
 	// password
 	Password string `json:"password,omitempty"`
-
-	// username
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this account request

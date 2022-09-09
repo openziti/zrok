@@ -11,10 +11,10 @@ import (
 )
 
 func createAccountHandler(params identity.CreateAccountParams) middleware.Responder {
-	logrus.Infof("received account request for username '%v'", params.Body.Username)
-	if params.Body == nil || params.Body.Username == "" || params.Body.Password == "" {
-		logrus.Errorf("missing username or password")
-		return identity.NewCreateAccountBadRequest().WithPayload("missing username or password")
+	logrus.Infof("received account request for email '%v'", params.Body.Email)
+	if params.Body == nil || params.Body.Email == "" || params.Body.Password == "" {
+		logrus.Errorf("missing email or password")
+		return identity.NewCreateAccountBadRequest().WithPayload("missing email or password")
 	}
 
 	token, err := generateApiToken()
@@ -23,7 +23,7 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	a := &store.Account{
-		Username: params.Body.Username,
+		Email:    params.Body.Email,
 		Password: hashPassword(params.Body.Password),
 		Token:    token,
 	}

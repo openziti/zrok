@@ -16,7 +16,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 	defer func() { _ = tx.Rollback() }()
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
-		logrus.Errorf("error finding environments for '%v': %v", principal.Username, err)
+		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	var out rest_model_zrok.EnvironmentServicesList

@@ -7,17 +7,17 @@ import (
 
 type Account struct {
 	Model
-	Username string
+	Email    string
 	Password string
 	Token    string
 }
 
 func (self *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into accounts (username, password, token) values (?, ?, ?)")
+	stmt, err := tx.Prepare("insert into accounts (email, password, token) values (?, ?, ?)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts insert statement")
 	}
-	res, err := stmt.Exec(a.Username, a.Password, a.Token)
+	res, err := stmt.Exec(a.Email, a.Password, a.Token)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing accounts insert statement")
 	}
@@ -36,10 +36,10 @@ func (self *Store) GetAccount(id int, tx *sqlx.Tx) (*Account, error) {
 	return a, nil
 }
 
-func (self *Store) FindAccountWithUsername(username string, tx *sqlx.Tx) (*Account, error) {
+func (self *Store) FindAccountWithEmail(email string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where username = ?", username).StructScan(a); err != nil {
-		return nil, errors.Wrap(err, "error selecting account by username")
+	if err := tx.QueryRowx("select * from accounts where email = ?", email).StructScan(a); err != nil {
+		return nil, errors.Wrap(err, "error selecting account by email")
 	}
 	return a, nil
 }

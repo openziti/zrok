@@ -21,7 +21,7 @@ func loginHandler(params identity.LoginParams) middleware.Responder {
 		return identity.NewLoginUnauthorized()
 	}
 	defer func() { _ = tx.Rollback() }()
-	a, err := str.FindAccountWithUsername(params.Body.Email, tx)
+	a, err := str.FindAccountWithEmail(params.Body.Email, tx)
 	if err != nil {
 		logrus.Errorf("error finding account '%v': %v", params.Body.Email, err)
 		return identity.NewLoginUnauthorized()
