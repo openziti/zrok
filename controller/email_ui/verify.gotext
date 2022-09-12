@@ -1,0 +1,5 @@
+Welcome to zrok, {{ .EmailAddress }}!
+
+Please visit this link to activate your zrok account:
+
+{{ .VerifyUrl }}

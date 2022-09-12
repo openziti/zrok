@@ -2,12 +2,11 @@ package controller
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/openziti-test-kitchen/zrok/controller/email_ui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/wneessen/go-mail"
 	"html/template"
-	"net/smtp"
 )
 
 type verificationEmail struct {
@@ -16,29 +15,61 @@ type verificationEmail struct {
 }
 
 func sendVerificationEmail(emailAddress, token string, cfg *Config) error {
-	t, err := template.ParseFS(email_ui.FS, "verify.gohtml")
-	if err != nil {
-		return errors.Wrap(err, "error parsing email verification template")
-	}
-	buf := new(bytes.Buffer)
-	err = t.Execute(buf, &verificationEmail{
+	emailData := &verificationEmail{
 		EmailAddress: emailAddress,
 		VerifyUrl:    cfg.Registration.RegistrationUrlTemplate + "/" + token,
-	})
-	if err != nil {
-		return errors.Wrap(err, "error executing email verification template")
 	}
 
-	subject := "Subject: Welcome to zrok!\n"
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	msg := []byte(subject + mime + buf.String())
-	auth := smtp.PlainAuth("", cfg.Email.Username, cfg.Email.Password, cfg.Email.Host)
-	to := []string{emailAddress}
-	err = smtp.SendMail(fmt.Sprintf("%v:%d", cfg.Email.Host, cfg.Email.Port), auth, cfg.Registration.EmailFrom, to, msg)
+	plainBody, err := mergeTemplate(emailData, "verify.gotext")
 	if err != nil {
-		return errors.Wrap(err, "error sending email verification")
+		return err
+	}
+	htmlBody, err := mergeTemplate(emailData, "verify.gohtml")
+	if err != nil {
+		return err
+	}
+
+	msg := mail.NewMsg()
+	if err := msg.From("ziggy@zrok.io"); err != nil {
+		return errors.Wrap(err, "failed to set from address in verification email")
+	}
+	if err := msg.To(emailAddress); err != nil {
+		return errors.Wrap(err, "failed to sent to address in verification email")
+	}
+	msg.Subject("Welcome to zrok!")
+	msg.SetDate()
+	msg.SetMessageID()
+	msg.SetBulk()
+	msg.SetImportance(mail.ImportanceHigh)
+	msg.SetBodyString(mail.TypeTextPlain, plainBody)
+	msg.SetBodyString(mail.TypeTextHTML, htmlBody)
+
+	client, err := mail.NewClient(cfg.Email.Host,
+		mail.WithPort(cfg.Email.Port),
+		mail.WithSMTPAuth(mail.SMTPAuthPlain),
+		mail.WithUsername(cfg.Email.Username),
+		mail.WithPassword(cfg.Email.Password),
+		mail.WithTLSPolicy(mail.TLSMandatory),
+	)
+	if err != nil {
+		return errors.Wrap(err, "error creating verification email client")
+	}
+	if err := client.DialAndSend(msg); err != nil {
+		return errors.Wrap(err, "error sending verification email")
 	}
 
 	logrus.Infof("verification email sent to '%v'", emailAddress)
 	return nil
+}
+
+func mergeTemplate(emailData *verificationEmail, filename string) (string, error) {
+	t, err := template.ParseFS(email_ui.FS, filename)
+	if err != nil {
+		return "", errors.Wrapf(err, "error parsing verification email template '%v'", filename)
+	}
+	buf := new(bytes.Buffer)
+	if err := t.Execute(buf, emailData); err != nil {
+		return "", errors.Wrapf(err, "error executing verification email template '%v'", filename)
+	}
+	return buf.String(), nil
 }
