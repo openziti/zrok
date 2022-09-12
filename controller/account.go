@@ -63,6 +63,19 @@ func (self *createAccountHandler) handleDirectCreate(params identity.CreateAccou
 }
 
 func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAccountParams) middleware.Responder {
+	if params.Body == nil || params.Body.Email == "" {
+		logrus.Errorf("missing email")
+		return identity.NewCreateAccountBadRequest().WithPayload("missing email")
+	}
+	token, err := generateApiToken()
+	if err != nil {
+		logrus.Errorf("error generating api token: %v", err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	if err := sendVerificationEmail(params.Body.Email, token, self.cfg); err != nil {
+		logrus.Error(err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
 	return identity.NewCreateAccountCreated()
 }
 

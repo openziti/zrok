@@ -29,9 +29,12 @@ func sendVerificationEmail(emailAddress, token string, cfg *Config) error {
 		return errors.Wrap(err, "error executing email verification template")
 	}
 
+	subject := "Subject: Welcome to zrok!\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	msg := []byte(subject + mime + buf.String())
 	auth := smtp.PlainAuth("", cfg.Email.Username, cfg.Email.Password, cfg.Email.Host)
 	to := []string{emailAddress}
-	err = smtp.SendMail(fmt.Sprintf("%v:%d", cfg.Email.Host, cfg.Email.Port), auth, cfg.Registration.EmailFrom, to, buf.Bytes())
+	err = smtp.SendMail(fmt.Sprintf("%v:%d", cfg.Email.Host, cfg.Email.Port), auth, cfg.Registration.EmailFrom, to, msg)
 	if err != nil {
 		return errors.Wrap(err, "error sending email verification")
 	}

@@ -27,7 +27,7 @@ type ProxyConfig struct {
 
 type EmailConfig struct {
 	Host     string
-	Port     uint16
+	Port     int
 	Username string
 	Password string
 }
