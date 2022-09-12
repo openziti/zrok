@@ -33,8 +33,9 @@ type EmailConfig struct {
 }
 
 type RegistrationConfig struct {
-	EmailFrom         string
-	VerifyUrlTemplate string
+	ImmediateCreate         bool
+	EmailFrom               string
+	RegistrationUrlTemplate string
 }
 
 type ZitiConfig struct {

@@ -10,8 +10,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func createAccountHandler(params identity.CreateAccountParams) middleware.Responder {
+type createAccountHandler struct {
+	cfg *Config
+}
+
+func newCreateAccountHandler(cfg *Config) *createAccountHandler {
+	return &createAccountHandler{cfg: cfg}
+}
+
+func (self *createAccountHandler) Handle(params identity.CreateAccountParams) middleware.Responder {
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
+	if self.cfg.Registration.ImmediateCreate {
+		return self.handleDirectCreate(params)
+	} else {
+		return self.handleVerifiedCreate(params)
+	}
+}
+
+func (self *createAccountHandler) handleDirectCreate(params identity.CreateAccountParams) middleware.Responder {
 	if params.Body == nil || params.Body.Email == "" || params.Body.Password == "" {
 		logrus.Errorf("missing email or password")
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email or password")
@@ -44,6 +60,10 @@ func createAccountHandler(params identity.CreateAccountParams) middleware.Respon
 
 	logrus.Infof("account created with id = '%v'", id)
 	return identity.NewCreateAccountCreated().WithPayload(&rest_model_zrok.AccountResponse{Token: token})
+}
+
+func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAccountParams) middleware.Responder {
+	return identity.NewCreateAccountCreated()
 }
 
 func hashPassword(raw string) string {
