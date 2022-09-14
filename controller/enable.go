@@ -93,11 +93,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 
 func (_ *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
-	iId, err := randomId()
-	if err != nil {
-		return nil, err
-	}
-	name := fmt.Sprintf("%v-%v", email, iId)
+	name := createToken()
 	identityType := rest_model_edge.IdentityTypeUser
 	i := &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},

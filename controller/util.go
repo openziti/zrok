@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
+	"github.com/lithammer/shortuuid/v4"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
@@ -41,12 +42,8 @@ func edgeClient(cfg *ZitiConfig) (*rest_management_api_client.ZitiEdgeManagement
 	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Username, cfg.Password, cfg.ApiEndpoint, caPool)
 }
 
-func generateApiToken() (string, error) {
-	bytes := make([]byte, 64)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", errors.Wrap(err, "error generating random api token")
-	}
-	return hex.EncodeToString(bytes), nil
+func createToken() string {
+	return shortuuid.New()
 }
 
 func randomId() (string, error) {

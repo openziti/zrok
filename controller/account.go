@@ -33,11 +33,7 @@ func (self *createAccountHandler) handleDirectCreate(params identity.CreateAccou
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email or password")
 	}
 
-	token, err := generateApiToken()
-	if err != nil {
-		logrus.Errorf("error generating api token: %v", err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
+	token := createToken()
 	a := &store.Account{
 		Email:    params.Body.Email,
 		Password: hashPassword(params.Body.Password),
@@ -67,11 +63,7 @@ func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAcc
 		logrus.Errorf("missing email")
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email")
 	}
-	token, err := generateApiToken()
-	if err != nil {
-		logrus.Errorf("error generating api token: %v", err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
+	token := createToken()
 	if err := sendVerificationEmail(params.Body.Email, token, self.cfg); err != nil {
 		logrus.Error(err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
