@@ -61,7 +61,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-	svcName, err := randomId()
+	svcName, err := createServiceName()
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))

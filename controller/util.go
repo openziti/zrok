@@ -46,10 +46,10 @@ func createToken() string {
 	return shortuuid.New()
 }
 
-func randomId() (string, error) {
-	bytes := make([]byte, 8)
+func createServiceName() (string, error) {
+	bytes := make([]byte, 4)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", errors.Wrap(err, "error generating random identity id")
+		return "", errors.Wrap(err, "error generating service name")
 	}
 	return hex.EncodeToString(bytes), nil
 }
