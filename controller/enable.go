@@ -91,7 +91,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	return resp
 }
 
-func (_ *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+func (self *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
 	name := createToken()
 	identityType := rest_model_edge.IdentityTypeUser
@@ -101,7 +101,7 @@ func (_ *enableHandler) createIdentity(email string, client *rest_management_api
 		Name:                &name,
 		RoleAttributes:      nil,
 		ServiceHostingCosts: nil,
-		Tags:                nil,
+		Tags:                self.zrokTags(),
 		Type:                &identityType,
 	}
 	req := identity_edge.NewCreateIdentityParams()
@@ -138,7 +138,7 @@ func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_cl
 	return conf, nil
 }
 
-func (_ *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	identityRoles := []string{fmt.Sprintf("@%v", id)}
 	name := fmt.Sprintf("zrok-%v", id)
@@ -148,6 +148,7 @@ func (_ *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_
 		IdentityRoles:   identityRoles,
 		Name:            &name,
 		Semantic:        &semantic,
+		Tags:            self.zrokTags(),
 	}
 	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
 		Policy:  erp,
@@ -160,4 +161,12 @@ func (_ *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_
 	}
 	logrus.Infof("created edge router policy '%v'", resp.Payload.Data.ID)
 	return nil
+}
+
+func (self *enableHandler) zrokTags() *rest_model_edge.Tags {
+	return &rest_model_edge.Tags{
+		SubTags: map[string]interface{}{
+			"zrok": version,
+		},
+	}
 }
