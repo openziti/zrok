@@ -130,6 +130,7 @@ func (self *tunnelHandler) createConfig(svcName string, params tunnel.TunnelPara
 		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
 		Name:         &svcName,
+		Tags:         self.zrokTags(svcName),
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
@@ -144,13 +145,14 @@ func (self *tunnelHandler) createConfig(svcName string, params tunnel.TunnelPara
 	return cfgResp.Payload.Data.ID, nil
 }
 
-func (self *tunnelHandler) createService(name, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+func (self *tunnelHandler) createService(svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
 	configs := []string{cfgId}
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		Configs:            configs,
 		EncryptionRequired: &encryptionRequired,
-		Name:               &name,
+		Name:               &svcName,
+		Tags:               self.zrokTags(svcName),
 	}
 	req := &service.CreateServiceParams{
 		Service: svc,
@@ -179,6 +181,7 @@ func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string,
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
+		Tags:              self.zrokTags(svcName),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -211,6 +214,7 @@ func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
+		Tags:              self.zrokTags(svcName),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -234,6 +238,7 @@ func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, 
 		Name:            &svcName,
 		Semantic:        &semantic,
 		ServiceRoles:    serviceRoles,
+		Tags:            self.zrokTags(svcName),
 	}
 	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{
 		Policy:  serp,
@@ -250,4 +255,13 @@ func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, 
 
 func (self *tunnelHandler) proxyUrl(svcName string) string {
 	return strings.Replace(self.cfg.Proxy.UrlTemplate, "{svcName}", svcName, -1)
+}
+
+func (self *tunnelHandler) zrokTags(svcName string) *rest_model.Tags {
+	return &rest_model.Tags{
+		SubTags: map[string]interface{}{
+			"zrok":              version,
+			"zrok-service-name": svcName,
+		},
+	}
 }

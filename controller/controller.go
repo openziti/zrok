@@ -13,6 +13,8 @@ import (
 
 var str *store.Store
 
+const version = "v0.2.0"
+
 func Run(cfg *Config) error {
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {
@@ -52,5 +54,5 @@ func Run(cfg *Config) error {
 }
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewVersionOK().WithPayload("v0.2.0")
+	return metadata.NewVersionOK().WithPayload(version)
 }
