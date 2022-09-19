@@ -3,7 +3,7 @@ import Logout from './Logout';
 import Network from './Network';
 import Token from './Token';
 import Version from './Version';
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 const App = () => {
     const [user, setUser] = useState();

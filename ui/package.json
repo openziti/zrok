@@ -14,6 +14,7 @@
     "react-data-table-component": "^7.5.2",
     "react-dom": "^18.2.0",
     "react-flow-renderer": "^10.3.12",
+    "react-router-dom": "^6.4.0",
     "react-scripts": "5.0.1",
     "styled-components": "^5.3.5"
   },
@@ -41,5 +42,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:18080"
+  "proxy": "https://api.zrok.io"
 }
