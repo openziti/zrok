@@ -44,10 +44,10 @@ func (self *createAccountHandler) handleDirectCreate(params identity.CreateAccou
 		logrus.Errorf("error starting transaction: %v", err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+	defer func() { _ = tx.Rollback() }()
 	id, err := str.CreateAccount(a, tx)
 	if err != nil {
 		logrus.Errorf("error creating account: %v", err)
-		_ = tx.Rollback()
 		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := tx.Commit(); err != nil {
