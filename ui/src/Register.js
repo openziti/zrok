@@ -1,6 +1,13 @@
+import { useParams } from 'react-router-dom';
+
 const Register = () => {
+    const { token } = useParams();
+
     return (
-        <h1>Register!</h1>
+        <div>
+            <h1>Register!</h1>
+            <p>token = "{token}"</p>
+        </div>
     )
 }
 

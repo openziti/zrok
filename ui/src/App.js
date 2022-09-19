@@ -4,8 +4,10 @@ import Network from './Network';
 import Token from './Token';
 import Version from './Version';
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Register from "./Register";
 
-const App = () => {
+const Overview = () => {
     const [user, setUser] = useState();
 
     useEffect(() => {
@@ -49,6 +51,17 @@ const App = () => {
                 </div>
             </div>
         </div>
+    );
+}
+
+const App = () => {
+    return (
+        <Router>
+            <Routes>
+                <Route path={"/"} element={<Overview />}/>
+                <Route path={"register/:token"} element={<Register />} />
+            </Routes>
+        </Router>
     );
 }
 
