@@ -62,6 +62,21 @@ export function login(options) {
   return gateway.request(loginOperation, parameters)
 }
 
+/**
+ * @param {object} options Optional options
+ * @param {module:types.verifyRequest} [options.body] 
+ * @return {Promise<module:types.verifyResponse>} token ready
+ */
+export function verify(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(verifyOperation, parameters)
+}
+
 const createAccountOperation = {
   path: '/account',
   contentTypes: ['application/zrok.v1+json'],
@@ -94,4 +109,10 @@ const loginOperation = {
   path: '/login',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post'
+}
+
+const verifyOperation = {
+  path: '/verify',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'get'
 }

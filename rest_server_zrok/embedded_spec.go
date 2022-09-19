@@ -286,6 +286,40 @@ func init() {
         }
       }
     },
+    "/verify": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "verify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/verifyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token ready",
+            "schema": {
+              "$ref": "#/definitions/verifyResponse"
+            }
+          },
+          "404": {
+            "description": "token not found"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -294,7 +328,7 @@ func init() {
         "operationId": "version",
         "responses": {
           "200": {
-            "description": "retrieve the current server version",
+            "description": "current server version",
             "schema": {
               "$ref": "#/definitions/version"
             }
@@ -508,6 +542,22 @@ func init() {
           "type": "string"
         },
         "zitiIdentityId": {
+          "type": "string"
+        }
+      }
+    },
+    "verifyRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "verifyResponse": {
+      "type": "object",
+      "properties": {
+        "email": {
           "type": "string"
         }
       }
@@ -793,6 +843,40 @@ func init() {
         }
       }
     },
+    "/verify": {
+      "get": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "verify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/verifyRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token ready",
+            "schema": {
+              "$ref": "#/definitions/verifyResponse"
+            }
+          },
+          "404": {
+            "description": "token not found"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/version": {
       "get": {
         "tags": [
@@ -801,7 +885,7 @@ func init() {
         "operationId": "version",
         "responses": {
           "200": {
-            "description": "retrieve the current server version",
+            "description": "current server version",
             "schema": {
               "$ref": "#/definitions/version"
             }
@@ -1015,6 +1099,22 @@ func init() {
           "type": "string"
         },
         "zitiIdentityId": {
+          "type": "string"
+        }
+      }
+    },
+    "verifyRequest": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "verifyResponse": {
+      "type": "object",
+      "properties": {
+        "email": {
           "type": "string"
         }
       }

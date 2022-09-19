@@ -17,7 +17,7 @@ import (
 const VersionOKCode int = 200
 
 /*
-VersionOK retrieve the current server version
+VersionOK current server version
 
 swagger:response versionOK
 */

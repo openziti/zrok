@@ -121,3 +121,17 @@
  * @property {string} zitiIdentityId 
  * @property {string} service 
  */
+
+/**
+ * @typedef verifyRequest
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ */
+
+/**
+ * @typedef verifyResponse
+ * @memberof module:types
+ * 
+ * @property {string} email 
+ */

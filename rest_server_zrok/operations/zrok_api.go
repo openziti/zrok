@@ -68,6 +68,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Untunnel has not yet been implemented")
 		}),
+		IdentityVerifyHandler: identity.VerifyHandlerFunc(func(params identity.VerifyParams) middleware.Responder {
+			return middleware.NotImplemented("operation identity.Verify has not yet been implemented")
+		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
@@ -135,6 +138,8 @@ type ZrokAPI struct {
 	TunnelTunnelHandler tunnel.TunnelHandler
 	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
 	TunnelUntunnelHandler tunnel.UntunnelHandler
+	// IdentityVerifyHandler sets the operation handler for the verify operation
+	IdentityVerifyHandler identity.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -238,6 +243,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.TunnelUntunnelHandler == nil {
 		unregistered = append(unregistered, "tunnel.UntunnelHandler")
+	}
+	if o.IdentityVerifyHandler == nil {
+		unregistered = append(unregistered, "identity.VerifyHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -369,6 +377,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/untunnel"] = tunnel.NewUntunnel(o.context, o.TunnelUntunnelHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/verify"] = identity.NewVerify(o.context, o.IdentityVerifyHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
