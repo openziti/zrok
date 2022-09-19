@@ -29,7 +29,7 @@ const Login = (props) => {
     };
 
     return (
-        <div className={"login"}>
+        <div className={"fullscreen"}>
             <img src={"ziggy.svg"} width={200}/>
             <h1>zrok</h1>
             <form onSubmit={handleSubmit}>

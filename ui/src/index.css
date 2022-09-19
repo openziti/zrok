@@ -20,7 +20,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-right: 10%;
 }
 
-.login {
+.fullscreen {
   background-color: #3b2693;
   text-align: center;
   padding: 25px;
@@ -31,28 +31,28 @@ h1, h2, h3, h4, h5, h6 {
   height: 100vh;
   justify-content: center;
 }
-.login h1 {
+.fullscreen h1 {
   font-size: 64pt;
 }
-.login fieldset {
+.fullscreen fieldset {
   width: 500px;
   border-radius: 25px;
 }
-.login label {
+.fullscreen label {
   text-align: right;
   width: 100px;
   float: left;
   font-family: 'Russo One', sans-serif;
   margin-right: 10px;
 }
-.login fieldset legend {
+.fullscreen fieldset legend {
   font-family: 'Russo One', sans-serif;
 }
-.login fieldset p {
+.fullscreen fieldset p {
   clear: both;
   padding: 5px;
 }
-.login input {
+.fullscreen input {
   width: 300px;
   float: left;
 }

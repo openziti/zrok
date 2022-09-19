@@ -12,7 +12,7 @@ const Proceed = (props) => {
     }
 
     return (
-        <div className={"login"}>
+        <div className={"fullscreen"}>
             <img src={"/ziggy.svg"} width={200}/>
             <h1>A new zrok user!</h1>
             <h2>{props.email}</h2>
@@ -32,7 +32,7 @@ const Proceed = (props) => {
 
 const Failed = () => {
     return (
-        <div className={"login"}>
+        <div className={"fullscreen"}>
             <img src={"/ziggy.svg"} width={200}/>
             <h1>No such account request!</h1>
         </div>
