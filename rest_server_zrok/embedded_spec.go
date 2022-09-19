@@ -287,7 +287,7 @@ func init() {
       }
     },
     "/verify": {
-      "get": {
+      "post": {
         "tags": [
           "identity"
         ],
@@ -844,7 +844,7 @@ func init() {
       }
     },
     "/verify": {
-      "get": {
+      "post": {
         "tags": [
           "identity"
         ],

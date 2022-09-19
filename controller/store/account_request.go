@@ -1,7 +1,6 @@
 package store
 
 import (
-	"database/sql"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -14,7 +13,7 @@ type AccountRequest struct {
 	SourceAddress string
 }
 
-func (self *Store) CreateAccountRequest(ar *AccountRequest, tx *sql.Tx) (int, error) {
+func (self *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into account_requests (token, email, source_address) values (?, ?, ?)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing account_requests insert statement")

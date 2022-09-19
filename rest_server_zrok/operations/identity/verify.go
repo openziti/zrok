@@ -30,7 +30,7 @@ func NewVerify(ctx *middleware.Context, handler VerifyHandler) *Verify {
 }
 
 /*
-	Verify swagger:route GET /verify identity verify
+	Verify swagger:route POST /verify identity verify
 
 Verify verify API
 */

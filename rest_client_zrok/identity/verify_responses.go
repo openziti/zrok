@@ -86,11 +86,11 @@ func (o *VerifyOK) IsCode(code int) bool {
 }
 
 func (o *VerifyOK) Error() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyOK  %+v", 200, o.Payload)
 }
 
 func (o *VerifyOK) String() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyOK  %+v", 200, o.Payload)
 }
 
 func (o *VerifyOK) GetPayload() *rest_model_zrok.VerifyResponse {
@@ -148,11 +148,11 @@ func (o *VerifyNotFound) IsCode(code int) bool {
 }
 
 func (o *VerifyNotFound) Error() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyNotFound ", 404)
+	return fmt.Sprintf("[POST /verify][%d] verifyNotFound ", 404)
 }
 
 func (o *VerifyNotFound) String() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyNotFound ", 404)
+	return fmt.Sprintf("[POST /verify][%d] verifyNotFound ", 404)
 }
 
 func (o *VerifyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -200,11 +200,11 @@ func (o *VerifyInternalServerError) IsCode(code int) bool {
 }
 
 func (o *VerifyInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *VerifyInternalServerError) String() string {
-	return fmt.Sprintf("[GET /verify][%d] verifyInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *VerifyInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {

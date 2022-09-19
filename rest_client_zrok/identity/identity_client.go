@@ -207,7 +207,7 @@ func (a *Client) Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, 
 	}
 	op := &runtime.ClientOperation{
 		ID:                 "verify",
-		Method:             "GET",
+		Method:             "POST",
 		PathPattern:        "/verify",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},

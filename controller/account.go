@@ -68,6 +68,25 @@ func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAcc
 		logrus.Error(err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
+	ar := &store.AccountRequest{
+		Token:         token,
+		Email:         params.Body.Email,
+		SourceAddress: params.HTTPRequest.RemoteAddr,
+	}
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	defer func() { _ = tx.Rollback() }()
+	if _, err := str.CreateAccountRequest(ar, tx); err != nil {
+		logrus.Error(err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+	if err := tx.Commit(); err != nil {
+		logrus.Error(err)
+		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
 	return identity.NewCreateAccountCreated()
 }
 

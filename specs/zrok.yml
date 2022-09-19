@@ -169,7 +169,7 @@ paths:
             $ref: "#/definitions/errorMessage"
 
   /verify:
-    get:
+    post:
       tags:
         - identity
       operationId: verify

@@ -114,5 +114,5 @@ const loginOperation = {
 const verifyOperation = {
   path: '/verify',
   contentTypes: ['application/zrok.v1+json'],
-  method: 'get'
+  method: 'post'
 }

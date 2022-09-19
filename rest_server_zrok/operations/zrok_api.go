@@ -377,10 +377,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/untunnel"] = tunnel.NewUntunnel(o.context, o.TunnelUntunnelHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/verify"] = identity.NewVerify(o.context, o.IdentityVerifyHandler)
+	o.handlers["POST"]["/verify"] = identity.NewVerify(o.context, o.IdentityVerifyHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

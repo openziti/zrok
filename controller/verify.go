@@ -16,16 +16,21 @@ func newVerifyHandler(cfg *Config) *verifyHandler {
 }
 
 func (self *verifyHandler) Handle(params identity.VerifyParams) middleware.Responder {
-	logrus.Infof("received verify request for token '%v'", params.Body.Token)
-	tx, err := str.Begin()
-	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewVerifyInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	if params.Body != nil {
+		logrus.Infof("received verify request for token '%v'", params.Body.Token)
+		tx, err := str.Begin()
+		if err != nil {
+			logrus.Errorf("error starting transaction: %v", err)
+			return identity.NewVerifyInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		}
+		ar, err := str.FindAccountRequestWithToken(params.Body.Token, tx)
+		if err != nil {
+			logrus.Errorf("error finding account with token '%v': %v", params.Body.Token, err)
+			return identity.NewVerifyNotFound()
+		}
+		return identity.NewVerifyOK().WithPayload(&rest_model_zrok.VerifyResponse{Email: ar.Email})
+	} else {
+		logrus.Error("empty verification request")
+		return identity.NewVerifyInternalServerError().WithPayload(rest_model_zrok.ErrorMessage("empty verification request"))
 	}
-	ar, err := str.FindAccountRequestWithToken(params.Body.Token, tx)
-	if err != nil {
-		logrus.Errorf("error finding account with token '%v': %v", params.Body.Token, err)
-		return identity.NewVerifyNotFound()
-	}
-	return identity.NewVerifyOK().WithPayload(&rest_model_zrok.VerifyResponse{Email: ar.Email})
 }
