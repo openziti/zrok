@@ -95,13 +95,15 @@ func (self *enableHandler) createIdentity(email string, client *rest_management_
 	iIsAdmin := false
 	name := createToken()
 	identityType := rest_model_edge.IdentityTypeUser
+	tags := self.zrokTags()
+	tags.SubTags["zrokEmail"] = email
 	i := &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
 		IsAdmin:             &iIsAdmin,
 		Name:                &name,
 		RoleAttributes:      nil,
 		ServiceHostingCosts: nil,
-		Tags:                self.zrokTags(),
+		Tags:                tags,
 		Type:                &identityType,
 	}
 	req := identity_edge.NewCreateIdentityParams()
@@ -141,12 +143,11 @@ func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_cl
 func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	identityRoles := []string{fmt.Sprintf("@%v", id)}
-	name := fmt.Sprintf("zrok-%v", id)
 	semantic := rest_model_edge.SemanticAllOf
 	erp := &rest_model_edge.EdgeRouterPolicyCreate{
 		EdgeRouterRoles: edgeRouterRoles,
 		IdentityRoles:   identityRoles,
-		Name:            &name,
+		Name:            &id,
 		Semantic:        &semantic,
 		Tags:            self.zrokTags(),
 	}
