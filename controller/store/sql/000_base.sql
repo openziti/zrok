@@ -23,12 +23,10 @@ create table account_requests (
   id                    integer             primary key,
   token                 string              not null unique,
   email                 string              not null unique,
-  verified              boolean             not null default(false),
   source_address        string              not null,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now'))
 );
-
 
 --
 -- environments

@@ -9,7 +9,6 @@ type AccountRequest struct {
 	Model
 	Token         string
 	Email         string
-	Verified      bool
 	SourceAddress string
 }
 
