@@ -86,6 +86,14 @@
  */
 
 /**
+ * @typedef registerRequest
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ * @property {string} password 
+ */
+
+/**
  * @typedef service
  * @memberof module:types
  * 

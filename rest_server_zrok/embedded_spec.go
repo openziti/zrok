@@ -205,6 +205,37 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/registerRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "account created"
+          },
+          "404": {
+            "description": "request not found"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -472,6 +503,17 @@ func init() {
         },
         "id": {
           "type": "integer"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "registerRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
         },
         "token": {
           "type": "string"
@@ -762,6 +804,37 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "tags": [
+          "identity"
+        ],
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/registerRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "account created"
+          },
+          "404": {
+            "description": "request not found"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/tunnel": {
       "post": {
         "security": [
@@ -1029,6 +1102,17 @@ func init() {
         },
         "id": {
           "type": "integer"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "registerRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
         },
         "token": {
           "type": "string"

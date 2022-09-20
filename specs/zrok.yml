@@ -12,6 +12,9 @@ securityDefinitions:
     name: x-token
 
 paths:
+#
+# identity
+#
   /account:
     post:
       tags:
@@ -114,6 +117,26 @@ paths:
           description: overview returned
           schema:
             $ref: "#/definitions/environmentServicesList"
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
+
+  /register:
+    post:
+      tags:
+        - identity
+      operationId: register
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/registerRequest"
+      responses:
+        200:
+          description: account created
+        404:
+          description: request not found
         500:
           description: internal server error
           schema:
@@ -299,6 +322,14 @@ definitions:
       email:
         type: string
       token:
+        type: string
+
+  registerRequest:
+    type: object
+    properties:
+      token:
+        type: string
+      password:
         type: string
 
   services:

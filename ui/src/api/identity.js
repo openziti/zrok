@@ -64,6 +64,21 @@ export function login(options) {
 
 /**
  * @param {object} options Optional options
+ * @param {module:types.registerRequest} [options.body] 
+ * @return {Promise<object>} account created
+ */
+export function register(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(registerOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.verifyRequest} [options.body] 
  * @return {Promise<module:types.verifyResponse>} token ready
  */
@@ -107,6 +122,12 @@ const disableOperation = {
 
 const loginOperation = {
   path: '/login',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post'
+}
+
+const registerOperation = {
+  path: '/register',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post'
 }

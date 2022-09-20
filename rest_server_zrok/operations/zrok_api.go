@@ -62,6 +62,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
+		IdentityRegisterHandler: identity.RegisterHandlerFunc(func(params identity.RegisterParams) middleware.Responder {
+			return middleware.NotImplemented("operation identity.Register has not yet been implemented")
+		}),
 		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
 		}),
@@ -134,6 +137,8 @@ type ZrokAPI struct {
 	IdentityLoginHandler identity.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
+	// IdentityRegisterHandler sets the operation handler for the register operation
+	IdentityRegisterHandler identity.RegisterHandler
 	// TunnelTunnelHandler sets the operation handler for the tunnel operation
 	TunnelTunnelHandler tunnel.TunnelHandler
 	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
@@ -237,6 +242,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
+	}
+	if o.IdentityRegisterHandler == nil {
+		unregistered = append(unregistered, "identity.RegisterHandler")
 	}
 	if o.TunnelTunnelHandler == nil {
 		unregistered = append(unregistered, "tunnel.TunnelHandler")
@@ -369,6 +377,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/overview"] = metadata.NewOverview(o.context, o.MetadataOverviewHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/register"] = identity.NewRegister(o.context, o.IdentityRegisterHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
