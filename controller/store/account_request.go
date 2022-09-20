@@ -43,3 +43,23 @@ func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*Acco
 	}
 	return ar, nil
 }
+
+func (self *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
+	ar := &AccountRequest{}
+	if err := tx.QueryRowx("select * from account_requests where email = ?", email).StructScan(ar); err != nil {
+		return nil, errors.Wrap(err, "error selecting account_request by email")
+	}
+	return ar, nil
+}
+
+func (self *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from account_requests where id = ?")
+	if err != nil {
+		return errors.Wrap(err, "error preparing account_requests delete statement")
+	}
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "error executing account_requests delete statement")
+	}
+	return nil
+}
