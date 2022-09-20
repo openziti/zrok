@@ -17,11 +17,11 @@ func newCreateAccountHandler(cfg *Config) *createAccountHandler {
 }
 
 func (self *createAccountHandler) Handle(params identity.CreateAccountParams) middleware.Responder {
-	logrus.Infof("received account request for email '%v'", params.Body.Email)
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email")
 	}
+	logrus.Infof("received account request for email '%v'", params.Body.Email)
 
 	token := createToken()
 	ar := &store.AccountRequest{

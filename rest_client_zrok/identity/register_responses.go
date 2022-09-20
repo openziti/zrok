@@ -57,6 +57,7 @@ RegisterOK describes a response with status code 200, with default header values
 account created
 */
 type RegisterOK struct {
+	Payload *rest_model_zrok.RegisterResponse
 }
 
 // IsSuccess returns true when this register o k response has a 2xx status code
@@ -85,14 +86,25 @@ func (o *RegisterOK) IsCode(code int) bool {
 }
 
 func (o *RegisterOK) Error() string {
-	return fmt.Sprintf("[POST /register][%d] registerOK ", 200)
+	return fmt.Sprintf("[POST /register][%d] registerOK  %+v", 200, o.Payload)
 }
 
 func (o *RegisterOK) String() string {
-	return fmt.Sprintf("[POST /register][%d] registerOK ", 200)
+	return fmt.Sprintf("[POST /register][%d] registerOK  %+v", 200, o.Payload)
+}
+
+func (o *RegisterOK) GetPayload() *rest_model_zrok.RegisterResponse {
+	return o.Payload
 }
 
 func (o *RegisterOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model_zrok.RegisterResponse)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

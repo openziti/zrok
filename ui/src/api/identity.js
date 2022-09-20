@@ -65,7 +65,7 @@ export function login(options) {
 /**
  * @param {object} options Optional options
  * @param {module:types.registerRequest} [options.body] 
- * @return {Promise<object>} account created
+ * @return {Promise<module:types.registerResponse>} account created
  */
 export function register(options) {
   if (!options) options = {}

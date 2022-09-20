@@ -118,6 +118,8 @@ paths:
       responses:
         200:
           description: account created
+          schema:
+            $ref: "#/definitions/registerResponse"
         404:
           description: request not found
         500:
@@ -334,6 +336,11 @@ definitions:
       token:
         type: string
       password:
+        type: string
+  registerResponse:
+    type: object
+    properties:
+      token:
         type: string
 
   services:

@@ -22,6 +22,11 @@ RegisterOK account created
 swagger:response registerOK
 */
 type RegisterOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *rest_model_zrok.RegisterResponse `json:"body,omitempty"`
 }
 
 // NewRegisterOK creates RegisterOK with default headers values
@@ -30,12 +35,27 @@ func NewRegisterOK() *RegisterOK {
 	return &RegisterOK{}
 }
 
+// WithPayload adds the payload to the register o k response
+func (o *RegisterOK) WithPayload(payload *rest_model_zrok.RegisterResponse) *RegisterOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the register o k response
+func (o *RegisterOK) SetPayload(payload *rest_model_zrok.RegisterResponse) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *RegisterOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(200)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 // RegisterNotFoundCode is the HTTP code returned for type RegisterNotFound

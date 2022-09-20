@@ -222,7 +222,10 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "account created"
+            "description": "account created",
+            "schema": {
+              "$ref": "#/definitions/registerResponse"
+            }
           },
           "404": {
             "description": "request not found"
@@ -515,6 +518,14 @@ func init() {
         "password": {
           "type": "string"
         },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "registerResponse": {
+      "type": "object",
+      "properties": {
         "token": {
           "type": "string"
         }
@@ -821,7 +832,10 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "account created"
+            "description": "account created",
+            "schema": {
+              "$ref": "#/definitions/registerResponse"
+            }
           },
           "404": {
             "description": "request not found"
@@ -1114,6 +1128,14 @@ func init() {
         "password": {
           "type": "string"
         },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "registerResponse": {
+      "type": "object",
+      "properties": {
         "token": {
           "type": "string"
         }

@@ -94,6 +94,13 @@
  */
 
 /**
+ * @typedef registerResponse
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ */
+
+/**
  * @typedef service
  * @memberof module:types
  * 
