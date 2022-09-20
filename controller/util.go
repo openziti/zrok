@@ -2,6 +2,7 @@ package controller
 
 import (
 	"crypto/rand"
+	"crypto/sha512"
 	"crypto/x509"
 	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
@@ -52,4 +53,10 @@ func createServiceName() (string, error) {
 		return "", errors.Wrap(err, "error generating service name")
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+func hashPassword(raw string) string {
+	hash := sha512.New()
+	hash.Write([]byte(raw))
+	return hex.EncodeToString(hash.Sum(nil))
 }

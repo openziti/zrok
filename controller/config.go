@@ -33,7 +33,6 @@ type EmailConfig struct {
 }
 
 type RegistrationConfig struct {
-	ImmediateCreate         bool
 	EmailFrom               string
 	RegistrationUrlTemplate string
 }

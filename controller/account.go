@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"crypto/sha512"
-	"encoding/hex"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
@@ -20,45 +18,6 @@ func newCreateAccountHandler(cfg *Config) *createAccountHandler {
 
 func (self *createAccountHandler) Handle(params identity.CreateAccountParams) middleware.Responder {
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
-	if self.cfg.Registration.ImmediateCreate {
-		return self.handleDirectCreate(params)
-	} else {
-		return self.handleVerifiedCreate(params)
-	}
-}
-
-func (self *createAccountHandler) handleDirectCreate(params identity.CreateAccountParams) middleware.Responder {
-	if params.Body == nil || params.Body.Email == "" || params.Body.Password == "" {
-		logrus.Errorf("missing email or password")
-		return identity.NewCreateAccountBadRequest().WithPayload("missing email or password")
-	}
-
-	token := createToken()
-	a := &store.Account{
-		Email:    params.Body.Email,
-		Password: hashPassword(params.Body.Password),
-		Token:    token,
-	}
-	tx, err := str.Begin()
-	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
-	defer func() { _ = tx.Rollback() }()
-	id, err := str.CreateAccount(a, tx)
-	if err != nil {
-		logrus.Errorf("error creating account: %v", err)
-		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
-	}
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error comitting: %v", err)
-	}
-
-	logrus.Infof("account created with id = '%v'", id)
-	return identity.NewCreateAccountCreated().WithPayload(&rest_model_zrok.AccountResponse{Token: token})
-}
-
-func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAccountParams) middleware.Responder {
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email")
@@ -88,10 +47,4 @@ func (self *createAccountHandler) handleVerifiedCreate(params identity.CreateAcc
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	return identity.NewCreateAccountCreated()
-}
-
-func hashPassword(raw string) string {
-	hash := sha512.New()
-	hash.Write([]byte(raw))
-	return hex.EncodeToString(hash.Sum(nil))
 }
