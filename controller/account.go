@@ -68,5 +68,7 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
+	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)
+
 	return identity.NewCreateAccountCreated()
 }
