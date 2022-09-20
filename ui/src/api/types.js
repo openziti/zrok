@@ -6,14 +6,6 @@
  * @memberof module:types
  * 
  * @property {string} email 
- * @property {string} password 
- */
-
-/**
- * @typedef accountResponse
- * @memberof module:types
- * 
- * @property {string} token 
  */
 
 /**

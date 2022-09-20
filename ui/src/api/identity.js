@@ -5,7 +5,7 @@ import * as gateway from './gateway'
 /**
  * @param {object} options Optional options
  * @param {module:types.accountRequest} [options.body] 
- * @return {Promise<module:types.accountResponse>} account created
+ * @return {Promise<object>} account created
  */
 export function createAccount(options) {
   if (!options) options = {}

@@ -38,16 +38,12 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		panic(err)
 	}
-	password, err := term.PromptPassword("New Password: ", false)
+	confirm, err := term.Prompt("Confirm Email: ")
 	if err != nil {
 		panic(err)
 	}
-	confirm, err := term.PromptPassword("Confirm Password: ", false)
-	if err != nil {
-		panic(err)
-	}
-	if confirm != password {
-		panic("confirmed password mismatch")
+	if confirm != email {
+		panic("email mismatch")
 	}
 
 	zrok, err := newZrokClient()
@@ -56,13 +52,11 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 	}
 	req := identity.NewCreateAccountParams()
 	req.Body = &rest_model_zrok.AccountRequest{
-		Email:    email,
-		Password: password,
+		Email: email,
 	}
-	resp, err := zrok.Identity.CreateAccount(req)
+	_, err = zrok.Identity.CreateAccount(req)
 	if err != nil {
 		panic(err)
 	}
-
-	logrus.Infof("api token: %v", resp.Payload.Token)
+	logrus.Infof("account request submitted")
 }

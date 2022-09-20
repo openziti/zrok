@@ -35,7 +35,7 @@ func (self *registerHandler) Handle(params identity.RegisterParams) middleware.R
 
 	a := &store.Account{
 		Email:    ar.Email,
-		Password: params.Body.Password,
+		Password: hashPassword(params.Body.Password),
 		Token:    createToken(),
 	}
 	if _, err := str.CreateAccount(a, tx); err != nil {

@@ -57,7 +57,6 @@ CreateAccountCreated describes a response with status code 201, with default hea
 account created
 */
 type CreateAccountCreated struct {
-	Payload *rest_model_zrok.AccountResponse
 }
 
 // IsSuccess returns true when this create account created response has a 2xx status code
@@ -86,25 +85,14 @@ func (o *CreateAccountCreated) IsCode(code int) bool {
 }
 
 func (o *CreateAccountCreated) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
+	return fmt.Sprintf("[POST /account][%d] createAccountCreated ", 201)
 }
 
 func (o *CreateAccountCreated) String() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
-}
-
-func (o *CreateAccountCreated) GetPayload() *rest_model_zrok.AccountResponse {
-	return o.Payload
+	return fmt.Sprintf("[POST /account][%d] createAccountCreated ", 201)
 }
 
 func (o *CreateAccountCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(rest_model_zrok.AccountResponse)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }

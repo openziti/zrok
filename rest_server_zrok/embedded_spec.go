@@ -52,10 +52,7 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "account created",
-            "schema": {
-              "$ref": "#/definitions/accountResponse"
-            }
+            "description": "account created"
           },
           "400": {
             "description": "account not created (already exists)",
@@ -376,17 +373,6 @@ func init() {
       "type": "object",
       "properties": {
         "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "accountResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
           "type": "string"
         }
       }
@@ -662,10 +648,7 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "account created",
-            "schema": {
-              "$ref": "#/definitions/accountResponse"
-            }
+            "description": "account created"
           },
           "400": {
             "description": "account not created (already exists)",
@@ -986,17 +969,6 @@ func init() {
       "type": "object",
       "properties": {
         "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "accountResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
           "type": "string"
         }
       }
