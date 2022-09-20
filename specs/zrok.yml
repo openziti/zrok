@@ -12,9 +12,9 @@ securityDefinitions:
     name: x-token
 
 paths:
-#
-# identity
-#
+  #
+  # identity
+  #
   /account:
     post:
       tags:
@@ -105,23 +105,6 @@ paths:
         401:
           description: invalid login
 
-  /overview:
-    get:
-      tags:
-        - metadata
-      security:
-        - key: []
-      operationId: overview
-      responses:
-        200:
-          description: overview returned
-          schema:
-            $ref: "#/definitions/environmentServicesList"
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
-
   /register:
     post:
       tags:
@@ -142,6 +125,60 @@ paths:
           schema:
             $ref: "#/definitions/errorMessage"
 
+  /verify:
+    post:
+      tags:
+        - identity
+      operationId: verify
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/verifyRequest"
+      responses:
+        200:
+          description: token ready
+          schema:
+            $ref: "#/definitions/verifyResponse"
+        404:
+          description: token not found
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
+  #
+  # metadata
+  #
+  /overview:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: overview
+      responses:
+        200:
+          description: overview returned
+          schema:
+            $ref: "#/definitions/environmentServicesList"
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
+
+  /version:
+    get:
+      tags:
+        - metadata
+      operationId: version
+      responses:
+        200:
+          description: current server version
+          schema:
+            $ref: "#/definitions/version"
+  #
+  # tunnel
+  #
   /tunnel:
     post:
       tags:
@@ -190,39 +227,6 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
-
-  /verify:
-    post:
-      tags:
-        - identity
-      operationId: verify
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/verifyRequest"
-      responses:
-        200:
-          description: token ready
-          schema:
-            $ref: "#/definitions/verifyResponse"
-        404:
-          description: token not found
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
-
-  /version:
-    get:
-      tags:
-        - metadata
-      operationId: version
-      responses:
-        200:
-          description: current server version
-          schema:
-            $ref: "#/definitions/version"
 
 definitions:
   accountRequest:
