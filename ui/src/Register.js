@@ -5,11 +5,32 @@ import * as identity from "./api/identity";
 const Proceed = (props) => {
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
+    const [message, setMessage] = useState();
+
+    const passwordMismatchMessage = <h2 className={"errorMessage"}>Entered passwords do not match!</h2>
+    const registerFailed = <h2 className={"errorMessage"}>Account creation failed!</h2>
 
     const handleSubmit = async e => {
         e.preventDefault();
-        console.log("submit", password, confirm)
-    }
+        console.log("handleSubmit");
+        if(confirm !== password) {
+            setMessage(passwordMismatchMessage);
+        } else {
+            identity.register({body: {"token": props.token, "password": password}})
+                .then(resp => {
+                    if(!resp.error) {
+                        console.log("resp", resp)
+                        setMessage(undefined);
+                    } else {
+                        setMessage(registerFailed);
+                    }
+                })
+                .catch(resp => {
+                    console.log("resp", resp);
+                    setMessage(registerFailed);
+                });
+        }
+    };
 
     return (
         <div className={"fullscreen"}>
@@ -26,6 +47,7 @@ const Proceed = (props) => {
                     </p>
                 </fieldset>
             </form>
+            {message}
         </div>
     )
 }
@@ -67,7 +89,7 @@ const Register = () => {
 
     let step;
     if(!failed) {
-        step = <Proceed email={email}/>
+        step = <Proceed email={email} token={token}/>
     } else {
         step = <Failed />
     }

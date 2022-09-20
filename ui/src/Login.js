@@ -4,7 +4,7 @@ import * as identity from './api/identity';
 const Login = (props) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [failed, setFailed] = useState();
+    const [message, setMessage] = useState();
 
     const errorMessage = <h2 className={"errorMessage"}>Login Failed!</h2>;
 
@@ -24,7 +24,7 @@ const Login = (props) => {
                     console.log('login succeeded', resp)
                 } else {
                     console.log('login failed')
-                    setFailed(errorMessage);
+                    setMessage(errorMessage);
                 }
             })
             .catch((resp) => {
@@ -36,7 +36,7 @@ const Login = (props) => {
         <div className={"fullscreen"}>
             <img src={"ziggy.svg"} width={200}/>
             <h1>zrok</h1>
-            {failed}
+            {message}
             <form onSubmit={handleSubmit}>
                 <fieldset>
                     <legend>Log In</legend>

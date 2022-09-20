@@ -55,16 +55,16 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 	}
 
 	if _, err := str.CreateAccountRequest(ar, tx); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating account request for '%v': %v", params.Body.Email, err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 	if err := tx.Commit(); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error committing account request for '%v': %v", params.Body.Email, err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	if err := sendVerificationEmail(params.Body.Email, token, self.cfg); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
 		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
