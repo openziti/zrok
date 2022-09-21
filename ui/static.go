@@ -21,7 +21,7 @@ func StaticBuilder(handler http.Handler) http.Handler {
 		logrus.Debugf("directing '%v' to static handler", r.URL.Path)
 
 		staticPath := "build"
-		indexPath := "index.gohtml"
+		indexPath := "index.html"
 
 		// get the absolute path to prevent directory traversal
 		path, err := filepath.Abs(r.URL.Path)
