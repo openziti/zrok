@@ -2,10 +2,12 @@ import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
 import * as identity from "./api/identity";
 
-const Proceed = (props) => {
+const RegistrationForm = (props) => {
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
     const [message, setMessage] = useState();
+    const [authToken, setAuthToken] = useState('');
+    const [complete, setComplete] = useState(false);
 
     const passwordMismatchMessage = <h2 className={"errorMessage"}>Entered passwords do not match!</h2>
     const registerFailed = <h2 className={"errorMessage"}>Account creation failed!</h2>
@@ -21,6 +23,8 @@ const Proceed = (props) => {
                     if(!resp.error) {
                         console.log("resp", resp)
                         setMessage(undefined);
+                        setAuthToken(resp.data.token);
+                        setComplete(true);
                     } else {
                         setMessage(registerFailed);
                     }
@@ -32,27 +36,31 @@ const Proceed = (props) => {
         }
     };
 
-    return (
-        <div className={"fullscreen"}>
-            <img src={"/ziggy.svg"} width={200}/>
-            <h1>A new zrok user!</h1>
-            <h2>{props.email}</h2>
-            <form onSubmit={handleSubmit}>
-                <fieldset>
-                    <legend>Set A Password</legend>
-                    <p><label htmlFor={"password"}>password: </label><input type={"password"} value={password} placeholder={"Password"} onChange={({target}) => setPassword(target.value)}/></p>
-                    <p>
-                        <label htmlFor={"confirm"}>confirm: </label><input type={"password"} value={confirm} placeholder={"Confirm Password"} onChange={({target}) => setConfirm(target.value)}/>
-                        <button type={"submit"}>Register</button>
-                    </p>
-                </fieldset>
-            </form>
-            {message}
-        </div>
-    )
+    if(!complete) {
+        return (
+            <div className={"fullscreen"}>
+                <img src={"/ziggy.svg"} width={200}/>
+                <h1>A new zrok user!</h1>
+                <h2>{props.email}</h2>
+                <form onSubmit={handleSubmit}>
+                    <fieldset>
+                        <legend>Set A Password</legend>
+                        <p><label htmlFor={"password"}>password: </label><input type={"password"} value={password} placeholder={"Password"} onChange={({target}) => setPassword(target.value)}/></p>
+                        <p>
+                            <label htmlFor={"confirm"}>confirm: </label><input type={"password"} value={confirm} placeholder={"Confirm Password"} onChange={({target}) => setConfirm(target.value)}/>
+                            <button type={"submit"}>Register</button>
+                        </p>
+                    </fieldset>
+                </form>
+                {message}
+            </div>
+        )
+    } else {
+        return <Success email={props.email} token={authToken}/>
+    }
 }
 
-const Failed = () => {
+const NoAccountRequest = () => {
     return (
         <div className={"fullscreen"}>
             <img src={"/ziggy.svg"} width={200}/>
@@ -61,17 +69,29 @@ const Failed = () => {
     )
 }
 
+const Success = (props) => {
+    return (
+        <div className={"fullscreen"}>
+            <img src={"/ziggy.svg"} width={200}/>
+            <h1>Welcome to zrok, {props.email}!</h1>
+            <pre>{props.token}</pre>
+        </div>
+    )
+}
+
+let step;
+
 const Register = () => {
     const { token } = useParams();
     const [email, setEmail] = useState();
-    const [failed, setFailed] = useState(false);
+    const [activeRequest, setActiveRequest] = useState(true);
 
     useEffect(() => {
         let mounted = true
         identity.verify({body: {token: token}}).then(resp => {
             if(mounted) {
                 if(resp.error) {
-                    setFailed(true);
+                    setActiveRequest(false);
                 } else {
                     setEmail(resp.data.email);
                 }
@@ -79,7 +99,7 @@ const Register = () => {
         }).catch(err => {
             console.log("err", err);
             if(mounted) {
-                setFailed(true);
+                setActiveRequest(false);
             }
         });
         return () => {
@@ -87,11 +107,13 @@ const Register = () => {
         }
     }, []);
 
-    let step;
-    if(!failed) {
-        step = <Proceed email={email} token={token}/>
+    if(activeRequest) {
+        step = <RegistrationForm
+            email={email}
+            token={token}
+        />
     } else {
-        step = <Failed />
+        step = <NoAccountRequest />
     }
 
     return (
