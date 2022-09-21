@@ -56,6 +56,10 @@ h1, h2, h3, h4, h5, h6 {
   width: 300px;
   float: left;
 }
+.fullscreen p a {
+  color: white;
+  font-weight: bold;
+}
 
 .header {
   background-color: #3b2693;

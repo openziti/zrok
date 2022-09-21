@@ -73,8 +73,15 @@ const Success = (props) => {
     return (
         <div className={"fullscreen"}>
             <img src={"/ziggy.svg"} width={200}/>
-            <h1>Welcome to zrok, {props.email}!</h1>
-            <pre>{props.token}</pre>
+            <h1>Welcome to zrok!</h1>
+
+            <p>You can proceed to the <a href={"/"}>zrok web portal</a> and log in with your email and password.</p>
+
+            <p>To enable your shell for zrok, use this command:</p>
+
+            <pre>
+                $ zrok enable {props.token}
+            </pre>
         </div>
     )
 }

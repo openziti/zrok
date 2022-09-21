@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/foundation/v2/term"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +43,7 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 	if confirm != email {
-		panic("email mismatch")
+		fmt.Println("entered emails do not match... aborting!")
 	}
 
 	zrok, err := newZrokClient()
@@ -58,5 +58,6 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof("account request submitted")
+
+	fmt.Printf("registration invitation sent to '%v'!\n", email)
 }
