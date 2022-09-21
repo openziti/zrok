@@ -33,7 +33,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	zrok, err := newZrokClient()
+	zrok, err := newZrokClient(env.ApiEndpoint)
 	if err != nil {
 		panic(err)
 	}

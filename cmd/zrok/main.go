@@ -49,8 +49,8 @@ func main() {
 	}
 }
 
-func newZrokClient() (*rest_client_zrok.Zrok, error) {
-	apiUrl, err := url.Parse(apiEndpoint)
+func newZrokClient(endpoint string) (*rest_client_zrok.Zrok, error) {
+	apiUrl, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", apiEndpoint)
 	}

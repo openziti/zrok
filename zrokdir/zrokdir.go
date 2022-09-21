@@ -11,6 +11,7 @@ import (
 type Environment struct {
 	ZrokToken      string `json:"zrok_token"`
 	ZitiIdentityId string `json:"ziti_identity"`
+	ApiEndpoint    string `json:"api_endpoint"`
 }
 
 func Delete() error {

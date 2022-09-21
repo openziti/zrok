@@ -55,7 +55,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
 
-	zrok, err := newZrokClient()
+	zrok, err := newZrokClient(apiEndpoint)
 	if err != nil {
 		panic(err)
 	}
@@ -69,7 +69,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity}); err != nil {
+	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
 		panic(err)
 	}
 	if err := zrokdir.WriteZitiIdentity("environment", resp.Payload.Cfg); err != nil {

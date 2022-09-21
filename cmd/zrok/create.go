@@ -46,7 +46,7 @@ func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
 		fmt.Println("entered emails do not match... aborting!")
 	}
 
-	zrok, err := newZrokClient()
+	zrok, err := newZrokClient(apiEndpoint)
 	if err != nil {
 		panic(err)
 	}

@@ -69,7 +69,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		EndpointAddress: args[0],
 	}
 
-	zrok, err := newZrokClient()
+	zrok, err := newZrokClient(env.ApiEndpoint)
 	if err != nil {
 		panic(err)
 	}
