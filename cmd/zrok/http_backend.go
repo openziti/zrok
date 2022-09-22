@@ -186,14 +186,14 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (self *httpBackendCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Infof("shutting down '%v'", cfg.Service)
+	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{
 		ZitiIdentityID: id,
 		Service:        cfg.Service,
 	}
 	if _, err := zrok.Tunnel.Untunnel(req, auth); err == nil {
-		logrus.Infof("shutdown complete")
+		logrus.Debugf("shutdown complete")
 	} else {
 		logrus.Errorf("error shutting down: %v", err)
 	}
