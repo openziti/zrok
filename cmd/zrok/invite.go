@@ -9,31 +9,25 @@ import (
 )
 
 func init() {
-	createCmd.AddCommand(newCreateAccountCommand().cmd)
-	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(newInviteCommand().cmd)
 }
 
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create objects",
-}
-
-type createAccountCommand struct {
+type inviteCommand struct {
 	cmd *cobra.Command
 }
 
-func newCreateAccountCommand() *createAccountCommand {
+func newInviteCommand() *inviteCommand {
 	cmd := &cobra.Command{
-		Use:   "account",
-		Short: "Create new zrok account",
+		Use:   "invite",
+		Short: "Invite a new user to zrok",
 		Args:  cobra.ExactArgs(0),
 	}
-	command := &createAccountCommand{cmd: cmd}
+	command := &inviteCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *createAccountCommand) run(_ *cobra.Command, _ []string) {
+func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	email, err := term.Prompt("New Email: ")
 	if err != nil {
 		panic(err)
