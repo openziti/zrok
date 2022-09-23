@@ -8,7 +8,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/host"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	user2 "os/user"
 )
@@ -75,7 +74,8 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if err := zrokdir.WriteZitiIdentity("environment", resp.Payload.Cfg); err != nil {
 		panic(err)
 	}
-	logrus.Infof("enabled, identity = '%v'", resp.Payload.Identity)
+
+	fmt.Printf("zrok environment '%v' enabled for '%v'\n", resp.Payload.Identity, token)
 }
 
 func getHost() (string, string, error) {

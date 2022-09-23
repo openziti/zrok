@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -49,5 +49,5 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	if err := zrokdir.Delete(); err != nil {
 		panic(err)
 	}
-	logrus.Infof("environment disabled")
+	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZitiIdentityId, env.ZrokToken)
 }
