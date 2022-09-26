@@ -11,6 +11,8 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
 	"github.com/pkg/errors"
+	"net/http"
+	"strings"
 )
 
 func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
@@ -59,4 +61,18 @@ func hashPassword(raw string) string {
 	hash := sha512.New()
 	hash.Write([]byte(raw))
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+func realRemoteAddress(req *http.Request) string {
+	ip := strings.Split(req.RemoteAddr, ":")[0]
+	fwdAddress := req.Header.Get("X-Forwarded-For")
+	if fwdAddress != "" {
+		ip = fwdAddress
+
+		ips := strings.Split(fwdAddress, ", ")
+		if len(ips) > 1 {
+			ip = ips[0]
+		}
+	}
+	return ip
 }

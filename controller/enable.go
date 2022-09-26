@@ -16,7 +16,6 @@ import (
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/sirupsen/logrus"
-	"strings"
 	"time"
 )
 
@@ -29,6 +28,8 @@ func newEnableHandler(cfg *Config) *enableHandler {
 }
 
 func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	logrus.Infof("headers = %v", params.HTTPRequest.Header)
+
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
@@ -55,13 +56,10 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		logrus.Error(err)
 		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
-
-	addrTokens := strings.Split(params.HTTPRequest.RemoteAddr, ":")
-	addr := addrTokens[0]
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
 		Description:    params.Body.Description,
 		Host:           params.Body.Host,
-		Address:        addr,
+		Address:        realRemoteAddress(params.HTTPRequest),
 		ZitiIdentityId: ident.Payload.Data.ID,
 	}, tx)
 	if err != nil {
