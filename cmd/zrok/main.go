@@ -18,6 +18,7 @@ import (
 func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	apiEndpointDefault := os.Getenv("ZROK_API_ENDPOINT")
 	if apiEndpointDefault == "" {
 		apiEndpointDefault = "https://api.zrok.io"
@@ -36,6 +37,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 var verbose bool
+var panicInstead bool
 var apiEndpoint string
 
 var httpCmd = &cobra.Command{

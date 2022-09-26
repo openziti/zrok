@@ -6,10 +6,11 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/spf13/cobra"
+	"os"
 	user2 "os/user"
+	"strings"
 )
 
 func init() {
@@ -36,7 +37,7 @@ func newEnableCommand() *enableCommand {
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	env, err := zrokdir.LoadEnvironment()
 	if err == nil {
-		panic(errors.Errorf("environment '%v' already enabled!", env.ZitiIdentityId))
+		showError(fmt.Sprintf("you already have an environment '%v' for '%v'", env.ZitiIdentityId, env.ZrokToken), nil)
 	}
 
 	token := args[0]
@@ -66,12 +67,21 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 	resp, err := zrok.Identity.Enable(req, auth)
 	if err != nil {
+		if !panicInstead {
+			showError("the zrok service returned an error", err)
+		}
 		panic(err)
 	}
 	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
+		if !panicInstead {
+			showError("there was an error saving the new environment", err)
+		}
 		panic(err)
 	}
 	if err := zrokdir.WriteZitiIdentity("environment", resp.Payload.Cfg); err != nil {
+		if !panicInstead {
+			showError("there was an error writing the environment file", err)
+		}
 		panic(err)
 	}
 
@@ -86,4 +96,13 @@ func getHost() (string, string, error) {
 	thisHost := fmt.Sprintf("%v; %v; %v; %v; %v; %v; %v",
 		info.Hostname, info.OS, info.Platform, info.PlatformFamily, info.PlatformVersion, info.KernelVersion, info.KernelArch)
 	return info.Hostname, thisHost, nil
+}
+
+func showError(msg string, err error) {
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %v (%v)\n", msg, strings.TrimSpace(err.Error()))
+	} else {
+		_, _ = fmt.Fprintf(os.Stderr, "ERROR: %v\n", msg)
+	}
+	os.Exit(1)
 }
