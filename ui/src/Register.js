@@ -70,6 +70,9 @@ const NoAccountRequest = () => {
 }
 
 const Success = (props) => {
+    // clear local storage on new account registration success.
+    localStorage.clear();
+
     return (
         <div className={"fullscreen"}>
             <img src={"/ziggy.svg"} width={200}/>
