@@ -38,11 +38,13 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	defer func() { _ = tx.Rollback() }()
 
 	envId := params.Body.ZitiIdentityID
+	envIdDb := 0
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
 		for _, env := range envs {
 			if env.ZitiIdentityId == envId {
 				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Email)
+				envIdDb = env.Id
 				found = true
 				break
 			}
@@ -91,7 +93,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 
 	logrus.Infof("allocated service '%v'", svcName)
 
-	sid, err := str.CreateService(int(principal.ID), &store.Service{
+	sid, err := str.CreateService(envIdDb, &store.Service{
 		ZitiServiceId: svcId,
 		Endpoint:      params.Body.Endpoint,
 	}, tx)
