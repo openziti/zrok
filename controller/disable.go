@@ -27,7 +27,7 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewDisableInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 	envId, err := self.checkZitiIdentity(params.Body.Identity, principal, tx)
@@ -37,20 +37,20 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 	}
 	if err := self.removeEnvironment(envId, tx); err != nil {
 		logrus.Errorf("error removing environment: %v", err)
-		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewDisableInternalServerError()
 	}
 	edge, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
-		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewDisableInternalServerError()
 	}
 	if err := self.deleteEdgeRouterPolicy(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
-		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewDisableInternalServerError()
 	}
 	if err := self.deleteIdentity(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting identity: %v", err)
-		return identity.NewDisableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewDisableInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)

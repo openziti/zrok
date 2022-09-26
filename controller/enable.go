@@ -34,27 +34,27 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError()
 	}
 
 	client, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
-		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError()
 	}
 	ident, err := self.createIdentity(principal.Email, client)
 	if err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError()
 	}
 	cfg, err := self.enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError()
 	}
 	if err := self.createEdgeRouterPolicy(ident.Payload.Data.ID, client); err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewEnableInternalServerError()
 	}
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
 		Description:    params.Body.Description,
@@ -65,11 +65,11 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)
 		_ = tx.Rollback()
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, envId, principal.Email)
 

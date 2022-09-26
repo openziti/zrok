@@ -31,20 +31,20 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	edge, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	svcName := params.Body.Service
 	svcId, err := self.findServiceId(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
@@ -57,11 +57,11 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		if senv == nil {
 			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZitiIdentityID, principal.Email)
 			logrus.Error(err)
-			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return tunnel.NewUntunnelNotFound()
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 
 	var ssvc *store.Service
@@ -75,32 +75,32 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		if ssvc == nil {
 			err := errors.Errorf("service with id '%v' not found for '%v'", svcId, principal.Email)
 			logrus.Error(err)
-			return tunnel.NewUntunnelNotFound().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return tunnel.NewUntunnelNotFound()
 		}
 	} else {
 		logrus.Errorf("error finding services for account '%v': %v", principal.Email, err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 
 	if err := self.deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := self.deleteServicePolicyDial(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := self.deleteServicePolicyBind(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := self.deleteConfig(svcName, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	if err := self.deleteService(svcId, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 
 	logrus.Infof("deallocated service '%v'", svcName)
@@ -108,11 +108,11 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	ssvc.Active = false
 	if err := str.UpdateService(ssvc, tx); err != nil {
 		logrus.Errorf("error deactivating service '%v': %v", svcId, err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 
 	return tunnel.NewUntunnelOK()

@@ -3,7 +3,6 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/sirupsen/logrus"
 )
@@ -33,7 +32,7 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Error(err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
@@ -48,7 +47,7 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 		logrus.Warnf("found previous account request for '%v', removing", params.Body.Email)
 		if err := str.DeleteAccountRequest(oldAr.Id, tx); err != nil {
 			logrus.Errorf("error deleteing previous account request for '%v': %v", params.Body.Email, err)
-			return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return identity.NewCreateAccountInternalServerError()
 		}
 	} else {
 		logrus.Warnf("error finding previous account request for '%v': %v", params.Body.Email, err)
@@ -56,16 +55,16 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 
 	if _, err := str.CreateAccountRequest(ar, tx); err != nil {
 		logrus.Errorf("error creating account request for '%v': %v", params.Body.Email, err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing account request for '%v': %v", params.Body.Email, err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 
 	if err := sendVerificationEmail(params.Body.Email, token, self.cfg); err != nil {
 		logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
-		return identity.NewCreateAccountInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return identity.NewCreateAccountInternalServerError()
 	}
 
 	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)

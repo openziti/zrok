@@ -11,20 +11,20 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return metadata.NewOverviewInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return metadata.NewOverviewInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
 		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
-		return metadata.NewOverviewInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return metadata.NewOverviewInternalServerError()
 	}
 	var out rest_model_zrok.EnvironmentServicesList
 	for _, env := range envs {
 		svcs, err := str.FindServicesForEnvironment(env.Id, tx)
 		if err != nil {
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZitiIdentityId, err)
-			return metadata.NewOverviewInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return metadata.NewOverviewInternalServerError()
 		}
 		es := &rest_model_zrok.EnvironmentServices{
 			Environment: &rest_model_zrok.Environment{

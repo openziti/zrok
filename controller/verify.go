@@ -21,7 +21,7 @@ func (self *verifyHandler) Handle(params identity.VerifyParams) middleware.Respo
 		tx, err := str.Begin()
 		if err != nil {
 			logrus.Errorf("error starting transaction: %v", err)
-			return identity.NewVerifyInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return identity.NewVerifyInternalServerError()
 		}
 		defer func() { _ = tx.Rollback() }()
 
