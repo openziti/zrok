@@ -31,10 +31,16 @@ func newDisableCommand() *disableCommand {
 func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
+		if !panicInstead {
+			showError("could not load environment; not active?", err)
+		}
 		panic(err)
 	}
 	zrok, err := newZrokClient(env.ApiEndpoint)
 	if err != nil {
+		if !panicInstead {
+			showError("could not create zrok service client", err)
+		}
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
@@ -44,9 +50,15 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	}
 	_, err = zrok.Identity.Disable(req, auth)
 	if err != nil {
+		if !panicInstead {
+			showError("zrok service call failed", err)
+		}
 		panic(err)
 	}
 	if err := zrokdir.Delete(); err != nil {
+		if !panicInstead {
+			showError("error removing local zrok directory", err)
+		}
 		panic(err)
 	}
 	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZitiIdentityId, env.ZrokToken)
