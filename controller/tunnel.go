@@ -33,7 +33,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
@@ -55,40 +55,40 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v'", principal.Email)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 
 	edge, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	svcName, err := createServiceName()
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	cfgId, err := self.createConfig(svcName, params, edge)
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	svcId, err := self.createService(svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	if err := self.createServicePolicyBind(svcName, svcId, envId, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	if err := self.createServicePolicyDial(svcName, svcId, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	if err := self.createServiceEdgeRouterPolicy(svcName, svcId, edge); err != nil {
 		logrus.Error(err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 
 	logrus.Infof("allocated service '%v'", svcName)
@@ -100,11 +100,11 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
 		_ = tx.Rollback()
-		return tunnel.NewUntunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing service record: %v", err)
-		return tunnel.NewTunnelInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return tunnel.NewTunnelInternalServerError()
 	}
 	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcId, sid, principal.Email)
 
