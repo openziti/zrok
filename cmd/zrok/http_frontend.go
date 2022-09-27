@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/endpoints/frontend"
 	"github.com/sirupsen/logrus"
@@ -31,15 +32,24 @@ func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
 	cfg := frontend.DefaultConfig()
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
+			if !panicInstead {
+				showError(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
+			}
 			panic(err)
 		}
 	}
 	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
 	httpListener, err := frontend.NewHTTP(cfg)
 	if err != nil {
+		if !panicInstead {
+			showError("unable to create http frontend", err)
+		}
 		panic(err)
 	}
 	if err := httpListener.Run(); err != nil {
+		if !panicInstead {
+			showError("unable to run http frontend", err)
+		}
 		panic(err)
 	}
 }
