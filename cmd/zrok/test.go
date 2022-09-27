@@ -38,10 +38,13 @@ func newTestEndpointCommand() *testEndpointCommand {
 	command := &testEndpointCommand{cmd: cmd}
 	var err error
 	if command.t, err = template.ParseFS(endpoint_ui.FS, "index.gohtml"); err != nil {
+		if !panicInstead {
+			showError("unable to parse index template", err)
+		}
 		panic(err)
 	}
 	cmd.Flags().StringVarP(&command.address, "address", "a", "0.0.0.0", "The address for the HTTP listener")
-	cmd.Flags().Uint16VarP(&command.port, "port", "p", 9090, "The port for the HTTP listener")
+	cmd.Flags().Uint16VarP(&command.port, "port", "P", 9090, "The port for the HTTP listener")
 	cmd.Run = command.run
 	return command
 }
@@ -49,6 +52,9 @@ func newTestEndpointCommand() *testEndpointCommand {
 func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 	http.HandleFunc("/", cmd.serveIndex)
 	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
+		if !panicInstead {
+			showError("unable to start http listener", err)
+		}
 		panic(err)
 	}
 }
