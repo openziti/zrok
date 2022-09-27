@@ -50,6 +50,9 @@ func newHttpBackendCommand() *httpBackendCommand {
 func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	if !self.quiet {
 		if err := ui.Init(); err != nil {
+			if !panicInstead {
+				showError("unable to initialize user interface", err)
+			}
 			panic(err)
 		}
 		defer ui.Close()
@@ -58,10 +61,18 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 
 	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
+		ui.Close()
+		if !panicInstead {
+			showError("unable to load environment; did you 'zrok enable'?", err)
+		}
 		panic(err)
 	}
 	zif, err := zrokdir.ZitiIdentityFile("environment")
 	if err != nil {
+		ui.Close()
+		if !panicInstead {
+			showError("unable to load ziti identity configuration", err)
+		}
 		panic(err)
 	}
 	cfg := &backend.Config{
@@ -71,6 +82,10 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 
 	zrok, err := newZrokClient(env.ApiEndpoint)
 	if err != nil {
+		ui.Close()
+		if !panicInstead {
+			showError("unable to create zrok client", err)
+		}
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
@@ -94,6 +109,10 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	}
 	resp, err := zrok.Tunnel.Tunnel(req, auth)
 	if err != nil {
+		ui.Close()
+		if !panicInstead {
+			showError("unable to create tunnel", err)
+		}
 		panic(err)
 	}
 	cfg.Service = resp.Payload.Service
@@ -108,11 +127,18 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 
 	httpProxy, err := backend.NewHTTP(cfg)
 	if err != nil {
+		ui.Close()
+		if !panicInstead {
+			showError("unable to create http backend", err)
+		}
 		panic(err)
 	}
 
 	go func() {
 		if err := httpProxy.Run(); err != nil {
+			if !panicInstead {
+				showError("unable to run http proxy", err)
+			}
 			panic(err)
 		}
 	}()
