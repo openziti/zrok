@@ -2,6 +2,7 @@ import Icon from "@mdi/react";
 import {mdiKey} from "@mdi/js";
 import Popover from "@mui/material/Popover";
 import {useState} from "react";
+import Copy from "./Copy";
 
 const Token = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -14,6 +15,8 @@ const Token = (props) => {
     }
     const popoverOpen = Boolean(anchorEl);
     const popoverId = popoverOpen ? 'token-popover' : undefined;
+
+    const text = "zrok enable " + props.user.token
 
     return (
         <div>
@@ -31,7 +34,7 @@ const Token = (props) => {
                 <div className={"popover"}>
                     <h3>Enable zrok access in your shell:</h3>
                     <pre>
-                        $ zrok enable {props.user.token}
+                        {text} <Copy text={text}/>
                     </pre>
                 </div>
             </Popover>
