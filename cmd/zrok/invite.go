@@ -37,11 +37,14 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 	if confirm != email {
-		fmt.Println("entered emails do not match... aborting!")
+		showError("entered emails do not match... aborting!", nil)
 	}
 
 	zrok, err := newZrokClient(apiEndpoint)
 	if err != nil {
+		if !panicInstead {
+			showError("error creating zrok api client", err)
+		}
 		panic(err)
 	}
 	req := identity.NewCreateAccountParams()
@@ -50,6 +53,9 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	}
 	_, err = zrok.Identity.CreateAccount(req)
 	if err != nil {
+		if !panicInstead {
+			showError("error creating account", err)
+		}
 		panic(err)
 	}
 
