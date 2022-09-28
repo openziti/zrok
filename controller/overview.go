@@ -41,9 +41,11 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			es.Services = append(es.Services, &rest_model_zrok.Service{
 				Active:        svc.Active,
 				CreatedAt:     svc.CreatedAt.String(),
-				Endpoint:      svc.Endpoint,
+				Frontend:      svc.Frontend,
+				Backend:       svc.Backend,
 				UpdatedAt:     svc.UpdatedAt.String(),
 				ZitiServiceID: svc.ZitiServiceId,
+				ZrokServiceID: svc.ZrokServiceId,
 			})
 		}
 		out = append(out, es)

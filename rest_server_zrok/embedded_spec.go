@@ -523,16 +523,22 @@ func init() {
         "active": {
           "type": "boolean"
         },
+        "backend": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "string"
         },
-        "endpoint": {
+        "frontend": {
           "type": "string"
         },
         "updatedAt": {
           "type": "string"
         },
         "zitiServiceId": {
+          "type": "string"
+        },
+        "zrokServiceId": {
           "type": "string"
         }
       }
@@ -1119,16 +1125,22 @@ func init() {
         "active": {
           "type": "boolean"
         },
+        "backend": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "string"
         },
-        "endpoint": {
+        "frontend": {
           "type": "string"
         },
         "updatedAt": {
           "type": "string"
         },
         "zitiServiceId": {
+          "type": "string"
+        },
+        "zrokServiceId": {
           "type": "string"
         }
       }

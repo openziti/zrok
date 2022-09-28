@@ -20,17 +20,23 @@ type Service struct {
 	// active
 	Active bool `json:"active,omitempty"`
 
+	// backend
+	Backend string `json:"backend,omitempty"`
+
 	// created at
 	CreatedAt string `json:"createdAt,omitempty"`
 
-	// endpoint
-	Endpoint string `json:"endpoint,omitempty"`
+	// frontend
+	Frontend string `json:"frontend,omitempty"`
 
 	// updated at
 	UpdatedAt string `json:"updatedAt,omitempty"`
 
 	// ziti service Id
 	ZitiServiceID string `json:"zitiServiceId,omitempty"`
+
+	// zrok service Id
+	ZrokServiceID string `json:"zrokServiceId,omitempty"`
 }
 
 // Validate validates this service

@@ -93,9 +93,12 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 
 	logrus.Infof("allocated service '%v'", svcName)
 
+	frontendUrl := self.proxyUrl(svcName)
 	sid, err := str.CreateService(envIdDb, &store.Service{
 		ZitiServiceId: svcId,
-		Endpoint:      params.Body.Endpoint,
+		ZrokServiceId: svcName,
+		Frontend:      frontendUrl,
+		Backend:       params.Body.Endpoint,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
@@ -109,7 +112,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcId, sid, principal.Email)
 
 	return tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
-		ProxyEndpoint: self.proxyUrl(svcName),
+		ProxyEndpoint: frontendUrl,
 		Service:       svcName,
 	})
 }

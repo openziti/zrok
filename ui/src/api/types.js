@@ -97,7 +97,9 @@
  * @memberof module:types
  * 
  * @property {string} zitiServiceId 
- * @property {string} endpoint 
+ * @property {string} zrokServiceId 
+ * @property {string} frontend 
+ * @property {string} backend 
  * @property {boolean} active 
  * @property {string} createdAt 
  * @property {string} updatedAt 

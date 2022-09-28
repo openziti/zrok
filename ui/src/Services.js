@@ -8,20 +8,15 @@ const Services = (props) => {
 
 	const columns = [
 		{
-			name: 'Endpoint',
-			selector: row => row.endpoint,
+			name: 'Frontend',
+			selector: row => row.frontend,
 			sortable: true,
 		},
 		{
-			name: 'Service',
-			selector: row => row.zitiServiceId,
+			name: 'Backend',
+			selector: row => row.backend,
 			sortable: true,
 		},
-		{
-			name: 'Updated',
-			selector: row => row.updatedAt,
-			sortable: true
-		}
 	]
 
 	const conditionalRowStyles = [

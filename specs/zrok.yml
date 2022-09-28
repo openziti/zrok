@@ -343,7 +343,11 @@ definitions:
     properties:
       zitiServiceId:
         type: string
-      endpoint:
+      zrokServiceId:
+        type: string
+      frontend:
+        type: string
+      backend:
         type: string
       active:
         type: boolean

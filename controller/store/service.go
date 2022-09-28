@@ -9,16 +9,18 @@ type Service struct {
 	Model
 	EnvironmentId int
 	ZitiServiceId string
-	Endpoint      string
+	ZrokServiceId string
+	Frontend      string
+	Backend       string
 	Active        bool
 }
 
 func (self *Store) CreateService(envId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (environment_id, ziti_service_id, endpoint, active) values (?, ?, ?, true)")
+	stmt, err := tx.Prepare("insert into services (environment_id, ziti_service_id, zrok_service_id, frontend, backend, active) values (?, ?, ?, ?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
-	res, err := stmt.Exec(envId, svc.ZitiServiceId, svc.Endpoint)
+	res, err := stmt.Exec(envId, svc.ZitiServiceId, svc.ZrokServiceId, svc.Frontend, svc.Backend)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
@@ -54,12 +56,12 @@ func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Servic
 }
 
 func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
-	sql := "update services set ziti_service_id = ?, endpoint = ?, active = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
+	sql := "update services set ziti_service_id = ?, zrok_service_id = ?, frontend = ?, backend = ?, active = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing services update statement")
 	}
-	_, err = stmt.Exec(svc.ZitiServiceId, svc.Endpoint, svc.Active, svc.Id)
+	_, err = stmt.Exec(svc.ZitiServiceId, svc.ZrokServiceId, svc.Frontend, svc.Backend, svc.Active, svc.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing services update statement")
 	}

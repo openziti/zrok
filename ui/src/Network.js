@@ -82,7 +82,7 @@ function buildGraph(overview) {
                 if(item.active) {
                     out.nodes.push({
                         id: '' + id,
-                        data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.endpoint }</div>},
+                        data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.frontend }</div>},
                         position: {x: (id * 25), y: 0},
                         style: { width: 'fit-content', backgroundColor: '#9367ef', color: 'white' },
                         type: 'output',
