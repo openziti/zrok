@@ -56,7 +56,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
 
-	zrok, err := newZrokClient(apiEndpoint)
+	zrok, err := zrokdir.ZrokClient(apiEndpoint)
 	if err != nil {
 		panic(err)
 	}

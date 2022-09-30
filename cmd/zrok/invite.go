@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/foundation/v2/term"
 	"github.com/spf13/cobra"
 )
@@ -40,7 +41,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		showError("entered emails do not match... aborting!", nil)
 	}
 
-	zrok, err := newZrokClient(apiEndpoint)
+	zrok, err := zrokdir.ZrokClient(apiEndpoint)
 	if err != nil {
 		if !panicInstead {
 			showError("error creating zrok api client", err)

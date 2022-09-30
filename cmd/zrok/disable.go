@@ -36,7 +36,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	zrok, err := newZrokClient(env.ApiEndpoint)
+	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
 	if err != nil {
 		if !panicInstead {
 			showError("could not create zrok service client", err)

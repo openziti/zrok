@@ -80,7 +80,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		EndpointAddress: args[0],
 	}
 
-	zrok, err := newZrokClient(env.ApiEndpoint)
+	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
