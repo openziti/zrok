@@ -6,8 +6,18 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/pkg/errors"
+	"github.com/spf13/pflag"
 	"net/url"
+	"os"
 )
+
+func AddZrokApiEndpointFlag(v *string, flags *pflag.FlagSet) {
+	defaultEndpoint := os.Getenv("ZROK_API_ENDPOINT")
+	if defaultEndpoint == "" {
+		defaultEndpoint = "https://api.zrok.io"
+	}
+	flags.StringVarP(v, "endpoint", "e", defaultEndpoint, "zrok API endpoint address")
+}
 
 func ZrokClient(endpoint string) (*rest_client_zrok.Zrok, error) {
 	apiUrl, err := url.Parse(endpoint)
