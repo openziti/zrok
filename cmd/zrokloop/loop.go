@@ -25,8 +25,9 @@ func init() {
 }
 
 type run struct {
-	cmd     *cobra.Command
-	loopers int
+	cmd        *cobra.Command
+	loopers    int
+	iterations int
 }
 
 func newRun() *run {
@@ -38,13 +39,14 @@ func newRun() *run {
 	r := &run{cmd: cmd}
 	cmd.Run = r.run
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
+	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
 	return r
 }
 
 func (r *run) run(_ *cobra.Command, _ []string) {
 	var loopers []*looper
 	for i := 0; i < r.loopers; i++ {
-		l := newLooper(i)
+		l := newLooper(i, r.iterations)
 		loopers = append(loopers, l)
 		go l.run()
 	}
@@ -54,15 +56,17 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 }
 
 type looper struct {
-	id       int
-	done     chan struct{}
-	listener edge.Listener
+	id         int
+	iterations int
+	done       chan struct{}
+	listener   edge.Listener
 }
 
-func newLooper(id int) *looper {
+func newLooper(id, iterations int) *looper {
 	return &looper{
-		id:   id,
-		done: make(chan struct{}),
+		id:         id,
+		iterations: iterations,
+		done:       make(chan struct{}),
 	}
 }
 
@@ -100,8 +104,11 @@ func (l *looper) run() {
 
 	time.Sleep(1 * time.Second)
 
-	for i := 0; i < 10; i++ {
-		outpayload := make([]byte, 64)
+	for i := 0; i < l.iterations; i++ {
+		if i > 0 && i%10 == 0 {
+			logrus.Infof("looper #%d: iteration #%d", l.id, i)
+		}
+		outpayload := make([]byte, 10240)
 		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
 		rand.Read(outpayload)
 		if req, err := http.NewRequest("POST", tunnelResp.Payload.ProxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
@@ -113,7 +120,7 @@ func (l *looper) run() {
 				if inbase64 != outbase64 {
 					logrus.Errorf("payload mismatch!")
 				} else {
-					logrus.Infof("payload match")
+					logrus.Debugf("payload match")
 				}
 			} else {
 				logrus.Errorf("error: %v", err)
@@ -122,6 +129,7 @@ func (l *looper) run() {
 			logrus.Errorf("error creating request: %v", err)
 		}
 	}
+	logrus.Infof("looper #%d: complete", l.id)
 
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
