@@ -4,6 +4,7 @@ import Version from "./Version";
 import Token from "./Token";
 import Logout from "./Logout";
 import Network from "./Network";
+import {ReactFlowProvider} from "react-flow-renderer";
 
 const Overview = () => {
     const [user, setUser] = useState();
@@ -45,7 +46,9 @@ const Overview = () => {
                     </div>
                 </div>
                 <div className="main">
-                    <Network />
+                    <ReactFlowProvider>
+                        <Network />
+                    </ReactFlowProvider>
                 </div>
             </div>
         </div>

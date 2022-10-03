@@ -1,7 +1,7 @@
 import Environments from './Environments';
 import * as metadata from './api/metadata';
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
-import ReactFlow, {isNode, useNodesState} from "react-flow-renderer";
+import ReactFlow, {isNode, useNodesState, useReactFlow} from "react-flow-renderer";
 import dagre from 'dagre';
 import { mdiDesktopClassic, mdiAccessPointNetwork } from '@mdi/js';
 import Icon from "@mdi/react";
@@ -10,6 +10,7 @@ const Network = () => {
     const [overview, setOverview] = useState([]);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useState([]);
+    const reactFlow = useReactFlow();
 
     useEffect(() => {
         let mounted = true
@@ -20,6 +21,7 @@ const Network = () => {
                 let g = buildGraph(resp.data)
                 setNodes(getLayout(g))
                 setEdges(g.edges)
+                reactFlow.fitView()
             }
         });
     })
