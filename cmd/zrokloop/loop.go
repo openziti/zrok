@@ -7,9 +7,13 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/sdk-golang/ziti"
+	"github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -47,8 +51,9 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 }
 
 type looper struct {
-	id   int
-	done chan struct{}
+	id       int
+	done     chan struct{}
+	listener edge.Listener
 }
 
 func newLooper(id int) *looper {
@@ -64,6 +69,10 @@ func (l *looper) run() {
 	defer logrus.Infof("stopping #%d", l.id)
 
 	env, err := zrokdir.LoadEnvironment()
+	if err != nil {
+		panic(err)
+	}
+	zif, err := zrokdir.ZitiIdentityFile("environment")
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +93,13 @@ func (l *looper) run() {
 	}
 
 	logrus.Infof("service: %v, frontend: %v", tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
-	time.Sleep(time.Duration(rand.Intn(5000)) * time.Millisecond)
+	go l.serviceListener(zif, tunnelResp.Payload.Service)
+	time.Sleep(time.Duration(rand.Intn(10000)) * time.Millisecond)
+	if l.listener != nil {
+		if err := l.listener.Close(); err != nil {
+			logrus.Errorf("error closing listener: %v", err)
+		}
+	}
 
 	untunnelReq := tunnel.NewUntunnelParams()
 	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
@@ -94,4 +109,27 @@ func (l *looper) run() {
 	if _, err := zrok.Tunnel.Untunnel(untunnelReq, auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
 	}
+}
+
+func (l *looper) serviceListener(zitiIdPath string, svcId string) {
+	zcfg, err := config.NewFromFile(zitiIdPath)
+	if err != nil {
+		logrus.Errorf("error opening ziti config '%v': %v", zitiIdPath, err)
+		return
+	}
+	opts := ziti.ListenOptions{
+		ConnectTimeout: 5 * time.Minute,
+		MaxConnections: 10,
+	}
+	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(svcId, &opts); err == nil {
+		if err := http.Serve(l.listener, l); err != nil {
+			logrus.Errorf("error serving: %v", err)
+		}
+	} else {
+		logrus.Errorf("error listening: %v", err)
+	}
+}
+
+func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
 }
