@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
@@ -12,7 +15,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"math/rand"
+	"io"
 	"net/http"
 	"time"
 )
@@ -94,7 +97,32 @@ func (l *looper) run() {
 
 	logrus.Infof("service: %v, frontend: %v", tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
 	go l.serviceListener(zif, tunnelResp.Payload.Service)
-	time.Sleep(time.Duration(rand.Intn(10000)) * time.Millisecond)
+
+	time.Sleep(1 * time.Second)
+
+	for i := 0; i < 10; i++ {
+		outpayload := make([]byte, 64)
+		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
+		rand.Read(outpayload)
+		if req, err := http.NewRequest("POST", tunnelResp.Payload.ProxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
+			client := &http.Client{Timeout: time.Second * 10}
+			if resp, err := client.Do(req); err == nil {
+				inpayload := new(bytes.Buffer)
+				io.Copy(inpayload, resp.Body)
+				inbase64 := inpayload.String()
+				if inbase64 != outbase64 {
+					logrus.Errorf("payload mismatch!")
+				} else {
+					logrus.Infof("payload match")
+				}
+			} else {
+				logrus.Errorf("error: %v", err)
+			}
+		} else {
+			logrus.Errorf("error creating request: %v", err)
+		}
+	}
+
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
 			logrus.Errorf("error closing listener: %v", err)
@@ -131,5 +159,7 @@ func (l *looper) serviceListener(zitiIdPath string, svcId string) {
 }
 
 func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("ok"))
+	buf := new(bytes.Buffer)
+	io.Copy(buf, r.Body)
+	w.Write(buf.Bytes())
 }
