@@ -21,7 +21,7 @@ const Network = () => {
                 let g = buildGraph(resp.data)
                 setNodes(getLayout(g))
                 setEdges(g.edges)
-                reactFlow.fitView()
+                reactFlow.fitView({maxZoom: 1})
             }
         });
     })
