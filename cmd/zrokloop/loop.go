@@ -25,9 +25,10 @@ func init() {
 }
 
 type run struct {
-	cmd        *cobra.Command
-	loopers    int
-	iterations int
+	cmd         *cobra.Command
+	loopers     int
+	iterations  int
+	statusEvery int
 }
 
 func newRun() *run {
@@ -40,13 +41,14 @@ func newRun() *run {
 	cmd.Run = r.run
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
+	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "e", 100, "Show status every # iterations")
 	return r
 }
 
 func (r *run) run(_ *cobra.Command, _ []string) {
 	var loopers []*looper
 	for i := 0; i < r.loopers; i++ {
-		l := newLooper(i, r.iterations)
+		l := newLooper(i, r)
 		loopers = append(loopers, l)
 		go l.run()
 	}
@@ -56,17 +58,17 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 }
 
 type looper struct {
-	id         int
-	iterations int
-	done       chan struct{}
-	listener   edge.Listener
+	id       int
+	runi     *run
+	done     chan struct{}
+	listener edge.Listener
 }
 
-func newLooper(id, iterations int) *looper {
+func newLooper(id int, runi *run) *looper {
 	return &looper{
-		id:         id,
-		iterations: iterations,
-		done:       make(chan struct{}),
+		id:   id,
+		runi: runi,
+		done: make(chan struct{}),
 	}
 }
 
@@ -99,13 +101,13 @@ func (l *looper) run() {
 		panic(err)
 	}
 
-	logrus.Infof("service: %v, frontend: %v", tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
+	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
 	go l.serviceListener(zif, tunnelResp.Payload.Service)
 
 	time.Sleep(1 * time.Second)
 
-	for i := 0; i < l.iterations; i++ {
-		if i > 0 && i%10 == 0 {
+	for i := 0; i < l.runi.iterations; i++ {
+		if i > 0 && i%l.runi.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
 		outpayload := make([]byte, 10240)
@@ -118,22 +120,22 @@ func (l *looper) run() {
 				io.Copy(inpayload, resp.Body)
 				inbase64 := inpayload.String()
 				if inbase64 != outbase64 {
-					logrus.Errorf("payload mismatch!")
+					logrus.Errorf("looper #%d payload mismatch!", l.id)
 				} else {
-					logrus.Debugf("payload match")
+					logrus.Debugf("looper #%d payload match", l.id)
 				}
 			} else {
-				logrus.Errorf("error: %v", err)
+				logrus.Errorf("looper #%d error: %v", l.id, err)
 			}
 		} else {
-			logrus.Errorf("error creating request: %v", err)
+			logrus.Errorf("looper #%d error creating request: %v", l.id, err)
 		}
 	}
 	logrus.Infof("looper #%d: complete", l.id)
 
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
-			logrus.Errorf("error closing listener: %v", err)
+			logrus.Errorf("looper #%d error closing listener: %v", l.id, err)
 		}
 	}
 
@@ -159,10 +161,10 @@ func (l *looper) serviceListener(zitiIdPath string, svcId string) {
 	}
 	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(svcId, &opts); err == nil {
 		if err := http.Serve(l.listener, l); err != nil {
-			logrus.Errorf("error serving: %v", err)
+			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}
 	} else {
-		logrus.Errorf("error listening: %v", err)
+		logrus.Errorf("looper #%d, error listening: %v", l.id, err)
 	}
 }
 
