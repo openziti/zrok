@@ -77,6 +77,7 @@ func newLooper(id int, r *run) *looper {
 }
 
 func (l *looper) run() {
+	// Startup
 	logrus.Infof("starting #%d", l.id)
 	defer close(l.done)
 	defer logrus.Infof("stopping #%d", l.id)
@@ -108,8 +109,10 @@ func (l *looper) run() {
 	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
 	go l.serviceListener(zif, tunnelResp.Payload.Service)
 
+	// Dwell
 	time.Sleep(time.Duration(l.r.dwellSeconds) * time.Second)
 
+	// Iterations
 	for i := 0; i < l.r.iterations; i++ {
 		if i > 0 && i%l.r.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
@@ -137,6 +140,7 @@ func (l *looper) run() {
 	}
 	logrus.Infof("looper #%d: complete", l.id)
 
+	// Shutdown
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
 			logrus.Errorf("looper #%d error closing listener: %v", l.id, err)
