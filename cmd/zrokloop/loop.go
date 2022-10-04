@@ -25,10 +25,12 @@ func init() {
 }
 
 type run struct {
-	cmd         *cobra.Command
-	loopers     int
-	iterations  int
-	statusEvery int
+	cmd            *cobra.Command
+	loopers        int
+	iterations     int
+	statusEvery    int
+	dwellSeconds   int
+	timeoutSeconds int
 }
 
 func newRun() *run {
@@ -42,6 +44,8 @@ func newRun() *run {
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
 	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "E", 100, "Show status every # iterations")
+	cmd.Flags().IntVarP(&r.dwellSeconds, "dwell-seconds", "D", 1, "Dwell # seconds before starting iterations")
+	cmd.Flags().IntVarP(&r.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
 	return r
 }
 
@@ -59,15 +63,15 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 
 type looper struct {
 	id       int
-	runi     *run
+	r        *run
 	done     chan struct{}
 	listener edge.Listener
 }
 
-func newLooper(id int, runi *run) *looper {
+func newLooper(id int, r *run) *looper {
 	return &looper{
 		id:   id,
-		runi: runi,
+		r:    r,
 		done: make(chan struct{}),
 	}
 }
@@ -104,17 +108,17 @@ func (l *looper) run() {
 	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
 	go l.serviceListener(zif, tunnelResp.Payload.Service)
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(time.Duration(l.r.dwellSeconds) * time.Second)
 
-	for i := 0; i < l.runi.iterations; i++ {
-		if i > 0 && i%l.runi.statusEvery == 0 {
+	for i := 0; i < l.r.iterations; i++ {
+		if i > 0 && i%l.r.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
 		outpayload := make([]byte, 10240)
 		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
 		rand.Read(outpayload)
 		if req, err := http.NewRequest("POST", tunnelResp.Payload.ProxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
-			client := &http.Client{Timeout: time.Second * 10}
+			client := &http.Client{Timeout: time.Second * time.Duration(l.r.timeoutSeconds)}
 			if resp, err := client.Do(req); err == nil {
 				inpayload := new(bytes.Buffer)
 				io.Copy(inpayload, resp.Body)
