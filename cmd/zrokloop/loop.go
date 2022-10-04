@@ -41,7 +41,7 @@ func newRun() *run {
 	cmd.Run = r.run
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
-	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "e", 100, "Show status every # iterations")
+	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "E", 100, "Show status every # iterations")
 	return r
 }
 
