@@ -1,41 +1,31 @@
 # zrok
 
-`zrok` is a utility for quickly proving public access to dark, private applications. 
+`zrok` is a service designed to provide frictionless access to ephemeral, geo-scale reverse proxy capabilities.
 
 ![zrok overview](docs/images/zrok_v0.2_overview.png)
 
 `zrok` is designed with the following properties:
 
-## Easiest Possible On-ramp
+## Frictionless
 
-`zrok` is the fastest, simplest path for exposing dark, private applications onto the public internet using Ziti.
+`zrok` is designed to provide a "frictionless" experience. A single binary and a single command is all that is required to enable ephemeral connectivity.
 
-### Simple Registration
+`zrok` works in a large number environments: developer shells, container sidecars, serverless environments, webhooks.
 
-Registering for access to `zrok` should provide the user with a single identity token, which can be used from any shell environment to quickly enable access to private applications.
+## Expand with OpenZiti
 
-Enabling `zrok` in a shell should be as simple as executing something like:
+`zrok` is built on top of OpenZiti, a next-generation solution for secure application connectivity. `zrok` is a fantastic way to start working with OpenZiti. Start with simple `zrok` ephemeral connectivity, and then layer on additional capabilities provided by the underlying OpenZiti network.
 
-```
-$ zrok enable <token>
-```
+Bring `zrok` into your existing OpenZiti deployment to provide rapid, ephemeral connectivity for a number of important HTTP scenarios.
 
-### Single-Executable Deployment
+## World-Scale
 
-A registered user should only need a single executable (`zrok`), along with their identity, to enable `zrok` capabilities in any shell environment.
-
-### URLs that Don't Change
-
-The smallest, simplest `zrok` implementation could be capable of providing URLs that don't change. The competition does not offer this capability without a subscription.
-
-## Expand into Ziti
-
-The `zrok` implementation should (ideally) be such that `zrok` usage patterns can co-exist with larger, more featureful Ziti implementations. Ideally, a developer who started with `zrok` should have patterns that allow them to incrementally expand their usage.
+`zrok` is the software that powers the `zrok.io` service. It is designed to scale as large as you want.
 
 ## Multiple Isolated Tenants
 
-A single `zrok` implementation should support multiple isolated tenants coexisting on the same deployment (and underlying Ziti network) in a secure manner.
+A single `zrok` instance can support any number of isolated tenants, allowing them to coexist on top of the same OpenZiti deployment in a secure manner.
 
 ## Self-hosting Capable
 
-The `zrok` implementation should support self-hosting, such that existing Ziti users can easily add `zrok` capabilities to their existing networks.
+Install `zrok` on top of your own OpenZiti network. `zrok` is simple to operate and scale.
