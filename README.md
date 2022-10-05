@@ -2,7 +2,7 @@
 
 `zrok` is a utility for quickly proving public access to dark, private applications. 
 
-![zrok overview](docs/images/zrok_overview.png)
+![zrok overview](docs/images/zrok_v0.2_overview.png)
 
 `zrok` is designed with the following properties:
 
