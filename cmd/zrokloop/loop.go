@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -65,6 +66,17 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 	for _, l := range loopers {
 		<-l.done
 	}
+	totalMismatches := 0
+	totalXfer := int64(0)
+	for _, l := range loopers {
+		deltaSeconds := l.stopTime.Sub(l.startTime).Seconds()
+		xfer := int64(float64(l.bytes) / deltaSeconds)
+		totalXfer += xfer
+		xferSec := util.BytesToSize(xfer)
+		logrus.Infof("looper #%d: %d mismatches, %s/sec", l.id, l.mismatches, xferSec)
+	}
+	totalXferSec := util.BytesToSize(totalXfer)
+	logrus.Infof("total: %d mismatches, %s/sec", totalMismatches, totalXferSec)
 }
 
 type looper struct {
@@ -78,6 +90,10 @@ type looper struct {
 	service       string
 	proxyEndpoint string
 	auth          runtime.ClientAuthInfoWriter
+	mismatches    int
+	bytes         int64
+	startTime     time.Time
+	stopTime      time.Time
 }
 
 func newLooper(id int, r *run) *looper {
@@ -162,6 +178,9 @@ func (l *looper) dwell() {
 }
 
 func (l *looper) iterate() {
+	l.startTime = time.Now()
+	defer func() { l.stopTime = time.Now() }()
+
 	for i := 0; i < l.r.iterations; i++ {
 		if i > 0 && i%l.r.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
@@ -181,7 +200,9 @@ func (l *looper) iterate() {
 				inbase64 := inpayload.String()
 				if inbase64 != outbase64 {
 					logrus.Errorf("looper #%d payload mismatch!", l.id)
+					l.mismatches++
 				} else {
+					l.bytes += int64(len(outbase64))
 					logrus.Debugf("looper #%d payload match", l.id)
 				}
 			} else {
