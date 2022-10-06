@@ -24,10 +24,10 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newRun().cmd)
+	testCmd.AddCommand(newLoopCmd().cmd)
 }
 
-type run struct {
+type loopCmd struct {
 	cmd            *cobra.Command
 	loopers        int
 	iterations     int
@@ -38,13 +38,13 @@ type run struct {
 	maxPayload     int
 }
 
-func newRun() *run {
+func newLoopCmd() *loopCmd {
 	cmd := &cobra.Command{
-		Use:   "run",
+		Use:   "loop",
 		Short: "Start a loop agent",
 		Args:  cobra.ExactArgs(0),
 	}
-	r := &run{cmd: cmd}
+	r := &loopCmd{cmd: cmd}
 	cmd.Run = r.run
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
@@ -56,7 +56,7 @@ func newRun() *run {
 	return r
 }
 
-func (r *run) run(_ *cobra.Command, _ []string) {
+func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 	var loopers []*looper
 	for i := 0; i < r.loopers; i++ {
 		l := newLooper(i, r)
@@ -81,7 +81,7 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 
 type looper struct {
 	id            int
-	r             *run
+	cmd           *loopCmd
 	env           *zrokdir.Environment
 	done          chan struct{}
 	listener      edge.Listener
@@ -96,10 +96,10 @@ type looper struct {
 	stopTime      time.Time
 }
 
-func newLooper(id int, r *run) *looper {
+func newLooper(id int, cmd *loopCmd) *looper {
 	return &looper{
 		id:   id,
-		r:    r,
+		cmd:  cmd,
 		done: make(chan struct{}),
 	}
 }
@@ -174,26 +174,26 @@ func (l *looper) startup() {
 }
 
 func (l *looper) dwell() {
-	time.Sleep(time.Duration(l.r.dwellSeconds) * time.Second)
+	time.Sleep(time.Duration(l.cmd.dwellSeconds) * time.Second)
 }
 
 func (l *looper) iterate() {
 	l.startTime = time.Now()
 	defer func() { l.stopTime = time.Now() }()
 
-	for i := 0; i < l.r.iterations; i++ {
-		if i > 0 && i%l.r.statusEvery == 0 {
+	for i := 0; i < l.cmd.iterations; i++ {
+		if i > 0 && i%l.cmd.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
-		sz := l.r.maxPayload
-		if l.r.maxPayload-l.r.minPayload > 0 {
-			sz = rand.Intn(l.r.maxPayload-l.r.minPayload) + l.r.minPayload
+		sz := l.cmd.maxPayload
+		if l.cmd.maxPayload-l.cmd.minPayload > 0 {
+			sz = rand.Intn(l.cmd.maxPayload-l.cmd.minPayload) + l.cmd.minPayload
 		}
 		outpayload := make([]byte, sz)
 		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
 		rand.Read(outpayload)
 		if req, err := http.NewRequest("POST", l.proxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
-			client := &http.Client{Timeout: time.Second * time.Duration(l.r.timeoutSeconds)}
+			client := &http.Client{Timeout: time.Second * time.Duration(l.cmd.timeoutSeconds)}
 			if resp, err := client.Do(req); err == nil {
 				inpayload := new(bytes.Buffer)
 				io.Copy(inpayload, resp.Body)
