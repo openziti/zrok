@@ -31,6 +31,19 @@ func gcServices(cfg *Config, str *store.Store) error {
 	if err != nil {
 		return err
 	}
+	tx, err := str.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+	dbSvcs, err := str.GetAllServices(tx)
+	if err != nil {
+		return err
+	}
+	liveMap := make(map[string]struct{})
+	for _, dbSvc := range dbSvcs {
+		liveMap[dbSvc.ZrokServiceId] = struct{}{}
+	}
 	filter := "tags.zrok != null"
 	limit := int64(0)
 	offset := int64(0)
@@ -43,8 +56,29 @@ func gcServices(cfg *Config, str *store.Store) error {
 	listReq.SetTimeout(30 * time.Second)
 	if listResp, err := edge.Service.ListServices(listReq, nil); err == nil {
 		for _, svc := range listResp.Payload.Data {
-			logrus.Infof("found svcId='%v', name='%v'", *svc.ID, *svc.Name)
+			if _, found := liveMap[*svc.Name]; !found {
+				logrus.Infof("garbage collecting, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
+				if err := deleteServiceEdgeRouterPolicy(*svc.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
+				}
+				if err := deleteServicePolicyDial(*svc.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting service dial policy: %v", err)
+				}
+				if err := deleteServicePolicyBind(*svc.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting service bind policy: %v", err)
+				}
+				if err := deleteConfig(*svc.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting config: %v", err)
+				}
+				if err := deleteService(*svc.ID, edge); err != nil {
+					logrus.Errorf("error garbage collecting service: %v", err)
+				}
+			} else {
+				logrus.Infof("remaining live, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
+			}
 		}
+	} else {
+		return errors.Wrap(err, "error listing services")
 	}
 	return nil
 }

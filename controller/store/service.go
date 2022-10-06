@@ -39,6 +39,22 @@ func (self *Store) GetService(id int, tx *sqlx.Tx) (*Service, error) {
 	return svc, nil
 }
 
+func (self *Store) GetAllServices(tx *sqlx.Tx) ([]*Service, error) {
+	rows, err := tx.Queryx("select * from services order by id")
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting all services")
+	}
+	var svcs []*Service
+	for rows.Next() {
+		svc := &Service{}
+		if err := rows.StructScan(svc); err != nil {
+			return nil, errors.Wrap(err, "error scanning service")
+		}
+		svcs = append(svcs, svc)
+	}
+	return svcs, nil
+}
+
 func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Service, error) {
 	rows, err := tx.Queryx("select services.* from services where environment_id = ?", envId)
 	if err != nil {
