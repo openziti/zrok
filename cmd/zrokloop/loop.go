@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -16,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -31,6 +31,8 @@ type run struct {
 	statusEvery    int
 	dwellSeconds   int
 	timeoutSeconds int
+	minPayload     int
+	maxPayload     int
 }
 
 func newRun() *run {
@@ -46,6 +48,8 @@ func newRun() *run {
 	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "E", 100, "Show status every # iterations")
 	cmd.Flags().IntVarP(&r.dwellSeconds, "dwell-seconds", "D", 1, "Dwell # seconds before starting iterations")
 	cmd.Flags().IntVarP(&r.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
+	cmd.Flags().IntVar(&r.minPayload, "min-payload", 64, "Minimum payload size in bytes")
+	cmd.Flags().IntVar(&r.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
 	return r
 }
 
@@ -117,7 +121,11 @@ func (l *looper) run() {
 		if i > 0 && i%l.r.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
-		outpayload := make([]byte, 10240)
+		sz := l.r.maxPayload
+		if l.r.maxPayload-l.r.minPayload > 0 {
+			sz = rand.Intn(l.r.maxPayload-l.r.minPayload) + l.r.minPayload
+		}
+		outpayload := make([]byte, sz)
 		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
 		rand.Read(outpayload)
 		if req, err := http.NewRequest("POST", tunnelResp.Payload.ProxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
