@@ -26,7 +26,7 @@ func newGcCmd() *gcCmd {
 	return c
 }
 
-func (c *gcCmd) run(_ *cobra.Command, args []string) {
+func (gc *gcCmd) run(_ *cobra.Command, args []string) {
 	cfg, err := controller.LoadConfig(args[0])
 	if err != nil {
 		panic(err)

@@ -2,14 +2,12 @@ package controller
 
 import (
 	"github.com/go-openapi/loads"
-	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var str *store.Store
@@ -54,22 +52,4 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "api server error")
 	}
 	return nil
-}
-
-func GC(cfg *Config) error {
-	if v, err := store.Open(cfg.Store); err == nil {
-		str = v
-	} else {
-		return errors.Wrap(err, "error opening store")
-	}
-	defer func() {
-		if err := str.Close(); err != nil {
-			logrus.Errorf("error closing store: %v", err)
-		}
-	}()
-	return nil
-}
-
-func versionHandler(_ metadata.VersionParams) middleware.Responder {
-	return metadata.NewVersionOK().WithPayload(version)
 }
