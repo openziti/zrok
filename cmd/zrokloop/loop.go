@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -68,8 +70,12 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 type looper struct {
 	id       int
 	r        *run
+	env      *zrokdir.Environment
 	done     chan struct{}
 	listener edge.Listener
+	zrok     *rest_client_zrok.Zrok
+	service  string
+	auth     runtime.ClientAuthInfoWriter
 }
 
 func newLooper(id int, r *run) *looper {
@@ -86,7 +92,8 @@ func (l *looper) run() {
 	defer close(l.done)
 	defer logrus.Infof("stopping #%d", l.id)
 
-	env, err := zrokdir.LoadEnvironment()
+	var err error
+	l.env, err = zrokdir.LoadEnvironment()
 	if err != nil {
 		panic(err)
 	}
@@ -94,23 +101,24 @@ func (l *looper) run() {
 	if err != nil {
 		panic(err)
 	}
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+	l.zrok, err = zrokdir.ZrokClient(l.env.ApiEndpoint)
 	if err != nil {
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("x-token", "header", env.ZrokToken)
+	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.ZrokToken)
 	tunnelReq := tunnel.NewTunnelParams()
 	tunnelReq.Body = &rest_model_zrok.TunnelRequest{
-		ZitiIdentityID: env.ZitiIdentityId,
+		ZitiIdentityID: l.env.ZitiIdentityId,
 		Endpoint:       fmt.Sprintf("looper#%d", l.id),
 		AuthScheme:     string(model.None),
 	}
-	tunnelResp, err := zrok.Tunnel.Tunnel(tunnelReq, auth)
+	tunnelResp, err := l.zrok.Tunnel.Tunnel(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
 	}
+	l.service = tunnelResp.Payload.Service
 
-	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, tunnelResp.Payload.Service, tunnelResp.Payload.ProxyEndpoint)
+	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, l.service, tunnelResp.Payload.ProxyEndpoint)
 	go l.serviceListener(zif, tunnelResp.Payload.Service)
 
 	// Dwell
@@ -146,23 +154,10 @@ func (l *looper) run() {
 			logrus.Errorf("looper #%d error creating request: %v", l.id, err)
 		}
 	}
+	
 	logrus.Infof("looper #%d: complete", l.id)
 
-	// Shutdown
-	if l.listener != nil {
-		if err := l.listener.Close(); err != nil {
-			logrus.Errorf("looper #%d error closing listener: %v", l.id, err)
-		}
-	}
-
-	untunnelReq := tunnel.NewUntunnelParams()
-	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
-		ZitiIdentityID: env.ZitiIdentityId,
-		Service:        tunnelResp.Payload.Service,
-	}
-	if _, err := zrok.Tunnel.Untunnel(untunnelReq, auth); err != nil {
-		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
-	}
+	l.shutdown()
 }
 
 func (l *looper) serviceListener(zitiIdPath string, svcId string) {
@@ -188,4 +183,21 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	io.Copy(buf, r.Body)
 	w.Write(buf.Bytes())
+}
+
+func (l *looper) shutdown() {
+	if l.listener != nil {
+		if err := l.listener.Close(); err != nil {
+			logrus.Errorf("looper #%d error closing listener: %v", l.id, err)
+		}
+	}
+
+	untunnelReq := tunnel.NewUntunnelParams()
+	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
+		ZitiIdentityID: l.env.ZitiIdentityId,
+		Service:        l.service,
+	}
+	if _, err := l.zrok.Tunnel.Untunnel(untunnelReq, l.auth); err != nil {
+		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
+	}
 }
