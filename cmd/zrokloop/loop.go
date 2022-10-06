@@ -68,14 +68,16 @@ func (r *run) run(_ *cobra.Command, _ []string) {
 }
 
 type looper struct {
-	id       int
-	r        *run
-	env      *zrokdir.Environment
-	done     chan struct{}
-	listener edge.Listener
-	zrok     *rest_client_zrok.Zrok
-	service  string
-	auth     runtime.ClientAuthInfoWriter
+	id            int
+	r             *run
+	env           *zrokdir.Environment
+	done          chan struct{}
+	listener      edge.Listener
+	zif           string
+	zrok          *rest_client_zrok.Zrok
+	service       string
+	proxyEndpoint string
+	auth          runtime.ClientAuthInfoWriter
 }
 
 func newLooper(id int, r *run) *looper {
@@ -87,17 +89,52 @@ func newLooper(id int, r *run) *looper {
 }
 
 func (l *looper) run() {
-	// Startup
-	logrus.Infof("starting #%d", l.id)
 	defer close(l.done)
 	defer logrus.Infof("stopping #%d", l.id)
+
+	l.startup()
+	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, l.service, l.proxyEndpoint)
+	go l.serviceListener()
+	l.dwell()
+	l.iterate()
+	logrus.Infof("looper #%d: complete", l.id)
+	l.shutdown()
+}
+
+func (l *looper) serviceListener() {
+	zcfg, err := config.NewFromFile(l.zif)
+	if err != nil {
+		logrus.Errorf("error opening ziti config '%v': %v", l.zif, err)
+		return
+	}
+	opts := ziti.ListenOptions{
+		ConnectTimeout: 5 * time.Minute,
+		MaxConnections: 10,
+	}
+	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.service, &opts); err == nil {
+		if err := http.Serve(l.listener, l); err != nil {
+			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
+		}
+	} else {
+		logrus.Errorf("looper #%d, error listening: %v", l.id, err)
+	}
+}
+
+func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	buf := new(bytes.Buffer)
+	io.Copy(buf, r.Body)
+	w.Write(buf.Bytes())
+}
+
+func (l *looper) startup() {
+	logrus.Infof("starting #%d", l.id)
 
 	var err error
 	l.env, err = zrokdir.LoadEnvironment()
 	if err != nil {
 		panic(err)
 	}
-	zif, err := zrokdir.ZitiIdentityFile("environment")
+	l.zif, err = zrokdir.ZitiIdentityFile("environment")
 	if err != nil {
 		panic(err)
 	}
@@ -117,14 +154,14 @@ func (l *looper) run() {
 		panic(err)
 	}
 	l.service = tunnelResp.Payload.Service
+	l.proxyEndpoint = tunnelResp.Payload.ProxyEndpoint
+}
 
-	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, l.service, tunnelResp.Payload.ProxyEndpoint)
-	go l.serviceListener(zif, tunnelResp.Payload.Service)
-
-	// Dwell
+func (l *looper) dwell() {
 	time.Sleep(time.Duration(l.r.dwellSeconds) * time.Second)
+}
 
-	// Iterations
+func (l *looper) iterate() {
 	for i := 0; i < l.r.iterations; i++ {
 		if i > 0 && i%l.r.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
@@ -136,7 +173,7 @@ func (l *looper) run() {
 		outpayload := make([]byte, sz)
 		outbase64 := base64.StdEncoding.EncodeToString(outpayload)
 		rand.Read(outpayload)
-		if req, err := http.NewRequest("POST", tunnelResp.Payload.ProxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
+		if req, err := http.NewRequest("POST", l.proxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
 			client := &http.Client{Timeout: time.Second * time.Duration(l.r.timeoutSeconds)}
 			if resp, err := client.Do(req); err == nil {
 				inpayload := new(bytes.Buffer)
@@ -154,35 +191,6 @@ func (l *looper) run() {
 			logrus.Errorf("looper #%d error creating request: %v", l.id, err)
 		}
 	}
-	
-	logrus.Infof("looper #%d: complete", l.id)
-
-	l.shutdown()
-}
-
-func (l *looper) serviceListener(zitiIdPath string, svcId string) {
-	zcfg, err := config.NewFromFile(zitiIdPath)
-	if err != nil {
-		logrus.Errorf("error opening ziti config '%v': %v", zitiIdPath, err)
-		return
-	}
-	opts := ziti.ListenOptions{
-		ConnectTimeout: 5 * time.Minute,
-		MaxConnections: 10,
-	}
-	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(svcId, &opts); err == nil {
-		if err := http.Serve(l.listener, l); err != nil {
-			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
-		}
-	} else {
-		logrus.Errorf("looper #%d, error listening: %v", l.id, err)
-	}
-}
-
-func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	buf := new(bytes.Buffer)
-	io.Copy(buf, r.Body)
-	w.Write(buf.Bytes())
 }
 
 func (l *looper) shutdown() {
