@@ -2,12 +2,15 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
+	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -45,13 +48,13 @@ func GC(cfg *Config) error {
 	if err := gcServiceEdgeRouterPolicies(edge, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting service edge router policies")
 	}
+	if err := gcServicePolicies(edge, liveMap); err != nil {
+		return errors.Wrap(err, "error garbage collecting service policies")
+	}
 	return nil
 }
 
 func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
-	filter := "tags.zrok != null"
-	limit := int64(0)
-	offset := int64(0)
 	listReq := &service.ListServicesParams{
 		Filter:  &filter,
 		Limit:   &limit,
@@ -89,9 +92,6 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 }
 
 func gcServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
-	filter := "tags.zrok != null"
-	limit := int64(0)
-	offset := int64(0)
 	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
 		Filter:  &filter,
 		Limit:   &limit,
@@ -115,3 +115,31 @@ func gcServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManage
 	}
 	return nil
 }
+
+func gcServicePolicies(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
+	listReq := &service_policy.ListServicePoliciesParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	listReq.SetTimeout(30 * time.Second)
+	if listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil); err == nil {
+		for _, sp := range listResp.Payload.Data {
+			spName := strings.Split(*sp.Name, "-")[0]
+			if _, found := liveMap[spName]; !found {
+				logrus.Infof("garbage collecting, svcId='%v'", spName)
+				deleteFilter := fmt.Sprintf("id=\"%v\"", *sp.ID)
+				if err := deleteServicePolicy(deleteFilter, edge); err != nil {
+					logrus.Errorf("error garbage collecting service policy: %v", err)
+				}
+			} else {
+				logrus.Infof("remaining live, svcId='%v'", spName)
+			}
+		}
+	}
+}
+
+var filter = "tags.zrok != null"
+var limit = int64(0)
+var offset = int64(0)
