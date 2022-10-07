@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
@@ -50,6 +51,9 @@ func GC(cfg *Config) error {
 	}
 	if err := gcServicePolicies(edge, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting service policies")
+	}
+	if err := gcConfigs(edge, liveMap); err != nil {
+		return errors.Wrap(err, "error garbage collecting configs")
 	}
 	return nil
 }
@@ -137,7 +141,34 @@ func gcServicePolicies(edge *rest_management_api_client.ZitiEdgeManagement, live
 				logrus.Infof("remaining live, svcId='%v'", spName)
 			}
 		}
+	} else {
+		return errors.Wrap(err, "error listing service policies")
 	}
+	return nil
+}
+
+func gcConfigs(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
+	listReq := &config.ListConfigsParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	listReq.SetTimeout(30 * time.Second)
+	if listResp, err := edge.Config.ListConfigs(listReq, nil); err == nil {
+		for _, c := range listResp.Payload.Data {
+			if _, found := liveMap[*c.Name]; !found {
+				if err := deleteConfig(*c.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting config: %v", err)
+				}
+			} else {
+				logrus.Infof("remaining live, svcId='%v'", *c.Name)
+			}
+		}
+	} else {
+		return errors.Wrap(err, "error listing configs")
+	}
+	return nil
 }
 
 var filter = "tags.zrok != null"
