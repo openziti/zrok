@@ -1,18 +1,12 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
-	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type disableHandler struct {
@@ -44,11 +38,11 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 		logrus.Errorf("error getting edge client: %v", err)
 		return identity.NewDisableInternalServerError()
 	}
-	if err := self.deleteEdgeRouterPolicy(params.Body.Identity, edge); err != nil {
+	if err := deleteEdgeRouterPolicy(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
 		return identity.NewDisableInternalServerError()
 	}
-	if err := self.deleteIdentity(params.Body.Identity, edge); err != nil {
+	if err := deleteIdentity(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting identity: %v", err)
 		return identity.NewDisableInternalServerError()
 	}
@@ -69,52 +63,6 @@ func (self *disableHandler) checkZitiIdentity(id string, principal *rest_model_z
 		}
 	}
 	return -1, errors.Errorf("no such environment '%v'", id)
-}
-
-func (self *disableHandler) deleteEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"zrok-%v\"", id)
-	limit := int64(0)
-	offset := int64(0)
-	listReq := &edge_router_policy.ListEdgeRouterPoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.EdgeRouterPolicy.ListEdgeRouterPolicies(listReq, nil)
-	if err != nil {
-		return err
-	}
-	if len(listResp.Payload.Data) == 1 {
-		erpId := *(listResp.Payload.Data[0].ID)
-		req := &edge_router_policy.DeleteEdgeRouterPolicyParams{
-			ID:      erpId,
-			Context: context.Background(),
-		}
-		_, err := edge.EdgeRouterPolicy.DeleteEdgeRouterPolicy(req, nil)
-		if err != nil {
-			return err
-		}
-		logrus.Infof("deleted edge router policy '%v'", erpId)
-	} else {
-		logrus.Infof("found '%d' edge router policies, expected 1", len(listResp.Payload.Data))
-	}
-	return nil
-}
-
-func (self *disableHandler) deleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	req := &identity_edge.DeleteIdentityParams{
-		ID:      id,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	_, err := edge.Identity.DeleteIdentity(req, nil)
-	if err != nil {
-		return err
-	}
-	logrus.Infof("deleted identity '%v'", id)
-	return nil
 }
 
 func (self *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
