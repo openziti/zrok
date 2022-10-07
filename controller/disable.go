@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -29,13 +30,17 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 		logrus.Errorf("identity check failed: %v", err)
 		return identity.NewDisableUnauthorized()
 	}
-	if err := self.removeEnvironment(envId, tx); err != nil {
-		logrus.Errorf("error removing environment: %v", err)
-		return identity.NewDisableInternalServerError()
-	}
 	edge, err := edgeClient(self.cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
+		return identity.NewDisableInternalServerError()
+	}
+	if err := self.removeServicesForEnvironment(envId, tx, edge); err != nil {
+		logrus.Errorf("error removing services for environment: %v", err)
+		return identity.NewDisableInternalServerError()
+	}
+	if err := self.removeEnvironment(envId, tx); err != nil {
+		logrus.Errorf("error removing environment: %v", err)
 		return identity.NewDisableInternalServerError()
 	}
 	if err := deleteEdgeRouterPolicy(params.Body.Identity, edge); err != nil {
@@ -63,6 +68,34 @@ func (self *disableHandler) checkZitiIdentity(id string, principal *rest_model_z
 		}
 	}
 	return -1, errors.Errorf("no such environment '%v'", id)
+}
+
+func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	svcs, err := str.FindServicesForEnvironment(envId, tx)
+	if err != nil {
+		return err
+	}
+	for _, svc := range svcs {
+		svcName := svc.ZrokServiceId
+		logrus.Infof("garbage collecting service '%v'", svcName)
+		if err := deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
+			logrus.Error(err)
+		}
+		if err := deleteServicePolicyDial(svcName, edge); err != nil {
+			logrus.Error(err)
+		}
+		if err := deleteServicePolicyBind(svcName, edge); err != nil {
+			logrus.Error(err)
+		}
+		if err := deleteConfig(svcName, edge); err != nil {
+			logrus.Error(err)
+		}
+		if err := deleteService(svc.ZitiServiceId, edge); err != nil {
+			logrus.Error(err)
+		}
+		logrus.Infof("removed service '%v'", svc.ZrokServiceId)
+	}
+	return nil
 }
 
 func (self *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
