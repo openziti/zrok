@@ -3,7 +3,9 @@ package controller
 import (
 	"context"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/service"
+	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -20,13 +22,6 @@ func GC(cfg *Config) error {
 			logrus.Errorf("error closing store: %v", err)
 		}
 	}()
-	if err := gcServices(cfg, str); err != nil {
-		return errors.Wrap(err, "error garbage collecting services")
-	}
-	return nil
-}
-
-func gcServices(cfg *Config, str *store.Store) error {
 	edge, err := edgeClient(cfg.Ziti)
 	if err != nil {
 		return err
@@ -44,6 +39,16 @@ func gcServices(cfg *Config, str *store.Store) error {
 	for _, dbSvc := range dbSvcs {
 		liveMap[dbSvc.ZrokServiceId] = struct{}{}
 	}
+	if err := gcServices(edge, liveMap); err != nil {
+		return errors.Wrap(err, "error garbage collecting services")
+	}
+	if err := gcServiceEdgeRouterPolicies(edge, liveMap); err != nil {
+		return errors.Wrap(err, "error garbage collecting service edge router policies")
+	}
+	return nil
+}
+
+func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
 	filter := "tags.zrok != null"
 	limit := int64(0)
 	offset := int64(0)
@@ -79,6 +84,34 @@ func gcServices(cfg *Config, str *store.Store) error {
 		}
 	} else {
 		return errors.Wrap(err, "error listing services")
+	}
+	return nil
+}
+
+func gcServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[string]struct{}) error {
+	filter := "tags.zrok != null"
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	listReq.SetTimeout(30 * time.Second)
+	if listResp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(listReq, nil); err == nil {
+		for _, serp := range listResp.Payload.Data {
+			if _, found := liveMap[*serp.Name]; !found {
+				logrus.Infof("garbage collecting, svcId='%v'", *serp.Name)
+				if err := deleteServiceEdgeRouterPolicy(*serp.Name, edge); err != nil {
+					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
+				}
+			} else {
+				logrus.Infof("remaining live, svcId='%v'", *serp.Name)
+			}
+		}
+	} else {
+		return errors.Wrap(err, "error listing service edge router policies")
 	}
 	return nil
 }
