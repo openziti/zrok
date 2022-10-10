@@ -65,7 +65,11 @@ type zitiDialContext struct {
 
 func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
 	svcName := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	return self.ctx.Dial(svcName)
+	conn, err := self.ctx.Dial(svcName)
+	if err != nil {
+		return conn, err
+	}
+	return newMetricsConn(svcName, conn), nil
 }
 
 func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
