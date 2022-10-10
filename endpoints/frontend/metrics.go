@@ -1,7 +1,8 @@
 package frontend
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"time"
 )
 
@@ -33,7 +34,29 @@ func (ma *metricsAgent) run() {
 	for {
 		select {
 		case update := <-ma.updates:
-			logrus.Infof("update: [%v] read: %d, written: %d", update.id, update.bytesRead, update.bytesWritten)
+			if sm, found := ma.metrics[update.id]; found {
+				sm.bytesRead += update.bytesRead
+				sm.bytesWritten += update.bytesWritten
+				sm.lastUpdate = time.Now()
+				ma.metrics[update.id] = sm
+			} else {
+				sm := sessionMetrics{
+					bytesRead:    update.bytesRead,
+					bytesWritten: update.bytesWritten,
+					lastUpdate:   time.Now(),
+				}
+				ma.metrics[update.id] = sm
+			}
+
+		case <-time.After(5 * time.Second):
+			now := time.Now()
+			out := "metrics = {\n"
+			for k, v := range ma.metrics {
+				age := now.Sub(v.lastUpdate)
+				out += fmt.Sprintf("\t[%v]: %s/%s (%s)\n", k, util.BytesToSize(v.bytesRead), util.BytesToSize(v.bytesWritten), age.String())
+			}
+			out += "}\n"
+			//fmt.Println(out)
 		}
 	}
 }
