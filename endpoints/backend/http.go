@@ -92,6 +92,5 @@ func metricsDial(_ context.Context, network string, addr string) (net.Conn, erro
 	if err != nil {
 		return conn, err
 	}
-	logrus.Infof("returned wrapped metricsConn")
 	return newMetricsConn("self", conn), nil
 }
