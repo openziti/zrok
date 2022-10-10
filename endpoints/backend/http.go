@@ -1,12 +1,14 @@
 package backend
 
 import (
+	"context"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -67,7 +69,11 @@ func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
 		return nil, err
 	}
 
+	tpt := http.DefaultTransport.(*http.Transport).Clone()
+	tpt.DialContext = metricsDial
+
 	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+	proxy.Transport = tpt
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
@@ -79,4 +85,13 @@ func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
 	}
 
 	return proxy, nil
+}
+
+func metricsDial(_ context.Context, network string, addr string) (net.Conn, error) {
+	conn, err := net.Dial(network, addr)
+	if err != nil {
+		return conn, err
+	}
+	logrus.Infof("returned wrapped metricsConn")
+	return newMetricsConn("self", conn), nil
 }
