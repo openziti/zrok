@@ -1,29 +1,29 @@
-package backend
+package frontend
 
 import (
-	"github.com/sirupsen/logrus"
 	"net"
 	"time"
 )
 
 type metricsConn struct {
-	id   string
-	conn net.Conn
+	id      string
+	conn    net.Conn
+	updates chan metricsUpdate
 }
 
-func newMetricsConn(id string, conn net.Conn) *metricsConn {
-	return &metricsConn{id, conn}
+func newMetricsConn(id string, conn net.Conn, updates chan metricsUpdate) *metricsConn {
+	return &metricsConn{id, conn, updates}
 }
 
 func (mc *metricsConn) Read(b []byte) (n int, err error) {
 	n, err = mc.conn.Read(b)
-	logrus.Infof("[%v] => %d", mc.id, n)
+	mc.updates <- metricsUpdate{mc.id, int64(n), 0}
 	return n, err
 }
 
 func (mc *metricsConn) Write(b []byte) (n int, err error) {
 	n, err = mc.conn.Write(b)
-	logrus.Infof("[%v] <= %d", mc.id, n)
+	mc.updates <- metricsUpdate{mc.id, 0, int64(n)}
 	return n, err
 }
 
