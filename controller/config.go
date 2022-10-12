@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	Endpoint     *EndpointConfig
-	Proxy        *ProxyConfig
-	Email        *EmailConfig
-	Registration *RegistrationConfig
-	Store        *store.Config
-	Ziti         *ZitiConfig
+	Endpoint      *EndpointConfig
+	Proxy         *ProxyConfig
+	Email         *EmailConfig
+	Registration  *RegistrationConfig
+	Store         *store.Config
+	Ziti          *ZitiConfig
+	MetricsConfig *MetricsConfig
 }
 
 type EndpointConfig struct {
