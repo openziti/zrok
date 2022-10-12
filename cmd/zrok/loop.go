@@ -36,6 +36,8 @@ type loopCmd struct {
 	timeoutSeconds int
 	minPayload     int
 	maxPayload     int
+	minPacingMs    int
+	maxPacingMs    int
 }
 
 func newLoopCmd() *loopCmd {
@@ -53,6 +55,8 @@ func newLoopCmd() *loopCmd {
 	cmd.Flags().IntVarP(&r.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
 	cmd.Flags().IntVar(&r.minPayload, "min-payload", 64, "Minimum payload size in bytes")
 	cmd.Flags().IntVar(&r.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
+	cmd.Flags().IntVar(&r.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
+	cmd.Flags().IntVar(&r.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
 	return r
 }
 
@@ -210,6 +214,11 @@ func (l *looper) iterate() {
 			}
 		} else {
 			logrus.Errorf("looper #%d error creating request: %v", l.id, err)
+		}
+		pacingMs := l.cmd.maxPayload
+		if l.cmd.maxPacingMs-l.cmd.minPacingMs > 0 {
+			pacingMs = rand.Intn(l.cmd.maxPacingMs-l.cmd.minPacingMs) + l.cmd.minPacingMs
+			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
 	}
 }
