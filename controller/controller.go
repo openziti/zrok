@@ -11,6 +11,7 @@ import (
 )
 
 var str *store.Store
+var mtr *metricsAgent
 
 const version = "v0.2.0"
 
@@ -43,6 +44,9 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
+	mtr = newMetricsAgent(cfg.MetricsConfig)
+	go mtr.run()
+
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
 	server.Host = cfg.Endpoint.Host
@@ -51,5 +55,6 @@ func Run(cfg *Config) error {
 	if err := server.Serve(); err != nil {
 		return errors.Wrap(err, "api server error")
 	}
+
 	return nil
 }
