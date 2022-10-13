@@ -9,19 +9,19 @@ $ source /dev/stdin <<< "$(wget -qO- https://raw.githubusercontent.com/openziti/
 ## configure frontend identity
 
 ```
-$ ziti edge create identity device -o ~/.zrok/proxy.jwt proxy
+$ ziti edge create identity device -o ~/.zrok/frontend.jwt frontend
 New identity proxy created with id: -zbBF8eVb-
 Enrollment expires at 2022-08-10T18:46:16.641Z
 ```
 
 ```
-$ ziti edge enroll -j ~/.zrok/proxy.jwt -o ~/.zrok/proxy.json
+$ ziti edge enroll -j ~/.zrok/frontend.jwt -o ~/.zrok/identities/frontend.json
 INFO    generating 4096 bit RSA key                  
 INFO    enrolled successfully. identity file written to: proxy.json
 ```
 
 ```
-$ ziti edge create erp --edge-router-roles "#all" --identity-roles @proxy
+$ ziti edge create erp frontend --edge-router-roles "#all" --identity-roles @frontend
 ```
 
 ## start zrok resources
