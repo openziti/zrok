@@ -44,8 +44,14 @@ func Run(cfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
-	mtr = newMetricsAgent(cfg.MetricsConfig)
-	go mtr.run()
+	if cfg.Metrics != nil {
+		mtr = newMetricsAgent(cfg.Metrics)
+		go mtr.run()
+		defer func() {
+			mtr.stop()
+			mtr.join()
+		}()
+	}
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()

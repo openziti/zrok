@@ -2,11 +2,11 @@ package controller
 
 import (
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type MetricsConfig struct {
-	Influx *InfluxConfig
+	ServiceName string
+	Influx      *InfluxConfig
 }
 
 type InfluxConfig struct {
@@ -17,18 +17,31 @@ type InfluxConfig struct {
 }
 
 type metricsAgent struct {
-	cfg *MetricsConfig
+	cfg      *MetricsConfig
+	shutdown chan struct{}
+	joined   chan struct{}
 }
 
 func newMetricsAgent(cfg *MetricsConfig) *metricsAgent {
-	return &metricsAgent{cfg: cfg}
+	return &metricsAgent{
+		cfg:      cfg,
+		shutdown: make(chan struct{}),
+		joined:   make(chan struct{}),
+	}
 }
 
 func (mtr *metricsAgent) run() {
 	logrus.Info("starting")
 	defer logrus.Info("exiting")
+	defer close(mtr.joined)
 
-	for {
-		time.Sleep(24 * time.Hour)
-	}
+	<-mtr.shutdown
+}
+
+func (mtr *metricsAgent) stop() {
+	close(mtr.shutdown)
+}
+
+func (mtr *metricsAgent) join() {
+	<-mtr.joined
 }
