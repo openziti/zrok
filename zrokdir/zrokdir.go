@@ -14,17 +14,6 @@ type Environment struct {
 	ApiEndpoint    string `json:"api_endpoint"`
 }
 
-func Delete() error {
-	path, err := zrokDir()
-	if err != nil {
-		return err
-	}
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
-	return nil
-}
-
 func LoadEnvironment() (*Environment, error) {
 	ef, err := environmentFile()
 	if err != nil {
@@ -59,7 +48,27 @@ func SaveEnvironment(env *Environment) error {
 	return nil
 }
 
-func WriteZitiIdentity(name, data string) error {
+func DeleteEnvironment() error {
+	ef, err := environmentFile()
+	if err != nil {
+		return errors.Wrap(err, "error getting environment file")
+	}
+	if err := os.Remove(ef); err != nil {
+		return errors.Wrap(err, "error removing environment file")
+	}
+
+	return nil
+}
+
+func ZitiIdentityFile(name string) (string, error) {
+	zrd, err := zrokDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "identities", fmt.Sprintf("%v.json", name)), nil
+}
+
+func SaveZitiIdentity(name, data string) error {
 	zif, err := ZitiIdentityFile(name)
 	if err != nil {
 		return err
@@ -73,12 +82,15 @@ func WriteZitiIdentity(name, data string) error {
 	return nil
 }
 
-func ZitiIdentityFile(name string) (string, error) {
-	zrd, err := zrokDir()
+func DeleteZitiIdentity(name string) error {
+	zif, err := ZitiIdentityFile(name)
 	if err != nil {
-		return "", err
+		return errors.Wrapf(err, "error getting ziti identity file path for '%v'", name)
 	}
-	return filepath.Join(zrd, "identities", fmt.Sprintf("%v.json", name)), nil
+	if err := os.Remove(zif); err != nil {
+		return errors.Wrapf(err, "error removing ziti identity file '%v'", zif)
+	}
+	return nil
 }
 
 func environmentFile() (string, error) {

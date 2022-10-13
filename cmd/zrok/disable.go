@@ -55,11 +55,16 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	if err := zrokdir.Delete(); err != nil {
+	if err := zrokdir.DeleteEnvironment(); err != nil {
 		if !panicInstead {
-			showError("error removing local zrok directory", err)
+			showError("error removing zrok environment", err)
 		}
 		panic(err)
+	}
+	if err := zrokdir.DeleteZitiIdentity("backend"); err != nil {
+		if !panicInstead {
+			showError("error removing zrok backend identity", err)
+		}
 	}
 	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZitiIdentityId, env.ZrokToken)
 }

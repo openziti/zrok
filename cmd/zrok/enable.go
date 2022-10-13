@@ -79,7 +79,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	if err := zrokdir.WriteZitiIdentity("environment", resp.Payload.Cfg); err != nil {
+	if err := zrokdir.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
 		if !panicInstead {
 			showError("there was an error writing the environment file", err)
 		}

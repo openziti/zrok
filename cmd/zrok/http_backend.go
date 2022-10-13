@@ -67,7 +67,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	zif, err := zrokdir.ZitiIdentityFile("environment")
+	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
