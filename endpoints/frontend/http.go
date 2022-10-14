@@ -28,7 +28,10 @@ type httpListen struct {
 }
 
 func NewHTTP(cfg *Config) (*httpListen, error) {
-	ma := newMetricsAgent()
+	ma, err := newMetricsAgent(cfg.Identity)
+	if err != nil {
+		return nil, err
+	}
 	go ma.run()
 
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.Identity)
