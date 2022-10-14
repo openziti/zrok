@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"encoding/json"
+	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -11,15 +12,9 @@ import (
 )
 
 type metricsAgent struct {
-	metrics map[string]sessionMetrics
+	metrics *model.Metrics
 	updates chan metricsUpdate
 	zCtx    ziti.Context
-}
-
-type sessionMetrics struct {
-	BytesRead    int64
-	BytesWritten int64
-	LastUpdate   time.Time
 }
 
 type metricsUpdate struct {
@@ -39,7 +34,7 @@ func newMetricsAgent(identityName string) (*metricsAgent, error) {
 	}
 	logrus.Infof("loaded '%v' identity", identityName)
 	return &metricsAgent{
-		metrics: make(map[string]sessionMetrics),
+		metrics: &model.Metrics{},
 		updates: make(chan metricsUpdate, 10240),
 		zCtx:    ziti.NewContextWithConfig(zCfg),
 	}, nil
@@ -49,19 +44,11 @@ func (ma *metricsAgent) run() {
 	for {
 		select {
 		case update := <-ma.updates:
-			if sm, found := ma.metrics[update.id]; found {
-				sm.BytesRead += update.bytesRead
-				sm.BytesWritten += update.bytesWritten
-				sm.LastUpdate = time.Now()
-				ma.metrics[update.id] = sm
-			} else {
-				sm := sessionMetrics{
-					BytesRead:    update.bytesRead,
-					BytesWritten: update.bytesWritten,
-					LastUpdate:   time.Now(),
-				}
-				ma.metrics[update.id] = sm
-			}
+			ma.metrics.PushSession(update.id, model.SessionMetrics{
+				BytesRead:    update.bytesRead,
+				BytesWritten: update.bytesWritten,
+				LastUpdate:   time.Now().UnixMilli(),
+			})
 
 		case <-time.After(5 * time.Second):
 			if metricsJson, err := json.MarshalIndent(ma.metrics, "", "  "); err == nil {
