@@ -1,8 +1,7 @@
 package frontend
 
 import (
-	"fmt"
-	"github.com/openziti-test-kitchen/zrok/util"
+	"encoding/json"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -18,9 +17,9 @@ type metricsAgent struct {
 }
 
 type sessionMetrics struct {
-	bytesRead    int64
-	bytesWritten int64
-	lastUpdate   time.Time
+	BytesRead    int64
+	BytesWritten int64
+	LastUpdate   time.Time
 }
 
 type metricsUpdate struct {
@@ -51,28 +50,25 @@ func (ma *metricsAgent) run() {
 		select {
 		case update := <-ma.updates:
 			if sm, found := ma.metrics[update.id]; found {
-				sm.bytesRead += update.bytesRead
-				sm.bytesWritten += update.bytesWritten
-				sm.lastUpdate = time.Now()
+				sm.BytesRead += update.bytesRead
+				sm.BytesWritten += update.bytesWritten
+				sm.LastUpdate = time.Now()
 				ma.metrics[update.id] = sm
 			} else {
 				sm := sessionMetrics{
-					bytesRead:    update.bytesRead,
-					bytesWritten: update.bytesWritten,
-					lastUpdate:   time.Now(),
+					BytesRead:    update.bytesRead,
+					BytesWritten: update.bytesWritten,
+					LastUpdate:   time.Now(),
 				}
 				ma.metrics[update.id] = sm
 			}
 
 		case <-time.After(5 * time.Second):
-			now := time.Now()
-			out := "metrics = {\n"
-			for k, v := range ma.metrics {
-				age := now.Sub(v.lastUpdate)
-				out += fmt.Sprintf("\t[%v]: %s/%s (%s)\n", k, util.BytesToSize(v.bytesRead), util.BytesToSize(v.bytesWritten), age.String())
+			if metricsJson, err := json.MarshalIndent(ma.metrics, "", "  "); err == nil {
+				logrus.Info(string(metricsJson))
+			} else {
+				logrus.Errorf("error marshaling metrics: %v", err)
 			}
-			out += "}\n"
-
 		}
 	}
 }
