@@ -9,19 +9,37 @@ $ source /dev/stdin <<< "$(wget -qO- https://raw.githubusercontent.com/openziti/
 ## configure frontend identity
 
 ```
-$ ziti edge create identity device -o ~/.zrok/frontend.jwt frontend
+$ ziti edge create identity service frontend -o ~/.zrok/identities/frontend.jwt
 New identity proxy created with id: -zbBF8eVb-
 Enrollment expires at 2022-08-10T18:46:16.641Z
 ```
 
 ```
-$ ziti edge enroll -j ~/.zrok/frontend.jwt -o ~/.zrok/identities/frontend.json
+$ ziti edge enroll -j ~/.zrok/identities/frontend.jwt -o ~/.zrok/identities/frontend.json
 INFO    generating 4096 bit RSA key                  
 INFO    enrolled successfully. identity file written to: proxy.json
 ```
 
 ```
-$ ziti edge create erp frontend --edge-router-roles "#all" --identity-roles @frontend
+$ ziti edge create erp frontend --edge-router-roles "#all" --identity-roles "@frontend"
+```
+
+## configure controller identity
+```
+$ ziti edge create identity service ctrl -o ~/.zrok/identities/ctrl.jwt 
+New identity ctrl created with id: e8c3tQo3SR
+Enrollment expires at 2022-10-14T19:59:01.908Z
+```
+
+```
+$ ziti edge enroll -j ~/.zrok/identities/ctrl.jwt -o ~/.zrok/identities/ctrl.json
+INFO    generating 4096 bit RSA key                  
+INFO    enrolled successfully. identity file written to: /home/michael/.zrok/identities/ctrl.json 
+```
+
+```
+$ ziti edge create erp ctrl --edge-router-roles "#all" --identity-roles "@ctrl"
+New edge router policy ctrl created with id: 7OxvtWIanFIAwuU51lF9SU
 ```
 
 ## start zrok resources
