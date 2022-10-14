@@ -6,15 +6,17 @@ import (
 )
 
 type Config struct {
-	Identity  string
-	Address   string
-	HostMatch string
+	Identity       string
+	MetricsService string
+	Address        string
+	HostMatch      string
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		Identity: "frontend",
-		Address:  "0.0.0.0:8080",
+		Identity:       "frontend",
+		MetricsService: "metrics",
+		Address:        "0.0.0.0:8080",
 	}
 }
 

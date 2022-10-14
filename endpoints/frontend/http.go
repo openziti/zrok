@@ -28,7 +28,7 @@ type httpListen struct {
 }
 
 func NewHTTP(cfg *Config) (*httpListen, error) {
-	ma, err := newMetricsAgent(cfg.Identity)
+	ma, err := newMetricsAgent(cfg.Identity, cfg.MetricsService)
 	if err != nil {
 		return nil, err
 	}

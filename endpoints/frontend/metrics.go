@@ -12,9 +12,10 @@ import (
 )
 
 type metricsAgent struct {
-	metrics *model.Metrics
-	updates chan metricsUpdate
-	zCtx    ziti.Context
+	metricsServiceName string
+	metrics            *model.Metrics
+	updates            chan metricsUpdate
+	zCtx               ziti.Context
 }
 
 type metricsUpdate struct {
@@ -23,7 +24,7 @@ type metricsUpdate struct {
 	bytesWritten int64
 }
 
-func newMetricsAgent(identityName string) (*metricsAgent, error) {
+func newMetricsAgent(identityName, metricsServiceName string) (*metricsAgent, error) {
 	zif, err := zrokdir.ZitiIdentityFile(identityName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting '%v' identity file", identityName)
@@ -34,9 +35,10 @@ func newMetricsAgent(identityName string) (*metricsAgent, error) {
 	}
 	logrus.Infof("loaded '%v' identity", identityName)
 	return &metricsAgent{
-		metrics: &model.Metrics{},
-		updates: make(chan metricsUpdate, 10240),
-		zCtx:    ziti.NewContextWithConfig(zCfg),
+		metricsServiceName: metricsServiceName,
+		metrics:            &model.Metrics{},
+		updates:            make(chan metricsUpdate, 10240),
+		zCtx:               ziti.NewContextWithConfig(zCfg),
 	}, nil
 }
 
@@ -51,11 +53,30 @@ func (ma *metricsAgent) run() {
 			})
 
 		case <-time.After(5 * time.Second):
-			if metricsJson, err := json.MarshalIndent(ma.metrics, "", "  "); err == nil {
-				logrus.Info(string(metricsJson))
-			} else {
-				logrus.Errorf("error marshaling metrics: %v", err)
+			if err := ma.sendMetrics(); err != nil {
+				logrus.Errorf("error sending metrics: %v", err)
 			}
 		}
 	}
+}
+
+func (ma *metricsAgent) sendMetrics() error {
+	metricsJson, err := json.MarshalIndent(ma.metrics, "", "  ")
+	if err != nil {
+		return errors.Wrap(err, "error marshaling metrics")
+	}
+	conn, err := ma.zCtx.Dial(ma.metricsServiceName)
+	if err != nil {
+		return errors.Wrap(err, "error connecting to metrics service")
+	}
+	n, err := conn.Write(metricsJson)
+	if err != nil {
+		return errors.Wrap(err, "error sending metrics")
+	}
+	defer func() { _ = conn.Close() }()
+	if n != len(metricsJson) {
+		return errors.Wrap(err, "short metrics write")
+	}
+	logrus.Infof("sent %d bytes of metrics data", n)
+	return nil
 }
