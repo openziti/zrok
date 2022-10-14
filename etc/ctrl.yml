@@ -20,3 +20,6 @@ ziti:
   api_endpoint:     "https://127.0.0.1:1280"
   username:         admin
   password:         admin
+
+metrics:
+  service_name:	    metrics
