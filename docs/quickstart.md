@@ -22,6 +22,7 @@ INFO    enrolled successfully. identity file written to: proxy.json
 
 ```
 $ ziti edge create erp frontend --edge-router-roles "#all" --identity-roles "@frontend"
+New edge router policy frontend created with id: aOxvtWIanFIAwuU51lF9SU
 ```
 
 ## configure controller identity
@@ -40,6 +41,24 @@ INFO    enrolled successfully. identity file written to: /home/michael/.zrok/ide
 ```
 $ ziti edge create erp ctrl --edge-router-roles "#all" --identity-roles "@ctrl"
 New edge router policy ctrl created with id: 7OxvtWIanFIAwuU51lF9SU
+```
+
+## create metrics service
+```
+$ ziti edge create service metrics
+New service metrics created with id: 56y5AFsKmSsIWLsmFNBeJz
+```
+
+### allow the controller to bind the metrics service
+```
+$ ziti edge create sp ctrl-bind Bind --identity-roles "@ctrl" --service-roles "@metrics"
+New service policy ctrl-bind created with id: 3SXgFftSgBnenjgdBENOGR
+```
+
+### allow frontends to dial the metrics service
+```
+$ ziti edge create sp ctrl-dial Dial --identity-roles "@frontend" --service-roles "@metrics"
+New service policy ctrl-dial created with id: 6pCe9uGj8oB2JXlWb44x2u
 ```
 
 ## start zrok resources
