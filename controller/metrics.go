@@ -2,14 +2,16 @@ package controller
 
 import (
 	"bytes"
-	"encoding/json"
+	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2/bson"
 	"net"
 	"time"
 )
@@ -90,7 +92,7 @@ func (mtr *metricsAgent) listen() {
 			logrus.Errorf("error accepting: %v", err)
 			return
 		}
-		logrus.Infof("accepted metrics connetion from '%v'", conn.RemoteAddr())
+		logrus.Debugf("accepted metrics connetion from '%v'", conn.RemoteAddr())
 		go newMetricsHandler(conn).run()
 	}
 }
@@ -112,7 +114,7 @@ func newMetricsHandler(conn net.Conn) *metricsHandler {
 }
 
 func (mh *metricsHandler) run() {
-	logrus.Infof("handling metrics connection: %v", mh.conn.RemoteAddr())
+	logrus.Debugf("handling metrics connection: %v", mh.conn.RemoteAddr())
 	var mtrBuf bytes.Buffer
 	buf := make([]byte, 4096)
 	for {
@@ -126,8 +128,13 @@ func (mh *metricsHandler) run() {
 		logrus.Errorf("error closing metrics connection")
 	}
 	mtr := &model.Metrics{}
-	if err := json.Unmarshal(mtrBuf.Bytes(), &mtr); err == nil {
-		logrus.Infof("received metrics snapshot from: %v", time.UnixMilli(mtr.LastUpdate))
+	if err := bson.Unmarshal(mtrBuf.Bytes(), &mtr); err == nil {
+		out := "metrics = {\n"
+		for k, v := range mtr.Sessions {
+			out += fmt.Sprintf("\t[%v]: %v/%v (%v)\n", k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Duration(mtr.Now-v.LastUpdate)*time.Millisecond)
+		}
+		out += "}"
+		logrus.Info(out)
 	} else {
 		logrus.Errorf("error unmarshaling metrics: %v", err)
 	}

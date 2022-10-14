@@ -1,10 +1,8 @@
 package model
 
-import "time"
-
 type Metrics struct {
-	LastUpdate int64 `json:"last_update"`
-	Sessions   map[string]SessionMetrics
+	Now      int64 `json:"now"`
+	Sessions map[string]SessionMetrics
 }
 
 func (m *Metrics) PushSession(svcName string, sm SessionMetrics) {
@@ -19,7 +17,6 @@ func (m *Metrics) PushSession(svcName string, sm SessionMetrics) {
 	} else {
 		m.Sessions[svcName] = sm
 	}
-	m.LastUpdate = time.Now().UnixMilli()
 }
 
 type SessionMetrics struct {

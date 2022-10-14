@@ -1,13 +1,13 @@
 package frontend
 
 import (
-	"encoding/json"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2/bson"
 	"time"
 )
 
@@ -61,7 +61,8 @@ func (ma *metricsAgent) run() {
 }
 
 func (ma *metricsAgent) sendMetrics() error {
-	metricsJson, err := json.MarshalIndent(ma.metrics, "", "  ")
+	ma.metrics.Now = time.Now().UnixMilli()
+	metricsJson, err := bson.Marshal(ma.metrics)
 	if err != nil {
 		return errors.Wrap(err, "error marshaling metrics")
 	}
