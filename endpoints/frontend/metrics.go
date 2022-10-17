@@ -36,7 +36,7 @@ func newMetricsAgent(identityName, metricsServiceName string) (*metricsAgent, er
 	logrus.Infof("loaded '%v' identity", identityName)
 	return &metricsAgent{
 		metricsServiceName: metricsServiceName,
-		metrics:            &model.Metrics{},
+		metrics:            &model.Metrics{Namespace: identityName},
 		updates:            make(chan metricsUpdate, 10240),
 		zCtx:               ziti.NewContextWithConfig(zCfg),
 	}, nil
@@ -61,7 +61,7 @@ func (ma *metricsAgent) run() {
 }
 
 func (ma *metricsAgent) sendMetrics() error {
-	ma.metrics.Now = time.Now().UnixMilli()
+	ma.metrics.LocalNow = time.Now().UnixMilli()
 	metricsJson, err := bson.Marshal(ma.metrics)
 	if err != nil {
 		return errors.Wrap(err, "error marshaling metrics")

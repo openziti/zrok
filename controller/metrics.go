@@ -131,7 +131,7 @@ func (mh *metricsHandler) run() {
 	if err := bson.Unmarshal(mtrBuf.Bytes(), &mtr); err == nil {
 		out := "metrics = {\n"
 		for k, v := range mtr.Sessions {
-			out += fmt.Sprintf("\t[%v]: %v/%v (%v)\n", k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Duration(mtr.Now-v.LastUpdate)*time.Millisecond)
+			out += fmt.Sprintf("\t[%v.%v]: %v/%v (%v)\n", mtr.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Duration(mtr.LocalNow-v.LastUpdate)*time.Millisecond)
 		}
 		out += "}"
 		logrus.Info(out)

@@ -1,8 +1,9 @@
 package model
 
 type Metrics struct {
-	Now      int64 `json:"now"`
-	Sessions map[string]SessionMetrics
+	LocalNow  int64
+	Namespace string
+	Sessions  map[string]SessionMetrics
 }
 
 func (m *Metrics) PushSession(svcName string, sm SessionMetrics) {
