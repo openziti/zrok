@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	"fmt"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -30,18 +31,21 @@ type InfluxConfig struct {
 
 type metricsAgent struct {
 	cfg       *MetricsConfig
-	shutdown  chan struct{}
-	joined    chan struct{}
+	influx    influxdb2.Client
 	zCtx      ziti.Context
 	zListener edge.Listener
+	shutdown  chan struct{}
+	joined    chan struct{}
 }
 
 func newMetricsAgent(cfg *MetricsConfig) *metricsAgent {
-	return &metricsAgent{
+	ma := &metricsAgent{
 		cfg:      cfg,
 		shutdown: make(chan struct{}),
 		joined:   make(chan struct{}),
 	}
+	ma.influx = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
+	return ma
 }
 
 func (mtr *metricsAgent) run() {
