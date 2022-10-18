@@ -92,5 +92,5 @@ func metricsDial(_ context.Context, network string, addr string) (net.Conn, erro
 	if err != nil {
 		return conn, err
 	}
-	return newMetricsConn("self", conn), nil
+	return newMetricsConn("backend", conn), nil
 }
