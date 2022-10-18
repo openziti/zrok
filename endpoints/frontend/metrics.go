@@ -12,10 +12,10 @@ import (
 )
 
 type metricsAgent struct {
-	metricsServiceName string
-	metrics            *model.Metrics
-	updates            chan metricsUpdate
-	zCtx               ziti.Context
+	cfg     *Config
+	metrics *model.Metrics
+	updates chan metricsUpdate
+	zCtx    ziti.Context
 }
 
 type metricsUpdate struct {
@@ -24,21 +24,21 @@ type metricsUpdate struct {
 	bytesWritten int64
 }
 
-func newMetricsAgent(identityName, metricsServiceName string) (*metricsAgent, error) {
-	zif, err := zrokdir.ZitiIdentityFile(identityName)
+func newMetricsAgent(cfg *Config) (*metricsAgent, error) {
+	zif, err := zrokdir.ZitiIdentityFile(cfg.Identity)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting '%v' identity file", identityName)
+		return nil, errors.Wrapf(err, "error getting '%v' identity file", cfg.Identity)
 	}
 	zCfg, err := config.NewFromFile(zif)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error loading '%v' identity", identityName)
+		return nil, errors.Wrapf(err, "error loading '%v' identity", cfg.Identity)
 	}
-	logrus.Infof("loaded '%v' identity", identityName)
+	logrus.Infof("loaded '%v' identity", cfg.Identity)
 	return &metricsAgent{
-		metricsServiceName: metricsServiceName,
-		metrics:            &model.Metrics{Namespace: identityName},
-		updates:            make(chan metricsUpdate, 10240),
-		zCtx:               ziti.NewContextWithConfig(zCfg),
+		cfg:     cfg,
+		metrics: &model.Metrics{Namespace: cfg.Identity},
+		updates: make(chan metricsUpdate, 10240),
+		zCtx:    ziti.NewContextWithConfig(zCfg),
 	}, nil
 }
 
@@ -56,6 +56,16 @@ func (ma *metricsAgent) run() {
 			if err := ma.sendMetrics(); err != nil {
 				logrus.Errorf("error sending metrics: %v", err)
 			}
+			var dropouts []string
+			for k, v := range ma.metrics.Sessions {
+				if time.Now().Sub(time.UnixMilli(v.LastUpdate)) > ma.cfg.Metrics.DropoutTimeout {
+					dropouts = append(dropouts, k)
+				}
+			}
+			for _, dropout := range dropouts {
+				delete(ma.metrics.Sessions, dropout)
+				logrus.Infof("dropout: %v", dropout)
+			}
 		}
 	}
 }
@@ -66,7 +76,7 @@ func (ma *metricsAgent) sendMetrics() error {
 	if err != nil {
 		return errors.Wrap(err, "error marshaling metrics")
 	}
-	conn, err := ma.zCtx.Dial(ma.metricsServiceName)
+	conn, err := ma.zCtx.Dial(ma.cfg.Metrics.Service)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to metrics service")
 	}

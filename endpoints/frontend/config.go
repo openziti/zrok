@@ -3,20 +3,29 @@ package frontend
 import (
 	"github.com/michaelquigley/cf"
 	"github.com/pkg/errors"
+	"time"
 )
 
 type Config struct {
-	Identity       string
-	MetricsService string
-	Address        string
-	HostMatch      string
+	Identity  string
+	Metrics   *MetricsConfig
+	Address   string
+	HostMatch string
+}
+
+type MetricsConfig struct {
+	Service        string
+	DropoutTimeout time.Duration
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		Identity:       "frontend",
-		MetricsService: "metrics",
-		Address:        "0.0.0.0:8080",
+		Identity: "frontend",
+		Metrics: &MetricsConfig{
+			Service:        "metrics",
+			DropoutTimeout: 30 * time.Second,
+		},
+		Address: "0.0.0.0:8080",
 	}
 }
 
