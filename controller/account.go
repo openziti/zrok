@@ -22,7 +22,11 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 	}
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
 
-	token := createToken()
+	token, err := createToken()
+	if err != nil {
+		logrus.Error(err)
+		return identity.NewCreateAccountInternalServerError()
+	}
 	ar := &store.AccountRequest{
 		Token:         token,
 		Email:         params.Body.Email,

@@ -33,10 +33,15 @@ func (self *registerHandler) Handle(params identity.RegisterParams) middleware.R
 		return identity.NewRegisterNotFound()
 	}
 
+	token, err := createToken()
+	if err != nil {
+		logrus.Error(err)
+		return identity.NewRegisterInternalServerError()
+	}
 	a := &store.Account{
 		Email:    ar.Email,
 		Password: hashPassword(params.Body.Password),
-		Token:    createToken(),
+		Token:    token,
 	}
 	if _, err := str.CreateAccount(a, tx); err != nil {
 		logrus.Error(err)

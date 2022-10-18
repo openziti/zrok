@@ -91,7 +91,10 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 
 func (self *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
-	name := createToken()
+	name, err := createToken()
+	if err != nil {
+		return nil, err
+	}
 	identityType := rest_model_edge.IdentityTypeUser
 	tags := self.zrokTags()
 	tags.SubTags["zrokEmail"] = email

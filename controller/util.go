@@ -1,16 +1,14 @@
 package controller
 
 import (
-	"crypto/rand"
 	"crypto/sha512"
 	"crypto/x509"
 	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
-	"github.com/lithammer/shortuuid/v4"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
-	"github.com/pkg/errors"
+	"github.com/teris-io/shortid"
 	"net/http"
 	"strings"
 )
@@ -45,16 +43,12 @@ func edgeClient(cfg *ZitiConfig) (*rest_management_api_client.ZitiEdgeManagement
 	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Username, cfg.Password, cfg.ApiEndpoint, caPool)
 }
 
-func createToken() string {
-	return shortuuid.New()
+func createToken() (string, error) {
+	return shortid.Generate()
 }
 
 func createServiceName() (string, error) {
-	bytes := make([]byte, 4)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", errors.Wrap(err, "error generating service name")
-	}
-	return hex.EncodeToString(bytes), nil
+	return shortid.Generate()
 }
 
 func hashPassword(raw string) string {
