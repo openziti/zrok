@@ -151,7 +151,7 @@ func (mh *metricsHandler) run() {
 					time.UnixMilli(v.LastUpdate))
 				pts = append(pts, pt)
 			}
-			out += fmt.Sprintf("\t[%v.%v]: %v/%v (%v)\n", mtr.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Duration(mtr.LocalNow-v.LastUpdate)*time.Millisecond)
+			out += fmt.Sprintf("\t[%v.%v]: %v/%v\n", mtr.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten))
 		}
 		out += "}"
 		logrus.Info(out)

@@ -14,16 +14,16 @@ type Config struct {
 }
 
 type MetricsConfig struct {
-	Service        string
-	DropoutTimeout time.Duration
+	Service     string
+	SendTimeout time.Duration
 }
 
 func DefaultConfig() *Config {
 	return &Config{
 		Identity: "frontend",
 		Metrics: &MetricsConfig{
-			Service:        "metrics",
-			DropoutTimeout: 30 * time.Second,
+			Service:     "metrics",
+			SendTimeout: 5 * time.Second,
 		},
 		Address: "0.0.0.0:8080",
 	}

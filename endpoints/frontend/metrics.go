@@ -12,10 +12,11 @@ import (
 )
 
 type metricsAgent struct {
-	cfg     *Config
-	metrics *model.Metrics
-	updates chan metricsUpdate
-	zCtx    ziti.Context
+	cfg      *Config
+	accum    map[string]model.SessionMetrics
+	updates  chan metricsUpdate
+	lastSend time.Time
+	zCtx     ziti.Context
 }
 
 type metricsUpdate struct {
@@ -35,10 +36,11 @@ func newMetricsAgent(cfg *Config) (*metricsAgent, error) {
 	}
 	logrus.Infof("loaded '%v' identity", cfg.Identity)
 	return &metricsAgent{
-		cfg:     cfg,
-		metrics: &model.Metrics{Namespace: cfg.Identity},
-		updates: make(chan metricsUpdate, 10240),
-		zCtx:    ziti.NewContextWithConfig(zCfg),
+		cfg:      cfg,
+		accum:    make(map[string]model.SessionMetrics),
+		updates:  make(chan metricsUpdate, 10240),
+		lastSend: time.Now(),
+		zCtx:     ziti.NewContextWithConfig(zCfg),
 	}, nil
 }
 
@@ -46,33 +48,43 @@ func (ma *metricsAgent) run() {
 	for {
 		select {
 		case update := <-ma.updates:
-			ma.metrics.PushSession(update.id, model.SessionMetrics{
-				BytesRead:    update.bytesRead,
-				BytesWritten: update.bytesWritten,
-				LastUpdate:   time.Now().UnixMilli(),
-			})
+			ma.pushUpdate(update)
+			if time.Since(ma.lastSend) >= ma.cfg.Metrics.SendTimeout {
+				if err := ma.sendMetrics(); err != nil {
+					logrus.Errorf("error sending metrics: %v", err)
+				}
+			}
 
 		case <-time.After(5 * time.Second):
 			if err := ma.sendMetrics(); err != nil {
 				logrus.Errorf("error sending metrics: %v", err)
 			}
-			var dropouts []string
-			for k, v := range ma.metrics.Sessions {
-				if time.Now().Sub(time.UnixMilli(v.LastUpdate)) > ma.cfg.Metrics.DropoutTimeout {
-					dropouts = append(dropouts, k)
-				}
-			}
-			for _, dropout := range dropouts {
-				delete(ma.metrics.Sessions, dropout)
-				logrus.Infof("dropout: %v", dropout)
-			}
+		}
+	}
+}
+
+func (ma *metricsAgent) pushUpdate(mu metricsUpdate) {
+	if sm, found := ma.accum[mu.id]; found {
+		ma.accum[mu.id] = model.SessionMetrics{
+			BytesRead:    sm.BytesRead + mu.bytesRead,
+			BytesWritten: sm.BytesWritten + mu.bytesWritten,
+			LastUpdate:   time.Now().UnixMilli(),
+		}
+	} else {
+		ma.accum[mu.id] = model.SessionMetrics{
+			BytesRead:    mu.bytesRead,
+			BytesWritten: mu.bytesWritten,
+			LastUpdate:   time.Now().UnixMilli(),
 		}
 	}
 }
 
 func (ma *metricsAgent) sendMetrics() error {
-	ma.metrics.LocalNow = time.Now().UnixMilli()
-	metricsJson, err := bson.Marshal(ma.metrics)
+	m := &model.Metrics{
+		Namespace: ma.cfg.Identity,
+		Sessions:  ma.accum,
+	}
+	metricsJson, err := bson.Marshal(m)
 	if err != nil {
 		return errors.Wrap(err, "error marshaling metrics")
 	}
@@ -89,5 +101,7 @@ func (ma *metricsAgent) sendMetrics() error {
 		return errors.Wrap(err, "short metrics write")
 	}
 	logrus.Infof("sent %d bytes of metrics data", n)
+	ma.accum = make(map[string]model.SessionMetrics)
+	ma.lastSend = time.Now()
 	return nil
 }
