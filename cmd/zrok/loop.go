@@ -76,6 +76,7 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 		deltaSeconds := l.stopTime.Sub(l.startTime).Seconds()
 		xfer := int64(float64(l.bytes) / deltaSeconds)
 		totalXfer += xfer
+		totalMismatches += l.mismatches
 		xferSec := util.BytesToSize(xfer)
 		logrus.Infof("looper #%d: %d mismatches, %s/sec", l.id, l.mismatches, xferSec)
 	}
@@ -154,7 +155,7 @@ func (l *looper) startup() {
 	if err != nil {
 		panic(err)
 	}
-	l.zif, err = zrokdir.ZitiIdentityFile("environment")
+	l.zif, err = zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		panic(err)
 	}
