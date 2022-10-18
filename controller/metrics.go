@@ -141,20 +141,22 @@ func (mh *metricsHandler) run() {
 	}
 	mtr := &model.Metrics{}
 	if err := bson.Unmarshal(mtrBuf.Bytes(), &mtr); err == nil {
-		out := "metrics = {\n"
 		var pts []*write.Point
-		for k, v := range mtr.Sessions {
-			if mh.writeApi != nil {
-				pt := influxdb2.NewPoint("xfer",
-					map[string]string{"namespace": mtr.Namespace, "session": k},
-					map[string]interface{}{"bytesRead": v.BytesRead, "bytesWritten": v.BytesWritten},
-					time.UnixMilli(v.LastUpdate))
-				pts = append(pts, pt)
+		if len(mtr.Sessions) > 0 {
+			out := "metrics = {\n"
+			for k, v := range mtr.Sessions {
+				if mh.writeApi != nil {
+					pt := influxdb2.NewPoint("xfer",
+						map[string]string{"namespace": mtr.Namespace, "session": k},
+						map[string]interface{}{"bytesRead": v.BytesRead, "bytesWritten": v.BytesWritten},
+						time.UnixMilli(v.LastUpdate))
+					pts = append(pts, pt)
+				}
+				out += fmt.Sprintf("\t[%v.%v]: %v/%v (%v)\n", mtr.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Since(time.UnixMilli(v.LastUpdate)))
 			}
-			out += fmt.Sprintf("\t[%v.%v]: %v/%v\n", mtr.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten))
+			out += "}"
+			logrus.Info(out)
 		}
-		out += "}"
-		logrus.Info(out)
 
 		if len(pts) > 0 {
 			if err := mh.writeApi.WritePoint(context.Background(), pts...); err == nil {
