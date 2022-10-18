@@ -48,7 +48,21 @@ func createToken() (string, error) {
 }
 
 func createServiceName() (string, error) {
-	return shortid.Generate()
+	return dnsSafeShortId()
+}
+
+func dnsSafeShortId() (string, error) {
+	sid, err := shortid.Generate()
+	if err != nil {
+		return "", err
+	}
+	for sid[0] == '-' || sid[0] == '_' {
+		sid, err = shortid.Generate()
+		if err != nil {
+			return "", err
+		}
+	}
+	return sid, nil
 }
 
 func hashPassword(raw string) string {
