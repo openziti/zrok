@@ -135,7 +135,7 @@ func (ma *metricsAgent) processMetrics(m *model.Metrics) error {
 		for k, v := range m.Sessions {
 			if ma.writeApi != nil {
 				pt := influxdb2.NewPoint("xfer",
-					map[string]string{"namespace": m.Namespace, "session": k},
+					map[string]string{"namespace": m.Namespace, "service": k},
 					map[string]interface{}{"bytesRead": v.BytesRead, "bytesWritten": v.BytesWritten},
 					time.UnixMilli(v.LastUpdate))
 				pts = append(pts, pt)
