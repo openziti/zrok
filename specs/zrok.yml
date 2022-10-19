@@ -349,12 +349,17 @@ definitions:
         type: string
       backend:
         type: string
-      active:
-        type: boolean
+      metrics:
+        $ref: "#/definitions/serviceMetrics"
       createdAt:
         type: string
       updatedAt:
         type: string
+
+  serviceMetrics:
+    type: array
+    items:
+      type: integer
 
   tunnelRequest:
     type: object

@@ -520,9 +520,6 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
-        },
         "backend": {
           "type": "string"
         },
@@ -531,6 +528,9 @@ func init() {
         },
         "frontend": {
           "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/definitions/serviceMetrics"
         },
         "name": {
           "type": "string"
@@ -541,6 +541,12 @@ func init() {
         "zId": {
           "type": "string"
         }
+      }
+    },
+    "serviceMetrics": {
+      "type": "array",
+      "items": {
+        "type": "integer"
       }
     },
     "services": {
@@ -1122,9 +1128,6 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
-        },
         "backend": {
           "type": "string"
         },
@@ -1133,6 +1136,9 @@ func init() {
         },
         "frontend": {
           "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/definitions/serviceMetrics"
         },
         "name": {
           "type": "string"
@@ -1143,6 +1149,12 @@ func init() {
         "zId": {
           "type": "string"
         }
+      }
+    },
+    "serviceMetrics": {
+      "type": "array",
+      "items": {
+        "type": "integer"
       }
     },
     "services": {

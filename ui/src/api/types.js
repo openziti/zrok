@@ -100,7 +100,7 @@
  * @property {string} name 
  * @property {string} frontend 
  * @property {string} backend 
- * @property {boolean} active 
+ * @property {module:types.serviceMetrics} metrics 
  * @property {string} createdAt 
  * @property {string} updatedAt 
  */

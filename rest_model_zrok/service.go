@@ -8,6 +8,7 @@ package rest_model_zrok
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -17,9 +18,6 @@ import (
 // swagger:model service
 type Service struct {
 
-	// active
-	Active bool `json:"active,omitempty"`
-
 	// backend
 	Backend string `json:"backend,omitempty"`
 
@@ -28,6 +26,9 @@ type Service struct {
 
 	// frontend
 	Frontend string `json:"frontend,omitempty"`
+
+	// metrics
+	Metrics ServiceMetrics `json:"metrics,omitempty"`
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -41,11 +42,60 @@ type Service struct {
 
 // Validate validates this service
 func (m *Service) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateMetrics(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this service based on context it is used
+func (m *Service) validateMetrics(formats strfmt.Registry) error {
+	if swag.IsZero(m.Metrics) { // not required
+		return nil
+	}
+
+	if err := m.Metrics.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("metrics")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("metrics")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this service based on the context it is used
 func (m *Service) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateMetrics(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Service) contextValidateMetrics(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Metrics.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("metrics")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("metrics")
+		}
+		return err
+	}
+
 	return nil
 }
 
