@@ -15,11 +15,10 @@ import (
 )
 
 type untunnelHandler struct {
-	cfg *Config
 }
 
-func newUntunnelHandler(cfg *Config) *untunnelHandler {
-	return &untunnelHandler{cfg: cfg}
+func newUntunnelHandler() *untunnelHandler {
+	return &untunnelHandler{}
 }
 
 func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -32,7 +31,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := edgeClient(self.cfg.Ziti)
+	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()

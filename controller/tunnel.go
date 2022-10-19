@@ -20,11 +20,10 @@ import (
 )
 
 type tunnelHandler struct {
-	cfg *Config
 }
 
-func newTunnelHandler(cfg *Config) *tunnelHandler {
-	return &tunnelHandler{cfg: cfg}
+func newTunnelHandler() *tunnelHandler {
+	return &tunnelHandler{}
 }
 
 func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -58,7 +57,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		return tunnel.NewTunnelInternalServerError()
 	}
 
-	edge, err := edgeClient(self.cfg.Ziti)
+	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
@@ -203,7 +202,7 @@ func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string,
 
 func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var identityRoles []string
-	for _, proxyIdentity := range self.cfg.Proxy.Identities {
+	for _, proxyIdentity := range cfg.Proxy.Identities {
 		identityRoles = append(identityRoles, "@"+proxyIdentity)
 		logrus.Infof("added proxy identity role '%v'", proxyIdentity)
 	}
@@ -259,7 +258,7 @@ func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, 
 }
 
 func (self *tunnelHandler) proxyUrl(svcName string) string {
-	return strings.Replace(self.cfg.Proxy.UrlTemplate, "{svcName}", svcName, -1)
+	return strings.Replace(cfg.Proxy.UrlTemplate, "{svcName}", svcName, -1)
 }
 
 func (self *tunnelHandler) zrokTags(svcName string) *rest_model.Tags {

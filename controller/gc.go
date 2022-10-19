@@ -15,7 +15,8 @@ import (
 	"time"
 )
 
-func GC(cfg *Config) error {
+func GC(inCfg *Config) error {
+	cfg = inCfg
 	if v, err := store.Open(cfg.Store); err == nil {
 		str = v
 	} else {
@@ -26,7 +27,7 @@ func GC(cfg *Config) error {
 			logrus.Errorf("error closing store: %v", err)
 		}
 	}()
-	edge, err := edgeClient(cfg.Ziti)
+	edge, err := edgeClient()
 	if err != nil {
 		return err
 	}

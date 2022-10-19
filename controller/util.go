@@ -31,8 +31,8 @@ func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
 	}
 }
 
-func edgeClient(cfg *ZitiConfig) (*rest_management_api_client.ZitiEdgeManagement, error) {
-	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.ApiEndpoint)
+func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
+	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.Ziti.ApiEndpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func edgeClient(cfg *ZitiConfig) (*rest_management_api_client.ZitiEdgeManagement
 	for _, ca := range caCerts {
 		caPool.AddCert(ca)
 	}
-	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Username, cfg.Password, cfg.ApiEndpoint, caPool)
+	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
 }
 
 func createToken() (string, error) {

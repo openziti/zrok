@@ -14,6 +14,7 @@ type Config struct {
 	Store        *store.Config
 	Ziti         *ZitiConfig
 	Metrics      *MetricsConfig
+	Influx       *InfluxConfig
 }
 
 type EndpointConfig struct {
@@ -42,6 +43,17 @@ type ZitiConfig struct {
 	ApiEndpoint string
 	Username    string
 	Password    string
+}
+
+type MetricsConfig struct {
+	ServiceName string
+}
+
+type InfluxConfig struct {
+	Url    string
+	Bucket string
+	Org    string
+	Token  string
 }
 
 func LoadConfig(path string) (*Config, error) {

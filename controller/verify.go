@@ -8,11 +8,10 @@ import (
 )
 
 type verifyHandler struct {
-	cfg *Config
 }
 
-func newVerifyHandler(cfg *Config) *verifyHandler {
-	return &verifyHandler{cfg: cfg}
+func newVerifyHandler() *verifyHandler {
+	return &verifyHandler{}
 }
 
 func (self *verifyHandler) Handle(params identity.VerifyParams) middleware.Responder {

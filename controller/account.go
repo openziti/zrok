@@ -8,11 +8,10 @@ import (
 )
 
 type createAccountHandler struct {
-	cfg *Config
 }
 
-func newCreateAccountHandler(cfg *Config) *createAccountHandler {
-	return &createAccountHandler{cfg: cfg}
+func newCreateAccountHandler() *createAccountHandler {
+	return &createAccountHandler{}
 }
 
 func (self *createAccountHandler) Handle(params identity.CreateAccountParams) middleware.Responder {
@@ -66,7 +65,7 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 		return identity.NewCreateAccountInternalServerError()
 	}
 
-	if err := sendVerificationEmail(params.Body.Email, token, self.cfg); err != nil {
+	if err := sendVerificationEmail(params.Body.Email, token); err != nil {
 		logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
 		return identity.NewCreateAccountInternalServerError()
 	}

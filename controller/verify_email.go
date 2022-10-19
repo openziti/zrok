@@ -14,7 +14,7 @@ type verificationEmail struct {
 	VerifyUrl    string
 }
 
-func sendVerificationEmail(emailAddress, token string, cfg *Config) error {
+func sendVerificationEmail(emailAddress, token string) error {
 	emailData := &verificationEmail{
 		EmailAddress: emailAddress,
 		VerifyUrl:    cfg.Registration.RegistrationUrlTemplate + "/" + token,

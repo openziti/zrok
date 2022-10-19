@@ -10,12 +10,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+var cfg *Config
 var str *store.Store
 var mtr *metricsAgent
 
 const version = "v0.2.0"
 
-func Run(cfg *Config) error {
+func Run(inCfg *Config) error {
+	cfg = inCfg
+
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {
 		return errors.Wrap(err, "error loading embedded swagger spec")
@@ -23,18 +26,18 @@ func Run(cfg *Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = ZrokAuthenticate
-	api.IdentityCreateAccountHandler = newCreateAccountHandler(cfg)
-	api.IdentityEnableHandler = newEnableHandler(cfg)
-	api.IdentityDisableHandler = newDisableHandler(cfg)
+	api.IdentityCreateAccountHandler = newCreateAccountHandler()
+	api.IdentityEnableHandler = newEnableHandler()
+	api.IdentityDisableHandler = newDisableHandler()
 	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
 	api.IdentityRegisterHandler = newRegisterHandler()
-	api.IdentityVerifyHandler = newVerifyHandler(cfg)
+	api.IdentityVerifyHandler = newVerifyHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
-	api.TunnelTunnelHandler = newTunnelHandler(cfg)
-	api.TunnelUntunnelHandler = newUntunnelHandler(cfg)
+	api.TunnelTunnelHandler = newTunnelHandler()
+	api.TunnelUntunnelHandler = newUntunnelHandler()
 
-	if err := controllerStartup(cfg); err != nil {
+	if err := controllerStartup(); err != nil {
 		return err
 	}
 
@@ -45,7 +48,7 @@ func Run(cfg *Config) error {
 	}
 
 	if cfg.Metrics != nil {
-		mtr = newMetricsAgent(cfg.Metrics)
+		mtr = newMetricsAgent()
 		go mtr.run()
 		defer func() {
 			mtr.stop()

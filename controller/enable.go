@@ -20,11 +20,10 @@ import (
 )
 
 type enableHandler struct {
-	cfg *Config
 }
 
-func newEnableHandler(cfg *Config) *enableHandler {
-	return &enableHandler{cfg: cfg}
+func newEnableHandler() *enableHandler {
+	return &enableHandler{}
 }
 
 func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -37,7 +36,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		return identity.NewEnableInternalServerError()
 	}
 
-	client, err := edgeClient(self.cfg.Ziti)
+	client, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return identity.NewEnableInternalServerError()

@@ -20,20 +20,7 @@ import (
 	"time"
 )
 
-type MetricsConfig struct {
-	ServiceName string
-	Influx      *InfluxConfig
-}
-
-type InfluxConfig struct {
-	Url    string
-	Bucket string
-	Org    string
-	Token  string
-}
-
 type metricsAgent struct {
-	cfg          *MetricsConfig
 	influx       influxdb2.Client
 	writeApi     api.WriteAPIBlocking
 	metricsQueue chan *model.Metrics
@@ -49,9 +36,8 @@ type envCacheEntry struct {
 	lastAccess time.Time
 }
 
-func newMetricsAgent(cfg *MetricsConfig) *metricsAgent {
+func newMetricsAgent() *metricsAgent {
 	ma := &metricsAgent{
-		cfg:          cfg,
 		metricsQueue: make(chan *model.Metrics, 1024),
 		envCache:     make(map[string]*envCacheEntry),
 		shutdown:     make(chan struct{}),
@@ -106,9 +92,9 @@ func (ma *metricsAgent) bindService() error {
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 1024,
 	}
-	ma.zListener, err = ma.zCtx.ListenWithOptions(ma.cfg.ServiceName, opts)
+	ma.zListener, err = ma.zCtx.ListenWithOptions(cfg.Metrics.ServiceName, opts)
 	if err != nil {
-		return errors.Wrapf(err, "error listening for metrics on '%v'", ma.cfg.ServiceName)
+		return errors.Wrapf(err, "error listening for metrics on '%v'", cfg.Metrics.ServiceName)
 	}
 	go ma.listen()
 	return nil

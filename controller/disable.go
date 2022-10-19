@@ -11,11 +11,10 @@ import (
 )
 
 type disableHandler struct {
-	cfg *Config
 }
 
-func newDisableHandler(cfg *Config) *disableHandler {
-	return &disableHandler{cfg: cfg}
+func newDisableHandler() *disableHandler {
+	return &disableHandler{}
 }
 
 func (self *disableHandler) Handle(params identity.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -30,7 +29,7 @@ func (self *disableHandler) Handle(params identity.DisableParams, principal *res
 		logrus.Errorf("identity check failed: %v", err)
 		return identity.NewDisableUnauthorized()
 	}
-	edge, err := edgeClient(self.cfg.Ziti)
+	edge, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return identity.NewDisableInternalServerError()

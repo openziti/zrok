@@ -14,17 +14,17 @@ import (
 
 var zrokProxyConfigId string
 
-func controllerStartup(cfg *Config) error {
-	if err := inspectZiti(cfg); err != nil {
+func controllerStartup() error {
+	if err := inspectZiti(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func inspectZiti(cfg *Config) error {
+func inspectZiti() error {
 	logrus.Infof("inspecting ziti controller configuration")
 
-	edge, err := edgeClient(cfg.Ziti)
+	edge, err := edgeClient()
 	if err != nil {
 		return errors.Wrap(err, "error getting ziti edge client")
 	}
