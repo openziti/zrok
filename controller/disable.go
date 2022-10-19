@@ -76,7 +76,7 @@ func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx,
 		return err
 	}
 	for _, svc := range svcs {
-		svcName := svc.ZrokServiceId
+		svcName := svc.Name
 		logrus.Infof("garbage collecting service '%v'", svcName)
 		if err := deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
 			logrus.Error(err)
@@ -90,10 +90,10 @@ func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx,
 		if err := deleteConfig(svcName, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteService(svc.ZitiServiceId, edge); err != nil {
+		if err := deleteService(svc.ZId, edge); err != nil {
 			logrus.Error(err)
 		}
-		logrus.Infof("removed service '%v'", svc.ZrokServiceId)
+		logrus.Infof("removed service '%v'", svc.Name)
 	}
 	return nil
 }

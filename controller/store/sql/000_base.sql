@@ -32,17 +32,17 @@ create table account_requests (
 -- environments
 --
 create table environments (
-    id                  integer             primary key,
-    account_id          integer             constraint fk_accounts_identities references accounts on delete cascade,
-    description         string,
-    host                string,
-    address             string,
-    ziti_identity_id    string              not null unique,
-    active              boolean             not null,
-    created_at          datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-    updated_at          datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
+  id                    integer             primary key,
+  account_id            integer             constraint fk_accounts_identities references accounts on delete cascade,
+  description           string,
+  host                  string,
+  address               string,
+  ziti_identity_id      string              not null unique,
+  active                boolean             not null,
+  created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
+  updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 
-    constraint chk_ziti_identity_id check (ziti_identity_id <> '')
+  constraint chk_ziti_identity_id check (ziti_identity_id <> '')
 );
 
 --
@@ -51,13 +51,14 @@ create table environments (
 create table services (
   id                    integer             primary key,
   environment_id        integer             constraint fk_environments_services references environments on delete cascade,
-  ziti_service_id       string              not null unique,
-  zrok_service_id       string              not null unique,
+  z_id                  string              not null unique,
+  name                  string              not null unique,
   frontend              string,
   backend               string,
   active                boolean             not null,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 
-  constraint chk_ziti_service_id check (ziti_service_id <> '')
+  constraint chk_z_id check (z_id <> ''),
+  constraint chk_name check (name <> '')
 );

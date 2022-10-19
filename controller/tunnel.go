@@ -73,20 +73,20 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	svcId, err := self.createService(svcName, cfgId, edge)
+	svcZId, err := self.createService(svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServicePolicyBind(svcName, svcId, envId, edge); err != nil {
+	if err := self.createServicePolicyBind(svcName, svcZId, envId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServicePolicyDial(svcName, svcId, edge); err != nil {
+	if err := self.createServicePolicyDial(svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServiceEdgeRouterPolicy(svcName, svcId, edge); err != nil {
+	if err := self.createServiceEdgeRouterPolicy(svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
@@ -95,10 +95,10 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 
 	frontendUrl := self.proxyUrl(svcName)
 	sid, err := str.CreateService(envIdDb, &store.Service{
-		ZitiServiceId: svcId,
-		ZrokServiceId: svcName,
-		Frontend:      frontendUrl,
-		Backend:       params.Body.Endpoint,
+		ZId:      svcZId,
+		Name:     svcName,
+		Frontend: frontendUrl,
+		Backend:  params.Body.Endpoint,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
@@ -109,7 +109,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Errorf("error committing service record: %v", err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcId, sid, principal.Email)
+	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcZId, sid, principal.Email)
 
 	return tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		ProxyEndpoint: frontendUrl,

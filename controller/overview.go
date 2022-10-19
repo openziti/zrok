@@ -44,8 +44,8 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				Frontend:      svc.Frontend,
 				Backend:       svc.Backend,
 				UpdatedAt:     svc.UpdatedAt.String(),
-				ZitiServiceID: svc.ZitiServiceId,
-				ZrokServiceID: svc.ZrokServiceId,
+				ZitiServiceID: svc.ZId,
+				ZrokServiceID: svc.Name,
 			})
 		}
 		out = append(out, es)

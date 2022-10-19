@@ -38,7 +38,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		return tunnel.NewUntunnelInternalServerError()
 	}
 	svcName := params.Body.Service
-	svcId, err := self.findServiceId(svcName, edge)
+	svcZId, err := self.findServiceZId(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
@@ -64,13 +64,13 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	var ssvc *store.Service
 	if svcs, err := str.FindServicesForEnvironment(senv.Id, tx); err == nil {
 		for _, svc := range svcs {
-			if svc.ZitiServiceId == svcId {
+			if svc.ZId == svcZId {
 				ssvc = svc
 				break
 			}
 		}
 		if ssvc == nil {
-			err := errors.Errorf("service with id '%v' not found for '%v'", svcId, principal.Email)
+			err := errors.Errorf("service with id '%v' not found for '%v'", svcZId, principal.Email)
 			logrus.Error(err)
 			return tunnel.NewUntunnelNotFound()
 		}
@@ -95,7 +95,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := deleteService(svcId, edge); err != nil {
+	if err := deleteService(svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
@@ -104,7 +104,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 
 	ssvc.Active = false
 	if err := str.UpdateService(ssvc, tx); err != nil {
-		logrus.Errorf("error deactivating service '%v': %v", svcId, err)
+		logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
@@ -115,7 +115,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	return tunnel.NewUntunnelOK()
 }
 
-func (_ *untunnelHandler) findServiceId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+func (_ *untunnelHandler) findServiceZId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
