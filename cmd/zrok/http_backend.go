@@ -91,9 +91,9 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := tunnel.NewTunnelParams()
 	req.Body = &rest_model_zrok.TunnelRequest{
-		ZitiIdentityID: env.ZId,
-		Endpoint:       cfg.EndpointAddress,
-		AuthScheme:     string(model.None),
+		ZID:        env.ZId,
+		Endpoint:   cfg.EndpointAddress,
+		AuthScheme: string(model.None),
 	}
 	if len(self.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
@@ -115,7 +115,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg.Service = resp.Payload.Service
+	cfg.Service = resp.Payload.SvcName
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -215,8 +215,8 @@ func (self *httpBackendCommand) destroy(id string, cfg *backend.Config, zrok *re
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := tunnel.NewUntunnelParams()
 	req.Body = &rest_model_zrok.UntunnelRequest{
-		ZitiIdentityID: id,
-		Service:        cfg.Service,
+		ZID:     id,
+		SvcName: cfg.Service,
 	}
 	if _, err := zrok.Tunnel.Untunnel(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

@@ -439,7 +439,7 @@ func init() {
         "updatedAt": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -532,13 +532,13 @@ func init() {
         "frontend": {
           "type": "string"
         },
+        "name": {
+          "type": "string"
+        },
         "updatedAt": {
           "type": "string"
         },
-        "zitiServiceId": {
-          "type": "string"
-        },
-        "zrokServiceId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -564,7 +564,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -575,7 +575,7 @@ func init() {
         "proxyEndpoint": {
           "type": "string"
         },
-        "service": {
+        "svcName": {
           "type": "string"
         }
       }
@@ -583,10 +583,10 @@ func init() {
     "untunnelRequest": {
       "type": "object",
       "properties": {
-        "service": {
+        "svcName": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -1041,7 +1041,7 @@ func init() {
         "updatedAt": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -1134,13 +1134,13 @@ func init() {
         "frontend": {
           "type": "string"
         },
+        "name": {
+          "type": "string"
+        },
         "updatedAt": {
           "type": "string"
         },
-        "zitiServiceId": {
-          "type": "string"
-        },
-        "zrokServiceId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -1166,7 +1166,7 @@ func init() {
         "endpoint": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }
@@ -1177,7 +1177,7 @@ func init() {
         "proxyEndpoint": {
           "type": "string"
         },
-        "service": {
+        "svcName": {
           "type": "string"
         }
       }
@@ -1185,10 +1185,10 @@ func init() {
     "untunnelRequest": {
       "type": "object",
       "properties": {
-        "service": {
+        "svcName": {
           "type": "string"
         },
-        "zitiIdentityId": {
+        "zId": {
           "type": "string"
         }
       }

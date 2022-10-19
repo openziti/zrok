@@ -277,7 +277,7 @@ definitions:
         type: string
       address:
         type: string
-      zitiIdentityId:
+      zId:
         type: string
       active:
         type: boolean
@@ -341,9 +341,9 @@ definitions:
   service:
     type: object
     properties:
-      zitiServiceId:
+      zId:
         type: string
-      zrokServiceId:
+      name:
         type: string
       frontend:
         type: string
@@ -359,7 +359,7 @@ definitions:
   tunnelRequest:
     type: object
     properties:
-      zitiIdentityId:
+      zId:
         type: string
       endpoint:
         type: string
@@ -374,15 +374,15 @@ definitions:
     properties:
       proxyEndpoint:
         type: string
-      service:
+      svcName:
         type: string
 
   untunnelRequest:
     type: object
     properties:
-      zitiIdentityId:
+      zId:
         type: string
-      service:
+      svcName:
         type: string
 
   verifyRequest:

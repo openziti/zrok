@@ -35,8 +35,8 @@ type Environment struct {
 	// updated at
 	UpdatedAt string `json:"updatedAt,omitempty"`
 
-	// ziti identity Id
-	ZitiIdentityID string `json:"zitiIdentityId,omitempty"`
+	// z Id
+	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this environment

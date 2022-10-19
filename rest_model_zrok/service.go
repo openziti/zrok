@@ -29,14 +29,14 @@ type Service struct {
 	// frontend
 	Frontend string `json:"frontend,omitempty"`
 
+	// name
+	Name string `json:"name,omitempty"`
+
 	// updated at
 	UpdatedAt string `json:"updatedAt,omitempty"`
 
-	// ziti service Id
-	ZitiServiceID string `json:"zitiServiceId,omitempty"`
-
-	// zrok service Id
-	ZrokServiceID string `json:"zrokServiceId,omitempty"`
+	// z Id
+	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this service

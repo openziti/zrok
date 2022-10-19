@@ -20,8 +20,8 @@ type TunnelResponse struct {
 	// proxy endpoint
 	ProxyEndpoint string `json:"proxyEndpoint,omitempty"`
 
-	// service
-	Service string `json:"service,omitempty"`
+	// svc name
+	SvcName string `json:"svcName,omitempty"`
 }
 
 // Validate validates this tunnel response

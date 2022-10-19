@@ -17,11 +17,11 @@ import (
 // swagger:model untunnelRequest
 type UntunnelRequest struct {
 
-	// service
-	Service string `json:"service,omitempty"`
+	// svc name
+	SvcName string `json:"svcName,omitempty"`
 
-	// ziti identity Id
-	ZitiIdentityID string `json:"zitiIdentityId,omitempty"`
+	// z Id
+	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this untunnel request

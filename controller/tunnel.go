@@ -37,7 +37,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	envId := params.Body.ZitiIdentityID
+	envId := params.Body.ZID
 	envIdDb := 0
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
@@ -113,7 +113,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 
 	return tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		ProxyEndpoint: frontendUrl,
-		Service:       svcName,
+		SvcName:       svcName,
 	})
 }
 

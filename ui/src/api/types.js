@@ -46,7 +46,7 @@
  * @property {string} description 
  * @property {string} host 
  * @property {string} address 
- * @property {string} zitiIdentityId 
+ * @property {string} zId 
  * @property {boolean} active 
  * @property {string} createdAt 
  * @property {string} updatedAt 
@@ -96,8 +96,8 @@
  * @typedef service
  * @memberof module:types
  * 
- * @property {string} zitiServiceId 
- * @property {string} zrokServiceId 
+ * @property {string} zId 
+ * @property {string} name 
  * @property {string} frontend 
  * @property {string} backend 
  * @property {boolean} active 
@@ -109,7 +109,7 @@
  * @typedef tunnelRequest
  * @memberof module:types
  * 
- * @property {string} zitiIdentityId 
+ * @property {string} zId 
  * @property {string} endpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
@@ -120,15 +120,15 @@
  * @memberof module:types
  * 
  * @property {string} proxyEndpoint 
- * @property {string} service 
+ * @property {string} svcName 
  */
 
 /**
  * @typedef untunnelRequest
  * @memberof module:types
  * 
- * @property {string} zitiIdentityId 
- * @property {string} service 
+ * @property {string} zId 
+ * @property {string} svcName 
  */
 
 /**

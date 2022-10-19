@@ -37,7 +37,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
-	svcName := params.Body.Service
+	svcName := params.Body.SvcName
 	svcZId, err := self.findServiceZId(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
@@ -46,13 +46,13 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
-			if env.ZId == params.Body.ZitiIdentityID {
+			if env.ZId == params.Body.ZID {
 				senv = env
 				break
 			}
 		}
 		if senv == nil {
-			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZitiIdentityID, principal.Email)
+			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZID, principal.Email)
 			logrus.Error(err)
 			return tunnel.NewUntunnelNotFound()
 		}

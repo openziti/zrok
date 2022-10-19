@@ -28,8 +28,8 @@ type TunnelRequest struct {
 	// endpoint
 	Endpoint string `json:"endpoint,omitempty"`
 
-	// ziti identity Id
-	ZitiIdentityID string `json:"zitiIdentityId,omitempty"`
+	// z Id
+	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this tunnel request

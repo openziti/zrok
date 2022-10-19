@@ -28,24 +28,24 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 		}
 		es := &rest_model_zrok.EnvironmentServices{
 			Environment: &rest_model_zrok.Environment{
-				Active:         env.Active,
-				Address:        env.Address,
-				CreatedAt:      env.CreatedAt.String(),
-				Description:    env.Description,
-				Host:           env.Host,
-				UpdatedAt:      env.UpdatedAt.String(),
-				ZitiIdentityID: env.ZId,
+				Active:      env.Active,
+				Address:     env.Address,
+				CreatedAt:   env.CreatedAt.String(),
+				Description: env.Description,
+				Host:        env.Host,
+				UpdatedAt:   env.UpdatedAt.String(),
+				ZID:         env.ZId,
 			},
 		}
 		for _, svc := range svcs {
 			es.Services = append(es.Services, &rest_model_zrok.Service{
-				Active:        svc.Active,
-				CreatedAt:     svc.CreatedAt.String(),
-				Frontend:      svc.Frontend,
-				Backend:       svc.Backend,
-				UpdatedAt:     svc.UpdatedAt.String(),
-				ZitiServiceID: svc.ZId,
-				ZrokServiceID: svc.Name,
+				Active:    svc.Active,
+				CreatedAt: svc.CreatedAt.String(),
+				Frontend:  svc.Frontend,
+				Backend:   svc.Backend,
+				UpdatedAt: svc.UpdatedAt.String(),
+				ZID:       svc.ZId,
+				Name:      svc.Name,
 			})
 		}
 		out = append(out, es)

@@ -166,15 +166,15 @@ func (l *looper) startup() {
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
 	tunnelReq := tunnel.NewTunnelParams()
 	tunnelReq.Body = &rest_model_zrok.TunnelRequest{
-		ZitiIdentityID: l.env.ZId,
-		Endpoint:       fmt.Sprintf("looper#%d", l.id),
-		AuthScheme:     string(model.None),
+		ZID:        l.env.ZId,
+		Endpoint:   fmt.Sprintf("looper#%d", l.id),
+		AuthScheme: string(model.None),
 	}
 	tunnelResp, err := l.zrok.Tunnel.Tunnel(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
 	}
-	l.service = tunnelResp.Payload.Service
+	l.service = tunnelResp.Payload.SvcName
 	l.proxyEndpoint = tunnelResp.Payload.ProxyEndpoint
 }
 
@@ -233,8 +233,8 @@ func (l *looper) shutdown() {
 
 	untunnelReq := tunnel.NewUntunnelParams()
 	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
-		ZitiIdentityID: l.env.ZId,
-		Service:        l.service,
+		ZID:     l.env.ZId,
+		SvcName: l.service,
 	}
 	if _, err := l.zrok.Tunnel.Untunnel(untunnelReq, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
