@@ -43,10 +43,10 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.ZrokToken)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := identity.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
-		Identity: env.ZitiIdentityId,
+		Identity: env.ZId,
 	}
 	_, err = zrok.Identity.Disable(req, auth)
 	if err != nil {
@@ -66,5 +66,5 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 			showError("error removing zrok backend identity", err)
 		}
 	}
-	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZitiIdentityId, env.ZrokToken)
+	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZId, env.Token)
 }

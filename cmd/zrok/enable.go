@@ -38,7 +38,7 @@ func newEnableCommand() *enableCommand {
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	env, err := zrokdir.LoadEnvironment()
 	if err == nil {
-		showError(fmt.Sprintf("you already have an environment '%v' for '%v'", env.ZitiIdentityId, env.ZrokToken), nil)
+		showError(fmt.Sprintf("you already have an environment '%v' for '%v'", env.ZId, env.Token), nil)
 	}
 
 	token := args[0]
@@ -73,7 +73,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{ZrokToken: token, ZitiIdentityId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
+	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
 		if !panicInstead {
 			showError("there was an error saving the new environment", err)
 		}

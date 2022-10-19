@@ -163,10 +163,10 @@ func (l *looper) startup() {
 	if err != nil {
 		panic(err)
 	}
-	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.ZrokToken)
+	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
 	tunnelReq := tunnel.NewTunnelParams()
 	tunnelReq.Body = &rest_model_zrok.TunnelRequest{
-		ZitiIdentityID: l.env.ZitiIdentityId,
+		ZitiIdentityID: l.env.ZId,
 		Endpoint:       fmt.Sprintf("looper#%d", l.id),
 		AuthScheme:     string(model.None),
 	}
@@ -233,7 +233,7 @@ func (l *looper) shutdown() {
 
 	untunnelReq := tunnel.NewUntunnelParams()
 	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
-		ZitiIdentityID: l.env.ZitiIdentityId,
+		ZitiIdentityID: l.env.ZId,
 		Service:        l.service,
 	}
 	if _, err := l.zrok.Tunnel.Untunnel(untunnelReq, l.auth); err != nil {

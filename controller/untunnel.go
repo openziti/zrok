@@ -46,7 +46,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
-			if env.ZitiIdentityId == params.Body.ZitiIdentityID {
+			if env.ZId == params.Body.ZitiIdentityID {
 				senv = env
 				break
 			}

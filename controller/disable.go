@@ -63,7 +63,7 @@ func (self *disableHandler) checkZitiIdentity(id string, principal *rest_model_z
 		return -1, err
 	}
 	for _, env := range envs {
-		if env.ZitiIdentityId == id {
+		if env.ZId == id {
 			return env.Id, nil
 		}
 	}

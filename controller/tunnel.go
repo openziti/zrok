@@ -42,7 +42,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
 		for _, env := range envs {
-			if env.ZitiIdentityId == envId {
+			if env.ZId == envId {
 				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Email)
 				envIdDb = env.Id
 				found = true

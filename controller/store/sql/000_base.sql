@@ -37,12 +37,12 @@ create table environments (
   description           string,
   host                  string,
   address               string,
-  ziti_identity_id      string              not null unique,
+  z_id                  string              not null unique,
   active                boolean             not null,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 
-  constraint chk_ziti_identity_id check (ziti_identity_id <> '')
+  constraint chk_z_id check (z_id <> '')
 );
 
 --

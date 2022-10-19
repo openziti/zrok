@@ -9,9 +9,9 @@ import (
 )
 
 type Environment struct {
-	ZrokToken      string `json:"zrok_token"`
-	ZitiIdentityId string `json:"ziti_identity"`
-	ApiEndpoint    string `json:"api_endpoint"`
+	Token       string `json:"zrok_token"`
+	ZId         string `json:"ziti_identity"`
+	ApiEndpoint string `json:"api_endpoint"`
 }
 
 func LoadEnvironment() (*Environment, error) {

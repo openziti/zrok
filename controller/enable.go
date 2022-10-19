@@ -57,10 +57,10 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		return identity.NewEnableInternalServerError()
 	}
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
-		Description:    params.Body.Description,
-		Host:           params.Body.Host,
-		Address:        realRemoteAddress(params.HTTPRequest),
-		ZitiIdentityId: ident.Payload.Data.ID,
+		Description: params.Body.Description,
+		Host:        params.Body.Host,
+		Address:     realRemoteAddress(params.HTTPRequest),
+		ZId:         ident.Payload.Data.ID,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)

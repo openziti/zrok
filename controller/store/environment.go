@@ -7,20 +7,20 @@ import (
 
 type Environment struct {
 	Model
-	AccountId      int
-	Description    string
-	Host           string
-	Address        string
-	ZitiIdentityId string
-	Active         bool
+	AccountId   int
+	Description string
+	Host        string
+	Address     string
+	ZId         string
+	Active      bool
 }
 
 func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into environments (account_id, description, host, address, ziti_identity_id, active) values (?, ?, ?, ?, ?, true)")
+	stmt, err := tx.Prepare("insert into environments (account_id, description, host, address, z_id, active) values (?, ?, ?, ?, ?, true)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing environments insert statement")
 	}
-	res, err := stmt.Exec(accountId, i.Description, i.Host, i.Address, i.ZitiIdentityId)
+	res, err := stmt.Exec(accountId, i.Description, i.Host, i.Address, i.ZId)
 	if err != nil {
 		return 0, errors.Wrap(err, "error executing environments insert statement")
 	}
