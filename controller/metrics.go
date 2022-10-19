@@ -36,15 +36,22 @@ type metricsAgent struct {
 	cfg       *MetricsConfig
 	influx    influxdb2.Client
 	writeApi  api.WriteAPIBlocking
+	envCache  map[string]*envCacheEntry
 	zCtx      ziti.Context
 	zListener edge.Listener
 	shutdown  chan struct{}
 	joined    chan struct{}
 }
 
+type envCacheEntry struct {
+	env        string
+	lastAccess time.Time
+}
+
 func newMetricsAgent(cfg *MetricsConfig) *metricsAgent {
 	ma := &metricsAgent{
 		cfg:      cfg,
+		envCache: make(map[string]*envCacheEntry),
 		shutdown: make(chan struct{}),
 		joined:   make(chan struct{}),
 	}

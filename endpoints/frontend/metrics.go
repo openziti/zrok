@@ -80,28 +80,30 @@ func (ma *metricsAgent) pushUpdate(mu metricsUpdate) {
 }
 
 func (ma *metricsAgent) sendMetrics() error {
-	m := &model.Metrics{
-		Namespace: ma.cfg.Identity,
-		Sessions:  ma.accum,
+	if len(ma.accum) > 0 {
+		m := &model.Metrics{
+			Namespace: ma.cfg.Identity,
+			Sessions:  ma.accum,
+		}
+		metricsJson, err := bson.Marshal(m)
+		if err != nil {
+			return errors.Wrap(err, "error marshaling metrics")
+		}
+		conn, err := ma.zCtx.Dial(ma.cfg.Metrics.Service)
+		if err != nil {
+			return errors.Wrap(err, "error connecting to metrics service")
+		}
+		n, err := conn.Write(metricsJson)
+		if err != nil {
+			return errors.Wrap(err, "error sending metrics")
+		}
+		defer func() { _ = conn.Close() }()
+		if n != len(metricsJson) {
+			return errors.Wrap(err, "short metrics write")
+		}
+		logrus.Infof("sent %d bytes of metrics data", n)
+		ma.accum = make(map[string]model.SessionMetrics)
+		ma.lastSend = time.Now()
 	}
-	metricsJson, err := bson.Marshal(m)
-	if err != nil {
-		return errors.Wrap(err, "error marshaling metrics")
-	}
-	conn, err := ma.zCtx.Dial(ma.cfg.Metrics.Service)
-	if err != nil {
-		return errors.Wrap(err, "error connecting to metrics service")
-	}
-	n, err := conn.Write(metricsJson)
-	if err != nil {
-		return errors.Wrap(err, "error sending metrics")
-	}
-	defer func() { _ = conn.Close() }()
-	if n != len(metricsJson) {
-		return errors.Wrap(err, "short metrics write")
-	}
-	logrus.Infof("sent %d bytes of metrics data", n)
-	ma.accum = make(map[string]model.SessionMetrics)
-	ma.lastSend = time.Now()
 	return nil
 }
