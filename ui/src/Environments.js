@@ -30,17 +30,8 @@ const Environments = (props) => {
         },
     ]
 
-    const conditionalRowStyles = [
-        {
-            when: row => !row.environment.active,
-            style: {
-                display: 'none'
-            }
-        }
-    ]
-
     const servicesComponent = ({ data }) => <Services services={data.services} />
-    const servicesExpanded = row => row.services != null && row.services.length > 0 && row.services.some((row) => row.active)
+    const servicesExpanded = row => row.services != null && row.services.length > 0
 
     return (
         <div>
@@ -54,7 +45,6 @@ const Environments = (props) => {
                         expandableRows
                         expandableRowsComponent={servicesComponent}
                         expandableRowExpanded={servicesExpanded}
-                        conditionalRowStyles={conditionalRowStyles}
                     />
                 </div>
             )}

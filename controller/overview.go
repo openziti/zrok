@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
@@ -26,31 +29,90 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
-		if env.Active {
-			es := &rest_model_zrok.EnvironmentServices{
-				Environment: &rest_model_zrok.Environment{
-					Address:     env.Address,
-					CreatedAt:   env.CreatedAt.String(),
-					Description: env.Description,
-					Host:        env.Host,
-					UpdatedAt:   env.UpdatedAt.String(),
-					ZID:         env.ZId,
-				},
-			}
-			for _, svc := range svcs {
-				if svc.Active {
-					es.Services = append(es.Services, &rest_model_zrok.Service{
-						CreatedAt: svc.CreatedAt.String(),
-						Frontend:  svc.Frontend,
-						Backend:   svc.Backend,
-						UpdatedAt: svc.UpdatedAt.String(),
-						ZID:       svc.ZId,
-						Name:      svc.Name,
-					})
-				}
-			}
-			out = append(out, es)
+		es := &rest_model_zrok.EnvironmentServices{
+			Environment: &rest_model_zrok.Environment{
+				Address:     env.Address,
+				CreatedAt:   env.CreatedAt.String(),
+				Description: env.Description,
+				Host:        env.Host,
+				UpdatedAt:   env.UpdatedAt.String(),
+				ZID:         env.ZId,
+			},
 		}
+		sparkData, err := sparkDataForServices(svcs)
+		if err != nil {
+			logrus.Errorf("error querying spark data for services: %v", err)
+			return metadata.NewOverviewInternalServerError()
+		}
+		for _, svc := range svcs {
+			es.Services = append(es.Services, &rest_model_zrok.Service{
+				CreatedAt: svc.CreatedAt.String(),
+				Frontend:  svc.Frontend,
+				Backend:   svc.Backend,
+				UpdatedAt: svc.UpdatedAt.String(),
+				ZID:       svc.ZId,
+				Name:      svc.Name,
+				Metrics:   sparkData[svc.Name],
+			})
+		}
+		out = append(out, es)
 	}
 	return metadata.NewOverviewOK().WithPayload(out)
+}
+
+func sparkDataForServices(svcs []*store.Service) (map[string][]int64, error) {
+	out := make(map[string][]int64)
+
+	if len(svcs) > 0 {
+		qapi := idb.QueryAPI(cfg.Influx.Org)
+
+		result, err := qapi.Query(context.Background(), sparkFluxQuery(svcs))
+		if err != nil {
+			return nil, err
+		}
+
+		for result.Next() {
+			combinedRate := int64(0)
+			readRate := result.Record().ValueByKey("_value_t1")
+			if readRate != nil {
+				combinedRate += int64(readRate.(float64))
+			}
+			writeRate := result.Record().ValueByKey("_value_t2")
+			if writeRate != nil {
+				combinedRate += int64(writeRate.(float64))
+			}
+			svcName := result.Record().ValueByKey("service_t1").(string)
+			svcMetrics := out[svcName]
+			svcMetrics = append(svcMetrics, combinedRate)
+			out[svcName] = svcMetrics
+		}
+	}
+	return out, nil
+}
+
+func sparkFluxQuery(svcs []*store.Service) string {
+	svcFilter := "|> filter(fn: (r) =>"
+	for i, svc := range svcs {
+		if i > 0 {
+			svcFilter += " or"
+		}
+		svcFilter += fmt.Sprintf(" r[\"service\"] == \"%v\"", svc.Name)
+	}
+	svcFilter += ")"
+	query := "read = from(bucket: \"zrok\")" +
+		"|> range(start: -5m)" +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\")" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"frontend\")" +
+		svcFilter +
+		"|> aggregateWindow(every: 5s, fn: mean, createEmpty: true)\n\n" +
+		"written = from(bucket: \"zrok\")" +
+		"|> range(start: -5m)" +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesWritten\")" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"frontend\")" +
+		svcFilter +
+		"|> aggregateWindow(every: 5s, fn: mean, createEmpty: true)\n\n" +
+		"join(tables: {t1: read, t2: written}, on: [\"_time\"])"
+	return query
 }

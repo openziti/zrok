@@ -1,11 +1,7 @@
 import DataTable from 'react-data-table-component';
-import {useEffect} from "react";
+import {Sparklines, SparklinesLine} from 'react-sparklines';
 
 const Services = (props) => {
-	useEffect((props) => {
-		console.log(props)
-	}, [])
-
 	const columns = [
 		{
 			name: 'Frontend',
@@ -17,14 +13,9 @@ const Services = (props) => {
 			selector: row => row.backend,
 			sortable: true,
 		},
-	]
-
-	const conditionalRowStyles = [
 		{
-			when: row => !row.active,
-			style: {
-				display: 'none'
-			}
+			name: 'Activity',
+			cell: row => <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/></Sparklines>
 		}
 	]
 
@@ -35,7 +26,6 @@ const Services = (props) => {
 					columns={columns}
 					data={props.services}
 					defaultSortFieldId={1}
-					conditionalRowStyles={conditionalRowStyles}
 				/>
 			)}
 		</div>

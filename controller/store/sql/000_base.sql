@@ -38,7 +38,6 @@ create table environments (
   host                  string,
   address               string,
   z_id                  string              not null unique,
-  active                boolean             not null,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 
@@ -55,7 +54,6 @@ create table services (
   name                  string              not null unique,
   frontend              string,
   backend               string,
-  active                boolean             not null,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 

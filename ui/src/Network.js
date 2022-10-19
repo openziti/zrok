@@ -24,7 +24,7 @@ const Network = () => {
                 reactFlow.fitView({maxZoom: 1})
             }
         });
-    })
+    }, [])
 
     useEffect(() => {
         let mounted = true
@@ -81,23 +81,21 @@ function buildGraph(overview) {
         id++
         if(item.services != null) {
             item.services.forEach((item) => {
-                if(item.active) {
-                    out.nodes.push({
-                        id: '' + id,
-                        data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.frontend }</div>},
-                        position: {x: (id * 25), y: 0},
-                        style: { width: 'fit-content', backgroundColor: '#9367ef', color: 'white' },
-                        type: 'output',
-                        draggable: true
-                    })
-                    out.edges.push({
-                        id: 'e' + envId + '-' + id,
-                        source: '' + envId,
-                        target: '' + id,
-                        animated: true
-                    })
-                    id++
-                }
+                out.nodes.push({
+                    id: '' + id,
+                    data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.frontend }</div>},
+                    position: {x: (id * 25), y: 0},
+                    style: { width: 'fit-content', backgroundColor: '#9367ef', color: 'white' },
+                    type: 'output',
+                    draggable: true
+                })
+                out.edges.push({
+                    id: 'e' + envId + '-' + id,
+                    source: '' + envId,
+                    target: '' + id,
+                    animated: true
+                })
+                id++
             });
         }
     });

@@ -12,11 +12,10 @@ type Environment struct {
 	Host        string
 	Address     string
 	ZId         string
-	Active      bool
 }
 
 func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into environments (account_id, description, host, address, z_id, active) values (?, ?, ?, ?, ?, true)")
+	stmt, err := tx.Prepare("insert into environments (account_id, description, host, address, z_id) values (?, ?, ?, ?, ?)")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing environments insert statement")
 	}

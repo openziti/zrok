@@ -101,8 +101,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 
 	logrus.Infof("deallocated service '%v'", svcName)
 
-	ssvc.Active = false
-	if err := str.UpdateService(ssvc, tx); err != nil {
+	if err := str.DeleteService(ssvc.Id, tx); err != nil {
 		logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
 		return tunnel.NewUntunnelInternalServerError()
 	}

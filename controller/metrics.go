@@ -21,7 +21,6 @@ import (
 )
 
 type metricsAgent struct {
-	influx       influxdb2.Client
 	writeApi     api.WriteAPIBlocking
 	metricsQueue chan *model.Metrics
 	envCache     map[string]*envCacheEntry
@@ -43,9 +42,8 @@ func newMetricsAgent() *metricsAgent {
 		shutdown:     make(chan struct{}),
 		joined:       make(chan struct{}),
 	}
-	if cfg.Influx != nil {
-		ma.influx = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
-		ma.writeApi = ma.influx.WriteAPIBlocking(cfg.Influx.Org, cfg.Influx.Bucket)
+	if idb != nil {
+		ma.writeApi = idb.WriteAPIBlocking(cfg.Influx.Org, cfg.Influx.Bucket)
 	}
 	return ma
 }

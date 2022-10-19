@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/loads"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
@@ -13,6 +14,7 @@ import (
 var cfg *Config
 var str *store.Store
 var mtr *metricsAgent
+var idb influxdb2.Client
 
 const version = "v0.2.0"
 
@@ -45,6 +47,10 @@ func Run(inCfg *Config) error {
 		str = v
 	} else {
 		return errors.Wrap(err, "error opening store")
+	}
+
+	if cfg.Influx != nil {
+		idb = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
 	}
 
 	if cfg.Metrics != nil {
