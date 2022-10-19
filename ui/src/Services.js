@@ -1,5 +1,5 @@
 import DataTable from 'react-data-table-component';
-import {Sparklines, SparklinesLine} from 'react-sparklines';
+import {Sparklines, SparklinesLine, SparklinesSpots} from 'react-sparklines';
 
 const Services = (props) => {
 	const columns = [
@@ -15,7 +15,7 @@ const Services = (props) => {
 		},
 		{
 			name: 'Activity',
-			cell: row => <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/></Sparklines>
+			cell: row => <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/><SparklinesSpots/></Sparklines>
 		}
 	]
 
