@@ -32,10 +32,11 @@ type loopCmd struct {
 	loopers        int
 	iterations     int
 	statusEvery    int
-	dwellSeconds   int
 	timeoutSeconds int
 	minPayload     int
 	maxPayload     int
+	minDwellMs     int
+	maxDwellMs     int
 	minPacingMs    int
 	maxPacingMs    int
 }
@@ -51,10 +52,11 @@ func newLoopCmd() *loopCmd {
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
 	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "E", 100, "Show status every # iterations")
-	cmd.Flags().IntVarP(&r.dwellSeconds, "dwell-seconds", "D", 1, "Dwell # seconds before starting iterations")
 	cmd.Flags().IntVarP(&r.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
 	cmd.Flags().IntVar(&r.minPayload, "min-payload", 64, "Minimum payload size in bytes")
 	cmd.Flags().IntVar(&r.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
+	cmd.Flags().IntVar(&r.minDwellMs, "min-dwell-ms", 1000, "Minimum dwell time in milliseconds")
+	cmd.Flags().IntVar(&r.maxDwellMs, "max-dwell-ms", 1000, "Maximum dwell time in milliseconds")
 	cmd.Flags().IntVar(&r.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
 	cmd.Flags().IntVar(&r.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
 	return r
@@ -170,6 +172,7 @@ func (l *looper) startup() {
 		Endpoint:   fmt.Sprintf("looper#%d", l.id),
 		AuthScheme: string(model.None),
 	}
+	tunnelReq.SetTimeout(60 * time.Second)
 	tunnelResp, err := l.zrok.Tunnel.Tunnel(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
@@ -179,7 +182,11 @@ func (l *looper) startup() {
 }
 
 func (l *looper) dwell() {
-	time.Sleep(time.Duration(l.cmd.dwellSeconds) * time.Second)
+	dwell := l.cmd.minDwellMs
+	if l.cmd.maxDwellMs-l.cmd.minDwellMs > 0 {
+		dwell = rand.Intn(l.cmd.maxDwellMs-l.cmd.minDwellMs) + l.cmd.minDwellMs
+	}
+	time.Sleep(time.Duration(dwell) * time.Millisecond)
 }
 
 func (l *looper) iterate() {
