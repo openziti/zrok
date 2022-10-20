@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
+	"github.com/jaevor/go-nanoid"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
@@ -48,7 +49,11 @@ func createToken() (string, error) {
 }
 
 func createServiceName() (string, error) {
-	return dnsSafeShortId()
+	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyz0123456789", 12)
+	if err != nil {
+		return "", err
+	}
+	return gen(), nil
 }
 
 func dnsSafeShortId() (string, error) {
