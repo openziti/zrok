@@ -15,24 +15,20 @@ type Service struct {
 }
 
 func (self *Store) CreateService(envId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (environment_id, z_id, name, frontend, backend) values (?, ?, ?, ?, ?)")
+	stmt, err := tx.Prepare("insert into services (environment_id, z_id, name, frontend, backend) values ($1, $2, $3, $4, $5) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
-	res, err := stmt.Exec(envId, svc.ZId, svc.Name, svc.Frontend, svc.Backend)
-	if err != nil {
+	var id int
+	if err := stmt.QueryRow(envId, svc.ZId, svc.Name, svc.Frontend, svc.Backend).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return 0, errors.Wrap(err, "error retrieving last services insert id")
-	}
-	return int(id), nil
+	return id, nil
 }
 
 func (self *Store) GetService(id int, tx *sqlx.Tx) (*Service, error) {
 	svc := &Service{}
-	if err := tx.QueryRowx("select * from services where id = ?", id).StructScan(svc); err != nil {
+	if err := tx.QueryRowx("select * from services where id = $1", id).StructScan(svc); err != nil {
 		return nil, errors.Wrap(err, "error selecting service by id")
 	}
 	return svc, nil
@@ -55,7 +51,7 @@ func (self *Store) GetAllServices(tx *sqlx.Tx) ([]*Service, error) {
 }
 
 func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Service, error) {
-	rows, err := tx.Queryx("select services.* from services where environment_id = ?", envId)
+	rows, err := tx.Queryx("select services.* from services where environment_id = $1", envId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting services by environment id")
 	}
@@ -71,7 +67,7 @@ func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Servic
 }
 
 func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
-	sql := "update services set z_id = ?, name = ?, frontend = ?, backend = ?, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = ?"
+	sql := "update services set z_id = $1, name = $2, frontend = $3, backend = $4, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = $5"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing services update statement")
@@ -84,7 +80,7 @@ func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
 }
 
 func (self *Store) DeleteService(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from services where id = ?")
+	stmt, err := tx.Prepare("delete from services where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing services delete statement")
 	}

@@ -17,6 +17,7 @@ require (
 	github.com/jaevor/go-nanoid v1.3.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/lib/pq v1.10.0
 	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/michaelquigley/cf v0.0.12
 	github.com/michaelquigley/pfxlog v0.6.9
