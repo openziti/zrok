@@ -27,8 +27,6 @@ func newEnableHandler() *enableHandler {
 }
 
 func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("headers = %v", params.HTTPRequest.Header)
-
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
