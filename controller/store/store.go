@@ -5,7 +5,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/openziti-test-kitchen/zrok/controller/store/sql"
+	sqlite3_schema "github.com/openziti-test-kitchen/zrok/controller/store/sql/sqlite3"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
@@ -52,7 +52,7 @@ func (self *Store) Close() error {
 
 func (self *Store) migrate() error {
 	migrations := &migrate.EmbedFileSystemMigrationSource{
-		FileSystem: sql.Fs,
+		FileSystem: sqlite3_schema.FS,
 		Root:       "/",
 	}
 	migrate.SetTable("migrations")
