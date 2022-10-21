@@ -47,9 +47,13 @@ func Open(cfg *Config) (*Store, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "error opening database '%v'", cfg.Path)
 		}
+
+	default:
+		return nil, errors.Errorf("unknown database type '%v' (supported: sqlite3, postgres)", cfg.Type)
 	}
 	logrus.Infof("opened database '%v'", cfg.Path)
 	dbx.MapperFunc(strcase.ToSnake)
+
 	store := &Store{cfg: cfg, db: dbx}
 	if err := store.migrate(cfg); err != nil {
 		return nil, errors.Wrapf(err, "error migrating database '%v'", cfg.Path)
