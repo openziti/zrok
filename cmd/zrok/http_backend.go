@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -48,6 +49,17 @@ func newHttpBackendCommand() *httpBackendCommand {
 }
 
 func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
+	targetEndpoint, err := url.Parse(args[0])
+	if err != nil {
+		if !panicInstead {
+			showError("invalid target endpoint URL", err)
+		}
+		panic(err)
+	}
+	if targetEndpoint.Scheme == "" {
+		targetEndpoint.Scheme = "https"
+	}
+
 	if !self.quiet {
 		if err := ui.Init(); err != nil {
 			if !panicInstead {
@@ -77,7 +89,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	}
 	cfg := &backend.Config{
 		IdentityPath:    zif,
-		EndpointAddress: args[0],
+		EndpointAddress: targetEndpoint.String(),
 	}
 
 	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
