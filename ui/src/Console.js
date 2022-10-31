@@ -3,10 +3,10 @@ import Login from "./Login";
 import Version from "./Version";
 import Token from "./Token";
 import Logout from "./Logout";
-import Network from "./Network";
+import Account from "./Account";
 import {ReactFlowProvider} from "react-flow-renderer";
 
-const Overview = () => {
+const Console = () => {
     const [user, setUser] = useState();
 
     useEffect(() => {
@@ -47,7 +47,7 @@ const Overview = () => {
                 </div>
                 <div className="main">
                     <ReactFlowProvider>
-                        <Network />
+                        <Account user={user}/>
                     </ReactFlowProvider>
                 </div>
             </div>
@@ -55,4 +55,4 @@ const Overview = () => {
     );
 }
 
-export default Overview;
+export default Console;

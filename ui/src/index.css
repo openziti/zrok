@@ -14,6 +14,14 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Russo One', sans-serif;
 }
 
+#zrok-enable {
+  text-align: center;
+  margin-top: 100px;
+}
+#zrok-enable h1 {
+  margin-bottom: 50px;
+}
+
 .container {
   display: grid;
   margin-left: 10%;
