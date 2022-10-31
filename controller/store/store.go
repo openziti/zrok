@@ -21,7 +21,7 @@ type Model struct {
 }
 
 type Config struct {
-	Path string
+	Path string `cf:"+secret"`
 	Type string
 }
 

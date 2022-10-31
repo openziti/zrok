@@ -31,7 +31,7 @@ type EmailConfig struct {
 	Host     string
 	Port     int
 	Username string
-	Password string
+	Password string `cf:"+secret"`
 }
 
 type RegistrationConfig struct {
@@ -42,7 +42,7 @@ type RegistrationConfig struct {
 type ZitiConfig struct {
 	ApiEndpoint string
 	Username    string
-	Password    string
+	Password    string `cf:"+secret"`
 }
 
 type MetricsConfig struct {
@@ -53,7 +53,7 @@ type InfluxConfig struct {
 	Url    string
 	Bucket string
 	Org    string
-	Token  string
+	Token  string `cf:"+secret"`
 }
 
 func LoadConfig(path string) (*Config, error) {

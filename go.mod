@@ -19,7 +19,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.0
 	github.com/mattn/go-sqlite3 v1.14.14
-	github.com/michaelquigley/cf v0.0.12
+	github.com/michaelquigley/cf v0.0.13
 	github.com/michaelquigley/pfxlog v0.6.9
 	github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d
 	github.com/opentracing/opentracing-go v1.2.0
