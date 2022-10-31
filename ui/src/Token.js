@@ -28,7 +28,7 @@ const Token = (props) => {
 
     return (
         <div>
-            <button aria-describedby={popoverId} onClick={handlePopoverClick}><Icon path={mdiKey} size={0.7}/></button>
+            <button aria-describedby={popoverId} onClick={handlePopoverClick} title={"See Enable Secret"}><Icon path={mdiKey} size={0.7}/></button>
             <Popover
                 id={popoverId}
                 open={popoverOpen}
