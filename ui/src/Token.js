@@ -1,8 +1,7 @@
 import Icon from "@mdi/react";
-import {mdiKey} from "@mdi/js";
+import {mdiKey, mdiContentCopy} from "@mdi/js";
 import Popover from "@mui/material/Popover";
 import {useState} from "react";
-import Copy from "./Copy";
 
 const Token = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -17,6 +16,15 @@ const Token = (props) => {
     const popoverId = popoverOpen ? 'token-popover' : undefined;
 
     const text = "zrok enable " + props.user.token
+    const handleCopy = async () => {
+        let copiedText = document.getElementById("zrok-enable-command").innerHTML;
+        try {
+            await navigator.clipboard.writeText(copiedText);
+            console.log("copied enable command");
+        } catch(err) {
+            console.error("failed to copy", err);
+        }
+    }
 
     return (
         <div>
@@ -34,7 +42,7 @@ const Token = (props) => {
                 <div className={"popover"}>
                     <h3>Enable zrok access in your shell:</h3>
                     <pre>
-                        {text} <Copy text={text}/>
+                        $ <span id={"zrok-enable-command"}>{text}</span> <Icon path={mdiContentCopy} size={0.7} onClick={handleCopy}/>
                     </pre>
                 </div>
             </Popover>

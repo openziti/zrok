@@ -1,5 +1,7 @@
+import Icon from "@mdi/react";
 import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
+import {mdiContentCopy} from "@mdi/js";
 import * as identity from "./api/identity";
 
 const RegistrationForm = (props) => {
@@ -70,6 +72,16 @@ const NoAccountRequest = () => {
 }
 
 const Success = (props) => {
+    const handleCopy = async () => {
+        let copiedText = document.getElementById("zrok-enable-command").innerHTML;
+        try {
+            await navigator.clipboard.writeText(copiedText);
+            console.log("copied enable command");
+        } catch(err) {
+            console.error("failed to copy", err);
+        }
+    }
+
     // clear local storage on new account registration success.
     localStorage.clear();
 
@@ -83,7 +95,7 @@ const Success = (props) => {
             <p>To enable your shell for zrok, use this command:</p>
 
             <pre>
-                $ zrok enable {props.token}
+                $ <span id={"zrok-enable-command"}>zrok enable {props.token}</span> <Icon path={mdiContentCopy} size={0.7} onClick={handleCopy}/>
             </pre>
         </div>
     )
