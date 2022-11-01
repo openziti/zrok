@@ -8,7 +8,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -30,7 +29,6 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
-		logrus.Infof("updatedAt: %v", time.Since(env.UpdatedAt.UTC()))
 		es := &rest_model_zrok.EnvironmentServices{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,

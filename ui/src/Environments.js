@@ -27,7 +27,7 @@ const Environments = (props) => {
         },
         {
             name: 'Uptime',
-            selector: row => humanizeDuration(new Date().getTime() - row.environment.updatedAt),
+            selector: row => humanizeDuration(Date.now() - row.environment.updatedAt),
             sortable: true,
         },
     ]

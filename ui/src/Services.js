@@ -2,6 +2,8 @@ import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from 'react-sparklines';
 
 const Services = (props) => {
+	const humanizeDuration = require("humanize-duration")
+
 	const columns = [
 		{
 			name: 'Frontend',
@@ -12,6 +14,10 @@ const Services = (props) => {
 			name: 'Backend',
 			selector: row => row.backend,
 			sortable: true,
+		},
+		{
+			name: 'Uptime',
+			selector: row => humanizeDuration(Date.now() - row.updatedAt),
 		},
 		{
 			name: 'Activity',
