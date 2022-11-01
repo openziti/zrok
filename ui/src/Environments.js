@@ -1,5 +1,7 @@
 import DataTable from 'react-data-table-component';
 import Services from './Services';
+import Icon from "@mdi/react";
+import {mdiCloseOutline} from "@mdi/js";
 
 const Environments = (props) => {
     const humanizeDuration = require("humanize-duration")
@@ -24,6 +26,12 @@ const Environments = (props) => {
             name: 'Identity',
             selector: row => row.environment.zId,
             sortable: true,
+        },
+        {
+            name: 'Actions',
+            selector: row => <>
+                <button title={"Disable Environment '"+row.environment.zId+"'"}><Icon path={mdiCloseOutline} size={0.7}/></button>
+            </>
         },
         {
             name: 'Uptime',

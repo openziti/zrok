@@ -1,5 +1,7 @@
 import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from 'react-sparklines';
+import {mdiCloseOutline} from "@mdi/js";
+import Icon from "@mdi/react";
 
 const Services = (props) => {
 	const humanizeDuration = require("humanize-duration")
@@ -14,6 +16,12 @@ const Services = (props) => {
 			name: 'Backend',
 			selector: row => row.backend,
 			sortable: true,
+		},
+		{
+			name: 'Actions',
+			selector: row => <>
+				<button title={"Disable Service '"+row.name+"'"}><Icon path={mdiCloseOutline} size={0.7}/></button>
+			</>
 		},
 		{
 			name: 'Uptime',
