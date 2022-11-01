@@ -282,9 +282,9 @@ definitions:
       active:
         type: boolean
       createdAt:
-        type: string
+        type: integer
       updatedAt:
-        type: string
+        type: integer
 
   environmentServicesList:
     type: array
@@ -352,9 +352,9 @@ definitions:
       metrics:
         $ref: "#/definitions/serviceMetrics"
       createdAt:
-        type: string
+        type: integer
       updatedAt:
-        type: string
+        type: integer
 
   serviceMetrics:
     type: array

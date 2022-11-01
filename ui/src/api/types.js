@@ -48,8 +48,8 @@
  * @property {string} address 
  * @property {string} zId 
  * @property {boolean} active 
- * @property {string} createdAt 
- * @property {string} updatedAt 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**
@@ -101,8 +101,8 @@
  * @property {string} frontend 
  * @property {string} backend 
  * @property {module:types.serviceMetrics} metrics 
- * @property {string} createdAt 
- * @property {string} updatedAt 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**

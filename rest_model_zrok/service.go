@@ -22,7 +22,7 @@ type Service struct {
 	Backend string `json:"backend,omitempty"`
 
 	// created at
-	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedAt int64 `json:"createdAt,omitempty"`
 
 	// frontend
 	Frontend string `json:"frontend,omitempty"`
@@ -34,7 +34,7 @@ type Service struct {
 	Name string `json:"name,omitempty"`
 
 	// updated at
-	UpdatedAt string `json:"updatedAt,omitempty"`
+	UpdatedAt int64 `json:"updatedAt,omitempty"`
 
 	// z Id
 	ZID string `json:"zId,omitempty"`

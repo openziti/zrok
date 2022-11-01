@@ -24,7 +24,7 @@ type Environment struct {
 	Address string `json:"address,omitempty"`
 
 	// created at
-	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedAt int64 `json:"createdAt,omitempty"`
 
 	// description
 	Description string `json:"description,omitempty"`
@@ -33,7 +33,7 @@ type Environment struct {
 	Host string `json:"host,omitempty"`
 
 	// updated at
-	UpdatedAt string `json:"updatedAt,omitempty"`
+	UpdatedAt int64 `json:"updatedAt,omitempty"`
 
 	// z Id
 	ZID string `json:"zId,omitempty"`

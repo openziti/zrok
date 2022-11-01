@@ -8,6 +8,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -29,13 +30,14 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
+		logrus.Infof("updatedAt: %v", time.Since(env.UpdatedAt.UTC()))
 		es := &rest_model_zrok.EnvironmentServices{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
-				CreatedAt:   env.CreatedAt.String(),
+				CreatedAt:   env.CreatedAt.UnixMilli(),
 				Description: env.Description,
 				Host:        env.Host,
-				UpdatedAt:   env.UpdatedAt.String(),
+				UpdatedAt:   env.UpdatedAt.UnixMilli(),
 				ZID:         env.ZId,
 			},
 		}
@@ -46,10 +48,10 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 		}
 		for _, svc := range svcs {
 			es.Services = append(es.Services, &rest_model_zrok.Service{
-				CreatedAt: svc.CreatedAt.String(),
+				CreatedAt: svc.CreatedAt.UnixMilli(),
 				Frontend:  svc.Frontend,
 				Backend:   svc.Backend,
-				UpdatedAt: svc.UpdatedAt.String(),
+				UpdatedAt: svc.UpdatedAt.UnixMilli(),
 				ZID:       svc.ZId,
 				Name:      svc.Name,
 				Metrics:   sparkData[svc.Name],

@@ -428,7 +428,7 @@ func init() {
           "type": "string"
         },
         "createdAt": {
-          "type": "string"
+          "type": "integer"
         },
         "description": {
           "type": "string"
@@ -437,7 +437,7 @@ func init() {
           "type": "string"
         },
         "updatedAt": {
-          "type": "string"
+          "type": "integer"
         },
         "zId": {
           "type": "string"
@@ -524,7 +524,7 @@ func init() {
           "type": "string"
         },
         "createdAt": {
-          "type": "string"
+          "type": "integer"
         },
         "frontend": {
           "type": "string"
@@ -536,7 +536,7 @@ func init() {
           "type": "string"
         },
         "updatedAt": {
-          "type": "string"
+          "type": "integer"
         },
         "zId": {
           "type": "string"
@@ -1036,7 +1036,7 @@ func init() {
           "type": "string"
         },
         "createdAt": {
-          "type": "string"
+          "type": "integer"
         },
         "description": {
           "type": "string"
@@ -1045,7 +1045,7 @@ func init() {
           "type": "string"
         },
         "updatedAt": {
-          "type": "string"
+          "type": "integer"
         },
         "zId": {
           "type": "string"
@@ -1132,7 +1132,7 @@ func init() {
           "type": "string"
         },
         "createdAt": {
-          "type": "string"
+          "type": "integer"
         },
         "frontend": {
           "type": "string"
@@ -1144,7 +1144,7 @@ func init() {
           "type": "string"
         },
         "updatedAt": {
-          "type": "string"
+          "type": "integer"
         },
         "zId": {
           "type": "string"

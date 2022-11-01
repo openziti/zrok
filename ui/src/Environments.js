@@ -2,6 +2,8 @@ import DataTable from 'react-data-table-component';
 import Services from './Services';
 
 const Environments = (props) => {
+    const humanizeDuration = require("humanize-duration")
+
     const columns = [
         {
             name: 'Description',
@@ -24,14 +26,16 @@ const Environments = (props) => {
             sortable: true,
         },
         {
-            name: 'Updated',
-            selector: row => row.environment.updatedAt,
+            name: 'Uptime',
+            selector: row => humanizeDuration(new Date().getTime() - row.environment.updatedAt),
             sortable: true,
         },
     ]
 
     const servicesComponent = ({ data }) => <Services services={data.services} />
     const servicesExpanded = row => row.services != null && row.services.length > 0
+
+    console.log('now', Date.now())
 
     return (
         <div>
