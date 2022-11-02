@@ -55,4 +55,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ~/go/bin/zrok
           asset_name: zrok-ubuntu-amd64
-          asset_type: application/octet-stream
+          asset_content_type: application/octet-stream
