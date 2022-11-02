@@ -38,5 +38,6 @@ jobs:
           version: latest
           args: release --rm-dist
           ldflags: "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}"
+          main: ./cmd/zrok
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
