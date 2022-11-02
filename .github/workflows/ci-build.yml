@@ -1,4 +1,4 @@
-name: Core Build
+name: CI Build
 
 on: [push]
 
