@@ -2,6 +2,7 @@ import DataTable from 'react-data-table-component';
 import Services from './Services';
 import Icon from "@mdi/react";
 import {mdiCloseOutline} from "@mdi/js";
+import * as identity from './api/identity';
 
 const Environments = (props) => {
     const humanizeDuration = require("humanize-duration")
@@ -9,6 +10,9 @@ const Environments = (props) => {
         console.log(envId)
         if(window.confirm('really disable environment "' + envId +'"?')) {
             console.log("will delete environment: " + envId)
+            identity.disable({body: {identity: envId}}).then(resp => {
+                console.log(resp);
+            })
         }
     }
 
