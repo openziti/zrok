@@ -5,6 +5,12 @@ import {mdiCloseOutline} from "@mdi/js";
 
 const Environments = (props) => {
     const humanizeDuration = require("humanize-duration")
+    const disableEnvironment = (envId) => {
+        console.log(envId)
+        if(window.confirm('really disable environment "' + envId +'"?')) {
+            console.log("will delete environment: " + envId)
+        }
+    }
 
     const columns = [
         {
@@ -30,7 +36,9 @@ const Environments = (props) => {
         {
             name: 'Actions',
             selector: row => <>
-                <button title={"Disable Environment '"+row.environment.zId+"'"}><Icon path={mdiCloseOutline} size={0.7}/></button>
+                <button data-value={row.environment.zId} onClick={e => disableEnvironment(row.environment.zId)} title={"Disable Environment '"+row.environment.zId+"'"}>
+                    <Icon path={mdiCloseOutline} size={0.7}/>
+                </button>
             </>
         },
         {

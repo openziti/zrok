@@ -5,6 +5,11 @@ import Icon from "@mdi/react";
 
 const Services = (props) => {
 	const humanizeDuration = require("humanize-duration")
+	const untunnelService = (svcName) => {
+		if(window.confirm('really disable service "' + svcName +'"?')) {
+			console.log("will disable serivce: " + svcName)
+		}
+	}
 
 	const columns = [
 		{
@@ -20,7 +25,9 @@ const Services = (props) => {
 		{
 			name: 'Actions',
 			selector: row => <>
-				<button title={"Disable Service '"+row.name+"'"}><Icon path={mdiCloseOutline} size={0.7}/></button>
+				<button data-value={row.name} onClick={e => untunnelService(row.name)} title={"Disable Service '"+row.name+"'"}>
+					<Icon path={mdiCloseOutline} size={0.7}/>
+				</button>
 			</>
 		},
 		{
