@@ -10,14 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: setup-go
-        uses: actions/setup-go@v3
         with:
-          go-version: 1.19.3
+          fetch-depth: 0
 
-      - name: setup-node
-        uses: actions/setup-node@v3
+      - run: git fetch --force --tags
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.19.3'
+          cache: true
+
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
@@ -29,30 +32,11 @@ jobs:
         env:
           CI: ""
 
-      - name: go install
-        run: go install -ldflags "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}" ./...
-
-      - name: test
-        run: go test -v ./...
-
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
+      - uses: goreleaser/goreleaser-action@v2
         with:
-          draft: false
-          prerelease: false
-          release_name: ${{ github.ref }}
-          tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
+          ldflags: "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}"
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: upload-ubuntu-build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ~/go/bin/zrok
-          asset_name: zrok-ubuntu-amd64
-          asset_content_type: application/octet-stream
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
