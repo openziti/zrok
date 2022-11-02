@@ -9,7 +9,6 @@ const Environments = (props) => {
     const disableEnvironment = (envId) => {
         console.log(envId)
         if(window.confirm('really disable environment "' + envId +'"?')) {
-            console.log("will delete environment: " + envId)
             identity.disable({body: {identity: envId}}).then(resp => {
                 console.log(resp);
             })
@@ -52,10 +51,8 @@ const Environments = (props) => {
         },
     ]
 
-    const servicesComponent = ({ data }) => <Services services={data.services} />
+    const servicesComponent = ({ data }) => <Services envId={data.environment.zId} services={data.services} />
     const servicesExpanded = row => row.services != null && row.services.length > 0
-
-    console.log('now', Date.now())
 
     return (
         <div>
