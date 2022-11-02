@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup-go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.3
+
+      - name: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - run: npm install
+        working-directory: ui
+
+      - run: npm run build
+        working-directory: ui
+        env:
+          CI: ""
+
+      - name: go build
+        run: go build -ldflags "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}" ./...
+
+      - name: test
+        run: go test -v ./...
+
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: upload-ubuntu-build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ~/go/bin/zrok
+          asset_name: zrok-ubuntu-amd64
+          asset_type: application/octet-stream
