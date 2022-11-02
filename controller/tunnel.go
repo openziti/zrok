@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/build"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
@@ -264,7 +265,7 @@ func (self *tunnelHandler) proxyUrl(svcName string) string {
 func (self *tunnelHandler) zrokTags(svcName string) *rest_model.Tags {
 	return &rest_model.Tags{
 		SubTags: map[string]interface{}{
-			"zrok":              version,
+			"zrok":              build.String(),
 			"zrok-service-name": svcName,
 		},
 	}

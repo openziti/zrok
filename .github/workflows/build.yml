@@ -1,9 +1,9 @@
-name: Go package
+name: Core Build
 
 on: [push]
 
 jobs:
-  build:
+  ubuntu-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
           CI: ""
 
       - name: go build
-        run: go build -v ./...
+        run: go build -ldflags "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}" ./...
 
       - name: test
         run: go test -v ./...

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/build"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
@@ -165,7 +166,7 @@ func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_manageme
 func (self *enableHandler) zrokTags() *rest_model_edge.Tags {
 	return &rest_model_edge.Tags{
 		SubTags: map[string]interface{}{
-			"zrok": version,
+			"zrok": build.String(),
 		},
 	}
 }

@@ -16,8 +16,6 @@ var str *store.Store
 var mtr *metricsAgent
 var idb influxdb2.Client
 
-const version = "v0.2.0"
-
 func Run(inCfg *Config) error {
 	cfg = inCfg
 
