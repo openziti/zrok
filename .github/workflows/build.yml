@@ -13,8 +13,19 @@ jobs:
         with:
           go-version: 1.19.3
 
-      - name: Build
+      - name: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - run: npm install
+        working-directory: ui
+
+      - run: npm run build
+        working-directory: ui
+
+      - name: go build
         run: go build -v ./...
 
-      - name: Test
+      - name: test
         run: go test -v ./...
