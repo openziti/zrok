@@ -23,6 +23,8 @@ jobs:
 
       - run: npm run build
         working-directory: ui
+        env:
+          CI: ""
 
       - name: go build
         run: go build -v ./...
