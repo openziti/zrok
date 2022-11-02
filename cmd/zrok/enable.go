@@ -99,7 +99,7 @@ func getHost() (string, string, error) {
 	return info.Hostname, thisHost, nil
 }
 
-var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166")).Background(lipgloss.Color(0))
+var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166")).Background(lipgloss.Color("0"))
 
 func showError(msg string, err error) {
 	errorLabel := errorStyle.Render("ERROR:")

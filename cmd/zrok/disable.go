@@ -6,6 +6,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -50,10 +51,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	}
 	_, err = zrok.Identity.Disable(req, auth)
 	if err != nil {
-		if !panicInstead {
-			showError("zrok service call failed", err)
-		}
-		panic(err)
+		logrus.Warnf("service cleanup failed (%v); will clean up local environment", err)
 	}
 	if err := zrokdir.DeleteEnvironment(); err != nil {
 		if !panicInstead {
