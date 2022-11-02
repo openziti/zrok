@@ -5,3 +5,5 @@ builds:
     - goarch: arm
     - goarch: arm64
     - goos: darwin
+  env:
+    - CGO_ENABLED=1
