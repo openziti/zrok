@@ -4,3 +4,4 @@ builds:
   ignore:
     - goarch: arm
     - goarch: arm64
+    - goos: darwin
