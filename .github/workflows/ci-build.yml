@@ -26,8 +26,8 @@ jobs:
         env:
           CI: ""
 
-      - name: go build
-        run: go build -ldflags "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}" ./...
+      - name: go install
+        run: go install -ldflags "-X github.com/openziti-test-kitchen/zrok/build.Version=${{ github.ref }} -X github.com/openziti-test-kitchen/zrok/build.Hash=${{ github.sha }}" ./...
 
       - name: test
         run: go test -v ./...
