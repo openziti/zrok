@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: action/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
           name: release-builds
           path: ./dist/*.gz
@@ -81,7 +81,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: action/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
           name: release-builds
           path: ./dist/*.gz
@@ -122,7 +122,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: action/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
           name: release-builds
           path: ./dist/*.gz
