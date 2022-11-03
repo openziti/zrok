@@ -1,0 +1,8 @@
+builds:
+  - skip: true
+release:
+  draft: true
+  mode: append
+  extra_files:
+    - glob: ./zrok-build/**/*
+    - glob: ./zrok-build/checksums.txt

@@ -1,9 +1,9 @@
 builds:
 - main: ./cmd/zrok
   ldflags: "-s -w -X github.com/openziti-test-kitchen/zrok/build.Version={{.Tag}} -X github.com/openziti-test-kitchen/zrok/build.Hash={{.ShortCommit}}"
-  ignore:
-    - goarch: arm
-    - goarch: arm64
-    - goos: darwin
   env:
     - CGO_ENABLED=1
+  goos:
+    - linux
+  goarch:
+    - amd64

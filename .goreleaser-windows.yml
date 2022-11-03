@@ -1,0 +1,10 @@
+builds:
+- main: ./cmd/zrok
+  ldflags: "-s -w -X github.com/openziti-test-kitchen/zrok/build.Version={{.Tag}} -X github.com/openziti-test-kitchen/zrok/build.Hash={{.ShortCommit}}"
+  env:
+    - CGO_ENABLED=1
+    - CC=/usr/bin/x86_64-w64-mingw32-gcc
+  goos:
+    - windows
+  goarch:
+    - amd64

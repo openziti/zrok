@@ -3,10 +3,10 @@ name: Release
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
-  release-build:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt-get install gcc-multilib g++-multilib
@@ -38,6 +38,85 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist
+          args: release --skip-publish --config .goreleaser-linux.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: action/upload-artifact@v3
+        with:
+          name: zrok-linux
+          path: dist/zrok*
+
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get install gcc-mingw-w64-x86-64
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - run: git fetch --force --tags
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.19.3'
+          cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - run: npm install
+        working-directory: ui
+
+      - run: npm run build
+        working-directory: ui
+        env:
+          CI: ""
+
+      - uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --skip-publish --config .goreleaser-windows.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: action/upload-artifact@v3
+        with:
+          name: zrok-windows
+          path: dist/zrok*
+
+  publish-release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: |
+          mkdir -p ./zrok-build/linux
+          mkdir -p ./zrok-build/windows
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: zrok-linux
+          path: ./zrok-build/linux
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: zrok-windows
+          path: ./zrok-build/windows
+
+      - run: |
+          cd ./zrok-build
+          cat ./linux/zrok*checksums.txt >> checksums.txt
+          cat ./windows/zrok*checksums.txt >> checksums.txt
+          rm ./linux/zrok*checksums.txt
+          rm ./windows/zrok*checksums.txt
+
+      - uses: goreleaser/goreleaser-action@v3
+        with:
+          args: release --config .goreleaser-release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
