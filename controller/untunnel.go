@@ -22,8 +22,6 @@ func newUntunnelHandler() *untunnelHandler {
 }
 
 func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("untunneling for '%v' (%v)", principal.Email, principal.Token)
-
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
@@ -99,7 +97,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		return tunnel.NewUntunnelInternalServerError()
 	}
 
-	logrus.Infof("deallocated service '%v'", svcName)
+	logrus.Debugf("deallocated service '%v'", svcName)
 
 	if err := str.DeleteService(ssvc.Id, tx); err != nil {
 		logrus.Errorf("error deactivating service '%v': %v", svcZId, err)

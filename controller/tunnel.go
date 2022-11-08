@@ -28,8 +28,6 @@ func newTunnelHandler() *tunnelHandler {
 }
 
 func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("tunneling for '%v' (%v)", principal.Email, principal.Token)
-
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
@@ -37,20 +35,20 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	envId := params.Body.ZID
-	envIdDb := 0
+	envZId := params.Body.ZID
+	envId := 0
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
 		for _, env := range envs {
-			if env.ZId == envId {
-				logrus.Infof("found identity '%v' for user '%v'", envId, principal.Email)
-				envIdDb = env.Id
+			if env.ZId == envZId {
+				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
+				envId = env.Id
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envId, principal.Email)
+			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
 			return tunnel.NewTunnelUnauthorized().WithPayload("bad environment identity")
 		}
 	} else {
@@ -68,33 +66,33 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	cfgId, err := self.createConfig(svcName, params, edge)
+	cfgId, err := self.createConfig(envZId, svcName, params, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	svcZId, err := self.createService(svcName, cfgId, edge)
+	svcZId, err := self.createService(envZId, svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServicePolicyBind(svcName, svcZId, envId, edge); err != nil {
+	if err := self.createServicePolicyBind(envZId, svcName, svcZId, envZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServicePolicyDial(svcName, svcZId, edge); err != nil {
+	if err := self.createServicePolicyDial(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := self.createServiceEdgeRouterPolicy(svcName, svcZId, edge); err != nil {
+	if err := self.createServiceEdgeRouterPolicy(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
 
-	logrus.Infof("allocated service '%v'", svcName)
+	logrus.Debugf("allocated service '%v'", svcName)
 
 	frontendUrl := self.proxyUrl(svcName)
-	sid, err := str.CreateService(envIdDb, &store.Service{
+	sid, err := str.CreateService(envId, &store.Service{
 		ZId:      svcZId,
 		Name:     svcName,
 		Frontend: frontendUrl,
@@ -109,7 +107,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 		logrus.Errorf("error committing service record: %v", err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcZId, sid, principal.Email)
+	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcName, sid, principal.Email)
 
 	return tunnel.NewTunnelCreated().WithPayload(&rest_model_zrok.TunnelResponse{
 		ProxyEndpoint: frontendUrl,
@@ -117,7 +115,7 @@ func (self *tunnelHandler) Handle(params tunnel.TunnelParams, principal *rest_mo
 	})
 }
 
-func (self *tunnelHandler) createConfig(svcName string, params tunnel.TunnelParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+func (self *tunnelHandler) createConfig(envZId, svcName string, params tunnel.TunnelParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
 	authScheme, err := model.ParseAuthScheme(params.Body.AuthScheme)
 	if err != nil {
 		return "", err
@@ -146,11 +144,11 @@ func (self *tunnelHandler) createConfig(svcName string, params tunnel.TunnelPara
 	if err != nil {
 		return "", err
 	}
-	logrus.Infof("created config '%v'", cfgResp.Payload.Data.ID)
+	logrus.Infof("created config '%v' for environment '%v'", cfgResp.Payload.Data.ID, envZId)
 	return cfgResp.Payload.Data.ID, nil
 }
 
-func (self *tunnelHandler) createService(svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+func (self *tunnelHandler) createService(envZId, svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
 	configs := []string{cfgId}
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
@@ -168,16 +166,16 @@ func (self *tunnelHandler) createService(svcName, cfgId string, edge *rest_manag
 	if err != nil {
 		return "", err
 	}
-	logrus.Infof("created service '%v'", resp.Payload.Data.ID)
+	logrus.Infof("created zrok service named '%v' (with ziti id '%v') for environment '%v'", svcName, resp.Payload.Data.ID, envZId)
 	return resp.Payload.Data.ID, nil
 }
 
-func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (self *tunnelHandler) createServicePolicyBind(envZId, svcName, svcZId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{fmt.Sprintf("@%v", envId)}
 	name := fmt.Sprintf("%v-backend", svcName)
 	postureCheckRoles := []string{}
-	serviceRoles := []string{fmt.Sprintf("@%v", svcId)}
+	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
 	dialBind := rest_model.DialBindBind
 	svcp := &rest_model.ServicePolicyCreate{
 		IdentityRoles:     identityRoles,
@@ -197,11 +195,11 @@ func (self *tunnelHandler) createServicePolicyBind(svcName, svcId, envId string,
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service policy '%v'", resp.Payload.Data.ID)
+	logrus.Infof("created bind service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
 	return nil
 }
 
-func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (self *tunnelHandler) createServicePolicyDial(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var identityRoles []string
 	for _, proxyIdentity := range cfg.Proxy.Identities {
 		identityRoles = append(identityRoles, "@"+proxyIdentity)
@@ -210,7 +208,7 @@ func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *
 	name := fmt.Sprintf("%v-dial", svcName)
 	postureCheckRoles := []string{}
 	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcId)}
+	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
 	dialBind := rest_model.DialBindDial
 	svcp := &rest_model.ServicePolicyCreate{
 		IdentityRoles:     identityRoles,
@@ -230,14 +228,14 @@ func (self *tunnelHandler) createServicePolicyDial(svcName, svcId string, edge *
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service policy '%v'", resp.Payload.Data.ID)
+	logrus.Infof("created dial service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
 	return nil
 }
 
-func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (self *tunnelHandler) createServiceEdgeRouterPolicy(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcId)}
+	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
 	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
 		EdgeRouterRoles: edgeRouterRoles,
 		Name:            &svcName,
@@ -254,7 +252,7 @@ func (self *tunnelHandler) createServiceEdgeRouterPolicy(svcName, svcId string, 
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service edge router policy '%v'", resp.Payload.Data.ID)
+	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
 	return nil
 }
 
