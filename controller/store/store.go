@@ -51,7 +51,7 @@ func Open(cfg *Config) (*Store, error) {
 	default:
 		return nil, errors.Errorf("unknown database type '%v' (supported: sqlite3, postgres)", cfg.Type)
 	}
-	logrus.Infof("opened database '%v'", cfg.Path)
+	logrus.Info("database connected")
 	dbx.MapperFunc(strcase.ToSnake)
 
 	store := &Store{cfg: cfg, db: dbx}
