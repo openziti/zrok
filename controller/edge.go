@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func deleteServiceEdgeRouterPolicy(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
@@ -40,22 +40,22 @@ func deleteServiceEdgeRouterPolicy(svcName string, edge *rest_management_api_cli
 		if err != nil {
 			return err
 		}
-		logrus.Infof("deleted service edge router policy '%v'", serpId)
+		logrus.Infof("deleted service edge router policy '%v' for environment '%v'", serpId, envZId)
 	} else {
 		logrus.Infof("did not find a service edge router policy")
 	}
 	return nil
 }
 
-func deleteServicePolicyBind(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(fmt.Sprintf("name=\"%v-backend\"", svcName), edge)
+func deleteServicePolicyBind(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return deleteServicePolicy(envZId, fmt.Sprintf("name=\"%v-backend\"", svcName), edge)
 }
 
-func deleteServicePolicyDial(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(fmt.Sprintf("name=\"%v-dial\"", svcName), edge)
+func deleteServicePolicyDial(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return deleteServicePolicy(envZId, fmt.Sprintf("name=\"%v-dial\"", svcName), edge)
 }
 
-func deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func deleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &service_policy.ListServicePoliciesParams{
@@ -80,14 +80,14 @@ func deleteServicePolicy(filter string, edge *rest_management_api_client.ZitiEdg
 		if err != nil {
 			return err
 		}
-		logrus.Infof("deleted service policy '%v'", spId)
+		logrus.Infof("deleted service policy '%v' for environment '%v'", spId, envZId)
 	} else {
 		logrus.Infof("did not find a service policy")
 	}
 	return nil
 }
 
-func deleteConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func deleteConfig(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(0)
 	offset := int64(0)
@@ -112,12 +112,12 @@ func deleteConfig(svcName string, edge *rest_management_api_client.ZitiEdgeManag
 		if err != nil {
 			return err
 		}
-		logrus.Infof("deleted config '%v'", *cfg.ID)
+		logrus.Infof("deleted config '%v' for '%v'", *cfg.ID, envZId)
 	}
 	return nil
 }
 
-func deleteService(svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func deleteService(envZId, svcId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	req := &service.DeleteServiceParams{
 		ID:      svcId,
 		Context: context.Background(),
@@ -127,12 +127,12 @@ func deleteService(svcId string, edge *rest_management_api_client.ZitiEdgeManage
 	if err != nil {
 		return err
 	}
-	logrus.Infof("deleted service '%v'", svcId)
+	logrus.Infof("deleted service '%v' for environment '%v'", svcId, envZId)
 	return nil
 }
 
-func deleteEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"zrok-%v\"", id)
+func deleteEdgeRouterPolicy(envZId, id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("name=\"%v\"", id)
 	limit := int64(0)
 	offset := int64(0)
 	listReq := &edge_router_policy.ListEdgeRouterPoliciesParams{
@@ -156,7 +156,7 @@ func deleteEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdge
 		if err != nil {
 			return err
 		}
-		logrus.Infof("deleted edge router policy '%v'", erpId)
+		logrus.Infof("deleted edge router policy '%v' for environment '%v'", erpId, envZId)
 	} else {
 		logrus.Infof("found '%d' edge router policies, expected 1", len(listResp.Payload.Data))
 	}
@@ -173,6 +173,6 @@ func deleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManageme
 	if err != nil {
 		return err
 	}
-	logrus.Infof("deleted identity '%v'", id)
+	logrus.Infof("deleted environment identity '%v'", id)
 	return nil
 }

@@ -78,23 +78,23 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		return tunnel.NewUntunnelInternalServerError()
 	}
 
-	if err := deleteServiceEdgeRouterPolicy(svcName, edge); err != nil {
+	if err := deleteServiceEdgeRouterPolicy(senv.ZId, svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
-	if err := deleteServicePolicyDial(svcName, edge); err != nil {
+	if err := deleteServicePolicyDial(senv.ZId, svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
-	if err := deleteServicePolicyBind(svcName, edge); err != nil {
+	if err := deleteServicePolicyBind(senv.ZId, svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}
-	if err := deleteConfig(svcName, edge); err != nil {
+	if err := deleteConfig(senv.ZId, svcName, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewTunnelInternalServerError()
 	}
-	if err := deleteService(svcZId, edge); err != nil {
+	if err := deleteService(senv.ZId, svcZId, edge); err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
 	}

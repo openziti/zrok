@@ -69,7 +69,7 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 		logrus.Errorf("error committing: %v", err)
 		return identity.NewCreateAccountInternalServerError()
 	}
-	logrus.Infof("recorded identity '%v' with id '%v' for '%v'", ident.Payload.Data.ID, envId, principal.Email)
+	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
 
 	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,
@@ -159,7 +159,7 @@ func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_manageme
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created edge router policy '%v'", resp.Payload.Data.ID)
+	logrus.Infof("created edge router policy '%v' for ziti identity '%v'", resp.Payload.Data.ID, id)
 	return nil
 }
 
