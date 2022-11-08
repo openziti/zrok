@@ -21,7 +21,7 @@ func newUntunnelHandler() *untunnelHandler {
 	return &untunnelHandler{}
 }
 
-func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
@@ -35,7 +35,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 		return tunnel.NewUntunnelInternalServerError()
 	}
 	svcName := params.Body.SvcName
-	svcZId, err := self.findServiceZId(svcName, edge)
+	svcZId, err := h.findServiceZId(svcName, edge)
 	if err != nil {
 		logrus.Error(err)
 		return tunnel.NewUntunnelInternalServerError()
@@ -111,7 +111,7 @@ func (self *untunnelHandler) Handle(params tunnel.UntunnelParams, principal *res
 	return tunnel.NewUntunnelOK()
 }
 
-func (_ *untunnelHandler) findServiceZId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+func (h *untunnelHandler) findServiceZId(svcName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	filter := fmt.Sprintf("name=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
