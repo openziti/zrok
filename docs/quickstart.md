@@ -49,6 +49,11 @@ $ ziti edge create service metrics
 New service metrics created with id: 56y5AFsKmSsIWLsmFNBeJz
 ```
 
+### create service edge router policy for metrics service
+```
+$ ziti edge create serp ctrl-public --service-roles "@metrics" --edge-router-roles "#all"
+```
+
 ### allow the controller to bind the metrics service
 ```
 $ ziti edge create sp ctrl-bind Bind --identity-roles "@ctrl" --service-roles "@metrics"

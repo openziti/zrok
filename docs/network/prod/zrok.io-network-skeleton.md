@@ -35,7 +35,7 @@
     `pki_client_server`:
 
     ```
-    $ ziti pki create server --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --server-file=ctrl-server --dns="ziti.zrok.io,localhost" --ip="0.0.0.0,10.0.0.41,127.0.01" --server-name="zrok.io controller server"
+    $ ziti pki create server --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --server-file=ctrl-server --dns="ziti.dev.zrok.io,localhost" --ip="0.0.0.0,10.0.0.41,127.0.01" --server-name="zrok.io controller server"
     $ ziti pki create client --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --client-file=ctrl-client --key-file=ctrl-server --client-name="zrok.io controller client"
     ```
 
@@ -44,7 +44,7 @@
     `pki_client_server`:
 
     ```
-    $ ziti pki create server --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --server-file=router0-server --dns="ziti.zrok.io,localhost" --ip="0.0.0.0,10.0.0.41,127.0.01" --server-name="zrok.io router0 server"
+    $ ziti pki create server --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --server-file=router0-server --dns="ziti.dev.zrok.io,localhost" --ip="0.0.0.0,10.0.0.41,127.0.01" --server-name="zrok.io router0 server"
     $ ziti pki create client --pki-root=/home/ubuntu/local/etc/zrok.io/pki --ca-name=intermediate --client-file=router0-client --key-file=router0-server --client-name="zrok.io router0 client"
     ```
 
