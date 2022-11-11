@@ -1,3 +1,3 @@
-## v0.2.0
+# v0.2.18
 
-* Automated build infrastructure.
+* First official release in the `v0.2.x` series. 

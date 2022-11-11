@@ -1,6 +1,6 @@
 # zrok
 
-`zrok` is a service designed to provide frictionless access to ephemeral, geo-scale reverse proxy capabilities.
+`zrok` is a service designed to provide frictionless access to ephemeral, geo-scale reverse proxy capabilities. `zrok` is implemented on top of OpenZiti as a _Ziti Native Application_.
 
 ## Characteristics
 
@@ -8,7 +8,7 @@
 
 ### Frictionless
 
-`zrok` is designed to provide a "frictionless" experience. A single binary and a single command are all that is required to take advantage of all of the power of `zrok`.
+`zrok` is designed to provide a "frictionless" experience. Only a single binary and a single command are required to take advantage of all of the power of `zrok`.
 
 `zrok` works in a large number environments: developer shells, container sidecars, serverless environments, webhooks.
 
