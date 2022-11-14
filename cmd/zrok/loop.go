@@ -85,16 +85,18 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 	}
 	totalMismatches := 0
 	totalXfer := int64(0)
+	totalLoops := int64(0)
 	for _, l := range loopers {
 		deltaSeconds := l.stopTime.Sub(l.startTime).Seconds()
 		xfer := int64(float64(l.bytes) / deltaSeconds)
 		totalXfer += xfer
 		totalMismatches += l.mismatches
 		xferSec := util.BytesToSize(xfer)
-		logrus.Infof("looper #%d: %d mismatches, %s/sec", l.id, l.mismatches, xferSec)
+		totalLoops += l.loops
+		logrus.Infof("looper #%d: %d loops, %d mismatches, %s/sec", l.id, l.loops, l.mismatches, xferSec)
 	}
 	totalXferSec := util.BytesToSize(totalXfer)
-	logrus.Infof("total: %d mismatches, %s/sec", totalMismatches, totalXferSec)
+	logrus.Infof("total: %d loops, %d mismatches, %s/sec", totalLoops, totalMismatches, totalXferSec)
 	os.Exit(0)
 }
 
@@ -111,6 +113,7 @@ type looper struct {
 	auth          runtime.ClientAuthInfoWriter
 	mismatches    int
 	bytes         int64
+	loops         int64
 	startTime     time.Time
 	stopTime      time.Time
 	stop          bool
@@ -241,6 +244,7 @@ func (l *looper) iterate() {
 			pacingMs = rand.Intn(l.cmd.maxPacingMs-l.cmd.minPacingMs) + l.cmd.minPacingMs
 			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		l.loops++
 	}
 }
 
