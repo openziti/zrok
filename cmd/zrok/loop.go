@@ -20,6 +20,9 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -69,6 +72,14 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 		loopers = append(loopers, l)
 		go l.run()
 	}
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		for _, looper := range loopers {
+			looper.stop = true
+		}
+	}()
 	for _, l := range loopers {
 		<-l.done
 	}
@@ -84,6 +95,7 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 	}
 	totalXferSec := util.BytesToSize(totalXfer)
 	logrus.Infof("total: %d mismatches, %s/sec", totalMismatches, totalXferSec)
+	os.Exit(0)
 }
 
 type looper struct {
@@ -101,6 +113,7 @@ type looper struct {
 	bytes         int64
 	startTime     time.Time
 	stopTime      time.Time
+	stop          bool
 }
 
 func newLooper(id int, cmd *loopCmd) *looper {
@@ -193,7 +206,7 @@ func (l *looper) iterate() {
 	l.startTime = time.Now()
 	defer func() { l.stopTime = time.Now() }()
 
-	for i := 0; i < l.cmd.iterations; i++ {
+	for i := 0; i < l.cmd.iterations && !l.stop; i++ {
 		if i > 0 && i%l.cmd.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
