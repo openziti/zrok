@@ -6,7 +6,9 @@ The `zrok` model has been extended to include support for both a "public share" 
 
 ### Underlying Schema Changes
 
-
+* Added new `frontends` table
+* Added new `availability_type` enumeration for use in the new `frontends` table
+* Made the `account_id` column of the `environments` table `NULL`-able; a `NULL` value in the `account_id` column signifies an "ephemeral" environment
 
 ## Loop Test Shutdown Hook
 
