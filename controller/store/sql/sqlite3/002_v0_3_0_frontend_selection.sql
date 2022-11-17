@@ -2,7 +2,7 @@
 
 create table frontends (
   id                    serial              primary key,
-  environment_id        integer             references environments(id),
+  environment_id        integer             not null references environments(id),
   z_id                  varchar(32)         not null unique,
   name                  varchar(64)         unique,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
