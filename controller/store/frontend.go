@@ -34,7 +34,7 @@ func (str *Store) GetFrontend(id int, tx *sqlx.Tx) (*Frontend, error) {
 
 func (str *Store) FindFrontendNamed(name string, tx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
-	if err := tx.QueryRowx("select frontends.* from frontends where name = $1", name).Scan(i); err != nil {
+	if err := tx.QueryRowx("select frontends.* from frontends where name = $1", name).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by name")
 	}
 	return i, nil
