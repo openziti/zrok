@@ -7,7 +7,7 @@ import (
 
 type Environment struct {
 	Model
-	AccountId   int
+	AccountId   *int
 	Description string
 	Host        string
 	Address     string
@@ -22,6 +22,18 @@ func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx)
 	var id int
 	if err := stmt.QueryRow(accountId, i.Description, i.Host, i.Address, i.ZId).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing environments insert statement")
+	}
+	return id, nil
+}
+
+func (self *Store) CreateEphemeralEnvironment(i *Environment, tx *sqlx.Tx) (int, error) {
+	stmt, err := tx.Prepare("insert into environments (description, host, address, z_id) values ($1, $2, $3, $4) returning id")
+	if err != nil {
+		return 0, errors.Wrap(err, "error preparing environments (ephemeral) insert statement")
+	}
+	var id int
+	if err := stmt.QueryRow(i.Description, i.Host, i.Address, i.ZId).Scan(&id); err != nil {
+		return 0, errors.Wrap(err, "error executing environments (ephemeral) insert statement")
 	}
 	return id, nil
 }
