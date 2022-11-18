@@ -106,7 +106,7 @@
  */
 
 /**
- * @typedef tunnelRequest
+ * @typedef shareRequest
  * @memberof module:types
  * 
  * @property {string} zId 
@@ -116,7 +116,7 @@
  */
 
 /**
- * @typedef tunnelResponse
+ * @typedef shareResponse
  * @memberof module:types
  * 
  * @property {string} proxyEndpoint 
@@ -124,7 +124,7 @@
  */
 
 /**
- * @typedef untunnelRequest
+ * @typedef unshareRequest
  * @memberof module:types
  * 
  * @property {string} zId 

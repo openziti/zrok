@@ -12,30 +12,30 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// UntunnelRequest untunnel request
+// ShareResponse share response
 //
-// swagger:model untunnelRequest
-type UntunnelRequest struct {
+// swagger:model shareResponse
+type ShareResponse struct {
+
+	// proxy endpoint
+	ProxyEndpoint string `json:"proxyEndpoint,omitempty"`
 
 	// svc name
 	SvcName string `json:"svcName,omitempty"`
-
-	// z Id
-	ZID string `json:"zId,omitempty"`
 }
 
-// Validate validates this untunnel request
-func (m *UntunnelRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this share response
+func (m *ShareResponse) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this untunnel request based on context it is used
-func (m *UntunnelRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this share response based on context it is used
+func (m *ShareResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *UntunnelRequest) MarshalBinary() ([]byte, error) {
+func (m *ShareResponse) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -43,8 +43,8 @@ func (m *UntunnelRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *UntunnelRequest) UnmarshalBinary(b []byte) error {
-	var res UntunnelRequest
+func (m *ShareResponse) UnmarshalBinary(b []byte) error {
+	var res ShareResponse
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

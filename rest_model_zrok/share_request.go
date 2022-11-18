@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// TunnelRequest tunnel request
+// ShareRequest share request
 //
-// swagger:model tunnelRequest
-type TunnelRequest struct {
+// swagger:model shareRequest
+type ShareRequest struct {
 
 	// auth scheme
 	AuthScheme string `json:"authScheme,omitempty"`
@@ -32,8 +32,8 @@ type TunnelRequest struct {
 	ZID string `json:"zId,omitempty"`
 }
 
-// Validate validates this tunnel request
-func (m *TunnelRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this share request
+func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAuthUsers(formats); err != nil {
@@ -46,7 +46,7 @@ func (m *TunnelRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *TunnelRequest) validateAuthUsers(formats strfmt.Registry) error {
+func (m *ShareRequest) validateAuthUsers(formats strfmt.Registry) error {
 	if swag.IsZero(m.AuthUsers) { // not required
 		return nil
 	}
@@ -72,8 +72,8 @@ func (m *TunnelRequest) validateAuthUsers(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this tunnel request based on the context it is used
-func (m *TunnelRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this share request based on the context it is used
+func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateAuthUsers(ctx, formats); err != nil {
@@ -86,7 +86,7 @@ func (m *TunnelRequest) ContextValidate(ctx context.Context, formats strfmt.Regi
 	return nil
 }
 
-func (m *TunnelRequest) contextValidateAuthUsers(ctx context.Context, formats strfmt.Registry) error {
+func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(m.AuthUsers); i++ {
 
@@ -107,7 +107,7 @@ func (m *TunnelRequest) contextValidateAuthUsers(ctx context.Context, formats st
 }
 
 // MarshalBinary interface implementation
-func (m *TunnelRequest) MarshalBinary() ([]byte, error) {
+func (m *ShareRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -115,8 +115,8 @@ func (m *TunnelRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *TunnelRequest) UnmarshalBinary(b []byte) error {
-	var res TunnelRequest
+func (m *ShareRequest) UnmarshalBinary(b []byte) error {
+	var res ShareRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

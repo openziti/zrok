@@ -236,7 +236,7 @@ func init() {
         }
       }
     },
-    "/tunnel": {
+    "/share": {
       "post": {
         "security": [
           {
@@ -244,30 +244,27 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "service"
         ],
-        "operationId": "tunnel",
+        "operationId": "share",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/tunnelRequest"
+              "$ref": "#/definitions/shareRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "tunnel created",
+            "description": "service created",
             "schema": {
-              "$ref": "#/definitions/tunnelResponse"
+              "$ref": "#/definitions/shareResponse"
             }
           },
           "401": {
-            "description": "invalid environment identity",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error",
@@ -278,7 +275,7 @@ func init() {
         }
       }
     },
-    "/untunnel": {
+    "/unshare": {
       "delete": {
         "security": [
           {
@@ -286,27 +283,27 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "service"
         ],
-        "operationId": "untunnel",
+        "operationId": "unshare",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/untunnelRequest"
+              "$ref": "#/definitions/unshareRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "tunnel removed"
+            "description": "service removed"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "404": {
-            "description": "not found",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -555,7 +552,7 @@ func init() {
         "$ref": "#/definitions/service"
       }
     },
-    "tunnelRequest": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "authScheme": {
@@ -575,7 +572,7 @@ func init() {
         }
       }
     },
-    "tunnelResponse": {
+    "shareResponse": {
       "type": "object",
       "properties": {
         "proxyEndpoint": {
@@ -586,7 +583,7 @@ func init() {
         }
       }
     },
-    "untunnelRequest": {
+    "unshareRequest": {
       "type": "object",
       "properties": {
         "svcName": {
@@ -844,7 +841,7 @@ func init() {
         }
       }
     },
-    "/tunnel": {
+    "/share": {
       "post": {
         "security": [
           {
@@ -852,30 +849,27 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "service"
         ],
-        "operationId": "tunnel",
+        "operationId": "share",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/tunnelRequest"
+              "$ref": "#/definitions/shareRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "tunnel created",
+            "description": "service created",
             "schema": {
-              "$ref": "#/definitions/tunnelResponse"
+              "$ref": "#/definitions/shareResponse"
             }
           },
           "401": {
-            "description": "invalid environment identity",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error",
@@ -886,7 +880,7 @@ func init() {
         }
       }
     },
-    "/untunnel": {
+    "/unshare": {
       "delete": {
         "security": [
           {
@@ -894,27 +888,27 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "service"
         ],
-        "operationId": "untunnel",
+        "operationId": "unshare",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/untunnelRequest"
+              "$ref": "#/definitions/unshareRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "tunnel removed"
+            "description": "service removed"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "404": {
-            "description": "not found",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -1163,7 +1157,7 @@ func init() {
         "$ref": "#/definitions/service"
       }
     },
-    "tunnelRequest": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "authScheme": {
@@ -1183,7 +1177,7 @@ func init() {
         }
       }
     },
-    "tunnelResponse": {
+    "shareResponse": {
       "type": "object",
       "properties": {
         "proxyEndpoint": {
@@ -1194,7 +1188,7 @@ func init() {
         }
       }
     },
-    "untunnelRequest": {
+    "unshareRequest": {
       "type": "object",
       "properties": {
         "svcName": {

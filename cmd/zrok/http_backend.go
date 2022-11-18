@@ -10,7 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/endpoints/backend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
@@ -101,8 +101,8 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := tunnel.NewTunnelParams()
-	req.Body = &rest_model_zrok.TunnelRequest{
+	req := service.NewShareParams()
+	req.Body = &rest_model_zrok.ShareRequest{
 		ZID:        env.ZId,
 		Endpoint:   cfg.EndpointAddress,
 		AuthScheme: string(model.None),
@@ -119,7 +119,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	}
-	resp, err := zrok.Tunnel.Tunnel(req, auth)
+	resp, err := zrok.Service.Share(req, auth)
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
@@ -225,12 +225,12 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 
 func (self *httpBackendCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", cfg.Service)
-	req := tunnel.NewUntunnelParams()
-	req.Body = &rest_model_zrok.UntunnelRequest{
+	req := service.NewUnshareParams()
+	req.Body = &rest_model_zrok.UnshareRequest{
 		ZID:     id,
 		SvcName: cfg.Service,
 	}
-	if _, err := zrok.Tunnel.Untunnel(req, auth); err == nil {
+	if _, err := zrok.Service.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
 	} else {
 		logrus.Errorf("error shutting down: %v", err)

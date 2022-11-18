@@ -34,8 +34,8 @@ func Run(inCfg *Config) error {
 	api.IdentityVerifyHandler = newVerifyHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
-	api.TunnelTunnelHandler = newTunnelHandler()
-	api.TunnelUntunnelHandler = newUntunnelHandler()
+	api.ServiceShareHandler = newShareHandler()
+	api.ServiceUnshareHandler = newUnshareHandler()
 
 	if err := controllerStartup(); err != nil {
 		return err

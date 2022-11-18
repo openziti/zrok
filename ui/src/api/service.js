@@ -1,39 +1,39 @@
-/** @module tunnel */
+/** @module service */
 // Auto-generated, edits will be overwritten
 import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
- * @param {module:types.tunnelRequest} [options.body] 
- * @return {Promise<module:types.tunnelResponse>} tunnel created
+ * @param {module:types.shareRequest} [options.body] 
+ * @return {Promise<module:types.shareResponse>} service created
  */
-export function tunnel(options) {
+export function share(options) {
   if (!options) options = {}
   const parameters = {
     body: {
       body: options.body
     }
   }
-  return gateway.request(tunnelOperation, parameters)
+  return gateway.request(shareOperation, parameters)
 }
 
 /**
  * @param {object} options Optional options
- * @param {module:types.untunnelRequest} [options.body] 
- * @return {Promise<object>} tunnel removed
+ * @param {module:types.unshareRequest} [options.body] 
+ * @return {Promise<object>} service removed
  */
-export function untunnel(options) {
+export function unshare(options) {
   if (!options) options = {}
   const parameters = {
     body: {
       body: options.body
     }
   }
-  return gateway.request(untunnelOperation, parameters)
+  return gateway.request(unshareOperation, parameters)
 }
 
-const tunnelOperation = {
-  path: '/tunnel',
+const shareOperation = {
+  path: '/share',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
   security: [
@@ -43,8 +43,8 @@ const tunnelOperation = {
   ]
 }
 
-const untunnelOperation = {
-  path: '/untunnel',
+const unshareOperation = {
+  path: '/unshare',
   contentTypes: ['application/zrok.v1+json'],
   method: 'delete',
   security: [

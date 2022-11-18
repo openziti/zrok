@@ -8,7 +8,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -182,14 +182,14 @@ func (l *looper) startup() {
 		panic(err)
 	}
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
-	tunnelReq := tunnel.NewTunnelParams()
-	tunnelReq.Body = &rest_model_zrok.TunnelRequest{
+	tunnelReq := service.NewShareParams()
+	tunnelReq.Body = &rest_model_zrok.ShareRequest{
 		ZID:        l.env.ZId,
 		Endpoint:   fmt.Sprintf("looper#%d", l.id),
 		AuthScheme: string(model.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
-	tunnelResp, err := l.zrok.Tunnel.Tunnel(tunnelReq, l.auth)
+	tunnelResp, err := l.zrok.Service.Share(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
 	}
@@ -255,12 +255,12 @@ func (l *looper) shutdown() {
 		}
 	}
 
-	untunnelReq := tunnel.NewUntunnelParams()
-	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
+	untunnelReq := service.NewUnshareParams()
+	untunnelReq.Body = &rest_model_zrok.UnshareRequest{
 		ZID:     l.env.ZId,
 		SvcName: l.service,
 	}
-	if _, err := l.zrok.Tunnel.Untunnel(untunnelReq, l.auth); err != nil {
+	if _, err := l.zrok.Service.Unshare(untunnelReq, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
 	}
 }

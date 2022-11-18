@@ -22,7 +22,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 )
 
 // NewZrokAPI creates a new Zrok instance
@@ -65,11 +65,11 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityRegisterHandler: identity.RegisterHandlerFunc(func(params identity.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Register has not yet been implemented")
 		}),
-		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
+		ServiceShareHandler: service.ShareHandlerFunc(func(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation service.Share has not yet been implemented")
 		}),
-		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation tunnel.Untunnel has not yet been implemented")
+		ServiceUnshareHandler: service.UnshareHandlerFunc(func(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation service.Unshare has not yet been implemented")
 		}),
 		IdentityVerifyHandler: identity.VerifyHandlerFunc(func(params identity.VerifyParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Verify has not yet been implemented")
@@ -139,10 +139,10 @@ type ZrokAPI struct {
 	MetadataOverviewHandler metadata.OverviewHandler
 	// IdentityRegisterHandler sets the operation handler for the register operation
 	IdentityRegisterHandler identity.RegisterHandler
-	// TunnelTunnelHandler sets the operation handler for the tunnel operation
-	TunnelTunnelHandler tunnel.TunnelHandler
-	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
-	TunnelUntunnelHandler tunnel.UntunnelHandler
+	// ServiceShareHandler sets the operation handler for the share operation
+	ServiceShareHandler service.ShareHandler
+	// ServiceUnshareHandler sets the operation handler for the unshare operation
+	ServiceUnshareHandler service.UnshareHandler
 	// IdentityVerifyHandler sets the operation handler for the verify operation
 	IdentityVerifyHandler identity.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
@@ -246,11 +246,11 @@ func (o *ZrokAPI) Validate() error {
 	if o.IdentityRegisterHandler == nil {
 		unregistered = append(unregistered, "identity.RegisterHandler")
 	}
-	if o.TunnelTunnelHandler == nil {
-		unregistered = append(unregistered, "tunnel.TunnelHandler")
+	if o.ServiceShareHandler == nil {
+		unregistered = append(unregistered, "service.ShareHandler")
 	}
-	if o.TunnelUntunnelHandler == nil {
-		unregistered = append(unregistered, "tunnel.UntunnelHandler")
+	if o.ServiceUnshareHandler == nil {
+		unregistered = append(unregistered, "service.UnshareHandler")
 	}
 	if o.IdentityVerifyHandler == nil {
 		unregistered = append(unregistered, "identity.VerifyHandler")
@@ -384,11 +384,11 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/tunnel"] = tunnel.NewTunnel(o.context, o.TunnelTunnelHandler)
+	o.handlers["POST"]["/share"] = service.NewShare(o.context, o.ServiceShareHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/untunnel"] = tunnel.NewUntunnel(o.context, o.TunnelUntunnelHandler)
+	o.handlers["DELETE"]["/unshare"] = service.NewUnshare(o.context, o.ServiceUnshareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
