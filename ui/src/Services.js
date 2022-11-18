@@ -2,13 +2,13 @@ import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from 'react-sparklines';
 import {mdiCloseOutline} from "@mdi/js";
 import Icon from "@mdi/react";
-import * as tunnel from './api/tunnel';
+import * as service from './api/service';
 
 const Services = (props) => {
 	const humanizeDuration = require("humanize-duration")
-	const untunnelService = (envId, svcName) => {
+	const unshareService = (envId, svcName) => {
 		if(window.confirm('really disable service "' + svcName +'"?')) {
-			tunnel.untunnel({body: {zId: envId, svcName: svcName}}).then(resp => {
+			service.unshare({body: {zId: envId, svcName: svcName}}).then(resp => {
 				console.log(resp)
 			})
 		}
@@ -28,7 +28,7 @@ const Services = (props) => {
 		{
 			name: 'Actions',
 			selector: row => <>
-				<button data-value={row.name} onClick={e => untunnelService(props.envId, row.name)} title={"Disable Service '"+row.name+"'"}>
+				<button data-value={row.name} onClick={e => unshareService(props.envId, row.name)} title={"Un-share Service '"+row.name+"'"}>
 					<Icon path={mdiCloseOutline} size={0.7}/>
 				</button>
 			</>
