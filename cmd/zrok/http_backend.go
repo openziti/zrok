@@ -103,9 +103,9 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := service.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		ZID:        env.ZId,
-		Endpoint:   cfg.EndpointAddress,
-		AuthScheme: string(model.None),
+		ZID:                  env.ZId,
+		BackendProxyEndpoint: cfg.EndpointAddress,
+		AuthScheme:           string(model.None),
 	}
 	if len(self.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
@@ -162,7 +162,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 		p := widgets.NewParagraph()
 		p.Border = true
 		p.Title = " access your zrok service "
-		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.ProxyEndpoint))/2)-1), resp.Payload.ProxyEndpoint)
+		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoint))/2)-1), resp.Payload.FrontendProxyEndpoint)
 		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
 		p.PaddingTop = 1
 		p.SetRect(5, 5, w-10, 10)
@@ -216,7 +216,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
-		logrus.Infof("access your zrok service: %v", resp.Payload.ProxyEndpoint)
+		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendProxyEndpoint)
 		for {
 			time.Sleep(30 * time.Second)
 		}

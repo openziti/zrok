@@ -96,7 +96,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 		ZId:      svcZId,
 		Name:     svcName,
 		Frontend: frontendUrl,
-		Backend:  params.Body.Endpoint,
+		Backend:  params.Body.BackendProxyEndpoint,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
@@ -110,8 +110,8 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcName, sid, principal.Email)
 
 	return service.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
-		ProxyEndpoint: frontendUrl,
-		SvcName:       svcName,
+		FrontendProxyEndpoint: frontendUrl,
+		SvcName:               svcName,
 	})
 }
 

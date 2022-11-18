@@ -364,7 +364,17 @@ definitions:
     properties:
       zId:
         type: string
-      endpoint:
+      shareMode:
+        type: string
+        enum: ["public", "private"]
+      frontendSelection:
+        type: array
+        items:
+          type: string
+      backendMode:
+        type: string
+        enum: ["proxy", "web", "dav"]
+      backendProxyEndpoint:
         type: string
       authScheme:
         type: string
@@ -375,7 +385,7 @@ definitions:
   shareResponse:
     type: object
     properties:
-      proxyEndpoint:
+      frontendProxyEndpoint:
         type: string
       svcName:
         type: string

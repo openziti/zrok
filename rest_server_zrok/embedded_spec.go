@@ -564,8 +564,29 @@ func init() {
             "$ref": "#/definitions/authUser"
           }
         },
-        "endpoint": {
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "dav"
+          ]
+        },
+        "backendProxyEndpoint": {
           "type": "string"
+        },
+        "frontendSelection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
         },
         "zId": {
           "type": "string"
@@ -575,7 +596,7 @@ func init() {
     "shareResponse": {
       "type": "object",
       "properties": {
-        "proxyEndpoint": {
+        "frontendProxyEndpoint": {
           "type": "string"
         },
         "svcName": {
@@ -1169,8 +1190,29 @@ func init() {
             "$ref": "#/definitions/authUser"
           }
         },
-        "endpoint": {
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "dav"
+          ]
+        },
+        "backendProxyEndpoint": {
           "type": "string"
+        },
+        "frontendSelection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
         },
         "zId": {
           "type": "string"
@@ -1180,7 +1222,7 @@ func init() {
     "shareResponse": {
       "type": "object",
       "properties": {
-        "proxyEndpoint": {
+        "frontendProxyEndpoint": {
           "type": "string"
         },
         "svcName": {

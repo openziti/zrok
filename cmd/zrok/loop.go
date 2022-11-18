@@ -184,9 +184,9 @@ func (l *looper) startup() {
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
 	tunnelReq := service.NewShareParams()
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
-		ZID:        l.env.ZId,
-		Endpoint:   fmt.Sprintf("looper#%d", l.id),
-		AuthScheme: string(model.None),
+		ZID:                  l.env.ZId,
+		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
+		AuthScheme:           string(model.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
 	tunnelResp, err := l.zrok.Service.Share(tunnelReq, l.auth)
@@ -194,7 +194,7 @@ func (l *looper) startup() {
 		panic(err)
 	}
 	l.service = tunnelResp.Payload.SvcName
-	l.proxyEndpoint = tunnelResp.Payload.ProxyEndpoint
+	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoint
 }
 
 func (l *looper) dwell() {

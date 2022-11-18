@@ -7,11 +7,13 @@ package rest_model_zrok
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ShareRequest share request
@@ -25,8 +27,19 @@ type ShareRequest struct {
 	// auth users
 	AuthUsers []*AuthUser `json:"authUsers"`
 
-	// endpoint
-	Endpoint string `json:"endpoint,omitempty"`
+	// backend mode
+	// Enum: [proxy web dav]
+	BackendMode string `json:"backendMode,omitempty"`
+
+	// backend proxy endpoint
+	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
+
+	// frontend selection
+	FrontendSelection []string `json:"frontendSelection"`
+
+	// share mode
+	// Enum: [public private]
+	ShareMode string `json:"shareMode,omitempty"`
 
 	// z Id
 	ZID string `json:"zId,omitempty"`
@@ -37,6 +50,14 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAuthUsers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateBackendMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateShareMode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -67,6 +88,93 @@ func (m *ShareRequest) validateAuthUsers(formats strfmt.Registry) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+var shareRequestTypeBackendModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["proxy","web","dav"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypeBackendModePropEnum = append(shareRequestTypeBackendModePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestBackendModeProxy captures enum value "proxy"
+	ShareRequestBackendModeProxy string = "proxy"
+
+	// ShareRequestBackendModeWeb captures enum value "web"
+	ShareRequestBackendModeWeb string = "web"
+
+	// ShareRequestBackendModeDav captures enum value "dav"
+	ShareRequestBackendModeDav string = "dav"
+)
+
+// prop value enum
+func (m *ShareRequest) validateBackendModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeBackendModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validateBackendMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.BackendMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateBackendModeEnum("backendMode", "body", m.BackendMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var shareRequestTypeShareModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["public","private"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypeShareModePropEnum = append(shareRequestTypeShareModePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestShareModePublic captures enum value "public"
+	ShareRequestShareModePublic string = "public"
+
+	// ShareRequestShareModePrivate captures enum value "private"
+	ShareRequestShareModePrivate string = "private"
+)
+
+// prop value enum
+func (m *ShareRequest) validateShareModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeShareModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validateShareMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.ShareMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateShareModeEnum("shareMode", "body", m.ShareMode); err != nil {
+		return err
 	}
 
 	return nil

@@ -17,8 +17,8 @@ import (
 // swagger:model shareResponse
 type ShareResponse struct {
 
-	// proxy endpoint
-	ProxyEndpoint string `json:"proxyEndpoint,omitempty"`
+	// frontend proxy endpoint
+	FrontendProxyEndpoint string `json:"frontendProxyEndpoint,omitempty"`
 
 	// svc name
 	SvcName string `json:"svcName,omitempty"`

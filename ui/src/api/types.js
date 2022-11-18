@@ -110,7 +110,10 @@
  * @memberof module:types
  * 
  * @property {string} zId 
- * @property {string} endpoint 
+ * @property {string} shareMode 
+ * @property {string[]} frontendSelection 
+ * @property {string} backendMode 
+ * @property {string} backendProxyEndpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
  */
@@ -119,7 +122,7 @@
  * @typedef shareResponse
  * @memberof module:types
  * 
- * @property {string} proxyEndpoint 
+ * @property {string} frontendProxyEndpoint 
  * @property {string} svcName 
  */
 
