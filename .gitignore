@@ -2,3 +2,4 @@
 .idea
 *.db
 automated-release-build
+etc/dev.yml
