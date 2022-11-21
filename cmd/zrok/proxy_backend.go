@@ -104,6 +104,8 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	req := service.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		ZID:                  env.ZId,
+		ShareMode:            "public",
+		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
 		AuthScheme:           string(model.None),
 	}
