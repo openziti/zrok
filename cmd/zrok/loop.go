@@ -185,6 +185,8 @@ func (l *looper) startup() {
 	tunnelReq := service.NewShareParams()
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
 		ZID:                  l.env.ZId,
+		ShareMode:            "public",
+		BackendMode:          "proxy",
 		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
 		AuthScheme:           string(model.None),
 	}
