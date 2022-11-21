@@ -14,8 +14,7 @@ import (
 	"time"
 )
 
-type unshareHandler struct {
-}
+type unshareHandler struct{}
 
 func newUnshareHandler() *unshareHandler {
 	return &unshareHandler{}
@@ -76,24 +75,15 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 
-	if err := deleteServiceEdgeRouterPolicy(senv.ZId, svcName, edge); err != nil {
-		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
-	}
-	if err := deleteServicePolicyDial(senv.ZId, svcName, edge); err != nil {
-		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
-	}
-	if err := deleteServicePolicyBind(senv.ZId, svcName, edge); err != nil {
-		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
-	}
-	if err := deleteConfig(senv.ZId, svcName, edge); err != nil {
-		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
-	}
-	if err := deleteService(senv.ZId, svcZId, edge); err != nil {
-		logrus.Error(err)
+	switch ssvc.ShareMode {
+	case "public":
+		if err := newUnsharePublicHandler().Handle(senv, ssvc, svcName, svcZId, edge); err != nil {
+			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
+			return service.NewUnshareInternalServerError()
+		}
+
+	default:
+		logrus.Errorf("unknown share mode '%v'", ssvc.ShareMode)
 		return service.NewUnshareInternalServerError()
 	}
 
@@ -104,7 +94,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing: %v", err)
+		logrus.Errorf("error committing transaction for '%v': %v", svcZId, err)
 		return service.NewUnshareInternalServerError()
 	}
 
