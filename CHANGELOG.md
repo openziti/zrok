@@ -1,5 +1,13 @@
 # v0.3.0 (WiP)
 
+## CLI/zrok Client Changes
+
+### Versioning 
+
+The `zrok` client now checks the version of the configured API endpoint before attempting to connect. This means a `zrok` client will only work with the same major/minor versions.
+
+This means that a `v0.3` client will NOT work with a `v0.2` service. This also means that breaking API changes will require a minor revision change. A breaking change made in `v0.3` will provoke a new `v0.4` series to begin.
+
 ## API Changes
 
 Naming has been streamlined:
