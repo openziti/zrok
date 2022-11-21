@@ -11,6 +11,6 @@ func String() string {
 	if Version != "" {
 		return fmt.Sprintf("%v [%v]", Version, Hash)
 	} else {
-		return "v0.3.x [developer build]"
+		return Series + ".x [developer build]"
 	}
 }
