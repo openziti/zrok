@@ -24,29 +24,29 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 	return &publicResourceAllocator{}
 }
 
-func (h *publicResourceAllocator) Allocate(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
-	cfgId, err := h.createConfig(envZId, svcName, params, edge)
+func (a *publicResourceAllocator) Allocate(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
+	cfgId, err := a.createConfig(envZId, svcName, params, edge)
 	if err != nil {
 		logrus.Error(err)
 	}
-	svcZId, err = h.createService(envZId, svcName, cfgId, edge)
+	svcZId, err = a.createService(envZId, svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
 	}
-	if err := h.createServicePolicyBind(envZId, svcName, svcZId, envZId, edge); err != nil {
+	if err := a.createServicePolicyBind(envZId, svcName, svcZId, envZId, edge); err != nil {
 		logrus.Error(err)
 	}
-	if err := h.createServicePolicyDial(envZId, svcName, svcZId, edge); err != nil {
+	if err := a.createServicePolicyDial(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 	}
-	if err := h.createServiceEdgeRouterPolicy(envZId, svcName, svcZId, edge); err != nil {
+	if err := a.createServiceEdgeRouterPolicy(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
 	}
-	frontendUrl := h.proxyUrl(svcName)
+	frontendUrl := a.proxyUrl(svcName)
 	return svcZId, []string{frontendUrl}, nil
 }
 
-func (h *publicResourceAllocator) createConfig(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+func (a *publicResourceAllocator) createConfig(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
 	authScheme, err := model.ParseAuthScheme(params.Body.AuthScheme)
 	if err != nil {
 		return "", err
@@ -64,7 +64,7 @@ func (h *publicResourceAllocator) createConfig(envZId, svcName string, params se
 		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
 		Name:         &svcName,
-		Tags:         h.zrokTags(svcName),
+		Tags:         a.zrokTags(svcName),
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
@@ -79,14 +79,14 @@ func (h *publicResourceAllocator) createConfig(envZId, svcName string, params se
 	return cfgResp.Payload.Data.ID, nil
 }
 
-func (h *publicResourceAllocator) createService(envZId, svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+func (a *publicResourceAllocator) createService(envZId, svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
 	configs := []string{cfgId}
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		Configs:            configs,
 		EncryptionRequired: &encryptionRequired,
 		Name:               &svcName,
-		Tags:               h.zrokTags(svcName),
+		Tags:               a.zrokTags(svcName),
 	}
 	req := &edge_service.CreateServiceParams{
 		Service: svc,
@@ -101,7 +101,7 @@ func (h *publicResourceAllocator) createService(envZId, svcName, cfgId string, e
 	return resp.Payload.Data.ID, nil
 }
 
-func (h *publicResourceAllocator) createServicePolicyBind(envZId, svcName, svcZId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (a *publicResourceAllocator) createServicePolicyBind(envZId, svcName, svcZId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{fmt.Sprintf("@%v", envId)}
 	name := fmt.Sprintf("%v-backend", svcName)
@@ -115,7 +115,7 @@ func (h *publicResourceAllocator) createServicePolicyBind(envZId, svcName, svcZI
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
-		Tags:              h.zrokTags(svcName),
+		Tags:              a.zrokTags(svcName),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -130,7 +130,7 @@ func (h *publicResourceAllocator) createServicePolicyBind(envZId, svcName, svcZI
 	return nil
 }
 
-func (h *publicResourceAllocator) createServicePolicyDial(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (a *publicResourceAllocator) createServicePolicyDial(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var identityRoles []string
 	for _, proxyIdentity := range cfg.Proxy.Identities {
 		identityRoles = append(identityRoles, "@"+proxyIdentity)
@@ -148,7 +148,7 @@ func (h *publicResourceAllocator) createServicePolicyDial(envZId, svcName, svcZI
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
-		Tags:              h.zrokTags(svcName),
+		Tags:              a.zrokTags(svcName),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -163,7 +163,7 @@ func (h *publicResourceAllocator) createServicePolicyDial(envZId, svcName, svcZI
 	return nil
 }
 
-func (h *publicResourceAllocator) createServiceEdgeRouterPolicy(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (a *publicResourceAllocator) createServiceEdgeRouterPolicy(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
 	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
@@ -172,7 +172,7 @@ func (h *publicResourceAllocator) createServiceEdgeRouterPolicy(envZId, svcName,
 		Name:            &svcName,
 		Semantic:        &semantic,
 		ServiceRoles:    serviceRoles,
-		Tags:            h.zrokTags(svcName),
+		Tags:            a.zrokTags(svcName),
 	}
 	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{
 		Policy:  serp,
@@ -187,11 +187,11 @@ func (h *publicResourceAllocator) createServiceEdgeRouterPolicy(envZId, svcName,
 	return nil
 }
 
-func (h *publicResourceAllocator) proxyUrl(svcName string) string {
+func (a *publicResourceAllocator) proxyUrl(svcName string) string {
 	return strings.Replace(cfg.Proxy.UrlTemplate, "{svcName}", svcName, -1)
 }
 
-func (h *publicResourceAllocator) zrokTags(svcName string) *rest_model.Tags {
+func (a *publicResourceAllocator) zrokTags(svcName string) *rest_model.Tags {
 	return &rest_model.Tags{
 		SubTags: map[string]interface{}{
 			"zrok":              build.String(),

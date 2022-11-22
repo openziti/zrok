@@ -74,8 +74,8 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	sid, err := str.CreateService(envId, &store.Service{
 		ZId:                  svcZId,
 		Name:                 svcName,
-		ShareMode:            "public",
-		BackendMode:          "proxy",
+		ShareMode:            params.Body.ShareMode,
+		BackendMode:          params.Body.BackendMode,
 		FrontendEndpoint:     &frontendEndpoints[0],
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 	}, tx)

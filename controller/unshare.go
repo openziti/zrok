@@ -77,7 +77,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 
 	switch ssvc.ShareMode {
 	case "public":
-		if err := newUnsharePublicHandler().Handle(senv, ssvc, svcName, svcZId, edge); err != nil {
+		if err := newPublicResourceDeallocator().Handle(senv, ssvc, svcName, svcZId, edge); err != nil {
 			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
 			return service.NewUnshareInternalServerError()
 		}

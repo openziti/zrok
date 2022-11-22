@@ -5,13 +5,13 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 )
 
-type unsharePublicHandler struct{}
+type publicResourceDeallocator struct{}
 
-func newUnsharePublicHandler() *unsharePublicHandler {
-	return &unsharePublicHandler{}
+func newPublicResourceDeallocator() *publicResourceDeallocator {
+	return &publicResourceDeallocator{}
 }
 
-func (h *unsharePublicHandler) Handle(senv *store.Environment, ssvc *store.Service, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (d *publicResourceDeallocator) Handle(senv *store.Environment, ssvc *store.Service, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	if err := deleteServiceEdgeRouterPolicy(senv.ZId, svcName, edge); err != nil {
 		return err
 	}
