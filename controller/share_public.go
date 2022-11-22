@@ -3,11 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/build"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/model"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
@@ -20,104 +17,36 @@ import (
 	"time"
 )
 
-type sharePublicHandler struct {
+type publicResourceAllocator struct {
 }
 
-func newSharePublicHandler() *sharePublicHandler {
-	return &sharePublicHandler{}
+func newPublicResourceAllocator() *publicResourceAllocator {
+	return &publicResourceAllocator{}
 }
 
-func (h *sharePublicHandler) Handle(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
-	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
-		return service.NewShareInternalServerError()
-	}
-	defer func() { _ = tx.Rollback() }()
-
-	envZId := params.Body.ZID
-	envId := 0
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
-		found := false
-		for _, env := range envs {
-			if env.ZId == envZId {
-				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
-				envId = env.Id
-				found = true
-				break
-			}
-		}
-		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
-			return service.NewShareUnauthorized()
-		}
-	} else {
-		logrus.Errorf("error finding environments for account '%v'", principal.Email)
-		return service.NewShareInternalServerError()
-	}
-
-	edge, err := edgeClient()
-	if err != nil {
-		logrus.Error(err)
-		return service.NewShareInternalServerError()
-	}
-	svcName, err := createServiceName()
-	if err != nil {
-		logrus.Error(err)
-		return service.NewShareInternalServerError()
-	}
+func (h *publicResourceAllocator) Allocate(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
 	cfgId, err := h.createConfig(envZId, svcName, params, edge)
 	if err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
 	}
-	svcZId, err := h.createService(envZId, svcName, cfgId, edge)
+	svcZId, err = h.createService(envZId, svcName, cfgId, edge)
 	if err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
 	}
 	if err := h.createServicePolicyBind(envZId, svcName, svcZId, envZId, edge); err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
 	}
 	if err := h.createServicePolicyDial(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
 	}
 	if err := h.createServiceEdgeRouterPolicy(envZId, svcName, svcZId, edge); err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
 	}
-
-	logrus.Debugf("allocated service '%v'", svcName)
-
 	frontendUrl := h.proxyUrl(svcName)
-	sid, err := str.CreateService(envId, &store.Service{
-		ZId:                  svcZId,
-		Name:                 svcName,
-		ShareMode:            "public",
-		BackendMode:          "proxy",
-		FrontendEndpoint:     &frontendUrl,
-		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
-	}, tx)
-	if err != nil {
-		logrus.Errorf("error creating service record: %v", err)
-		_ = tx.Rollback()
-		return service.NewShareInternalServerError()
-	}
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing service record: %v", err)
-		return service.NewShareInternalServerError()
-	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcName, sid, principal.Email)
-
-	return service.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
-		FrontendProxyEndpoint: frontendUrl,
-		SvcName:               svcName,
-	})
+	return svcZId, []string{frontendUrl}, nil
 }
 
-func (h *sharePublicHandler) createConfig(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+func (h *publicResourceAllocator) createConfig(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
 	authScheme, err := model.ParseAuthScheme(params.Body.AuthScheme)
 	if err != nil {
 		return "", err
@@ -150,7 +79,7 @@ func (h *sharePublicHandler) createConfig(envZId, svcName string, params service
 	return cfgResp.Payload.Data.ID, nil
 }
 
-func (h *sharePublicHandler) createService(envZId, svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+func (h *publicResourceAllocator) createService(envZId, svcName, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
 	configs := []string{cfgId}
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
@@ -172,7 +101,7 @@ func (h *sharePublicHandler) createService(envZId, svcName, cfgId string, edge *
 	return resp.Payload.Data.ID, nil
 }
 
-func (h *sharePublicHandler) createServicePolicyBind(envZId, svcName, svcZId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *publicResourceAllocator) createServicePolicyBind(envZId, svcName, svcZId, envId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{fmt.Sprintf("@%v", envId)}
 	name := fmt.Sprintf("%v-backend", svcName)
@@ -201,7 +130,7 @@ func (h *sharePublicHandler) createServicePolicyBind(envZId, svcName, svcZId, en
 	return nil
 }
 
-func (h *sharePublicHandler) createServicePolicyDial(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *publicResourceAllocator) createServicePolicyDial(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var identityRoles []string
 	for _, proxyIdentity := range cfg.Proxy.Identities {
 		identityRoles = append(identityRoles, "@"+proxyIdentity)
@@ -234,7 +163,7 @@ func (h *sharePublicHandler) createServicePolicyDial(envZId, svcName, svcZId str
 	return nil
 }
 
-func (h *sharePublicHandler) createServiceEdgeRouterPolicy(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *publicResourceAllocator) createServiceEdgeRouterPolicy(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
 	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
@@ -258,11 +187,11 @@ func (h *sharePublicHandler) createServiceEdgeRouterPolicy(envZId, svcName, svcZ
 	return nil
 }
 
-func (h *sharePublicHandler) proxyUrl(svcName string) string {
+func (h *publicResourceAllocator) proxyUrl(svcName string) string {
 	return strings.Replace(cfg.Proxy.UrlTemplate, "{svcName}", svcName, -1)
 }
 
-func (h *sharePublicHandler) zrokTags(svcName string) *rest_model.Tags {
+func (h *publicResourceAllocator) zrokTags(svcName string) *rest_model.Tags {
 	return &rest_model.Tags{
 		SubTags: map[string]interface{}{
 			"zrok":              build.String(),
