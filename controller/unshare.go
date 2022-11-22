@@ -75,15 +75,9 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 
-	switch ssvc.ShareMode {
-	case "public":
-		if err := newPublicResourceDeallocator().Handle(senv, ssvc, svcName, svcZId, edge); err != nil {
-			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
-			return service.NewUnshareInternalServerError()
-		}
-
-	default:
-		logrus.Errorf("unknown share mode '%v'", ssvc.ShareMode)
+	// single tag-based service deallocator; should work regardless of sharing mode
+	if err := h.deallocateResources(senv, ssvc, svcName, svcZId, edge); err != nil {
+		logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
 		return service.NewUnshareInternalServerError()
 	}
 
@@ -120,4 +114,23 @@ func (h *unshareHandler) findServiceZId(svcName string, edge *rest_management_ap
 		return *(listResp.Payload.Data[0].ID), nil
 	}
 	return "", errors.Errorf("service '%v' not found", svcName)
+}
+
+func (h *unshareHandler) deallocateResources(senv *store.Environment, ssvc *store.Service, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	if err := deleteServiceEdgeRouterPolicy(senv.ZId, svcName, edge); err != nil {
+		return err
+	}
+	if err := deleteServicePolicyDial(senv.ZId, svcName, edge); err != nil {
+		return err
+	}
+	if err := deleteServicePolicyBind(senv.ZId, svcName, edge); err != nil {
+		return err
+	}
+	if err := deleteConfig(senv.ZId, svcName, edge); err != nil {
+		return err
+	}
+	if err := deleteService(senv.ZId, svcZId, edge); err != nil {
+		return err
+	}
+	return nil
 }
