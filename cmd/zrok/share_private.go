@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	tb "github.com/nsf/termbox-go"
 	"github.com/openziti-test-kitchen/zrok/endpoints/backend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
@@ -25,29 +22,27 @@ import (
 )
 
 func init() {
-	shareCmd.AddCommand(newSharePublicCommand().cmd)
+	shareCmd.AddCommand(newSharePrivateCommand().cmd)
 }
 
-type sharePublicCommand struct {
-	quiet     bool
+type sharePrivateCommand struct {
 	basicAuth []string
 	cmd       *cobra.Command
 }
 
-func newSharePublicCommand() *sharePublicCommand {
+func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "public <targetEndpoint>",
-		Short: "Share a target endpoint publicly",
+		Use:   "private <targetEndpoint>",
+		Short: "Share a target endpoint privately",
 		Args:  cobra.ExactArgs(1),
 	}
-	command := &sharePublicCommand{cmd: cmd}
-	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
+	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Run = command.run
 	return command
 }
 
-func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
+func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	targetEndpoint, err := url.Parse(args[0])
 	if err != nil {
 		if !panicInstead {
@@ -59,20 +54,8 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		targetEndpoint.Scheme = "https"
 	}
 
-	if !self.quiet {
-		if err := ui.Init(); err != nil {
-			if !panicInstead {
-				showError("unable to initialize user interface", err)
-			}
-			panic(err)
-		}
-		defer ui.Close()
-		tb.SetInputMode(tb.InputEsc)
-	}
-
 	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to load environment; did you 'zrok enable'?", err)
 		}
@@ -80,7 +63,6 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to load ziti identity configuration", err)
 		}
@@ -93,25 +75,25 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create zrok client", err)
 		}
 		panic(err)
 	}
+
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := service.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		ZID:                  env.ZId,
-		ShareMode:            "public",
+		ShareMode:            "private",
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
 		AuthScheme:           string(model.None),
 	}
-	if len(self.basicAuth) > 0 {
+	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
 		req.Body.AuthScheme = string(model.Basic)
-		for _, pair := range self.basicAuth {
+		for _, pair := range cmd.basicAuth {
 			tokens := strings.Split(pair, ":")
 			if len(tokens) == 2 {
 				req.Body.AuthUsers = append(req.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
@@ -134,7 +116,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		self.destroy(env.ZId, cfg, zrok, auth)
+		cmd.destroy(env.ZId, cfg, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -156,75 +138,14 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	if !self.quiet {
-		ui.Clear()
-		w, h := ui.TerminalDimensions()
+	logrus.Infof("share your zrok service; use this command for access: 'zrok serve private %v'", resp.Payload.SvcName)
 
-		p := widgets.NewParagraph()
-		p.Border = true
-		p.Title = " access your zrok service "
-		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoint))/2)-1), resp.Payload.FrontendProxyEndpoint)
-		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
-		p.PaddingTop = 1
-		p.SetRect(5, 5, w-10, 10)
-
-		lastRequests := float64(0)
-		var requestData []float64
-		spk := widgets.NewSparkline()
-		spk.Title = " requests "
-		spk.Data = requestData
-		spk.LineColor = ui.ColorCyan
-
-		slg := widgets.NewSparklineGroup(spk)
-		slg.SetRect(5, 11, w-10, h-5)
-
-		ui.Render(p, slg)
-
-		ticker := time.NewTicker(time.Second).C
-		uiEvents := ui.PollEvents()
-		for {
-			select {
-			case e := <-uiEvents:
-				switch e.Type {
-				case ui.ResizeEvent:
-					ui.Clear()
-					w, h = ui.TerminalDimensions()
-					p.SetRect(5, 5, w-10, 10)
-					slg.SetRect(5, 11, w-10, h-5)
-					ui.Render(p, slg)
-
-				case ui.KeyboardEvent:
-					switch e.ID {
-					case "q", "<C-c>":
-						ui.Close()
-						self.destroy(env.ZId, cfg, zrok, auth)
-						os.Exit(0)
-					}
-				}
-
-			case <-ticker:
-				currentRequests := float64(httpProxy.Requests())
-				deltaRequests := currentRequests - lastRequests
-				requestData = append(requestData, deltaRequests)
-				lastRequests = currentRequests
-				requestData = append(requestData, deltaRequests)
-				for len(requestData) > w-17 {
-					requestData = requestData[1:]
-				}
-				spk.Title = fmt.Sprintf(" requests (%d) ", int(currentRequests))
-				spk.Data = requestData
-				ui.Render(p, slg)
-			}
-		}
-	} else {
-		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendProxyEndpoint)
-		for {
-			time.Sleep(30 * time.Second)
-		}
+	for {
+		time.Sleep(30 * time.Second)
 	}
 }
 
-func (self *sharePublicCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (self *sharePrivateCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
