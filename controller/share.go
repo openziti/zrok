@@ -58,7 +58,14 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	var frontendEndpoints []string
 	switch params.Body.ShareMode {
 	case "public":
-		svcZId, frontendEndpoints, err = newPublicResourceAllocator().Allocate(envZId, svcName, params, edge)
+		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, svcName, params, edge)
+		if err != nil {
+			logrus.Error(err)
+			return service.NewShareInternalServerError()
+		}
+
+	case "private":
+		svcZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, svcName, params, edge)
 		if err != nil {
 			logrus.Error(err)
 			return service.NewShareInternalServerError()
