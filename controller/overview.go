@@ -45,10 +45,18 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, svc := range svcs {
+			fe := ""
+			if svc.FrontendEndpoint != nil {
+				fe = *svc.FrontendEndpoint
+			}
+			be := ""
+			if svc.BackendProxyEndpoint != nil {
+				be = *svc.BackendProxyEndpoint
+			}
 			es.Services = append(es.Services, &rest_model_zrok.Service{
 				CreatedAt: svc.CreatedAt.UnixMilli(),
-				Frontend:  svc.Frontend,
-				Backend:   svc.Backend,
+				Frontend:  fe,
+				Backend:   be,
 				UpdatedAt: svc.UpdatedAt.UnixMilli(),
 				ZID:       svc.ZId,
 				Name:      svc.Name,

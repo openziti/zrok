@@ -93,12 +93,12 @@ func (h *sharePublicHandler) Handle(params service.ShareParams, principal *rest_
 
 	frontendUrl := h.proxyUrl(svcName)
 	sid, err := str.CreateService(envId, &store.Service{
-		ZId:         svcZId,
-		Name:        svcName,
-		Frontend:    frontendUrl,
-		Backend:     params.Body.BackendProxyEndpoint,
-		ShareMode:   "public",
-		BackendMode: "proxy",
+		ZId:                  svcZId,
+		Name:                 svcName,
+		ShareMode:            "public",
+		BackendMode:          "proxy",
+		FrontendEndpoint:     &frontendUrl,
+		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)

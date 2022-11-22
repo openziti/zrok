@@ -21,8 +21,8 @@ create table services (
 
   constraint chk_z_id check (z_id <> ''),
   constraint chk_name check (name <> ''),
-  constraint chk_share_mode check (share_mode == 'public' || share_mode == 'private'),
-  constraint chk_backend_mode check (backend_mode == 'proxy' || backend_mode == 'web' || backend_mode == 'dav')
+  constraint chk_share_mode check (share_mode == 'public' or share_mode == 'private'),
+  constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'dav')
 );
 
 insert into services (id, environment_id, z_id, name, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at)
