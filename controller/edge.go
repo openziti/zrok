@@ -15,7 +15,7 @@ import (
 )
 
 func deleteServiceEdgeRouterPolicy(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"%v\"", svcName)
+	filter := fmt.Sprintf("tags.zrokServiceName=\"%v\"", svcName)
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
@@ -48,11 +48,13 @@ func deleteServiceEdgeRouterPolicy(envZId, svcName string, edge *rest_management
 }
 
 func deleteServicePolicyBind(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(envZId, fmt.Sprintf("name=\"%v-backend\"", svcName), edge)
+	// type=2 == "Bind"
+	return deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and type=2", svcName), edge)
 }
 
 func deleteServicePolicyDial(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return deleteServicePolicy(envZId, fmt.Sprintf("name=\"%v-dial\"", svcName), edge)
+	// type=1 == "Dial"
+	return deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and type=1", svcName), edge)
 }
 
 func deleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
@@ -88,7 +90,7 @@ func deleteServicePolicy(envZId, filter string, edge *rest_management_api_client
 }
 
 func deleteConfig(envZId, svcName string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"%v\"", svcName)
+	filter := fmt.Sprintf("tags.zrokServiceName=\"%v\"", svcName)
 	limit := int64(0)
 	offset := int64(0)
 	listReq := &config.ListConfigsParams{

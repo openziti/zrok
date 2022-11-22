@@ -194,8 +194,8 @@ func (a *publicResourceAllocator) proxyUrl(svcName string) string {
 func (a *publicResourceAllocator) zrokTags(svcName string) *rest_model.Tags {
 	return &rest_model.Tags{
 		SubTags: map[string]interface{}{
-			"zrok":              build.String(),
-			"zrok-service-name": svcName,
+			"zrok":            build.String(),
+			"zrokServiceName": svcName,
 		},
 	}
 }
