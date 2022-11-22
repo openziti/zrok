@@ -16,6 +16,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
 	rootCmd.AddCommand(httpCmd)
+	rootCmd.AddCommand(shareCmd)
 }
 
 var rootCmd = &cobra.Command{
@@ -34,6 +35,11 @@ var apiEndpoint string
 var httpCmd = &cobra.Command{
 	Use:   "http",
 	Short: "HTTP endpoint operations",
+}
+
+var shareCmd = &cobra.Command{
+	Use:   "share",
+	Short: "Share resources",
 }
 
 func main() {

@@ -25,30 +25,30 @@ import (
 )
 
 func init() {
-	httpCmd.AddCommand(newHttpBackendCommand().cmd)
+	shareCmd.AddCommand(newHttpBackendCommand().cmd)
 }
 
-type httpBackendCommand struct {
+type sharePublicCommand struct {
 	quiet     bool
 	basicAuth []string
 	cmd       *cobra.Command
 }
 
-func newHttpBackendCommand() *httpBackendCommand {
+func newHttpBackendCommand() *sharePublicCommand {
 	cmd := &cobra.Command{
-		Use:     "backend <targetEndpoint>",
+		Use:     "public <targetEndpoint>",
 		Aliases: []string{"be"},
 		Short:   "Create an HTTP binding",
 		Args:    cobra.ExactArgs(1),
 	}
-	command := &httpBackendCommand{cmd: cmd}
+	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Run = command.run
 	return command
 }
 
-func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
+func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	targetEndpoint, err := url.Parse(args[0])
 	if err != nil {
 		if !panicInstead {
@@ -225,7 +225,7 @@ func (self *httpBackendCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (self *httpBackendCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (self *sharePublicCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
