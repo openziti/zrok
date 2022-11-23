@@ -32,6 +32,12 @@ func (o *AccessReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewAccessNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewAccessInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -141,6 +147,57 @@ func (o *AccessUnauthorized) String() string {
 }
 
 func (o *AccessUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewAccessNotFound creates a AccessNotFound with default headers values
+func NewAccessNotFound() *AccessNotFound {
+	return &AccessNotFound{}
+}
+
+/*
+AccessNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type AccessNotFound struct {
+}
+
+// IsSuccess returns true when this access not found response has a 2xx status code
+func (o *AccessNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this access not found response has a 3xx status code
+func (o *AccessNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this access not found response has a 4xx status code
+func (o *AccessNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this access not found response has a 5xx status code
+func (o *AccessNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this access not found response a status code equal to that given
+func (o *AccessNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+func (o *AccessNotFound) Error() string {
+	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+}
+
+func (o *AccessNotFound) String() string {
+	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+}
+
+func (o *AccessNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

@@ -61,6 +61,31 @@ func (o *AccessUnauthorized) WriteResponse(rw http.ResponseWriter, producer runt
 	rw.WriteHeader(401)
 }
 
+// AccessNotFoundCode is the HTTP code returned for type AccessNotFound
+const AccessNotFoundCode int = 404
+
+/*
+AccessNotFound not found
+
+swagger:response accessNotFound
+*/
+type AccessNotFound struct {
+}
+
+// NewAccessNotFound creates AccessNotFound with default headers values
+func NewAccessNotFound() *AccessNotFound {
+
+	return &AccessNotFound{}
+}
+
+// WriteResponse to the client
+func (o *AccessNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // AccessInternalServerErrorCode is the HTTP code returned for type AccessInternalServerError
 const AccessInternalServerErrorCode int = 500
 

@@ -34,6 +34,7 @@ func Run(inCfg *Config) error {
 	api.IdentityVerifyHandler = newVerifyHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
+	api.ServiceAccessHandler = newAccessHandler()
 	api.ServiceShareHandler = newShareHandler()
 	api.ServiceUnshareHandler = newUnshareHandler()
 
