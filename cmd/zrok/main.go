@@ -32,6 +32,11 @@ var verbose bool
 var panicInstead bool
 var apiEndpoint string
 
+var accessCmd = &cobra.Command{
+	Use:   "access",
+	Short: "Access services",
+}
+
 var httpCmd = &cobra.Command{
 	Use:   "http",
 	Short: "HTTP endpoint operations",
