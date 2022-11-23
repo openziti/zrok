@@ -1,16 +1,16 @@
-package frontend
+package public_frontend
 
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/endpoints/frontend/health_ui"
-	"github.com/openziti-test-kitchen/zrok/endpoints/frontend/notfound_ui"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
+	"github.com/openziti-test-kitchen/zrok/endpoints/public_frontend/health_ui"
+	"github.com/openziti-test-kitchen/zrok/endpoints/public_frontend/notfound_ui"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
-	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -20,14 +20,14 @@ import (
 	"strings"
 )
 
-type httpListen struct {
+type httpFrontend struct {
 	cfg     *Config
 	zCtx    ziti.Context
 	handler http.Handler
 	metrics *metricsAgent
 }
 
-func NewHTTP(cfg *Config) (*httpListen, error) {
+func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	ma, err := newMetricsAgent(cfg)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func NewHTTP(cfg *Config) (*httpListen, error) {
 	proxy.Transport = zTransport
 
 	handler := authHandler(util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
-	return &httpListen{
+	return &httpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
 		handler: handler,
@@ -63,7 +63,7 @@ func NewHTTP(cfg *Config) (*httpListen, error) {
 	}, nil
 }
 
-func (self *httpListen) Run() error {
+func (self *httpFrontend) Run() error {
 	return http.ListenAndServe(self.cfg.Address, self.handler)
 }
 
@@ -95,14 +95,13 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 		logrus.Errorf("error proxying: %v", err)
 		notfound_ui.WriteNotFound(w)
 	}
-
 	return proxy, nil
 }
 
 func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		targetSvc := resolveService(cfg.HostMatch, req.Host)
-		if svc, found := getRefreshedService(targetSvc, ctx); found {
+		if svc, found := endpoints.GetRefreshedService(targetSvc, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
 			} else {
@@ -114,7 +113,7 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme
 				req.URL.Host = target.Host
-				req.URL.Path, req.URL.RawPath = joinURLPath(target, req.URL)
+				req.URL.Path, req.URL.RawPath = endpoints.JoinURLPath(target, req.URL)
 				if targetQuery == "" || req.URL.RawQuery == "" {
 					req.URL.RawQuery = targetQuery + req.URL.RawQuery
 				} else {
@@ -132,44 +131,11 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func joinURLPath(a, b *url.URL) (path, rawpath string) {
-	if a.RawPath == "" && b.RawPath == "" {
-		return singleJoiningSlash(a.Path, b.Path), ""
-	}
-	// Same as singleJoiningSlash, but uses EscapedPath to determine
-	// whether a slash should be added
-	apath := a.EscapedPath()
-	bpath := b.EscapedPath()
-
-	aslash := strings.HasSuffix(apath, "/")
-	bslash := strings.HasPrefix(bpath, "/")
-
-	switch {
-	case aslash && bslash:
-		return a.Path + b.Path[1:], apath + bpath[1:]
-	case !aslash && !bslash:
-		return a.Path + "/" + b.Path, apath + "/" + bpath
-	}
-	return a.Path + b.Path, apath + bpath
-}
-
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
-}
-
 func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		svcName := resolveService(cfg.HostMatch, r.Host)
 		if svcName != "" {
-			if svc, found := getRefreshedService(svcName, ctx); found {
+			if svc, found := endpoints.GetRefreshedService(svcName, ctx); found {
 				if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
@@ -261,16 +227,4 @@ func resolveService(hostMatch string, host string) string {
 		}
 	}
 	return ""
-}
-
-func getRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
-	svc, found := ctx.GetService(name)
-	if !found {
-		if err := ctx.RefreshServices(); err != nil {
-			logrus.Errorf("error refreshing services: %v", err)
-			return nil, false
-		}
-		return ctx.GetService(name)
-	}
-	return svc, found
 }

@@ -1,4 +1,4 @@
-package frontend
+package public_frontend
 
 import (
 	"github.com/openziti-test-kitchen/zrok/model"

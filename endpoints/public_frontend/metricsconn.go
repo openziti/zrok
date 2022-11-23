@@ -1,4 +1,4 @@
-package frontend
+package public_frontend
 
 import (
 	"net"

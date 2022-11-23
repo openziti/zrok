@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/michaelquigley/cf"
-	"github.com/openziti-test-kitchen/zrok/endpoints/frontend"
+	"github.com/openziti-test-kitchen/zrok/endpoints/public_frontend"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +29,7 @@ func newHttpFrontendCommand() *httpFrontendCommand {
 }
 
 func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
-	cfg := frontend.DefaultConfig()
+	cfg := public_frontend.DefaultConfig()
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
 			if !panicInstead {
@@ -39,7 +39,7 @@ func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
-	httpListener, err := frontend.NewHTTP(cfg)
+	httpListener, err := public_frontend.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to create http frontend", err)
