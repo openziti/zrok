@@ -106,7 +106,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
-			showError("unable to create tunnel", err)
+			showError("unable to create share", err)
 		}
 		panic(err)
 	}

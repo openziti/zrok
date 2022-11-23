@@ -39,14 +39,14 @@ func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
-	httpListener, err := public_frontend.NewHTTP(cfg)
+	frontend, err := public_frontend.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to create http frontend", err)
 		}
 		panic(err)
 	}
-	if err := httpListener.Run(); err != nil {
+	if err := frontend.Run(); err != nil {
 		if !panicInstead {
 			showError("unable to run http frontend", err)
 		}

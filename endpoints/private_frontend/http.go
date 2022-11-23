@@ -54,6 +54,10 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	}, nil
 }
 
+func (h *httpFrontend) Run() error {
+	return http.ListenAndServe(h.cfg.Address, h.handler)
+}
+
 type zitiDialContext struct {
 	ctx     ziti.Context
 	svcName string
