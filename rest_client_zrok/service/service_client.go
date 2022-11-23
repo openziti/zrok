@@ -30,11 +30,54 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	Access(params *AccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AccessCreated, error)
+
 	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
+
+	Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error)
 
 	Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+Access access API
+*/
+func (a *Client) Access(params *AccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AccessCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "access",
+		Method:             "POST",
+		PathPattern:        "/access",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &AccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AccessCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for access: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -73,6 +116,45 @@ func (a *Client) Share(params *ShareParams, authInfo runtime.ClientAuthInfoWrite
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for share: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+Unaccess unaccess API
+*/
+func (a *Client) Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUnaccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "unaccess",
+		Method:             "DELETE",
+		PathPattern:        "/unaccess",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UnaccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UnaccessOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for unaccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

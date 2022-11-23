@@ -35,6 +35,39 @@ func init() {
   },
   "basePath": "/api/v1",
   "paths": {
+    "/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "access",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/accessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "access created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/account": {
       "post": {
         "tags": [
@@ -275,6 +308,42 @@ func init() {
         }
       }
     },
+    "/unaccess": {
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "unaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/unaccessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "access removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/unshare": {
       "delete": {
         "security": [
@@ -366,6 +435,17 @@ func init() {
     }
   },
   "definitions": {
+    "accessRequest": {
+      "type": "object",
+      "properties": {
+        "svcName": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "accountRequest": {
       "type": "object",
       "properties": {
@@ -600,6 +680,17 @@ func init() {
           "type": "string"
         },
         "svcName": {
+          "type": "string"
+        }
+      }
+    },
+    "unaccessRequest": {
+      "type": "object",
+      "properties": {
+        "svcName": {
+          "type": "string"
+        },
+        "zId": {
           "type": "string"
         }
       }
@@ -661,6 +752,39 @@ func init() {
   },
   "basePath": "/api/v1",
   "paths": {
+    "/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "access",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/accessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "access created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/account": {
       "post": {
         "tags": [
@@ -901,6 +1025,42 @@ func init() {
         }
       }
     },
+    "/unaccess": {
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "unaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/unaccessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "access removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/unshare": {
       "delete": {
         "security": [
@@ -992,6 +1152,17 @@ func init() {
     }
   },
   "definitions": {
+    "accessRequest": {
+      "type": "object",
+      "properties": {
+        "svcName": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "accountRequest": {
       "type": "object",
       "properties": {
@@ -1226,6 +1397,17 @@ func init() {
           "type": "string"
         },
         "svcName": {
+          "type": "string"
+        }
+      }
+    },
+    "unaccessRequest": {
+      "type": "object",
+      "properties": {
+        "svcName": {
+          "type": "string"
+        },
+        "zId": {
           "type": "string"
         }
       }

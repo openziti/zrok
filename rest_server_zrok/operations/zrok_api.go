@@ -47,6 +47,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		ServiceAccessHandler: service.AccessHandlerFunc(func(params service.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation service.Access has not yet been implemented")
+		}),
 		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
 		}),
@@ -67,6 +70,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		ServiceShareHandler: service.ShareHandlerFunc(func(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Share has not yet been implemented")
+		}),
+		ServiceUnaccessHandler: service.UnaccessHandlerFunc(func(params service.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation service.Unaccess has not yet been implemented")
 		}),
 		ServiceUnshareHandler: service.UnshareHandlerFunc(func(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Unshare has not yet been implemented")
@@ -127,6 +133,8 @@ type ZrokAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// ServiceAccessHandler sets the operation handler for the access operation
+	ServiceAccessHandler service.AccessHandler
 	// IdentityCreateAccountHandler sets the operation handler for the create account operation
 	IdentityCreateAccountHandler identity.CreateAccountHandler
 	// IdentityDisableHandler sets the operation handler for the disable operation
@@ -141,6 +149,8 @@ type ZrokAPI struct {
 	IdentityRegisterHandler identity.RegisterHandler
 	// ServiceShareHandler sets the operation handler for the share operation
 	ServiceShareHandler service.ShareHandler
+	// ServiceUnaccessHandler sets the operation handler for the unaccess operation
+	ServiceUnaccessHandler service.UnaccessHandler
 	// ServiceUnshareHandler sets the operation handler for the unshare operation
 	ServiceUnshareHandler service.UnshareHandler
 	// IdentityVerifyHandler sets the operation handler for the verify operation
@@ -228,6 +238,9 @@ func (o *ZrokAPI) Validate() error {
 		unregistered = append(unregistered, "XTokenAuth")
 	}
 
+	if o.ServiceAccessHandler == nil {
+		unregistered = append(unregistered, "service.AccessHandler")
+	}
 	if o.IdentityCreateAccountHandler == nil {
 		unregistered = append(unregistered, "identity.CreateAccountHandler")
 	}
@@ -248,6 +261,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ServiceShareHandler == nil {
 		unregistered = append(unregistered, "service.ShareHandler")
+	}
+	if o.ServiceUnaccessHandler == nil {
+		unregistered = append(unregistered, "service.UnaccessHandler")
 	}
 	if o.ServiceUnshareHandler == nil {
 		unregistered = append(unregistered, "service.UnshareHandler")
@@ -360,6 +376,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/access"] = service.NewAccess(o.context, o.ServiceAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -385,6 +405,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/share"] = service.NewShare(o.context, o.ServiceShareHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/unaccess"] = service.NewUnaccess(o.context, o.ServiceUnaccessHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

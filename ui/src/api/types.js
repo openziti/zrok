@@ -2,6 +2,14 @@
 // Auto-generated, edits will be overwritten
 
 /**
+ * @typedef accessRequest
+ * @memberof module:types
+ * 
+ * @property {string} zId 
+ * @property {string} svcName 
+ */
+
+/**
  * @typedef accountRequest
  * @memberof module:types
  * 
@@ -123,6 +131,14 @@
  * @memberof module:types
  * 
  * @property {string} frontendProxyEndpoint 
+ * @property {string} svcName 
+ */
+
+/**
+ * @typedef unaccessRequest
+ * @memberof module:types
+ * 
+ * @property {string} zId 
  * @property {string} svcName 
  */
 

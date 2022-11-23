@@ -179,6 +179,48 @@ paths:
   #
   # service
   #
+  /access:
+    post:
+      tags:
+        - service
+      security:
+        - key: []
+      operationId: access
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/accessRequest"
+      responses:
+        201:
+          description: access created
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /unaccess:
+    delete:
+      tags:
+        - service
+      security:
+        - key: []
+      operationId: unaccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/unaccessRequest"
+      responses:
+        200:
+          description: access removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /share:
     post:
       tags:
@@ -202,6 +244,7 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
   /unshare:
     delete:
       tags:
@@ -227,6 +270,14 @@ paths:
             $ref: "#/definitions/errorMessage"
 
 definitions:
+  accessRequest:
+    type: object
+    properties:
+      zId:
+        type: string
+      svcName:
+        type: string
+
   accountRequest:
     type: object
     properties:
@@ -386,6 +437,14 @@ definitions:
     type: object
     properties:
       frontendProxyEndpoint:
+        type: string
+      svcName:
+        type: string
+
+  unaccessRequest:
+    type: object
+    properties:
+      zId:
         type: string
       svcName:
         type: string

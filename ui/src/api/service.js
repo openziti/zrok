@@ -4,6 +4,36 @@ import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
+ * @param {module:types.accessRequest} [options.body] 
+ * @return {Promise<object>} access created
+ */
+export function access(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(accessOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
+ * @param {module:types.unaccessRequest} [options.body] 
+ * @return {Promise<object>} access removed
+ */
+export function unaccess(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(unaccessOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.shareRequest} [options.body] 
  * @return {Promise<module:types.shareResponse>} service created
  */
@@ -30,6 +60,28 @@ export function unshare(options) {
     }
   }
   return gateway.request(unshareOperation, parameters)
+}
+
+const accessOperation = {
+  path: '/access',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const unaccessOperation = {
+  path: '/unaccess',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'delete',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const shareOperation = {
