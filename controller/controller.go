@@ -36,6 +36,7 @@ func Run(inCfg *Config) error {
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ServiceAccessHandler = newAccessHandler()
 	api.ServiceShareHandler = newShareHandler()
+	api.ServiceUnaccessHandler = newUnaccessHandler()
 	api.ServiceUnshareHandler = newUnshareHandler()
 
 	if err := controllerStartup(); err != nil {

@@ -138,7 +138,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	logrus.Infof("share your zrok service; use this command for access: 'zrok serve private %v'", resp.Payload.SvcName)
+	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.SvcName)
 
 	for {
 		time.Sleep(30 * time.Second)

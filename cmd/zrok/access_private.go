@@ -15,8 +15,13 @@ import (
 	"syscall"
 )
 
+func init() {
+	accessCmd.AddCommand(newAccessPrivateCommand().cmd)
+}
+
 type accessPrivateCommand struct {
-	cmd *cobra.Command
+	cmd         *cobra.Command
+	bindAddress string
 }
 
 func newAccessPrivateCommand() *accessPrivateCommand {
@@ -27,6 +32,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Run = command.run
+	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "0.0.0.0:9191", "The address to bind the private frontend")
 	return command
 }
 
@@ -63,6 +69,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	cfg := private_frontend.DefaultConfig("backend")
+	cfg.Address = cmd.bindAddress
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

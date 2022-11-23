@@ -15,6 +15,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
+	rootCmd.AddCommand(accessCmd)
 	rootCmd.AddCommand(httpCmd)
 	rootCmd.AddCommand(shareCmd)
 }
