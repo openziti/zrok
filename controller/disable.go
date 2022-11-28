@@ -107,6 +107,15 @@ func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx,
 }
 
 func (self *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
+	svcs, err := str.FindServicesForEnvironment(envId, tx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding services for environment '%d'", envId)
+	}
+	for _, svc := range svcs {
+		if err := str.DeleteService(svc.Id, tx); err != nil {
+			return errors.Wrapf(err, "error deleting service '%d' for environment '%d'", svc.Id, envId)
+		}
+	}
 	if err := str.DeleteEnvironment(envId, tx); err != nil {
 		return errors.Wrapf(err, "error deleting environment '%d'", envId)
 	}
