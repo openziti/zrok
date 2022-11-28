@@ -145,6 +145,7 @@
  * @typedef unaccessRequest
  * @memberof module:types
  * 
+ * @property {string} frontendName 
  * @property {string} zId 
  * @property {string} svcName 
  */

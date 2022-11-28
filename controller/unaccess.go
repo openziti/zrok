@@ -17,8 +17,10 @@ func newUnaccessHandler() *unaccessHandler {
 }
 
 func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	frontendName := params.Body.FrontendName
 	svcName := params.Body.SvcName
 	envZId := params.Body.ZID
+	logrus.Infof("processing unaccess request for frontend '%v' (service '%v', environment '%v')", frontendName, svcName, envZId)
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -51,8 +53,29 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 		return service.NewUnaccessUnauthorized()
 	}
 
-	if err := deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and tags.zrokEnvironmentZId=\"%v\" and type=1", svcName, envZId), edge); err != nil {
+	sfe, err := str.FindFrontendNamed(frontendName, tx)
+	if err != nil {
+		logrus.Error(err)
+		return service.NewUnaccessInternalServerError()
+	}
+
+	if sfe == nil || sfe.EnvironmentId != senv.Id {
+		logrus.Errorf("frontend named '%v' not found", frontendName)
+		return service.NewUnaccessInternalServerError()
+	}
+
+	if err := str.DeleteFrontend(sfe.Id, tx); err != nil {
+		logrus.Errorf("error deleting frontend named '%v': %v", frontendName, err)
+		return service.NewUnaccessNotFound()
+	}
+
+	if err := deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and tags.zrokFrontendName=\"%v\" and type=1", svcName, frontendName), edge); err != nil {
 		logrus.Errorf("error removing access to '%v' for '%v': %v", svcName, envZId, err)
+		return service.NewUnaccessInternalServerError()
+	}
+
+	if err := tx.Commit(); err != nil {
+		logrus.Errorf("error committing frontend '%v' delete: %v", frontendName, err)
 		return service.NewUnaccessInternalServerError()
 	}
 

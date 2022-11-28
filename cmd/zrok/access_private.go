@@ -60,13 +60,14 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		SvcName: svcName,
 		ZID:     env.ZId,
 	}
-	_, err = zrok.Service.Access(req, auth)
+	accessResp, err := zrok.Service.Access(req, auth)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to access", err)
 		}
 		panic(err)
 	}
+	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendName)
 
 	cfg := private_frontend.DefaultConfig("backend")
 	cfg.SvcName = svcName
@@ -76,7 +77,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.ZId, svcName, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendName, env.ZId, svcName, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -94,12 +95,13 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *accessPrivateCommand) destroy(envZId, svcName string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *accessPrivateCommand) destroy(frotendName, envZId, svcName string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", svcName)
 	req := service.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
-		SvcName: svcName,
-		ZID:     envZId,
+		FrontendName: frotendName,
+		SvcName:      svcName,
+		ZID:          envZId,
 	}
 	if _, err := zrok.Service.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

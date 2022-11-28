@@ -17,6 +17,9 @@ import (
 // swagger:model unaccessRequest
 type UnaccessRequest struct {
 
+	// frontend name
+	FrontendName string `json:"frontendName,omitempty"`
+
 	// svc name
 	SvcName string `json:"svcName,omitempty"`
 

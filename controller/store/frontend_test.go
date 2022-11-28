@@ -31,8 +31,9 @@ func TestPublicFrontend(t *testing.T) {
 
 	feName := "public"
 	feId, err := str.CreateFrontend(envId, &Frontend{
-		ZId:  "zId0",
-		Name: &feName,
+		Name:       "name",
+		ZId:        "zId0",
+		PublicName: &feName,
 	}, tx)
 	assert.Nil(t, err)
 
@@ -40,9 +41,9 @@ func TestPublicFrontend(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, fe)
 	assert.Equal(t, envId, fe.EnvironmentId)
-	assert.Equal(t, feName, *fe.Name)
+	assert.Equal(t, feName, *fe.PublicName)
 
-	fe0, err := str.FindFrontendNamed(feName, tx)
+	fe0, err := str.FindFrontendPubliclyNamed(feName, tx)
 	assert.Nil(t, err)
 	assert.NotNil(t, fe0)
 	assert.EqualValues(t, fe, fe0)

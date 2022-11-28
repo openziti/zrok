@@ -454,6 +454,8 @@ definitions:
   unaccessRequest:
     type: object
     properties:
+      frontendName:
+        type: string
       zId:
         type: string
       svcName:

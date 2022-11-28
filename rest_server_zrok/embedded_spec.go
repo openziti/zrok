@@ -701,6 +701,9 @@ func init() {
     "unaccessRequest": {
       "type": "object",
       "properties": {
+        "frontendName": {
+          "type": "string"
+        },
         "svcName": {
           "type": "string"
         },
@@ -1432,6 +1435,9 @@ func init() {
     "unaccessRequest": {
       "type": "object",
       "properties": {
+        "frontendName": {
+          "type": "string"
+        },
         "svcName": {
           "type": "string"
         },

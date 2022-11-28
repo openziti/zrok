@@ -41,6 +41,14 @@ func (str *Store) FindFrontendNamed(name string, tx *sqlx.Tx) (*Frontend, error)
 	return i, nil
 }
 
+func (str *Store) FindFrontendPubliclyNamed(publicName string, tx *sqlx.Tx) (*Frontend, error) {
+	i := &Frontend{}
+	if err := tx.QueryRowx("select frontends.* from frontends where public_name = $1", publicName).StructScan(i); err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend by public_name")
+	}
+	return i, nil
+}
+
 func (str *Store) FindFrontendsForEnvironment(envId int, tx *sqlx.Tx) ([]*Frontend, error) {
 	rows, err := tx.Queryx("select frontends.* from frontends where environment_id = $1", envId)
 	if err != nil {
