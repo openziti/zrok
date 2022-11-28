@@ -9,7 +9,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
-	"github.com/teris-io/shortid"
 	"net/http"
 	"strings"
 )
@@ -44,10 +43,6 @@ func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
 	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
 }
 
-func createToken() (string, error) {
-	return shortid.Generate()
-}
-
 func createServiceName() (string, error) {
 	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyz0123456789", 12)
 	if err != nil {
@@ -56,18 +51,12 @@ func createServiceName() (string, error) {
 	return gen(), nil
 }
 
-func dnsSafeShortId() (string, error) {
-	sid, err := shortid.Generate()
+func createToken() (string, error) {
+	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 12)
 	if err != nil {
 		return "", err
 	}
-	for sid[0] == '-' || sid[0] == '_' {
-		sid, err = shortid.Generate()
-		if err != nil {
-			return "", err
-		}
-	}
-	return sid, nil
+	return gen(), nil
 }
 
 func hashPassword(raw string) string {
