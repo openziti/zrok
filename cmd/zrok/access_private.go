@@ -69,6 +69,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	cfg := private_frontend.DefaultConfig("backend")
+	cfg.SvcName = svcName
 	cfg.Address = cmd.bindAddress
 
 	c := make(chan os.Signal)

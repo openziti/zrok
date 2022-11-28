@@ -1,12 +1,18 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge/rest_management_api_client/service_policy"
+	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type accessHandler struct{}
@@ -68,10 +74,46 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	}
 
 	extraTags := &rest_model_edge.Tags{SubTags: map[string]interface{}{"zrokEnvironmentZId": envZId}}
-	if err := createServicePolicyDial(envZId, ssvc.Name, ssvc.ZId, edge, extraTags); err != nil {
+	if err := createServicePolicyDialForEnvironment(envZId, ssvc.Name, ssvc.ZId, edge, extraTags); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}
 
 	return service.NewAccessCreated()
+}
+
+func createServicePolicyDialForEnvironment(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
+	allTags := zrokTags(svcName)
+	for _, t := range tags {
+		for k, v := range t.SubTags {
+			allTags.SubTags[k] = v
+		}
+	}
+
+	identityRoles := []string{"@" + envZId}
+	name := fmt.Sprintf("%v-%v-dial", envZId, svcName)
+	var postureCheckRoles []string
+	semantic := rest_model.SemanticAllOf
+	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
+	dialBind := rest_model.DialBindDial
+	svcp := &rest_model.ServicePolicyCreate{
+		IdentityRoles:     identityRoles,
+		Name:              &name,
+		PostureCheckRoles: postureCheckRoles,
+		Semantic:          &semantic,
+		ServiceRoles:      serviceRoles,
+		Type:              &dialBind,
+		Tags:              allTags,
+	}
+	req := &service_policy.CreateServicePolicyParams{
+		Policy:  svcp,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("created dial service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
+	return nil
 }
