@@ -10,6 +10,13 @@
  */
 
 /**
+ * @typedef accessResponse
+ * @memberof module:types
+ * 
+ * @property {string} frontendName 
+ */
+
+/**
  * @typedef accountRequest
  * @memberof module:types
  * 

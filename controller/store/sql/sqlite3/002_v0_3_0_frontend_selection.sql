@@ -20,8 +20,9 @@ drop table environments_old;
 create table frontends (
    id                    integer             primary key,
    environment_id        integer             not null references environments(id),
+   name                  varchar(32)         not null unique,
    z_id                  varchar(32)         not null unique,
-   name                  varchar(64)         unique,
+   public_name           varchar(64)         unique,
    created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
    updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now'))
 );

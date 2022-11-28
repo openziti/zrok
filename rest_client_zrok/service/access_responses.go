@@ -7,9 +7,12 @@ package service
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
 // AccessReader is a Reader for the Access structure.
@@ -60,6 +63,7 @@ AccessCreated describes a response with status code 201, with default header val
 access created
 */
 type AccessCreated struct {
+	Payload *rest_model_zrok.AccessResponse
 }
 
 // IsSuccess returns true when this access created response has a 2xx status code
@@ -88,14 +92,25 @@ func (o *AccessCreated) IsCode(code int) bool {
 }
 
 func (o *AccessCreated) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated ", 201)
+	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
 }
 
 func (o *AccessCreated) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated ", 201)
+	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
+}
+
+func (o *AccessCreated) GetPayload() *rest_model_zrok.AccessResponse {
+	return o.Payload
 }
 
 func (o *AccessCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(rest_model_zrok.AccessResponse)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

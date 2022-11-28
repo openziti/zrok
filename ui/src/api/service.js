@@ -5,7 +5,7 @@ import * as gateway from './gateway'
 /**
  * @param {object} options Optional options
  * @param {module:types.accessRequest} [options.body] 
- * @return {Promise<object>} access created
+ * @return {Promise<module:types.accessResponse>} access created
  */
 export function access(options) {
   if (!options) options = {}

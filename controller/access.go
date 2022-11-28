@@ -67,19 +67,37 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		return service.NewAccessNotFound()
 	}
 
-	edge, err := edgeClient()
+	frontendName, err := createToken()
 	if err != nil {
 		logrus.Error(err)
 		return service.NewAccessInternalServerError()
 	}
 
-	extraTags := &rest_model_edge.Tags{SubTags: map[string]interface{}{"zrokEnvironmentZId": envZId}}
+	if _, err := str.CreateFrontend(envId, &store.Frontend{Name: frontendName, ZId: envZId}, tx); err != nil {
+		logrus.Errorf("error creating frontend record: %v", err)
+		return service.NewAccessInternalServerError()
+	}
+
+	edge, err := edgeClient()
+	if err != nil {
+		logrus.Error(err)
+		return service.NewAccessInternalServerError()
+	}
+	extraTags := &rest_model_edge.Tags{SubTags: map[string]interface{}{
+		"zrokEnvironmentZId": envZId,
+		"zrokFrontendName":   frontendName,
+	}}
 	if err := createServicePolicyDialForEnvironment(envZId, ssvc.Name, ssvc.ZId, edge, extraTags); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}
 
-	return service.NewAccessCreated()
+	if err := tx.Commit(); err != nil {
+		logrus.Errorf("error committing frontend record: %v", err)
+		return service.NewAccessInternalServerError()
+	}
+
+	return service.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendName: frontendName})
 }
 
 func createServicePolicyDialForEnvironment(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {

@@ -194,6 +194,8 @@ paths:
       responses:
         201:
           description: access created
+          schema:
+            $ref: "#/definitions/accessResponse"
         401:
           description: unauthorized
         404:
@@ -278,6 +280,12 @@ definitions:
       zId:
         type: string
       svcName:
+        type: string
+
+  accessResponse:
+    type: object
+    properties:
+      frontendName:
         type: string
 
   accountRequest:

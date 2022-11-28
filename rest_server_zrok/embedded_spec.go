@@ -57,7 +57,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "access created"
+            "description": "access created",
+            "schema": {
+              "$ref": "#/definitions/accessResponse"
+            }
           },
           "401": {
             "description": "unauthorized"
@@ -445,6 +448,14 @@ func init() {
           "type": "string"
         },
         "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "accessResponse": {
+      "type": "object",
+      "properties": {
+        "frontendName": {
           "type": "string"
         }
       }
@@ -777,7 +788,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "access created"
+            "description": "access created",
+            "schema": {
+              "$ref": "#/definitions/accessResponse"
+            }
           },
           "401": {
             "description": "unauthorized"
@@ -1165,6 +1179,14 @@ func init() {
           "type": "string"
         },
         "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "accessResponse": {
+      "type": "object",
+      "properties": {
+        "frontendName": {
           "type": "string"
         }
       }
