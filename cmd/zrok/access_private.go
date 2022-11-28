@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -38,6 +39,14 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	svcName := args[0]
+
+	endpointUrl, err := url.Parse("http://" + cmd.bindAddress)
+	if err != nil {
+		if !panicInstead {
+			showError("invalid endpoint address", err)
+		}
+		panic(err)
+	}
 
 	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
@@ -88,6 +97,9 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
+
+	logrus.Infof("access your service at: %v", endpointUrl.String())
+
 	if err := frontend.Run(); err != nil {
 		if !panicInstead {
 			showError("unable to run frontend", err)
