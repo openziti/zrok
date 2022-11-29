@@ -47,20 +47,14 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v'", principal.Email)
-		return service.NewAccessInternalServerError()
+		return service.NewAccessNotFound()
 	}
 
-	ssvcs, err := str.FindServicesForEnvironment(envId, tx)
+	svcName := params.Body.SvcName
+	ssvc, err := str.FindServiceWithName(svcName, tx)
 	if err != nil {
-		logrus.Errorf("error finding services for environment")
-		return service.NewAccessInternalServerError()
-	}
-	var ssvc *store.Service
-	for _, v := range ssvcs {
-		if v.Name == params.Body.SvcName {
-			ssvc = v
-			break
-		}
+		logrus.Errorf("error finding service")
+		return service.NewAccessNotFound()
 	}
 	if ssvc == nil {
 		logrus.Errorf("unable to find service '%v' for user '%v'", params.Body.SvcName, principal.Email)

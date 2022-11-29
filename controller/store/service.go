@@ -53,6 +53,14 @@ func (self *Store) GetAllServices(tx *sqlx.Tx) ([]*Service, error) {
 	return svcs, nil
 }
 
+func (self *Store) FindServiceWithName(svcName string, tx *sqlx.Tx) (*Service, error) {
+	svc := &Service{}
+	if err := tx.QueryRowx("select * from services where name = $1", svcName).StructScan(svc); err != nil {
+		return nil, errors.Wrap(err, "error selecting service by name")
+	}
+	return svc, nil
+}
+
 func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Service, error) {
 	rows, err := tx.Queryx("select services.* from services where environment_id = $1", envId)
 	if err != nil {
