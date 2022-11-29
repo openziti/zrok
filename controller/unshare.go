@@ -75,21 +75,26 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 
-	// single tag-based service deallocator; should work regardless of sharing mode
-	if err := h.deallocateResources(senv, ssvc, svcName, svcZId, edge); err != nil {
-		logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
-		return service.NewUnshareInternalServerError()
-	}
+	if !ssvc.Reserved {
+		// single tag-based service deallocator; should work regardless of sharing mode
+		if err := h.deallocateResources(senv, ssvc, svcName, svcZId, edge); err != nil {
+			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
+			return service.NewUnshareInternalServerError()
+		}
 
-	logrus.Debugf("deallocated service '%v'", svcName)
+		logrus.Debugf("deallocated service '%v'", svcName)
 
-	if err := str.DeleteService(ssvc.Id, tx); err != nil {
-		logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
-		return service.NewUnshareInternalServerError()
-	}
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for '%v': %v", svcZId, err)
-		return service.NewUnshareInternalServerError()
+		if err := str.DeleteService(ssvc.Id, tx); err != nil {
+			logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
+			return service.NewUnshareInternalServerError()
+		}
+		if err := tx.Commit(); err != nil {
+			logrus.Errorf("error committing transaction for '%v': %v", svcZId, err)
+			return service.NewUnshareInternalServerError()
+		}
+
+	} else {
+		logrus.Infof("service '%v' is reserved, skipping deallocation", svcName)
 	}
 
 	return service.NewUnshareOK()
