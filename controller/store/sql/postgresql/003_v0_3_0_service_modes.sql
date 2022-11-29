@@ -6,7 +6,8 @@ create type backend_mode as enum ('proxy', 'web', 'dav');
 alter table services
     add column frontend_selection varchar(64),
     add column share_mode share_mode not null default 'public',
-    add column backend_mode backend_mode not null default 'proxy';
+    add column backend_mode backend_mode not null default 'proxy',
+    add column reserved boolean not null default false;
 
 alter table services
     alter column share_mode drop default;
@@ -28,6 +29,7 @@ create table services (
   frontend_selection        varchar(64),
   frontend_endpoint         varchar(1024),
   backend_proxy_endpoint    varchar(1024),
+  reserved                  boolean             not null default(false),
   created_at                timestamptz         not null default(current_timestamp),
   updated_at                timestamptz         not null default(current_timestamp),
 

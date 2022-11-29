@@ -3,6 +3,7 @@
 alter table services add column frontend_selection string;
 alter table services add column share_mode string not null default 'public';
 alter table services add column backend_mode string not null default 'proxy';
+alter table services add column reserved boolean not null default false;
 
 alter table services rename to services_old;
 
@@ -16,6 +17,7 @@ create table services (
   frontend_selection        string,
   frontend_endpoint         string,
   backend_proxy_endpoint    string,
+  reserved                  boolean             not null default(false),
   created_at                datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at                datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
 

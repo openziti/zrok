@@ -15,15 +15,16 @@ type Service struct {
 	FrontendSelection    *string
 	FrontendEndpoint     *string
 	BackendProxyEndpoint *string
+	Reserved             bool
 }
 
 func (self *Store) CreateService(envId int, svc *Service, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into services (environment_id, z_id, name, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id")
+	stmt, err := tx.Prepare("insert into services (environment_id, z_id, name, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing services insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, svc.ZId, svc.Name, svc.ShareMode, svc.BackendMode, svc.FrontendSelection, svc.FrontendEndpoint, svc.BackendProxyEndpoint).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, svc.ZId, svc.Name, svc.ShareMode, svc.BackendMode, svc.FrontendSelection, svc.FrontendEndpoint, svc.BackendProxyEndpoint, svc.Reserved).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing services insert statement")
 	}
 	return id, nil
@@ -78,12 +79,12 @@ func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Servic
 }
 
 func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
-	sql := "update services set z_id = $1, name = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = $8"
+	sql := "update services set z_id = $1, name = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = $9"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing services update statement")
 	}
-	_, err = stmt.Exec(svc.ZId, svc.Name, svc.ShareMode, svc.BackendMode, svc.FrontendSelection, svc.FrontendEndpoint, svc.BackendProxyEndpoint, svc.Id)
+	_, err = stmt.Exec(svc.ZId, svc.Name, svc.ShareMode, svc.BackendMode, svc.FrontendSelection, svc.FrontendEndpoint, svc.BackendProxyEndpoint, svc.Reserved, svc.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing services update statement")
 	}
