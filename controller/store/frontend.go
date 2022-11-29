@@ -11,15 +11,16 @@ type Frontend struct {
 	Name          string
 	ZId           string
 	PublicName    *string
+	Reserved      bool
 }
 
 func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (environment_id, name, z_id, public_name) values ($1, $2, $3, $4) returning id")
+	stmt, err := tx.Prepare("insert into frontends (environment_id, name, z_id, public_name, reserved) values ($1, $2, $3, $4, $5) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing frontends insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, f.Name, f.ZId, f.PublicName).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, f.Name, f.ZId, f.PublicName, f.Reserved).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing frontends insert statement")
 	}
 	return id, nil

@@ -6,6 +6,7 @@ create table frontends (
   name                  varchar(32)         not null unique,
   z_id                  varchar(32)         not null unique,
   public_name           varchar(64)         unique,
+  reserved              boolean             not null default(false),
   created_at            timestamptz         not null default(current_timestamp),
   updated_at            timestamptz         not null default(current_timestamp)
 );
