@@ -27,6 +27,7 @@ func init() {
 
 type sharePrivateCommand struct {
 	basicAuth []string
+	reserve   bool
 	cmd       *cobra.Command
 }
 
@@ -38,6 +39,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
+	cmd.Flags().BoolVar(&command.reserve, "reserve", false, "Reserve the service (don't free after exit)")
 	cmd.Run = command.run
 	return command
 }
@@ -89,6 +91,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
 		AuthScheme:           string(model.None),
+		Reserve:              cmd.reserve,
 	}
 	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
