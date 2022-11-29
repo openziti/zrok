@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,6 +21,10 @@ func (self *createAccountHandler) Handle(params identity.CreateAccountParams) mi
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return identity.NewCreateAccountBadRequest().WithPayload("missing email")
+	}
+	if !util.IsValidEmail(params.Body.Email) {
+		logrus.Errorf("'%v' is not a valid email address", params.Body.Email)
+		return identity.NewCreateAccountBadRequest().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("'%v' is not a valid email address", params.Body.Email)))
 	}
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/foundation/v2/term"
 	"github.com/spf13/cobra"
@@ -32,6 +33,9 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	email, err := term.Prompt("New Email: ")
 	if err != nil {
 		panic(err)
+	}
+	if !util.IsValidEmail(email) {
+		showError(fmt.Sprintf("'%v' is not a valid email address", email), nil)
 	}
 	confirm, err := term.Prompt("Confirm Email: ")
 	if err != nil {
