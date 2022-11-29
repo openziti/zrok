@@ -34,15 +34,18 @@ type ShareRequest struct {
 	// backend proxy endpoint
 	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
 	// frontend selection
 	FrontendSelection []string `json:"frontendSelection"`
+
+	// reserve
+	Reserve bool `json:"reserve,omitempty"`
 
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
-
-	// z Id
-	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this share request

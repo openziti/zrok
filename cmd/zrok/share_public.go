@@ -102,7 +102,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := service.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		ZID:                  env.ZId,
+		EnvZID:               env.ZId,
 		ShareMode:            "public",
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
@@ -128,7 +128,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg.Service = resp.Payload.SvcName
+	cfg.Service = resp.Payload.SvcToken
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

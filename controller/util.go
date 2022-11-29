@@ -43,7 +43,7 @@ func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
 	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
 }
 
-func createServiceName() (string, error) {
+func createServiceToken() (string, error) {
 	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyz0123456789", 12)
 	if err != nil {
 		return "", err

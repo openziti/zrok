@@ -84,7 +84,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := service.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		ZID:                  env.ZId,
+		EnvZID:               env.ZId,
 		ShareMode:            "private",
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
@@ -110,7 +110,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg.Service = resp.Payload.SvcName
+	cfg.Service = resp.Payload.SvcToken
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -138,7 +138,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.SvcName)
+	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.SvcToken)
 
 	for {
 		time.Sleep(30 * time.Second)

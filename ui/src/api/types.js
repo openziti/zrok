@@ -124,13 +124,14 @@
  * @typedef shareRequest
  * @memberof module:types
  * 
- * @property {string} zId 
+ * @property {string} envZId 
  * @property {string} shareMode 
  * @property {string[]} frontendSelection 
  * @property {string} backendMode 
  * @property {string} backendProxyEndpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
+ * @property {boolean} reserve 
  */
 
 /**
@@ -138,7 +139,7 @@
  * @memberof module:types
  * 
  * @property {string} frontendProxyEndpoint 
- * @property {string} svcName 
+ * @property {string} svcToken 
  */
 
 /**

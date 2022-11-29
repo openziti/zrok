@@ -323,10 +323,6 @@ definitions:
       identity:
         type: string
 
-  environments:
-    type: array
-    items:
-      $ref: "#/definitions/environment"
   environment:
     type: object
     properties:
@@ -345,10 +341,16 @@ definitions:
       updatedAt:
         type: integer
 
+  environments:
+    type: array
+    items:
+      $ref: "#/definitions/environment"
+
   environmentServicesList:
     type: array
     items:
       $ref: "#/definitions/environmentServices"
+
   environmentServices:
     type: object
     properties:
@@ -367,6 +369,7 @@ definitions:
         type: string
       password:
         type: string
+
   loginResponse:
     type: string
 
@@ -387,16 +390,13 @@ definitions:
         type: string
       password:
         type: string
+
   registerResponse:
     type: object
     properties:
       token:
         type: string
 
-  services:
-    type: array
-    items:
-      $ref: "#/definitions/service"
   service:
     type: object
     properties:
@@ -415,6 +415,11 @@ definitions:
       updatedAt:
         type: integer
 
+  services:
+    type: array
+    items:
+      $ref: "#/definitions/service"
+
   serviceMetrics:
     type: array
     items:
@@ -423,7 +428,7 @@ definitions:
   shareRequest:
     type: object
     properties:
-      zId:
+      envZId:
         type: string
       shareMode:
         type: string
@@ -443,12 +448,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/authUser"
+      reserve:
+        type: boolean
+
   shareResponse:
     type: object
     properties:
       frontendProxyEndpoint:
         type: string
-      svcName:
+      svcToken:
         type: string
 
   unaccessRequest:

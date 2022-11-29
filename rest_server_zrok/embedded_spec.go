@@ -669,11 +669,17 @@ func init() {
         "backendProxyEndpoint": {
           "type": "string"
         },
+        "envZId": {
+          "type": "string"
+        },
         "frontendSelection": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        },
+        "reserve": {
+          "type": "boolean"
         },
         "shareMode": {
           "type": "string",
@@ -681,9 +687,6 @@ func init() {
             "public",
             "private"
           ]
-        },
-        "zId": {
-          "type": "string"
         }
       }
     },
@@ -693,7 +696,7 @@ func init() {
         "frontendProxyEndpoint": {
           "type": "string"
         },
-        "svcName": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -1403,11 +1406,17 @@ func init() {
         "backendProxyEndpoint": {
           "type": "string"
         },
+        "envZId": {
+          "type": "string"
+        },
         "frontendSelection": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        },
+        "reserve": {
+          "type": "boolean"
         },
         "shareMode": {
           "type": "string",
@@ -1415,9 +1424,6 @@ func init() {
             "public",
             "private"
           ]
-        },
-        "zId": {
-          "type": "string"
         }
       }
     },
@@ -1427,7 +1433,7 @@ func init() {
         "frontendProxyEndpoint": {
           "type": "string"
         },
-        "svcName": {
+        "svcToken": {
           "type": "string"
         }
       }
