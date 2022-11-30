@@ -59,8 +59,8 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				Backend:   be,
 				UpdatedAt: svc.UpdatedAt.UnixMilli(),
 				ZID:       svc.ZId,
-				Name:      svc.Name,
-				Metrics:   sparkData[svc.Name],
+				Name:      svc.Token,
+				Metrics:   sparkData[svc.Token],
 			})
 		}
 		out = append(out, es)
@@ -89,10 +89,10 @@ func sparkDataForServices(svcs []*store.Service) (map[string][]int64, error) {
 			if writeRate != nil {
 				combinedRate += writeRate.(int64)
 			}
-			svcName := result.Record().ValueByKey("service").(string)
-			svcMetrics := out[svcName]
+			svcToken := result.Record().ValueByKey("service").(string)
+			svcMetrics := out[svcToken]
 			svcMetrics = append(svcMetrics, combinedRate)
-			out[svcName] = svcMetrics
+			out[svcToken] = svcMetrics
 		}
 	}
 	return out, nil
@@ -104,7 +104,7 @@ func sparkFluxQuery(svcs []*store.Service) string {
 		if i > 0 {
 			svcFilter += " or"
 		}
-		svcFilter += fmt.Sprintf(" r[\"service\"] == \"%v\"", svc.Name)
+		svcFilter += fmt.Sprintf(" r[\"service\"] == \"%v\"", svc.Token)
 	}
 	svcFilter += ")"
 	query := "read = from(bucket: \"zrok\")" +

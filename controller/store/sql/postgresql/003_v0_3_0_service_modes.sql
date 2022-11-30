@@ -16,6 +16,7 @@ alter table services
 
 alter table services rename frontend to frontend_endpoint;
 alter table services rename backend to backend_proxy_endpoint;
+alter table services rename name to token;
 
 alter table services rename to services_old;
 
@@ -23,7 +24,7 @@ create table services (
   id                        serial              primary key,
   environment_id            integer             not null references environments(id),
   z_id                      varchar(32)         not null unique,
-  name                      varchar(32)         not null unique,
+  token                      varchar(32)         not null unique,
   share_mode                share_mode          not null,
   backend_mode              backend_mode        not null,
   frontend_selection        varchar(64),
@@ -37,7 +38,7 @@ create table services (
   constraint chk_name check (name <> '')
 );
 
-insert into services (id, environment_id, z_id, name, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at)
-    select id, environment_id, z_id, name, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at from services_old;
+insert into services (id, environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at)
+    select id, environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at from services_old;
 
 drop table services_old;

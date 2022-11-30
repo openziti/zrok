@@ -47,7 +47,7 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error removing environment: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := deleteEdgeRouterPolicy(env.ZId, params.Body.Identity, edge); err != nil {
+	if err := deleteEdgeRouterPolicy(env.ZId, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
@@ -84,24 +84,24 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 		return err
 	}
 	for _, svc := range svcs {
-		svcName := svc.Name
-		logrus.Infof("garbage collecting service '%v' for environment '%v'", svcName, env.ZId)
-		if err := deleteServiceEdgeRouterPolicy(env.ZId, svcName, edge); err != nil {
+		svcToken := svc.Token
+		logrus.Infof("garbage collecting service '%v' for environment '%v'", svcToken, env.ZId)
+		if err := deleteServiceEdgeRouterPolicy(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteServicePolicyDial(env.ZId, svcName, edge); err != nil {
+		if err := deleteServicePolicyDial(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteServicePolicyBind(env.ZId, svcName, edge); err != nil {
+		if err := deleteServicePolicyBind(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteConfig(env.ZId, svcName, edge); err != nil {
+		if err := deleteConfig(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
 		if err := deleteService(env.ZId, svc.ZId, edge); err != nil {
 			logrus.Error(err)
 		}
-		logrus.Infof("removed service '%v' for environment '%v'", svc.Name, env.ZId)
+		logrus.Infof("removed service '%v' for environment '%v'", svc.Token, env.ZId)
 	}
 	return nil
 }

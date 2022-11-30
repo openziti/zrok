@@ -51,7 +51,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	}
 
 	svcName := params.Body.SvcName
-	ssvc, err := str.FindServiceWithName(svcName, tx)
+	ssvc, err := str.FindServiceWithToken(svcName, tx)
 	if err != nil {
 		logrus.Errorf("error finding service")
 		return service.NewAccessNotFound()
@@ -81,7 +81,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		"zrokEnvironmentZId": envZId,
 		"zrokFrontendToken":  feToken,
 	}}
-	if err := createServicePolicyDialForEnvironment(envZId, ssvc.Name, ssvc.ZId, edge, extraTags); err != nil {
+	if err := createServicePolicyDialForEnvironment(envZId, ssvc.Token, ssvc.ZId, edge, extraTags); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}
@@ -94,8 +94,8 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	return service.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendName: feToken})
 }
 
-func createServicePolicyDialForEnvironment(envZId, svcName, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := zrokTags(svcName)
+func createServicePolicyDialForEnvironment(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
+	allTags := zrokTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
 			allTags.SubTags[k] = v
@@ -103,7 +103,7 @@ func createServicePolicyDialForEnvironment(envZId, svcName, svcZId string, edge 
 	}
 
 	identityRoles := []string{"@" + envZId}
-	name := fmt.Sprintf("%v-%v-dial", envZId, svcName)
+	name := fmt.Sprintf("%v-%v-dial", envZId, svcToken)
 	var postureCheckRoles []string
 	semantic := rest_model.SemanticAllOf
 	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}

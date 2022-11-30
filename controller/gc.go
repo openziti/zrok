@@ -42,7 +42,7 @@ func GC(inCfg *Config) error {
 	}
 	liveMap := make(map[string]struct{})
 	for _, dbSvc := range dbSvcs {
-		liveMap[dbSvc.Name] = struct{}{}
+		liveMap[dbSvc.Token] = struct{}{}
 	}
 	if err := gcServices(edge, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting services")

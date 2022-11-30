@@ -12,28 +12,28 @@ func newPrivateResourceAllocator() *privateResourceAllocator {
 	return &privateResourceAllocator{}
 }
 
-func (a *privateResourceAllocator) allocate(envZId, svcName string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
+func (a *privateResourceAllocator) allocate(envZId, svcToken string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
 	var authUsers []*model.AuthUser
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
 	}
-	cfgId, err := createConfig(envZId, svcName, params.Body.AuthScheme, authUsers, edge)
+	cfgId, err := createConfig(envZId, svcToken, params.Body.AuthScheme, authUsers, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	svcZId, err = createService(envZId, svcName, cfgId, edge)
+	svcZId, err = createService(envZId, svcToken, cfgId, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err := createServicePolicyBind(envZId, svcName, svcZId, edge); err != nil {
+	if err := createServicePolicyBind(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := createServiceEdgeRouterPolicy(envZId, svcName, svcZId, edge); err != nil {
+	if err := createServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 
-	return svcZId, []string{proxyUrl(svcName)}, nil
+	return svcZId, []string{proxyUrl(svcToken)}, nil
 }

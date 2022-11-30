@@ -9,7 +9,7 @@ endpoint:
   port:             18080
 
 proxy:
-  url_template:     "https://{svcName}.in.zrok.io/"
+  url_template:     "https://{svcToken}.in.zrok.io/"
   identities:
     - "e6gMfeD4y"
 

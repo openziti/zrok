@@ -80,7 +80,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 
 	sid, err := str.CreateService(envId, &store.Service{
 		ZId:                  svcZId,
-		Name:                 svcToken,
+		Token:                svcToken,
 		ShareMode:            params.Body.ShareMode,
 		BackendMode:          params.Body.BackendMode,
 		FrontendEndpoint:     &frontendEndpoints[0],
