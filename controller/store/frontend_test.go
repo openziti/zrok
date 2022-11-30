@@ -31,7 +31,7 @@ func TestPublicFrontend(t *testing.T) {
 
 	feName := "public"
 	feId, err := str.CreateFrontend(envId, &Frontend{
-		Name:       "name",
+		Token:      "token",
 		ZId:        "zId0",
 		PublicName: &feName,
 	}, tx)

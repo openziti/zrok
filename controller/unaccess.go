@@ -69,7 +69,7 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 		return service.NewUnaccessNotFound()
 	}
 
-	if err := deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and tags.zrokFrontendName=\"%v\" and type=1", svcName, frontendName), edge); err != nil {
+	if err := deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceName=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", svcName, frontendName), edge); err != nil {
 		logrus.Errorf("error removing access to '%v' for '%v': %v", svcName, envZId, err)
 		return service.NewUnaccessInternalServerError()
 	}

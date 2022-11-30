@@ -3,7 +3,7 @@
 create table frontends (
   id                    serial              primary key,
   environment_id        integer             not null references environments(id),
-  name                  varchar(32)         not null unique,
+  token                 varchar(32)         not null unique,
   z_id                  varchar(32)         not null unique,
   public_name           varchar(64)         unique,
   reserved              boolean             not null default(false),
