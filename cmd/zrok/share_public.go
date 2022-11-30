@@ -42,7 +42,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	}
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
-	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
+	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Run = command.run
 	return command
 }

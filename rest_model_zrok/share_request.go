@@ -40,6 +40,9 @@ type ShareRequest struct {
 	// frontend selection
 	FrontendSelection []string `json:"frontendSelection"`
 
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
+
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`

@@ -20,6 +20,9 @@ type UnshareRequest struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
+
 	// svc token
 	SvcToken string `json:"svcToken,omitempty"`
 }

@@ -736,6 +736,9 @@ func init() {
             "type": "string"
           }
         },
+        "reserved": {
+          "type": "boolean"
+        },
         "shareMode": {
           "type": "string",
           "enum": [
@@ -775,6 +778,9 @@ func init() {
       "properties": {
         "envZId": {
           "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
         },
         "svcToken": {
           "type": "string"
@@ -1528,6 +1534,9 @@ func init() {
             "type": "string"
           }
         },
+        "reserved": {
+          "type": "boolean"
+        },
         "shareMode": {
           "type": "string",
           "enum": [
@@ -1567,6 +1576,9 @@ func init() {
       "properties": {
         "envZId": {
           "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
         },
         "svcToken": {
           "type": "string"

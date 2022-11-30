@@ -152,6 +152,7 @@
  * @property {string} backendProxyEndpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
+ * @property {boolean} reserved 
  */
 
 /**
@@ -177,6 +178,7 @@
  * 
  * @property {string} envZId 
  * @property {string} svcToken 
+ * @property {boolean} reserved 
  */
 
 /**

@@ -491,6 +491,8 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/authUser"
+      reserved:
+        type: boolean
 
   shareResponse:
     type: object
@@ -517,6 +519,8 @@ definitions:
         type: string
       svcToken:
         type: string
+      reserved:
+        type: boolean
 
   verifyRequest:
     type: object

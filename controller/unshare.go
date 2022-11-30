@@ -75,7 +75,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 
-	if !ssvc.Reserved {
+	if ssvc.Reserved == params.Body.Reserved {
 		// single tag-based service deallocator; should work regardless of sharing mode
 		if err := h.deallocateResources(senv, ssvc, svcToken, svcZId, edge); err != nil {
 			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
