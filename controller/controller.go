@@ -6,7 +6,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
 )
@@ -26,12 +26,12 @@ func Run(inCfg *Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = ZrokAuthenticate
-	api.IdentityCreateAccountHandler = newCreateAccountHandler()
-	api.IdentityEnableHandler = newEnableHandler()
-	api.IdentityDisableHandler = newDisableHandler()
-	api.IdentityLoginHandler = identity.LoginHandlerFunc(loginHandler)
-	api.IdentityRegisterHandler = newRegisterHandler()
-	api.IdentityVerifyHandler = newVerifyHandler()
+	api.AccountInviteHandler = newInviteHandler()
+	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
+	api.AccountRegisterHandler = newRegisterHandler()
+	api.AccountVerifyHandler = newVerifyHandler()
+	api.EnvironmentEnableHandler = newEnableHandler()
+	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ServiceAccessHandler = newAccessHandler()

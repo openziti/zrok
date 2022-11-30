@@ -20,7 +20,8 @@ import (
 	"github.com/go-openapi/swag"
 
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 )
@@ -50,26 +51,26 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ServiceAccessHandler: service.AccessHandlerFunc(func(params service.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Access has not yet been implemented")
 		}),
-		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
+		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
 		}),
-		IdentityDisableHandler: identity.DisableHandlerFunc(func(params identity.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Disable has not yet been implemented")
-		}),
-		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
+		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
 		ServiceGetServiceHandler: service.GetServiceHandlerFunc(func(params service.GetServiceParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.GetService has not yet been implemented")
 		}),
-		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
+		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
+		}),
+		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
-		IdentityRegisterHandler: identity.RegisterHandlerFunc(func(params identity.RegisterParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Register has not yet been implemented")
+		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
 		ServiceShareHandler: service.ShareHandlerFunc(func(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Share has not yet been implemented")
@@ -80,8 +81,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ServiceUnshareHandler: service.UnshareHandlerFunc(func(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Unshare has not yet been implemented")
 		}),
-		IdentityVerifyHandler: identity.VerifyHandlerFunc(func(params identity.VerifyParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Verify has not yet been implemented")
+		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
 		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
@@ -138,28 +139,28 @@ type ZrokAPI struct {
 
 	// ServiceAccessHandler sets the operation handler for the access operation
 	ServiceAccessHandler service.AccessHandler
-	// IdentityCreateAccountHandler sets the operation handler for the create account operation
-	IdentityCreateAccountHandler identity.CreateAccountHandler
-	// IdentityDisableHandler sets the operation handler for the disable operation
-	IdentityDisableHandler identity.DisableHandler
-	// IdentityEnableHandler sets the operation handler for the enable operation
-	IdentityEnableHandler identity.EnableHandler
+	// EnvironmentDisableHandler sets the operation handler for the disable operation
+	EnvironmentDisableHandler environment.DisableHandler
+	// EnvironmentEnableHandler sets the operation handler for the enable operation
+	EnvironmentEnableHandler environment.EnableHandler
 	// ServiceGetServiceHandler sets the operation handler for the get service operation
 	ServiceGetServiceHandler service.GetServiceHandler
-	// IdentityLoginHandler sets the operation handler for the login operation
-	IdentityLoginHandler identity.LoginHandler
+	// AccountInviteHandler sets the operation handler for the invite operation
+	AccountInviteHandler account.InviteHandler
+	// AccountLoginHandler sets the operation handler for the login operation
+	AccountLoginHandler account.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
-	// IdentityRegisterHandler sets the operation handler for the register operation
-	IdentityRegisterHandler identity.RegisterHandler
+	// AccountRegisterHandler sets the operation handler for the register operation
+	AccountRegisterHandler account.RegisterHandler
 	// ServiceShareHandler sets the operation handler for the share operation
 	ServiceShareHandler service.ShareHandler
 	// ServiceUnaccessHandler sets the operation handler for the unaccess operation
 	ServiceUnaccessHandler service.UnaccessHandler
 	// ServiceUnshareHandler sets the operation handler for the unshare operation
 	ServiceUnshareHandler service.UnshareHandler
-	// IdentityVerifyHandler sets the operation handler for the verify operation
-	IdentityVerifyHandler identity.VerifyHandler
+	// AccountVerifyHandler sets the operation handler for the verify operation
+	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -246,26 +247,26 @@ func (o *ZrokAPI) Validate() error {
 	if o.ServiceAccessHandler == nil {
 		unregistered = append(unregistered, "service.AccessHandler")
 	}
-	if o.IdentityCreateAccountHandler == nil {
-		unregistered = append(unregistered, "identity.CreateAccountHandler")
+	if o.EnvironmentDisableHandler == nil {
+		unregistered = append(unregistered, "environment.DisableHandler")
 	}
-	if o.IdentityDisableHandler == nil {
-		unregistered = append(unregistered, "identity.DisableHandler")
-	}
-	if o.IdentityEnableHandler == nil {
-		unregistered = append(unregistered, "identity.EnableHandler")
+	if o.EnvironmentEnableHandler == nil {
+		unregistered = append(unregistered, "environment.EnableHandler")
 	}
 	if o.ServiceGetServiceHandler == nil {
 		unregistered = append(unregistered, "service.GetServiceHandler")
 	}
-	if o.IdentityLoginHandler == nil {
-		unregistered = append(unregistered, "identity.LoginHandler")
+	if o.AccountInviteHandler == nil {
+		unregistered = append(unregistered, "account.InviteHandler")
+	}
+	if o.AccountLoginHandler == nil {
+		unregistered = append(unregistered, "account.LoginHandler")
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
-	if o.IdentityRegisterHandler == nil {
-		unregistered = append(unregistered, "identity.RegisterHandler")
+	if o.AccountRegisterHandler == nil {
+		unregistered = append(unregistered, "account.RegisterHandler")
 	}
 	if o.ServiceShareHandler == nil {
 		unregistered = append(unregistered, "service.ShareHandler")
@@ -276,8 +277,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.ServiceUnshareHandler == nil {
 		unregistered = append(unregistered, "service.UnshareHandler")
 	}
-	if o.IdentityVerifyHandler == nil {
-		unregistered = append(unregistered, "identity.VerifyHandler")
+	if o.AccountVerifyHandler == nil {
+		unregistered = append(unregistered, "account.VerifyHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -388,15 +389,11 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
+	o.handlers["POST"]["/disable"] = environment.NewDisable(o.context, o.EnvironmentDisableHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/disable"] = identity.NewDisable(o.context, o.IdentityDisableHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
-	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
+	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -404,7 +401,11 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/login"] = identity.NewLogin(o.context, o.IdentityLoginHandler)
+	o.handlers["POST"]["/invite"] = account.NewInvite(o.context, o.AccountInviteHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -412,7 +413,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/register"] = identity.NewRegister(o.context, o.IdentityRegisterHandler)
+	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -428,7 +429,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/verify"] = identity.NewVerify(o.context, o.IdentityVerifyHandler)
+	o.handlers["POST"]["/verify"] = account.NewVerify(o.context, o.AccountVerifyHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

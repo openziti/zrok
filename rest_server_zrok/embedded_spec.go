@@ -31,7 +31,7 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "1.0.0"
+    "version": "0.3.0"
   },
   "basePath": "/api/v1",
   "paths": {
@@ -74,40 +74,6 @@ func init() {
         }
       }
     },
-    "/account": {
-      "post": {
-        "tags": [
-          "identity"
-        ],
-        "operationId": "createAccount",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/accountRequest"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "account created"
-          },
-          "400": {
-            "description": "account not created (already exists)",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      }
-    },
     "/disable": {
       "post": {
         "security": [
@@ -116,7 +82,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "disable",
         "parameters": [
@@ -136,10 +102,7 @@ func init() {
             "description": "invalid environment"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -152,7 +115,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "enable",
         "parameters": [
@@ -172,16 +135,41 @@ func init() {
             }
           },
           "401": {
-            "description": "invalid api key"
+            "description": "unauthorized"
           },
           "404": {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "invite",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/inviteRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation created"
+          },
+          "400": {
+            "description": "invitation not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -189,7 +177,7 @@ func init() {
     "/login": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "login",
         "parameters": [
@@ -244,7 +232,7 @@ func init() {
     "/register": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "register",
         "parameters": [
@@ -267,10 +255,7 @@ func init() {
             "description": "request not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -431,7 +416,7 @@ func init() {
     "/verify": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "verify",
         "parameters": [
@@ -454,10 +439,7 @@ func init() {
             "description": "token not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -495,14 +477,6 @@ func init() {
       "type": "object",
       "properties": {
         "frontendName": {
-          "type": "string"
-        }
-      }
-    },
-    "accountRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
           "type": "string"
         }
       }
@@ -599,6 +573,14 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
     },
     "loginRequest": {
       "type": "object",
@@ -841,7 +823,7 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "1.0.0"
+    "version": "0.3.0"
   },
   "basePath": "/api/v1",
   "paths": {
@@ -884,40 +866,6 @@ func init() {
         }
       }
     },
-    "/account": {
-      "post": {
-        "tags": [
-          "identity"
-        ],
-        "operationId": "createAccount",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/accountRequest"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "account created"
-          },
-          "400": {
-            "description": "account not created (already exists)",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      }
-    },
     "/disable": {
       "post": {
         "security": [
@@ -926,7 +874,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "disable",
         "parameters": [
@@ -946,10 +894,7 @@ func init() {
             "description": "invalid environment"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -962,7 +907,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "enable",
         "parameters": [
@@ -982,16 +927,41 @@ func init() {
             }
           },
           "401": {
-            "description": "invalid api key"
+            "description": "unauthorized"
           },
           "404": {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "invite",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/inviteRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation created"
+          },
+          "400": {
+            "description": "invitation not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -999,7 +969,7 @@ func init() {
     "/login": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "login",
         "parameters": [
@@ -1054,7 +1024,7 @@ func init() {
     "/register": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "register",
         "parameters": [
@@ -1077,10 +1047,7 @@ func init() {
             "description": "request not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -1241,7 +1208,7 @@ func init() {
     "/verify": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "verify",
         "parameters": [
@@ -1264,10 +1231,7 @@ func init() {
             "description": "token not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -1305,14 +1269,6 @@ func init() {
       "type": "object",
       "properties": {
         "frontendName": {
-          "type": "string"
-        }
-      }
-    },
-    "accountRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
           "type": "string"
         }
       }
@@ -1409,6 +1365,14 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
     },
     "loginRequest": {
       "type": "object",

@@ -10,7 +10,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
 )
@@ -57,7 +58,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 
 	cli := new(Zrok)
 	cli.Transport = transport
-	cli.Identity = identity.New(transport, formats)
+	cli.Account = account.New(transport, formats)
+	cli.Environment = environment.New(transport, formats)
 	cli.Metadata = metadata.New(transport, formats)
 	cli.Service = service.New(transport, formats)
 	return cli
@@ -104,7 +106,9 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Zrok is a client for zrok
 type Zrok struct {
-	Identity identity.ClientService
+	Account account.ClientService
+
+	Environment environment.ClientService
 
 	Metadata metadata.ClientService
 
@@ -116,7 +120,8 @@ type Zrok struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-	c.Identity.SetTransport(transport)
+	c.Account.SetTransport(transport)
+	c.Environment.SetTransport(transport)
 	c.Metadata.SetTransport(transport)
 	c.Service.SetTransport(transport)
 }

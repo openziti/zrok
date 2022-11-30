@@ -4,7 +4,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -17,51 +17,51 @@ func newDisableHandler() *disableHandler {
 	return &disableHandler{}
 }
 
-func (self *disableHandler) Handle(params identity.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *disableHandler) Handle(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
-	envId, err := self.checkZitiIdentity(params.Body.Identity, principal, tx)
+	envId, err := h.checkZitiIdentity(params.Body.Identity, principal, tx)
 	if err != nil {
 		logrus.Errorf("identity check failed: %v", err)
-		return identity.NewDisableUnauthorized()
+		return environment.NewDisableUnauthorized()
 	}
 	env, err := str.GetEnvironment(envId, tx)
 	if err != nil {
 		logrus.Errorf("error getting environment: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
-	if err := self.removeServicesForEnvironment(envId, tx, edge); err != nil {
+	if err := h.removeServicesForEnvironment(envId, tx, edge); err != nil {
 		logrus.Errorf("error removing services for environment: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
-	if err := self.removeEnvironment(envId, tx); err != nil {
+	if err := h.removeEnvironment(envId, tx); err != nil {
 		logrus.Errorf("error removing environment: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
 	if err := deleteEdgeRouterPolicy(env.ZId, params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
 	if err := deleteIdentity(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting identity: %v", err)
-		return identity.NewDisableInternalServerError()
+		return environment.NewDisableInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)
 	}
-	return identity.NewDisableOK()
+	return environment.NewDisableOK()
 }
 
-func (self *disableHandler) checkZitiIdentity(id string, principal *rest_model_zrok.Principal, tx *sqlx.Tx) (int, error) {
+func (h *disableHandler) checkZitiIdentity(id string, principal *rest_model_zrok.Principal, tx *sqlx.Tx) (int, error) {
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
 		return -1, err
@@ -74,7 +74,7 @@ func (self *disableHandler) checkZitiIdentity(id string, principal *rest_model_z
 	return -1, errors.Errorf("no such environment '%v'", id)
 }
 
-func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	env, err := str.GetEnvironment(envId, tx)
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (self *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx,
 	return nil
 }
 
-func (self *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
+func (h *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
 	svcs, err := str.FindServicesForEnvironment(envId, tx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding services for environment '%d'", envId)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/shirou/gopsutil/v3/host"
@@ -61,12 +61,12 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
-	req := identity.NewEnableParams()
+	req := environment.NewEnableParams()
 	req.Body = &rest_model_zrok.EnableRequest{
 		Description: cmd.description,
 		Host:        hostDetail,
 	}
-	resp, err := zrok.Identity.Enable(req, auth)
+	resp, err := zrok.Environment.Enable(req, auth)
 	if err != nil {
 		if !panicInstead {
 			showError("the zrok service returned an error", err)

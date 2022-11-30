@@ -17,18 +17,18 @@
  */
 
 /**
- * @typedef accountRequest
- * @memberof module:types
- * 
- * @property {string} email 
- */
-
-/**
  * @typedef authUser
  * @memberof module:types
  * 
  * @property {string} username 
  * @property {string} password 
+ */
+
+/**
+ * @typedef disableRequest
+ * @memberof module:types
+ * 
+ * @property {string} identity 
  */
 
 /**
@@ -45,13 +45,6 @@
  * 
  * @property {string} identity 
  * @property {string} cfg 
- */
-
-/**
- * @typedef disableRequest
- * @memberof module:types
- * 
- * @property {string} identity 
  */
 
 /**
@@ -73,6 +66,13 @@
  * 
  * @property {module:types.environment} environment 
  * @property {module:types.services} services 
+ */
+
+/**
+ * @typedef inviteRequest
+ * @memberof module:types
+ * 
+ * @property {string} email 
  */
 
 /**

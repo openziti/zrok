@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -52,17 +52,17 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	req := identity.NewCreateAccountParams()
-	req.Body = &rest_model_zrok.AccountRequest{
+	req := account.NewInviteParams()
+	req.Body = &rest_model_zrok.InviteRequest{
 		Email: email,
 	}
-	_, err = zrok.Identity.CreateAccount(req)
+	_, err = zrok.Account.Invite(req)
 	if err != nil {
 		if !panicInstead {
-			showError("error creating account", err)
+			showError("error creating invitation", err)
 		}
 		panic(err)
 	}
 
-	fmt.Printf("registration invitation sent to '%v'!\n", email)
+	fmt.Printf("invitation sent to '%v'!\n", email)
 }

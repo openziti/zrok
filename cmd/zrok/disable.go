@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
@@ -45,11 +45,11 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := identity.NewDisableParams()
+	req := environment.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
 		Identity: env.ZId,
 	}
-	_, err = zrok.Identity.Disable(req, auth)
+	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
 		logrus.Warnf("service cleanup failed (%v); will clean up local environment", err)
 	}

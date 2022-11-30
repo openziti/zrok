@@ -9,7 +9,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/build"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
@@ -27,32 +27,32 @@ func newEnableHandler() *enableHandler {
 	return &enableHandler{}
 }
 
-func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return identity.NewEnableInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
 
 	client, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
-		return identity.NewEnableInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
-	ident, err := self.createIdentity(principal.Email, client)
+	ident, err := h.createIdentity(principal.Email, client)
 	if err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
-	cfg, err := self.enrollIdentity(ident.Payload.Data.ID, client)
+	cfg, err := h.enrollIdentity(ident.Payload.Data.ID, client)
 	if err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
-	if err := self.createEdgeRouterPolicy(ident.Payload.Data.ID, client); err != nil {
+	if err := h.createEdgeRouterPolicy(ident.Payload.Data.ID, client); err != nil {
 		logrus.Error(err)
-		return identity.NewEnableInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
 		Description: params.Body.Description,
@@ -63,15 +63,15 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)
 		_ = tx.Rollback()
-		return identity.NewCreateAccountInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)
-		return identity.NewCreateAccountInternalServerError()
+		return environment.NewEnableInternalServerError()
 	}
 	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
 
-	resp := identity.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
+	resp := environment.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
 		Identity: ident.Payload.Data.ID,
 	})
 
@@ -87,14 +87,14 @@ func (self *enableHandler) Handle(params identity.EnableParams, principal *rest_
 	return resp
 }
 
-func (self *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+func (h *enableHandler) createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	iIsAdmin := false
 	name, err := createToken()
 	if err != nil {
 		return nil, err
 	}
 	identityType := rest_model_edge.IdentityTypeUser
-	tags := self.zrokTags()
+	tags := h.zrokTags()
 	tags.SubTags["zrokEmail"] = email
 	i := &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
@@ -114,7 +114,7 @@ func (self *enableHandler) createIdentity(email string, client *rest_management_
 	return resp, nil
 }
 
-func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
+func (h *enableHandler) enrollIdentity(id string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
 	p := &identity_edge.DetailIdentityParams{
 		Context: context.Background(),
 		ID:      id,
@@ -139,7 +139,7 @@ func (_ *enableHandler) enrollIdentity(id string, client *rest_management_api_cl
 	return conf, nil
 }
 
-func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *enableHandler) createEdgeRouterPolicy(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	identityRoles := []string{fmt.Sprintf("@%v", id)}
 	semantic := rest_model_edge.SemanticAllOf
@@ -148,7 +148,7 @@ func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_manageme
 		IdentityRoles:   identityRoles,
 		Name:            &id,
 		Semantic:        &semantic,
-		Tags:            self.zrokTags(),
+		Tags:            h.zrokTags(),
 	}
 	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
 		Policy:  erp,
@@ -163,7 +163,7 @@ func (self *enableHandler) createEdgeRouterPolicy(id string, edge *rest_manageme
 	return nil
 }
 
-func (self *enableHandler) zrokTags() *rest_model_edge.Tags {
+func (h *enableHandler) zrokTags() *rest_model_edge.Tags {
 	return &rest_model_edge.Tags{
 		SubTags: map[string]interface{}{
 			"zrok": build.String(),
