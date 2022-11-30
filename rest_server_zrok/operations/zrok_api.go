@@ -59,6 +59,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
 		}),
+		ServiceGetServiceHandler: service.GetServiceHandlerFunc(func(params service.GetServiceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation service.GetService has not yet been implemented")
+		}),
 		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
 		}),
@@ -141,6 +144,8 @@ type ZrokAPI struct {
 	IdentityDisableHandler identity.DisableHandler
 	// IdentityEnableHandler sets the operation handler for the enable operation
 	IdentityEnableHandler identity.EnableHandler
+	// ServiceGetServiceHandler sets the operation handler for the get service operation
+	ServiceGetServiceHandler service.GetServiceHandler
 	// IdentityLoginHandler sets the operation handler for the login operation
 	IdentityLoginHandler identity.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
@@ -249,6 +254,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.IdentityEnableHandler == nil {
 		unregistered = append(unregistered, "identity.EnableHandler")
+	}
+	if o.ServiceGetServiceHandler == nil {
+		unregistered = append(unregistered, "service.GetServiceHandler")
 	}
 	if o.IdentityLoginHandler == nil {
 		unregistered = append(unregistered, "identity.LoginHandler")
@@ -389,6 +397,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/service"] = service.NewGetService(o.context, o.ServiceGetServiceHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

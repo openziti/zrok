@@ -108,6 +108,20 @@
  */
 
 /**
+ * @typedef service03
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ * @property {string} zId 
+ * @property {string} shareMode 
+ * @property {string} backendMode 
+ * @property {string} frontendSelection 
+ * @property {string} frontendEndpoint 
+ * @property {string} backendProxyEndpoint 
+ * @property {boolean} reserved 
+ */
+
+/**
  * @typedef service
  * @memberof module:types
  * 
@@ -121,6 +135,13 @@
  */
 
 /**
+ * @typedef serviceRequest
+ * @memberof module:types
+ * 
+ * @property {string} svcToken 
+ */
+
+/**
  * @typedef shareRequest
  * @memberof module:types
  * 
@@ -131,7 +152,6 @@
  * @property {string} backendProxyEndpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
- * @property {boolean} reserve 
  */
 
 /**

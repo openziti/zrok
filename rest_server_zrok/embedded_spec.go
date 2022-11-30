@@ -275,6 +275,45 @@ func init() {
         }
       }
     },
+    "/service": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "getService",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/serviceRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/service"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -634,10 +673,47 @@ func init() {
         }
       }
     },
+    "service03": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "frontendEndpoint": {
+          "type": "string"
+        },
+        "frontendSelection": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "serviceMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
+      }
+    },
+    "serviceRequest": {
+      "type": "object",
+      "properties": {
+        "svcToken": {
+          "type": "string"
+        }
       }
     },
     "services": {
@@ -677,9 +753,6 @@ func init() {
           "items": {
             "type": "string"
           }
-        },
-        "reserve": {
-          "type": "boolean"
         },
         "shareMode": {
           "type": "string",
@@ -1012,6 +1085,45 @@ func init() {
         }
       }
     },
+    "/service": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "getService",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/serviceRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/service"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -1371,10 +1483,47 @@ func init() {
         }
       }
     },
+    "service03": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "frontendEndpoint": {
+          "type": "string"
+        },
+        "frontendSelection": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "serviceMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
+      }
+    },
+    "serviceRequest": {
+      "type": "object",
+      "properties": {
+        "svcToken": {
+          "type": "string"
+        }
       }
     },
     "services": {
@@ -1414,9 +1563,6 @@ func init() {
           "items": {
             "type": "string"
           }
-        },
-        "reserve": {
-          "type": "boolean"
         },
         "shareMode": {
           "type": "string",

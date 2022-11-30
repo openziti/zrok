@@ -203,21 +203,23 @@ paths:
         500:
           description: internal server error
 
-  /unaccess:
-    delete:
+  /service:
+    get:
       tags:
         - service
       security:
         - key: []
-      operationId: unaccess
+      operationId: getService
       parameters:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/unaccessRequest"
+            $ref: "#/definitions/serviceRequest"
       responses:
         200:
-          description: access removed
+          description: ok
+          schema:
+            $ref: "#/definitions/service"
         401:
           description: unauthorized
         404:
@@ -248,6 +250,28 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
+  /unaccess:
+    delete:
+      tags:
+        - service
+      security:
+        - key: []
+      operationId: unaccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/unaccessRequest"
+      responses:
+        200:
+          description: access removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   /unshare:
     delete:
@@ -397,6 +421,26 @@ definitions:
       token:
         type: string
 
+  service03:
+    type: object
+    properties:
+      token:
+        type: string
+      zId:
+        type: string
+      shareMode:
+        type: string
+      backendMode:
+        type: string
+      frontendSelection:
+        type: string
+      frontendEndpoint:
+        type: string
+      backendProxyEndpoint:
+        type: string
+      reserved:
+        type: boolean
+
   service:
     type: object
     properties:
@@ -425,6 +469,12 @@ definitions:
     items:
       type: integer
 
+  serviceRequest:
+    type: object
+    properties:
+      svcToken:
+        type: string
+
   shareRequest:
     type: object
     properties:
@@ -448,8 +498,6 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/authUser"
-      reserve:
-        type: boolean
 
   shareResponse:
     type: object

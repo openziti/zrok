@@ -78,10 +78,6 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 
 	logrus.Debugf("allocated service '%v'", svcToken)
 
-	reserved := false
-	if params.Body.Reserve {
-		reserved = true
-	}
 	sid, err := str.CreateService(envId, &store.Service{
 		ZId:                  svcZId,
 		Name:                 svcToken,
@@ -89,7 +85,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 		BackendMode:          params.Body.BackendMode,
 		FrontendEndpoint:     &frontendEndpoints[0],
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
-		Reserved:             reserved,
+		Reserved:             false,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)

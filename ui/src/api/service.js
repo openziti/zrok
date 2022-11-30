@@ -19,17 +19,17 @@ export function access(options) {
 
 /**
  * @param {object} options Optional options
- * @param {module:types.unaccessRequest} [options.body] 
- * @return {Promise<object>} access removed
+ * @param {module:types.serviceRequest} [options.body] 
+ * @return {Promise<module:types.service>} ok
  */
-export function unaccess(options) {
+export function getService(options) {
   if (!options) options = {}
   const parameters = {
     body: {
       body: options.body
     }
   }
-  return gateway.request(unaccessOperation, parameters)
+  return gateway.request(getServiceOperation, parameters)
 }
 
 /**
@@ -45,6 +45,21 @@ export function share(options) {
     }
   }
   return gateway.request(shareOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
+ * @param {module:types.unaccessRequest} [options.body] 
+ * @return {Promise<object>} access removed
+ */
+export function unaccess(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(unaccessOperation, parameters)
 }
 
 /**
@@ -73,10 +88,10 @@ const accessOperation = {
   ]
 }
 
-const unaccessOperation = {
-  path: '/unaccess',
+const getServiceOperation = {
+  path: '/service',
   contentTypes: ['application/zrok.v1+json'],
-  method: 'delete',
+  method: 'get',
   security: [
     {
       id: 'key'
@@ -88,6 +103,17 @@ const shareOperation = {
   path: '/share',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const unaccessOperation = {
+  path: '/unaccess',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'delete',
   security: [
     {
       id: 'key'
