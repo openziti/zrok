@@ -1,5 +1,5 @@
 import {useState} from "react";
-import * as identity from './api/identity';
+import * as account from './api/account';
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ const Login = (props) => {
     const handleSubmit = async e => {
         e.preventDefault()
 
-        identity.login({body: {"email": email, "password": password}})
+        account.login({body: {"email": email, "password": password}})
             .then(resp => {
                 if (!resp.error) {
                     let user = {

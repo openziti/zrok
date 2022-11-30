@@ -465,10 +465,10 @@ func init() {
     "accessRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -476,7 +476,7 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
-        "frontendName": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -632,19 +632,19 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
-        "backend": {
+        "backendProxyEndpoint": {
           "type": "string"
         },
         "createdAt": {
           "type": "integer"
         },
-        "frontend": {
+        "frontendEndpoint": {
           "type": "string"
         },
         "metrics": {
           "$ref": "#/definitions/serviceMetrics"
         },
-        "name": {
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -759,13 +759,13 @@ func init() {
     "unaccessRequest": {
       "type": "object",
       "properties": {
-        "frontendName": {
+        "envZId": {
           "type": "string"
         },
-        "svcName": {
+        "frontendToken": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -773,10 +773,10 @@ func init() {
     "unshareRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -1257,10 +1257,10 @@ func init() {
     "accessRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -1268,7 +1268,7 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
-        "frontendName": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -1424,19 +1424,19 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
-        "backend": {
+        "backendProxyEndpoint": {
           "type": "string"
         },
         "createdAt": {
           "type": "integer"
         },
-        "frontend": {
+        "frontendEndpoint": {
           "type": "string"
         },
         "metrics": {
           "$ref": "#/definitions/serviceMetrics"
         },
-        "name": {
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -1551,13 +1551,13 @@ func init() {
     "unaccessRequest": {
       "type": "object",
       "properties": {
-        "frontendName": {
+        "envZId": {
           "type": "string"
         },
-        "svcName": {
+        "frontendToken": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }
@@ -1565,10 +1565,10 @@ func init() {
     "unshareRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "svcToken": {
           "type": "string"
         }
       }

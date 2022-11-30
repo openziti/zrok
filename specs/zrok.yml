@@ -293,15 +293,15 @@ definitions:
   accessRequest:
     type: object
     properties:
-      zId:
+      envZId:
         type: string
-      svcName:
+      svcToken:
         type: string
 
   accessResponse:
     type: object
     properties:
-      frontendName:
+      frontendToken:
         type: string
 
   authUser:
@@ -439,11 +439,11 @@ definitions:
     properties:
       zId:
         type: string
-      name:
+      token:
         type: string
-      frontend:
+      frontendEndpoint:
         type: string
-      backend:
+      backendProxyEndpoint:
         type: string
       metrics:
         $ref: "#/definitions/serviceMetrics"
@@ -503,19 +503,19 @@ definitions:
   unaccessRequest:
     type: object
     properties:
-      frontendName:
+      frontendToken:
         type: string
-      zId:
+      envZId:
         type: string
-      svcName:
+      svcToken:
         type: string
 
   unshareRequest:
     type: object
     properties:
-      zId:
+      envZId:
         type: string
-      svcName:
+      svcToken:
         type: string
 
   verifyRequest:

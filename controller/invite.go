@@ -77,5 +77,5 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 
 	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)
 
-	return account.NewInviteInternalServerError()
+	return account.NewInviteCreated()
 }

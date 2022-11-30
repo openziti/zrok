@@ -38,7 +38,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 }
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
-	svcName := args[0]
+	svcToken := args[0]
 
 	endpointUrl, err := url.Parse("http://" + cmd.bindAddress)
 	if err != nil {
@@ -66,8 +66,8 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
 	req := service.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
-		SvcName: svcName,
-		ZID:     env.ZId,
+		SvcToken: svcToken,
+		EnvZID:   env.ZId,
 	}
 	accessResp, err := zrok.Service.Access(req, auth)
 	if err != nil {
@@ -76,17 +76,17 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendName)
+	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
 	cfg := private_frontend.DefaultConfig("backend")
-	cfg.SvcName = svcName
+	cfg.SvcToken = svcToken
 	cfg.Address = cmd.bindAddress
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendName, env.ZId, svcName, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.ZId, svcToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -107,13 +107,13 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *accessPrivateCommand) destroy(frotendName, envZId, svcName string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", svcName)
+func (cmd *accessPrivateCommand) destroy(frotendName, envZId, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", svcToken)
 	req := service.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendName: frotendName,
-		SvcName:      svcName,
-		ZID:          envZId,
+		FrontendToken: frotendName,
+		SvcToken:      svcToken,
+		EnvZID:        envZId,
 	}
 	if _, err := zrok.Service.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

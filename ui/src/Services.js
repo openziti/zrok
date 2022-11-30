@@ -6,9 +6,9 @@ import * as service from './api/service';
 
 const Services = (props) => {
 	const humanizeDuration = require("humanize-duration")
-	const unshareService = (envId, svcName) => {
-		if(window.confirm('really disable service "' + svcName +'"?')) {
-			service.unshare({body: {zId: envId, svcName: svcName}}).then(resp => {
+	const unshareService = (envId, svcToken) => {
+		if(window.confirm('really disable service "' + svcToken +'"?')) {
+			service.unshare({body: {zId: envId, svcToken: svcToken}}).then(resp => {
 				console.log(resp)
 			})
 		}
@@ -17,12 +17,12 @@ const Services = (props) => {
 	const columns = [
 		{
 			name: 'Frontend',
-			selector: row => row.frontend,
+			selector: row => row.frontendEndpoint,
 			sortable: true,
 		},
 		{
 			name: 'Backend',
-			selector: row => row.backend,
+			selector: row => row.backendProxyEndpoint,
 			sortable: true,
 		},
 		{

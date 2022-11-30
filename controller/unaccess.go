@@ -17,9 +17,9 @@ func newUnaccessHandler() *unaccessHandler {
 }
 
 func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	feToken := params.Body.FrontendName
-	svcToken := params.Body.SvcName
-	envZId := params.Body.ZID
+	feToken := params.Body.FrontendToken
+	svcToken := params.Body.SvcToken
+	envZId := params.Body.EnvZID
 	logrus.Infof("processing unaccess request for frontend '%v' (service '%v', environment '%v')", feToken, svcToken, envZId)
 
 	tx, err := str.Begin()
@@ -38,13 +38,13 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
-			if env.ZId == params.Body.ZID {
+			if env.ZId == envZId {
 				senv = env
 				break
 			}
 		}
 		if senv == nil {
-			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.ZID, principal.Email)
+			err := errors.Errorf("environment with id '%v' not found for '%v", envZId, principal.Email)
 			logrus.Error(err)
 			return service.NewUnaccessUnauthorized()
 		}

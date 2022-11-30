@@ -17,8 +17,8 @@ import (
 // swagger:model accessResponse
 type AccessResponse struct {
 
-	// frontend name
-	FrontendName string `json:"frontendName,omitempty"`
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
 }
 
 // Validate validates this access response

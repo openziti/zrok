@@ -259,8 +259,8 @@ func (l *looper) shutdown() {
 
 	untunnelReq := service.NewUnshareParams()
 	untunnelReq.Body = &rest_model_zrok.UnshareRequest{
-		ZID:     l.env.ZId,
-		SvcName: l.service,
+		EnvZID:   l.env.ZId,
+		SvcToken: l.service,
 	}
 	if _, err := l.zrok.Service.Unshare(untunnelReq, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)

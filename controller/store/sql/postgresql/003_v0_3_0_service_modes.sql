@@ -24,7 +24,7 @@ create table services (
   id                        serial              primary key,
   environment_id            integer             not null references environments(id),
   z_id                      varchar(32)         not null unique,
-  token                      varchar(32)         not null unique,
+  token                     varchar(32)         not null unique,
   share_mode                share_mode          not null,
   backend_mode              backend_mode        not null,
   frontend_selection        varchar(64),
@@ -35,7 +35,7 @@ create table services (
   updated_at                timestamptz         not null default(current_timestamp),
 
   constraint chk_z_id check (z_id <> ''),
-  constraint chk_name check (name <> '')
+  constraint chk_token check (token <> '')
 );
 
 insert into services (id, environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at)

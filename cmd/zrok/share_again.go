@@ -115,8 +115,8 @@ func (self *shareAgainCommand) destroy(id string, cfg *backend.Config, zrok *res
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
-		ZID:     id,
-		SvcName: cfg.Service,
+		EnvZID:   id,
+		SvcToken: cfg.Service,
 	}
 	if _, err := zrok.Service.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

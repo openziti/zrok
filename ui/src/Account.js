@@ -87,7 +87,7 @@ function buildGraph(overview) {
             item.services.forEach((item) => {
                 out.nodes.push({
                     id: '' + id,
-                    data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.name }</div>},
+                    data: {label: <div><Icon path={mdiAccessPointNetwork} size={0.75} className={"flowNode"}/> { item.token }</div>},
                     position: {x: (id * 25), y: 0},
                     style: { width: 'fit-content', backgroundColor: '#9367ef', color: 'white' },
                     type: 'output',

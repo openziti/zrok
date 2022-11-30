@@ -29,7 +29,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	envZId := params.Body.ZID
+	envZId := params.Body.EnvZID
 	envId := 0
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		found := false
@@ -50,14 +50,14 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		return service.NewAccessNotFound()
 	}
 
-	svcName := params.Body.SvcName
-	ssvc, err := str.FindServiceWithToken(svcName, tx)
+	svcToken := params.Body.SvcToken
+	ssvc, err := str.FindServiceWithToken(svcToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding service")
 		return service.NewAccessNotFound()
 	}
 	if ssvc == nil {
-		logrus.Errorf("unable to find service '%v' for user '%v'", params.Body.SvcName, principal.Email)
+		logrus.Errorf("unable to find service '%v' for user '%v'", svcToken, principal.Email)
 		return service.NewAccessNotFound()
 	}
 
@@ -91,7 +91,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		return service.NewAccessInternalServerError()
 	}
 
-	return service.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendName: feToken})
+	return service.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendToken: feToken})
 }
 
 func createServicePolicyDialForEnvironment(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {

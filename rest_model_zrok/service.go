@@ -18,20 +18,20 @@ import (
 // swagger:model service
 type Service struct {
 
-	// backend
-	Backend string `json:"backend,omitempty"`
+	// backend proxy endpoint
+	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
-	// frontend
-	Frontend string `json:"frontend,omitempty"`
+	// frontend endpoint
+	FrontendEndpoint string `json:"frontendEndpoint,omitempty"`
 
 	// metrics
 	Metrics ServiceMetrics `json:"metrics,omitempty"`
 
-	// name
-	Name string `json:"name,omitempty"`
+	// token
+	Token string `json:"token,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`

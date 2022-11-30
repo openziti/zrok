@@ -17,14 +17,14 @@ import (
 // swagger:model unaccessRequest
 type UnaccessRequest struct {
 
-	// frontend name
-	FrontendName string `json:"frontendName,omitempty"`
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
 
-	// svc name
-	SvcName string `json:"svcName,omitempty"`
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
 
-	// z Id
-	ZID string `json:"zId,omitempty"`
+	// svc token
+	SvcToken string `json:"svcToken,omitempty"`
 }
 
 // Validate validates this unaccess request

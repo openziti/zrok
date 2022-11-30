@@ -2,7 +2,7 @@ import Icon from "@mdi/react";
 import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
 import {mdiContentCopy} from "@mdi/js";
-import * as identity from "./api/identity";
+import * as account from "./api/account";
 
 const RegistrationForm = (props) => {
     const [password, setPassword] = useState('');
@@ -20,7 +20,7 @@ const RegistrationForm = (props) => {
         if(confirm !== password) {
             setMessage(passwordMismatchMessage);
         } else {
-            identity.register({body: {"token": props.token, "password": password}})
+            account.register({body: {"token": props.token, "password": password}})
                 .then(resp => {
                     if(!resp.error) {
                         console.log("resp", resp)
@@ -110,7 +110,7 @@ const Register = () => {
 
     useEffect(() => {
         let mounted = true
-        identity.verify({body: {token: token}}).then(resp => {
+        account.verify({body: {token: token}}).then(resp => {
             if(mounted) {
                 if(resp.error) {
                     setActiveRequest(false);

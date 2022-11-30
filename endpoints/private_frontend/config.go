@@ -2,7 +2,7 @@ package private_frontend
 
 type Config struct {
 	IdentityName string
-	SvcName      string
+	SvcToken     string
 	Address      string
 }
 

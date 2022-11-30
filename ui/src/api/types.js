@@ -5,15 +5,15 @@
  * @typedef accessRequest
  * @memberof module:types
  * 
- * @property {string} zId 
- * @property {string} svcName 
+ * @property {string} envZId 
+ * @property {string} svcToken 
  */
 
 /**
  * @typedef accessResponse
  * @memberof module:types
  * 
- * @property {string} frontendName 
+ * @property {string} frontendToken 
  */
 
 /**
@@ -126,9 +126,9 @@
  * @memberof module:types
  * 
  * @property {string} zId 
- * @property {string} name 
- * @property {string} frontend 
- * @property {string} backend 
+ * @property {string} token 
+ * @property {string} frontendEndpoint 
+ * @property {string} backendProxyEndpoint 
  * @property {module:types.serviceMetrics} metrics 
  * @property {number} createdAt 
  * @property {number} updatedAt 
@@ -166,17 +166,17 @@
  * @typedef unaccessRequest
  * @memberof module:types
  * 
- * @property {string} frontendName 
- * @property {string} zId 
- * @property {string} svcName 
+ * @property {string} frontendToken 
+ * @property {string} envZId 
+ * @property {string} svcToken 
  */
 
 /**
  * @typedef unshareRequest
  * @memberof module:types
  * 
- * @property {string} zId 
- * @property {string} svcName 
+ * @property {string} envZId 
+ * @property {string} svcToken 
  */
 
 /**

@@ -73,12 +73,12 @@ type zitiDialContext struct {
 }
 
 func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
-	svcName := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	conn, err := self.ctx.Dial(svcName)
+	svcToken := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
+	conn, err := self.ctx.Dial(svcToken)
 	if err != nil {
 		return conn, err
 	}
-	return newMetricsConn(svcName, conn, self.updates), nil
+	return newMetricsConn(svcToken, conn, self.updates), nil
 }
 
 func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
@@ -133,19 +133,19 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 
 func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		svcName := resolveService(cfg.HostMatch, r.Host)
-		if svcName != "" {
-			if svc, found := endpoints.GetRefreshedService(svcName, ctx); found {
+		svcToken := resolveService(cfg.HostMatch, r.Host)
+		if svcToken != "" {
+			if svc, found := endpoints.GetRefreshedService(svcToken, ctx); found {
 				if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
 						case string(model.None):
-							logrus.Debugf("auth scheme none '%v'", svcName)
+							logrus.Debugf("auth scheme none '%v'", svcToken)
 							handler.ServeHTTP(w, r)
 							return
 
 						case string(model.Basic):
-							logrus.Debugf("auth scheme basic '%v", svcName)
+							logrus.Debugf("auth scheme basic '%v", svcToken)
 							inUser, inPass, ok := r.BasicAuth()
 							if !ok {
 								writeUnauthorizedResponse(w, realm)
@@ -194,15 +194,15 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 							return
 						}
 					} else {
-						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcName)
+						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcToken)
 						notfound_ui.WriteNotFound(w)
 					}
 				} else {
-					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcName)
+					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcToken)
 					notfound_ui.WriteNotFound(w)
 				}
 			} else {
-				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcName)
+				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcToken)
 				notfound_ui.WriteNotFound(w)
 			}
 		} else {

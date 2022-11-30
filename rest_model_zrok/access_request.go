@@ -17,11 +17,11 @@ import (
 // swagger:model accessRequest
 type AccessRequest struct {
 
-	// svc name
-	SvcName string `json:"svcName,omitempty"`
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
 
-	// z Id
-	ZID string `json:"zId,omitempty"`
+	// svc token
+	SvcToken string `json:"svcToken,omitempty"`
 }
 
 // Validate validates this access request

@@ -54,13 +54,13 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				be = *svc.BackendProxyEndpoint
 			}
 			es.Services = append(es.Services, &rest_model_zrok.Service{
-				CreatedAt: svc.CreatedAt.UnixMilli(),
-				Frontend:  fe,
-				Backend:   be,
-				UpdatedAt: svc.UpdatedAt.UnixMilli(),
-				ZID:       svc.ZId,
-				Name:      svc.Token,
-				Metrics:   sparkData[svc.Token],
+				CreatedAt:            svc.CreatedAt.UnixMilli(),
+				FrontendEndpoint:     fe,
+				BackendProxyEndpoint: be,
+				UpdatedAt:            svc.UpdatedAt.UnixMilli(),
+				ZID:                  svc.ZId,
+				Token:                svc.Token,
+				Metrics:              sparkData[svc.Token],
 			})
 		}
 		out = append(out, es)
