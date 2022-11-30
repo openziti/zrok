@@ -138,6 +138,7 @@
  * @typedef serviceRequest
  * @memberof module:types
  * 
+ * @property {string} envZId 
  * @property {string} svcToken 
  */
 

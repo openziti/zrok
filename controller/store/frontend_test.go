@@ -51,7 +51,7 @@ func TestPublicFrontend(t *testing.T) {
 	err = str.DeleteFrontend(fe.Id, tx)
 	assert.Nil(t, err)
 
-	fe0, err = str.FindFrontendNamed(feName, tx)
+	fe0, err = str.FindFrontendWithToken(feName, tx)
 	assert.NotNil(t, err)
 	assert.Nil(t, fe0)
 

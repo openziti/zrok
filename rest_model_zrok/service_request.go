@@ -17,6 +17,9 @@ import (
 // swagger:model serviceRequest
 type ServiceRequest struct {
 
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
 	// svc token
 	SvcToken string `json:"svcToken,omitempty"`
 }

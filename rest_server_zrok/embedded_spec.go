@@ -284,7 +284,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service"
+              "$ref": "#/definitions/service03"
             }
           },
           "401": {
@@ -693,6 +693,9 @@ func init() {
     "serviceRequest": {
       "type": "object",
       "properties": {
+        "envZId": {
+          "type": "string"
+        },
         "svcToken": {
           "type": "string"
         }
@@ -1082,7 +1085,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service"
+              "$ref": "#/definitions/service03"
             }
           },
           "401": {
@@ -1491,6 +1494,9 @@ func init() {
     "serviceRequest": {
       "type": "object",
       "properties": {
+        "envZId": {
+          "type": "string"
+        },
         "svcToken": {
           "type": "string"
         }

@@ -20,7 +20,7 @@ export function access(options) {
 /**
  * @param {object} options Optional options
  * @param {module:types.serviceRequest} [options.body] 
- * @return {Promise<module:types.service>} ok
+ * @return {Promise<module:types.service03>} ok
  */
 export function getService(options) {
   if (!options) options = {}

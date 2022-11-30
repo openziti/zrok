@@ -4,7 +4,7 @@ create table frontends (
   id                    serial              primary key,
   environment_id        integer             not null references environments(id),
   token                 varchar(32)         not null unique,
-  z_id                  varchar(32)         not null unique,
+  z_id                  varchar(32)         not null,
   public_name           varchar(64)         unique,
   reserved              boolean             not null default(false),
   created_at            timestamptz         not null default(current_timestamp),

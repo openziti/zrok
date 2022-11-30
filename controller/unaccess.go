@@ -53,7 +53,7 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 		return service.NewUnaccessUnauthorized()
 	}
 
-	sfe, err := str.FindFrontendNamed(feToken, tx)
+	sfe, err := str.FindFrontendWithToken(feToken, tx)
 	if err != nil {
 		logrus.Error(err)
 		return service.NewUnaccessInternalServerError()

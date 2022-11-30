@@ -26,7 +26,7 @@ type GetServiceOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.Service `json:"body,omitempty"`
+	Payload *rest_model_zrok.Service03 `json:"body,omitempty"`
 }
 
 // NewGetServiceOK creates GetServiceOK with default headers values
@@ -36,13 +36,13 @@ func NewGetServiceOK() *GetServiceOK {
 }
 
 // WithPayload adds the payload to the get service o k response
-func (o *GetServiceOK) WithPayload(payload *rest_model_zrok.Service) *GetServiceOK {
+func (o *GetServiceOK) WithPayload(payload *rest_model_zrok.Service03) *GetServiceOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get service o k response
-func (o *GetServiceOK) SetPayload(payload *rest_model_zrok.Service) {
+func (o *GetServiceOK) SetPayload(payload *rest_model_zrok.Service03) {
 	o.Payload = payload
 }
 

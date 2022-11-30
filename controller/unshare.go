@@ -37,7 +37,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 	svcZId, err := h.findServiceZId(svcToken, edge)
 	if err != nil {
 		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
+		return service.NewUnshareNotFound()
 	}
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
@@ -54,7 +54,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
-		return service.NewUnshareInternalServerError()
+		return service.NewUnshareNotFound()
 	}
 
 	var ssvc *store.Service

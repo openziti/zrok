@@ -56,7 +56,10 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 		Reserved: true,
 	}
 	if _, err := zrok.Service.Unshare(req, auth); err != nil {
-		logrus.Errorf("error releasing service '%v': %v", svcToken, err)
+		if !panicInstead {
+			showError("error releasing service", err)
+		}
+		panic(err)
 	}
 
 	logrus.Infof("reserved service '%v' released", svcToken)

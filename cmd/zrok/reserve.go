@@ -41,7 +41,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		showError("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
-	targetEndpoint, err := url.Parse(args[0])
+	targetEndpoint, err := url.Parse(args[1])
 	if err != nil {
 		if !panicInstead {
 			showError("invalid target endpoint URL", err)

@@ -211,7 +211,7 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/service"
+            $ref: "#/definitions/service03"
         401:
           description: unauthorized
         404:
@@ -465,6 +465,8 @@ definitions:
   serviceRequest:
     type: object
     properties:
+      envZId:
+        type: string
       svcToken:
         type: string
 
