@@ -43,7 +43,7 @@ func newTestEndpointCommand() *testEndpointCommand {
 		}
 		panic(err)
 	}
-	cmd.Flags().StringVarP(&command.address, "address", "a", "0.0.0.0", "The address for the HTTP listener")
+	cmd.Flags().StringVarP(&command.address, "address", "a", "127.0.0.1", "The address for the HTTP listener")
 	cmd.Flags().Uint16VarP(&command.port, "port", "P", 9090, "The port for the HTTP listener")
 	cmd.Run = command.run
 	return command

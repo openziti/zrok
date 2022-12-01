@@ -33,7 +33,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Run = command.run
-	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "0.0.0.0:9191", "The address to bind the private frontend")
+	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	return command
 }
 
