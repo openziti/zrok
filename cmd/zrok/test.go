@@ -14,12 +14,6 @@ import (
 
 func init() {
 	testCmd.AddCommand(newTestEndpointCommand().cmd)
-	rootCmd.AddCommand(testCmd)
-}
-
-var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "Utilities used for testing zrok",
 }
 
 type testEndpointCommand struct {

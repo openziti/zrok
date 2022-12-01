@@ -8,25 +8,25 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newGcCmd().cmd)
+	adminCmd.AddCommand(newAdminGcCommand().cmd)
 }
 
-type gcCmd struct {
+type adminGcCommand struct {
 	cmd *cobra.Command
 }
 
-func newGcCmd() *gcCmd {
+func newAdminGcCommand() *adminGcCommand {
 	cmd := &cobra.Command{
 		Use:   "gc <configPath>",
 		Short: "Garbage collect a zrok instance",
 		Args:  cobra.ExactArgs(1),
 	}
-	c := &gcCmd{cmd: cmd}
+	c := &adminGcCommand{cmd: cmd}
 	cmd.Run = c.run
 	return c
 }
 
-func (gc *gcCmd) run(_ *cobra.Command, args []string) {
+func (gc *adminGcCommand) run(_ *cobra.Command, args []string) {
 	cfg, err := controller.LoadConfig(args[0])
 	if err != nil {
 		panic(err)

@@ -26,7 +26,7 @@ type reserveCommand struct {
 func newReserveCommand() *reserveCommand {
 	cmd := &cobra.Command{
 		Use:   "reserve <public|private> <targetEndpoint>",
-		Short: "Reserve a service",
+		Short: "Create a reserved service",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}

@@ -16,7 +16,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
 	rootCmd.AddCommand(accessCmd)
+	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(shareCmd)
+	rootCmd.AddCommand(testCmd)
 }
 
 var rootCmd = &cobra.Command{
@@ -34,12 +36,22 @@ var apiEndpoint string
 
 var accessCmd = &cobra.Command{
 	Use:   "access",
-	Short: "Access services",
+	Short: "Create frontend access for services",
+}
+
+var adminCmd = &cobra.Command{
+	Use:   "admin",
+	Short: "Administration and operations functions",
 }
 
 var shareCmd = &cobra.Command{
 	Use:   "share",
-	Short: "Share resources",
+	Short: "Create backend access for services",
+}
+
+var testCmd = &cobra.Command{
+	Use:   "test",
+	Short: "Utilities for testing zrok deployments",
 }
 
 func main() {
