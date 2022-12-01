@@ -59,7 +59,7 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 		return service.NewUnaccessInternalServerError()
 	}
 
-	if sfe == nil || sfe.EnvironmentId != senv.Id {
+	if sfe == nil || (sfe.EnvironmentId != nil && *sfe.EnvironmentId != senv.Id) {
 		logrus.Errorf("frontend named '%v' not found", feToken)
 		return service.NewUnaccessInternalServerError()
 	}

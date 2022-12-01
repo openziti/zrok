@@ -7,10 +7,11 @@ import (
 
 type Frontend struct {
 	Model
-	EnvironmentId int
+	EnvironmentId *int
 	Token         string
 	ZId           string
 	PublicName    *string
+	UrlTemplate   *string
 	Reserved      bool
 }
 

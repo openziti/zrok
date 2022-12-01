@@ -40,7 +40,7 @@ func TestPublicFrontend(t *testing.T) {
 	fe, err := str.GetFrontend(feId, tx)
 	assert.Nil(t, err)
 	assert.NotNil(t, fe)
-	assert.Equal(t, envId, fe.EnvironmentId)
+	assert.Equal(t, envId, *fe.EnvironmentId)
 	assert.Equal(t, feName, *fe.PublicName)
 
 	fe0, err := str.FindFrontendPubliclyNamed(feName, tx)
