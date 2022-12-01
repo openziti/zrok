@@ -284,7 +284,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service03"
+              "$ref": "#/definitions/service"
             }
           },
           "401": {
@@ -632,6 +632,9 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "backendProxyEndpoint": {
           "type": "string"
         },
@@ -641,34 +644,11 @@ func init() {
         "frontendEndpoint": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "service03": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "frontendEndpoint": {
-          "type": "string"
-        },
         "frontendSelection": {
           "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/definitions/serviceMetrics"
         },
         "reserved": {
           "type": "boolean"
@@ -678,6 +658,9 @@ func init() {
         },
         "token": {
           "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
         },
         "zId": {
           "type": "string"
@@ -1085,7 +1068,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service03"
+              "$ref": "#/definitions/service"
             }
           },
           "401": {
@@ -1433,6 +1416,9 @@ func init() {
     "service": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "backendProxyEndpoint": {
           "type": "string"
         },
@@ -1442,34 +1428,11 @@ func init() {
         "frontendEndpoint": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "service03": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "frontendEndpoint": {
-          "type": "string"
-        },
         "frontendSelection": {
           "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/definitions/serviceMetrics"
         },
         "reserved": {
           "type": "boolean"
@@ -1479,6 +1442,9 @@ func init() {
         },
         "token": {
           "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
         },
         "zId": {
           "type": "string"

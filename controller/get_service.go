@@ -40,12 +40,14 @@ func getServiceHandler(params service.GetServiceParams, principal *rest_model_zr
 		return service.NewGetServiceNotFound()
 	}
 
-	svc := &rest_model_zrok.Service03{
+	svc := &rest_model_zrok.Service{
 		Token:       ssvc.Token,
 		ZID:         ssvc.ZId,
 		ShareMode:   ssvc.ShareMode,
 		BackendMode: ssvc.BackendMode,
 		Reserved:    ssvc.Reserved,
+		CreatedAt:   ssvc.CreatedAt.UnixMilli(),
+		UpdatedAt:   ssvc.UpdatedAt.UnixMilli(),
 	}
 	if ssvc.FrontendSelection != nil {
 		svc.FrontendSelection = *ssvc.FrontendSelection

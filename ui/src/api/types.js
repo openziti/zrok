@@ -108,7 +108,7 @@
  */
 
 /**
- * @typedef service03
+ * @typedef service
  * @memberof module:types
  * 
  * @property {string} token 
@@ -119,16 +119,6 @@
  * @property {string} frontendEndpoint 
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
- */
-
-/**
- * @typedef service
- * @memberof module:types
- * 
- * @property {string} zId 
- * @property {string} token 
- * @property {string} frontendEndpoint 
- * @property {string} backendProxyEndpoint 
  * @property {module:types.serviceMetrics} metrics 
  * @property {number} createdAt 
  * @property {number} updatedAt 

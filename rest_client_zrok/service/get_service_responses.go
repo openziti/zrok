@@ -63,7 +63,7 @@ GetServiceOK describes a response with status code 200, with default header valu
 ok
 */
 type GetServiceOK struct {
-	Payload *rest_model_zrok.Service03
+	Payload *rest_model_zrok.Service
 }
 
 // IsSuccess returns true when this get service o k response has a 2xx status code
@@ -99,13 +99,13 @@ func (o *GetServiceOK) String() string {
 	return fmt.Sprintf("[GET /service][%d] getServiceOK  %+v", 200, o.Payload)
 }
 
-func (o *GetServiceOK) GetPayload() *rest_model_zrok.Service03 {
+func (o *GetServiceOK) GetPayload() *rest_model_zrok.Service {
 	return o.Payload
 }
 
 func (o *GetServiceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.Service03)
+	o.Payload = new(rest_model_zrok.Service)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

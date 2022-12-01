@@ -18,6 +18,9 @@ import (
 // swagger:model service
 type Service struct {
 
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
 	// backend proxy endpoint
 	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
@@ -27,8 +30,17 @@ type Service struct {
 	// frontend endpoint
 	FrontendEndpoint string `json:"frontendEndpoint,omitempty"`
 
+	// frontend selection
+	FrontendSelection string `json:"frontendSelection,omitempty"`
+
 	// metrics
 	Metrics ServiceMetrics `json:"metrics,omitempty"`
+
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
+
+	// share mode
+	ShareMode string `json:"shareMode,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`

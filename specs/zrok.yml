@@ -211,7 +211,7 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/service03"
+            $ref: "#/definitions/service"
         401:
           description: unauthorized
         404:
@@ -414,7 +414,7 @@ definitions:
       token:
         type: string
 
-  service03:
+  service:
     type: object
     properties:
       token:
@@ -433,18 +433,6 @@ definitions:
         type: string
       reserved:
         type: boolean
-
-  service:
-    type: object
-    properties:
-      zId:
-        type: string
-      token:
-        type: string
-      frontendEndpoint:
-        type: string
-      backendProxyEndpoint:
-        type: string
       metrics:
         $ref: "#/definitions/serviceMetrics"
       createdAt:
