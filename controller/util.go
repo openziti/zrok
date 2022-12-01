@@ -13,20 +13,43 @@ import (
 	"strings"
 )
 
-func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
+type zrokAuthenticator struct {
+	cfg *Config
+}
+
+func newZrokAuthenticator(cfg *Config) *zrokAuthenticator {
+	return &zrokAuthenticator{cfg}
+}
+
+func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Principal, error) {
 	tx, err := str.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = tx.Rollback() }()
+
 	if a, err := str.FindAccountWithToken(token, tx); err == nil {
-		principal := rest_model_zrok.Principal{
+		principal := &rest_model_zrok.Principal{
 			ID:    int64(a.Id),
 			Token: a.Token,
 			Email: a.Email,
 		}
-		return &principal, nil
+		return principal, nil
 	} else {
+		// check for admin secret
+		if cfg.Admin != nil {
+			for _, secret := range cfg.Admin.Secrets {
+				if token == secret {
+					principal := &rest_model_zrok.Principal{
+						ID:    int64(-1),
+						Admin: true,
+					}
+					return principal, nil
+				}
+			}
+		}
+
+		// no match
 		return nil, errors2.New(401, "invalid api key")
 	}
 }

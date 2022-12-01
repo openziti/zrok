@@ -90,6 +90,7 @@
  * @property {number} id 
  * @property {string} email 
  * @property {string} token 
+ * @property {boolean} admin 
  */
 
 /**

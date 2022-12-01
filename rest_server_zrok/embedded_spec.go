@@ -599,6 +599,9 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "admin": {
+          "type": "boolean"
+        },
         "email": {
           "type": "string"
         },
@@ -1383,6 +1386,9 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "admin": {
+          "type": "boolean"
+        },
         "email": {
           "type": "string"
         },

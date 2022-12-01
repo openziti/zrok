@@ -399,6 +399,8 @@ definitions:
         type: string
       token:
         type: string
+      admin:
+        type: boolean
 
   registerRequest:
     type: object

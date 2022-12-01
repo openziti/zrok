@@ -10,6 +10,7 @@ const ConfigVersion = 1
 
 type Config struct {
 	V            int
+	Admin        *AdminConfig
 	Endpoint     *EndpointConfig
 	Proxy        *ProxyConfig
 	Email        *EmailConfig
@@ -18,6 +19,10 @@ type Config struct {
 	Ziti         *ZitiConfig
 	Metrics      *MetricsConfig
 	Influx       *InfluxConfig
+}
+
+type AdminConfig struct {
+	Secrets []string `cf:"+secret"`
 }
 
 type EndpointConfig struct {

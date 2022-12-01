@@ -17,6 +17,9 @@ import (
 // swagger:model principal
 type Principal struct {
 
+	// admin
+	Admin bool `json:"admin,omitempty"`
+
 	// email
 	Email string `json:"email,omitempty"`
 
