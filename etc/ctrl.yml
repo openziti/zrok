@@ -4,6 +4,8 @@
 #   /___|_|  \___/|_|\_\
 # controller configuration
 
+v:                  1
+
 endpoint:
   host:             0.0.0.0
   port:             18080

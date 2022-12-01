@@ -6,7 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const ConfigVersion = 1
+
 type Config struct {
+	V            int
 	Endpoint     *EndpointConfig
 	Proxy        *ProxyConfig
 	Email        *EmailConfig
@@ -60,6 +63,9 @@ func LoadConfig(path string) (*Config, error) {
 	cfg := &Config{}
 	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
+	}
+	if cfg.V != ConfigVersion {
+		return nil, errors.Errorf("expecting configuration version '%v', your configuration is version '%v'; please see zrok.io for changelog and configuration documentation", ConfigVersion, cfg.V)
 	}
 	return cfg, nil
 }
