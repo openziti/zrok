@@ -9,26 +9,26 @@ import (
 )
 
 func init() {
-	httpCmd.AddCommand(newHttpFrontendCommand().cmd)
+	accessCmd.AddCommand(newAccessPublicCommand().cmd)
 }
 
-type httpFrontendCommand struct {
+type accessPublicCommand struct {
 	cmd *cobra.Command
 }
 
-func newHttpFrontendCommand() *httpFrontendCommand {
+func newAccessPublicCommand() *accessPublicCommand {
 	cmd := &cobra.Command{
-		Use:     "frontend [<configPath>]",
+		Use:     "public [<configPath>]",
 		Aliases: []string{"fe"},
-		Short:   "Create an HTTP frontend",
+		Short:   "Create a public access HTTP frontend",
 		Args:    cobra.RangeArgs(0, 1),
 	}
-	command := &httpFrontendCommand{cmd: cmd}
+	command := &accessPublicCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (self *httpFrontendCommand) run(_ *cobra.Command, args []string) {
+func (self *accessPublicCommand) run(_ *cobra.Command, args []string) {
 	cfg := public_frontend.DefaultConfig()
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
