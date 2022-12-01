@@ -90,9 +90,9 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
-		_ = tx.Rollback()
 		return service.NewShareInternalServerError()
 	}
+
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing service record: %v", err)
 		return service.NewShareInternalServerError()

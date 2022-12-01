@@ -31,6 +31,7 @@ func Run(inCfg *Config) error {
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
 	api.AccountRegisterHandler = newRegisterHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
+	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
