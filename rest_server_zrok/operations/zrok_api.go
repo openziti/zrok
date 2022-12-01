@@ -21,6 +21,7 @@ import (
 
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
@@ -50,6 +51,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		ServiceAccessHandler: service.AccessHandlerFunc(func(params service.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Access has not yet been implemented")
+		}),
+		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
 		}),
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
@@ -139,6 +143,8 @@ type ZrokAPI struct {
 
 	// ServiceAccessHandler sets the operation handler for the access operation
 	ServiceAccessHandler service.AccessHandler
+	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
+	AdminCreateFrontendHandler admin.CreateFrontendHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
@@ -246,6 +252,9 @@ func (o *ZrokAPI) Validate() error {
 
 	if o.ServiceAccessHandler == nil {
 		unregistered = append(unregistered, "service.AccessHandler")
+	}
+	if o.AdminCreateFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.CreateFrontendHandler")
 	}
 	if o.EnvironmentDisableHandler == nil {
 		unregistered = append(unregistered, "environment.DisableHandler")
@@ -386,6 +395,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/access"] = service.NewAccess(o.context, o.ServiceAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/frontend"] = admin.NewCreateFrontend(o.context, o.AdminCreateFrontendHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

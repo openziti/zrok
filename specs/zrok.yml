@@ -92,6 +92,31 @@ paths:
           description: internal server error
 
   #
+  # admin
+  #
+  /frontend:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createFrontend
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/createFrontendRequest"
+      responses:
+        201:
+          description: frontend created
+          schema:
+            $ref: "#/definitions/createFrontendResponse"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  #
   # environment
   #
   /enable:
@@ -310,6 +335,22 @@ definitions:
       username:
         type: string
       password:
+        type: string
+
+  createFrontendRequest:
+    type: object
+    properties:
+      zId:
+        type: string
+      url_template:
+        type: string
+      public_name:
+        type: string
+
+  createFrontendResponse:
+    type: object
+    properties:
+      token:
         type: string
 
   disableRequest:

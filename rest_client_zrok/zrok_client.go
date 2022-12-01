@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
@@ -59,6 +60,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 	cli := new(Zrok)
 	cli.Transport = transport
 	cli.Account = account.New(transport, formats)
+	cli.Admin = admin.New(transport, formats)
 	cli.Environment = environment.New(transport, formats)
 	cli.Metadata = metadata.New(transport, formats)
 	cli.Service = service.New(transport, formats)
@@ -108,6 +110,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type Zrok struct {
 	Account account.ClientService
 
+	Admin admin.ClientService
+
 	Environment environment.ClientService
 
 	Metadata metadata.ClientService
@@ -121,6 +125,7 @@ type Zrok struct {
 func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Account.SetTransport(transport)
+	c.Admin.SetTransport(transport)
 	c.Environment.SetTransport(transport)
 	c.Metadata.SetTransport(transport)
 	c.Service.SetTransport(transport)

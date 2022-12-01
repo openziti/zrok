@@ -146,6 +146,42 @@ func init() {
         }
       }
     },
+    "/frontend": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/createFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "frontend created",
+            "schema": {
+              "$ref": "#/definitions/createFrontendResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/invite": {
       "post": {
         "tags": [
@@ -488,6 +524,28 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "public_name": {
+          "type": "string"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
           "type": "string"
         }
       }
@@ -933,6 +991,42 @@ func init() {
         }
       }
     },
+    "/frontend": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/createFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "frontend created",
+            "schema": {
+              "$ref": "#/definitions/createFrontendResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/invite": {
       "post": {
         "tags": [
@@ -1275,6 +1369,28 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "public_name": {
+          "type": "string"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
           "type": "string"
         }
       }

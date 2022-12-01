@@ -25,6 +25,22 @@
  */
 
 /**
+ * @typedef createFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} zId 
+ * @property {string} url_template 
+ * @property {string} public_name 
+ */
+
+/**
+ * @typedef createFrontendResponse
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ */
+
+/**
  * @typedef disableRequest
  * @memberof module:types
  * 
