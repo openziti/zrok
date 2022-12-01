@@ -24,7 +24,8 @@ type shareReservedCommand struct {
 
 func newShareReservedCommand() *shareReservedCommand {
 	cmd := &cobra.Command{
-		Use: "reserved <serviceToken>",
+		Use:   "reserved <serviceToken>",
+		Short: "Start a backend for a reserved service",
 	}
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
