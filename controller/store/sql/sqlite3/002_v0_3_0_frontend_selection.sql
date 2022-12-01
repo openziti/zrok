@@ -23,6 +23,7 @@ create table frontends (
    token                 varchar(32)         not null unique,
    z_id                  varchar(32)         not null,
    public_name           varchar(64)         unique,
+   url_template          varchar(1024),
    reserved              boolean             not null default(false),
    created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
    updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now'))
