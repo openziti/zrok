@@ -21,9 +21,9 @@ func newAdminGcCommand() *adminGcCommand {
 		Short: "Garbage collect a zrok instance",
 		Args:  cobra.ExactArgs(1),
 	}
-	c := &adminGcCommand{cmd: cmd}
-	cmd.Run = c.run
-	return c
+	command := &adminGcCommand{cmd: cmd}
+	cmd.Run = command.run
+	return command
 }
 
 func (gc *adminGcCommand) run(_ *cobra.Command, args []string) {
