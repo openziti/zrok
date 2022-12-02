@@ -117,6 +117,26 @@ paths:
           description: not found
         500:
           description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteFrontend
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/deleteFrontendRequest"
+      responses:
+        200:
+          description: frontend deleted
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   #
   # environment
@@ -353,6 +373,12 @@ definitions:
     type: object
     properties:
       token:
+        type: string
+
+  deleteFrontendRequest:
+    type: object
+    properties:
+      frontendToken:
         type: string
 
   disableRequest:

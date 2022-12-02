@@ -55,6 +55,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
 		}),
+		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
+		}),
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
 		}),
@@ -145,6 +148,8 @@ type ZrokAPI struct {
 	ServiceAccessHandler service.AccessHandler
 	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
 	AdminCreateFrontendHandler admin.CreateFrontendHandler
+	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
+	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
@@ -255,6 +260,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminCreateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.CreateFrontendHandler")
+	}
+	if o.AdminDeleteFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteFrontendHandler")
 	}
 	if o.EnvironmentDisableHandler == nil {
 		unregistered = append(unregistered, "environment.DisableHandler")
@@ -399,6 +407,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/frontend"] = admin.NewCreateFrontend(o.context, o.AdminCreateFrontendHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/frontend"] = admin.NewDeleteFrontend(o.context, o.AdminDeleteFrontendHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

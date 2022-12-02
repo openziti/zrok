@@ -41,6 +41,13 @@
  */
 
 /**
+ * @typedef deleteFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} frontendToken 
+ */
+
+/**
  * @typedef disableRequest
  * @memberof module:types
  * 

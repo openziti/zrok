@@ -17,10 +17,36 @@ export function createFrontend(options) {
   return gateway.request(createFrontendOperation, parameters)
 }
 
+/**
+ * @param {object} options Optional options
+ * @param {module:types.deleteFrontendRequest} [options.body] 
+ * @return {Promise<object>} frontend deleted
+ */
+export function deleteFrontend(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(deleteFrontendOperation, parameters)
+}
+
 const createFrontendOperation = {
   path: '/frontend',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const deleteFrontendOperation = {
+  path: '/frontend',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'delete',
   security: [
     {
       id: 'key'

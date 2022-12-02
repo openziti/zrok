@@ -183,6 +183,40 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/deleteFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/invite": {
@@ -549,6 +583,14 @@ func init() {
       "type": "object",
       "properties": {
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "deleteFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -1031,6 +1073,40 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/deleteFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/invite": {
@@ -1397,6 +1473,14 @@ func init() {
       "type": "object",
       "properties": {
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "deleteFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
