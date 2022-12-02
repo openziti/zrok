@@ -95,7 +95,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 }
 
 func createServicePolicyDialForEnvironment(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := zrokTags(svcToken)
+	allTags := zrokServiceTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
 			allTags.SubTags[k] = v

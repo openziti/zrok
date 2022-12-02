@@ -14,6 +14,9 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/openziti/edge/rest_model"
+	rest_model_edge "github.com/openziti/edge/rest_model"
+	sdk_config "github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -27,7 +30,7 @@ func createServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_m
 		Name:            &svcToken,
 		Semantic:        &semantic,
 		ServiceRoles:    serviceRoles,
-		Tags:            zrokTags(svcToken),
+		Tags:            zrokServiceTags(svcToken),
 	}
 	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{
 		Policy:  serp,
@@ -89,7 +92,7 @@ func createServicePolicyBind(envZId, svcToken, svcZId string, edge *rest_managem
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
-		Tags:              zrokTags(svcToken),
+		Tags:              zrokServiceTags(svcToken),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -110,7 +113,7 @@ func deleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_
 }
 
 func createServicePolicyDial(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := zrokTags(svcToken)
+	allTags := zrokServiceTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
 			allTags.SubTags[k] = v
@@ -204,7 +207,7 @@ func createConfig(envZId, svcToken string, authSchemeStr string, authUsers []*mo
 		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
 		Name:         &svcToken,
-		Tags:         zrokTags(svcToken),
+		Tags:         zrokServiceTags(svcToken),
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
@@ -256,7 +259,7 @@ func createService(envZId, svcToken, cfgId string, edge *rest_management_api_cli
 		Configs:            configs,
 		EncryptionRequired: &encryptionRequired,
 		Name:               &svcToken,
-		Tags:               zrokTags(svcToken),
+		Tags:               zrokServiceTags(svcToken),
 	}
 	req := &edge_service.CreateServiceParams{
 		Service: svc,
@@ -282,6 +285,30 @@ func deleteService(envZId, svcZId string, edge *rest_management_api_client.ZitiE
 		return err
 	}
 	logrus.Infof("deleted service '%v' for environment '%v'", svcZId, envZId)
+	return nil
+}
+
+func createEdgeRouterPolicy(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	edgeRouterRoles := []string{"#all"}
+	identityRoles := []string{fmt.Sprintf("@%v", zId)}
+	semantic := rest_model_edge.SemanticAllOf
+	erp := &rest_model_edge.EdgeRouterPolicyCreate{
+		EdgeRouterRoles: edgeRouterRoles,
+		IdentityRoles:   identityRoles,
+		Name:            &zId,
+		Semantic:        &semantic,
+		Tags:            zrokTags(),
+	}
+	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
+		Policy:  erp,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	resp, err := edge.EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("created edge router policy '%v' for ziti identity '%v'", resp.Payload.Data.ID, zId)
 	return nil
 }
 
@@ -317,6 +344,58 @@ func deleteEdgeRouterPolicy(envZId string, edge *rest_management_api_client.Ziti
 	return nil
 }
 
+func createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+	iIsAdmin := false
+	name, err := createToken()
+	if err != nil {
+		return nil, err
+	}
+	identityType := rest_model_edge.IdentityTypeUser
+	tags := zrokTags()
+	tags.SubTags["zrokEmail"] = email
+	i := &rest_model_edge.IdentityCreate{
+		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
+		IsAdmin:             &iIsAdmin,
+		Name:                &name,
+		RoleAttributes:      nil,
+		ServiceHostingCosts: nil,
+		Tags:                tags,
+		Type:                &identityType,
+	}
+	req := identity_edge.NewCreateIdentityParams()
+	req.Identity = i
+	resp, err := client.Identity.CreateIdentity(req, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func enrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
+	p := &identity_edge.DetailIdentityParams{
+		Context: context.Background(),
+		ID:      zId,
+	}
+	p.SetTimeout(30 * time.Second)
+	resp, err := client.Identity.DetailIdentity(p, nil)
+	if err != nil {
+		return nil, err
+	}
+	tkn, _, err := enroll.ParseToken(resp.GetPayload().Data.Enrollment.Ott.JWT)
+	if err != nil {
+		return nil, err
+	}
+	flags := enroll.EnrollmentFlags{
+		Token:  tkn,
+		KeyAlg: "RSA",
+	}
+	conf, err := enroll.Enroll(flags)
+	if err != nil {
+		return nil, err
+	}
+	return conf, nil
+}
+
 func deleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	req := &identity_edge.DeleteIdentityParams{
 		ID:      id,
@@ -331,11 +410,16 @@ func deleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManageme
 	return nil
 }
 
-func zrokTags(svcToken string) *rest_model.Tags {
+func zrokTags() *rest_model.Tags {
 	return &rest_model.Tags{
 		SubTags: map[string]interface{}{
-			"zrok":             build.String(),
-			"zrokServiceToken": svcToken,
+			"zrok": build.String(),
 		},
 	}
+}
+
+func zrokServiceTags(svcToken string) *rest_model.Tags {
+	tags := zrokTags()
+	tags.SubTags["zrokServiceToken"] = svcToken
+	return tags
 }
