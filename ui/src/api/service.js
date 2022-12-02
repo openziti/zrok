@@ -49,6 +49,21 @@ export function share(options) {
 
 /**
  * @param {object} options Optional options
+ * @param {module:types.updateShareRequest} [options.body] 
+ * @return {Promise<object>} service updated
+ */
+export function updateShare(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(updateShareOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.unaccessRequest} [options.body] 
  * @return {Promise<object>} access removed
  */
@@ -103,6 +118,17 @@ const shareOperation = {
   path: '/share',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const updateShareOperation = {
+  path: '/share',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'patch',
   security: [
     {
       id: 'key'

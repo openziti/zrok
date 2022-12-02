@@ -470,6 +470,40 @@ func init() {
             }
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateShareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "service updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/unaccess": {
@@ -979,6 +1013,17 @@ func init() {
           "type": "string"
         },
         "urlTemplate": {
+          "type": "string"
+        }
+      }
+    },
+    "updateShareRequest": {
+      "type": "object",
+      "properties": {
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "serviceToken": {
           "type": "string"
         }
       }
@@ -1464,6 +1509,40 @@ func init() {
             }
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "service"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateShareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "service updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/unaccess": {
@@ -1973,6 +2052,17 @@ func init() {
           "type": "string"
         },
         "urlTemplate": {
+          "type": "string"
+        }
+      }
+    },
+    "updateShareRequest": {
+      "type": "object",
+      "properties": {
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "serviceToken": {
           "type": "string"
         }
       }

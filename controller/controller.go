@@ -44,6 +44,7 @@ func Run(inCfg *Config) error {
 	api.ServiceShareHandler = newShareHandler()
 	api.ServiceUnaccessHandler = newUnaccessHandler()
 	api.ServiceUnshareHandler = newUnshareHandler()
+	api.ServiceUpdateShareHandler = newUpdateShareHandler()
 
 	if err := controllerStartup(); err != nil {
 		return err

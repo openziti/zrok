@@ -200,6 +200,15 @@
  */
 
 /**
+ * @typedef unshareRequest
+ * @memberof module:types
+ * 
+ * @property {string} envZId 
+ * @property {string} svcToken 
+ * @property {boolean} reserved 
+ */
+
+/**
  * @typedef updateFrontendRequest
  * @memberof module:types
  * 
@@ -209,12 +218,11 @@
  */
 
 /**
- * @typedef unshareRequest
+ * @typedef updateShareRequest
  * @memberof module:types
  * 
- * @property {string} envZId 
- * @property {string} svcToken 
- * @property {boolean} reserved 
+ * @property {string} serviceToken 
+ * @property {string} backendProxyEndpoint 
  */
 
 /**
