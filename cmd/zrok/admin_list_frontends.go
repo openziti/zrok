@@ -45,14 +45,14 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, args []string) {
 	fmt.Println()
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredBright)
-	t.AppendHeader(table.Row{"Token", "zId", "Url Template", "Public Name", "Created At", "Updated At"})
+	t.SetStyle(table.StyleColoredDark)
+	t.AppendHeader(table.Row{"Token", "zId", "Public Name", "Url Template", "Created At", "Updated At"})
 	for _, pfe := range resp.Payload {
 		t.AppendRow(table.Row{
 			pfe.Token,
 			pfe.ZID,
-			pfe.URLTemplate,
 			pfe.PublicName,
+			pfe.URLTemplate,
 			time.UnixMilli(pfe.CreatedAt),
 			time.UnixMilli(pfe.UpdatedAt),
 		})
