@@ -33,6 +33,7 @@ func Run(inCfg *Config) error {
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminDeleteFrontendHandler = newDeleteFrontendHandler()
+	api.AdminListFrontendsHandler = newListFrontendsHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)

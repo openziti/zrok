@@ -79,7 +79,24 @@ func (str *Store) FindFrontendsForEnvironment(envId int, tx *sqlx.Tx) ([]*Fronte
 	return is, nil
 }
 
+func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := tx.Queryx("select frontends.* from frontends where environment_id is null and reserved = true")
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting public frontends")
+	}
+	var frontends []*Frontend
+	for rows.Next() {
+		frontend := &Frontend{}
+		if err := rows.StructScan(frontend); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend")
+		}
+		frontends = append(frontends, frontend)
+	}
+	return frontends, nil
+}
+
 func (str *Store) DeleteFrontend(id int, tx *sqlx.Tx) error {
+
 	stmt, err := tx.Prepare("delete from frontends where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends delete statement")

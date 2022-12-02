@@ -219,6 +219,33 @@ func init() {
         }
       }
     },
+    "/frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listFrontends",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/publicFrontendList"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/invite": {
       "post": {
         "tags": [
@@ -714,6 +741,35 @@ func init() {
         "token": {
           "type": "string"
         }
+      }
+    },
+    "publicFrontend": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "public_name": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "integer"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "publicFrontendList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publicFrontend"
       }
     },
     "registerRequest": {
@@ -1109,6 +1165,33 @@ func init() {
         }
       }
     },
+    "/frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listFrontends",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/publicFrontendList"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/invite": {
       "post": {
         "tags": [
@@ -1604,6 +1687,35 @@ func init() {
         "token": {
           "type": "string"
         }
+      }
+    },
+    "publicFrontend": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "public_name": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "integer"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "publicFrontendList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publicFrontend"
       }
     },
     "registerRequest": {

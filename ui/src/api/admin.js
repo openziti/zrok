@@ -32,6 +32,12 @@ export function deleteFrontend(options) {
   return gateway.request(deleteFrontendOperation, parameters)
 }
 
+/**
+ */
+export function listFrontends() {
+  return gateway.request(listFrontendsOperation)
+}
+
 const createFrontendOperation = {
   path: '/frontend',
   contentTypes: ['application/zrok.v1+json'],
@@ -47,6 +53,16 @@ const deleteFrontendOperation = {
   path: '/frontend',
   contentTypes: ['application/zrok.v1+json'],
   method: 'delete',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const listFrontendsOperation = {
+  path: '/frontends',
+  method: 'get',
   security: [
     {
       id: 'key'

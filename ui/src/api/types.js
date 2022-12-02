@@ -117,6 +117,18 @@
  */
 
 /**
+ * @typedef publicFrontend
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ * @property {string} zId 
+ * @property {string} url_template 
+ * @property {string} public_name 
+ * @property {number} created_at 
+ * @property {number} updated_at 
+ */
+
+/**
  * @typedef registerRequest
  * @memberof module:types
  * 

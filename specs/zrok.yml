@@ -138,6 +138,22 @@ paths:
         500:
           description: internal server error
 
+  /frontends:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listFrontends
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/publicFrontendList"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
   #
   # environment
   #
@@ -470,6 +486,27 @@ definitions:
         type: string
       admin:
         type: boolean
+
+  publicFrontend:
+    type: object
+    properties:
+      token:
+        type: string
+      zId:
+        type: string
+      url_template:
+        type: string
+      public_name:
+        type: string
+      created_at:
+        type: integer
+      updated_at:
+        type: integer
+
+  publicFrontendList:
+    type: array
+    items:
+      $ref: "#/definitions/publicFrontend"
 
   registerRequest:
     type: object
