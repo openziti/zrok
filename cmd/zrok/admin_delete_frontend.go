@@ -18,9 +18,10 @@ type adminDeleteFrontendCommand struct {
 
 func newAdminDeleteFrontendCommand() *adminDeleteFrontendCommand {
 	cmd := &cobra.Command{
-		Use:   "frontend <frontendToken>",
-		Short: "Delete a global public frontend",
-		Args:  cobra.ExactArgs(1),
+		Use:     "frontend <frontendToken>",
+		Aliases: []string{"fe"},
+		Short:   "Delete a global public frontend",
+		Args:    cobra.ExactArgs(1),
 	}
 	command := &adminDeleteFrontendCommand{cmd: cmd}
 	cmd.Run = command.run
