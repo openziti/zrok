@@ -217,6 +217,40 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/frontends": {
@@ -746,19 +780,19 @@ func init() {
     "publicFrontend": {
       "type": "object",
       "properties": {
-        "created_at": {
+        "createdAt": {
           "type": "integer"
         },
-        "public_name": {
+        "publicName": {
           "type": "string"
         },
         "token": {
           "type": "string"
         },
-        "updated_at": {
+        "updatedAt": {
           "type": "integer"
         },
-        "url_template": {
+        "urlTemplate": {
           "type": "string"
         },
         "zId": {
@@ -931,6 +965,20 @@ func init() {
           "type": "boolean"
         },
         "svcToken": {
+          "type": "string"
+        }
+      }
+    },
+    "updateFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
           "type": "string"
         }
       }
@@ -1163,6 +1211,40 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/frontends": {
@@ -1692,19 +1774,19 @@ func init() {
     "publicFrontend": {
       "type": "object",
       "properties": {
-        "created_at": {
+        "createdAt": {
           "type": "integer"
         },
-        "public_name": {
+        "publicName": {
           "type": "string"
         },
         "token": {
           "type": "string"
         },
-        "updated_at": {
+        "updatedAt": {
           "type": "integer"
         },
-        "url_template": {
+        "urlTemplate": {
           "type": "string"
         },
         "zId": {
@@ -1877,6 +1959,20 @@ func init() {
           "type": "boolean"
         },
         "svcToken": {
+          "type": "string"
+        }
+      }
+    },
+    "updateFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
           "type": "string"
         }
       }

@@ -95,6 +95,19 @@ func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
 	return frontends, nil
 }
 
+func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
+	sql := "update frontends set environment_id = $1, token = $2, z_id = $3, public_name = $4, url_template = $5, reserved = $6, updated_at = current_timestamp where id = $7"
+	stmt, err := tx.Prepare(sql)
+	if err != nil {
+		return errors.Wrap(err, "error preparing frontends update statement")
+	}
+	_, err = stmt.Exec(fe.EnvironmentId, fe.Token, fe.ZId, fe.PublicName, fe.UrlTemplate, fe.Reserved, fe.Id)
+	if err != nil {
+		return errors.Wrap(err, "error executing frontends update statement")
+	}
+	return nil
+}
+
 func (str *Store) DeleteFrontend(id int, tx *sqlx.Tx) error {
 
 	stmt, err := tx.Prepare("delete from frontends where id = $1")

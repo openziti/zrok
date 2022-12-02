@@ -117,6 +117,26 @@ paths:
           description: not found
         500:
           description: internal server error
+    patch:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: updateFrontend
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/updateFrontendRequest"
+      responses:
+        200:
+          description: frontend updated
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
     delete:
       tags:
         - admin
@@ -494,13 +514,13 @@ definitions:
         type: string
       zId:
         type: string
-      url_template:
+      urlTemplate:
         type: string
-      public_name:
+      publicName:
         type: string
-      created_at:
+      createdAt:
         type: integer
-      updated_at:
+      updatedAt:
         type: integer
 
   publicFrontendList:
@@ -608,6 +628,16 @@ definitions:
       envZId:
         type: string
       svcToken:
+        type: string
+
+  updateFrontendRequest:
+    type: object
+    properties:
+      frontendToken:
+        type: string
+      publicName:
+        type: string
+      urlTemplate:
         type: string
 
   unshareRequest:

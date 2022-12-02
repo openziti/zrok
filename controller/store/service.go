@@ -79,7 +79,7 @@ func (self *Store) FindServicesForEnvironment(envId int, tx *sqlx.Tx) ([]*Servic
 }
 
 func (self *Store) UpdateService(svc *Service, tx *sqlx.Tx) error {
-	sql := "update services set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now') where id = $9"
+	sql := "update services set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, updated_at = current_timestamp where id = $9"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing services update statement")

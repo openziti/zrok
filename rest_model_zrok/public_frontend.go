@@ -18,19 +18,19 @@ import (
 type PublicFrontend struct {
 
 	// created at
-	CreatedAt int64 `json:"created_at,omitempty"`
+	CreatedAt int64 `json:"createdAt,omitempty"`
 
 	// public name
-	PublicName string `json:"public_name,omitempty"`
+	PublicName string `json:"publicName,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`
 
 	// updated at
-	UpdatedAt int64 `json:"updated_at,omitempty"`
+	UpdatedAt int64 `json:"updatedAt,omitempty"`
 
 	// url template
-	URLTemplate string `json:"url_template,omitempty"`
+	URLTemplate string `json:"urlTemplate,omitempty"`
 
 	// z Id
 	ZID string `json:"zId,omitempty"`

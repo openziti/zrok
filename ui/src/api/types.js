@@ -122,10 +122,10 @@
  * 
  * @property {string} token 
  * @property {string} zId 
- * @property {string} url_template 
- * @property {string} public_name 
- * @property {number} created_at 
- * @property {number} updated_at 
+ * @property {string} urlTemplate 
+ * @property {string} publicName 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**
@@ -197,6 +197,15 @@
  * @property {string} frontendToken 
  * @property {string} envZId 
  * @property {string} svcToken 
+ */
+
+/**
+ * @typedef updateFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} frontendToken 
+ * @property {string} publicName 
+ * @property {string} urlTemplate 
  */
 
 /**

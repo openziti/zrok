@@ -91,6 +91,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ServiceUnshareHandler: service.UnshareHandlerFunc(func(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.Unshare has not yet been implemented")
 		}),
+		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
+		}),
 		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
 		}),
@@ -175,6 +178,8 @@ type ZrokAPI struct {
 	ServiceUnaccessHandler service.UnaccessHandler
 	// ServiceUnshareHandler sets the operation handler for the unshare operation
 	ServiceUnshareHandler service.UnshareHandler
+	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
+	AdminUpdateFrontendHandler admin.UpdateFrontendHandler
 	// AccountVerifyHandler sets the operation handler for the verify operation
 	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
@@ -301,6 +306,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ServiceUnshareHandler == nil {
 		unregistered = append(unregistered, "service.UnshareHandler")
+	}
+	if o.AdminUpdateFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.UpdateFrontendHandler")
 	}
 	if o.AccountVerifyHandler == nil {
 		unregistered = append(unregistered, "account.VerifyHandler")
@@ -463,6 +471,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/unshare"] = service.NewUnshare(o.context, o.ServiceUnshareHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
+	o.handlers["PATCH"]["/frontend"] = admin.NewUpdateFrontend(o.context, o.AdminUpdateFrontendHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
