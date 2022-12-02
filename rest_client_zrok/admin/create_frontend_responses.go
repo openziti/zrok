@@ -35,6 +35,12 @@ func (o *CreateFrontendReader) ReadResponse(response runtime.ClientResponse, con
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewCreateFrontendNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewCreateFrontendInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -156,6 +162,57 @@ func (o *CreateFrontendUnauthorized) String() string {
 }
 
 func (o *CreateFrontendUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewCreateFrontendNotFound creates a CreateFrontendNotFound with default headers values
+func NewCreateFrontendNotFound() *CreateFrontendNotFound {
+	return &CreateFrontendNotFound{}
+}
+
+/*
+CreateFrontendNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type CreateFrontendNotFound struct {
+}
+
+// IsSuccess returns true when this create frontend not found response has a 2xx status code
+func (o *CreateFrontendNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create frontend not found response has a 3xx status code
+func (o *CreateFrontendNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create frontend not found response has a 4xx status code
+func (o *CreateFrontendNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this create frontend not found response has a 5xx status code
+func (o *CreateFrontendNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create frontend not found response a status code equal to that given
+func (o *CreateFrontendNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+func (o *CreateFrontendNotFound) Error() string {
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
+}
+
+func (o *CreateFrontendNotFound) String() string {
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
+}
+
+func (o *CreateFrontendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

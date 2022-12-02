@@ -371,6 +371,24 @@ func createIdentity(email string, client *rest_management_api_client.ZitiEdgeMan
 	return resp, nil
 }
 
+func getIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.ListIdentitiesOK, error) {
+	filter := fmt.Sprintf("id=\"%v\"", zId)
+	limit := int64(0)
+	offset := int64(0)
+	req := &identity_edge.ListIdentitiesParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	resp, err := client.Identity.ListIdentities(req, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func enrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
 	p := &identity_edge.DetailIdentityParams{
 		Context: context.Background(),

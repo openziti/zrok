@@ -83,6 +83,31 @@ func (o *CreateFrontendUnauthorized) WriteResponse(rw http.ResponseWriter, produ
 	rw.WriteHeader(401)
 }
 
+// CreateFrontendNotFoundCode is the HTTP code returned for type CreateFrontendNotFound
+const CreateFrontendNotFoundCode int = 404
+
+/*
+CreateFrontendNotFound not found
+
+swagger:response createFrontendNotFound
+*/
+type CreateFrontendNotFound struct {
+}
+
+// NewCreateFrontendNotFound creates CreateFrontendNotFound with default headers values
+func NewCreateFrontendNotFound() *CreateFrontendNotFound {
+
+	return &CreateFrontendNotFound{}
+}
+
+// WriteResponse to the client
+func (o *CreateFrontendNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // CreateFrontendInternalServerErrorCode is the HTTP code returned for type CreateFrontendInternalServerError
 const CreateFrontendInternalServerErrorCode int = 500
 
