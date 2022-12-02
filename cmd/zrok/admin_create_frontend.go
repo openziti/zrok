@@ -1,13 +1,11 @@
 package main
 
 import (
-	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -46,13 +44,7 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		URLTemplate: urlTemplate,
 	}
 
-	adminToken := os.Getenv("ZROK_ADMIN_TOKEN")
-	if adminToken == "" {
-		panic("please set ZROK_ADMIN_TOKEN to a valid admin token for your zrok instance")
-	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", adminToken)
-
-	resp, err := zrok.Admin.CreateFrontend(req, auth)
+	resp, err := zrok.Admin.CreateFrontend(req, mustGetAdminAuth())
 	if err != nil {
 		panic(err)
 	}

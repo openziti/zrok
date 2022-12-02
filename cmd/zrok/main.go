@@ -17,6 +17,7 @@ func init() {
 	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
 	rootCmd.AddCommand(accessCmd)
 	adminCmd.AddCommand(adminCreateCmd)
+	adminCmd.AddCommand(adminDeleteCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
@@ -48,6 +49,11 @@ var adminCmd = &cobra.Command{
 var adminCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create global resources",
+}
+
+var adminDeleteCmd = &cobra.Command{
+	Use:   "delete",
+	Short: "Delete global resources",
 }
 
 var shareCmd = &cobra.Command{
