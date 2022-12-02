@@ -18,6 +18,7 @@ func init() {
 	rootCmd.AddCommand(accessCmd)
 	adminCmd.AddCommand(adminCreateCmd)
 	adminCmd.AddCommand(adminDeleteCmd)
+	adminCmd.AddCommand(adminListCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
@@ -54,6 +55,11 @@ var adminCreateCmd = &cobra.Command{
 var adminDeleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete global resources",
+}
+
+var adminListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List global resources",
 }
 
 var shareCmd = &cobra.Command{
