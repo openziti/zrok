@@ -37,21 +37,17 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 	}
 
 	doUpdate := false
-	if (fe.PublicName == nil && publicName != "") || (fe.PublicName != nil && *fe.PublicName != publicName) {
-		if publicName != "" {
+	if publicName != "" {
+		if fe.PublicName == nil || (fe.PublicName != nil && *fe.PublicName != publicName) {
 			fe.PublicName = &publicName
-		} else {
-			fe.PublicName = nil
+			doUpdate = true
 		}
-		doUpdate = true
 	}
-	if (fe.UrlTemplate == nil && urlTemplate != "") || (fe.UrlTemplate != nil && *fe.UrlTemplate != urlTemplate) {
-		if urlTemplate != "" {
+	if urlTemplate != "" {
+		if fe.UrlTemplate == nil || (fe.UrlTemplate != nil && *fe.UrlTemplate != urlTemplate) {
 			fe.UrlTemplate = &urlTemplate
-		} else {
-			fe.UrlTemplate = nil
+			doUpdate = true
 		}
-		doUpdate = true
 	}
 
 	if doUpdate {
