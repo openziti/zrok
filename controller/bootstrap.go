@@ -11,6 +11,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/identity"
+	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
@@ -65,6 +66,10 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 	}
 
 	if err := assertZrokProxyConfigType(edge); err != nil {
+		return err
+	}
+
+	if err := assertMetricsService(edge); err != nil {
 		return err
 	}
 
@@ -145,13 +150,13 @@ func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagem
 func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	idc, err := createIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
 	if err != nil {
-		return "", errors.Wrap(err, "error creating 'ctrl' identity")
+		return "", errors.Wrapf(err, "error creating '%v' identity", name)
 	}
 
 	zId := idc.Payload.Data.ID
 	cfg, err := enrollIdentity(zId, edge)
 	if err != nil {
-		return "", errors.Wrap(err, "error enrolling 'ctrl' identity")
+		return "", errors.Wrapf(err, "error enrolling '%v' identity", name)
 	}
 
 	var out bytes.Buffer
@@ -168,7 +173,6 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 }
 
 func assertErpForIdentity(name, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	logrus.Infof("asserting erps for '%v'", name)
 	filter := fmt.Sprintf("name=\"%v\" and tags.zrok != null", name)
 	limit := int64(0)
 	offset := int64(0)
@@ -189,5 +193,30 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 		}
 	}
 	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
+	return nil
+}
+
+func assertMetricsService(edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := "name=\"metrics\" and tags.zrok != null"
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service.ListServicesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Service.ListServices(listReq, nil)
+	if err != nil {
+		return errors.Wrap(err, "error listing metrics service")
+	}
+	if len(listResp.Payload.Data) != 1 {
+		logrus.Infof("creating 'metrics' service")
+		_, err := createService("metrics", nil, nil, edge)
+		if err != nil {
+			return errors.Wrap(err, "error creating metrics service")
+		}
+	}
+	logrus.Infof("asserted metrics service")
 	return nil
 }

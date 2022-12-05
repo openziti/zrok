@@ -22,7 +22,7 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 		return "", nil, err
 	}
 
-	svcZId, err = createService(envZId, svcToken, cfgId, edge)
+	svcZId, err = createShareService(envZId, svcToken, cfgId, edge)
 	if err != nil {
 		return "", nil, err
 	}

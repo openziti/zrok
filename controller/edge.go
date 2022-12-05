@@ -17,6 +17,7 @@ import (
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -252,14 +253,29 @@ func deleteConfig(envZId, svcToken string, edge *rest_management_api_client.Ziti
 	return nil
 }
 
-func createService(envZId, svcToken, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (serviceId string, err error) {
+func createShareService(envZId, svcToken, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
 	configs := []string{cfgId}
+	tags := zrokServiceTags(svcToken)
+	svcZId, err = createService(svcToken, configs, tags.SubTags, edge)
+	if err != nil {
+		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
+	}
+	logrus.Infof("created zrok service named '%v' (with ziti id '%v') for environment '%v'", svcToken, svcZId, envZId)
+	return svcZId, nil
+}
+
+func createService(name string, cfgIds []string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
-		Configs:            configs,
 		EncryptionRequired: &encryptionRequired,
-		Name:               &svcToken,
-		Tags:               zrokServiceTags(svcToken),
+		Name:               &name,
+	}
+	if cfgIds != nil {
+		svc.Configs = cfgIds
+	}
+	tags := zrokTags()
+	for k, v := range moreTags {
+		tags.SubTags[k] = v
 	}
 	req := &edge_service.CreateServiceParams{
 		Service: svc,
@@ -270,7 +286,6 @@ func createService(envZId, svcToken, cfgId string, edge *rest_management_api_cli
 	if err != nil {
 		return "", err
 	}
-	logrus.Infof("created zrok service named '%v' (with ziti id '%v') for environment '%v'", svcToken, resp.Payload.Data.ID, envZId)
 	return resp.Payload.Data.ID, nil
 }
 
