@@ -35,12 +35,13 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
-	cfg, err := enrollIdentity(ident.Payload.Data.ID, client)
+	envZId := ident.Payload.Data.ID
+	cfg, err := enrollIdentity(envZId, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
-	if err := createEdgeRouterPolicy(ident.Payload.Data.ID, client); err != nil {
+	if err := createEdgeRouterPolicy(envZId, envZId, client); err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
@@ -48,7 +49,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		Description: params.Body.Description,
 		Host:        params.Body.Host,
 		Address:     realRemoteAddress(params.HTTPRequest),
-		ZId:         ident.Payload.Data.ID,
+		ZId:         envZId,
 	}, tx)
 	if err != nil {
 		logrus.Errorf("error storing created identity: %v", err)
@@ -62,7 +63,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
 
 	resp := environment.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
-		Identity: ident.Payload.Data.ID,
+		Identity: envZId,
 	})
 
 	var out bytes.Buffer

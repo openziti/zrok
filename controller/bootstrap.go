@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-func Bootstrap(inCfg *Config) error {
+func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 	cfg = inCfg
 
 	edge, err := edgeClient()
@@ -25,28 +25,32 @@ func Bootstrap(inCfg *Config) error {
 		return err
 	}
 
-	if ctrlZId, err := getIdentityId("ctrl"); err == nil {
-		logrus.Infof("controller identity: %v", ctrlZId)
-		if err := assertIdentity(ctrlZId, edge); err != nil {
+	if !skipCtrl {
+		if ctrlZId, err := getIdentityId("ctrl"); err == nil {
+			logrus.Infof("controller identity: %v", ctrlZId)
+			if err := assertIdentity(ctrlZId, edge); err != nil {
+				panic(err)
+			}
+			if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
+				panic(err)
+			}
+		} else {
 			panic(err)
 		}
-		if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
-			panic(err)
-		}
-	} else {
-		panic(err)
 	}
 
-	if frontendZId, err := getIdentityId("frontend"); err == nil {
-		logrus.Infof("frontend identity: %v", frontendZId)
-		if err := assertIdentity(frontendZId, edge); err != nil {
+	if !skipFrontend {
+		if frontendZId, err := getIdentityId("frontend"); err == nil {
+			logrus.Infof("frontend identity: %v", frontendZId)
+			if err := assertIdentity(frontendZId, edge); err != nil {
+				panic(err)
+			}
+			if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
+				panic(err)
+			}
+		} else {
 			panic(err)
 		}
-		if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
-			panic(err)
-		}
-	} else {
-		panic(err)
 	}
 
 	if err := assertZrokProxyConfigType(edge); err != nil {
@@ -143,7 +147,10 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 		return errors.Wrapf(err, "error listing edge router policies for '%v' (%v)", name, zId)
 	}
 	if len(listResp.Payload.Data) != 1 {
-		return errors.Errorf("found %d erps for '%v' (%v)", name, zId)
+		logrus.Infof("creating erp for '%v' (%v)", name, zId)
+		if err := createEdgeRouterPolicy(name, zId, edge); err != nil {
+			return errors.Wrapf(err, "error creating erp for '%v' (%v)", name, zId)
+		}
 	}
 	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
 	return nil

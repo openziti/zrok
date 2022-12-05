@@ -288,14 +288,14 @@ func deleteService(envZId, svcZId string, edge *rest_management_api_client.ZitiE
 	return nil
 }
 
-func createEdgeRouterPolicy(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func createEdgeRouterPolicy(name, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
 	identityRoles := []string{fmt.Sprintf("@%v", zId)}
 	semantic := rest_model_edge.SemanticAllOf
 	erp := &rest_model_edge.EdgeRouterPolicyCreate{
 		EdgeRouterRoles: edgeRouterRoles,
 		IdentityRoles:   identityRoles,
-		Name:            &zId,
+		Name:            &name,
 		Semantic:        &semantic,
 		Tags:            zrokTags(),
 	}

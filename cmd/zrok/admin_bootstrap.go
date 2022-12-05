@@ -12,7 +12,9 @@ func init() {
 }
 
 type adminBootstrap struct {
-	cmd *cobra.Command
+	cmd          *cobra.Command
+	skipCtrl     bool
+	skipFrontend bool
 }
 
 func newAdminBootstrap() *adminBootstrap {
@@ -23,6 +25,8 @@ func newAdminBootstrap() *adminBootstrap {
 	}
 	command := &adminBootstrap{cmd: cmd}
 	cmd.Run = command.run
+	cmd.Flags().BoolVar(&command.skipCtrl, "skip-ctrl", false, "Skip controller (ctrl) identity bootstrapping")
+	cmd.Flags().BoolVar(&command.skipFrontend, "skip-frontend", false, "Slip frontend identity bootstrapping")
 	return command
 }
 
@@ -33,7 +37,7 @@ func (cmd *adminBootstrap) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	logrus.Infof(cf.Dump(inCfg, cf.DefaultOptions()))
-	if err := controller.Bootstrap(inCfg); err != nil {
+	if err := controller.Bootstrap(cmd.skipCtrl, cmd.skipFrontend, inCfg); err != nil {
 		panic(err)
 	}
 	logrus.Info("bootstrap complete!")
