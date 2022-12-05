@@ -7,6 +7,8 @@ import (
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
+	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
+	"github.com/openziti/edge/rest_management_api_client/identity"
 	"github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	config2 "github.com/openziti/sdk-golang/ziti/config"
@@ -18,21 +20,33 @@ import (
 func Bootstrap(inCfg *Config) error {
 	cfg = inCfg
 
+	edge, err := edgeClient()
+	if err != nil {
+		return err
+	}
+
 	if ctrlZId, err := getIdentityId("ctrl"); err == nil {
 		logrus.Infof("controller identity: %v", ctrlZId)
+		if err := assertIdentity(ctrlZId, edge); err != nil {
+			panic(err)
+		}
+		if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
+			panic(err)
+		}
 	} else {
 		panic(err)
 	}
 
 	if frontendZId, err := getIdentityId("frontend"); err == nil {
 		logrus.Infof("frontend identity: %v", frontendZId)
+		if err := assertIdentity(frontendZId, edge); err != nil {
+			panic(err)
+		}
+		if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
+			panic(err)
+		}
 	} else {
 		panic(err)
-	}
-
-	edge, err := edgeClient()
-	if err != nil {
-		return err
 	}
 
 	if err := assertZrokProxyConfigType(edge); err != nil {
@@ -90,4 +104,47 @@ func getIdentityId(identityName string) (string, error) {
 		return "", errors.Wrapf(err, "error getting current identity from '%v'", zif)
 	}
 	return id.Id, nil
+}
+
+func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("id=\"%v\"", zId)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &identity.ListIdentitiesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Identity.ListIdentities(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing identities for '%v'", zId)
+	}
+	if len(listResp.Payload.Data) != 1 {
+		return errors.Wrapf(err, "found %d identities for '%v'", zId)
+	}
+	logrus.Infof("asserted identity '%v'", zId)
+	return nil
+}
+
+func assertErpForIdentity(name, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	logrus.Infof("asserting erps for '%v'", name)
+	filter := fmt.Sprintf("name=\"%v\" and tags.zrok != null", name)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &edge_router_policy.ListEdgeRouterPoliciesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.EdgeRouterPolicy.ListEdgeRouterPolicies(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing edge router policies for '%v' (%v)", name, zId)
+	}
+	if len(listResp.Payload.Data) != 1 {
+		return errors.Errorf("found %d erps for '%v' (%v)", name, zId)
+	}
+	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
+	return nil
 }
