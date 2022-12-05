@@ -125,7 +125,7 @@ func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagem
 		return errors.Wrapf(err, "error listing identities for '%v'", zId)
 	}
 	if len(listResp.Payload.Data) != 1 {
-		return errors.Wrapf(err, "found %d identities for '%v'", zId)
+		return errors.Wrapf(err, "found %d identities for '%v'", len(listResp.Payload.Data), zId)
 	}
 	logrus.Infof("asserted identity '%v'", zId)
 	return nil
