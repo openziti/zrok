@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
+	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_model"
+	"github.com/openziti/sdk-golang/ziti"
+	config2 "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -14,6 +17,18 @@ import (
 
 func Bootstrap(inCfg *Config) error {
 	cfg = inCfg
+
+	if ctrlZId, err := getIdentityId("ctrl"); err == nil {
+		logrus.Infof("controller identity: %v", ctrlZId)
+	} else {
+		panic(err)
+	}
+
+	if frontendZId, err := getIdentityId("frontend"); err == nil {
+		logrus.Infof("frontend identity: %v", frontendZId)
+	} else {
+		panic(err)
+	}
 
 	edge, err := edgeClient()
 	if err != nil {
@@ -58,4 +73,21 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 		logrus.Infof("found '%v' config type with id '%v'", model.ZrokProxyConfig, *(listResp.Payload.Data[0].ID))
 	}
 	return nil
+}
+
+func getIdentityId(identityName string) (string, error) {
+	zif, err := zrokdir.ZitiIdentityFile(identityName)
+	if err != nil {
+		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir: %v", identityName)
+	}
+	zcfg, err := config2.NewFromFile(zif)
+	if err != nil {
+		return "", errors.Wrapf(err, "error loading ziti config from file '%v': %v", zif)
+	}
+	zctx := ziti.NewContextWithConfig(zcfg)
+	id, err := zctx.GetCurrentIdentity()
+	if err != nil {
+		return "", errors.Wrapf(err, "error getting current identity from '%v': %v", zif)
+	}
+	return id.Id, nil
 }
