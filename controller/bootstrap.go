@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -10,6 +12,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/identity"
 	"github.com/openziti/edge/rest_model"
+	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	config2 "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/pkg/errors"
@@ -25,30 +28,38 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		return err
 	}
 
+	var ctrlZId string
 	if !skipCtrl {
-		if ctrlZId, err := getIdentityId("ctrl"); err == nil {
+		if ctrlZId, err = getIdentityId("ctrl"); err == nil {
 			logrus.Infof("controller identity: %v", ctrlZId)
-			if err := assertIdentity(ctrlZId, edge); err != nil {
-				panic(err)
-			}
-			if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
-				panic(err)
-			}
 		} else {
+			ctrlZId, err = bootstrapIdentity("ctrl", edge)
+			if err != nil {
+				panic(err)
+			}
+		}
+		if err := assertIdentity(ctrlZId, edge); err != nil {
+			panic(err)
+		}
+		if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
 			panic(err)
 		}
 	}
 
+	var frontendZId string
 	if !skipFrontend {
-		if frontendZId, err := getIdentityId("frontend"); err == nil {
+		if frontendZId, err = getIdentityId("frontend"); err == nil {
 			logrus.Infof("frontend identity: %v", frontendZId)
-			if err := assertIdentity(frontendZId, edge); err != nil {
-				panic(err)
-			}
-			if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
-				panic(err)
-			}
 		} else {
+			frontendZId, err = bootstrapIdentity("frontend", edge)
+			if err != nil {
+				panic(err)
+			}
+		}
+		if err := assertIdentity(frontendZId, edge); err != nil {
+			panic(err)
+		}
+		if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
 			panic(err)
 		}
 	}
@@ -129,6 +140,31 @@ func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagem
 	}
 	logrus.Infof("asserted identity '%v'", zId)
 	return nil
+}
+
+func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+	idc, err := createIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
+	if err != nil {
+		return "", errors.Wrap(err, "error creating 'ctrl' identity")
+	}
+
+	zId := idc.Payload.Data.ID
+	cfg, err := enrollIdentity(zId, edge)
+	if err != nil {
+		return "", errors.Wrap(err, "error enrolling 'ctrl' identity")
+	}
+
+	var out bytes.Buffer
+	enc := json.NewEncoder(&out)
+	enc.SetEscapeHTML(false)
+	err = enc.Encode(&cfg)
+	if err != nil {
+		return "", errors.Wrapf(err, "error encoding identity config '%v'", name)
+	}
+	if err := zrokdir.SaveZitiIdentity(name, out.String()); err != nil {
+		return "", errors.Wrapf(err, "error saving identity config '%v'", name)
+	}
+	return zId, nil
 }
 
 func assertErpForIdentity(name, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {

@@ -30,7 +30,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Errorf("error getting edge client: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
-	ident, err := createIdentity(principal.Email, client)
+	ident, err := createEnvironmentIdentity(principal.Email, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()

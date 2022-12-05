@@ -344,26 +344,33 @@ func deleteEdgeRouterPolicy(envZId string, edge *rest_management_api_client.Ziti
 	return nil
 }
 
-func createIdentity(email string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
-	iIsAdmin := false
+func createEnvironmentIdentity(accountEmail string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	name, err := createToken()
 	if err != nil {
 		return nil, err
 	}
 	identityType := rest_model_edge.IdentityTypeUser
+	moreTags := map[string]interface{}{"zrokEmail": accountEmail}
+	return createIdentity(name, identityType, moreTags, client)
+}
+
+func createIdentity(name string, identityType rest_model_edge.IdentityType, moreTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+	isAdmin := false
 	tags := zrokTags()
-	tags.SubTags["zrokEmail"] = email
-	i := &rest_model_edge.IdentityCreate{
+	for k, v := range moreTags {
+		tags.SubTags[k] = v
+	}
+	req := identity_edge.NewCreateIdentityParams()
+	req.Identity = &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
-		IsAdmin:             &iIsAdmin,
+		IsAdmin:             &isAdmin,
 		Name:                &name,
 		RoleAttributes:      nil,
 		ServiceHostingCosts: nil,
 		Tags:                tags,
 		Type:                &identityType,
 	}
-	req := identity_edge.NewCreateIdentityParams()
-	req.Identity = i
+	req.SetTimeout(30 * time.Second)
 	resp, err := client.Identity.CreateIdentity(req, nil)
 	if err != nil {
 		return nil, err
