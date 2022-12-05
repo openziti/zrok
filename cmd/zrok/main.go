@@ -16,6 +16,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
 	rootCmd.AddCommand(accessCmd)
+	adminCreateCmd.AddCommand(adminCreateIdentity)
 	adminCmd.AddCommand(adminCreateCmd)
 	adminCmd.AddCommand(adminDeleteCmd)
 	adminCmd.AddCommand(adminListCmd)
@@ -51,6 +52,11 @@ var adminCmd = &cobra.Command{
 var adminCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create global resources",
+}
+
+var adminCreateIdentity = &cobra.Command{
+	Use:   "identity",
+	Short: "Create global identities",
 }
 
 var adminDeleteCmd = &cobra.Command{
