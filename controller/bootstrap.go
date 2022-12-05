@@ -78,16 +78,16 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 func getIdentityId(identityName string) (string, error) {
 	zif, err := zrokdir.ZitiIdentityFile(identityName)
 	if err != nil {
-		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir: %v", identityName)
+		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir", identityName)
 	}
 	zcfg, err := config2.NewFromFile(zif)
 	if err != nil {
-		return "", errors.Wrapf(err, "error loading ziti config from file '%v': %v", zif)
+		return "", errors.Wrapf(err, "error loading ziti config from file '%v'", zif)
 	}
 	zctx := ziti.NewContextWithConfig(zcfg)
 	id, err := zctx.GetCurrentIdentity()
 	if err != nil {
-		return "", errors.Wrapf(err, "error getting current identity from '%v': %v", zif)
+		return "", errors.Wrapf(err, "error getting current identity from '%v'", zif)
 	}
 	return id.Id, nil
 }
