@@ -13,6 +13,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/identity"
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
+	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
@@ -77,6 +78,18 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 
 	if err := assertMetricsSerp(metricsSvcZId, cfg, edge); err != nil {
 		return err
+	}
+
+	if !skipCtrl {
+		if err := assertCtrlMetricsBind(ctrlZId, metricsSvcZId, edge); err != nil {
+			return err
+		}
+	}
+
+	if !skipFrontend {
+		if err := assertFrontendMetricsDial(frontendZId, metricsSvcZId, edge); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -253,5 +266,53 @@ func assertMetricsSerp(metricsSvcZId string, cfg *Config, edge *rest_management_
 		}
 	}
 	logrus.Infof("asserted '%v' serp", cfg.Metrics.ServiceName)
+	return nil
+}
+
+func assertCtrlMetricsBind(ctrlZId, metricsSvcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(identityRoles) = \"@%v\" and type = 2 and tags.zrok != null", metricsSvcZId, ctrlZId)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service_policy.ListServicePoliciesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing 'ctrl-metrics-bind' service policy")
+	}
+	if len(listResp.Payload.Data) != 1 {
+		logrus.Info("creating 'ctrl-metrics-bind' service policy")
+		if err := createNamedBindServicePolicy("ctrl-metrics-bind", metricsSvcZId, ctrlZId, edge, zrokTags()); err != nil {
+			return errors.Wrap(err, "error creating 'ctrl-metrics-bind' service policy")
+		}
+	}
+	logrus.Infof("asserted 'ctrl-metrics-bind' service policy")
+	return nil
+}
+
+func assertFrontendMetricsDial(frontendZId, metricsSvcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(identityRoles) = \"@%v\" and type = 1 and tags.zrok != null", metricsSvcZId, frontendZId)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service_policy.ListServicePoliciesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing 'frontend-metrics-dial' service policy")
+	}
+	if len(listResp.Payload.Data) != 1 {
+		logrus.Info("creating 'frontend-metrics-dial' service policy")
+		if err := createNamedDialServicePolicy("frontend-metrics-dial", metricsSvcZId, frontendZId, edge, zrokTags()); err != nil {
+			return errors.Wrap(err, "error creating 'frontend-metrics-dial' service policy")
+		}
+	}
+	logrus.Infof("asserted 'frontend-metrics-dial' service policy")
 	return nil
 }

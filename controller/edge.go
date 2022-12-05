@@ -120,6 +120,39 @@ func createServicePolicyBind(envZId, svcToken, svcZId string, edge *rest_managem
 	return nil
 }
 
+func createNamedBindServicePolicy(name, svcZId, idZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
+	allTags := &rest_model_edge.Tags{SubTags: make(rest_model_edge.SubTags)}
+	for _, t := range tags {
+		for k, v := range t.SubTags {
+			allTags.SubTags[k] = v
+		}
+	}
+	identityRoles := []string{"@" + idZId}
+	var postureCheckRoles []string
+	semantic := rest_model.SemanticAllOf
+	serviceRoles := []string{"@" + svcZId}
+	dialBind := rest_model.DialBindBind
+	sp := &rest_model.ServicePolicyCreate{
+		IdentityRoles:     identityRoles,
+		Name:              &name,
+		PostureCheckRoles: postureCheckRoles,
+		Semantic:          &semantic,
+		ServiceRoles:      serviceRoles,
+		Type:              &dialBind,
+		Tags:              allTags,
+	}
+	req := &service_policy.CreateServicePolicyParams{
+		Policy:  sp,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func deleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	// type=2 == "Bind"
 	return deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=2", svcToken), edge)
@@ -162,6 +195,39 @@ func createServicePolicyDial(envZId, svcToken, svcZId string, edge *rest_managem
 		return err
 	}
 	logrus.Infof("created dial service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
+	return nil
+}
+
+func createNamedDialServicePolicy(name, svcZId, idZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
+	allTags := &rest_model_edge.Tags{SubTags: make(rest_model_edge.SubTags)}
+	for _, t := range tags {
+		for k, v := range t.SubTags {
+			allTags.SubTags[k] = v
+		}
+	}
+	identityRoles := []string{"@" + idZId}
+	var postureCheckRoles []string
+	semantic := rest_model.SemanticAllOf
+	serviceRoles := []string{"@" + svcZId}
+	dialBind := rest_model.DialBindDial
+	sp := &rest_model.ServicePolicyCreate{
+		IdentityRoles:     identityRoles,
+		Name:              &name,
+		PostureCheckRoles: postureCheckRoles,
+		Semantic:          &semantic,
+		ServiceRoles:      serviceRoles,
+		Type:              &dialBind,
+		Tags:              allTags,
+	}
+	req := &service_policy.CreateServicePolicyParams{
+		Policy:  sp,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
