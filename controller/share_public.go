@@ -35,7 +35,7 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, params servi
 		return "", nil, err
 	}
 
-	if err := createServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := createShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

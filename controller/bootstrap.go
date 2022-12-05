@@ -12,6 +12,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/identity"
 	"github.com/openziti/edge/rest_management_api_client/service"
+	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
@@ -69,7 +70,12 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		return err
 	}
 
-	if err := assertMetricsService(edge); err != nil {
+	var metricsSvcZId string
+	if metricsSvcZId, err = assertMetricsService(cfg, edge); err != nil {
+		return err
+	}
+
+	if err := assertMetricsSerp(metricsSvcZId, cfg, edge); err != nil {
 		return err
 	}
 
@@ -196,8 +202,8 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 	return nil
 }
 
-func assertMetricsService(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "name=\"metrics\" and tags.zrok != null"
+func assertMetricsService(cfg *Config, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+	filter := fmt.Sprintf("name=\"%v\" and tags.zrok != null", cfg.Metrics.ServiceName)
 	limit := int64(0)
 	offset := int64(0)
 	listReq := &service.ListServicesParams{
@@ -208,15 +214,44 @@ func assertMetricsService(edge *rest_management_api_client.ZitiEdgeManagement) e
 	listReq.SetTimeout(30 * time.Second)
 	listResp, err := edge.Service.ListServices(listReq, nil)
 	if err != nil {
-		return errors.Wrap(err, "error listing metrics service")
+		return "", errors.Wrapf(err, "error listing '%v' service", cfg.Metrics.ServiceName)
+	}
+	var svcZId string
+	if len(listResp.Payload.Data) != 1 {
+		logrus.Infof("creating '%v' service", cfg.Metrics.ServiceName)
+		svcZId, err = createService("metrics", nil, nil, edge)
+		if err != nil {
+			return "", errors.Wrapf(err, "error creating '%v' service", cfg.Metrics.ServiceName)
+		}
+	} else {
+		svcZId = *listResp.Payload.Data[0].ID
+	}
+
+	logrus.Infof("asserted '%v' service (%v)", cfg.Metrics.ServiceName, svcZId)
+	return svcZId, nil
+}
+
+func assertMetricsSerp(metricsSvcZId string, cfg *Config, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(edgeRouterRoles) = \"#all\" and tags.zrok != null", metricsSvcZId)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing '%v' serps", cfg.Metrics.ServiceName)
 	}
 	if len(listResp.Payload.Data) != 1 {
-		logrus.Infof("creating 'metrics' service")
-		_, err := createService("metrics", nil, nil, edge)
+		logrus.Infof("creating '%v' serp", cfg.Metrics.ServiceName)
+		_, err := createServiceEdgeRouterPolicy(cfg.Metrics.ServiceName, metricsSvcZId, nil, edge)
 		if err != nil {
-			return errors.Wrap(err, "error creating metrics service")
+			return errors.Wrapf(err, "error creating '%v' serp", cfg.Metrics.ServiceName)
 		}
 	}
-	logrus.Infof("asserted metrics service")
+	logrus.Infof("asserted '%v' serp", cfg.Metrics.ServiceName)
 	return nil
 }

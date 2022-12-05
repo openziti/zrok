@@ -22,16 +22,29 @@ import (
 	"time"
 )
 
-func createServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func createShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	serpZId, err := createServiceEdgeRouterPolicy(svcToken, svcZId, zrokServiceTags(svcToken).SubTags, edge)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", serpZId, svcZId, envZId)
+	return nil
+}
+
+func createServiceEdgeRouterPolicy(name, svcZId string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
 	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
+	tags := zrokTags()
+	for k, v := range moreTags {
+		tags.SubTags[k] = v
+	}
 	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
 		EdgeRouterRoles: edgeRouterRoles,
-		Name:            &svcToken,
+		Name:            &name,
 		Semantic:        &semantic,
 		ServiceRoles:    serviceRoles,
-		Tags:            zrokServiceTags(svcToken),
+		Tags:            tags,
 	}
 	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{
 		Policy:  serp,
@@ -40,10 +53,9 @@ func createServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_m
 	serpParams.SetTimeout(30 * time.Second)
 	resp, err := edge.ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(serpParams, nil)
 	if err != nil {
-		return err
+		return "", errors.Wrapf(err, "error creating serp '%v' for service '%v'", name, svcZId)
 	}
-	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
-	return nil
+	return resp.Payload.Data.ID, nil
 }
 
 func deleteServiceEdgeRouterPolicy(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
@@ -277,6 +289,7 @@ func createService(name string, cfgIds []string, moreTags map[string]interface{}
 	for k, v := range moreTags {
 		tags.SubTags[k] = v
 	}
+	svc.Tags = tags
 	req := &edge_service.CreateServiceParams{
 		Service: svc,
 		Context: context.Background(),
