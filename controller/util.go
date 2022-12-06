@@ -102,6 +102,6 @@ func realRemoteAddress(req *http.Request) string {
 	return ip
 }
 
-func proxyUrl(svcToken string) string {
-	return strings.Replace(cfg.Proxy.UrlTemplate, "{svcToken}", svcToken, -1)
+func proxyUrl(svcToken, template string) string {
+	return strings.Replace(template, "{svcToken}", svcToken, -1)
 }

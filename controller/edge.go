@@ -158,7 +158,7 @@ func deleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_
 	return deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=2", svcToken), edge)
 }
 
-func createServicePolicyDial(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
+func createServicePolicyDial(envZId, svcToken, svcZId string, dialZIds []string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
 	allTags := zrokServiceTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
@@ -167,7 +167,7 @@ func createServicePolicyDial(envZId, svcToken, svcZId string, edge *rest_managem
 	}
 
 	var identityRoles []string
-	for _, proxyIdentity := range cfg.Proxy.Identities {
+	for _, proxyIdentity := range dialZIds {
 		identityRoles = append(identityRoles, "@"+proxyIdentity)
 		logrus.Infof("added proxy identity role '%v'", proxyIdentity)
 	}

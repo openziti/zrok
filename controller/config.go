@@ -12,7 +12,6 @@ type Config struct {
 	V            int
 	Admin        *AdminConfig
 	Endpoint     *EndpointConfig
-	Proxy        *ProxyConfig
 	Email        *EmailConfig
 	Registration *RegistrationConfig
 	Store        *store.Config
@@ -28,11 +27,6 @@ type AdminConfig struct {
 type EndpointConfig struct {
 	Host string
 	Port int
-}
-
-type ProxyConfig struct {
-	UrlTemplate string
-	Identities  []string
 }
 
 type EmailConfig struct {

@@ -12,7 +12,7 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 	return &publicResourceAllocator{}
 }
 
-func (a *publicResourceAllocator) allocate(envZId, svcToken string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
+func (a *publicResourceAllocator) allocate(envZId, svcToken string, frontendZIds, frontendTemplates []string, params service.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
 	var authUsers []*model.AuthUser
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
@@ -31,7 +31,7 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, params servi
 		return "", nil, err
 	}
 
-	if err := createServicePolicyDial(envZId, svcToken, svcZId, edge); err != nil {
+	if err := createServicePolicyDial(envZId, svcToken, svcZId, frontendZIds, edge); err != nil {
 		return "", nil, err
 	}
 
@@ -39,5 +39,9 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, params servi
 		return "", nil, err
 	}
 
-	return svcZId, []string{proxyUrl(svcToken)}, nil
+	for _, frontendTemplate := range frontendTemplates {
+		frontendEndpoints = append(frontendEndpoints, proxyUrl(svcToken, frontendTemplate))
+	}
+
+	return svcZId, frontendEndpoints, nil
 }

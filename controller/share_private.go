@@ -35,5 +35,5 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 		return "", nil, err
 	}
 
-	return svcZId, []string{proxyUrl(svcToken)}, nil
+	return svcZId, nil, nil
 }

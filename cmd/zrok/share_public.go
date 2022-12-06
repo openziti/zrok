@@ -29,9 +29,10 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	quiet     bool
-	basicAuth []string
-	cmd       *cobra.Command
+	quiet             bool
+	basicAuth         []string
+	frontendSelection []string
+	cmd               *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -43,6 +44,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
+	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Run = command.run
 	return command
 }
@@ -104,6 +106,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.ZId,
 		ShareMode:            "public",
+		FrontendSelection:    self.frontendSelection,
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
 		AuthScheme:           string(model.None),

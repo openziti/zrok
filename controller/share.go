@@ -60,7 +60,21 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	var frontendEndpoints []string
 	switch params.Body.ShareMode {
 	case "public":
-		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, svcToken, params, edge)
+		var frontendZIds []string
+		var frontendTemplates []string
+		for _, frontendSelection := range params.Body.FrontendSelection {
+			sfe, err := str.FindFrontendPubliclyNamed(frontendSelection, tx)
+			if err != nil {
+				logrus.Error(err)
+				return service.NewUpdateShareNotFound()
+			}
+			if sfe != nil && sfe.UrlTemplate != nil {
+				frontendZIds = append(frontendZIds, sfe.ZId)
+				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
+				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", svcToken)
+			}
+		}
+		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, svcToken, frontendZIds, frontendTemplates, params, edge)
 		if err != nil {
 			logrus.Error(err)
 			return service.NewShareInternalServerError()
