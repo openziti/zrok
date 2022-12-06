@@ -55,6 +55,14 @@ func (str *Store) FindFrontendWithToken(token string, tx *sqlx.Tx) (*Frontend, e
 	return i, nil
 }
 
+func (str *Store) FindFrontendWithZId(zId string, tx *sqlx.Tx) (*Frontend, error) {
+	i := &Frontend{}
+	if err := tx.QueryRowx("select frontends.* from frontends where z_id = $1", zId).StructScan(i); err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend by ziti id")
+	}
+	return i, nil
+}
+
 func (str *Store) FindFrontendPubliclyNamed(publicName string, tx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
 	if err := tx.QueryRowx("select frontends.* from frontends where public_name = $1", publicName).StructScan(i); err != nil {

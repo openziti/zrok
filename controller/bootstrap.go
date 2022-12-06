@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -25,6 +26,12 @@ import (
 
 func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 	cfg = inCfg
+
+	if v, err := store.Open(cfg.Store); err == nil {
+		str = v
+	} else {
+		return errors.Wrap(err, "error opening store")
+	}
 
 	edge, err := edgeClient()
 	if err != nil {
@@ -64,6 +71,22 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		}
 		if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
 			panic(err)
+		}
+
+		tx, err := str.Begin()
+		if err != nil {
+			panic(err)
+		}
+		defer func() { _ = tx.Rollback() }()
+		publicFe, err := str.FindFrontendWithZId(frontendZId, tx)
+		if err != nil {
+			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend' to create a frontend instance", frontendZId)
+		} else {
+			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
+				logrus.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)
+			} else {
+				logrus.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template")
+			}
 		}
 	}
 
