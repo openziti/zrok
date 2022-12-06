@@ -280,6 +280,53 @@ func init() {
         }
       }
     },
+    "/identity": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created",
+            "schema": {
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/invite": {
       "post": {
         "tags": [
@@ -1314,6 +1361,53 @@ func init() {
             "description": "ok",
             "schema": {
               "$ref": "#/definitions/publicFrontendList"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/identity": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created",
+            "schema": {
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {

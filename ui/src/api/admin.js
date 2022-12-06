@@ -53,6 +53,21 @@ export function listFrontends() {
   return gateway.request(listFrontendsOperation)
 }
 
+/**
+ * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} created
+ */
+export function createIdentity(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(createIdentityOperation, parameters)
+}
+
 const createFrontendOperation = {
   path: '/frontend',
   contentTypes: ['application/zrok.v1+json'],
@@ -89,6 +104,17 @@ const deleteFrontendOperation = {
 const listFrontendsOperation = {
   path: '/frontends',
   method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const createIdentityOperation = {
+  path: '/identity',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
   security: [
     {
       id: 'key'
