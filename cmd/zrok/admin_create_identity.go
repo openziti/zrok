@@ -21,7 +21,7 @@ func newAdminCreateIdentity() *adminCreateIdentity {
 	cmd := &cobra.Command{
 		Use:     "identity <name>",
 		Aliases: []string{"id"},
-		Short:   "Create an identity and basic edge policies",
+		Short:   "Create an identity and policies for a public frontend",
 		Args:    cobra.ExactArgs(1),
 	}
 	command := &adminCreateIdentity{cmd: cmd}
