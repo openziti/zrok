@@ -85,7 +85,7 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
 				logrus.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)
 			} else {
-				logrus.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template")
+				logrus.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template", frontendZId)
 			}
 		}
 	}

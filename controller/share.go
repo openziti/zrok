@@ -76,7 +76,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
-				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", svcToken)
+				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", frontendSelection, sfe.ZId, svcToken)
 			}
 		}
 		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, svcToken, frontendZIds, frontendTemplates, params, edge)
