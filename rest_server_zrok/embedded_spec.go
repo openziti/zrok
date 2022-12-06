@@ -463,6 +463,9 @@ func init() {
           "401": {
             "description": "unauthorized"
           },
+          "404": {
+            "description": "not found"
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -967,8 +970,11 @@ func init() {
     "shareResponse": {
       "type": "object",
       "properties": {
-        "frontendProxyEndpoint": {
-          "type": "string"
+        "frontendProxyEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "svcToken": {
           "type": "string"
@@ -1502,6 +1508,9 @@ func init() {
           "401": {
             "description": "unauthorized"
           },
+          "404": {
+            "description": "not found"
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -2006,8 +2015,11 @@ func init() {
     "shareResponse": {
       "type": "object",
       "properties": {
-        "frontendProxyEndpoint": {
-          "type": "string"
+        "frontendProxyEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "svcToken": {
           "type": "string"

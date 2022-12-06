@@ -166,7 +166,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		p := widgets.NewParagraph()
 		p.Border = true
 		p.Title = " access your zrok service "
-		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoint))/2)-1), resp.Payload.FrontendProxyEndpoint)
+		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoints[0]))/2)-1), resp.Payload.FrontendProxyEndpoints[0])
 		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
 		p.PaddingTop = 1
 		p.SetRect(5, 5, w-10, 10)
@@ -220,7 +220,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
-		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendProxyEndpoint)
+		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendProxyEndpoints[0])
 		for {
 			time.Sleep(30 * time.Second)
 		}

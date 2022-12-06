@@ -83,6 +83,31 @@ func (o *ShareUnauthorized) WriteResponse(rw http.ResponseWriter, producer runti
 	rw.WriteHeader(401)
 }
 
+// ShareNotFoundCode is the HTTP code returned for type ShareNotFound
+const ShareNotFoundCode int = 404
+
+/*
+ShareNotFound not found
+
+swagger:response shareNotFound
+*/
+type ShareNotFound struct {
+}
+
+// NewShareNotFound creates ShareNotFound with default headers values
+func NewShareNotFound() *ShareNotFound {
+
+	return &ShareNotFound{}
+}
+
+// WriteResponse to the client
+func (o *ShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // ShareInternalServerErrorCode is the HTTP code returned for type ShareInternalServerError
 const ShareInternalServerErrorCode int = 500
 

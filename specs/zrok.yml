@@ -321,6 +321,8 @@ paths:
             $ref: "#/definitions/shareResponse"
         401:
           description: unauthorized
+        404:
+          description: not found
         500:
           description: internal server error
           schema:
@@ -635,8 +637,10 @@ definitions:
   shareResponse:
     type: object
     properties:
-      frontendProxyEndpoint:
-        type: string
+      frontendProxyEndpoints:
+        type: array
+        items:
+          type: string
       svcToken:
         type: string
 

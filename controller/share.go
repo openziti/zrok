@@ -60,13 +60,18 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	var frontendEndpoints []string
 	switch params.Body.ShareMode {
 	case "public":
+		if len(params.Body.FrontendSelection) < 1 {
+			logrus.Info("no frontend selection provided")
+			return service.NewShareNotFound()
+		}
+
 		var frontendZIds []string
 		var frontendTemplates []string
 		for _, frontendSelection := range params.Body.FrontendSelection {
 			sfe, err := str.FindFrontendPubliclyNamed(frontendSelection, tx)
 			if err != nil {
 				logrus.Error(err)
-				return service.NewUpdateShareNotFound()
+				return service.NewShareNotFound()
 			}
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
@@ -116,7 +121,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcToken, sid, principal.Email)
 
 	return service.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
-		FrontendProxyEndpoint: frontendEndpoints[0],
-		SvcToken:              svcToken,
+		FrontendProxyEndpoints: frontendEndpoints,
+		SvcToken:               svcToken,
 	})
 }

@@ -102,7 +102,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	logrus.Infof("your reserved service token is '%v'", resp.Payload.SvcToken)
-	if resp.Payload.FrontendProxyEndpoint != "" {
-		logrus.Infof("your reserved service frontend is '%v'", resp.Payload.FrontendProxyEndpoint)
+	for _, fpe := range resp.Payload.FrontendProxyEndpoints {
+		logrus.Infof("reserved frontend endpoint: %v", fpe)
 	}
 }

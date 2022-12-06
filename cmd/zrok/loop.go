@@ -31,17 +31,18 @@ func init() {
 }
 
 type loopCmd struct {
-	cmd            *cobra.Command
-	loopers        int
-	iterations     int
-	statusEvery    int
-	timeoutSeconds int
-	minPayload     int
-	maxPayload     int
-	minDwellMs     int
-	maxDwellMs     int
-	minPacingMs    int
-	maxPacingMs    int
+	cmd               *cobra.Command
+	loopers           int
+	iterations        int
+	statusEvery       int
+	timeoutSeconds    int
+	minPayload        int
+	maxPayload        int
+	minDwellMs        int
+	maxDwellMs        int
+	minPacingMs       int
+	maxPacingMs       int
+	frontendSelection []string
 }
 
 func newLoopCmd() *loopCmd {
@@ -62,6 +63,7 @@ func newLoopCmd() *loopCmd {
 	cmd.Flags().IntVar(&r.maxDwellMs, "max-dwell-ms", 1000, "Maximum dwell time in milliseconds")
 	cmd.Flags().IntVar(&r.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
 	cmd.Flags().IntVar(&r.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
+	cmd.Flags().StringArrayVar(&r.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	return r
 }
 
@@ -186,6 +188,7 @@ func (l *looper) startup() {
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               l.env.ZId,
 		ShareMode:            "public",
+		FrontendSelection:    l.cmd.frontendSelection,
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
 		AuthScheme:           string(model.None),
@@ -196,7 +199,7 @@ func (l *looper) startup() {
 		panic(err)
 	}
 	l.service = tunnelResp.Payload.SvcToken
-	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoint
+	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoints[0]
 }
 
 func (l *looper) dwell() {

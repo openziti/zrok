@@ -186,7 +186,7 @@
  * @typedef shareResponse
  * @memberof module:types
  * 
- * @property {string} frontendProxyEndpoint 
+ * @property {string[]} frontendProxyEndpoints 
  * @property {string} svcToken 
  */
 

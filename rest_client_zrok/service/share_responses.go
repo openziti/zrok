@@ -35,6 +35,12 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewShareNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewShareInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -156,6 +162,57 @@ func (o *ShareUnauthorized) String() string {
 }
 
 func (o *ShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewShareNotFound creates a ShareNotFound with default headers values
+func NewShareNotFound() *ShareNotFound {
+	return &ShareNotFound{}
+}
+
+/*
+ShareNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type ShareNotFound struct {
+}
+
+// IsSuccess returns true when this share not found response has a 2xx status code
+func (o *ShareNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this share not found response has a 3xx status code
+func (o *ShareNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this share not found response has a 4xx status code
+func (o *ShareNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this share not found response has a 5xx status code
+func (o *ShareNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this share not found response a status code equal to that given
+func (o *ShareNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+func (o *ShareNotFound) Error() string {
+	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
+}
+
+func (o *ShareNotFound) String() string {
+	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
+}
+
+func (o *ShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
