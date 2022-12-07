@@ -70,9 +70,13 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		return account.NewInviteInternalServerError()
 	}
 
-	if err := sendVerificationEmail(params.Body.Email, token); err != nil {
-		logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
-		return account.NewInviteInternalServerError()
+	if cfg.Email != nil && cfg.Registration != nil {
+		if err := sendVerificationEmail(params.Body.Email, token); err != nil {
+			logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
+			return account.NewInviteInternalServerError()
+		}
+	} else {
+		logrus.Errorf("'email' and 'registration' configuration missing; skipping registration email")
 	}
 
 	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)

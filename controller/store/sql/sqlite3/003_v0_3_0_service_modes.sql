@@ -12,7 +12,7 @@ create table services (
   id                        integer             primary key,
   environment_id            integer             constraint fk_environments_services references environments on delete cascade,
   z_id                      string              not null unique,
-  token                      string              not null unique,
+  token                     string              not null unique,
   share_mode                string              not null,
   backend_mode              string              not null,
   frontend_selection        string,

@@ -8,7 +8,7 @@ const Services = (props) => {
 	const humanizeDuration = require("humanize-duration")
 	const unshareService = (envId, svcToken) => {
 		if(window.confirm('really disable service "' + svcToken +'"?')) {
-			service.unshare({body: {zId: envId, svcToken: svcToken}}).then(resp => {
+						service.unshare({body: {envZId: envId, svcToken: svcToken}}).then(resp => {
 				console.log(resp)
 			})
 		}
@@ -28,7 +28,7 @@ const Services = (props) => {
 		{
 			name: 'Actions',
 			selector: row => <>
-				<button data-value={row.name} onClick={e => unshareService(props.envId, row.name)} title={"Un-share Service '"+row.name+"'"}>
+				<button data-value={row.name} onClick={e => unshareService(props.envId, row.token)} title={"Un-share Service '"+row.token+"'"}>
 					<Icon path={mdiCloseOutline} size={0.7}/>
 				</button>
 			</>

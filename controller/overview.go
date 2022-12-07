@@ -39,11 +39,16 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				ZID:         env.ZId,
 			},
 		}
-		sparkData, err := sparkDataForServices(svcs)
-		if err != nil {
-			logrus.Errorf("error querying spark data for services: %v", err)
-			return metadata.NewOverviewInternalServerError()
+
+		var sparkData map[string][]int64
+		if cfg.Influx != nil {
+			sparkData, err = sparkDataForServices(svcs)
+			if err != nil {
+				logrus.Errorf("error querying spark data for services: %v", err)
+				return metadata.NewOverviewInternalServerError()
+			}
 		}
+		
 		for _, svc := range svcs {
 			feEndpoint := ""
 			if svc.FrontendEndpoint != nil {

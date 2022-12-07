@@ -7,7 +7,6 @@ import * as environment from './api/environment';
 const Environments = (props) => {
     const humanizeDuration = require("humanize-duration")
     const disableEnvironment = (envId) => {
-        console.log(envId)
         if(window.confirm('really disable environment "' + envId +'"?')) {
             environment.disable({body: {identity: envId}}).then(resp => {
                 console.log(resp);
