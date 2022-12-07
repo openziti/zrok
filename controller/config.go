@@ -59,7 +59,9 @@ type InfluxConfig struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	cfg := &Config{}
+	cfg := &Config{
+		Metrics: &MetricsConfig{ServiceName: "metrics"},
+	}
 	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
