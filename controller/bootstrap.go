@@ -33,13 +33,16 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
+	logrus.Info("connecting to the ziti edge management api")
 	edge, err := edgeClient()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}
 
 	var ctrlZId string
 	if !skipCtrl {
+		logrus.Info("creating identity for controller ziti access")
+
 		if ctrlZId, err = getIdentityId("ctrl"); err == nil {
 			logrus.Infof("controller identity: %v", ctrlZId)
 		} else {
@@ -58,6 +61,8 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 
 	var frontendZId string
 	if !skipFrontend {
+		logrus.Info("creating identity for frontend ziti access")
+
 		if frontendZId, err = getIdentityId("frontend"); err == nil {
 			logrus.Infof("frontend identity: %v", frontendZId)
 		} else {
@@ -80,7 +85,7 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		defer func() { _ = tx.Rollback() }()
 		publicFe, err := str.FindFrontendWithZId(frontendZId, tx)
 		if err != nil {
-			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend' to create a frontend instance", frontendZId)
+			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{svcToken}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
 		} else {
 			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
 				logrus.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)

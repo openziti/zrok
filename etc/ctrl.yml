@@ -10,20 +10,15 @@ endpoint:
   host:             0.0.0.0
   port:             18080
 
-proxy:
-  url_template:     "https://{svcToken}.in.zrok.io/"
-  identities:
-    - "e6gMfeD4y"
-
 email:
-  host:             smtp.email.us-ashburn-1.oci.oraclecloud.com
+  host:             smtp.server.com
   port:             587
   username:         ""
   password:         ""
 
 registration:
-  email_from:       ziggy@zrok.io
-  registration_url_template: https://api.zrok.io/register
+  email_from:       ziggy@server.com
+  registration_url_template: https://zrok.server.com/register
 
 store:
   path:             "host=127.0.0.1 user=zrok password=zrok dbname=zrok"
