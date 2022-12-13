@@ -23,7 +23,7 @@ type Config struct {
 
 type httpBind struct {
 	cfg      *Config
-	Requests func() int32
+	requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
@@ -50,7 +50,7 @@ func NewHTTP(cfg *Config) (*httpBind, error) {
 	handler := util.NewProxyHandler(proxy)
 	return &httpBind{
 		cfg:      cfg,
-		Requests: handler.Requests,
+		requests: handler.Requests,
 		listener: listener,
 		handler:  handler,
 	}, nil
@@ -61,6 +61,10 @@ func (self *httpBind) Run() error {
 		return err
 	}
 	return nil
+}
+
+func (self *httpBind) Requests() func() int32 {
+	return self.requests
 }
 
 func newReverseProxy(target string) (*httputil.ReverseProxy, error) {

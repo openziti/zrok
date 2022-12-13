@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+type backendHandler interface {
+	Requests() func() int32
+}
+
 func mustGetAdminAuth() runtime.ClientAuthInfoWriter {
 	adminToken := os.Getenv("ZROK_ADMIN_TOKEN")
 	if adminToken == "" {

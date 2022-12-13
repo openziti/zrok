@@ -32,33 +32,44 @@ type sharePublicCommand struct {
 	quiet             bool
 	basicAuth         []string
 	frontendSelection []string
+	backendMode       string
 	cmd               *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
 	cmd := &cobra.Command{
-		Use:   "public <targetEndpoint>",
-		Short: "Share a target endpoint publicly",
+		Use:   "public <target>",
+		Short: "Share a target resource publicly",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
 	cmd.Run = command.run
 	return command
 }
 
 func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
-	targetEndpoint, err := url.Parse(args[0])
-	if err != nil {
-		if !panicInstead {
-			showError("invalid target endpoint URL", err)
+	var target string
+
+	switch self.backendMode {
+	case "proxy":
+		targetEndpoint, err := url.Parse(args[0])
+		if err != nil {
+			if !panicInstead {
+				showError("invalid target endpoint URL", err)
+			}
+			panic(err)
 		}
-		panic(err)
-	}
-	if targetEndpoint.Scheme == "" {
-		targetEndpoint.Scheme = "https"
+		if targetEndpoint.Scheme == "" {
+			targetEndpoint.Scheme = "https"
+		}
+		target = targetEndpoint.String()
+
+	default:
+		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", self.backendMode), nil)
 	}
 
 	if !self.quiet {
@@ -90,7 +101,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 	cfg := &backend.Config{
 		IdentityPath:    zif,
-		EndpointAddress: targetEndpoint.String(),
+		EndpointAddress: target,
 	}
 
 	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
@@ -141,23 +152,22 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	httpProxy, err := backend.NewHTTP(cfg)
-	if err != nil {
-		ui.Close()
-		if !panicInstead {
-			showError("unable to create http backend", err)
-		}
-		panic(err)
-	}
-
-	go func() {
-		if err := httpProxy.Run(); err != nil {
+	var bh backendHandler
+	switch self.backendMode {
+	case "proxy":
+		bh, err = self.proxyBackendMode(cfg)
+		if err != nil {
+			ui.Close()
 			if !panicInstead {
-				showError("unable to run http proxy", err)
+				showError("unable to create proxy backend handler", err)
 			}
 			panic(err)
 		}
-	}()
+
+	default:
+		ui.Close()
+		showError("invalid backend mode", nil)
+	}
 
 	if !self.quiet {
 		ui.Clear()
@@ -206,7 +216,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 				}
 
 			case <-ticker:
-				currentRequests := float64(httpProxy.Requests())
+				currentRequests := float64(bh.Requests()())
 				deltaRequests := currentRequests - lastRequests
 				requestData = append(requestData, deltaRequests)
 				lastRequests = currentRequests
@@ -225,6 +235,21 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			time.Sleep(30 * time.Second)
 		}
 	}
+}
+
+func (self *sharePublicCommand) proxyBackendMode(cfg *backend.Config) (backendHandler, error) {
+	httpProxy, err := backend.NewHTTP(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating http proxy backend")
+	}
+
+	go func() {
+		if err := httpProxy.Run(); err != nil {
+			logrus.Errorf("error running http proxy backend: %v", err)
+		}
+	}()
+
+	return httpProxy, nil
 }
 
 func (self *sharePublicCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
