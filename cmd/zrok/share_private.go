@@ -6,6 +6,7 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxy_backend"
+	"github.com/openziti-test-kitchen/zrok/endpoints/web_backend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
@@ -62,6 +63,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		target = targetEndpoint.String()
 
+	case "web":
+		target = args[0]
+
 	default:
 		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
@@ -80,10 +84,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg := &proxy_backend.Config{
-		IdentityPath:    zif,
-		EndpointAddress: target,
-	}
 
 	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
 	if err != nil {
@@ -99,7 +99,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		EnvZID:               env.ZId,
 		ShareMode:            "private",
 		BackendMode:          "proxy",
-		BackendProxyEndpoint: cfg.EndpointAddress,
+		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 	}
 	if len(cmd.basicAuth) > 0 {
@@ -122,23 +122,42 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg.Service = resp.Payload.SvcToken
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.ZId, cfg, zrok, auth)
+		cmd.destroy(env.ZId, resp.Payload.SvcToken, zrok, auth)
 		os.Exit(0)
 	}()
 
 	switch cmd.backendMode {
 	case "proxy":
+		cfg := &proxy_backend.Config{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			Service:         resp.Payload.SvcToken,
+		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
 			ui.Close()
 			if !panicInstead {
 				showError("unable to create proxy backend handler", err)
+			}
+			panic(err)
+		}
+
+	case "web":
+		cfg := &web_backend.Config{
+			IdentityPath: zif,
+			WebRoot:      target,
+			Service:      resp.Payload.SvcToken,
+		}
+		_, err = cmd.webBackendMode(cfg)
+		if err != nil {
+			ui.Close()
+			if !panicInstead {
+				showError("unable to create web backend handler", err)
 			}
 			panic(err)
 		}
@@ -156,26 +175,41 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxy_backend.Config) (backendHandler, error) {
-	httpProxy, err := proxy_backend.NewBackend(cfg)
+	be, err := proxy_backend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
 	}
 
 	go func() {
-		if err := httpProxy.Run(); err != nil {
+		if err := be.Run(); err != nil {
 			logrus.Errorf("error running http proxy backend: %v", err)
 		}
 	}()
 
-	return httpProxy, nil
+	return be, nil
 }
 
-func (cmd *sharePrivateCommand) destroy(id string, cfg *proxy_backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", cfg.Service)
+func (cmd *sharePrivateCommand) webBackendMode(cfg *web_backend.Config) (backendHandler, error) {
+	be, err := web_backend.NewBackend(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating http web backend")
+	}
+
+	go func() {
+		if err := be.Run(); err != nil {
+			logrus.Errorf("error running http web backend: %v", err)
+		}
+	}()
+
+	return be, nil
+}
+
+func (cmd *sharePrivateCommand) destroy(id string, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", svcToken)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   id,
-		SvcToken: cfg.Service,
+		SvcToken: svcToken,
 	}
 	if _, err := zrok.Service.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
