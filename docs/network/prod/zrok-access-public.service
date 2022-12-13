@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu
-ExecStart=/home/ubuntu/local/zrok/bin/zrok http frontend -e 0.0.0.0:8080 /home/ubuntu/.zrok/frontend.json
+ExecStart=/home/ubuntu/local/zrok/bin/zrok access public /home/ubuntu/.zrok/frontend.json
 Restart=always
 RestartSec=2
 LimitNOFILE=65535
