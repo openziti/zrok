@@ -5,7 +5,7 @@ import (
 	ui "github.com/gizak/termui/v3"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/endpoints/backend"
+	"github.com/openziti-test-kitchen/zrok/endpoints/proxy_backend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
@@ -80,7 +80,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg := &backend.Config{
+	cfg := &proxy_backend.Config{
 		IdentityPath:    zif,
 		EndpointAddress: target,
 	}
@@ -155,8 +155,8 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *sharePrivateCommand) proxyBackendMode(cfg *backend.Config) (backendHandler, error) {
-	httpProxy, err := backend.NewHTTP(cfg)
+func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxy_backend.Config) (backendHandler, error) {
+	httpProxy, err := proxy_backend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
 	}
@@ -170,7 +170,7 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *backend.Config) (backendHa
 	return httpProxy, nil
 }
 
-func (cmd *sharePrivateCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *sharePrivateCommand) destroy(id string, cfg *proxy_backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{

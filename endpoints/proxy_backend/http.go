@@ -1,4 +1,4 @@
-package backend
+package proxy_backend
 
 import (
 	"context"
@@ -21,14 +21,14 @@ type Config struct {
 	Service         string
 }
 
-type httpBind struct {
+type backend struct {
 	cfg      *Config
 	requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
 
-func NewHTTP(cfg *Config) (*httpBind, error) {
+func NewBackend(cfg *Config) (*backend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
@@ -48,7 +48,7 @@ func NewHTTP(cfg *Config) (*httpBind, error) {
 	}
 
 	handler := util.NewProxyHandler(proxy)
-	return &httpBind{
+	return &backend{
 		cfg:      cfg,
 		requests: handler.Requests,
 		listener: listener,
@@ -56,14 +56,14 @@ func NewHTTP(cfg *Config) (*httpBind, error) {
 	}, nil
 }
 
-func (self *httpBind) Run() error {
+func (self *backend) Run() error {
 	if err := http.Serve(self.listener, self.handler); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (self *httpBind) Requests() func() int32 {
+func (self *backend) Requests() func() int32 {
 	return self.requests
 }
 

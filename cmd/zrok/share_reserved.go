@@ -3,7 +3,7 @@ package main
 import (
 	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/endpoints/backend"
+	"github.com/openziti-test-kitchen/zrok/endpoints/proxy_backend"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -91,7 +91,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	cfg := &backend.Config{
+	cfg := &proxy_backend.Config{
 		IdentityPath:    zif,
 		EndpointAddress: targetEndpoint,
 		Service:         svcToken,
@@ -115,7 +115,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("using existing backend proxy endpoint: %v", targetEndpoint)
 	}
 
-	httpProxy, err := backend.NewHTTP(cfg)
+	httpProxy, err := proxy_backend.NewBackend(cfg)
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
