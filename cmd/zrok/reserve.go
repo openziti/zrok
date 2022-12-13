@@ -19,8 +19,9 @@ func init() {
 }
 
 type reserveCommand struct {
-	basicAuth []string
-	cmd       *cobra.Command
+	basicAuth         []string
+	frontendSelection []string
+	cmd               *cobra.Command
 }
 
 func newReserveCommand() *reserveCommand {
@@ -31,6 +32,7 @@ func newReserveCommand() *reserveCommand {
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
+	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Run = command.run
 	return command
 }
@@ -79,6 +81,9 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		AuthScheme:           string(model.None),
 		Reserved:             true,
 	}
+	if shareMode == "public" {
+		req.Body.FrontendSelection = cmd.frontendSelection
+	}
 	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
 		req.Body.AuthScheme = string(model.Basic)
@@ -94,7 +99,6 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 
 	resp, err := zrok.Service.Share(req, auth)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create tunnel", err)
 		}
