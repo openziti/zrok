@@ -51,10 +51,10 @@ func newSharePublicCommand() *sharePublicCommand {
 	return command
 }
 
-func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
+func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	var target string
 
-	switch self.backendMode {
+	switch cmd.backendMode {
 	case "proxy":
 		targetEndpoint, err := url.Parse(args[0])
 		if err != nil {
@@ -69,10 +69,10 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		target = targetEndpoint.String()
 
 	default:
-		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", self.backendMode), nil)
+		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	if !self.quiet {
+	if !cmd.quiet {
 		if err := ui.Init(); err != nil {
 			if !panicInstead {
 				showError("unable to initialize user interface", err)
@@ -117,15 +117,15 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.ZId,
 		ShareMode:            "public",
-		FrontendSelection:    self.frontendSelection,
+		FrontendSelection:    cmd.frontendSelection,
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: cfg.EndpointAddress,
 		AuthScheme:           string(model.None),
 	}
-	if len(self.basicAuth) > 0 {
+	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
 		req.Body.AuthScheme = string(model.Basic)
-		for _, pair := range self.basicAuth {
+		for _, pair := range cmd.basicAuth {
 			tokens := strings.Split(pair, ":")
 			if len(tokens) == 2 {
 				req.Body.AuthUsers = append(req.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
@@ -148,14 +148,14 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		self.destroy(env.ZId, cfg, zrok, auth)
+		cmd.destroy(env.ZId, cfg, zrok, auth)
 		os.Exit(0)
 	}()
 
 	var bh backendHandler
-	switch self.backendMode {
+	switch cmd.backendMode {
 	case "proxy":
-		bh, err = self.proxyBackendMode(cfg)
+		bh, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
 			ui.Close()
 			if !panicInstead {
@@ -169,7 +169,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		showError("invalid backend mode", nil)
 	}
 
-	if !self.quiet {
+	if !cmd.quiet {
 		ui.Clear()
 		w, h := ui.TerminalDimensions()
 
@@ -210,7 +210,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 					switch e.ID {
 					case "q", "<C-c>":
 						ui.Close()
-						self.destroy(env.ZId, cfg, zrok, auth)
+						cmd.destroy(env.ZId, cfg, zrok, auth)
 						os.Exit(0)
 					}
 				}
@@ -237,7 +237,7 @@ func (self *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (self *sharePublicCommand) proxyBackendMode(cfg *backend.Config) (backendHandler, error) {
+func (cmd *sharePublicCommand) proxyBackendMode(cfg *backend.Config) (backendHandler, error) {
 	httpProxy, err := backend.NewHTTP(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -252,7 +252,7 @@ func (self *sharePublicCommand) proxyBackendMode(cfg *backend.Config) (backendHa
 	return httpProxy, nil
 }
 
-func (self *sharePublicCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *sharePublicCommand) destroy(id string, cfg *backend.Config, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", cfg.Service)
 	req := service.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
