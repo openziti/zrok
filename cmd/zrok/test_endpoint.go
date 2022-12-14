@@ -54,7 +54,7 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 }
 
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("%v {%v} -> /index.gohtml", r.RemoteAddr, r.Host)
+	logrus.Infof("%v {%v} | %v -> /index.gohtml", r.RemoteAddr, r.Host, r.RequestURI)
 	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
 		log.Error(err)
 	}
