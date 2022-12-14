@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func CreateConfig(cfgZId, envZId, svcToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgID string, err error) {
+func CreateConfig(cfgTypeZId, envZId, svcToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	authScheme, err := model.ParseAuthScheme(authSchemeStr)
 	if err != nil {
 		return "", err
@@ -26,7 +26,7 @@ func CreateConfig(cfgZId, envZId, svcToken string, authSchemeStr string, authUse
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{
-		ConfigTypeID: &cfgZId,
+		ConfigTypeID: &cfgTypeZId,
 		Data:         cfg,
 		Name:         &svcToken,
 		Tags:         ZrokServiceTags(svcToken),
