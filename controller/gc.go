@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
@@ -83,7 +84,7 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 				if err := deleteConfig("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
-				if err := deleteService("gc", *svc.ID, edge); err != nil {
+				if err := edge_ctrl.DeleteService("gc", *svc.ID, edge); err != nil {
 					logrus.Errorf("error garbage collecting service: %v", err)
 				}
 			} else {

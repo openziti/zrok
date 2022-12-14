@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -98,7 +99,7 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 		if err := deleteConfig(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteService(env.ZId, svc.ZId, edge); err != nil {
+		if err := edge_ctrl.DeleteService(env.ZId, svc.ZId, edge); err != nil {
 			logrus.Error(err)
 		}
 		logrus.Infof("removed service '%v' for environment '%v'", svc.Token, env.ZId)

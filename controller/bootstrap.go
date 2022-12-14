@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -260,7 +261,7 @@ func assertMetricsService(cfg *Config, edge *rest_management_api_client.ZitiEdge
 	var svcZId string
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Infof("creating '%v' service", cfg.Metrics.ServiceName)
-		svcZId, err = createService("metrics", nil, nil, edge)
+		svcZId, err = edge_ctrl.CreateService("metrics", nil, nil, edge)
 		if err != nil {
 			return "", errors.Wrapf(err, "error creating '%v' service", cfg.Metrics.ServiceName)
 		}
@@ -313,7 +314,7 @@ func assertCtrlMetricsBind(ctrlZId, metricsSvcZId string, edge *rest_management_
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'ctrl-metrics-bind' service policy")
-		if err := createNamedBindServicePolicy("ctrl-metrics-bind", metricsSvcZId, ctrlZId, edge, zrokTags()); err != nil {
+		if err := createNamedBindServicePolicy("ctrl-metrics-bind", metricsSvcZId, ctrlZId, edge, edge_ctrl.ZrokTags()); err != nil {
 			return errors.Wrap(err, "error creating 'ctrl-metrics-bind' service policy")
 		}
 	}
@@ -337,7 +338,7 @@ func assertFrontendMetricsDial(frontendZId, metricsSvcZId string, edge *rest_man
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'frontend-metrics-dial' service policy")
-		if err := createNamedDialServicePolicy("frontend-metrics-dial", metricsSvcZId, frontendZId, edge, zrokTags()); err != nil {
+		if err := createNamedDialServicePolicy("frontend-metrics-dial", metricsSvcZId, frontendZId, edge, edge_ctrl.ZrokTags()); err != nil {
 			return errors.Wrap(err, "error creating 'frontend-metrics-dial' service policy")
 		}
 	}

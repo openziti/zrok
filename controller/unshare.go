@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
@@ -134,7 +135,7 @@ func (h *unshareHandler) deallocateResources(senv *store.Environment, ssvc *stor
 	if err := deleteConfig(senv.ZId, svcToken, edge); err != nil {
 		return err
 	}
-	if err := deleteService(senv.ZId, svcZId, edge); err != nil {
+	if err := edge_ctrl.DeleteService(senv.ZId, svcZId, edge); err != nil {
 		return err
 	}
 	return nil
