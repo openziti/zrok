@@ -23,7 +23,7 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, frontendZIds
 		return "", nil, err
 	}
 
-	svcZId, err = createShareService(envZId, svcToken, cfgId, edge)
+	svcZId, err = zrok_edge_sdk.CreateShareService(envZId, svcToken, cfgId, edge)
 	if err != nil {
 		return "", nil, err
 	}

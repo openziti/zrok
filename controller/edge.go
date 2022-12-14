@@ -10,21 +10,9 @@ import (
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	sdk_config "github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
 )
-
-func createShareService(envZId, svcToken, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
-	configs := []string{cfgId}
-	tags := zrok_edge_sdk.ZrokServiceTags(svcToken)
-	svcZId, err = zrok_edge_sdk.CreateService(svcToken, configs, tags.SubTags, edge)
-	if err != nil {
-		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
-	}
-	logrus.Infof("created zrok service named '%v' (with ziti id '%v') for environment '%v'", svcToken, svcZId, envZId)
-	return svcZId, nil
-}
 
 func createEdgeRouterPolicy(name, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	edgeRouterRoles := []string{"#all"}
