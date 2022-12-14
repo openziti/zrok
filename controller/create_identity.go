@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti/edge/rest_management_api_client/service"
@@ -72,7 +73,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	svcZId := *listSvcResp.Payload.Data[0].ID
 
 	spName := fmt.Sprintf("%v-%v-dial", name, cfg.Metrics.ServiceName)
-	if err := createNamedDialServicePolicy(spName, svcZId, zId, edge); err != nil {
+	if err := zrok_edge_sdk.CreateNamedDialServicePolicy(spName, svcZId, zId, edge); err != nil {
 		logrus.Errorf("error creating named dial service policy '%v': %v", spName, err)
 		return admin.NewCreateIdentityInternalServerError()
 	}

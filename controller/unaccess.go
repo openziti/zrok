@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/pkg/errors"
@@ -69,7 +70,7 @@ func (h *unaccessHandler) Handle(params service.UnaccessParams, principal *rest_
 		return service.NewUnaccessNotFound()
 	}
 
-	if err := deleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", svcToken, feToken), edge); err != nil {
+	if err := zrok_edge_sdk.DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", svcToken, feToken), edge); err != nil {
 		logrus.Errorf("error removing access to '%v' for '%v': %v", svcToken, envZId, err)
 		return service.NewUnaccessInternalServerError()
 	}

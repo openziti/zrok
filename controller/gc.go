@@ -75,10 +75,10 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 				if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
 				}
-				if err := deleteServicePolicyDial("gc", *svc.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteServicePolicyDial("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service dial policy: %v", err)
 				}
-				if err := deleteServicePolicyBind("gc", *svc.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteServicePolicyBind("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service bind policy: %v", err)
 				}
 				if err := deleteConfig("gc", *svc.Name, edge); err != nil {
@@ -136,7 +136,7 @@ func gcServicePolicies(edge *rest_management_api_client.ZitiEdgeManagement, live
 			if _, found := liveMap[spName]; !found {
 				logrus.Infof("garbage collecting, svcId='%v'", spName)
 				deleteFilter := fmt.Sprintf("id=\"%v\"", *sp.ID)
-				if err := deleteServicePolicy("gc", deleteFilter, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteServicePolicy("gc", deleteFilter, edge); err != nil {
 					logrus.Errorf("error garbage collecting service policy: %v", err)
 				}
 			} else {

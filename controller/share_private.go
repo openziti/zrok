@@ -28,7 +28,7 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 		return "", nil, err
 	}
 
-	if err := createServicePolicyBind(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrok_edge_sdk.CreateServicePolicyBind(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

@@ -90,10 +90,10 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 		if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteServicePolicyDial(env.ZId, svcToken, edge); err != nil {
+		if err := zrok_edge_sdk.DeleteServicePolicyDial(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := deleteServicePolicyBind(env.ZId, svcToken, edge); err != nil {
+		if err := zrok_edge_sdk.DeleteServicePolicyBind(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
 		if err := deleteConfig(env.ZId, svcToken, edge); err != nil {
