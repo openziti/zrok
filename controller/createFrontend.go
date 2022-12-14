@@ -28,7 +28,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 	}
 
 	zId := params.Body.ZID
-	detail, err := zrokEdgeSdk.GetIdentity(zId, client)
+	detail, err := zrokEdgeSdk.GetIdentityByZId(zId, client)
 	if err != nil {
 		logrus.Errorf("error getting identity details for '%v': %v", zId, err)
 		return admin.NewCreateFrontendInternalServerError()

@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-func CreateEnvironmentIdentity(accountEmail, accountToken string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
+func CreateEnvironmentIdentity(accountEmail, envDescription string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	identityType := rest_model_edge.IdentityTypeUser
 	moreTags := map[string]interface{}{"zrokEmail": accountEmail}
-	return CreateIdentity(accountToken, identityType, moreTags, client)
+	return CreateIdentity(envDescription, identityType, moreTags, client)
 }
 
-func CreateIdentity(name string, identityType rest_model_edge.IdentityType, moreTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
+func CreateIdentity(name string, identityType rest_model_edge.IdentityType, addlTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	isAdmin := false
 	tags := ZrokTags()
-	for k, v := range moreTags {
+	for k, v := range addlTags {
 		tags.SubTags[k] = v
 	}
 	req := identity.NewCreateIdentityParams()
@@ -42,7 +42,7 @@ func CreateIdentity(name string, identityType rest_model_edge.IdentityType, more
 	return resp, nil
 }
 
-func GetIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.ListIdentitiesOK, error) {
+func GetIdentityByZId(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.ListIdentitiesOK, error) {
 	filter := fmt.Sprintf("id=\"%v\"", zId)
 	limit := int64(0)
 	offset := int64(0)
@@ -82,12 +82,13 @@ func EnrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManag
 	if err != nil {
 		return nil, err
 	}
+	logrus.Infof("enrolled ziti identity '%v'", zId)
 	return conf, nil
 }
 
-func DeleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func DeleteIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	req := &identity.DeleteIdentityParams{
-		ID:      id,
+		ID:      zId,
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
@@ -95,6 +96,6 @@ func DeleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManageme
 	if err != nil {
 		return err
 	}
-	logrus.Infof("deleted environment identity '%v'", id)
+	logrus.Infof("deleted ziti identity '%v'", zId)
 	return nil
 }

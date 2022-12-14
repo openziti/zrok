@@ -25,18 +25,14 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Errorf("error starting transaction: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
+	defer func() { _ = tx.Rollback() }()
 
 	client, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
-	accountToken, err := createToken()
-	if err != nil {
-		logrus.Errorf("error creating account token: %v", err)
-		return environment.NewEnableInternalServerError()
-	}
-	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(principal.Email, accountToken, client)
+	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(principal.Email, params.Body.Description, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
