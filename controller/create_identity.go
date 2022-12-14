@@ -47,7 +47,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	if err := createEdgeRouterPolicy(name, zId, edge); err != nil {
+	if err := zrok_edge_sdk.CreateEdgeRouterPolicy(name, zId, edge); err != nil {
 		logrus.Errorf("error creating edge router policy for identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}

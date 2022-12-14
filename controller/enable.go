@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/sirupsen/logrus"
@@ -41,7 +42,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
-	if err := createEdgeRouterPolicy(envZId, envZId, client); err != nil {
+	if err := zrok_edge_sdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}

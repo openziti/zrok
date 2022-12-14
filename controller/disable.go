@@ -48,7 +48,7 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error removing environment: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := deleteEdgeRouterPolicy(env.ZId, edge); err != nil {
+	if err := zrok_edge_sdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
