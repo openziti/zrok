@@ -28,15 +28,15 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, frontendZIds
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-bind", svcZId, envZId, zrokEdgeSdk.ZrokServiceTags(svcToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId, svcToken, svcZId, frontendZIds, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-dial", svcZId, frontendZIds, zrokEdgeSdk.ZrokServiceTags(svcToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServiceEdgeRouterPolicyForShare(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

@@ -28,11 +28,11 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-bind", svcZId, envZId, zrokEdgeSdk.ZrokServiceTags(svcToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServiceEdgeRouterPolicyForShare(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

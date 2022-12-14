@@ -6,7 +6,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
-	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,11 +71,12 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		logrus.Error(err)
 		return service.NewAccessInternalServerError()
 	}
-	extraTags := &rest_model_edge.Tags{SubTags: map[string]interface{}{
+	addlTags := map[string]interface{}{
 		"zrokEnvironmentZId": envZId,
 		"zrokFrontendToken":  feToken,
-	}}
-	if err := zrokEdgeSdk.CreateServicePolicyDialForEnvironment(envZId, ssvc.Token, ssvc.ZId, edge, extraTags); err != nil {
+		"zrokServiceToken":   svcToken,
+	}
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-dial", ssvc.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}

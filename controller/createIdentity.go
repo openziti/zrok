@@ -73,7 +73,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	svcZId := *listSvcResp.Payload.Data[0].ID
 
 	spName := fmt.Sprintf("%v-%v-dial", name, cfg.Metrics.ServiceName)
-	if err := zrokEdgeSdk.CreateNamedDialServicePolicy(spName, svcZId, zId, edge); err != nil {
+	if _, err := zrokEdgeSdk.CreateServicePolicy(spName, rest_model_edge.SemanticAllOf, []string{zId}, []string{svcZId}, nil, zrokEdgeSdk.ServicePolicyDial, edge); err != nil {
 		logrus.Errorf("error creating named dial service policy '%v': %v", spName, err)
 		return admin.NewCreateIdentityInternalServerError()
 	}

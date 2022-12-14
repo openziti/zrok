@@ -6,158 +6,84 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/openziti/edge/rest_model"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 const (
-	ServicePolicyBind = 1
-	ServicePolicyDial = 2
+	ServicePolicyDial = 1
+	ServicePolicyBind = 2
 )
 
-func CreateServicePolicyBind(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func CreateServicePolicyBind(name, svcZId, bindZId string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
-	identityRoles := []string{fmt.Sprintf("@%v", envZId)}
-	name := fmt.Sprintf("%v-backend", svcToken)
-	var postureCheckRoles []string
-	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
-	dialBind := rest_model.DialBindBind
-	svcp := &rest_model.ServicePolicyCreate{
-		IdentityRoles:     identityRoles,
-		Name:              &name,
-		PostureCheckRoles: postureCheckRoles,
-		Semantic:          &semantic,
-		ServiceRoles:      serviceRoles,
-		Type:              &dialBind,
-		Tags:              ZrokServiceTags(svcToken),
-	}
-	req := &service_policy.CreateServicePolicyParams{
-		Policy:  svcp,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+	identityRoles := []string{"@" + bindZId}
+	serviceRoles := []string{"@" + svcZId}
+	spZId, err := CreateServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyBind, edge)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error creating bind service policy for service '%v' for identity '%v'", svcZId, bindZId)
 	}
-	logrus.Infof("created bind service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
+	logrus.Infof("created bind service policy '%v' for service '%v' for identity '%v'", spZId, svcZId, bindZId)
 	return nil
 }
 
-func CreateNamedBindServicePolicy(name, svcZId, idZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := &rest_model.Tags{SubTags: make(rest_model.SubTags)}
-	for _, t := range tags {
-		for k, v := range t.SubTags {
-			allTags.SubTags[k] = v
-		}
-	}
-	identityRoles := []string{"@" + idZId}
-	var postureCheckRoles []string
+func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{"@" + svcZId}
-	dialBind := rest_model.DialBindBind
-	sp := &rest_model.ServicePolicyCreate{
+	var identityRoles []string
+	for _, zId := range dialZIds {
+		identityRoles = append(identityRoles, "@"+zId)
+	}
+	serviceRoles := []string{"@"+svcZId}
+	spZId, err := CreateServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyDial, edge)
+	if err != nil {
+		return errors.Wrapf(err, "error creating dial service policy for service '%v' for identities '%v'", svcZId, dialZIds)
+	}
+	logrus.Infof("created dial service policy '%v' for service '%v' for identities '%v'", spZId, svcZId, dialZIds)
+	return nil
+}
+
+func CreateServicePolicy(name string, semantic rest_model.Semantic, identityRoles, serviceRoles []string, addlTags map[string]interface{}, dialBind int, edge *rest_management_api_client.ZitiEdgeManagement) (spZId string, err error) {
+	var dialBindType rest_model.DialBind
+	switch dialBind {
+	case ServicePolicyBind:
+		dialBindType = rest_model.DialBindBind
+	case ServicePolicyDial:
+		dialBindType = rest_model.DialBindDial
+	default:
+		return "", errors.Errorf("invalid dial bind type")
+	}
+
+	spc := &rest_model.ServicePolicyCreate{
 		IdentityRoles:     identityRoles,
 		Name:              &name,
-		PostureCheckRoles: postureCheckRoles,
+		PostureCheckRoles: make([]string, 0),
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
-		Type:              &dialBind,
-		Tags:              allTags,
+		Tags:              MergeTags(ZrokTags(), addlTags),
+		Type:              &dialBindType,
 	}
+
 	req := &service_policy.CreateServicePolicyParams{
-		Policy:  sp,
+		Policy: spc,
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
-	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
+
+	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "error creating service policy")
 	}
-	return nil
+
+	return resp.Payload.Data.ID, nil
 }
 
 func DeleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	// type=2 == "Bind"
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=2", svcToken), edge)
-}
-
-func CreateServicePolicyDial(envZId, svcToken, svcZId string, dialZIds []string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := ZrokServiceTags(svcToken)
-	for _, t := range tags {
-		for k, v := range t.SubTags {
-			allTags.SubTags[k] = v
-		}
-	}
-
-	var identityRoles []string
-	for _, proxyIdentity := range dialZIds {
-		identityRoles = append(identityRoles, "@"+proxyIdentity)
-		logrus.Infof("added proxy identity role '%v'", proxyIdentity)
-	}
-	name := fmt.Sprintf("%v-dial", svcToken)
-	var postureCheckRoles []string
-	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
-	dialBind := rest_model.DialBindDial
-	svcp := &rest_model.ServicePolicyCreate{
-		IdentityRoles:     identityRoles,
-		Name:              &name,
-		PostureCheckRoles: postureCheckRoles,
-		Semantic:          &semantic,
-		ServiceRoles:      serviceRoles,
-		Type:              &dialBind,
-		Tags:              allTags,
-	}
-	req := &service_policy.CreateServicePolicyParams{
-		Policy:  svcp,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
-	if err != nil {
-		return err
-	}
-	logrus.Infof("created dial service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
-	return nil
-}
-
-func CreateNamedDialServicePolicy(name, svcZId, idZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := &rest_model.Tags{SubTags: make(rest_model.SubTags)}
-	for _, t := range tags {
-		for k, v := range t.SubTags {
-			allTags.SubTags[k] = v
-		}
-	}
-	identityRoles := []string{"@" + idZId}
-	var postureCheckRoles []string
-	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{"@" + svcZId}
-	dialBind := rest_model.DialBindDial
-	sp := &rest_model.ServicePolicyCreate{
-		IdentityRoles:     identityRoles,
-		Name:              &name,
-		PostureCheckRoles: postureCheckRoles,
-		Semantic:          &semantic,
-		ServiceRoles:      serviceRoles,
-		Type:              &dialBind,
-		Tags:              allTags,
-	}
-	req := &service_policy.CreateServicePolicyParams{
-		Policy:  sp,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	_, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, ServicePolicyBind), edge)
 }
 
 func DeleteServicePolicyDial(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	// type=1 == "Dial"
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=1", svcToken), edge)
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, ServicePolicyDial), edge)
 }
 
 func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
@@ -189,41 +115,5 @@ func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client
 	} else {
 		logrus.Infof("did not find a service policy")
 	}
-	return nil
-}
-
-func CreateServicePolicyDialForEnvironment(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := ZrokServiceTags(svcToken)
-	for _, t := range tags {
-		for k, v := range t.SubTags {
-			allTags.SubTags[k] = v
-		}
-	}
-
-	identityRoles := []string{"@" + envZId}
-	name := fmt.Sprintf("%v-%v-dial", envZId, svcToken)
-	var postureCheckRoles []string
-	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
-	dialBind := rest_model.DialBindDial
-	svcp := &rest_model.ServicePolicyCreate{
-		IdentityRoles:     identityRoles,
-		Name:              &name,
-		PostureCheckRoles: postureCheckRoles,
-		Semantic:          &semantic,
-		ServiceRoles:      serviceRoles,
-		Type:              &dialBind,
-		Tags:              allTags,
-	}
-	req := &service_policy.CreateServicePolicyParams{
-		Policy:  svcp,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	resp, err := edge.ServicePolicy.CreateServicePolicy(req, nil)
-	if err != nil {
-		return err
-	}
-	logrus.Infof("created dial service policy '%v' for service '%v' for environment '%v'", resp.Payload.Data.ID, svcZId, envZId)
 	return nil
 }
