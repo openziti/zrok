@@ -31,13 +31,18 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Errorf("error getting edge client: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
-	ident, err := createEnvironmentIdentity(principal.Email, client)
+	accountToken, err := createToken()
+	if err != nil {
+		logrus.Errorf("error creating account token: %v", err)
+		return environment.NewEnableInternalServerError()
+	}
+	ident, err := zrok_edge_sdk.CreateEnvironmentIdentity(principal.Email, accountToken, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
 	envZId := ident.Payload.Data.ID
-	cfg, err := enrollIdentity(envZId, client)
+	cfg, err := zrok_edge_sdk.EnrollIdentity(envZId, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()

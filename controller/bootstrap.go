@@ -196,13 +196,13 @@ func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagem
 }
 
 func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	idc, err := createIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
+	idc, err := zrok_edge_sdk.CreateIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating '%v' identity", name)
 	}
 
 	zId := idc.Payload.Data.ID
-	cfg, err := enrollIdentity(zId, edge)
+	cfg, err := zrok_edge_sdk.EnrollIdentity(zId, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error enrolling '%v' identity", name)
 	}

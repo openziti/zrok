@@ -52,7 +52,7 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error deleting edge router policy: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := deleteIdentity(params.Body.Identity, edge); err != nil {
+	if err := zrok_edge_sdk.DeleteIdentity(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting identity: %v", err)
 		return environment.NewDisableInternalServerError()
 	}

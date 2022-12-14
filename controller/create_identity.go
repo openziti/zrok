@@ -34,14 +34,14 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	idc, err := createIdentity(name, rest_model_edge.IdentityTypeService, nil, edge)
+	idc, err := zrok_edge_sdk.CreateIdentity(name, rest_model_edge.IdentityTypeService, nil, edge)
 	if err != nil {
 		logrus.Errorf("error creating identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
 	zId := idc.Payload.Data.ID
-	idCfg, err := enrollIdentity(zId, edge)
+	idCfg, err := zrok_edge_sdk.EnrollIdentity(zId, edge)
 	if err != nil {
 		logrus.Errorf("error enrolling identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()

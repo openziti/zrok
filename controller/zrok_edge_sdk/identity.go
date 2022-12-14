@@ -1,35 +1,30 @@
-package controller
+package zrok_edge_sdk
 
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti/edge/rest_management_api_client"
-	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
+	"github.com/openziti/edge/rest_management_api_client/identity"
 	rest_model_edge "github.com/openziti/edge/rest_model"
-	sdk_config "github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
-func createEnvironmentIdentity(accountEmail string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
-	name, err := createToken()
-	if err != nil {
-		return nil, err
-	}
+func CreateEnvironmentIdentity(accountEmail, accountToken string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	identityType := rest_model_edge.IdentityTypeUser
 	moreTags := map[string]interface{}{"zrokEmail": accountEmail}
-	return createIdentity(name, identityType, moreTags, client)
+	return CreateIdentity(accountToken, identityType, moreTags, client)
 }
 
-func createIdentity(name string, identityType rest_model_edge.IdentityType, moreTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
+func CreateIdentity(name string, identityType rest_model_edge.IdentityType, moreTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	isAdmin := false
-	tags := zrok_edge_sdk.ZrokTags()
+	tags := ZrokTags()
 	for k, v := range moreTags {
 		tags.SubTags[k] = v
 	}
-	req := identity_edge.NewCreateIdentityParams()
+	req := identity.NewCreateIdentityParams()
 	req.Identity = &rest_model_edge.IdentityCreate{
 		Enrollment:          &rest_model_edge.IdentityCreateEnrollment{Ott: true},
 		IsAdmin:             &isAdmin,
@@ -47,11 +42,11 @@ func createIdentity(name string, identityType rest_model_edge.IdentityType, more
 	return resp, nil
 }
 
-func getIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.ListIdentitiesOK, error) {
+func GetIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*identity.ListIdentitiesOK, error) {
 	filter := fmt.Sprintf("id=\"%v\"", zId)
 	limit := int64(0)
 	offset := int64(0)
-	req := &identity_edge.ListIdentitiesParams{
+	req := &identity.ListIdentitiesParams{
 		Filter:  &filter,
 		Limit:   &limit,
 		Offset:  &offset,
@@ -65,8 +60,8 @@ func getIdentity(zId string, client *rest_management_api_client.ZitiEdgeManageme
 	return resp, nil
 }
 
-func enrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*sdk_config.Config, error) {
-	p := &identity_edge.DetailIdentityParams{
+func EnrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManagement) (*config.Config, error) {
+	p := &identity.DetailIdentityParams{
 		Context: context.Background(),
 		ID:      zId,
 	}
@@ -90,8 +85,8 @@ func enrollIdentity(zId string, client *rest_management_api_client.ZitiEdgeManag
 	return conf, nil
 }
 
-func deleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	req := &identity_edge.DeleteIdentityParams{
+func DeleteIdentity(id string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	req := &identity.DeleteIdentityParams{
 		ID:      id,
 		Context: context.Background(),
 	}

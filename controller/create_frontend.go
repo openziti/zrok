@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 	}
 
 	zId := params.Body.ZID
-	detail, err := getIdentity(zId, client)
+	detail, err := zrok_edge_sdk.GetIdentity(zId, client)
 	if err != nil {
 		logrus.Errorf("error getting identity details for '%v': %v", zId, err)
 		return admin.NewCreateFrontendInternalServerError()
