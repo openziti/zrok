@@ -20,7 +20,7 @@ func CreateServicePolicyBind(name, svcZId, bindZId string, addlTags map[string]i
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{"@" + bindZId}
 	serviceRoles := []string{"@" + svcZId}
-	spZId, err := CreateServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyBind, edge)
+	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyBind, edge)
 	if err != nil {
 		return errors.Wrapf(err, "error creating bind service policy for service '%v' for identity '%v'", svcZId, bindZId)
 	}
@@ -35,7 +35,7 @@ func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags ma
 		identityRoles = append(identityRoles, "@"+zId)
 	}
 	serviceRoles := []string{"@"+svcZId}
-	spZId, err := CreateServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyDial, edge)
+	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyDial, edge)
 	if err != nil {
 		return errors.Wrapf(err, "error creating dial service policy for service '%v' for identities '%v'", svcZId, dialZIds)
 	}
@@ -43,7 +43,7 @@ func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags ma
 	return nil
 }
 
-func CreateServicePolicy(name string, semantic rest_model.Semantic, identityRoles, serviceRoles []string, addlTags map[string]interface{}, dialBind int, edge *rest_management_api_client.ZitiEdgeManagement) (spZId string, err error) {
+func createServicePolicy(name string, semantic rest_model.Semantic, identityRoles, serviceRoles []string, addlTags map[string]interface{}, dialBind int, edge *rest_management_api_client.ZitiEdgeManagement) (spZId string, err error) {
 	var dialBindType rest_model.DialBind
 	switch dialBind {
 	case ServicePolicyBind:

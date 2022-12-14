@@ -314,7 +314,7 @@ func assertCtrlMetricsBind(ctrlZId, metricsSvcZId string, edge *rest_management_
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'ctrl-metrics-bind' service policy")
-		if _, err = zrokEdgeSdk.CreateServicePolicy("ctrl-metrics-bind", rest_model.SemanticAllOf, []string{"@"+ctrlZId}, []string{"@"+metricsSvcZId}, nil, zrokEdgeSdk.ServicePolicyBind, edge); err != nil {
+		if err = zrokEdgeSdk.CreateServicePolicyBind("ctrl-metrics-bind", metricsSvcZId, ctrlZId, nil, edge); err != nil {
 			return errors.Wrap(err, "error creating 'ctrl-metrics-bind' service policy")
 		}
 	}
@@ -338,7 +338,7 @@ func assertFrontendMetricsDial(frontendZId, metricsSvcZId string, edge *rest_man
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'frontend-metrics-dial' service policy")
-		if _, err = zrokEdgeSdk.CreateServicePolicy("frontend-metrics-dial", rest_model.SemanticAllOf, []string{"@"+frontendZId}, []string{"@"+metricsSvcZId}, nil, zrokEdgeSdk.ServicePolicyDial, edge); err != nil {
+		if err = zrokEdgeSdk.CreateServicePolicyDial("frontend-metrics-dial", metricsSvcZId, []string{frontendZId}, nil, edge); err != nil {
 			return errors.Wrap(err, "error creating 'frontend-metrics-dial' service policy")
 		}
 	}
