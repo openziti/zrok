@@ -1,4 +1,4 @@
-package edge_ctrl
+package zrok_edge_sdk
 
 import (
 	"context"

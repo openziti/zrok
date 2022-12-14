@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/service"
@@ -72,7 +72,7 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 		for _, svc := range listResp.Payload.Data {
 			if _, found := liveMap[*svc.Name]; !found {
 				logrus.Infof("garbage collecting, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
-				if err := deleteServiceEdgeRouterPolicy("gc", *svc.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
 				}
 				if err := deleteServicePolicyDial("gc", *svc.Name, edge); err != nil {
@@ -84,7 +84,7 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 				if err := deleteConfig("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
-				if err := edge_ctrl.DeleteService("gc", *svc.ID, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteService("gc", *svc.ID, edge); err != nil {
 					logrus.Errorf("error garbage collecting service: %v", err)
 				}
 			} else {
@@ -109,7 +109,7 @@ func gcServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManage
 		for _, serp := range listResp.Payload.Data {
 			if _, found := liveMap[*serp.Name]; !found {
 				logrus.Infof("garbage collecting, svcId='%v'", *serp.Name)
-				if err := deleteServiceEdgeRouterPolicy("gc", *serp.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy("gc", *serp.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
 				}
 			} else {

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -31,7 +32,7 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 		return "", nil, err
 	}
 
-	if err := createShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrok_edge_sdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

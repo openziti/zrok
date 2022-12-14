@@ -3,13 +3,12 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
 	identity_edge "github.com/openziti/edge/rest_management_api_client/identity"
-	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
 	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
@@ -19,75 +18,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"time"
 )
-
-func createShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	serpZId, err := createServiceEdgeRouterPolicy(svcToken, svcZId, edge_ctrl.ZrokServiceTags(svcToken).SubTags, edge)
-	if err != nil {
-		return err
-	}
-	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", serpZId, svcZId, envZId)
-	return nil
-}
-
-func createServiceEdgeRouterPolicy(name, svcZId string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	edgeRouterRoles := []string{"#all"}
-	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
-	tags := edge_ctrl.ZrokTags()
-	for k, v := range moreTags {
-		tags.SubTags[k] = v
-	}
-	serp := &rest_model.ServiceEdgeRouterPolicyCreate{
-		EdgeRouterRoles: edgeRouterRoles,
-		Name:            &name,
-		Semantic:        &semantic,
-		ServiceRoles:    serviceRoles,
-		Tags:            tags,
-	}
-	serpParams := &service_edge_router_policy.CreateServiceEdgeRouterPolicyParams{
-		Policy:  serp,
-		Context: context.Background(),
-	}
-	serpParams.SetTimeout(30 * time.Second)
-	resp, err := edge.ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(serpParams, nil)
-	if err != nil {
-		return "", errors.Wrapf(err, "error creating serp '%v' for service '%v'", name, svcZId)
-	}
-	return resp.Payload.Data.ID, nil
-}
-
-func deleteServiceEdgeRouterPolicy(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("tags.zrokServiceToken=\"%v\"", svcToken)
-	limit := int64(1)
-	offset := int64(0)
-	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(listReq, nil)
-	if err != nil {
-		return err
-	}
-	if len(listResp.Payload.Data) == 1 {
-		serpId := *(listResp.Payload.Data[0].ID)
-		req := &service_edge_router_policy.DeleteServiceEdgeRouterPolicyParams{
-			ID:      serpId,
-			Context: context.Background(),
-		}
-		req.SetTimeout(30 * time.Second)
-		_, err := edge.ServiceEdgeRouterPolicy.DeleteServiceEdgeRouterPolicy(req, nil)
-		if err != nil {
-			return err
-		}
-		logrus.Infof("deleted service edge router policy '%v' for environment '%v'", serpId, envZId)
-	} else {
-		logrus.Infof("did not find a service edge router policy")
-	}
-	return nil
-}
 
 func createServicePolicyBind(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
@@ -103,7 +33,7 @@ func createServicePolicyBind(envZId, svcToken, svcZId string, edge *rest_managem
 		Semantic:          &semantic,
 		ServiceRoles:      serviceRoles,
 		Type:              &dialBind,
-		Tags:              edge_ctrl.ZrokServiceTags(svcToken),
+		Tags:              zrok_edge_sdk.ZrokServiceTags(svcToken),
 	}
 	req := &service_policy.CreateServicePolicyParams{
 		Policy:  svcp,
@@ -157,7 +87,7 @@ func deleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_
 }
 
 func createServicePolicyDial(envZId, svcToken, svcZId string, dialZIds []string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := edge_ctrl.ZrokServiceTags(svcToken)
+	allTags := zrok_edge_sdk.ZrokServiceTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
 			allTags.SubTags[k] = v
@@ -284,7 +214,7 @@ func createConfig(envZId, svcToken string, authSchemeStr string, authUsers []*mo
 		ConfigTypeID: &zrokProxyConfigId,
 		Data:         cfg,
 		Name:         &svcToken,
-		Tags:         edge_ctrl.ZrokServiceTags(svcToken),
+		Tags:         zrok_edge_sdk.ZrokServiceTags(svcToken),
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
@@ -331,8 +261,8 @@ func deleteConfig(envZId, svcToken string, edge *rest_management_api_client.Ziti
 
 func createShareService(envZId, svcToken, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
 	configs := []string{cfgId}
-	tags := edge_ctrl.ZrokServiceTags(svcToken)
-	svcZId, err = edge_ctrl.CreateService(svcToken, configs, tags.SubTags, edge)
+	tags := zrok_edge_sdk.ZrokServiceTags(svcToken)
+	svcZId, err = zrok_edge_sdk.CreateService(svcToken, configs, tags.SubTags, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
 	}
@@ -349,7 +279,7 @@ func createEdgeRouterPolicy(name, zId string, edge *rest_management_api_client.Z
 		IdentityRoles:   identityRoles,
 		Name:            &name,
 		Semantic:        &semantic,
-		Tags:            edge_ctrl.ZrokTags(),
+		Tags:            zrok_edge_sdk.ZrokTags(),
 	}
 	req := &edge_router_policy.CreateEdgeRouterPolicyParams{
 		Policy:  erp,
@@ -408,7 +338,7 @@ func createEnvironmentIdentity(accountEmail string, client *rest_management_api_
 
 func createIdentity(name string, identityType rest_model_edge.IdentityType, moreTags map[string]interface{}, client *rest_management_api_client.ZitiEdgeManagement) (*identity_edge.CreateIdentityCreated, error) {
 	isAdmin := false
-	tags := edge_ctrl.ZrokTags()
+	tags := zrok_edge_sdk.ZrokTags()
 	for k, v := range moreTags {
 		tags.SubTags[k] = v
 	}

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti-test-kitchen/zrok/controller/edge_ctrl"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -78,7 +78,7 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 
 	if ssvc.Reserved == params.Body.Reserved {
 		// single tag-based service deallocator; should work regardless of sharing mode
-		if err := h.deallocateResources(senv, ssvc, svcToken, svcZId, edge); err != nil {
+		if err := h.deallocateResources(senv, svcToken, svcZId, edge); err != nil {
 			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
 			return service.NewUnshareInternalServerError()
 		}
@@ -122,8 +122,8 @@ func (h *unshareHandler) findServiceZId(svcToken string, edge *rest_management_a
 	return "", errors.Errorf("service '%v' not found", svcToken)
 }
 
-func (h *unshareHandler) deallocateResources(senv *store.Environment, ssvc *store.Service, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	if err := deleteServiceEdgeRouterPolicy(senv.ZId, svcToken, edge); err != nil {
+func (h *unshareHandler) deallocateResources(senv *store.Environment, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy(senv.ZId, svcToken, edge); err != nil {
 		return err
 	}
 	if err := deleteServicePolicyDial(senv.ZId, svcToken, edge); err != nil {
@@ -135,7 +135,7 @@ func (h *unshareHandler) deallocateResources(senv *store.Environment, ssvc *stor
 	if err := deleteConfig(senv.ZId, svcToken, edge); err != nil {
 		return err
 	}
-	if err := edge_ctrl.DeleteService(senv.ZId, svcZId, edge); err != nil {
+	if err := zrok_edge_sdk.DeleteService(senv.ZId, svcZId, edge); err != nil {
 		return err
 	}
 	return nil
