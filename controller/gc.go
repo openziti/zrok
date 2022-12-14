@@ -81,7 +81,7 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 				if err := zrok_edge_sdk.DeleteServicePolicyBind("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service bind policy: %v", err)
 				}
-				if err := deleteConfig("gc", *svc.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteConfig("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
 				if err := zrok_edge_sdk.DeleteService("gc", *svc.ID, edge); err != nil {
@@ -160,7 +160,7 @@ func gcConfigs(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[
 	if listResp, err := edge.Config.ListConfigs(listReq, nil); err == nil {
 		for _, c := range listResp.Payload.Data {
 			if _, found := liveMap[*c.Name]; !found {
-				if err := deleteConfig("gc", *c.Name, edge); err != nil {
+				if err := zrok_edge_sdk.DeleteConfig("gc", *c.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
 			} else {
