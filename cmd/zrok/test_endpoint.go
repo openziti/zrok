@@ -61,21 +61,23 @@ func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Reques
 }
 
 type endpointData struct {
-	Now        time.Time
-	RemoteAddr string
-	Host       string
-	HostDetail string
-	Ips        string
-	HostHeader string
-	Headers    map[string][]string
+	RequestedPath string
+	Now           time.Time
+	RemoteAddr    string
+	Host          string
+	HostDetail    string
+	Ips           string
+	HostHeader    string
+	Headers       map[string][]string
 }
 
 func newEndpointData(r *http.Request) *endpointData {
 	ed := &endpointData{
-		Now:        time.Now(),
-		HostHeader: r.Host,
-		Headers:    r.Header,
-		RemoteAddr: r.RemoteAddr,
+		RequestedPath: r.RequestURI,
+		Now:           time.Now(),
+		HostHeader:    r.Host,
+		Headers:       r.Header,
+		RemoteAddr:    r.RemoteAddr,
 	}
 	ed.getHostInfo()
 	ed.getIps()
