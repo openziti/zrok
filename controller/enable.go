@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
+	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/sirupsen/logrus"
@@ -36,18 +36,18 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Errorf("error creating account token: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
-	ident, err := zrok_edge_sdk.CreateEnvironmentIdentity(principal.Email, accountToken, client)
+	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(principal.Email, accountToken, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
 	envZId := ident.Payload.Data.ID
-	cfg, err := zrok_edge_sdk.EnrollIdentity(envZId, client)
+	cfg, err := zrokEdgeSdk.EnrollIdentity(envZId, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
-	if err := zrok_edge_sdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
+	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}

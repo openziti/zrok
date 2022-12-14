@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
+	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -196,13 +196,13 @@ func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagem
 }
 
 func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	idc, err := zrok_edge_sdk.CreateIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
+	idc, err := zrokEdgeSdk.CreateIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating '%v' identity", name)
 	}
 
 	zId := idc.Payload.Data.ID
-	cfg, err := zrok_edge_sdk.EnrollIdentity(zId, edge)
+	cfg, err := zrokEdgeSdk.EnrollIdentity(zId, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error enrolling '%v' identity", name)
 	}
@@ -236,7 +236,7 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Infof("creating erp for '%v' (%v)", name, zId)
-		if err := zrok_edge_sdk.CreateEdgeRouterPolicy(name, zId, edge); err != nil {
+		if err := zrokEdgeSdk.CreateEdgeRouterPolicy(name, zId, edge); err != nil {
 			return errors.Wrapf(err, "error creating erp for '%v' (%v)", name, zId)
 		}
 	}
@@ -261,7 +261,7 @@ func assertMetricsService(cfg *Config, edge *rest_management_api_client.ZitiEdge
 	var svcZId string
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Infof("creating '%v' service", cfg.Metrics.ServiceName)
-		svcZId, err = zrok_edge_sdk.CreateService("metrics", nil, nil, edge)
+		svcZId, err = zrokEdgeSdk.CreateService("metrics", nil, nil, edge)
 		if err != nil {
 			return "", errors.Wrapf(err, "error creating '%v' service", cfg.Metrics.ServiceName)
 		}
@@ -289,7 +289,7 @@ func assertMetricsSerp(metricsSvcZId string, cfg *Config, edge *rest_management_
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Infof("creating '%v' serp", cfg.Metrics.ServiceName)
-		_, err := zrok_edge_sdk.CreateServiceEdgeRouterPolicy(cfg.Metrics.ServiceName, metricsSvcZId, nil, edge)
+		_, err := zrokEdgeSdk.CreateServiceEdgeRouterPolicy(cfg.Metrics.ServiceName, metricsSvcZId, nil, edge)
 		if err != nil {
 			return errors.Wrapf(err, "error creating '%v' serp", cfg.Metrics.ServiceName)
 		}
@@ -314,7 +314,7 @@ func assertCtrlMetricsBind(ctrlZId, metricsSvcZId string, edge *rest_management_
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'ctrl-metrics-bind' service policy")
-		if err := zrok_edge_sdk.CreateNamedBindServicePolicy("ctrl-metrics-bind", metricsSvcZId, ctrlZId, edge, zrok_edge_sdk.ZrokTags()); err != nil {
+		if err := zrokEdgeSdk.CreateNamedBindServicePolicy("ctrl-metrics-bind", metricsSvcZId, ctrlZId, edge, zrokEdgeSdk.ZrokTags()); err != nil {
 			return errors.Wrap(err, "error creating 'ctrl-metrics-bind' service policy")
 		}
 	}
@@ -338,7 +338,7 @@ func assertFrontendMetricsDial(frontendZId, metricsSvcZId string, edge *rest_man
 	}
 	if len(listResp.Payload.Data) != 1 {
 		logrus.Info("creating 'frontend-metrics-dial' service policy")
-		if err := zrok_edge_sdk.CreateNamedDialServicePolicy("frontend-metrics-dial", metricsSvcZId, frontendZId, edge, zrok_edge_sdk.ZrokTags()); err != nil {
+		if err := zrokEdgeSdk.CreateNamedDialServicePolicy("frontend-metrics-dial", metricsSvcZId, frontendZId, edge, zrokEdgeSdk.ZrokTags()); err != nil {
 			return errors.Wrap(err, "error creating 'frontend-metrics-dial' service policy")
 		}
 	}

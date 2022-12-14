@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
+	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -96,7 +96,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 }
 
 func createServicePolicyDialForEnvironment(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement, tags ...*rest_model.Tags) error {
-	allTags := zrok_edge_sdk.ZrokServiceTags(svcToken)
+	allTags := zrokEdgeSdk.ZrokServiceTags(svcToken)
 	for _, t := range tags {
 		for k, v := range t.SubTags {
 			allTags.SubTags[k] = v

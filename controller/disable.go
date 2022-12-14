@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti-test-kitchen/zrok/controller/zrok_edge_sdk"
+	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -48,11 +48,11 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error removing environment: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := zrok_edge_sdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
 		logrus.Errorf("error deleting edge router policy: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := zrok_edge_sdk.DeleteIdentity(params.Body.Identity, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteIdentity(params.Body.Identity, edge); err != nil {
 		logrus.Errorf("error deleting identity: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
@@ -87,19 +87,19 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 	for _, svc := range svcs {
 		svcToken := svc.Token
 		logrus.Infof("garbage collecting service '%v' for environment '%v'", svcToken, env.ZId)
-		if err := zrok_edge_sdk.DeleteServiceEdgeRouterPolicy(env.ZId, svcToken, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := zrok_edge_sdk.DeleteServicePolicyDial(env.ZId, svcToken, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := zrok_edge_sdk.DeleteServicePolicyBind(env.ZId, svcToken, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteServicePolicyBind(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := zrok_edge_sdk.DeleteConfig(env.ZId, svcToken, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteConfig(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := zrok_edge_sdk.DeleteService(env.ZId, svc.ZId, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteService(env.ZId, svc.ZId, edge); err != nil {
 			logrus.Error(err)
 		}
 		logrus.Infof("removed service '%v' for environment '%v'", svc.Token, env.ZId)
