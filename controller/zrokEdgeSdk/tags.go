@@ -18,3 +18,10 @@ func ZrokServiceTags(svcToken string) *rest_model.Tags {
 	tags.SubTags["zrokServiceToken"] = svcToken
 	return tags
 }
+
+func MergeTags(tags *rest_model.Tags, addl map[string]interface{}) *rest_model.Tags {
+	for k, v := range addl {
+		tags.SubTags[k] = v
+	}
+	return tags
+}

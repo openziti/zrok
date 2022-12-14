@@ -18,12 +18,12 @@ func (a *privateResourceAllocator) allocate(envZId, svcToken string, params serv
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
 	}
-	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, svcToken, params.Body.AuthScheme, authUsers, edge)
+	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, svcToken, params.Body.AuthScheme, authUsers, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	svcZId, err = zrokEdgeSdk.CreateShareService(envZId, svcToken, cfgId, edge)
+	svcZId, err = zrokEdgeSdk.CreateShareService(envZId, svcToken, cfgZId, edge)
 	if err != nil {
 		return "", nil, err
 	}

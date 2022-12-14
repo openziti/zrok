@@ -10,10 +10,9 @@ import (
 	"time"
 )
 
-func CreateShareService(envZId, svcToken, cfgId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
-	configs := []string{cfgId}
-	tags := ZrokServiceTags(svcToken)
-	svcZId, err = CreateService(svcToken, configs, tags.SubTags, edge)
+func CreateShareService(envZId, svcToken, cfgZId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
+	cfgZIds := []string{cfgZId}
+	svcZId, err = CreateService(svcToken, cfgZIds, map[string]interface{}{"zrokServiceToken": svcToken}, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
 	}
@@ -21,20 +20,16 @@ func CreateShareService(envZId, svcToken, cfgId string, edge *rest_management_ap
 	return svcZId, nil
 }
 
-func CreateService(name string, cfgIds []string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
+func CreateService(name string, cfgZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		EncryptionRequired: &encryptionRequired,
 		Name:               &name,
+		Tags:               MergeTags(ZrokTags(), addlTags),
 	}
-	if cfgIds != nil {
-		svc.Configs = cfgIds
+	if cfgZIds != nil {
+		svc.Configs = cfgZIds
 	}
-	tags := ZrokTags()
-	for k, v := range moreTags {
-		tags.SubTags[k] = v
-	}
-	svc.Tags = tags
 	req := &edge_service.CreateServiceParams{
 		Service: svc,
 		Context: context.Background(),
