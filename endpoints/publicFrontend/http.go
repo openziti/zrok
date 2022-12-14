@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/endpoints"
-	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend/health_ui"
-	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend/notfound_ui"
+	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend/healthUi"
+	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend/notFoundUi"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -93,7 +93,7 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
-		notfound_ui.WriteNotFound(w)
+		notFoundUi.WriteNotFound(w)
 	}
 	return proxy, nil
 }
@@ -195,19 +195,19 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 						}
 					} else {
 						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcToken)
-						notfound_ui.WriteNotFound(w)
+						notFoundUi.WriteNotFound(w)
 					}
 				} else {
 					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcToken)
-					notfound_ui.WriteNotFound(w)
+					notFoundUi.WriteNotFound(w)
 				}
 			} else {
 				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcToken)
-				notfound_ui.WriteNotFound(w)
+				notFoundUi.WriteNotFound(w)
 			}
 		} else {
 			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			health_ui.WriteHealthOk(w)
+			healthUi.WriteHealthOk(w)
 		}
 	}
 }

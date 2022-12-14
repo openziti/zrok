@@ -1,4 +1,4 @@
-package health_ui
+package healthUi
 
 import "embed"
 

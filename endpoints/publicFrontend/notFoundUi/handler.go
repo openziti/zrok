@@ -1,13 +1,13 @@
-package health_ui
+package notFoundUi
 
 import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-func WriteHealthOk(w http.ResponseWriter) {
+func WriteNotFound(w http.ResponseWriter) {
 	if data, err := FS.ReadFile("index.html"); err == nil {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNotFound)
 		n, err := w.Write(data)
 		if n != len(data) {
 			logrus.Errorf("short write")

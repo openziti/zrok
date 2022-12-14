@@ -1,4 +1,4 @@
-package notfound_ui
+package notFoundUi
 
 import "embed"
 
