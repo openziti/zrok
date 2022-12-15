@@ -11,8 +11,7 @@ import (
 )
 
 func CreateShareService(envZId, svcToken, cfgZId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
-	cfgZIds := []string{cfgZId}
-	svcZId, err = CreateService(svcToken, cfgZIds, map[string]interface{}{"zrokServiceToken": svcToken}, edge)
+	svcZId, err = CreateService(svcToken, []string{cfgZId}, map[string]interface{}{"zrokServiceToken": svcToken}, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
 	}

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func CreateServiceEdgeRouterPolicyForShare(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	serpZId, err := CreateServiceEdgeRouterPolicy(svcToken, svcZId, ZrokServiceTags(svcToken).SubTags, edge)
 	if err != nil {
 		return err

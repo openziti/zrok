@@ -36,7 +36,7 @@ func (a *publicResourceAllocator) allocate(envZId, svcToken string, frontendZIds
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServiceEdgeRouterPolicyForShare(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

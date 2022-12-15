@@ -12,15 +12,15 @@ import (
 )
 
 const (
-	ServicePolicyDial = 1
-	ServicePolicyBind = 2
+	servicePolicyDial = 1
+	servicePolicyBind = 2
 )
 
 func CreateServicePolicyBind(name, svcZId, bindZId string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{"@" + bindZId}
 	serviceRoles := []string{"@" + svcZId}
-	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyBind, edge)
+	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, servicePolicyBind, edge)
 	if err != nil {
 		return errors.Wrapf(err, "error creating bind service policy for service '%v' for identity '%v'", svcZId, bindZId)
 	}
@@ -34,8 +34,8 @@ func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags ma
 	for _, zId := range dialZIds {
 		identityRoles = append(identityRoles, "@"+zId)
 	}
-	serviceRoles := []string{"@"+svcZId}
-	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, ServicePolicyDial, edge)
+	serviceRoles := []string{"@" + svcZId}
+	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, servicePolicyDial, edge)
 	if err != nil {
 		return errors.Wrapf(err, "error creating dial service policy for service '%v' for identities '%v'", svcZId, dialZIds)
 	}
@@ -46,9 +46,9 @@ func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags ma
 func createServicePolicy(name string, semantic rest_model.Semantic, identityRoles, serviceRoles []string, addlTags map[string]interface{}, dialBind int, edge *rest_management_api_client.ZitiEdgeManagement) (spZId string, err error) {
 	var dialBindType rest_model.DialBind
 	switch dialBind {
-	case ServicePolicyBind:
+	case servicePolicyBind:
 		dialBindType = rest_model.DialBindBind
-	case ServicePolicyDial:
+	case servicePolicyDial:
 		dialBindType = rest_model.DialBindDial
 	default:
 		return "", errors.Errorf("invalid dial bind type")
@@ -65,7 +65,7 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 	}
 
 	req := &service_policy.CreateServicePolicyParams{
-		Policy: spc,
+		Policy:  spc,
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
@@ -79,11 +79,11 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 }
 
 func DeleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, ServicePolicyBind), edge)
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, servicePolicyBind), edge)
 }
 
 func DeleteServicePolicyDial(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, ServicePolicyDial), edge)
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, servicePolicyDial), edge)
 }
 
 func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
