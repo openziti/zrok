@@ -1,0 +1,30 @@
+import {useEffect, useState} from "react";
+import * as metadata from "./api/metadata";
+import Modal from "react-bootstrap/Modal";
+
+const NewVersion = (props) => {
+    const [v, setV] = useState('');
+
+    useEffect(() => {
+        let mounted = true;
+        metadata.version().then(resp => {
+            if(mounted) {
+                setV(resp.data);
+            }
+        });
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    return (
+        <Modal show={props.show} onHide={props.onHide} centered>
+            <Modal.Header closeButton>About zrok</Modal.Header>
+            <Modal.Body>
+                <h3>{v}</h3>
+            </Modal.Body>
+        </Modal>
+    );
+}
+
+export default NewVersion;
