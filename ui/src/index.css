@@ -5,8 +5,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-    font-family: 'Russo One', sans-serif;
+code, pre {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }
 
 #navbar {

@@ -13,8 +13,8 @@ const NewConsole = (props) => {
     const closeVersionModal = () => setShowVersionModal(false);
 
     return (
-        <Container fluid="xl">
-            <Navbar bg="primary" variant="dark" id="navbar" expand="lg">
+        <Container fluid={"xl"}>
+            <Navbar bg="primary" variant="dark" id="navbar" expand="md">
                 <Container fluid>
                     <Navbar.Brand>
                         <img alt="Ziggy" src="/ziggy.svg" width="65" className="d-inline-block align-top" />{' '}

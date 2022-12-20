@@ -21,7 +21,7 @@ const NewVersion = (props) => {
         <Modal show={props.show} onHide={props.onHide} centered>
             <Modal.Header closeButton>About zrok</Modal.Header>
             <Modal.Body>
-                <h3>{v}</h3>
+                <code>{v}</code>
             </Modal.Body>
         </Modal>
     );
