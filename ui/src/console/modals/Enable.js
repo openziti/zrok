@@ -2,7 +2,7 @@ import Modal from "react-bootstrap/Modal";
 import {mdiContentCopy} from "@mdi/js";
 import Icon from "@mdi/react";
 
-const NewEnable = (props) => {
+const Enable = (props) => {
     const handleCopy = async () => {
         let copiedText = document.getElementById("zrok-enable-command").innerHTML;
         try {
@@ -28,4 +28,4 @@ const NewEnable = (props) => {
     );
 }
 
-export default NewEnable;
+export default Enable;

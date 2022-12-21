@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Register from "./Register";
-import NewConsole from "./NewConsole";
+import Console from "./console/Console";
 import {useEffect, useState} from "react";
 import Login from "./Login";
 
@@ -20,7 +20,7 @@ const App = () => {
         localStorage.clear();
     }
 
-    const consoleComponent = user ? <NewConsole logout={logout} user={user} /> : <Login loginSuccess={setUser} />
+    const consoleComponent = user ? <Console logout={logout} user={user} /> : <Login loginSuccess={setUser} />
 
     return (
         <Router>

@@ -1,10 +1,11 @@
-import {Container, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
-import {useState} from "react";
+import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {useEffect, useState} from "react";
 import Visualizer from "./visualizer/Visualizer";
-import NewEnable from "./modals/NewEnable";
-import NewVersion from "./modals/NewVersion";
+import Enable from "./modals/Enable";
+import Version from "./modals/Version";
+import * as metadata from "../api/metadata";
 
-const NewConsole = (props) => {
+const Console = (props) => {
     const [showEnableModal, setShowEnableModal] = useState(false);
     const openEnableModal = () => setShowEnableModal(true);
     const closeEnableModal = () => setShowEnableModal(false);
@@ -12,6 +13,32 @@ const NewConsole = (props) => {
     const [showVersionModal, setShowVersionModal] = useState(false);
     const openVersionModal = () => setShowVersionModal(true);
     const closeVersionModal = () => setShowVersionModal(false);
+
+    const [overview, setOverview] = useState([]);
+
+    useEffect(() => {
+        let mounted = true;
+        metadata.overview().then(resp => {
+            if(mounted) {
+                setOverview(resp.data);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        let mounted = true;
+        let interval = setInterval(() => {
+            metadata.overview().then(resp => {
+                if(mounted) {
+                    setOverview(resp.data);
+                }
+            })
+        }, 1000)
+        return () => {
+            mounted = false;
+            clearInterval(interval);
+        }
+    }, [])
 
     return (
         <Container fluid={"xl"}>
@@ -33,11 +60,11 @@ const NewConsole = (props) => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Visualizer />
-            <NewEnable show={showEnableModal} onHide={closeEnableModal} token={props.user.token}/>
-            <NewVersion show={showVersionModal} onHide={closeVersionModal} />
+            <Visualizer overview={overview} />
+            <Enable show={showEnableModal} onHide={closeEnableModal} token={props.user.token} />
+            <Version show={showVersionModal} onHide={closeVersionModal} />
         </Container>
     );
 }
 
-export default NewConsole;
+export default Console;

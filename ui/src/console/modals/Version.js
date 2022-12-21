@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import * as metadata from "../api/metadata";
+import * as metadata from "../../api/metadata";
 import Modal from "react-bootstrap/Modal";
 
-const NewVersion = (props) => {
+const Version = (props) => {
     const [v, setV] = useState('');
 
     useEffect(() => {
@@ -27,4 +27,4 @@ const NewVersion = (props) => {
     );
 }
 
-export default NewVersion;
+export default Version;
