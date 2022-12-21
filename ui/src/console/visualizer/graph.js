@@ -1,10 +1,10 @@
 export const mergeGraph = (oldGraph, newOverview) => {
-    let graph = {
+    let newGraph = {
         nodes: [],
         links: []
     }
     newOverview.forEach(env => {
-        graph.nodes.push({
+        newGraph.nodes.push({
             id: env.environment.zId,
             label: env.environment.description,
             type: "environment"
@@ -15,13 +15,13 @@ export const mergeGraph = (oldGraph, newOverview) => {
                 if(svc.backendProxyEndpoint !== "") {
                     svcLabel = svc.backendProxyEndpoint;
                 }
-                graph.nodes.push({
+                newGraph.nodes.push({
                     id: svc.token,
                     label: svcLabel,
                     type: "service",
                     val: 10
                 });
-                graph.links.push({
+                newGraph.links.push({
                     target: env.environment.zId,
                     source: svc.token,
                     color: "#777"
@@ -29,14 +29,12 @@ export const mergeGraph = (oldGraph, newOverview) => {
             });
         }
     });
-    graph.nodes.forEach(newNode => {
-        let found = oldGraph.nodes.find(oldNode => oldNode.id === newNode.id);
-        if(found) {
-            newNode.vx = found.vx;
-            newNode.vy = found.vy;
-            newNode.x = found.x;
-            newNode.y = found.y;
-        }
-    })
-    return graph;
+    // we want to preserve nodes that exist in the new graph, and remove those that don't.
+    oldGraph.nodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
+    // and then do the opposite; add any nodes that are in newGraph that are missing from oldGraph.
+    oldGraph.nodes.push(...newGraph.nodes.filter(newNode => !oldGraph.nodes.find(oldNode => oldNode.id === newNode.id)));
+    return {
+        nodes: oldGraph.nodes,
+        links: newGraph.links,
+    };
 };

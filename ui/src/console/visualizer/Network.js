@@ -11,7 +11,7 @@ const Network = (props) => {
 
     useEffect(() => {
         const fg = targetRef.current;
-        fg.d3Force('collide', d3.forceCollide(32));
+        fg.d3Force('collide', d3.forceCollide(22));
     }, []);
 
     const paintNode = (node, ctx) => {

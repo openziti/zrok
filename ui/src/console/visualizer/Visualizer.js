@@ -8,7 +8,7 @@ const Visualizer = (props) => {
 
     useEffect(() => {
         setNetworkGraph(mergeGraph(networkGraph, props.overview));
-    }, [props.overview]);
+    }, [props]);
 
     // fgRef to access force graph controls from this component
     let fgRef = () => { };
