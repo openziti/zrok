@@ -1,7 +1,8 @@
-import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Container, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
 import {useState} from "react";
-import NewEnable from "./NewEnable";
-import NewVersion from "./NewVersion";
+import Visualizer from "./visualizer/Visualizer";
+import NewEnable from "./modals/NewEnable";
+import NewVersion from "./modals/NewVersion";
 
 const NewConsole = (props) => {
     const [showEnableModal, setShowEnableModal] = useState(false);
@@ -32,6 +33,7 @@ const NewConsole = (props) => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
+            <Visualizer />
             <NewEnable show={showEnableModal} onHide={closeEnableModal} token={props.user.token}/>
             <NewVersion show={showVersionModal} onHide={closeVersionModal} />
         </Container>

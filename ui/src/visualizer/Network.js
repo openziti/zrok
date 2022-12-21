@@ -1,5 +1,6 @@
 import {withSize} from "react-sizeme";
 import {useRef} from "react";
+import {ForceGraph2D} from "react-force-graph";
 
 const Network = (props) => {
     const targetRef = useRef();
@@ -14,7 +15,7 @@ const Network = (props) => {
             width={props.size.width}
             height={500}
             linkOpacity={.75}
-            backgroundColor={"#30205d"}
+            backgroundColor={"#3b2693"}
         />
     )
 }

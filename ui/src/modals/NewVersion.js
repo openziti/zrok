@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import * as metadata from "./api/metadata";
+import * as metadata from "../api/metadata";
 import Modal from "react-bootstrap/Modal";
 
 const NewVersion = (props) => {

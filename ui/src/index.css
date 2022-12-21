@@ -14,6 +14,17 @@ code, pre {
     padding: 15px 50px 20px;
 }
 
+.visualizer-container {
+    padding: 10px;
+    background: #3b2693;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+.visualizer-controls {
+    text-align: right;
+    margin-top: 5px;
+}
+
 .header-title {
     font-family: 'Russo One', sans-serif;
     font-size: 3em;
