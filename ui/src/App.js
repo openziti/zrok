@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Register from "./register/Register";
 import Console from "./console/Console";
 import {useEffect, useState} from "react";
-import Login from "./login/Login";
+import Login from "./console/login/Login";
 
 const App = () => {
     const [user, setUser] = useState();
