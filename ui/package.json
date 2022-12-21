@@ -17,8 +17,10 @@
     "react-data-table-component": "^7.5.2",
     "react-dom": "^18.2.0",
     "react-flow-renderer": "^10.3.12",
+    "react-force-graph": "^1.41.17",
     "react-router-dom": "^6.4.0",
     "react-scripts": "5.0.1",
+    "react-sizeme": "^3.0.2",
     "react-sparklines": "^1.7.0",
     "styled-components": "^5.3.5"
   },
