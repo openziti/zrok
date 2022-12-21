@@ -11,7 +11,7 @@ const Network = (props) => {
 
     useEffect(() => {
         const fg = targetRef.current;
-        fg.d3Force('collide', d3.forceCollide(22));
+        fg.d3Force('collide', d3.forceCollide().radius(30));
     }, []);
 
     const paintNode = (node, ctx) => {
@@ -31,6 +31,7 @@ const Network = (props) => {
 
         ctx.fillStyle = nodeColor;
         ctx.fillRect(node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14);
+
         ctx.fillStyle = textColor;
         ctx.fillText(node.label, node.x, node.y);
     }
@@ -50,6 +51,7 @@ const Network = (props) => {
             linkWidth={1.5}
             nodeCanvasObject={paintNode}
             backgroundColor={"#3b2693"}
+            cooldownTicks={100}
         />
     )
 }
