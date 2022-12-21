@@ -1,3 +1,13 @@
+const compareArrays = (a, b) => {
+    if(a.length !== b.length) return false;
+    return a.every((e, i) => e === b[i]);
+}
+
+const compareLinks = (a, b) => {
+    if(a.length !== b.length) return false;
+    return a.every((e, i) => e.source === b[i].source && e.target === b[i].target);
+}
+
 export const mergeGraph = (oldGraph, newOverview) => {
     let newGraph = {
         nodes: [],
@@ -30,11 +40,15 @@ export const mergeGraph = (oldGraph, newOverview) => {
         }
     });
     // we want to preserve nodes that exist in the new graph, and remove those that don't.
-    oldGraph.nodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
+    let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
+    let outputLinks = oldGraph.nodes.filter(oldLink => newGraph.links.find(newLink => newLink.target === oldLink.target && newLink.source === oldLink.source));
     // and then do the opposite; add any nodes that are in newGraph that are missing from oldGraph.
-    oldGraph.nodes.push(...newGraph.nodes.filter(newNode => !oldGraph.nodes.find(oldNode => oldNode.id === newNode.id)));
+    outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id)));
+    outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
+    outputNodes = outputNodes.sort();
+    outputLinks = outputLinks.sort();
     return {
-        nodes: oldGraph.nodes,
-        links: newGraph.links,
+        nodes: outputNodes,
+        links: outputLinks
     };
 };
