@@ -2,7 +2,7 @@ import Icon from "@mdi/react";
 import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
 import {mdiContentCopy} from "@mdi/js";
-import * as account from "./api/account";
+import * as account from "../api/account";
 
 const RegistrationForm = (props) => {
     const [password, setPassword] = useState('');

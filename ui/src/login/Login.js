@@ -1,5 +1,5 @@
 import {useState} from "react";
-import * as account from './api/account';
+import * as account from '../api/account';
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
@@ -34,7 +34,7 @@ const Login = (props) => {
 
     return (
         <div className={"fullscreen"}>
-            <img src={"ziggy.svg"} width={200}/>
+            <img src={"/ziggy.svg"} width={200}/>
             <h1>zrok</h1>
             {message}
             <form onSubmit={handleSubmit}>

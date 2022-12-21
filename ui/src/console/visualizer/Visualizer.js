@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Button} from "react-bootstrap";
 import Network from "./Network";
-import {buildGraph, mergeGraph} from "./graph";
+import {mergeGraph} from "./graph";
 
 const Visualizer = (props) => {
     const [networkGraph, setNetworkGraph] = useState({nodes: [], links: []});

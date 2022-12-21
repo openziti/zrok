@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Register from "./Register";
+import Register from "./register/Register";
 import Console from "./console/Console";
 import {useEffect, useState} from "react";
-import Login from "./Login";
+import Login from "./login/Login";
 
 const App = () => {
     const [user, setUser] = useState();
