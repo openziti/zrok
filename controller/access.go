@@ -76,7 +76,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		"zrokFrontendToken":  feToken,
 		"zrokServiceToken":   svcToken,
 	}
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-dial", ssvc.ZId, []string{envZId}, addlTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+ssvc.ZId+"-dial", ssvc.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}
