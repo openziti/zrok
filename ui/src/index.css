@@ -14,6 +14,14 @@ code, pre {
     padding: 15px 50px 20px;
 }
 
+.header-title {
+    font-family: 'Russo One', sans-serif;
+    font-size: 3em;
+    margin-left: 0.53em;
+    vertical-align: center;
+    line-height: 1.7;
+}
+
 .visualizer-container {
     padding: 10px;
     background: #3b2693;
@@ -25,12 +33,8 @@ code, pre {
     margin-top: 5px;
 }
 
-.header-title {
-    font-family: 'Russo One', sans-serif;
-    font-size: 3em;
-    margin-left: 0.53em;
-    vertical-align: center;
-    line-height: 1.7;
+.detail-container {
+    margin-top: 15px;
 }
 
 .btn-close {

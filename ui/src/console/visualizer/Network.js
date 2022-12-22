@@ -16,12 +16,11 @@ const Network = (props) => {
     }, []);
 
     const paintNode = (node, ctx) => {
-        let nodeColor = "#555";
+        let nodeColor = "#636363";
         let textColor = "white";
         switch(node.type) {
             case "environment":
-                nodeColor = "#777";
-                textColor = "black";
+                nodeColor = "#444";
                 break;
             case "service":
                 nodeColor = "#291A66";
@@ -38,10 +37,15 @@ const Network = (props) => {
         roundRect(ctx, node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14, 1.25);
         ctx.fill();
 
-        switch(node.type) {
-            case "service":
-                ctx.strokeStyle = "#433482";
-                ctx.stroke();
+        if(node.selected) {
+            ctx.strokeStyle = "#c4bdde";
+            ctx.stroke();
+        } else {
+            switch(node.type) {
+                case "service":
+                    ctx.strokeStyle = "#433482";
+                    ctx.stroke();
+            }
         }
 
         ctx.fillStyle = textColor;
@@ -49,7 +53,7 @@ const Network = (props) => {
     }
 
     const nodeClicked = (node) => {
-        console.log("node clicked", node.label);
+        props.setSelection({id: node.id, type: node.type});
     }
 
     return (

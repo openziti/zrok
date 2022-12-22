@@ -4,6 +4,7 @@ import Visualizer from "./visualizer/Visualizer";
 import Enable from "./modals/Enable";
 import Version from "./modals/Version";
 import * as metadata from "../api/metadata";
+import Detail from "./Detail";
 
 const Console = (props) => {
     const [showEnableModal, setShowEnableModal] = useState(false);
@@ -38,7 +39,10 @@ const Console = (props) => {
             mounted = false;
             clearInterval(interval);
         }
-    }, [])
+    }, []);
+
+    const defaultSelection = {id: props.user.token, type: "account"};
+    const [selection, setSelection] = useState(defaultSelection);
 
     return (
         <Container fluid={"xl"}>
@@ -60,7 +64,14 @@ const Console = (props) => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Visualizer user={props.user} overview={overview} />
+            <Visualizer
+                user={props.user}
+                overview={overview}
+                defaultSelection={defaultSelection}
+                selection={selection}
+                setSelection={setSelection}
+            />
+            <Detail selection={selection} />
             <Enable show={showEnableModal} onHide={closeEnableModal} token={props.user.token} />
             <Version show={showVersionModal} onHide={closeVersionModal} />
         </Container>
