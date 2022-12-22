@@ -15,7 +15,7 @@ import (
 func CreateEnvironmentIdentity(accountEmail, envDescription string, edge *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	identityType := rest_model_edge.IdentityTypeUser
 	moreTags := map[string]interface{}{"zrokEmail": accountEmail}
-	return CreateIdentity(envDescription, identityType, moreTags, edge)
+	return CreateIdentity(accountEmail+"-"+envDescription, identityType, moreTags, edge)
 }
 
 func CreateIdentity(name string, identityType rest_model_edge.IdentityType, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
