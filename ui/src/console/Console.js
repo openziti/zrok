@@ -60,7 +60,7 @@ const Console = (props) => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Visualizer overview={overview} />
+            <Visualizer user={props.user} overview={overview} />
             <Enable show={showEnableModal} onHide={closeEnableModal} token={props.user.token} />
             <Version show={showVersionModal} onHide={closeVersionModal} />
         </Container>

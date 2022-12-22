@@ -2,6 +2,7 @@ import {withSize} from "react-sizeme";
 import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
+import {roundRect} from "./draw";
 
 const Network = (props) => {
     const targetRef = useRef();
@@ -11,15 +12,19 @@ const Network = (props) => {
 
     useEffect(() => {
         const fg = targetRef.current;
-        fg.d3Force('collide', d3.forceCollide().radius(30));
+        fg.d3Force('collide', d3.forceCollide().radius(35));
     }, []);
 
     const paintNode = (node, ctx) => {
-        let nodeColor = "#777";
+        let nodeColor = "#555";
         let textColor = "white";
         switch(node.type) {
+            case "environment":
+                nodeColor = "#777";
+                textColor = "black";
+                break;
             case "service":
-                nodeColor = "#7e67e2";
+                nodeColor = "#291A66";
                 break;
         }
 
@@ -27,10 +32,17 @@ const Network = (props) => {
         ctx.textAlign = "center";
         ctx.font = "6px 'JetBrains Mono'";
         let extents = ctx.measureText(node.label);
-        let nodeWidth = extents.width + 5;
+        let nodeWidth = extents.width + 10;
 
         ctx.fillStyle = nodeColor;
-        ctx.fillRect(node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14);
+        roundRect(ctx, node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14, 1.25);
+        ctx.fill();
+
+        switch(node.type) {
+            case "service":
+                ctx.strokeStyle = "#433482";
+                ctx.stroke();
+        }
 
         ctx.fillStyle = textColor;
         ctx.fillText(node.label, node.x, node.y);
@@ -51,7 +63,9 @@ const Network = (props) => {
             linkWidth={1.5}
             nodeCanvasObject={paintNode}
             backgroundColor={"#3b2693"}
-            cooldownTicks={100}
+            cooldownTicks={300}
+            d3VelocityDecay={0.3}
+            d3AlphaDecay={0.0128}
         />
     )
 }

@@ -15,11 +15,19 @@ const nodesEqual = (a, b) => {
     return a.every((e, i) => e.id === b[i].id);
 }
 
-export const mergeGraph = (oldGraph, newOverview) => {
+export const mergeGraph = (oldGraph, user, newOverview) => {
     let newGraph = {
         nodes: [],
         links: []
     }
+
+    let accountNode = {
+        id: user.token,
+        label: user.email,
+        type: "account"
+    }
+    newGraph.nodes.push(accountNode);
+
     newOverview.forEach(env => {
         let envNode = {
             id: env.environment.zId,
@@ -27,6 +35,11 @@ export const mergeGraph = (oldGraph, newOverview) => {
             type: "environment"
         };
         newGraph.nodes.push(envNode);
+        newGraph.links.push({
+            target: accountNode.id,
+            source: envNode.id,
+            color: "#777"
+        });
         if(env.services) {
             env.services.forEach(svc => {
                 let svcLabel = svc.token;
