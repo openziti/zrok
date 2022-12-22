@@ -10,36 +10,9 @@ const sortNodes = (nodes) => {
     })
 }
 
-const sortLinks = (links) => {
-    return links.sort((a, b) => {
-        if(a.target.id+a.source.id > b.target.id+b.source.id) {
-            return 1;
-        }
-        if(a.target.id+a.source.id < b.target.id+b.source.id) {
-            return -1;
-        }
-        return 0;
-    })
-}
-
-const graphsEqual = (a, b) => {
-    let nodes = nodesEqual(a.nodes, b.nodes);
-    let links = linksEqual(a.links, b.links);
-    if(!links) {
-        console.log("a", a.links.map(l => l.target + ' ' + l.source));
-        console.log("b", b.links.map(l => l.target + ' ' + l.source))
-    }
-    return nodes && links;
-}
-
 const nodesEqual = (a, b) => {
     if(a.length !== b.length) return false;
     return a.every((e, i) => e.id === b[i].id);
-}
-
-const linksEqual = (a, b) => {
-    if(a.length !== b.length) return false;
-    return a.every((e, i) => e.target === b[i].target.id && e.source === b[i].source.id);
 }
 
 export const mergeGraph = (oldGraph, newOverview) => {
@@ -76,11 +49,12 @@ export const mergeGraph = (oldGraph, newOverview) => {
         }
     });
     newGraph.nodes = sortNodes(newGraph.nodes);
-    newGraph.links = sortLinks(newGraph.links);
 
-    if(graphsEqual(newGraph, oldGraph)) {
+    if(nodesEqual(oldGraph.nodes, newGraph.nodes)) {
         return oldGraph;
     }
+
+    console.log("nodes not equal");
 
     // we want to preserve nodes that exist in the new graph, and remove those that don't.
     let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
@@ -89,7 +63,7 @@ export const mergeGraph = (oldGraph, newOverview) => {
     outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id)));
     outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
     return {
-        nodes: outputNodes,
+        nodes: sortNodes(outputNodes),
         links: outputLinks
     };
 };
