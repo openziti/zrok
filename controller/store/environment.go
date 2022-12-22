@@ -64,7 +64,7 @@ func (self *Store) FindEnvironmentsForAccount(accountId int, tx *sqlx.Tx) ([]*En
 
 func (self *Store) FindEnvironmentForAccount(envZId string, accountId int, tx *sqlx.Tx) (*Environment, error) {
 	env := &Environment{}
-	if err := tx.QueryRowx("select environments.* from environments where z_id = $1 and account_id = $1", envZId, accountId).StructScan(env); err != nil {
+	if err := tx.QueryRowx("select environments.* from environments where z_id = $1 and account_id = $2", envZId, accountId).StructScan(env); err != nil {
 		return nil, errors.Wrap(err, "error finding environment by z_id and account_id")
 	}
 	return env, nil

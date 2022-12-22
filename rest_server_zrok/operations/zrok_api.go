@@ -466,7 +466,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/detail/environment"] = metadata.NewGetEnvironmentDetail(o.context, o.MetadataGetEnvironmentDetailHandler)
+	o.handlers["GET"]["/detail/environment/{envZId}"] = metadata.NewGetEnvironmentDetail(o.context, o.MetadataGetEnvironmentDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

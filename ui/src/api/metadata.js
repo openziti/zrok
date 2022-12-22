@@ -3,15 +3,13 @@
 import * as gateway from './gateway'
 
 /**
- * @param {object} options Optional options
- * @param {object} [options.body] 
+ * @param {string} envZId 
  * @return {Promise<module:types.environmentServices>} ok
  */
-export function getEnvironmentDetail(options) {
-  if (!options) options = {}
+export function getEnvironmentDetail(envZId) {
   const parameters = {
-    body: {
-      body: options.body
+    path: {
+      envZId
     }
   }
   return gateway.request(getEnvironmentDetailOperation, parameters)
@@ -30,8 +28,7 @@ export function version() {
 }
 
 const getEnvironmentDetailOperation = {
-  path: '/detail/environment',
-  contentTypes: ['application/zrok.v1+json'],
+  path: '/detail/environment/{envZId}',
   method: 'get',
   security: [
     {

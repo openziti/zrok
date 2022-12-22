@@ -9,9 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/validate"
+	"github.com/go-openapi/strfmt"
 )
 
 // NewGetEnvironmentDetailParams creates a new GetEnvironmentDetailParams object
@@ -32,9 +31,10 @@ type GetEnvironmentDetailParams struct {
 	HTTPRequest *http.Request `json:"-"`
 
 	/*
-	  In: body
+	  Required: true
+	  In: path
 	*/
-	Body GetEnvironmentDetailBody
+	EnvZID string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -46,29 +46,26 @@ func (o *GetEnvironmentDetailParams) BindRequest(r *http.Request, route *middlew
 
 	o.HTTPRequest = r
 
-	if runtime.HasBody(r) {
-		defer r.Body.Close()
-		var body GetEnvironmentDetailBody
-		if err := route.Consumer.Consume(r.Body, &body); err != nil {
-			res = append(res, errors.NewParseError("body", "body", "", err))
-		} else {
-			// validate body object
-			if err := body.Validate(route.Formats); err != nil {
-				res = append(res, err)
-			}
-
-			ctx := validate.WithOperationRequest(r.Context())
-			if err := body.ContextValidate(ctx, route.Formats); err != nil {
-				res = append(res, err)
-			}
-
-			if len(res) == 0 {
-				o.Body = body
-			}
-		}
+	rEnvZID, rhkEnvZID, _ := route.Params.GetOK("envZId")
+	if err := o.bindEnvZID(rEnvZID, rhkEnvZID, route.Formats); err != nil {
+		res = append(res, err)
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// bindEnvZID binds and validates parameter EnvZID from path.
+func (o *GetEnvironmentDetailParams) bindEnvZID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: true
+	// Parameter is provided by construction from the route
+	o.EnvZID = raw
+
 	return nil
 }

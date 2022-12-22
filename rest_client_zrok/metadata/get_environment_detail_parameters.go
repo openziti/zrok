@@ -61,8 +61,8 @@ GetEnvironmentDetailParams contains all the parameters to send to the API endpoi
 */
 type GetEnvironmentDetailParams struct {
 
-	// Body.
-	Body GetEnvironmentDetailBody
+	// EnvZID.
+	EnvZID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *GetEnvironmentDetailParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithBody adds the body to the get environment detail params
-func (o *GetEnvironmentDetailParams) WithBody(body GetEnvironmentDetailBody) *GetEnvironmentDetailParams {
-	o.SetBody(body)
+// WithEnvZID adds the envZID to the get environment detail params
+func (o *GetEnvironmentDetailParams) WithEnvZID(envZID string) *GetEnvironmentDetailParams {
+	o.SetEnvZID(envZID)
 	return o
 }
 
-// SetBody adds the body to the get environment detail params
-func (o *GetEnvironmentDetailParams) SetBody(body GetEnvironmentDetailBody) {
-	o.Body = body
+// SetEnvZID adds the envZId to the get environment detail params
+func (o *GetEnvironmentDetailParams) SetEnvZID(envZID string) {
+	o.EnvZID = envZID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -135,7 +135,9 @@ func (o *GetEnvironmentDetailParams) WriteToRequest(r runtime.ClientRequest, reg
 		return err
 	}
 	var res []error
-	if err := r.SetBodyParam(o.Body); err != nil {
+
+	// path param envZId
+	if err := r.SetPathParam("envZId", o.EnvZID); err != nil {
 		return err
 	}
 

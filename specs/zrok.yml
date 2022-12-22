@@ -252,7 +252,7 @@ paths:
   #
   # metadata
   #
-  /detail/environment:
+  /detail/environment/{envZId}:
     get:
       tags:
         - metadata
@@ -260,12 +260,10 @@ paths:
         - key: []
       operationId: getEnvironmentDetail
       parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              envZId:
-                type: string
+        - name: envZId
+          in: path
+          type: string
+          required: true
       responses:
         200:
           description: ok

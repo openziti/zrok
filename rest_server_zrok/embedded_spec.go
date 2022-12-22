@@ -74,7 +74,7 @@ func init() {
         }
       }
     },
-    "/detail/environment": {
+    "/detail/environment/{envZId}": {
       "get": {
         "security": [
           {
@@ -87,15 +87,10 @@ func init() {
         "operationId": "getEnvironmentDetail",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "envZId": {
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string",
+            "name": "envZId",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -1209,7 +1204,7 @@ func init() {
         }
       }
     },
-    "/detail/environment": {
+    "/detail/environment/{envZId}": {
       "get": {
         "security": [
           {
@@ -1222,15 +1217,10 @@ func init() {
         "operationId": "getEnvironmentDetail",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "envZId": {
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string",
+            "name": "envZId",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {

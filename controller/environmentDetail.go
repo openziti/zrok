@@ -20,9 +20,9 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
-	senv, err := str.FindEnvironmentForAccount(params.Body.EnvZID, int(principal.ID), tx)
+	senv, err := str.FindEnvironmentForAccount(params.EnvZID, int(principal.ID), tx)
 	if err != nil {
-		logrus.Errorf("environment '%v' not found for account '%v': %v", params.Body.EnvZID, principal.Email, err)
+		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
 	}
 	es := &rest_model_zrok.EnvironmentServices{

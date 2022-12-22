@@ -6,12 +6,9 @@ package metadata
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
@@ -35,7 +32,7 @@ func NewGetEnvironmentDetail(ctx *middleware.Context, handler GetEnvironmentDeta
 }
 
 /*
-	GetEnvironmentDetail swagger:route GET /detail/environment metadata getEnvironmentDetail
+	GetEnvironmentDetail swagger:route GET /detail/environment/{envZId} metadata getEnvironmentDetail
 
 GetEnvironmentDetail get environment detail API
 */
@@ -71,41 +68,4 @@ func (o *GetEnvironmentDetail) ServeHTTP(rw http.ResponseWriter, r *http.Request
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
-}
-
-// GetEnvironmentDetailBody get environment detail body
-//
-// swagger:model GetEnvironmentDetailBody
-type GetEnvironmentDetailBody struct {
-
-	// env z Id
-	EnvZID string `json:"envZId,omitempty"`
-}
-
-// Validate validates this get environment detail body
-func (o *GetEnvironmentDetailBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this get environment detail body based on context it is used
-func (o *GetEnvironmentDetailBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *GetEnvironmentDetailBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *GetEnvironmentDetailBody) UnmarshalBinary(b []byte) error {
-	var res GetEnvironmentDetailBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
 }

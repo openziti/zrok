@@ -9,11 +9,16 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+	"strings"
 )
 
 // GetEnvironmentDetailURL generates an URL for the get environment detail operation
 type GetEnvironmentDetailURL struct {
+	EnvZID string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -35,7 +40,14 @@ func (o *GetEnvironmentDetailURL) SetBasePath(bp string) {
 func (o *GetEnvironmentDetailURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/detail/environment"
+	var _path = "/detail/environment/{envZId}"
+
+	envZID := o.EnvZID
+	if envZID != "" {
+		_path = strings.Replace(_path, "{envZId}", envZID, -1)
+	} else {
+		return nil, errors.New("envZId is required on GetEnvironmentDetailURL")
+	}
 
 	_basePath := o._basePath
 	if _basePath == "" {

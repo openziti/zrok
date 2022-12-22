@@ -50,7 +50,7 @@ func (a *Client) GetEnvironmentDetail(params *GetEnvironmentDetailParams, authIn
 	op := &runtime.ClientOperation{
 		ID:                 "getEnvironmentDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/environment",
+		PathPattern:        "/detail/environment/{envZId}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

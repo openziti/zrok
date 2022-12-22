@@ -4,7 +4,7 @@ import Visualizer from "./visualizer/Visualizer";
 import Enable from "./modals/Enable";
 import Version from "./modals/Version";
 import * as metadata from "../api/metadata";
-import Detail from "./Detail";
+import Detail from "./detail/Detail";
 
 const Console = (props) => {
     const [showEnableModal, setShowEnableModal] = useState(false);
@@ -34,7 +34,7 @@ const Console = (props) => {
                     setOverview(resp.data);
                 }
             })
-        }, 1000)
+        }, 1000);
         return () => {
             mounted = false;
             clearInterval(interval);

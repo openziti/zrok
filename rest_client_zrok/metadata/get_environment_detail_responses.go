@@ -6,13 +6,11 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
@@ -94,11 +92,11 @@ func (o *GetEnvironmentDetailOK) IsCode(code int) bool {
 }
 
 func (o *GetEnvironmentDetailOK) Error() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
 }
 
 func (o *GetEnvironmentDetailOK) String() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
 }
 
 func (o *GetEnvironmentDetailOK) GetPayload() *rest_model_zrok.EnvironmentServices {
@@ -156,11 +154,11 @@ func (o *GetEnvironmentDetailUnauthorized) IsCode(code int) bool {
 }
 
 func (o *GetEnvironmentDetailUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized ", 401)
 }
 
 func (o *GetEnvironmentDetailUnauthorized) String() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized ", 401)
 }
 
 func (o *GetEnvironmentDetailUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +205,11 @@ func (o *GetEnvironmentDetailNotFound) IsCode(code int) bool {
 }
 
 func (o *GetEnvironmentDetailNotFound) Error() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound ", 404)
 }
 
 func (o *GetEnvironmentDetailNotFound) String() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound ", 404)
 }
 
 func (o *GetEnvironmentDetailNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -258,52 +256,14 @@ func (o *GetEnvironmentDetailInternalServerError) IsCode(code int) bool {
 }
 
 func (o *GetEnvironmentDetailInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError ", 500)
 }
 
 func (o *GetEnvironmentDetailInternalServerError) String() string {
-	return fmt.Sprintf("[GET /detail/environment][%d] getEnvironmentDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError ", 500)
 }
 
 func (o *GetEnvironmentDetailInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	return nil
-}
-
-/*
-GetEnvironmentDetailBody get environment detail body
-swagger:model GetEnvironmentDetailBody
-*/
-type GetEnvironmentDetailBody struct {
-
-	// env z Id
-	EnvZID string `json:"envZId,omitempty"`
-}
-
-// Validate validates this get environment detail body
-func (o *GetEnvironmentDetailBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this get environment detail body based on context it is used
-func (o *GetEnvironmentDetailBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *GetEnvironmentDetailBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *GetEnvironmentDetailBody) UnmarshalBinary(b []byte) error {
-	var res GetEnvironmentDetailBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
 	return nil
 }
