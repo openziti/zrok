@@ -51,18 +51,23 @@ export const mergeGraph = (oldGraph, newOverview) => {
     newGraph.nodes = sortNodes(newGraph.nodes);
 
     if(nodesEqual(oldGraph.nodes, newGraph.nodes)) {
+        // if the list of nodes is equal, the graph hasn't changed; we can just return the oldGraph and save the
+        // physics headaches in the visualizer.
         return oldGraph;
     }
 
-    console.log("nodes not equal");
+    // we're going to need to recompute a new graph... but we want to maintain the instances that already exist...
 
     // we want to preserve nodes that exist in the new graph, and remove those that don't.
     let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
     let outputLinks = oldGraph.nodes.filter(oldLink => newGraph.links.find(newLink => newLink.target === oldLink.target && newLink.source === oldLink.source));
+
     // and then do the opposite; add any nodes that are in newGraph that are missing from oldGraph.
     outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id)));
     outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
+
     return {
+        // we need a new outer object, to trigger react to refresh the view correctly.
         nodes: sortNodes(outputNodes),
         links: outputLinks
     };
