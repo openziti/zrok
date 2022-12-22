@@ -11,8 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type enableHandler struct {
-}
+type enableHandler struct{}
 
 func newEnableHandler() *enableHandler {
 	return &enableHandler{}

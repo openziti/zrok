@@ -74,6 +74,49 @@ func init() {
         }
       }
     },
+    "/detail/environment": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentDetail",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environmentServices"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/disable": {
       "post": {
         "security": [
@@ -1152,6 +1195,49 @@ func init() {
             "description": "access created",
             "schema": {
               "$ref": "#/definitions/accessResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/environment": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentDetail",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environmentServices"
             }
           },
           "401": {

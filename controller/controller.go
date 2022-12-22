@@ -38,6 +38,7 @@ func Run(inCfg *Config) error {
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
+	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ServiceAccessHandler = newAccessHandler()

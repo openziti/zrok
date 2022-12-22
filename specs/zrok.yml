@@ -252,6 +252,32 @@ paths:
   #
   # metadata
   #
+  /detail/environment:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getEnvironmentDetail
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/environmentServices"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /overview:
     get:
       tags:

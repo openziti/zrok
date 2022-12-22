@@ -30,11 +30,52 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error)
+
 	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
 
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+GetEnvironmentDetail get environment detail API
+*/
+func (a *Client) GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetEnvironmentDetailParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getEnvironmentDetail",
+		Method:             "GET",
+		PathPattern:        "/detail/environment",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetEnvironmentDetailReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetEnvironmentDetailOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getEnvironmentDetail: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*

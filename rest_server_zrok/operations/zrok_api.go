@@ -67,6 +67,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
+		}),
 		ServiceGetServiceHandler: service.GetServiceHandlerFunc(func(params service.GetServiceParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.GetService has not yet been implemented")
 		}),
@@ -168,6 +171,8 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
+	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
+	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
 	// ServiceGetServiceHandler sets the operation handler for the get service operation
 	ServiceGetServiceHandler service.GetServiceHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
@@ -292,6 +297,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
+	}
+	if o.MetadataGetEnvironmentDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetEnvironmentDetailHandler")
 	}
 	if o.ServiceGetServiceHandler == nil {
 		unregistered = append(unregistered, "service.GetServiceHandler")
@@ -455,6 +463,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/environment"] = metadata.NewGetEnvironmentDetail(o.context, o.MetadataGetEnvironmentDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
