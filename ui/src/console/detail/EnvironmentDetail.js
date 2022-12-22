@@ -16,7 +16,6 @@ const EnvironmentDetail = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            if(mounted) {}
             metadata.getEnvironmentDetail(props.selection.id)
                 .then(resp => {
                     if(mounted) {

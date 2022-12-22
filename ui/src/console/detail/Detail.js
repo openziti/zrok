@@ -1,5 +1,6 @@
 import EnvironmentDetail from "./EnvironmentDetail";
 import AccountDetail from "./AccountDetail";
+import ServiceDetail from "./ServiceDetail";
 
 const Detail = (props) => {
     let detailComponent = <h1>{props.selection.id} ({props.selection.type})</h1>;
@@ -12,6 +13,9 @@ const Detail = (props) => {
         case "environment":
             detailComponent = <EnvironmentDetail selection={props.selection} />;
             break;
+
+        case "service":
+            detailComponent = <ServiceDetail selection={props.selection} />;
     }
 
     return (
