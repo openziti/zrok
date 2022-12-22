@@ -71,7 +71,7 @@ const Console = (props) => {
                 selection={selection}
                 setSelection={setSelection}
             />
-            <Detail selection={selection} />
+            <Detail user={props.user} selection={selection} />
             <Enable show={showEnableModal} onHide={closeEnableModal} token={props.user.token} />
             <Version show={showVersionModal} onHide={closeVersionModal} />
         </Container>
