@@ -3,6 +3,8 @@ import {Button} from "react-bootstrap";
 import Network from "./Network";
 import {mergeGraph} from "./graph";
 import {isSelectionGone, markSelected} from "./selection";
+import {mdiFitToPageOutline} from "@mdi/js";
+import Icon from "@mdi/react";
 
 const Visualizer = (props) => {
     const [networkGraph, setNetworkGraph] = useState({nodes: [], links: []});
@@ -42,7 +44,7 @@ const Visualizer = (props) => {
                     setSelection={props.setSelection}
                 />
                 <div className={"visualizer-controls"}>
-                    <Button variant={"secondary"} size={"sm"} onClick={centerFocus}>Zoom to Fit</Button>
+                    <Button variant={"secondary"} size={"sm"} onClick={centerFocus} aria-label={"Zoom to Fit"}><Icon path={mdiFitToPageOutline} size={0.7}/></Button>
                 </div>
             </div>
         </div>
