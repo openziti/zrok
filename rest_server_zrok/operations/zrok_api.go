@@ -73,6 +73,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ServiceGetServiceHandler: service.GetServiceHandlerFunc(func(params service.GetServiceParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service.GetService has not yet been implemented")
 		}),
+		MetadataGetServiceDetailHandler: metadata.GetServiceDetailHandlerFunc(func(params metadata.GetServiceDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetServiceDetail has not yet been implemented")
+		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
 		}),
@@ -175,6 +178,8 @@ type ZrokAPI struct {
 	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
 	// ServiceGetServiceHandler sets the operation handler for the get service operation
 	ServiceGetServiceHandler service.GetServiceHandler
+	// MetadataGetServiceDetailHandler sets the operation handler for the get service detail operation
+	MetadataGetServiceDetailHandler metadata.GetServiceDetailHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
@@ -303,6 +308,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ServiceGetServiceHandler == nil {
 		unregistered = append(unregistered, "service.GetServiceHandler")
+	}
+	if o.MetadataGetServiceDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetServiceDetailHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -471,6 +479,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/service"] = service.NewGetService(o.context, o.ServiceGetServiceHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/service/{svcToken}"] = metadata.NewGetServiceDetail(o.context, o.MetadataGetServiceDetailHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -16,6 +16,19 @@ export function getEnvironmentDetail(envZId) {
 }
 
 /**
+ * @param {string} svcToken 
+ * @return {Promise<module:types.service>} ok
+ */
+export function getServiceDetail(svcToken) {
+  const parameters = {
+    path: {
+      svcToken
+    }
+  }
+  return gateway.request(getServiceDetailOperation, parameters)
+}
+
+/**
  */
 export function overview() {
   return gateway.request(overviewOperation)
@@ -29,6 +42,16 @@ export function version() {
 
 const getEnvironmentDetailOperation = {
   path: '/detail/environment/{envZId}',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const getServiceDetailOperation = {
+  path: '/detail/service/{svcToken}',
   method: 'get',
   security: [
     {

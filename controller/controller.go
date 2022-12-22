@@ -39,6 +39,7 @@ func Run(inCfg *Config) error {
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataGetServiceDetailHandler = newServiceDetailHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ServiceAccessHandler = newAccessHandler()

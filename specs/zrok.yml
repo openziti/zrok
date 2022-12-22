@@ -276,6 +276,30 @@ paths:
         500:
           description: internal server error
 
+  /detail/service/{svcToken}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getServiceDetail
+      parameters:
+        - name: svcToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/service"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /overview:
     get:
       tags:

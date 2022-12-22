@@ -112,6 +112,44 @@ func init() {
         }
       }
     },
+    "/detail/service/{svcToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getServiceDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "svcToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/service"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/disable": {
       "post": {
         "security": [
@@ -1228,6 +1266,44 @@ func init() {
             "description": "ok",
             "schema": {
               "$ref": "#/definitions/environmentServices"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/service/{svcToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getServiceDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "svcToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/service"
             }
           },
           "401": {
