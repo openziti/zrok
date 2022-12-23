@@ -24,7 +24,8 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
     let accountNode = {
         id: user.token,
         label: user.email,
-        type: "account"
+        type: "account",
+        val: 50
     }
     newGraph.nodes.push(accountNode);
 
@@ -32,7 +33,8 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
         let envNode = {
             id: env.environment.zId,
             label: env.environment.description,
-            type: "environment"
+            type: "environment",
+            val: 50
         };
         newGraph.nodes.push(envNode);
         newGraph.links.push({
@@ -50,7 +52,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                     id: svc.token,
                     label: svcLabel,
                     type: "service",
-                    val: 10
+                    val: 50
                 };
                 newGraph.nodes.push(svcNode);
                 newGraph.links.push({

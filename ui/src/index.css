@@ -53,6 +53,10 @@ code, pre {
     border: 0;
 }
 
+.rdt_TableRow {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
 /*
 #zrok-enable {
   text-align: center;
