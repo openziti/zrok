@@ -82,7 +82,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
     outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
 
     return {
-        // we need a new outer object, to trigger react to refresh the view correctly.
+        // we need a new outer object, to trigger react to refresh the view.
         nodes: sortNodes(outputNodes),
         links: outputLinks
     };

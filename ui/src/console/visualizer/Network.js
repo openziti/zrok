@@ -17,7 +17,7 @@ const Network = (props) => {
 
     const paintNode = (node, ctx) => {
         let nodeColor = "#636363";
-        let textColor = "white";
+        let textColor = "#ccc";
         switch(node.type) {
             case "environment":
                 nodeColor = "#444";
@@ -29,7 +29,7 @@ const Network = (props) => {
 
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
-        ctx.font = "6px 'JetBrains Mono'";
+        ctx.font = "6px 'Russo One'";
         let extents = ctx.measureText(node.label);
         let nodeWidth = extents.width + 10;
 
@@ -68,8 +68,6 @@ const Network = (props) => {
             nodeCanvasObject={paintNode}
             backgroundColor={"#3b2693"}
             cooldownTicks={300}
-            d3VelocityDecay={0.3}
-            d3AlphaDecay={0.0128}
         />
     )
 }
