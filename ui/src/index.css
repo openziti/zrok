@@ -57,6 +57,11 @@ code, pre {
     font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }
 
+.nav-tabs {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
 /*
 #zrok-enable {
   text-align: center;

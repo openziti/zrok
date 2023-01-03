@@ -3,8 +3,9 @@ import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
+import {Tab, Tabs} from "react-bootstrap";
 
-const ServiceDetail = (props) => {
+const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
@@ -32,16 +33,23 @@ const ServiceDetail = (props) => {
         return (
             <div>
                 <h2><Icon path={mdiShareVariant} size={2} />{" "}{detail.backendProxyEndpoint}</h2>
-                <div className={"zrok-big-sparkline"}>
-                    <Sparklines data={detail.metrics} limit={60} height={20}>
-                        <SparklinesLine color={"#3b2693"} />
-                        <SparklinesSpots />
-                    </Sparklines>
-                </div>
+                <Tabs defaultActiveKey={"activity"}>
+                    <Tab eventKey={"details"} className={"mb-3"}>
+                        <h3>Share Details</h3>
+                    </Tab>
+                    <Tab eventKey={"activity"}>
+                        <div className={"zrok-big-sparkline"}>
+                            <Sparklines data={detail.metrics} limit={60} height={20}>
+                                <SparklinesLine color={"#3b2693"} />
+                                <SparklinesSpots />
+                            </Sparklines>
+                        </div>
+                    </Tab>
+                </Tabs>
             </div>
         );
     }
     return <></>;
 }
 
-export default ServiceDetail;
+export default ShareDetail;

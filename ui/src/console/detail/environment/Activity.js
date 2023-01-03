@@ -1,11 +1,11 @@
-import * as metadata from "../../api/metadata";
+import * as metadata from "../../../api/metadata";
 import {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {mdiConsoleNetwork} from "@mdi/js";
 import Icon from "@mdi/react";
 
-const EnvironmentDetail = (props) => {
+const Activity = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
@@ -57,7 +57,6 @@ const EnvironmentDetail = (props) => {
         {
             name: "Activity",
             cell: row => {
-                console.log(row.metrics);
                 return <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/><SparklinesSpots/></Sparklines>;
             }
         }
@@ -65,20 +64,17 @@ const EnvironmentDetail = (props) => {
 
     if(detail.environment) {
         return (
-            <div>
-                <h2><Icon path={mdiConsoleNetwork} size={2} />{" "}{detail.environment.description}</h2>
-                <div className={"zrok-datatable"}>
-                    <DataTable
-                        className={"zrok-datatable"}
-                        data={detail.services}
-                        columns={columns}
-                        defaultSortField={1}
-                    />
-                </div>
+            <div className={"zrok-datatable"}>
+                <DataTable
+                    className={"zrok-datatable"}
+                    data={detail.services}
+                    columns={columns}
+                    defaultSortField={1}
+                />
             </div>
         );
     }
     return <></>;
 }
 
-export default EnvironmentDetail;
+export default Activity;
