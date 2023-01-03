@@ -50,7 +50,7 @@ const Login = (props) => {
                         </Row>
                         <Row>
                             <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId={"email"} >
+                                <Form.Group controlId={"email"}>
                                     <Form.Control
                                         type={"email"}
                                         placeholder={"Email Address"}
@@ -71,9 +71,11 @@ const Login = (props) => {
                                 <Button variant={"light"} type={"submit"}>Log In</Button>
                             </Form>
                         </Row>
+                        <Row>
+                            {message}
+                        </Row>
                     </Container>
                 </Row>
-
             </Container>
         </div>
     )
