@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../PropertyTable";
+import {Tab, Tabs} from "react-bootstrap";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -40,7 +41,11 @@ const ShareDetail = (props) => {
         return (
             <div>
                 <h2><Icon path={mdiShareVariant} size={2} />{" "}{detail.backendProxyEndpoint}</h2>
-                <PropertyTable object={detail} custom={customProperties} />
+                <Tabs defaultActiveKey={"detail"}>
+                    <Tab eventKey={"detail"} title={"Detail"}>
+                        <PropertyTable object={detail} custom={customProperties} />
+                    </Tab>
+                </Tabs>
             </div>
         );
     }
