@@ -1,6 +1,8 @@
 import * as metadata from "../../api/metadata";
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {useEffect, useState} from "react";
+import {mdiShareVariant} from "@mdi/js";
+import Icon from "@mdi/react";
 
 const ServiceDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -29,7 +31,7 @@ const ServiceDetail = (props) => {
     if(detail) {
         return (
             <div>
-                <h2>Service: {detail.token}</h2>
+                <h2><Icon path={mdiShareVariant} size={2} />{" "}{detail.backendProxyEndpoint}</h2>
                 <div className={"zrok-big-sparkline"}>
                     <Sparklines data={detail.metrics} limit={60} height={20}>
                         <SparklinesLine color={"#3b2693"} />

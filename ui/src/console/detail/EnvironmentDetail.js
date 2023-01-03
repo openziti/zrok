@@ -2,6 +2,8 @@ import * as metadata from "../../api/metadata";
 import {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
+import {mdiConsoleNetwork} from "@mdi/js";
+import Icon from "@mdi/react";
 
 const EnvironmentDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -64,7 +66,7 @@ const EnvironmentDetail = (props) => {
     if(detail.environment) {
         return (
             <div>
-                <h2>Environment: {detail.environment.description} ({detail.environment.zId})</h2>
+                <h2><Icon path={mdiConsoleNetwork} size={2} />{" "}{detail.environment.description}</h2>
                 <div className={"zrok-datatable"}>
                     <DataTable
                         className={"zrok-datatable"}

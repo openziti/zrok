@@ -1,7 +1,10 @@
+import {mdiCardAccountDetails} from "@mdi/js";
+import Icon from "@mdi/react";
+
 const AccountDetail = (props) => {
     return (
         <div>
-            <h2>Your Account: {props.user.email}</h2>
+            <h2><Icon path={mdiCardAccountDetails} size={2} />{" "}{props.user.email}</h2>
         </div>
     );
 }
