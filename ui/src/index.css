@@ -95,11 +95,11 @@ code, pre {
 }
 
 .fullscreen a {
-    color: gray;
+    color: #bbb;
 }
 
 .fullscreen pre {
-    color: white;
+    color: #bbb;
 }
 
 .errorMessage {
