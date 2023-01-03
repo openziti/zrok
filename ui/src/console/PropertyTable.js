@@ -36,8 +36,15 @@ const PropertyTable = (props) => {
         },
         {
             name: "Value",
-            selector: row => rowToValue(row),
-            sortable: true,
+            cell: row => {
+                if(props.custom) {
+                    if(row.property in props.custom) {
+                        console.log(Date.now());
+                        return props.custom[row.property](row);
+                    }
+                }
+                return rowToValue(row)
+            },
             grow: 3
         }
     ];
