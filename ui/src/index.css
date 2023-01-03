@@ -62,142 +62,37 @@ code, pre {
     margin-bottom: 25px;
 }
 
-/*
-#zrok-enable {
-  text-align: center;
-  margin-top: 100px;
-}
-#zrok-enable h1 {
-  margin-bottom: 50px;
-}
-
-.container {
-  display: grid;
-  margin-left: 10%;
-  margin-right: 10%;
-}
-
 .fullscreen {
-  background-color: #3b2693;
-  text-align: center;
-  padding: 25px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  justify-content: center;
+    background-color: #3b2693;
+    padding: 25px;
+    color: white;
+    display: flex;
+    align-items: center;
+    height: 100vh;
 }
+
+.fullscreen .row {
+    text-align: center;
+    justify-content: center;
+}
+
 .fullscreen h1 {
-  font-size: 64pt;
-}
-.fullscreen fieldset {
-  width: 500px;
-  border-radius: 25px;
-}
-.fullscreen label {
-  text-align: right;
-  width: 100px;
-  float: left;
-  font-family: 'Russo One', sans-serif;
-  margin-right: 10px;
-}
-.fullscreen fieldset legend {
-  font-family: 'Russo One', sans-serif;
-}
-.fullscreen fieldset p {
-  clear: both;
-  padding: 5px;
-}
-.fullscreen input {
-  width: 300px;
-  float: left;
-}
-.fullscreen p a {
-  color: white;
-  font-weight: bold;
+    font-size: 96pt;
 }
 
-.header {
-  background-color: #3b2693;
-  color: white;
-  padding-left: 2em;
-  padding-right: 2em;
-  display: flex;
-  align-items: center;
-  border-radius: 0 0 25px 25px;
-}
-.header-title {
-  font-family: 'Russo One', sans-serif;
-  font-size: 3em;
-  margin-left: 0.53em;
-  border: 1px solid red;
-}
-.header-status {
-  width: 100%;
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-}
-.header-status div p {
-  font-size: 75%;
-}
-.header-status div {
-  text-align: right;
-}
-.header-controls {
-  display: flex;
-  justify-content: right;
-  align-items: flex-end;
-}
-.header-controls button {
-  margin-left: 30px;
-  display: flex;
-  align-items: center;
-  background-color: #30205d;
-  border-radius: 5px 5px 5px 5px;
-  border: 1px solid #7733ff;
-  color: #7733ff;
-  padding: 5px;
-  width: 100px;
-  justify-content: center;
-  height: 2em;
-  margin-bottom: 1em;
-}
-.header-controls button:hover {
-  color: white;
-  border-color: white;
+.fullscreen-body {
+    margin-top: 6em;
 }
 
-.main {
-  padding: 2em;
+.fullscreen form {
+    margin: 15px;
 }
 
-.rdt_TableCol_Sortable div {
-  font-family: 'Russo One', sans-serif;
-  font-size: 1.25em;
-}
-
-.network {
-  height: 400px;
-}
-
-.react-flow__attribution {
-  display: none;
-}
-
-.nested-services {
-  padding-left: 10em;
-}
-
-.popover {
-  padding: 0 25px;
-}
-
-svg.flowNode {
-  vertical-align: middle;
+.fullscreen form input {
+    margin: 15px 0;
+    width: 400px;
 }
 
 .errorMessage {
-  color: deeppink;
+    color: deeppink;
 }
-*/

@@ -1,5 +1,6 @@
 import {useState} from "react";
 import * as account from '../../api/account';
+import {Button, Container, Form, Row} from "react-bootstrap";
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const Login = (props) => {
 
     const handleSubmit = async e => {
         e.preventDefault()
+        console.log(email, password);
 
         account.login({body: {"email": email, "password": password}})
             .then(resp => {
@@ -34,16 +36,45 @@ const Login = (props) => {
 
     return (
         <div className={"fullscreen"}>
-            <img src={"/ziggy.svg"} width={200}/>
-            <h1>zrok</h1>
-            {message}
-            <form onSubmit={handleSubmit}>
-                <fieldset>
-                    <legend>Log In</legend>
-                    <p><label htmlFor="email">email: </label><input type="text" value={email} placeholder="enter an email" onChange={({target}) => setEmail(target.value)}/></p>
-                    <p><label htmlFor="password">password: </label><input type="password" value={password} placeholder="enter a password" onChange={({target}) => setPassword(target.value)}/><button type="submit">Log In</button></p>
-                </fieldset>
-            </form>
+            <Container fluid>
+                <Row>
+                    <img alt="ziggy" src={"/ziggy.svg"} width={200}/>
+                </Row>
+                <Row>
+                    <h1>zrok</h1>
+                </Row>
+                <Row className={"fullscreen-body"}>
+                    <Container className={"fullscreen-form"}>
+                        <Row>
+                            {message}
+                        </Row>
+                        <Row>
+                            <Form onSubmit={handleSubmit}>
+                                <Form.Group controlId={"email"} >
+                                    <Form.Control
+                                        type={"email"}
+                                        placeholder={"Email Address"}
+                                        onChange={t => { setMessage(null); setEmail(t.target.value); }}
+                                        value={email}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group controlId={"password"}>
+                                    <Form.Control
+                                        type={"password"}
+                                        placeholder={"Password"}
+                                        onChange={t => { setMessage(null); setPassword(t.target.value); }}
+                                        value={password}
+                                    />
+                                </Form.Group>
+
+                                <Button variant={"light"} type={"submit"}>Log In</Button>
+                            </Form>
+                        </Row>
+                    </Container>
+                </Row>
+
+            </Container>
         </div>
     )
 }
