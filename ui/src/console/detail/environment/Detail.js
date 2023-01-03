@@ -1,6 +1,8 @@
+import PropertyTable from "../../PropertyTable";
+
 const Detail = (props) => {
     return (
-        <h3>{props.environment.zId}</h3>
+        <PropertyTable object={props.environment} />
     );
 };
 

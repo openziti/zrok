@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import {Tab, Tabs} from "react-bootstrap";
+import PropertyTable from "../PropertyTable";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -39,6 +40,7 @@ const ShareDetail = (props) => {
                     </Tab>
                     <Tab eventKey={"activity"}>
                         <div className={"zrok-big-sparkline"}>
+                            <PropertyTable object={detail} />
                             <Sparklines data={detail.metrics} limit={60} height={20}>
                                 <SparklinesLine color={"#3b2693"} />
                                 <SparklinesSpots />
