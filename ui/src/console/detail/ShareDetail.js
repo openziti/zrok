@@ -34,7 +34,14 @@ const ShareDetail = (props) => {
         metrics: row => <Sparklines data={row.value} limit={60} height={10}>
             <SparklinesLine color={"#3b2693"}/>
             <SparklinesSpots/>
-        </Sparklines>
+        </Sparklines>,
+        frontendEndpoint: row => <a href={row.value} target="_">{row.value}</a>,
+        backendProxyEndpoint: row => {
+            if(row.value.startsWith("http://") || row.value.startsWith("https://")) {
+                return <a href={row.value} target="_">{row.value}</a>;
+            }
+            return row.value;
+        }
     }
 
     if(detail) {
