@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func CreateConfig(cfgTypeZId, envZId, svcToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
+func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	authScheme, err := model.ParseAuthScheme(authSchemeStr)
 	if err != nil {
 		return "", err
@@ -28,8 +28,8 @@ func CreateConfig(cfgTypeZId, envZId, svcToken string, authSchemeStr string, aut
 	cfgCrt := &rest_model.ConfigCreate{
 		ConfigTypeID: &cfgTypeZId,
 		Data:         cfg,
-		Name:         &svcToken,
-		Tags:         ZrokServiceTags(svcToken),
+		Name:         &shrToken,
+		Tags:         ZrokShareTags(shrToken),
 	}
 	cfgReq := &config.CreateConfigParams{
 		Config:  cfgCrt,
@@ -44,8 +44,8 @@ func CreateConfig(cfgTypeZId, envZId, svcToken string, authSchemeStr string, aut
 	return cfgResp.Payload.Data.ID, nil
 }
 
-func DeleteConfig(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("tags.zrokServiceToken=\"%v\"", svcToken)
+func DeleteConfig(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
 	limit := int64(0)
 	offset := int64(0)
 	listReq := &config.ListConfigsParams{

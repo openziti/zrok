@@ -23,7 +23,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, tx)
 		if err != nil {
-			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
+			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 		es := &rest_model_zrok.EnvironmentShares{

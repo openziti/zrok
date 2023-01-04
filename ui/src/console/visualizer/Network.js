@@ -22,7 +22,7 @@ const Network = (props) => {
             case "environment":
                 nodeColor = "#444";
                 break;
-            case "service":
+            case "share":
                 nodeColor = "#291A66";
                 break;
         }
@@ -42,7 +42,7 @@ const Network = (props) => {
             ctx.stroke();
         } else {
             switch(node.type) {
-                case "service":
+                case "share":
                     ctx.strokeStyle = "#433482";
                     ctx.stroke();
             }

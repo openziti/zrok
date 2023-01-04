@@ -56,7 +56,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	var svcZId string
+	var shrZId string
 	var frontendEndpoints []string
 	switch params.Body.ShareMode {
 	case "public":
@@ -76,17 +76,17 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
-				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", frontendSelection, sfe.ZId, shrToken)
+				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for share '%v'", frontendSelection, sfe.ZId, shrToken)
 			}
 		}
-		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, edge)
+		shrZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, edge)
 		if err != nil {
 			logrus.Error(err)
 			return share.NewShareInternalServerError()
 		}
 
 	case "private":
-		svcZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
+		shrZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
 		if err != nil {
 			logrus.Error(err)
 			return share.NewShareInternalServerError()
@@ -97,11 +97,11 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	logrus.Debugf("allocated service '%v'", shrToken)
+	logrus.Debugf("allocated share '%v'", shrToken)
 
 	reserved := params.Body.Reserved
 	sshr := &store.Share{
-		ZId:                  svcZId,
+		ZId:                  shrZId,
 		Token:                shrToken,
 		ShareMode:            params.Body.ShareMode,
 		BackendMode:          params.Body.BackendMode,
@@ -116,15 +116,15 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	sid, err := str.CreateShare(envId, sshr, tx)
 	if err != nil {
-		logrus.Errorf("error creating service record: %v", err)
+		logrus.Errorf("error creating share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing service record: %v", err)
+		logrus.Errorf("error committing share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", shrToken, sid, principal.Email)
+	logrus.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, sid, principal.Email)
 
 	return share.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,

@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-func CreateShareService(envZId, svcToken, cfgZId string, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
-	svcZId, err = CreateService(svcToken, []string{cfgZId}, map[string]interface{}{"zrokServiceToken": svcToken}, edge)
+func CreateShareService(envZId, shrToken, cfgZId string, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, err error) {
+	shrZId, err = CreateService(shrToken, []string{cfgZId}, map[string]interface{}{"zrokShareToken": shrToken}, edge)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating service '%v'", svcToken)
+		return "", errors.Wrapf(err, "error creating share '%v'", shrToken)
 	}
-	logrus.Infof("created zrok service named '%v' (with ziti id '%v') for environment '%v'", svcToken, svcZId, envZId)
-	return svcZId, nil
+	logrus.Infof("created share '%v' (with ziti id '%v') for environment '%v'", shrToken, shrZId, envZId)
+	return shrZId, nil
 }
 
-func CreateService(name string, cfgZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, err error) {
+func CreateService(name string, cfgZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, err error) {
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		EncryptionRequired: &encryptionRequired,

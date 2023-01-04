@@ -86,7 +86,7 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		defer func() { _ = tx.Rollback() }()
 		publicFe, err := str.FindFrontendWithZId(frontendZId, tx)
 		if err != nil {
-			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{svcToken}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
+			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{token}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
 		} else {
 			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
 				logrus.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)

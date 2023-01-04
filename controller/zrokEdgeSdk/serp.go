@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-func CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	serpZId, err := CreateServiceEdgeRouterPolicy(svcToken, svcZId, ZrokServiceTags(svcToken).SubTags, edge)
+func CreateShareServiceEdgeRouterPolicy(envZId, shrToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	serpZId, err := CreateServiceEdgeRouterPolicy(shrToken, svcZId, ZrokShareTags(shrToken).SubTags, edge)
 	if err != nil {
 		return err
 	}
@@ -20,10 +20,10 @@ func CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId string, edge *r
 	return nil
 }
 
-func CreateServiceEdgeRouterPolicy(name, svcZId string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+func CreateServiceEdgeRouterPolicy(name, shrZId string, moreTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
 	edgeRouterRoles := []string{"#all"}
 	semantic := rest_model.SemanticAllOf
-	serviceRoles := []string{fmt.Sprintf("@%v", svcZId)}
+	serviceRoles := []string{fmt.Sprintf("@%v", shrZId)}
 	tags := ZrokTags()
 	for k, v := range moreTags {
 		tags.SubTags[k] = v
@@ -42,13 +42,13 @@ func CreateServiceEdgeRouterPolicy(name, svcZId string, moreTags map[string]inte
 	serpParams.SetTimeout(30 * time.Second)
 	resp, err := edge.ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(serpParams, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating serp '%v' for service '%v'", name, svcZId)
+		return "", errors.Wrapf(err, "error creating serp '%v' for service '%v'", name, shrZId)
 	}
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteServiceEdgeRouterPolicy(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("tags.zrokServiceToken=\"%v\"", svcToken)
+func DeleteServiceEdgeRouterPolicy(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{

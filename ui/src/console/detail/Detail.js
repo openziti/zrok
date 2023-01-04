@@ -14,7 +14,7 @@ const Detail = (props) => {
             detailComponent = <Environment selection={props.selection} />;
             break;
 
-        case "service":
+        case "share":
             detailComponent = <ShareDetail selection={props.selection} />;
     }
 

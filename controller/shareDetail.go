@@ -39,14 +39,14 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		}
 	}
 	if !found {
-		logrus.Errorf("environment not matched for service '%v' for account '%v'", params.ShrToken, principal.Email)
+		logrus.Errorf("environment not matched for share '%v' for account '%v'", params.ShrToken, principal.Email)
 		return metadata.NewGetShareDetailNotFound()
 	}
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
-		sparkData, err = sparkDataForServices([]*store.Share{shr})
+		sparkData, err = sparkDataForShares([]*store.Share{shr})
 		if err != nil {
-			logrus.Errorf("error querying spark data for services: %v", err)
+			logrus.Errorf("error querying spark data for share: %v", err)
 			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}

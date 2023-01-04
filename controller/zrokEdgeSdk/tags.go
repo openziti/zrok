@@ -13,9 +13,9 @@ func ZrokTags() *rest_model.Tags {
 	}
 }
 
-func ZrokServiceTags(svcToken string) *rest_model.Tags {
+func ZrokShareTags(shrToken string) *rest_model.Tags {
 	tags := ZrokTags()
-	tags.SubTags["zrokServiceToken"] = svcToken
+	tags.SubTags["zrokShareToken"] = shrToken
 	return tags
 }
 

@@ -13,26 +13,26 @@ func newPrivateResourceAllocator() *privateResourceAllocator {
 	return &privateResourceAllocator{}
 }
 
-func (a *privateResourceAllocator) allocate(envZId, svcToken string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
+func (a *privateResourceAllocator) allocate(envZId, shrToken string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
 	var authUsers []*model.AuthUser
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
 	}
-	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, svcToken, params.Body.AuthScheme, authUsers, edge)
+	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	svcZId, err = zrokEdgeSdk.CreateShareService(envZId, svcToken, cfgZId, edge)
+	svcZId, err = zrokEdgeSdk.CreateShareService(envZId, shrToken, cfgZId, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-"+svcZId+"-bind", svcZId, envZId, zrokEdgeSdk.ZrokServiceTags(svcToken).SubTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-"+svcZId+"-bind", svcZId, envZId, zrokEdgeSdk.ZrokShareTags(shrToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, shrToken, svcZId, edge); err != nil {
 		return "", nil, err
 	}
 

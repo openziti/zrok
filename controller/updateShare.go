@@ -26,7 +26,7 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 
 	sshr, err := str.FindShareWithToken(shrToken, tx)
 	if err != nil {
-		logrus.Errorf("service '%v' not found: %v", shrToken, err)
+		logrus.Errorf("share '%v' not found: %v", shrToken, err)
 		return share.NewUpdateShareNotFound()
 	}
 
@@ -44,18 +44,18 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 		}
 	}
 	if !envFound {
-		logrus.Errorf("environment not found for service '%v'", shrToken)
+		logrus.Errorf("environment not found for share '%v'", shrToken)
 		return share.NewUpdateShareNotFound()
 	}
 
 	sshr.BackendProxyEndpoint = &backendProxyEndpoint
 	if err := str.UpdateShare(sshr, tx); err != nil {
-		logrus.Errorf("error updating service '%v': %v", shrToken, err)
+		logrus.Errorf("error updating share '%v': %v", shrToken, err)
 		return share.NewUpdateShareInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for service '%v' update: %v", shrToken, err)
+		logrus.Errorf("error committing transaction for share '%v' update: %v", shrToken, err)
 		return share.NewUpdateShareInternalServerError()
 	}
 

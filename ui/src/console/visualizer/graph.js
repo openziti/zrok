@@ -42,8 +42,8 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
             source: envNode.id,
             color: "#777"
         });
-        if(env.services) {
-            env.services.forEach(svc => {
+        if(env.shares) {
+            env.shares.forEach(svc => {
                 let svcLabel = svc.token;
                 if(svc.backendProxyEndpoint !== "") {
                     svcLabel = svc.backendProxyEndpoint;
@@ -51,7 +51,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                 let svcNode = {
                     id: svc.token,
                     label: svcLabel,
-                    type: "service",
+                    type: "share",
                     val: 50
                 };
                 newGraph.nodes.push(svcNode);

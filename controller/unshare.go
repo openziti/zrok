@@ -59,34 +59,34 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 
 	var sshr *store.Share
-	if svcs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
-		for _, svc := range svcs {
-			if svc.ZId == svcZId {
-				sshr = svc
+	if shrs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
+		for _, shr := range shrs {
+			if shr.ZId == svcZId {
+				sshr = shr
 				break
 			}
 		}
 		if sshr == nil {
-			err := errors.Errorf("service with id '%v' not found for '%v'", svcZId, principal.Email)
+			err := errors.Errorf("share with id '%v' not found for '%v'", svcZId, principal.Email)
 			logrus.Error(err)
 			return share.NewUnshareNotFound()
 		}
 	} else {
-		logrus.Errorf("error finding services for account '%v': %v", principal.Email, err)
+		logrus.Errorf("error finding shares for account '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 
 	if sshr.Reserved == params.Body.Reserved {
-		// single tag-based service deallocator; should work regardless of sharing mode
+		// single tag-based share deallocator; should work regardless of sharing mode
 		if err := h.deallocateResources(senv, shrToken, svcZId, edge); err != nil {
 			logrus.Errorf("error unsharing ziti resources for '%v': %v", sshr, err)
 			return share.NewUnshareInternalServerError()
 		}
 
-		logrus.Debugf("deallocated service '%v'", shrToken)
+		logrus.Debugf("deallocated share '%v'", shrToken)
 
 		if err := str.DeleteShare(sshr.Id, tx); err != nil {
-			logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
+			logrus.Errorf("error deactivating share '%v': %v", svcZId, err)
 			return share.NewUnshareInternalServerError()
 		}
 		if err := tx.Commit(); err != nil {
@@ -95,14 +95,14 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		}
 
 	} else {
-		logrus.Infof("service '%v' is reserved, skipping deallocation", shrToken)
+		logrus.Infof("share '%v' is reserved, skipping deallocation", shrToken)
 	}
 
 	return share.NewUnshareOK()
 }
 
-func (h *unshareHandler) findServiceZId(svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	filter := fmt.Sprintf("name=\"%v\"", svcToken)
+func (h *unshareHandler) findServiceZId(shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+	filter := fmt.Sprintf("name=\"%v\"", shrToken)
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &edge_service.ListServicesParams{
@@ -119,20 +119,20 @@ func (h *unshareHandler) findServiceZId(svcToken string, edge *rest_management_a
 	if len(listResp.Payload.Data) == 1 {
 		return *(listResp.Payload.Data[0].ID), nil
 	}
-	return "", errors.Errorf("service '%v' not found", svcToken)
+	return "", errors.Errorf("share '%v' not found", shrToken)
 }
 
-func (h *unshareHandler) deallocateResources(senv *store.Environment, svcToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, svcToken, edge); err != nil {
+func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyDial(senv.ZId, svcToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePolicyDial(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyBind(senv.ZId, svcToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePolicyBind(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, svcToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
 	if err := zrokEdgeSdk.DeleteService(senv.ZId, svcZId, edge); err != nil {

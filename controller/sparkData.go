@@ -6,7 +6,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 )
 
-func sparkDataForServices(shrs []*store.Share) (map[string][]int64, error) {
+func sparkDataForShares(shrs []*store.Share) (map[string][]int64, error) {
 	out := make(map[string][]int64)
 
 	if len(shrs) > 0 {
@@ -37,20 +37,20 @@ func sparkDataForServices(shrs []*store.Share) (map[string][]int64, error) {
 }
 
 func sparkFluxQuery(shrs []*store.Share) string {
-	svcFilter := "|> filter(fn: (r) =>"
+	shrFilter := "|> filter(fn: (r) =>"
 	for i, shr := range shrs {
 		if i > 0 {
-			svcFilter += " or"
+			shrFilter += " or"
 		}
-		svcFilter += fmt.Sprintf(" r[\"share\"] == \"%v\"", shr.Token)
+		shrFilter += fmt.Sprintf(" r[\"share\"] == \"%v\"", shr.Token)
 	}
-	svcFilter += ")"
+	shrFilter += ")"
 	query := "read = from(bucket: \"zrok\")" +
 		"|> range(start: -5m)" +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")" +
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\" or r[\"_field\"] == \"bytesWritten\")" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"frontend\")" +
-		svcFilter +
+		shrFilter +
 		"|> aggregateWindow(every: 5s, fn: sum, createEmpty: true)\n" +
 		"|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")" +
 		"|> yield(name: \"last\")"

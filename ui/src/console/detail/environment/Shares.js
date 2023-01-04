@@ -67,7 +67,7 @@ const Shares = (props) => {
             <div className={"zrok-datatable"}>
                 <DataTable
                     className={"zrok-datatable"}
-                    data={detail.services}
+                    data={detail.shares}
                     columns={columns}
                     defaultSortField={1}
                     noDataComponent={<p>No shares in environment</p>}

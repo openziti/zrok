@@ -37,14 +37,14 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 	}
 	shrs, err := str.FindSharesForEnvironment(senv.Id, tx)
 	if err != nil {
-		logrus.Errorf("error finding services for environment '%v': %v", senv.ZId, err)
+		logrus.Errorf("error finding shares for environment '%v': %v", senv.ZId, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
-		sparkData, err = sparkDataForServices(shrs)
+		sparkData, err = sparkDataForShares(shrs)
 		if err != nil {
-			logrus.Errorf("error querying spark data for services: %v", err)
+			logrus.Errorf("error querying spark data for shares: %v", err)
 			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}

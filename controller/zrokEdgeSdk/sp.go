@@ -16,30 +16,30 @@ const (
 	servicePolicyBind = 2
 )
 
-func CreateServicePolicyBind(name, svcZId, bindZId string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func CreateServicePolicyBind(name, shrZId, bindZId string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	identityRoles := []string{"@" + bindZId}
-	serviceRoles := []string{"@" + svcZId}
+	serviceRoles := []string{"@" + shrZId}
 	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, servicePolicyBind, edge)
 	if err != nil {
-		return errors.Wrapf(err, "error creating bind service policy for service '%v' for identity '%v'", svcZId, bindZId)
+		return errors.Wrapf(err, "error creating bind service policy for service '%v' for identity '%v'", shrZId, bindZId)
 	}
-	logrus.Infof("created bind service policy '%v' for service '%v' for identity '%v'", spZId, svcZId, bindZId)
+	logrus.Infof("created bind service policy '%v' for service '%v' for identity '%v'", spZId, shrZId, bindZId)
 	return nil
 }
 
-func CreateServicePolicyDial(name, svcZId string, dialZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func CreateServicePolicyDial(name, shrZId string, dialZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	semantic := rest_model.SemanticAllOf
 	var identityRoles []string
 	for _, zId := range dialZIds {
 		identityRoles = append(identityRoles, "@"+zId)
 	}
-	serviceRoles := []string{"@" + svcZId}
+	serviceRoles := []string{"@" + shrZId}
 	spZId, err := createServicePolicy(name, semantic, identityRoles, serviceRoles, addlTags, servicePolicyDial, edge)
 	if err != nil {
-		return errors.Wrapf(err, "error creating dial service policy for service '%v' for identities '%v'", svcZId, dialZIds)
+		return errors.Wrapf(err, "error creating dial service policy for service '%v' for identities '%v'", shrZId, dialZIds)
 	}
-	logrus.Infof("created dial service policy '%v' for service '%v' for identities '%v'", spZId, svcZId, dialZIds)
+	logrus.Infof("created dial service policy '%v' for service '%v' for identities '%v'", spZId, shrZId, dialZIds)
 	return nil
 }
 
@@ -78,12 +78,12 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteServicePolicyBind(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, servicePolicyBind), edge)
+func DeleteServicePolicyBind(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyBind), edge)
 }
 
-func DeleteServicePolicyDial(envZId, svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokServiceToken=\"%v\" and type=%d", svcToken, servicePolicyDial), edge)
+func DeleteServicePolicyDial(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyDial), edge)
 }
 
 func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
