@@ -70,6 +70,7 @@ const Shares = (props) => {
                     data={detail.services}
                     columns={columns}
                     defaultSortField={1}
+                    noDataComponent={<p>No shares in environment</p>}
                 />
             </div>
         );
