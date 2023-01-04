@@ -18,7 +18,7 @@ import (
 type Config struct {
 	IdentityPath    string
 	EndpointAddress string
-	Service         string
+	ShrToken        string
 }
 
 type backend struct {
@@ -37,7 +37,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
-	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions(cfg.Service, &options)
+	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions(cfg.ShrToken, &options)
 	if err != nil {
 		return nil, errors.Wrap(err, "error listening")
 	}

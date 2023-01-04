@@ -136,7 +136,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			Service:         resp.Payload.ShrToken,
+			ShrToken:        resp.Payload.ShrToken,
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -151,7 +151,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		cfg := &webBackend.Config{
 			IdentityPath: zif,
 			WebRoot:      target,
-			Service:      resp.Payload.ShrToken,
+			ShrToken:     resp.Payload.ShrToken,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -167,7 +167,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		showError("invalid backend mode", nil)
 	}
 
-	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.ShrToken)
+	logrus.Infof("share with others; they will use this command for access: 'zrok access private %v'", resp.Payload.ShrToken)
 
 	for {
 		time.Sleep(30 * time.Second)
@@ -204,12 +204,12 @@ func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (backendH
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) destroy(id string, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", svcToken)
+func (cmd *sharePrivateCommand) destroy(id string, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", shrToken)
 	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   id,
-		ShrToken: svcToken,
+		ShrToken: shrToken,
 	}
 	if _, err := zrok.Share.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

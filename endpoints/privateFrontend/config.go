@@ -2,7 +2,7 @@ package privateFrontend
 
 type Config struct {
 	IdentityName string
-	SvcToken     string
+	ShrToken     string
 	Address      string
 }
 

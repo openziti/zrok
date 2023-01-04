@@ -8,11 +8,6 @@ endpoint:
   host:             0.0.0.0
   port:             8080
 
-proxy:
-  url_template:     "https://{svcName}.in.zrok.io/"
-  identities:
-    - "e6gMfeD4y"
-
 store:
   path:             /home/ubuntu/local/etc/zrok.io/db/zrok-ctrl.db
 

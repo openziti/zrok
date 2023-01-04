@@ -40,7 +40,7 @@ var apiEndpoint string
 
 var accessCmd = &cobra.Command{
 	Use:   "access",
-	Short: "Create frontend access for services",
+	Short: "Create frontend access for shares",
 }
 
 var adminCmd = &cobra.Command{
@@ -70,7 +70,7 @@ var adminUpdateCmd = &cobra.Command{
 
 var shareCmd = &cobra.Command{
 	Use:   "share",
-	Short: "Create backend access for services",
+	Short: "Create backend access for shares",
 }
 
 var testCmd = &cobra.Command{

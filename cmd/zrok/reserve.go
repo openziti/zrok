@@ -27,7 +27,7 @@ type reserveCommand struct {
 func newReserveCommand() *reserveCommand {
 	cmd := &cobra.Command{
 		Use:   "reserve <public|private> <targetEndpoint>",
-		Short: "Create a reserved service",
+		Short: "Create a reserved share",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}
@@ -105,7 +105,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("your reserved service token is '%v'", resp.Payload.ShrToken)
+	logrus.Infof("your reserved share token is '%v'", resp.Payload.ShrToken)
 	for _, fpe := range resp.Payload.FrontendProxyEndpoints {
 		logrus.Infof("reserved frontend endpoint: %v", fpe)
 	}

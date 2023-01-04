@@ -27,8 +27,8 @@ type accessPrivateCommand struct {
 
 func newAccessPrivateCommand() *accessPrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "private <serviceToken>",
-		Short: "Create a private frontend to access a service",
+		Use:   "private <shareToken>",
+		Short: "Create a private frontend to access a share",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &accessPrivateCommand{cmd: cmd}
@@ -79,7 +79,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
 	cfg := privateFrontend.DefaultConfig("backend")
-	cfg.SvcToken = shrToken
+	cfg.ShrToken = shrToken
 	cfg.Address = cmd.bindAddress
 
 	c := make(chan os.Signal)
@@ -98,7 +98,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("access your service at: %v", endpointUrl.String())
+	logrus.Infof("access your share at: %v", endpointUrl.String())
 
 	if err := frontend.Run(); err != nil {
 		if !panicInstead {
@@ -107,12 +107,12 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *accessPrivateCommand) destroy(frotendName, envZId, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", svcToken)
+func (cmd *accessPrivateCommand) destroy(frotendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
 		FrontendToken: frotendName,
-		ShrToken:      svcToken,
+		ShrToken:      shrToken,
 		EnvZID:        envZId,
 	}
 	if _, err := zrok.Share.Unaccess(req, auth); err == nil {

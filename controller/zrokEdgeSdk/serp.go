@@ -11,12 +11,12 @@ import (
 	"time"
 )
 
-func CreateShareServiceEdgeRouterPolicy(envZId, shrToken, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	serpZId, err := CreateServiceEdgeRouterPolicy(shrToken, svcZId, ZrokShareTags(shrToken).SubTags, edge)
+func CreateShareServiceEdgeRouterPolicy(envZId, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	serpZId, err := CreateServiceEdgeRouterPolicy(shrToken, shrZId, ZrokShareTags(shrToken).SubTags, edge)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", serpZId, svcZId, envZId)
+	logrus.Infof("created service edge router policy '%v' for service '%v' for environment '%v'", serpZId, shrZId, envZId)
 	return nil
 }
 

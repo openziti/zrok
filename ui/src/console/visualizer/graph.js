@@ -43,21 +43,21 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
             color: "#777"
         });
         if(env.shares) {
-            env.shares.forEach(svc => {
-                let svcLabel = svc.token;
-                if(svc.backendProxyEndpoint !== "") {
-                    svcLabel = svc.backendProxyEndpoint;
+            env.shares.forEach(shr => {
+                let shrLabel = shr.token;
+                if(shr.backendProxyEndpoint !== "") {
+                    shrLabel = shr.backendProxyEndpoint;
                 }
-                let svcNode = {
-                    id: svc.token,
-                    label: svcLabel,
+                let shrNode = {
+                    id: shr.token,
+                    label: shrLabel,
                     type: "share",
                     val: 50
                 };
-                newGraph.nodes.push(svcNode);
+                newGraph.nodes.push(shrNode);
                 newGraph.links.push({
                     target: envNode.id,
-                    source: svcNode.id,
+                    source: shrNode.id,
                     color: "#777"
                 });
             });

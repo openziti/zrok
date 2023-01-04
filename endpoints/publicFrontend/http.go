@@ -73,12 +73,12 @@ type zitiDialContext struct {
 }
 
 func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
-	svcToken := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	conn, err := self.ctx.Dial(svcToken)
+	shrToken := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
+	conn, err := self.ctx.Dial(shrToken)
 	if err != nil {
 		return conn, err
 	}
-	return newMetricsConn(svcToken, conn, self.updates), nil
+	return newMetricsConn(shrToken, conn, self.updates), nil
 }
 
 func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
@@ -100,15 +100,15 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 
 func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetSvc := resolveService(cfg.HostMatch, req.Host)
-		if svc, found := endpoints.GetRefreshedService(targetSvc, ctx); found {
+		targetShrToken := resolveService(cfg.HostMatch, req.Host)
+		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
 			} else {
 				logrus.Warn("no config!")
 			}
-			if target, err := url.Parse(fmt.Sprintf("http://%v", targetSvc)); err == nil {
-				logrus.Infof("[%v] -> %v", targetSvc, req.URL)
+			if target, err := url.Parse(fmt.Sprintf("http://%v", targetShrToken)); err == nil {
+				logrus.Infof("[%v] -> %v", targetShrToken, req.URL)
 
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme
@@ -133,19 +133,19 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 
 func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		svcToken := resolveService(cfg.HostMatch, r.Host)
-		if svcToken != "" {
-			if svc, found := endpoints.GetRefreshedService(svcToken, ctx); found {
+		shrToken := resolveService(cfg.HostMatch, r.Host)
+		if shrToken != "" {
+			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 				if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
 						case string(model.None):
-							logrus.Debugf("auth scheme none '%v'", svcToken)
+							logrus.Debugf("auth scheme none '%v'", shrToken)
 							handler.ServeHTTP(w, r)
 							return
 
 						case string(model.Basic):
-							logrus.Debugf("auth scheme basic '%v", svcToken)
+							logrus.Debugf("auth scheme basic '%v", shrToken)
 							inUser, inPass, ok := r.BasicAuth()
 							if !ok {
 								writeUnauthorizedResponse(w, realm)
@@ -194,15 +194,15 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 							return
 						}
 					} else {
-						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcToken)
+						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
 						notFoundUi.WriteNotFound(w)
 					}
 				} else {
-					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcToken)
+					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
 					notFoundUi.WriteNotFound(w)
 				}
 			} else {
-				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcToken)
+				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
 				notFoundUi.WriteNotFound(w)
 			}
 		} else {

@@ -13,36 +13,36 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 	return &publicResourceAllocator{}
 }
 
-func (a *publicResourceAllocator) allocate(envZId, svcToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (svcZId string, frontendEndpoints []string, err error) {
+func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
 	var authUsers []*model.AuthUser
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
 	}
-	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, svcToken, params.Body.AuthScheme, authUsers, edge)
+	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	svcZId, err = zrokEdgeSdk.CreateShareService(envZId, svcToken, cfgId, edge)
+	shrZId, err = zrokEdgeSdk.CreateShareService(envZId, shrToken, cfgId, edge)
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-"+svcZId+"-bind", svcZId, envZId, zrokEdgeSdk.ZrokShareTags(svcToken).SubTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyBind(envZId+"-"+shrZId+"-bind", shrZId, envZId, zrokEdgeSdk.ZrokShareTags(shrToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+svcZId+"-dial", svcZId, frontendZIds, zrokEdgeSdk.ZrokShareTags(svcToken).SubTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+shrZId+"-dial", shrZId, frontendZIds, zrokEdgeSdk.ZrokShareTags(shrToken).SubTags, edge); err != nil {
 		return "", nil, err
 	}
 
-	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, svcToken, svcZId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(envZId, shrToken, shrZId, edge); err != nil {
 		return "", nil, err
 	}
 
 	for _, frontendTemplate := range frontendTemplates {
-		frontendEndpoints = append(frontendEndpoints, proxyUrl(svcToken, frontendTemplate))
+		frontendEndpoints = append(frontendEndpoints, proxyUrl(shrToken, frontendTemplate))
 	}
 
-	return svcZId, frontendEndpoints, nil
+	return shrZId, frontendEndpoints, nil
 }

@@ -25,8 +25,8 @@ type shareReservedCommand struct {
 
 func newShareReservedCommand() *shareReservedCommand {
 	cmd := &cobra.Command{
-		Use:   "reserved <serviceToken>",
-		Short: "Start a backend for a reserved service",
+		Use:   "reserved <shareToken>",
+		Short: "Start a backend for a reserved share",
 	}
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
@@ -73,7 +73,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to retrieve reserved service", err)
+			showError("unable to retrieve reserved share", err)
 		}
 		panic(err)
 	}
@@ -92,7 +92,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	cfg := &proxyBackend.Config{
 		IdentityPath:    zif,
 		EndpointAddress: targetEndpoint,
-		Service:         shrToken,
+		ShrToken:        shrToken,
 	}
 	logrus.Infof("sharing target endpoint: '%v'", cfg.EndpointAddress)
 
@@ -133,10 +133,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	switch resp.Payload.ShareMode {
 	case "public":
-		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendEndpoint)
+		logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
 
 	case "private":
-		logrus.Infof("use this command to access your zrok service: 'zrok access private %v'", shrToken)
+		logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
 	}
 
 	for {

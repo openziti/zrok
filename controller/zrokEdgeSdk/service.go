@@ -41,9 +41,9 @@ func CreateService(name string, cfgZIds []string, addlTags map[string]interface{
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteService(envZId, svcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func DeleteService(envZId, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	req := &edge_service.DeleteServiceParams{
-		ID:      svcZId,
+		ID:      shrZId,
 		Context: context.Background(),
 	}
 	req.SetTimeout(30 * time.Second)
@@ -51,6 +51,6 @@ func DeleteService(envZId, svcZId string, edge *rest_management_api_client.ZitiE
 	if err != nil {
 		return err
 	}
-	logrus.Infof("deleted service '%v' for environment '%v'", svcZId, envZId)
+	logrus.Infof("deleted service '%v' for environment '%v'", shrZId, envZId)
 	return nil
 }

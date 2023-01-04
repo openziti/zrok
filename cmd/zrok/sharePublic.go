@@ -157,7 +157,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			Service:         resp.Payload.ShrToken,
+			ShrToken:        resp.Payload.ShrToken,
 		}
 		bh, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -172,7 +172,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		cfg := &webBackend.Config{
 			IdentityPath: zif,
 			WebRoot:      target,
-			Service:      resp.Payload.ShrToken,
+			ShrToken:     resp.Payload.ShrToken,
 		}
 		bh, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -194,7 +194,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 		p := widgets.NewParagraph()
 		p.Border = true
-		p.Title = " access your zrok service "
+		p.Title = " access your zrok share "
 		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoints[0]))/2)-1), resp.Payload.FrontendProxyEndpoints[0])
 		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
 		p.PaddingTop = 1
@@ -249,7 +249,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
-		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendProxyEndpoints[0])
+		logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
 		for {
 			time.Sleep(30 * time.Second)
 		}
@@ -286,12 +286,12 @@ func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (backendHa
 	return be, nil
 }
 
-func (cmd *sharePublicCommand) destroy(id string, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", svcToken)
+func (cmd *sharePublicCommand) destroy(id string, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", shrToken)
 	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   id,
-		ShrToken: svcToken,
+		ShrToken: shrToken,
 	}
 	if _, err := zrok.Share.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

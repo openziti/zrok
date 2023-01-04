@@ -21,7 +21,7 @@ import (
 type httpFrontend struct {
 	cfg      *Config
 	zCtx     ziti.Context
-	svcToken string
+	shrToken string
 	handler  http.Handler
 }
 
@@ -36,7 +36,7 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
-	zDialCtx := zitiDialContext{ctx: zCtx, svcToken: cfg.SvcToken}
+	zDialCtx := zitiDialContext{ctx: zCtx, shrToken: cfg.ShrToken}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
@@ -46,7 +46,7 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	}
 	proxy.Transport = zTransport
 
-	handler := authHandler(cfg.SvcToken, util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
+	handler := authHandler(cfg.ShrToken, util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
 	return &httpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -60,11 +60,11 @@ func (h *httpFrontend) Run() error {
 
 type zitiDialContext struct {
 	ctx      ziti.Context
-	svcToken string
+	shrToken string
 }
 
 func (zdc *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
-	conn, err := zdc.ctx.Dial(zdc.svcToken)
+	conn, err := zdc.ctx.Dial(zdc.shrToken)
 	if err != nil {
 		return conn, err
 	}
@@ -90,15 +90,15 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 
 func serviceTargetProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetSvc := cfg.SvcToken
-		if svc, found := endpoints.GetRefreshedService(targetSvc, ctx); found {
+		targetShrToken := cfg.ShrToken
+		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
 			} else {
 				logrus.Warn("no config!")
 			}
-			if target, err := url.Parse(fmt.Sprintf("http://%v", targetSvc)); err == nil {
-				logrus.Infof("[%v] -> %v", targetSvc, req.URL)
+			if target, err := url.Parse(fmt.Sprintf("http://%v", targetShrToken)); err == nil {
+				logrus.Infof("[%v] -> %v", targetShrToken, req.URL)
 
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme
@@ -121,19 +121,19 @@ func serviceTargetProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func authHandler(svcToken string, handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
+func authHandler(shrToken string, handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if svc, found := endpoints.GetRefreshedService(svcToken, ctx); found {
+		if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
 				if scheme, found := cfg["auth_scheme"]; found {
 					switch scheme {
 					case string(model.None):
-						logrus.Debugf("auth scheme none '%v'", svcToken)
+						logrus.Debugf("auth scheme none '%v'", shrToken)
 						handler.ServeHTTP(w, r)
 						return
 
 					case string(model.Basic):
-						logrus.Debugf("auth scheme basic '%v", svcToken)
+						logrus.Debugf("auth scheme basic '%v", shrToken)
 						inUser, inPass, ok := r.BasicAuth()
 						if !ok {
 							writeUnauthorizedResponse(w, realm)
@@ -182,15 +182,15 @@ func authHandler(svcToken string, handler http.Handler, realm string, cfg *Confi
 						return
 					}
 				} else {
-					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, svcToken)
+					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
 					notFoundUi.WriteNotFound(w)
 				}
 			} else {
-				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, svcToken)
+				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
 				notFoundUi.WriteNotFound(w)
 			}
 		} else {
-			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, svcToken)
+			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
 			notFoundUi.WriteNotFound(w)
 		}
 	}

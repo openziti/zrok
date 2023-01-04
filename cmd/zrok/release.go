@@ -20,8 +20,8 @@ type releaseCommand struct {
 
 func newReleaseCommand() *releaseCommand {
 	cmd := &cobra.Command{
-		Use:   "release <serviceToken>",
-		Short: "Release a reserved service",
+		Use:   "release <shareToken>",
+		Short: "Release a reserved share",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &releaseCommand{cmd: cmd}
@@ -30,7 +30,7 @@ func newReleaseCommand() *releaseCommand {
 }
 
 func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
-	svcToken := args[0]
+	shrToken := args[0]
 	env, err := zrokdir.LoadEnvironment()
 	if err != nil {
 		ui.Close()
@@ -52,15 +52,15 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   env.ZId,
-		ShrToken: svcToken,
+		ShrToken: shrToken,
 		Reserved: true,
 	}
 	if _, err := zrok.Share.Unshare(req, auth); err != nil {
 		if !panicInstead {
-			showError("error releasing service", err)
+			showError("error releasing share", err)
 		}
 		panic(err)
 	}
 
-	logrus.Infof("reserved service '%v' released", svcToken)
+	logrus.Infof("reserved share '%v' released", shrToken)
 }

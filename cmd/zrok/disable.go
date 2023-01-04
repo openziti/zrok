@@ -40,7 +40,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
 	if err != nil {
 		if !panicInstead {
-			showError("could not create zrok service client", err)
+			showError("could not create zrok client", err)
 		}
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 	}
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
-		logrus.Warnf("service cleanup failed (%v); will clean up local environment", err)
+		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
 	if err := zrokdir.DeleteEnvironment(); err != nil {
 		if !panicInstead {
