@@ -6,7 +6,7 @@
  * @memberof module:types
  * 
  * @property {string} envZId 
- * @property {string} svcToken 
+ * @property {string} shrToken 
  */
 
 /**
@@ -84,11 +84,11 @@
  */
 
 /**
- * @typedef environmentServices
+ * @typedef environmentShares
  * @memberof module:types
  * 
  * @property {module:types.environment} environment 
- * @property {module:types.services} services 
+ * @property {module:types.shares} shares 
  */
 
 /**
@@ -144,7 +144,7 @@
  */
 
 /**
- * @typedef service
+ * @typedef share
  * @memberof module:types
  * 
  * @property {string} token 
@@ -155,17 +155,9 @@
  * @property {string} frontendEndpoint 
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
- * @property {module:types.serviceMetrics} metrics 
+ * @property {module:types.shareMetrics} metrics 
  * @property {number} createdAt 
  * @property {number} updatedAt 
- */
-
-/**
- * @typedef serviceRequest
- * @memberof module:types
- * 
- * @property {string} envZId 
- * @property {string} svcToken 
  */
 
 /**
@@ -187,7 +179,7 @@
  * @memberof module:types
  * 
  * @property {string[]} frontendProxyEndpoints 
- * @property {string} svcToken 
+ * @property {string} shrToken 
  */
 
 /**
@@ -196,7 +188,7 @@
  * 
  * @property {string} frontendToken 
  * @property {string} envZId 
- * @property {string} svcToken 
+ * @property {string} shrToken 
  */
 
 /**
@@ -204,7 +196,7 @@
  * @memberof module:types
  * 
  * @property {string} envZId 
- * @property {string} svcToken 
+ * @property {string} shrToken 
  * @property {boolean} reserved 
  */
 
@@ -221,7 +213,7 @@
  * @typedef updateShareRequest
  * @memberof module:types
  * 
- * @property {string} serviceToken 
+ * @property {string} shrToken 
  * @property {string} backendProxyEndpoint 
  */
 

@@ -46,9 +46,6 @@ const Login = (props) => {
                 <Row className={"fullscreen-body"}>
                     <Container className={"fullscreen-form"}>
                         <Row>
-                            {message}
-                        </Row>
-                        <Row>
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group controlId={"email"}>
                                     <Form.Control

@@ -4,7 +4,7 @@ import (
 	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
@@ -72,7 +72,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := service.NewShareParams()
+	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.ZId,
 		ShareMode:            shareMode,
@@ -97,7 +97,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	resp, err := zrok.Service.Share(req, auth)
+	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to create tunnel", err)
@@ -105,7 +105,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("your reserved service token is '%v'", resp.Payload.SvcToken)
+	logrus.Infof("your reserved service token is '%v'", resp.Payload.ShrToken)
 	for _, fpe := range resp.Payload.FrontendProxyEndpoints {
 		logrus.Infof("reserved frontend endpoint: %v", fpe)
 	}

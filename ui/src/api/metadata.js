@@ -4,7 +4,7 @@ import * as gateway from './gateway'
 
 /**
  * @param {string} envZId 
- * @return {Promise<module:types.environmentServices>} ok
+ * @return {Promise<module:types.environmentShares>} ok
  */
 export function getEnvironmentDetail(envZId) {
   const parameters = {
@@ -16,16 +16,16 @@ export function getEnvironmentDetail(envZId) {
 }
 
 /**
- * @param {string} svcToken 
- * @return {Promise<module:types.service>} ok
+ * @param {string} shrToken 
+ * @return {Promise<module:types.share>} ok
  */
-export function getServiceDetail(svcToken) {
+export function getShareDetail(shrToken) {
   const parameters = {
     path: {
-      svcToken
+      shrToken
     }
   }
-  return gateway.request(getServiceDetailOperation, parameters)
+  return gateway.request(getShareDetailOperation, parameters)
 }
 
 /**
@@ -50,8 +50,8 @@ const getEnvironmentDetailOperation = {
   ]
 }
 
-const getServiceDetailOperation = {
-  path: '/detail/service/{svcToken}',
+const getShareDetailOperation = {
+  path: '/detail/share/{shrToken}',
   method: 'get',
   security: [
     {

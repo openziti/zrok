@@ -5,7 +5,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,11 +15,11 @@ func newAccessHandler() *accessHandler {
 	return &accessHandler{}
 }
 
-func (h *accessHandler) Handle(params service.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
@@ -37,39 +37,39 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		}
 		if !found {
 			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
-			return service.NewAccessUnauthorized()
+			return share.NewAccessUnauthorized()
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v'", principal.Email)
-		return service.NewAccessNotFound()
+		return share.NewAccessNotFound()
 	}
 
-	svcToken := params.Body.SvcToken
+	svcToken := params.Body.ShrToken
 	sshr, err := str.FindShareWithToken(svcToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding service")
-		return service.NewAccessNotFound()
+		return share.NewAccessNotFound()
 	}
 	if sshr == nil {
 		logrus.Errorf("unable to find service '%v' for user '%v'", svcToken, principal.Email)
-		return service.NewAccessNotFound()
+		return share.NewAccessNotFound()
 	}
 
 	feToken, err := createToken()
 	if err != nil {
 		logrus.Error(err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 
 	if _, err := str.CreateFrontend(envId, &store.Frontend{Token: feToken, ZId: envZId}, tx); err != nil {
 		logrus.Errorf("error creating frontend record: %v", err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 	addlTags := map[string]interface{}{
 		"zrokEnvironmentZId": envZId,
@@ -78,13 +78,13 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	}
 	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+sshr.ZId+"-dial", sshr.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing frontend record: %v", err)
-		return service.NewAccessInternalServerError()
+		return share.NewAccessInternalServerError()
 	}
 
-	return service.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendToken: feToken})
+	return share.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendToken: feToken})
 }

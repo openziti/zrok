@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,27 +13,27 @@ func newUpdateShareHandler() *updateShareHandler {
 	return &updateShareHandler{}
 }
 
-func (h *updateShareHandler) Handle(params service.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	svcToken := params.Body.ServiceToken
+func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	shrToken := params.Body.ShrToken
 	backendProxyEndpoint := params.Body.BackendProxyEndpoint
 
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return service.NewUpdateShareInternalServerError()
+		return share.NewUpdateShareInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	sshr, err := str.FindShareWithToken(svcToken, tx)
+	sshr, err := str.FindShareWithToken(shrToken, tx)
 	if err != nil {
-		logrus.Errorf("service '%v' not found: %v", svcToken, err)
-		return service.NewUpdateShareNotFound()
+		logrus.Errorf("service '%v' not found: %v", shrToken, err)
+		return share.NewUpdateShareNotFound()
 	}
 
 	senvs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 	if err != nil {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
-		return service.NewUpdateShareInternalServerError()
+		return share.NewUpdateShareInternalServerError()
 	}
 
 	envFound := false
@@ -44,20 +44,20 @@ func (h *updateShareHandler) Handle(params service.UpdateShareParams, principal 
 		}
 	}
 	if !envFound {
-		logrus.Errorf("environment not found for service '%v'", svcToken)
-		return service.NewUpdateShareNotFound()
+		logrus.Errorf("environment not found for service '%v'", shrToken)
+		return share.NewUpdateShareNotFound()
 	}
 
 	sshr.BackendProxyEndpoint = &backendProxyEndpoint
 	if err := str.UpdateShare(sshr, tx); err != nil {
-		logrus.Errorf("error updating service '%v': %v", svcToken, err)
-		return service.NewUpdateShareInternalServerError()
+		logrus.Errorf("error updating service '%v': %v", shrToken, err)
+		return share.NewUpdateShareInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for service '%v' update: %v", svcToken, err)
-		return service.NewUpdateShareInternalServerError()
+		logrus.Errorf("error committing transaction for service '%v' update: %v", shrToken, err)
+		return share.NewUpdateShareInternalServerError()
 	}
 
-	return service.NewUpdateShareOK()
+	return share.NewUpdateShareOK()
 }

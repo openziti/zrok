@@ -19,14 +19,14 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
-	var out rest_model_zrok.EnvironmentServicesList
+	var out rest_model_zrok.EnvironmentSharesList
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, tx)
 		if err != nil {
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
-		es := &rest_model_zrok.EnvironmentServices{
+		es := &rest_model_zrok.EnvironmentShares{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
 				CreatedAt:   env.CreatedAt.UnixMilli(),
@@ -50,7 +50,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			if shr.BackendProxyEndpoint != nil {
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
-			es.Services = append(es.Services, &rest_model_zrok.Service{
+			es.Shares = append(es.Shares, &rest_model_zrok.Share{
 				Token:                shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,

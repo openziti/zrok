@@ -8,7 +8,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
 	"github.com/pkg/errors"
 )
 
@@ -39,15 +38,14 @@ func Run(inCfg *Config) error {
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
-	api.MetadataGetServiceDetailHandler = newServiceDetailHandler()
+	api.MetadataGetShareDetailHandler = newShareDetailHandler()
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
-	api.ServiceAccessHandler = newAccessHandler()
-	api.ServiceGetServiceHandler = service.GetServiceHandlerFunc(getServiceHandler)
-	api.ServiceShareHandler = newShareHandler()
-	api.ServiceUnaccessHandler = newUnaccessHandler()
-	api.ServiceUnshareHandler = newUnshareHandler()
-	api.ServiceUpdateShareHandler = newUpdateShareHandler()
+	api.ShareAccessHandler = newAccessHandler()
+	api.ShareShareHandler = newShareHandler()
+	api.ShareUnaccessHandler = newUnaccessHandler()
+	api.ShareUnshareHandler = newUnshareHandler()
+	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
 	if err := controllerStartup(); err != nil {
 		return err

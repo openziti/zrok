@@ -7,7 +7,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/edge/rest_management_api_client"
 	edge_service "github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/pkg/errors"
@@ -21,24 +21,24 @@ func newUnshareHandler() *unshareHandler {
 	return &unshareHandler{}
 }
 
-func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return service.NewUnshareInternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
-		return service.NewUnshareInternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
-	svcToken := params.Body.SvcToken
-	svcZId, err := h.findServiceZId(svcToken, edge)
+	shrToken := params.Body.ShrToken
+	svcZId, err := h.findServiceZId(shrToken, edge)
 	if err != nil {
 		logrus.Error(err)
-		return service.NewUnshareNotFound()
+		return share.NewUnshareNotFound()
 	}
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
@@ -51,11 +51,11 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		if senv == nil {
 			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.EnvZID, principal.Email)
 			logrus.Error(err)
-			return service.NewUnshareNotFound()
+			return share.NewUnshareNotFound()
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
-		return service.NewUnshareNotFound()
+		return share.NewUnshareNotFound()
 	}
 
 	var sshr *store.Share
@@ -69,36 +69,36 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		if sshr == nil {
 			err := errors.Errorf("service with id '%v' not found for '%v'", svcZId, principal.Email)
 			logrus.Error(err)
-			return service.NewUnshareNotFound()
+			return share.NewUnshareNotFound()
 		}
 	} else {
 		logrus.Errorf("error finding services for account '%v': %v", principal.Email, err)
-		return service.NewUnshareInternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 
 	if sshr.Reserved == params.Body.Reserved {
 		// single tag-based service deallocator; should work regardless of sharing mode
-		if err := h.deallocateResources(senv, svcToken, svcZId, edge); err != nil {
+		if err := h.deallocateResources(senv, shrToken, svcZId, edge); err != nil {
 			logrus.Errorf("error unsharing ziti resources for '%v': %v", sshr, err)
-			return service.NewUnshareInternalServerError()
+			return share.NewUnshareInternalServerError()
 		}
 
-		logrus.Debugf("deallocated service '%v'", svcToken)
+		logrus.Debugf("deallocated service '%v'", shrToken)
 
 		if err := str.DeleteShare(sshr.Id, tx); err != nil {
 			logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
-			return service.NewUnshareInternalServerError()
+			return share.NewUnshareInternalServerError()
 		}
 		if err := tx.Commit(); err != nil {
 			logrus.Errorf("error committing transaction for '%v': %v", svcZId, err)
-			return service.NewUnshareInternalServerError()
+			return share.NewUnshareInternalServerError()
 		}
 
 	} else {
-		logrus.Infof("service '%v' is reserved, skipping deallocation", svcToken)
+		logrus.Infof("service '%v' is reserved, skipping deallocation", shrToken)
 	}
 
-	return service.NewUnshareOK()
+	return share.NewUnshareOK()
 }
 
 func (h *unshareHandler) findServiceZId(svcToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {

@@ -32,7 +32,7 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error)
 
-	GetServiceDetail(params *GetServiceDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetServiceDetailOK, error)
+	GetShareDetail(params *GetShareDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareDetailOK, error)
 
 	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
 
@@ -81,22 +81,22 @@ func (a *Client) GetEnvironmentDetail(params *GetEnvironmentDetailParams, authIn
 }
 
 /*
-GetServiceDetail get service detail API
+GetShareDetail get share detail API
 */
-func (a *Client) GetServiceDetail(params *GetServiceDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetServiceDetailOK, error) {
+func (a *Client) GetShareDetail(params *GetShareDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareDetailOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetServiceDetailParams()
+		params = NewGetShareDetailParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "getServiceDetail",
+		ID:                 "getShareDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/service/{svcToken}",
+		PathPattern:        "/detail/share/{shrToken}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetServiceDetailReader{formats: a.formats},
+		Reader:             &GetShareDetailReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -109,13 +109,13 @@ func (a *Client) GetServiceDetail(params *GetServiceDetailParams, authInfo runti
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetServiceDetailOK)
+	success, ok := result.(*GetShareDetailOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getServiceDetail: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getShareDetail: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

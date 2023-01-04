@@ -3,7 +3,7 @@ package main
 import (
 	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
@@ -49,13 +49,13 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := service.NewUnshareParams()
+	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   env.ZId,
-		SvcToken: svcToken,
+		ShrToken: svcToken,
 		Reserved: true,
 	}
-	if _, err := zrok.Service.Unshare(req, auth); err != nil {
+	if _, err := zrok.Share.Unshare(req, auth); err != nil {
 		if !panicInstead {
 			showError("error releasing service", err)
 		}

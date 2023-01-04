@@ -23,8 +23,8 @@ type UnaccessRequest struct {
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
-	// svc token
-	SvcToken string `json:"svcToken,omitempty"`
+	// shr token
+	ShrToken string `json:"shrToken,omitempty"`
 }
 
 // Validate validates this unaccess request

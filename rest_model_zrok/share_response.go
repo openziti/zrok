@@ -20,8 +20,8 @@ type ShareResponse struct {
 	// frontend proxy endpoints
 	FrontendProxyEndpoints []string `json:"frontendProxyEndpoints"`
 
-	// svc token
-	SvcToken string `json:"svcToken,omitempty"`
+	// shr token
+	ShrToken string `json:"shrToken,omitempty"`
 }
 
 // Validate validates this share response

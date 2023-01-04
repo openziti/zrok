@@ -24,7 +24,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 )
 
 // NewZrokAPI creates a new Zrok instance
@@ -49,8 +49,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		ServiceAccessHandler: service.AccessHandlerFunc(func(params service.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.Access has not yet been implemented")
+		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
 		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
@@ -70,11 +70,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
 		}),
-		ServiceGetServiceHandler: service.GetServiceHandlerFunc(func(params service.GetServiceParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.GetService has not yet been implemented")
-		}),
-		MetadataGetServiceDetailHandler: metadata.GetServiceDetailHandlerFunc(func(params metadata.GetServiceDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metadata.GetServiceDetail has not yet been implemented")
+		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
 		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
@@ -91,20 +88,20 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
-		ServiceShareHandler: service.ShareHandlerFunc(func(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.Share has not yet been implemented")
+		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
-		ServiceUnaccessHandler: service.UnaccessHandlerFunc(func(params service.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.Unaccess has not yet been implemented")
+		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
 		}),
-		ServiceUnshareHandler: service.UnshareHandlerFunc(func(params service.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.Unshare has not yet been implemented")
+		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
 		}),
 		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
 		}),
-		ServiceUpdateShareHandler: service.UpdateShareHandlerFunc(func(params service.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation service.UpdateShare has not yet been implemented")
+		ShareUpdateShareHandler: share.UpdateShareHandlerFunc(func(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.UpdateShare has not yet been implemented")
 		}),
 		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
@@ -162,8 +159,8 @@ type ZrokAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
-	// ServiceAccessHandler sets the operation handler for the access operation
-	ServiceAccessHandler service.AccessHandler
+	// ShareAccessHandler sets the operation handler for the access operation
+	ShareAccessHandler share.AccessHandler
 	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
 	AdminCreateFrontendHandler admin.CreateFrontendHandler
 	// AdminCreateIdentityHandler sets the operation handler for the create identity operation
@@ -176,10 +173,8 @@ type ZrokAPI struct {
 	EnvironmentEnableHandler environment.EnableHandler
 	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
 	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
-	// ServiceGetServiceHandler sets the operation handler for the get service operation
-	ServiceGetServiceHandler service.GetServiceHandler
-	// MetadataGetServiceDetailHandler sets the operation handler for the get service detail operation
-	MetadataGetServiceDetailHandler metadata.GetServiceDetailHandler
+	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
+	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
@@ -190,16 +185,16 @@ type ZrokAPI struct {
 	MetadataOverviewHandler metadata.OverviewHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
-	// ServiceShareHandler sets the operation handler for the share operation
-	ServiceShareHandler service.ShareHandler
-	// ServiceUnaccessHandler sets the operation handler for the unaccess operation
-	ServiceUnaccessHandler service.UnaccessHandler
-	// ServiceUnshareHandler sets the operation handler for the unshare operation
-	ServiceUnshareHandler service.UnshareHandler
+	// ShareShareHandler sets the operation handler for the share operation
+	ShareShareHandler share.ShareHandler
+	// ShareUnaccessHandler sets the operation handler for the unaccess operation
+	ShareUnaccessHandler share.UnaccessHandler
+	// ShareUnshareHandler sets the operation handler for the unshare operation
+	ShareUnshareHandler share.UnshareHandler
 	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
 	AdminUpdateFrontendHandler admin.UpdateFrontendHandler
-	// ServiceUpdateShareHandler sets the operation handler for the update share operation
-	ServiceUpdateShareHandler service.UpdateShareHandler
+	// ShareUpdateShareHandler sets the operation handler for the update share operation
+	ShareUpdateShareHandler share.UpdateShareHandler
 	// AccountVerifyHandler sets the operation handler for the verify operation
 	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
@@ -285,8 +280,8 @@ func (o *ZrokAPI) Validate() error {
 		unregistered = append(unregistered, "XTokenAuth")
 	}
 
-	if o.ServiceAccessHandler == nil {
-		unregistered = append(unregistered, "service.AccessHandler")
+	if o.ShareAccessHandler == nil {
+		unregistered = append(unregistered, "share.AccessHandler")
 	}
 	if o.AdminCreateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.CreateFrontendHandler")
@@ -306,11 +301,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataGetEnvironmentDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetEnvironmentDetailHandler")
 	}
-	if o.ServiceGetServiceHandler == nil {
-		unregistered = append(unregistered, "service.GetServiceHandler")
-	}
-	if o.MetadataGetServiceDetailHandler == nil {
-		unregistered = append(unregistered, "metadata.GetServiceDetailHandler")
+	if o.MetadataGetShareDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -327,20 +319,20 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
 	}
-	if o.ServiceShareHandler == nil {
-		unregistered = append(unregistered, "service.ShareHandler")
+	if o.ShareShareHandler == nil {
+		unregistered = append(unregistered, "share.ShareHandler")
 	}
-	if o.ServiceUnaccessHandler == nil {
-		unregistered = append(unregistered, "service.UnaccessHandler")
+	if o.ShareUnaccessHandler == nil {
+		unregistered = append(unregistered, "share.UnaccessHandler")
 	}
-	if o.ServiceUnshareHandler == nil {
-		unregistered = append(unregistered, "service.UnshareHandler")
+	if o.ShareUnshareHandler == nil {
+		unregistered = append(unregistered, "share.UnshareHandler")
 	}
 	if o.AdminUpdateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.UpdateFrontendHandler")
 	}
-	if o.ServiceUpdateShareHandler == nil {
-		unregistered = append(unregistered, "service.UpdateShareHandler")
+	if o.ShareUpdateShareHandler == nil {
+		unregistered = append(unregistered, "share.UpdateShareHandler")
 	}
 	if o.AccountVerifyHandler == nil {
 		unregistered = append(unregistered, "account.VerifyHandler")
@@ -450,7 +442,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/access"] = service.NewAccess(o.context, o.ServiceAccessHandler)
+	o.handlers["POST"]["/access"] = share.NewAccess(o.context, o.ShareAccessHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -478,11 +470,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/service"] = service.NewGetService(o.context, o.ServiceGetServiceHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/detail/service/{svcToken}"] = metadata.NewGetServiceDetail(o.context, o.MetadataGetServiceDetailHandler)
+	o.handlers["GET"]["/detail/share/{shrToken}"] = metadata.NewGetShareDetail(o.context, o.MetadataGetShareDetailHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -506,15 +494,15 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/share"] = service.NewShare(o.context, o.ServiceShareHandler)
+	o.handlers["POST"]["/share"] = share.NewShare(o.context, o.ShareShareHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/unaccess"] = service.NewUnaccess(o.context, o.ServiceUnaccessHandler)
+	o.handlers["DELETE"]["/unaccess"] = share.NewUnaccess(o.context, o.ShareUnaccessHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/unshare"] = service.NewUnshare(o.context, o.ServiceUnshareHandler)
+	o.handlers["DELETE"]["/unshare"] = share.NewUnshare(o.context, o.ShareUnshareHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
@@ -522,7 +510,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
-	o.handlers["PATCH"]["/share"] = service.NewUpdateShare(o.context, o.ServiceUpdateShareHandler)
+	o.handlers["PATCH"]["/share"] = share.NewUpdateShare(o.context, o.ShareUpdateShareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

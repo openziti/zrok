@@ -8,7 +8,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
@@ -110,7 +110,7 @@ type looper struct {
 	listener      edge.Listener
 	zif           string
 	zrok          *rest_client_zrok.Zrok
-	service       string
+	shrToken      string
 	proxyEndpoint string
 	auth          runtime.ClientAuthInfoWriter
 	mismatches    int
@@ -134,7 +134,7 @@ func (l *looper) run() {
 	defer logrus.Infof("stopping #%d", l.id)
 
 	l.startup()
-	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, l.service, l.proxyEndpoint)
+	logrus.Infof("looper #%d, shrToken: %v, frontend: %v", l.id, l.shrToken, l.proxyEndpoint)
 	go l.serviceListener()
 	l.dwell()
 	l.iterate()
@@ -152,7 +152,7 @@ func (l *looper) serviceListener() {
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 10,
 	}
-	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.service, &opts); err == nil {
+	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.shrToken, &opts); err == nil {
 		if err := http.Serve(l.listener, l); err != nil {
 			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}
@@ -184,7 +184,7 @@ func (l *looper) startup() {
 		panic(err)
 	}
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
-	tunnelReq := service.NewShareParams()
+	tunnelReq := share.NewShareParams()
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               l.env.ZId,
 		ShareMode:            "public",
@@ -194,11 +194,11 @@ func (l *looper) startup() {
 		AuthScheme:           string(model.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
-	tunnelResp, err := l.zrok.Service.Share(tunnelReq, l.auth)
+	tunnelResp, err := l.zrok.Share.Share(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
 	}
-	l.service = tunnelResp.Payload.SvcToken
+	l.shrToken = tunnelResp.Payload.ShrToken
 	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoints[0]
 }
 
@@ -260,12 +260,12 @@ func (l *looper) shutdown() {
 		}
 	}
 
-	untunnelReq := service.NewUnshareParams()
+	untunnelReq := share.NewUnshareParams()
 	untunnelReq.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   l.env.ZId,
-		SvcToken: l.service,
+		ShrToken: l.shrToken,
 	}
-	if _, err := l.zrok.Service.Unshare(untunnelReq, l.auth); err != nil {
+	if _, err := l.zrok.Share.Unshare(untunnelReq, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
 	}
 }

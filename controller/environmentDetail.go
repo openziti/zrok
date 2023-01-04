@@ -25,7 +25,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
 	}
-	es := &rest_model_zrok.EnvironmentServices{
+	es := &rest_model_zrok.EnvironmentShares{
 		Environment: &rest_model_zrok.Environment{
 			Address:     senv.Address,
 			CreatedAt:   senv.CreatedAt.UnixMilli(),
@@ -61,7 +61,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		if shr.BackendProxyEndpoint != nil {
 			beProxyEndpoint = *shr.BackendProxyEndpoint
 		}
-		es.Services = append(es.Services, &rest_model_zrok.Service{
+		es.Shares = append(es.Shares, &rest_model_zrok.Share{
 			Token:                shr.Token,
 			ZID:                  shr.ZId,
 			ShareMode:            shr.ShareMode,

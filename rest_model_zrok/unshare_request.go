@@ -23,8 +23,8 @@ type UnshareRequest struct {
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
-	// svc token
-	SvcToken string `json:"svcToken,omitempty"`
+	// shr token
+	ShrToken string `json:"shrToken,omitempty"`
 }
 
 // Validate validates this unshare request

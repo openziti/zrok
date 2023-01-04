@@ -20,8 +20,8 @@ type UpdateShareRequest struct {
 	// backend proxy endpoint
 	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
-	// service token
-	ServiceToken string `json:"serviceToken,omitempty"`
+	// shr token
+	ShrToken string `json:"shrToken,omitempty"`
 }
 
 // Validate validates this update share request

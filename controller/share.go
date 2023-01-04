@@ -4,7 +4,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/service"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,13 +14,13 @@ func newShareHandler() *shareHandler {
 	return &shareHandler{}
 }
 
-func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	logrus.Infof("handling")
 
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
@@ -38,22 +38,22 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 		}
 		if !found {
 			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
-			return service.NewShareUnauthorized()
+			return share.NewShareUnauthorized()
 		}
 	} else {
 		logrus.Errorf("error finding environments for account '%v'", principal.Email)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	edge, err := edgeClient()
 	if err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
-	svcToken, err := createServiceToken()
+	shrToken, err := createShareToken()
 	if err != nil {
 		logrus.Error(err)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	var svcZId string
@@ -62,7 +62,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	case "public":
 		if len(params.Body.FrontendSelection) < 1 {
 			logrus.Info("no frontend selection provided")
-			return service.NewShareNotFound()
+			return share.NewShareNotFound()
 		}
 
 		var frontendZIds []string
@@ -71,38 +71,38 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 			sfe, err := str.FindFrontendPubliclyNamed(frontendSelection, tx)
 			if err != nil {
 				logrus.Error(err)
-				return service.NewShareNotFound()
+				return share.NewShareNotFound()
 			}
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
-				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", frontendSelection, sfe.ZId, svcToken)
+				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for service '%v'", frontendSelection, sfe.ZId, shrToken)
 			}
 		}
-		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, svcToken, frontendZIds, frontendTemplates, params, edge)
+		svcZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, edge)
 		if err != nil {
 			logrus.Error(err)
-			return service.NewShareInternalServerError()
+			return share.NewShareInternalServerError()
 		}
 
 	case "private":
-		svcZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, svcToken, params, edge)
+		svcZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
 		if err != nil {
 			logrus.Error(err)
-			return service.NewShareInternalServerError()
+			return share.NewShareInternalServerError()
 		}
 
 	default:
 		logrus.Errorf("unknown share mode '%v", params.Body.ShareMode)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
-	logrus.Debugf("allocated service '%v'", svcToken)
+	logrus.Debugf("allocated service '%v'", shrToken)
 
 	reserved := params.Body.Reserved
 	sshr := &store.Share{
 		ZId:                  svcZId,
-		Token:                svcToken,
+		Token:                shrToken,
 		ShareMode:            params.Body.ShareMode,
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
@@ -117,17 +117,17 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	sid, err := str.CreateShare(envId, sshr, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing service record: %v", err)
-		return service.NewShareInternalServerError()
+		return share.NewShareInternalServerError()
 	}
-	logrus.Infof("recorded service '%v' with id '%v' for '%v'", svcToken, sid, principal.Email)
+	logrus.Infof("recorded service '%v' with id '%v' for '%v'", shrToken, sid, principal.Email)
 
-	return service.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
+	return share.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,
-		SvcToken:               svcToken,
+		ShrToken:               shrToken,
 	})
 }

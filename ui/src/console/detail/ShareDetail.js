@@ -10,7 +10,7 @@ const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getServiceDetail(props.selection.id)
+        metadata.getShareDetail(props.selection.id)
             .then(resp => {
                setDetail(resp.data);
             });
@@ -19,7 +19,7 @@ const ShareDetail = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getServiceDetail(props.selection.id)
+            metadata.getShareDetail(props.selection.id)
                 .then(resp => {
                     setDetail(resp.data);
                 });

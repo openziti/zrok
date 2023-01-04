@@ -43,7 +43,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "access",
         "parameters": [
@@ -97,7 +97,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentServices"
+              "$ref": "#/definitions/environmentShares"
             }
           },
           "401": {
@@ -112,7 +112,7 @@ func init() {
         }
       }
     },
-    "/detail/service/{svcToken}": {
+    "/detail/share/{shrToken}": {
       "get": {
         "security": [
           {
@@ -122,11 +122,11 @@ func init() {
         "tags": [
           "metadata"
         ],
-        "operationId": "getServiceDetail",
+        "operationId": "getShareDetail",
         "parameters": [
           {
             "type": "string",
-            "name": "svcToken",
+            "name": "shrToken",
             "in": "path",
             "required": true
           }
@@ -135,7 +135,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service"
+              "$ref": "#/definitions/share"
             }
           },
           "401": {
@@ -474,7 +474,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServicesList"
+              "$ref": "#/definitions/environmentSharesList"
             }
           },
           "500": {
@@ -517,45 +517,6 @@ func init() {
         }
       }
     },
-    "/service": {
-      "get": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "service"
-        ],
-        "operationId": "getService",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/serviceRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok",
-            "schema": {
-              "$ref": "#/definitions/service"
-            }
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/share": {
       "post": {
         "security": [
@@ -564,7 +525,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "share",
         "parameters": [
@@ -578,7 +539,7 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "service created",
+            "description": "share created",
             "schema": {
               "$ref": "#/definitions/shareResponse"
             }
@@ -604,7 +565,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "updateShare",
         "parameters": [
@@ -618,7 +579,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "service updated"
+            "description": "share updated"
           },
           "401": {
             "description": "unauthorized"
@@ -640,7 +601,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "unaccess",
         "parameters": [
@@ -676,7 +637,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "unshare",
         "parameters": [
@@ -690,7 +651,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "service removed"
+            "description": "share removed"
           },
           "401": {
             "description": "unauthorized"
@@ -762,7 +723,7 @@ func init() {
         "envZId": {
           "type": "string"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -872,21 +833,21 @@ func init() {
         }
       }
     },
-    "environmentServices": {
+    "environmentShares": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
-        "services": {
-          "$ref": "#/definitions/services"
+        "shares": {
+          "$ref": "#/definitions/shares"
         }
       }
     },
-    "environmentServicesList": {
+    "environmentSharesList": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/environmentServices"
+        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -985,7 +946,7 @@ func init() {
         }
       }
     },
-    "service": {
+    "share": {
       "type": "object",
       "properties": {
         "backendMode": {
@@ -1004,7 +965,7 @@ func init() {
           "type": "string"
         },
         "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
+          "$ref": "#/definitions/shareMetrics"
         },
         "reserved": {
           "type": "boolean"
@@ -1023,27 +984,10 @@ func init() {
         }
       }
     },
-    "serviceMetrics": {
+    "shareMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
-      }
-    },
-    "serviceRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "svcToken": {
-          "type": "string"
-        }
-      }
-    },
-    "services": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/service"
       }
     },
     "shareRequest": {
@@ -1099,9 +1043,15 @@ func init() {
             "type": "string"
           }
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
+      }
+    },
+    "shares": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/share"
       }
     },
     "unaccessRequest": {
@@ -1113,7 +1063,7 @@ func init() {
         "frontendToken": {
           "type": "string"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -1127,7 +1077,7 @@ func init() {
         "reserved": {
           "type": "boolean"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -1152,7 +1102,7 @@ func init() {
         "backendProxyEndpoint": {
           "type": "string"
         },
-        "serviceToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -1211,7 +1161,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "access",
         "parameters": [
@@ -1265,7 +1215,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentServices"
+              "$ref": "#/definitions/environmentShares"
             }
           },
           "401": {
@@ -1280,7 +1230,7 @@ func init() {
         }
       }
     },
-    "/detail/service/{svcToken}": {
+    "/detail/share/{shrToken}": {
       "get": {
         "security": [
           {
@@ -1290,11 +1240,11 @@ func init() {
         "tags": [
           "metadata"
         ],
-        "operationId": "getServiceDetail",
+        "operationId": "getShareDetail",
         "parameters": [
           {
             "type": "string",
-            "name": "svcToken",
+            "name": "shrToken",
             "in": "path",
             "required": true
           }
@@ -1303,7 +1253,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/service"
+              "$ref": "#/definitions/share"
             }
           },
           "401": {
@@ -1642,7 +1592,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServicesList"
+              "$ref": "#/definitions/environmentSharesList"
             }
           },
           "500": {
@@ -1685,45 +1635,6 @@ func init() {
         }
       }
     },
-    "/service": {
-      "get": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "service"
-        ],
-        "operationId": "getService",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/serviceRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok",
-            "schema": {
-              "$ref": "#/definitions/service"
-            }
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/share": {
       "post": {
         "security": [
@@ -1732,7 +1643,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "share",
         "parameters": [
@@ -1746,7 +1657,7 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "service created",
+            "description": "share created",
             "schema": {
               "$ref": "#/definitions/shareResponse"
             }
@@ -1772,7 +1683,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "updateShare",
         "parameters": [
@@ -1786,7 +1697,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "service updated"
+            "description": "share updated"
           },
           "401": {
             "description": "unauthorized"
@@ -1808,7 +1719,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "unaccess",
         "parameters": [
@@ -1844,7 +1755,7 @@ func init() {
           }
         ],
         "tags": [
-          "service"
+          "share"
         ],
         "operationId": "unshare",
         "parameters": [
@@ -1858,7 +1769,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "service removed"
+            "description": "share removed"
           },
           "401": {
             "description": "unauthorized"
@@ -1930,7 +1841,7 @@ func init() {
         "envZId": {
           "type": "string"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -2040,21 +1951,21 @@ func init() {
         }
       }
     },
-    "environmentServices": {
+    "environmentShares": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
-        "services": {
-          "$ref": "#/definitions/services"
+        "shares": {
+          "$ref": "#/definitions/shares"
         }
       }
     },
-    "environmentServicesList": {
+    "environmentSharesList": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/environmentServices"
+        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -2153,7 +2064,7 @@ func init() {
         }
       }
     },
-    "service": {
+    "share": {
       "type": "object",
       "properties": {
         "backendMode": {
@@ -2172,7 +2083,7 @@ func init() {
           "type": "string"
         },
         "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
+          "$ref": "#/definitions/shareMetrics"
         },
         "reserved": {
           "type": "boolean"
@@ -2191,27 +2102,10 @@ func init() {
         }
       }
     },
-    "serviceMetrics": {
+    "shareMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
-      }
-    },
-    "serviceRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "svcToken": {
-          "type": "string"
-        }
-      }
-    },
-    "services": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/service"
       }
     },
     "shareRequest": {
@@ -2267,9 +2161,15 @@ func init() {
             "type": "string"
           }
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
+      }
+    },
+    "shares": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/share"
       }
     },
     "unaccessRequest": {
@@ -2281,7 +2181,7 @@ func init() {
         "frontendToken": {
           "type": "string"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -2295,7 +2195,7 @@ func init() {
         "reserved": {
           "type": "boolean"
         },
-        "svcToken": {
+        "shrToken": {
           "type": "string"
         }
       }
@@ -2320,7 +2220,7 @@ func init() {
         "backendProxyEndpoint": {
           "type": "string"
         },
-        "serviceToken": {
+        "shrToken": {
           "type": "string"
         }
       }

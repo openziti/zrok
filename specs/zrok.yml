@@ -268,7 +268,7 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/environmentServices"
+            $ref: "#/definitions/environmentShares"
         401:
           description: unauthorized
         404:
@@ -276,15 +276,15 @@ paths:
         500:
           description: internal server error
 
-  /detail/service/{svcToken}:
+  /detail/share/{shrToken}:
     get:
       tags:
         - metadata
       security:
         - key: []
-      operationId: getServiceDetail
+      operationId: getShareDetail
       parameters:
-        - name: svcToken
+        - name: shrToken
           in: path
           type: string
           required: true
@@ -292,7 +292,7 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/service"
+            $ref: "#/definitions/share"
         401:
           description: unauthorized
         404:
@@ -311,7 +311,7 @@ paths:
         200:
           description: overview returned
           schema:
-            $ref: "#/definitions/environmentServicesList"
+            $ref: "#/definitions/environmentSharesList"
         500:
           description: internal server error
           schema:
@@ -328,12 +328,12 @@ paths:
           schema:
             $ref: "#/definitions/version"
   #
-  # service
+  # share
   #
   /access:
     post:
       tags:
-        - service
+        - share
       security:
         - key: []
       operationId: access
@@ -354,34 +354,10 @@ paths:
         500:
           description: internal server error
 
-  /service:
-    get:
-      tags:
-        - service
-      security:
-        - key: []
-      operationId: getService
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/serviceRequest"
-      responses:
-        200:
-          description: ok
-          schema:
-            $ref: "#/definitions/service"
-        401:
-          description: unauthorized
-        404:
-          description: not found
-        500:
-          description: internal server error
-
   /share:
     post:
       tags:
-        - service
+        - share
       security:
         - key: []
       operationId: share
@@ -392,7 +368,7 @@ paths:
             $ref: "#/definitions/shareRequest"
       responses:
         201:
-          description: service created
+          description: share created
           schema:
             $ref: "#/definitions/shareResponse"
         401:
@@ -405,7 +381,7 @@ paths:
             $ref: "#/definitions/errorMessage"
     patch:
       tags:
-        - service
+        - share
       security:
         - key: []
       operationId: updateShare
@@ -416,7 +392,7 @@ paths:
             $ref: "#/definitions/updateShareRequest"
       responses:
         200:
-          description: service updated
+          description: share updated
         401:
           description: unauthorized
         404:
@@ -427,7 +403,7 @@ paths:
   /unaccess:
     delete:
       tags:
-        - service
+        - share
       security:
         - key: []
       operationId: unaccess
@@ -449,7 +425,7 @@ paths:
   /unshare:
     delete:
       tags:
-        - service
+        - share
       security:
         - key: []
       operationId: unshare
@@ -460,7 +436,7 @@ paths:
             $ref: "#/definitions/unshareRequest"
       responses:
         200:
-          description: service removed
+          description: share removed
         401:
           description: unauthorized
         404:
@@ -476,7 +452,7 @@ definitions:
     properties:
       envZId:
         type: string
-      svcToken:
+      shrToken:
         type: string
 
   accessResponse:
@@ -560,18 +536,18 @@ definitions:
     items:
       $ref: "#/definitions/environment"
 
-  environmentServicesList:
+  environmentSharesList:
     type: array
     items:
-      $ref: "#/definitions/environmentServices"
+      $ref: "#/definitions/environmentShares"
 
-  environmentServices:
+  environmentShares:
     type: object
     properties:
       environment:
         $ref: "#/definitions/environment"
-      services:
-        $ref: "#/definitions/services"
+      shares:
+        $ref: "#/definitions/shares"
 
   errorMessage:
     type: string
@@ -640,7 +616,7 @@ definitions:
       token:
         type: string
 
-  service:
+  share:
     type: object
     properties:
       token:
@@ -660,29 +636,21 @@ definitions:
       reserved:
         type: boolean
       metrics:
-        $ref: "#/definitions/serviceMetrics"
+        $ref: "#/definitions/shareMetrics"
       createdAt:
         type: integer
       updatedAt:
         type: integer
 
-  services:
+  shares:
     type: array
     items:
-      $ref: "#/definitions/service"
+      $ref: "#/definitions/share"
 
-  serviceMetrics:
+  shareMetrics:
     type: array
     items:
       type: integer
-
-  serviceRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      svcToken:
-        type: string
 
   shareRequest:
     type: object
@@ -717,7 +685,7 @@ definitions:
         type: array
         items:
           type: string
-      svcToken:
+      shrToken:
         type: string
 
   unaccessRequest:
@@ -727,7 +695,7 @@ definitions:
         type: string
       envZId:
         type: string
-      svcToken:
+      shrToken:
         type: string
 
   unshareRequest:
@@ -735,7 +703,7 @@ definitions:
     properties:
       envZId:
         type: string
-      svcToken:
+      shrToken:
         type: string
       reserved:
         type: boolean
@@ -753,7 +721,7 @@ definitions:
   updateShareRequest:
     type: object
     properties:
-      serviceToken:
+      shrToken:
         type: string
       backendProxyEndpoint:
         type: string

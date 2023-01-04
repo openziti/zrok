@@ -4,7 +4,8 @@ import (
 	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
@@ -34,7 +35,7 @@ func newShareReservedCommand() *shareReservedCommand {
 }
 
 func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
-	svcToken := args[0]
+	shrToken := args[0]
 	targetEndpoint := ""
 	if cmd.overrideEndpoint != "" {
 		e, err := url.Parse(cmd.overrideEndpoint)
@@ -67,12 +68,9 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := service.NewGetServiceParams()
-	req.Body = &rest_model_zrok.ServiceRequest{
-		EnvZID:   env.ZId,
-		SvcToken: svcToken,
-	}
-	resp, err := zrok.Service.GetService(req, auth)
+	req := metadata.NewGetShareDetailParams()
+	req.ShrToken = shrToken
+	resp, err := zrok.Metadata.GetShareDetail(req, auth)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to retrieve reserved service", err)
@@ -94,17 +92,17 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	cfg := &proxyBackend.Config{
 		IdentityPath:    zif,
 		EndpointAddress: targetEndpoint,
-		Service:         svcToken,
+		Service:         shrToken,
 	}
 	logrus.Infof("sharing target endpoint: '%v'", cfg.EndpointAddress)
 
 	if resp.Payload.BackendProxyEndpoint != targetEndpoint {
-		upReq := service.NewUpdateShareParams()
+		upReq := share.NewUpdateShareParams()
 		upReq.Body = &rest_model_zrok.UpdateShareRequest{
-			ServiceToken:         svcToken,
+			ShrToken:             shrToken,
 			BackendProxyEndpoint: targetEndpoint,
 		}
-		if _, err := zrok.Service.UpdateShare(upReq, auth); err != nil {
+		if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
 			if !panicInstead {
 				showError("unable to update backend proxy endpoint", err)
 			}
@@ -138,7 +136,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("access your zrok service: %v", resp.Payload.FrontendEndpoint)
 
 	case "private":
-		logrus.Infof("use this command to access your zrok service: 'zrok access private %v'", svcToken)
+		logrus.Infof("use this command to access your zrok service: 'zrok access private %v'", shrToken)
 	}
 
 	for {

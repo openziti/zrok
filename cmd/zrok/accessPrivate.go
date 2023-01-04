@@ -5,7 +5,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/privateFrontend"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
@@ -38,7 +38,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 }
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
-	svcToken := args[0]
+	shrToken := args[0]
 
 	endpointUrl, err := url.Parse("http://" + cmd.bindAddress)
 	if err != nil {
@@ -64,12 +64,12 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := service.NewAccessParams()
+	req := share.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
-		SvcToken: svcToken,
+		ShrToken: shrToken,
 		EnvZID:   env.ZId,
 	}
-	accessResp, err := zrok.Service.Access(req, auth)
+	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
 		if !panicInstead {
 			showError("unable to access", err)
@@ -79,14 +79,14 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
 	cfg := privateFrontend.DefaultConfig("backend")
-	cfg.SvcToken = svcToken
+	cfg.SvcToken = shrToken
 	cfg.Address = cmd.bindAddress
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, env.ZId, svcToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.ZId, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -109,13 +109,13 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 
 func (cmd *accessPrivateCommand) destroy(frotendName, envZId, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", svcToken)
-	req := service.NewUnaccessParams()
+	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
 		FrontendToken: frotendName,
-		SvcToken:      svcToken,
+		ShrToken:      svcToken,
 		EnvZID:        envZId,
 	}
-	if _, err := zrok.Service.Unaccess(req, auth); err == nil {
+	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
 	} else {
 		logrus.Errorf("error shutting down: %v", err)

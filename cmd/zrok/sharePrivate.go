@@ -9,7 +9,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/service"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
@@ -94,7 +94,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
-	req := service.NewShareParams()
+	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.ZId,
 		ShareMode:            "private",
@@ -114,7 +114,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	}
-	resp, err := zrok.Service.Share(req, auth)
+	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
@@ -127,7 +127,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.ZId, resp.Payload.SvcToken, zrok, auth)
+		cmd.destroy(env.ZId, resp.Payload.ShrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -136,7 +136,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			Service:         resp.Payload.SvcToken,
+			Service:         resp.Payload.ShrToken,
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -151,7 +151,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		cfg := &webBackend.Config{
 			IdentityPath: zif,
 			WebRoot:      target,
-			Service:      resp.Payload.SvcToken,
+			Service:      resp.Payload.ShrToken,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -167,7 +167,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		showError("invalid backend mode", nil)
 	}
 
-	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.SvcToken)
+	logrus.Infof("share your zrok service; use this command for access: 'zrok access private %v'", resp.Payload.ShrToken)
 
 	for {
 		time.Sleep(30 * time.Second)
@@ -206,12 +206,12 @@ func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (backendH
 
 func (cmd *sharePrivateCommand) destroy(id string, svcToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", svcToken)
-	req := service.NewUnshareParams()
+	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   id,
-		SvcToken: svcToken,
+		ShrToken: svcToken,
 	}
-	if _, err := zrok.Service.Unshare(req, auth); err == nil {
+	if _, err := zrok.Share.Unshare(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
 	} else {
 		logrus.Errorf("error shutting down: %v", err)

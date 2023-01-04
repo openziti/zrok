@@ -20,8 +20,8 @@ type AccessRequest struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// svc token
-	SvcToken string `json:"svcToken,omitempty"`
+	// shr token
+	ShrToken string `json:"shrToken,omitempty"`
 }
 
 // Validate validates this access request
