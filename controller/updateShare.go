@@ -24,7 +24,7 @@ func (h *updateShareHandler) Handle(params service.UpdateShareParams, principal 
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	ssvc, err := str.FindServiceWithToken(svcToken, tx)
+	sshr, err := str.FindShareWithToken(svcToken, tx)
 	if err != nil {
 		logrus.Errorf("service '%v' not found: %v", svcToken, err)
 		return service.NewUpdateShareNotFound()
@@ -38,7 +38,7 @@ func (h *updateShareHandler) Handle(params service.UpdateShareParams, principal 
 
 	envFound := false
 	for _, senv := range senvs {
-		if senv.Id == ssvc.Id {
+		if senv.Id == sshr.Id {
 			envFound = true
 			break
 		}
@@ -48,8 +48,8 @@ func (h *updateShareHandler) Handle(params service.UpdateShareParams, principal 
 		return service.NewUpdateShareNotFound()
 	}
 
-	ssvc.BackendProxyEndpoint = &backendProxyEndpoint
-	if err := str.UpdateService(ssvc, tx); err != nil {
+	sshr.BackendProxyEndpoint = &backendProxyEndpoint
+	if err := str.UpdateShare(sshr, tx); err != nil {
 		logrus.Errorf("error updating service '%v': %v", svcToken, err)
 		return service.NewUpdateShareInternalServerError()
 	}

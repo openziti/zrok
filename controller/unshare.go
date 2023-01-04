@@ -58,15 +58,15 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareNotFound()
 	}
 
-	var ssvc *store.Service
-	if svcs, err := str.FindServicesForEnvironment(senv.Id, tx); err == nil {
+	var sshr *store.Share
+	if svcs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
 		for _, svc := range svcs {
 			if svc.ZId == svcZId {
-				ssvc = svc
+				sshr = svc
 				break
 			}
 		}
-		if ssvc == nil {
+		if sshr == nil {
 			err := errors.Errorf("service with id '%v' not found for '%v'", svcZId, principal.Email)
 			logrus.Error(err)
 			return service.NewUnshareNotFound()
@@ -76,16 +76,16 @@ func (h *unshareHandler) Handle(params service.UnshareParams, principal *rest_mo
 		return service.NewUnshareInternalServerError()
 	}
 
-	if ssvc.Reserved == params.Body.Reserved {
+	if sshr.Reserved == params.Body.Reserved {
 		// single tag-based service deallocator; should work regardless of sharing mode
 		if err := h.deallocateResources(senv, svcToken, svcZId, edge); err != nil {
-			logrus.Errorf("error unsharing ziti resources for '%v': %v", ssvc, err)
+			logrus.Errorf("error unsharing ziti resources for '%v': %v", sshr, err)
 			return service.NewUnshareInternalServerError()
 		}
 
 		logrus.Debugf("deallocated service '%v'", svcToken)
 
-		if err := str.DeleteService(ssvc.Id, tx); err != nil {
+		if err := str.DeleteShare(sshr.Id, tx); err != nil {
 			logrus.Errorf("error deactivating service '%v': %v", svcZId, err)
 			return service.NewUnshareInternalServerError()
 		}

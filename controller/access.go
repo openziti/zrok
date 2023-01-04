@@ -45,12 +45,12 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 	}
 
 	svcToken := params.Body.SvcToken
-	ssvc, err := str.FindServiceWithToken(svcToken, tx)
+	sshr, err := str.FindShareWithToken(svcToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding service")
 		return service.NewAccessNotFound()
 	}
-	if ssvc == nil {
+	if sshr == nil {
 		logrus.Errorf("unable to find service '%v' for user '%v'", svcToken, principal.Email)
 		return service.NewAccessNotFound()
 	}
@@ -76,7 +76,7 @@ func (h *accessHandler) Handle(params service.AccessParams, principal *rest_mode
 		"zrokFrontendToken":  feToken,
 		"zrokServiceToken":   svcToken,
 	}
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+ssvc.ZId+"-dial", ssvc.ZId, []string{envZId}, addlTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+sshr.ZId+"-dial", sshr.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy: %v", err)
 		return service.NewAccessInternalServerError()
 	}

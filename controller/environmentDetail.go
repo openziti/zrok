@@ -35,44 +35,44 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 			ZID:         senv.ZId,
 		},
 	}
-	svcs, err := str.FindServicesForEnvironment(senv.Id, tx)
+	shrs, err := str.FindSharesForEnvironment(senv.Id, tx)
 	if err != nil {
 		logrus.Errorf("error finding services for environment '%v': %v", senv.ZId, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
-		sparkData, err = sparkDataForServices(svcs)
+		sparkData, err = sparkDataForServices(shrs)
 		if err != nil {
 			logrus.Errorf("error querying spark data for services: %v", err)
 			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}
-	for _, svc := range svcs {
+	for _, shr := range shrs {
 		feEndpoint := ""
-		if svc.FrontendEndpoint != nil {
-			feEndpoint = *svc.FrontendEndpoint
+		if shr.FrontendEndpoint != nil {
+			feEndpoint = *shr.FrontendEndpoint
 		}
 		feSelection := ""
-		if svc.FrontendSelection != nil {
-			feSelection = *svc.FrontendSelection
+		if shr.FrontendSelection != nil {
+			feSelection = *shr.FrontendSelection
 		}
 		beProxyEndpoint := ""
-		if svc.BackendProxyEndpoint != nil {
-			beProxyEndpoint = *svc.BackendProxyEndpoint
+		if shr.BackendProxyEndpoint != nil {
+			beProxyEndpoint = *shr.BackendProxyEndpoint
 		}
 		es.Services = append(es.Services, &rest_model_zrok.Service{
-			Token:                svc.Token,
-			ZID:                  svc.ZId,
-			ShareMode:            svc.ShareMode,
-			BackendMode:          svc.BackendMode,
+			Token:                shr.Token,
+			ZID:                  shr.ZId,
+			ShareMode:            shr.ShareMode,
+			BackendMode:          shr.BackendMode,
 			FrontendSelection:    feSelection,
 			FrontendEndpoint:     feEndpoint,
 			BackendProxyEndpoint: beProxyEndpoint,
-			Reserved:             svc.Reserved,
-			Metrics:              sparkData[svc.Token],
-			CreatedAt:            svc.CreatedAt.UnixMilli(),
-			UpdatedAt:            svc.UpdatedAt.UnixMilli(),
+			Reserved:             shr.Reserved,
+			Metrics:              sparkData[shr.Token],
+			CreatedAt:            shr.CreatedAt.UnixMilli(),
+			UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 		})
 	}
 	return metadata.NewGetEnvironmentDetailOK().WithPayload(es)

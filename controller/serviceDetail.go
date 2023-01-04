@@ -21,7 +21,7 @@ func (h *serviceDetailHandler) Handle(params metadata.GetServiceDetailParams, pr
 		return metadata.NewGetServiceDetailInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
-	svc, err := str.FindServiceWithToken(params.SvcToken, tx)
+	shr, err := str.FindShareWithToken(params.SvcToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding service '%v': %v", params.SvcToken, err)
 		return metadata.NewGetServiceDetailNotFound()
@@ -33,7 +33,7 @@ func (h *serviceDetailHandler) Handle(params metadata.GetServiceDetailParams, pr
 	}
 	found := false
 	for _, env := range envs {
-		if svc.EnvironmentId == env.Id {
+		if shr.EnvironmentId == env.Id {
 			found = true
 			break
 		}
@@ -44,35 +44,35 @@ func (h *serviceDetailHandler) Handle(params metadata.GetServiceDetailParams, pr
 	}
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
-		sparkData, err = sparkDataForServices([]*store.Service{svc})
+		sparkData, err = sparkDataForServices([]*store.Share{shr})
 		if err != nil {
 			logrus.Errorf("error querying spark data for services: %v", err)
 			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}
 	feEndpoint := ""
-	if svc.FrontendEndpoint != nil {
-		feEndpoint = *svc.FrontendEndpoint
+	if shr.FrontendEndpoint != nil {
+		feEndpoint = *shr.FrontendEndpoint
 	}
 	feSelection := ""
-	if svc.FrontendSelection != nil {
-		feSelection = *svc.FrontendSelection
+	if shr.FrontendSelection != nil {
+		feSelection = *shr.FrontendSelection
 	}
 	beProxyEndpoint := ""
-	if svc.BackendProxyEndpoint != nil {
-		beProxyEndpoint = *svc.BackendProxyEndpoint
+	if shr.BackendProxyEndpoint != nil {
+		beProxyEndpoint = *shr.BackendProxyEndpoint
 	}
 	return metadata.NewGetServiceDetailOK().WithPayload(&rest_model_zrok.Service{
-		Token:                svc.Token,
-		ZID:                  svc.ZId,
-		ShareMode:            svc.ShareMode,
-		BackendMode:          svc.BackendMode,
+		Token:                shr.Token,
+		ZID:                  shr.ZId,
+		ShareMode:            shr.ShareMode,
+		BackendMode:          shr.BackendMode,
 		FrontendSelection:    feSelection,
 		FrontendEndpoint:     feEndpoint,
 		BackendProxyEndpoint: beProxyEndpoint,
-		Reserved:             svc.Reserved,
-		Metrics:              sparkData[svc.Token],
-		CreatedAt:            svc.CreatedAt.UnixMilli(),
-		UpdatedAt:            svc.UpdatedAt.UnixMilli(),
+		Reserved:             shr.Reserved,
+		Metrics:              sparkData[shr.Token],
+		CreatedAt:            shr.CreatedAt.UnixMilli(),
+		UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 	})
 }

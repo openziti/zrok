@@ -18,7 +18,7 @@ func getServiceHandler(params service.GetServiceParams, principal *rest_model_zr
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	ssvc, err := str.FindServiceWithToken(svcToken, tx)
+	sshr, err := str.FindShareWithToken(svcToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding service with token '%v': %v", svcToken, err)
 		return service.NewGetServiceNotFound()
@@ -30,7 +30,7 @@ func getServiceHandler(params service.GetServiceParams, principal *rest_model_zr
 	}
 	envFound := false
 	for _, senv := range senvs {
-		if senv.Id == ssvc.EnvironmentId && senv.ZId == envZId {
+		if senv.Id == sshr.EnvironmentId && senv.ZId == envZId {
 			envFound = true
 			break
 		}
@@ -40,24 +40,24 @@ func getServiceHandler(params service.GetServiceParams, principal *rest_model_zr
 		return service.NewGetServiceNotFound()
 	}
 
-	svc := &rest_model_zrok.Service{
-		Token:       ssvc.Token,
-		ZID:         ssvc.ZId,
-		ShareMode:   ssvc.ShareMode,
-		BackendMode: ssvc.BackendMode,
-		Reserved:    ssvc.Reserved,
-		CreatedAt:   ssvc.CreatedAt.UnixMilli(),
-		UpdatedAt:   ssvc.UpdatedAt.UnixMilli(),
+	shr := &rest_model_zrok.Service{
+		Token:       sshr.Token,
+		ZID:         sshr.ZId,
+		ShareMode:   sshr.ShareMode,
+		BackendMode: sshr.BackendMode,
+		Reserved:    sshr.Reserved,
+		CreatedAt:   sshr.CreatedAt.UnixMilli(),
+		UpdatedAt:   sshr.UpdatedAt.UnixMilli(),
 	}
-	if ssvc.FrontendSelection != nil {
-		svc.FrontendSelection = *ssvc.FrontendSelection
+	if sshr.FrontendSelection != nil {
+		shr.FrontendSelection = *sshr.FrontendSelection
 	}
-	if ssvc.FrontendEndpoint != nil {
-		svc.FrontendEndpoint = *ssvc.FrontendEndpoint
+	if sshr.FrontendEndpoint != nil {
+		shr.FrontendEndpoint = *sshr.FrontendEndpoint
 	}
-	if ssvc.BackendProxyEndpoint != nil {
-		svc.BackendProxyEndpoint = *ssvc.BackendProxyEndpoint
+	if sshr.BackendProxyEndpoint != nil {
+		shr.BackendProxyEndpoint = *sshr.BackendProxyEndpoint
 	}
 
-	return service.NewGetServiceOK().WithPayload(svc)
+	return service.NewGetServiceOK().WithPayload(shr)
 }

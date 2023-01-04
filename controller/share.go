@@ -100,7 +100,7 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 	logrus.Debugf("allocated service '%v'", svcToken)
 
 	reserved := params.Body.Reserved
-	ssvc := &store.Service{
+	sshr := &store.Share{
 		ZId:                  svcZId,
 		Token:                svcToken,
 		ShareMode:            params.Body.ShareMode,
@@ -109,12 +109,12 @@ func (h *shareHandler) Handle(params service.ShareParams, principal *rest_model_
 		Reserved:             reserved,
 	}
 	if len(frontendEndpoints) > 0 {
-		ssvc.FrontendEndpoint = &frontendEndpoints[0]
-	} else if ssvc.ShareMode == "private" {
-		ssvc.FrontendEndpoint = &ssvc.ShareMode
+		sshr.FrontendEndpoint = &frontendEndpoints[0]
+	} else if sshr.ShareMode == "private" {
+		sshr.FrontendEndpoint = &sshr.ShareMode
 	}
 
-	sid, err := str.CreateService(envId, ssvc, tx)
+	sid, err := str.CreateShare(envId, sshr, tx)
 	if err != nil {
 		logrus.Errorf("error creating service record: %v", err)
 		return service.NewShareInternalServerError()

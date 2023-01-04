@@ -21,7 +21,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 	}
 	var out rest_model_zrok.EnvironmentServicesList
 	for _, env := range envs {
-		svcs, err := str.FindServicesForEnvironment(env.Id, tx)
+		shrs, err := str.FindSharesForEnvironment(env.Id, tx)
 		if err != nil {
 			logrus.Errorf("error finding services for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
@@ -37,30 +37,30 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			},
 		}
 
-		for _, svc := range svcs {
+		for _, shr := range shrs {
 			feEndpoint := ""
-			if svc.FrontendEndpoint != nil {
-				feEndpoint = *svc.FrontendEndpoint
+			if shr.FrontendEndpoint != nil {
+				feEndpoint = *shr.FrontendEndpoint
 			}
 			feSelection := ""
-			if svc.FrontendSelection != nil {
-				feSelection = *svc.FrontendSelection
+			if shr.FrontendSelection != nil {
+				feSelection = *shr.FrontendSelection
 			}
 			beProxyEndpoint := ""
-			if svc.BackendProxyEndpoint != nil {
-				beProxyEndpoint = *svc.BackendProxyEndpoint
+			if shr.BackendProxyEndpoint != nil {
+				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
 			es.Services = append(es.Services, &rest_model_zrok.Service{
-				Token:                svc.Token,
-				ZID:                  svc.ZId,
-				ShareMode:            svc.ShareMode,
-				BackendMode:          svc.BackendMode,
+				Token:                shr.Token,
+				ZID:                  shr.ZId,
+				ShareMode:            shr.ShareMode,
+				BackendMode:          shr.BackendMode,
 				FrontendSelection:    feSelection,
 				FrontendEndpoint:     feEndpoint,
 				BackendProxyEndpoint: beProxyEndpoint,
-				Reserved:             svc.Reserved,
-				CreatedAt:            svc.CreatedAt.UnixMilli(),
-				UpdatedAt:            svc.UpdatedAt.UnixMilli(),
+				Reserved:             shr.Reserved,
+				CreatedAt:            shr.CreatedAt.UnixMilli(),
+				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			})
 		}
 		out = append(out, es)

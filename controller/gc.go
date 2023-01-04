@@ -37,13 +37,13 @@ func GC(inCfg *Config) error {
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
-	dbSvcs, err := str.GetAllServices(tx)
+	sshrs, err := str.GetAllShares(tx)
 	if err != nil {
 		return err
 	}
 	liveMap := make(map[string]struct{})
-	for _, dbSvc := range dbSvcs {
-		liveMap[dbSvc.Token] = struct{}{}
+	for _, sshr := range sshrs {
+		liveMap[sshr.Token] = struct{}{}
 	}
 	if err := gcServices(edge, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting services")

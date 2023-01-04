@@ -80,12 +80,12 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 	if err != nil {
 		return err
 	}
-	svcs, err := str.FindServicesForEnvironment(envId, tx)
+	shrs, err := str.FindSharesForEnvironment(envId, tx)
 	if err != nil {
 		return err
 	}
-	for _, svc := range svcs {
-		svcToken := svc.Token
+	for _, shr := range shrs {
+		svcToken := shr.Token
 		logrus.Infof("garbage collecting service '%v' for environment '%v'", svcToken, env.ZId)
 		if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
@@ -99,22 +99,22 @@ func (h *disableHandler) removeServicesForEnvironment(envId int, tx *sqlx.Tx, ed
 		if err := zrokEdgeSdk.DeleteConfig(env.ZId, svcToken, edge); err != nil {
 			logrus.Error(err)
 		}
-		if err := zrokEdgeSdk.DeleteService(env.ZId, svc.ZId, edge); err != nil {
+		if err := zrokEdgeSdk.DeleteService(env.ZId, shr.ZId, edge); err != nil {
 			logrus.Error(err)
 		}
-		logrus.Infof("removed service '%v' for environment '%v'", svc.Token, env.ZId)
+		logrus.Infof("removed service '%v' for environment '%v'", shr.Token, env.ZId)
 	}
 	return nil
 }
 
 func (h *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
-	svcs, err := str.FindServicesForEnvironment(envId, tx)
+	shrs, err := str.FindSharesForEnvironment(envId, tx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding services for environment '%d'", envId)
 	}
-	for _, svc := range svcs {
-		if err := str.DeleteService(svc.Id, tx); err != nil {
-			return errors.Wrapf(err, "error deleting service '%d' for environment '%d'", svc.Id, envId)
+	for _, shr := range shrs {
+		if err := str.DeleteShare(shr.Id, tx); err != nil {
+			return errors.Wrapf(err, "error deleting service '%d' for environment '%d'", shr.Id, envId)
 		}
 	}
 	if err := str.DeleteEnvironment(envId, tx); err != nil {

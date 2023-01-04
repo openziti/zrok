@@ -6,13 +6,13 @@ import (
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 )
 
-func sparkDataForServices(svcs []*store.Service) (map[string][]int64, error) {
+func sparkDataForServices(shrs []*store.Share) (map[string][]int64, error) {
 	out := make(map[string][]int64)
 
-	if len(svcs) > 0 {
+	if len(shrs) > 0 {
 		qapi := idb.QueryAPI(cfg.Influx.Org)
 
-		result, err := qapi.Query(context.Background(), sparkFluxQuery(svcs))
+		result, err := qapi.Query(context.Background(), sparkFluxQuery(shrs))
 		if err != nil {
 			return nil, err
 		}
@@ -27,22 +27,22 @@ func sparkDataForServices(svcs []*store.Service) (map[string][]int64, error) {
 			if writeRate != nil {
 				combinedRate += writeRate.(int64)
 			}
-			svcToken := result.Record().ValueByKey("service").(string)
-			svcMetrics := out[svcToken]
-			svcMetrics = append(svcMetrics, combinedRate)
-			out[svcToken] = svcMetrics
+			shrToken := result.Record().ValueByKey("share").(string)
+			shrMetrics := out[shrToken]
+			shrMetrics = append(shrMetrics, combinedRate)
+			out[shrToken] = shrMetrics
 		}
 	}
 	return out, nil
 }
 
-func sparkFluxQuery(svcs []*store.Service) string {
+func sparkFluxQuery(shrs []*store.Share) string {
 	svcFilter := "|> filter(fn: (r) =>"
-	for i, svc := range svcs {
+	for i, shr := range shrs {
 		if i > 0 {
 			svcFilter += " or"
 		}
-		svcFilter += fmt.Sprintf(" r[\"service\"] == \"%v\"", svc.Token)
+		svcFilter += fmt.Sprintf(" r[\"share\"] == \"%v\"", shr.Token)
 	}
 	svcFilter += ")"
 	query := "read = from(bucket: \"zrok\")" +
