@@ -1,14 +1,21 @@
 import Icon from "@mdi/react";
 import {mdiContentCopy} from "@mdi/js";
-import {Container, Row} from "react-bootstrap";
-import React from "react";
+import {Container, Overlay, Row, Tooltip} from "react-bootstrap";
+import React, {useRef, useState} from "react";
 
 const Success = (props) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const target = useRef(null);
+
     const handleCopy = async () => {
         let copiedText = document.getElementById("zrok-enable-command").innerHTML;
         try {
             await navigator.clipboard.writeText(copiedText);
             console.log("copied enable command");
+
+            setShowTooltip(true);
+            setTimeout(() => setShowTooltip(false), 2000);
+
         } catch(err) {
             console.error("failed to copy", err);
         }
@@ -35,8 +42,15 @@ const Success = (props) => {
                     </Row>
                     <Row>
                         <pre>
-                           $ <span id={"zrok-enable-command"}>zrok enable {props.token}</span> <Icon path={mdiContentCopy} size={0.7} onClick={handleCopy}/>
+                           $ <span id={"zrok-enable-command"}>zrok enable {props.token}</span> <Icon ref={target} path={mdiContentCopy} size={0.7} onClick={handleCopy}/>
                         </pre>
+                        <Overlay target={target.current} show={showTooltip} placement={"bottom"}>
+                            {(props) => (
+                                <Tooltip id={"copy-tooltip"} {...props}>
+                                    Copied!
+                                </Tooltip>
+                            )}
+                        </Overlay>
                     </Row>
                 </Container>
             </Row>
