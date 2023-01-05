@@ -5,7 +5,7 @@ import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {mdiConsoleNetwork} from "@mdi/js";
 import Icon from "@mdi/react";
 
-const Shares = (props) => {
+const SharesTab = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
@@ -78,4 +78,4 @@ const Shares = (props) => {
     return <></>;
 }
 
-export default Shares;
+export default SharesTab;

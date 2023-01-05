@@ -1,6 +1,6 @@
 import AccountDetail from "./AccountDetail";
 import ShareDetail from "./ShareDetail";
-import Environment from "./environment/Environment";
+import EnvironmentDetail from "./environment/EnvironmentDetail";
 
 const Detail = (props) => {
     let detailComponent = <h1>{props.selection.id} ({props.selection.type})</h1>;
@@ -11,7 +11,7 @@ const Detail = (props) => {
             break;
 
         case "environment":
-            detailComponent = <Environment selection={props.selection} />;
+            detailComponent = <EnvironmentDetail selection={props.selection} />;
             break;
 
         case "share":

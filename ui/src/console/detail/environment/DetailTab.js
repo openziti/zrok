@@ -4,7 +4,7 @@ import {mdiEyeOffOutline, mdiEyeOutline} from "@mdi/js";
 import {secretString} from "../util";
 import {useState} from "react";
 
-const Detail = (props) => {
+const DetailTab = (props) => {
     const [showZId, setShowZId] = useState(false);
 
     const customProperties = {
@@ -22,4 +22,4 @@ const Detail = (props) => {
     );
 };
 
-export default Detail;
+export default DetailTab;

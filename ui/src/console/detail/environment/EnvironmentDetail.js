@@ -1,12 +1,13 @@
 import {Tab, Tabs} from "react-bootstrap";
-import Shares from "./Shares";
+import SharesTab from "./SharesTab";
 import {useEffect, useState} from "react";
 import Icon from "@mdi/react";
 import {mdiConsoleNetwork} from "@mdi/js";
 import {getEnvironmentDetail} from "../../../api/metadata";
-import Detail from "./Detail";
+import DetailTab from "./DetailTab";
+import ActionsTab from "./ActionsTab";
 
-const Environment = (props) => {
+const EnvironmentDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
@@ -22,10 +23,13 @@ const Environment = (props) => {
                 <h2><Icon path={mdiConsoleNetwork} size={2} />{" "}{detail.environment.description}</h2>
                 <Tabs defaultActiveKey={"shares"} className={"mb-3"}>
                     <Tab eventKey={"shares"} title={"Shares"}>
-                        <Shares selection={props.selection} />
+                        <SharesTab selection={props.selection} />
                     </Tab>
                     <Tab eventKey={"detail"} title={"Detail"}>
-                        <Detail environment={detail.environment} />
+                        <DetailTab environment={detail.environment} />
+                    </Tab>
+                    <Tab eventKey={"actions"} title={"Actions"}>
+                        <ActionsTab environment={detail.environment} />
                     </Tab>
                 </Tabs>
             </div>
@@ -34,4 +38,4 @@ const Environment = (props) => {
     return <></>;
 };
 
-export default Environment;
+export default EnvironmentDetail;

@@ -105,3 +105,10 @@ code, pre {
 .errorMessage {
     color: deeppink;
 }
+
+.actions-tab {
+    margin-top: 50px;
+}
+.actions-tab p {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
