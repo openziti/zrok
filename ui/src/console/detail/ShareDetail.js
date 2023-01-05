@@ -1,13 +1,15 @@
 import * as metadata from "../../api/metadata";
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {useEffect, useState} from "react";
-import {mdiShareVariant} from "@mdi/js";
+import {mdiEyeOffOutline, mdiEyeOutline, mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
+import {secretString} from "./util";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
+    const [showZId, setShowZId] = useState(false);
 
     useEffect(() => {
         metadata.getShareDetail(props.selection.id)
@@ -41,6 +43,13 @@ const ShareDetail = (props) => {
                 return <a href={row.value} target="_">{row.value}</a>;
             }
             return row.value;
+        },
+        zId: row => {
+            if(showZId) {
+                return <span>{row.value} <Icon path={mdiEyeOffOutline} size={0.7} onClick={() => setShowZId(false)} /></span>
+            } else {
+                return <span>{secretString(row.value)} <Icon path={mdiEyeOutline} size={0.7} onClick={() => setShowZId(true)} /></span>
+            }
         }
     }
 

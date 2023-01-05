@@ -47,7 +47,6 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		sparkData, err = sparkDataForShares([]*store.Share{shr})
 		if err != nil {
 			logrus.Errorf("error querying spark data for share: %v", err)
-			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}
 	feEndpoint := ""
