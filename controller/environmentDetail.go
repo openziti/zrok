@@ -45,7 +45,6 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		sparkData, err = sparkDataForShares(shrs)
 		if err != nil {
 			logrus.Errorf("error querying spark data for shares: %v", err)
-			return metadata.NewGetEnvironmentDetailInternalServerError()
 		}
 	}
 	for _, shr := range shrs {
