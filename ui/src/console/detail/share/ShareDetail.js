@@ -17,7 +17,6 @@ const ShareDetail = (props) => {
             .then(resp => {
                 let detail = resp.data;
                 detail.envZId = props.selection.envZId;
-                console.log(detail);
                 setDetail(detail);
             });
     }, [props.selection]);
