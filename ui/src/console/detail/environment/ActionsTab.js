@@ -1,17 +1,17 @@
 import {Button} from "react-bootstrap";
-import * as identity from "../../../api/environment";
+import * as environment from "../../../api/environment";
 
 const ActionsTab = (props) => {
     const deleteEnvironment = (envZId) => {
         if(window.confirm("Really delete environment '" + envZId + "' and all shares within?")) {
-            identity.disable({body: {identity: envZId}}).then(resp => {
+            environment.disable({body: {identity: envZId}}).then(resp => {
                 console.log(resp);
             });
         }
     }
 
     return (
-        <div class={"actions-tab"}>
+        <div className={"actions-tab"}>
             <h3>Delete your environment '{props.environment.description}' ({props.environment.zId})?</h3>
             <p>
                 This will remove all shares from this environment, and will remove the environment from the network. You

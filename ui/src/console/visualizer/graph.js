@@ -50,6 +50,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                 }
                 let shrNode = {
                     id: shr.token,
+                    envZId: env.environment.zId,
                     label: shrLabel,
                     type: "share",
                     val: 50

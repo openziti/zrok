@@ -53,7 +53,7 @@ const Network = (props) => {
     }
 
     const nodeClicked = (node) => {
-        props.setSelection({id: node.id, type: node.type});
+        props.setSelection(node);
     }
 
     return (

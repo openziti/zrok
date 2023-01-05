@@ -39,7 +39,6 @@ const PropertyTable = (props) => {
             cell: row => {
                 if(props.custom) {
                     if(row.property in props.custom) {
-                        console.log(Date.now());
                         return props.custom[row.property](row);
                     }
                 }

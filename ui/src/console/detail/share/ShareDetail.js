@@ -1,11 +1,12 @@
-import * as metadata from "../../api/metadata";
+import * as metadata from "../../../api/metadata";
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
 import {useEffect, useState} from "react";
 import {mdiEyeOffOutline, mdiEyeOutline, mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
-import PropertyTable from "../PropertyTable";
+import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
-import {secretString} from "./util";
+import {secretString} from "../util";
+import ActionsTab from "./ActionsTab";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -14,7 +15,10 @@ const ShareDetail = (props) => {
     useEffect(() => {
         metadata.getShareDetail(props.selection.id)
             .then(resp => {
-               setDetail(resp.data);
+                let detail = resp.data;
+                detail.envZId = props.selection.envZId;
+                console.log(detail);
+                setDetail(detail);
             });
     }, [props.selection]);
 
@@ -23,7 +27,9 @@ const ShareDetail = (props) => {
         let interval = setInterval(() => {
             metadata.getShareDetail(props.selection.id)
                 .then(resp => {
-                    setDetail(resp.data);
+                    let detail = resp.data;
+                    detail.envZId = props.selection.envZId;
+                    setDetail(detail);
                 });
         }, 1000);
         return () => {
@@ -60,6 +66,9 @@ const ShareDetail = (props) => {
                 <Tabs defaultActiveKey={"detail"}>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <PropertyTable object={detail} custom={customProperties} />
+                    </Tab>
+                    <Tab eventKey={"actions"} title={"Actions"}>
+                        <ActionsTab share={detail} />
                     </Tab>
                 </Tabs>
             </div>

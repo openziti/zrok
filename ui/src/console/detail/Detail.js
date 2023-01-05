@@ -1,5 +1,5 @@
 import AccountDetail from "./AccountDetail";
-import ShareDetail from "./ShareDetail";
+import ShareDetail from "./share/ShareDetail";
 import EnvironmentDetail from "./environment/EnvironmentDetail";
 
 const Detail = (props) => {
