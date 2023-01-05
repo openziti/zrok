@@ -14,7 +14,7 @@ const Success = (props) => {
             console.log("copied enable command");
 
             setShowTooltip(true);
-            setTimeout(() => setShowTooltip(false), 2000);
+            setTimeout(() => setShowTooltip(false), 1000);
 
         } catch(err) {
             console.error("failed to copy", err);
