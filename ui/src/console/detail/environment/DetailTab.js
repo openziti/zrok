@@ -1,7 +1,7 @@
 import PropertyTable from "../../PropertyTable";
 import Icon from "@mdi/react";
 import {mdiEyeOffOutline, mdiEyeOutline} from "@mdi/js";
-import {secretString} from "../util";
+import {secretString} from "../../Utils";
 import {useState} from "react";
 
 const DetailTab = (props) => {

@@ -1,9 +1,9 @@
 import {mdiCardAccountDetails, mdiEyeOutline, mdiEyeOffOutline} from "@mdi/js";
 import Icon from "@mdi/react";
-import PropertyTable from "../PropertyTable";
+import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
 import {useState} from "react";
-import {secretString} from "./util";
+import {secretString} from "../../Utils";
 
 const AccountDetail = (props) => {
     const [showToken, setShowToken] = useState(false);

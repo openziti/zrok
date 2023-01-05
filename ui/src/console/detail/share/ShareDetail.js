@@ -5,7 +5,7 @@ import {mdiEyeOffOutline, mdiEyeOutline, mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
-import {secretString} from "../util";
+import {secretString} from "../../Utils";
 import ActionsTab from "./ActionsTab";
 
 const ShareDetail = (props) => {
@@ -38,11 +38,15 @@ const ShareDetail = (props) => {
     }, [props.selection]);
 
     const customProperties = {
-        metrics: row => <Sparklines data={row.value} limit={60} height={10}>
-            <SparklinesLine color={"#3b2693"}/>
-            <SparklinesSpots/>
-        </Sparklines>,
-        frontendEndpoint: row => <a href={row.value} target="_">{row.value}</a>,
+        metrics: row => (
+            <Sparklines data={row.value} limit={60} height={10}>
+                <SparklinesLine color={"#3b2693"}/>
+                <SparklinesSpots/>
+            </Sparklines>
+        ),
+        frontendEndpoint: row => (
+            <a href={row.value} target="_">{row.value}</a>
+        ),
         backendProxyEndpoint: row => {
             if(row.value.startsWith("http://") || row.value.startsWith("https://")) {
                 return <a href={row.value} target="_">{row.value}</a>;

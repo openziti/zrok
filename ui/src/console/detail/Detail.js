@@ -1,4 +1,4 @@
-import AccountDetail from "./AccountDetail";
+import AccountDetail from "./account/AccountDetail";
 import ShareDetail from "./share/ShareDetail";
 import EnvironmentDetail from "./environment/EnvironmentDetail";
 
