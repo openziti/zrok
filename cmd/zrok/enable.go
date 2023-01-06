@@ -2,16 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/spf13/cobra"
-	"os"
 	user2 "os/user"
-	"strings"
 )
 
 func init() {
@@ -97,16 +94,4 @@ func getHost() (string, string, error) {
 	thisHost := fmt.Sprintf("%v; %v; %v; %v; %v; %v; %v",
 		info.Hostname, info.OS, info.Platform, info.PlatformFamily, info.PlatformVersion, info.KernelVersion, info.KernelArch)
 	return info.Hostname, thisHost, nil
-}
-
-var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166")).Background(lipgloss.Color("0"))
-
-func showError(msg string, err error) {
-	errorLabel := errorStyle.Render("ERROR:")
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v %v (%v)\n", errorLabel, msg, strings.TrimSpace(err.Error()))
-	} else {
-		_, _ = fmt.Fprintf(os.Stderr, "%v %v\n", errorLabel, msg)
-	}
-	os.Exit(1)
 }
