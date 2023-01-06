@@ -21,11 +21,11 @@ func mustGetAdminAuth() runtime.ClientAuthInfoWriter {
 	return httptransport.APIKeyAuth("X-TOKEN", "header", adminToken)
 }
 
-var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166")).Background(lipgloss.Color("0"))
+var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166"))
 var errorLabel = errorStyle.Render("ERROR")
-var warningStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500")).Background(lipgloss.Color("0"))
+var warningStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500"))
 var warningLabel = warningStyle.Render("WARNING")
-var codeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF")).Background(lipgloss.Color("0"))
+var codeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF"))
 
 func showError(msg string, err error) {
 	if err != nil {

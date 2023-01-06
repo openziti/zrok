@@ -26,6 +26,6 @@ func newVersionCommand() *versionCommand {
 }
 
 func (cmd *versionCommand) run(_ *cobra.Command, _ []string) {
-	zrokStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0080"))
+	zrokStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00EE"))
 	fmt.Println(zrokStyle.Render("               _    \n _____ __ ___ | | __\n|_  / '__/ _ \\| |/ /\n / /| | | (_) |   < \n/___|_|  \\___/|_|\\_\\") + "\n\n" + codeStyle.Render(build.String()) + "\n")
 }
