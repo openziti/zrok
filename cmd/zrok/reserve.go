@@ -1,7 +1,6 @@
 package main
 
 import (
-	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
@@ -54,27 +53,29 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		targetEndpoint.Scheme = "https"
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
+			showError("error loading zrokdir", err)
 		}
 		panic(err)
 	}
 
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+	if zrd.Env == nil {
+		showError("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.ZId,
+		EnvZID:               zrd.Env.ZId,
 		ShareMode:            shareMode,
 		BackendMode:          "proxy",
 		BackendProxyEndpoint: targetEndpoint.String(),

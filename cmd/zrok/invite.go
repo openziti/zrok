@@ -45,7 +45,12 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		showError("entered emails do not match... aborting!", nil)
 	}
 
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		showError("error loading zrokdir", err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
 			showError("error creating zrok api client", err)

@@ -29,25 +29,30 @@ func newDisableCommand() *disableCommand {
 	return command
 }
 
-func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
-	env, err := zrokdir.LoadEnvironment()
+func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("could not load environment; not active?", err)
+			showError("unable to load zrokdir", err)
 		}
 		panic(err)
 	}
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+
+	if zrd.Env == nil {
+		showError("no environment found; nothing to disable!", nil)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
 			showError("could not create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := environment.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
-		Identity: env.ZId,
+		Identity: zrd.Env.ZId,
 	}
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
@@ -64,5 +69,5 @@ func (cmd *disableCommand) run(_ *cobra.Command, args []string) {
 			showError("error removing zrok backend identity", err)
 		}
 	}
-	fmt.Printf("zrok environment '%v' disabled for '%v'\n", env.ZId, env.Token)
+	fmt.Printf("zrok environment '%v' disabled for '%v'\n", zrd.Env.ZId, zrd.Env.Token)
 }

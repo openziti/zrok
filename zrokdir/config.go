@@ -11,7 +11,7 @@ type Config struct {
 	ApiEndpoint string `json:"api_endpoint"`
 }
 
-func HasConfig() (bool, error) {
+func hasConfig() (bool, error) {
 	cf, err := configFile()
 	if err != nil {
 		return false, errors.Wrap(err, "error getting config file path")
@@ -26,7 +26,7 @@ func HasConfig() (bool, error) {
 	return true, nil
 }
 
-func LoadConfig() (*Config, error) {
+func loadConfig() (*Config, error) {
 	cf, err := configFile()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting config file path")
@@ -42,7 +42,7 @@ func LoadConfig() (*Config, error) {
 	return cfg, nil
 }
 
-func SaveConfig(cfg *Config) error {
+func saveConfig(cfg *Config) error {
 	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "error marshaling config")

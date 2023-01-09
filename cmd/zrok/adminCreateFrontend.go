@@ -33,7 +33,12 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	publicName := args[1]
 	urlTemplate := args[2]
 
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		panic(err)
 	}

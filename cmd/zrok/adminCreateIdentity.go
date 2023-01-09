@@ -41,7 +41,12 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		panic(err)
 	}

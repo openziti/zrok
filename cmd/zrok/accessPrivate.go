@@ -48,14 +48,16 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
-		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
-		}
-		panic(err)
+		showError("unable to load zrokdir", err)
 	}
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+
+	if zrd.Env == nil {
+		showError("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
 			showError("unable to create zrok client", err)
@@ -63,11 +65,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
 		ShrToken: shrToken,
-		EnvZID:   env.ZId,
+		EnvZID:   zrd.Env.ZId,
 	}
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
@@ -86,7 +88,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, env.ZId, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 

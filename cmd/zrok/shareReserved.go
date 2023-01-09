@@ -51,15 +51,21 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		targetEndpoint = e.String()
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
+			showError("error loading zrokdir", err)
 		}
 		panic(err)
 	}
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+
+	if zrd.Env == nil {
+		ui.Close()
+		showError("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
@@ -67,7 +73,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)

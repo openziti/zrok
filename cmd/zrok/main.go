@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -14,7 +13,6 @@ func init() {
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti-test-kitchen/"))
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
-	zrokdir.AddZrokApiEndpointFlag(&apiEndpoint, rootCmd.PersistentFlags())
 	rootCmd.AddCommand(accessCmd)
 	adminCmd.AddCommand(adminCreateCmd)
 	adminCmd.AddCommand(adminDeleteCmd)
@@ -36,7 +34,6 @@ var rootCmd = &cobra.Command{
 }
 var verbose bool
 var panicInstead bool
-var apiEndpoint string
 
 var accessCmd = &cobra.Command{
 	Use:   "access",

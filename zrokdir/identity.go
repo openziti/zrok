@@ -1,18 +1,13 @@
 package zrokdir
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 )
 
 func ZitiIdentityFile(name string) (string, error) {
-	zrd, err := zrokDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(zrd, "identities", fmt.Sprintf("%v.json", name)), nil
+	return identityFile(name)
 }
 
 func SaveZitiIdentity(name, data string) error {

@@ -87,14 +87,20 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tb.SetInputMode(tb.InputEsc)
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
+			showError("unable to load zrokdir", nil)
 		}
 		panic(err)
 	}
+
+	if zrd.Env == nil {
+		ui.Close()
+		showError("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		ui.Close()
@@ -104,7 +110,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+	zrok, err := zrd.Client()
 	if err != nil {
 		ui.Close()
 		if !panicInstead {
@@ -112,10 +118,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.ZId,
+		EnvZID:               zrd.Env.ZId,
 		ShareMode:            "public",
 		FrontendSelection:    cmd.frontendSelection,
 		BackendMode:          "proxy",
@@ -147,7 +153,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -229,7 +235,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 					switch e.ID {
 					case "q", "<C-c>":
 						ui.Close()
-						cmd.destroy(env.ZId, resp.Payload.ShrToken, zrok, auth)
+						cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 						os.Exit(0)
 					}
 				}
