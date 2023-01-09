@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
@@ -176,7 +177,7 @@ func (l *looper) startup() {
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 	l.env = zrd.Env
 

@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -55,7 +56,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		targetEndpoint, err := url.Parse(args[0])
 		if err != nil {
 			if !panicInstead {
-				showError("invalid target endpoint URL", err)
+				tui.Error("invalid target endpoint URL", err)
 			}
 			panic(err)
 		}
@@ -68,25 +69,25 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		target = args[0]
 
 	default:
-		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load zrokdir", nil)
+			tui.Error("unable to load zrokdir", nil)
 		}
 		panic(err)
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load ziti identity configuration", err)
+			tui.Error("unable to load ziti identity configuration", err)
 		}
 		panic(err)
 	}
@@ -94,7 +95,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
@@ -123,7 +124,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create tunnel", err)
+			tui.Error("unable to create tunnel", err)
 		}
 		panic(err)
 	}
@@ -147,7 +148,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		bh, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
 			if !panicInstead {
-				showError("unable to create proxy backend handler", err)
+				tui.Error("unable to create proxy backend handler", err)
 			}
 			panic(err)
 		}
@@ -161,13 +162,13 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		bh, err = cmd.webBackendMode(cfg)
 		if err != nil {
 			if !panicInstead {
-				showError("unable to create web backend handler", err)
+				tui.Error("unable to create web backend handler", err)
 			}
 			panic(err)
 		}
 
 	default:
-		showError("invalid backend mode", nil)
+		tui.Error("invalid backend mode", nil)
 	}
 
 	logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])

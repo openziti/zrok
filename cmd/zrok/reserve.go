@@ -5,6 +5,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -39,13 +40,13 @@ func newReserveCommand() *reserveCommand {
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	shareMode := args[0]
 	if shareMode != "public" && shareMode != "private" {
-		showError("invalid sharing mode; expecting 'public' or 'private'", nil)
+		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
 	targetEndpoint, err := url.Parse(args[1])
 	if err != nil {
 		if !panicInstead {
-			showError("invalid target endpoint URL", err)
+			tui.Error("invalid target endpoint URL", err)
 		}
 		panic(err)
 	}
@@ -56,19 +57,19 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("error loading zrokdir", err)
+			tui.Error("error loading zrokdir", err)
 		}
 		panic(err)
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
@@ -101,7 +102,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create tunnel", err)
+			tui.Error("unable to create tunnel", err)
 		}
 		panic(err)
 	}

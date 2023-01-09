@@ -2,8 +2,8 @@ package zrokdir
 
 import (
 	"encoding/json"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -20,7 +20,7 @@ func checkMetadata() error {
 	}
 	data, err := os.ReadFile(mf)
 	if err != nil {
-		logrus.Warnf("unable to read zrokdir metadata; ignoring non-existent: %v", err)
+		tui.Warning("unable to open zrokdir metadata; ignoring")
 		return nil
 	}
 	m := &Metadata{}

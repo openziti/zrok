@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"os"
@@ -33,10 +34,10 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
-		showError("unable to load zrokdir", err)
+		tui.Error("unable to load zrokdir", err)
 	}
 
-	_, _ = fmt.Fprintf(os.Stdout, codeStyle.Render("Config")+":\n\n")
+	_, _ = fmt.Fprintf(os.Stdout, tui.CodeStyle.Render("Config")+":\n\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
@@ -47,10 +48,10 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
 	if zrd.Env == nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v: Unable to load your local environment!\n\n", warningLabel)
-		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", codeStyle.Render("zrok enable"))
+		_, _ = fmt.Fprintf(os.Stderr, "%v: Unable to load your local environment!\n\n", tui.WarningLabel)
+		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.CodeStyle.Render("zrok enable"))
 	} else {
-		_, _ = fmt.Fprintf(os.Stdout, codeStyle.Render("Environment")+":\n\n")
+		_, _ = fmt.Fprintf(os.Stdout, tui.CodeStyle.Render("Environment")+":\n\n")
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)

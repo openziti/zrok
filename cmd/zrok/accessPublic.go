@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ func (self *accessPublicCommand) run(_ *cobra.Command, args []string) {
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
 			if !panicInstead {
-				showError(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
+				tui.Error(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
 			}
 			panic(err)
 		}
@@ -42,13 +43,13 @@ func (self *accessPublicCommand) run(_ *cobra.Command, args []string) {
 	frontend, err := publicFrontend.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create http frontend", err)
+			tui.Error("unable to create http frontend", err)
 		}
 		panic(err)
 	}
 	if err := frontend.Run(); err != nil {
 		if !panicInstead {
-			showError("unable to run http frontend", err)
+			tui.Error("unable to run http frontend", err)
 		}
 		panic(err)
 	}

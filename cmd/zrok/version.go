@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/openziti-test-kitchen/zrok/build"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -27,5 +28,5 @@ func newVersionCommand() *versionCommand {
 
 func (cmd *versionCommand) run(_ *cobra.Command, _ []string) {
 	zrokStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00EE"))
-	fmt.Println(zrokStyle.Render("               _    \n _____ __ ___ | | __\n|_  / '__/ _ \\| |/ /\n / /| | | (_) |   < \n/___|_|  \\___/|_|\\_\\") + "\n\n" + codeStyle.Render(build.String()) + "\n")
+	fmt.Println(zrokStyle.Render("               _    \n _____ __ ___ | | __\n|_  / '__/ _ \\| |/ /\n / /| | | (_) |   < \n/___|_|  \\___/|_|\\_\\") + "\n\n" + tui.CodeStyle.Render(build.String()) + "\n")
 }

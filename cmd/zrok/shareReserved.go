@@ -6,6 +6,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -40,7 +41,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		e, err := url.Parse(cmd.overrideEndpoint)
 		if err != nil {
 			if !panicInstead {
-				showError("invalid override endpoint URL", err)
+				tui.Error("invalid override endpoint URL", err)
 			}
 			panic(err)
 		}
@@ -53,19 +54,19 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("error loading zrokdir", err)
+			tui.Error("error loading zrokdir", err)
 		}
 		panic(err)
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
@@ -75,7 +76,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to retrieve reserved share", err)
+			tui.Error("unable to retrieve reserved share", err)
 		}
 		panic(err)
 	}
@@ -86,7 +87,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load ziti identity configuration", err)
+			tui.Error("unable to load ziti identity configuration", err)
 		}
 		panic(err)
 	}
@@ -105,7 +106,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 		if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
 			if !panicInstead {
-				showError("unable to update backend proxy endpoint", err)
+				tui.Error("unable to update backend proxy endpoint", err)
 			}
 			panic(err)
 		}
@@ -117,7 +118,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	httpProxy, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create http backend", err)
+			tui.Error("unable to create http backend", err)
 		}
 		panic(err)
 	}
@@ -125,7 +126,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	go func() {
 		if err := httpProxy.Run(); err != nil {
 			if !panicInstead {
-				showError("unable to run http proxy", err)
+				tui.Error("unable to run http proxy", err)
 			}
 			panic(err)
 		}

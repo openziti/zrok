@@ -4,6 +4,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,19 +34,19 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load zrokdir", err)
+			tui.Error("unable to load zrokdir", err)
 		}
 		panic(err)
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
@@ -59,7 +60,7 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	}
 	if _, err := zrok.Share.Unshare(req, auth); err != nil {
 		if !panicInstead {
-			showError("error releasing share", err)
+			tui.Error("error releasing share", err)
 		}
 		panic(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/foundation/v2/term"
@@ -35,25 +36,25 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 	if !util.IsValidEmail(email) {
-		showError(fmt.Sprintf("'%v' is not a valid email address", email), nil)
+		tui.Error(fmt.Sprintf("'%v' is not a valid email address", email), nil)
 	}
 	confirm, err := term.Prompt("Confirm Email: ")
 	if err != nil {
 		panic(err)
 	}
 	if confirm != email {
-		showError("entered emails do not match... aborting!", nil)
+		tui.Error("entered emails do not match... aborting!", nil)
 	}
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
-		showError("error loading zrokdir", err)
+		tui.Error("error loading zrokdir", err)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("error creating zrok api client", err)
+			tui.Error("error creating zrok api client", err)
 		}
 		panic(err)
 	}
@@ -64,7 +65,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	_, err = zrok.Account.Invite(req)
 	if err != nil {
 		if !panicInstead {
-			showError("error creating invitation", err)
+			tui.Error("error creating invitation", err)
 		}
 		panic(err)
 	}

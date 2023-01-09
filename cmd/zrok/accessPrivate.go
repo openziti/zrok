@@ -7,6 +7,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -43,24 +44,24 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	endpointUrl, err := url.Parse("http://" + cmd.bindAddress)
 	if err != nil {
 		if !panicInstead {
-			showError("invalid endpoint address", err)
+			tui.Error("invalid endpoint address", err)
 		}
 		panic(err)
 	}
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
-		showError("unable to load zrokdir", err)
+		tui.Error("unable to load zrokdir", err)
 	}
 
 	if zrd.Env == nil {
-		showError("unable to load environment; did you 'zrok enable'?", nil)
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
@@ -74,7 +75,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to access", err)
+			tui.Error("unable to access", err)
 		}
 		panic(err)
 	}
@@ -95,7 +96,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	frontend, err := privateFrontend.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create private frontend", err)
+			tui.Error("unable to create private frontend", err)
 		}
 		panic(err)
 	}
@@ -104,7 +105,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 
 	if err := frontend.Run(); err != nil {
 		if !panicInstead {
-			showError("unable to run frontend", err)
+			tui.Error("unable to run frontend", err)
 		}
 	}
 }

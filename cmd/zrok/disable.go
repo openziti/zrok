@@ -5,6 +5,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,19 +34,19 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load zrokdir", err)
+			tui.Error("unable to load zrokdir", err)
 		}
 		panic(err)
 	}
 
 	if zrd.Env == nil {
-		showError("no environment found; nothing to disable!", nil)
+		tui.Error("no environment found; nothing to disable!", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("could not create zrok client", err)
+			tui.Error("could not create zrok client", err)
 		}
 		panic(err)
 	}
@@ -60,13 +61,13 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 	}
 	if err := zrokdir.DeleteEnvironment(); err != nil {
 		if !panicInstead {
-			showError("error removing zrok environment", err)
+			tui.Error("error removing zrok environment", err)
 		}
 		panic(err)
 	}
 	if err := zrokdir.DeleteZitiIdentity("backend"); err != nil {
 		if !panicInstead {
-			showError("error removing zrok backend identity", err)
+			tui.Error("error removing zrok backend identity", err)
 		}
 	}
 	fmt.Printf("zrok environment '%v' disabled for '%v'\n", zrd.Env.ZId, zrd.Env.Token)

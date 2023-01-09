@@ -5,6 +5,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/spf13/cobra"
@@ -65,7 +66,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Environment.Enable(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("the zrok service returned an error", err)
+			tui.Error("the zrok service returned an error", err)
 		}
 		panic(err)
 	}
@@ -73,13 +74,13 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
 	if err := zrd.Save(); err != nil {
 		if !panicInstead {
-			showError("there was an error saving the new environment", err)
+			tui.Error("there was an error saving the new environment", err)
 		}
 		panic(err)
 	}
 	if err := zrokdir.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
 		if !panicInstead {
-			showError("there was an error writing the environment file", err)
+			tui.Error("there was an error writing the environment file", err)
 		}
 		panic(err)
 	}
