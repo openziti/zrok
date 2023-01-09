@@ -3,6 +3,7 @@ package zrokdir
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -19,7 +20,8 @@ func checkMetadata() error {
 	}
 	data, err := os.ReadFile(mf)
 	if err != nil {
-		return errors.Wrapf(err, "error reading metadata file '%v'", mf)
+		logrus.Warnf("unable to read zrokdir metadata; ignoring non-existent: %v", err)
+		return nil
 	}
 	m := &Metadata{}
 	if err := json.Unmarshal(data, m); err != nil {
