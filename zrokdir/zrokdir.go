@@ -5,6 +5,14 @@ import (
 	"path/filepath"
 )
 
+func configFile() (string, error) {
+	zrd, err := zrokDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "config.json"), nil
+}
+
 func environmentFile() (string, error) {
 	zrd, err := zrokDir()
 	if err != nil {
