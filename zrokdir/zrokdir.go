@@ -104,15 +104,23 @@ func Obliterate() error {
 }
 
 func listIdentities() (map[string]struct{}, error) {
+	ids := make(map[string]struct{})
+
 	idd, err := identitiesDir()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting zrokdir identities path")
+	}
+	_, err = os.Stat(idd)
+	if os.IsNotExist(err) {
+		return ids, nil
+	}
+	if err != nil {
+		return nil, errors.Wrapf(err, "error stat-ing zrokdir identities root '%v'", idd)
 	}
 	des, err := os.ReadDir(idd)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error listing zrokdir identities from '%v'", idd)
 	}
-	ids := make(map[string]struct{})
 	for _, de := range des {
 		if strings.HasSuffix(de.Name(), ".json") && !de.IsDir() {
 			name := strings.TrimSuffix(de.Name(), ".json")
