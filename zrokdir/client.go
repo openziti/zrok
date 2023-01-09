@@ -13,7 +13,7 @@ import (
 )
 
 func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
-	apiEndpoint := zrd.ApiEndpoint()
+	apiEndpoint, _ := zrd.ApiEndpoint()
 	apiUrl, err := url.Parse(apiEndpoint)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", zrd)
@@ -34,21 +34,25 @@ func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
 	return zrok, nil
 }
 
-func (zrd *ZrokDir) ApiEndpoint() string {
-	apiEndpoint := "https://api.zrok.io"
+func (zrd *ZrokDir) ApiEndpoint() (apiEndpoint string, from string) {
+	apiEndpoint = "https://api.zrok.io"
+	from = "binary"
 
 	if zrd.Cfg != nil && zrd.Cfg.ApiEndpoint != "" {
 		apiEndpoint = zrd.Cfg.ApiEndpoint
+		from = "config"
 	}
 
 	env := os.Getenv("ZROK_API_ENDPOINT")
 	if env != "" {
 		apiEndpoint = env
+		from = "ZROK_API_ENDPOINT"
 	}
 
 	if zrd.Env != nil && zrd.Env.ApiEndpoint != "" {
 		apiEndpoint = zrd.Env.ApiEndpoint
+		from = "env"
 	}
 
-	return apiEndpoint
+	return apiEndpoint, from
 }

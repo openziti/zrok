@@ -36,22 +36,29 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		showError("unable to load zrokdir", err)
 	}
 
+	_, _ = fmt.Fprintf(os.Stdout, codeStyle.Render("Config")+":\n\n")
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleColoredDark)
+	t.AppendHeader(table.Row{"Property", "Value", "Source"})
+	apiEndpoint, from := zrd.ApiEndpoint()
+	t.AppendRow(table.Row{"API Endpoint", apiEndpoint, from})
+	t.Render()
+	_, _ = fmt.Fprintf(os.Stderr, "\n")
+
 	if zrd.Env == nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%v: Unable to load your local environment!\n\n", warningLabel)
 		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", codeStyle.Render("zrok enable"))
 	} else {
-		_, _ = fmt.Fprintf(os.Stdout, codeStyle.Render("Environment"+":\n"))
-		_, _ = fmt.Fprintf(os.Stdout, "\n")
+		_, _ = fmt.Fprintf(os.Stdout, codeStyle.Render("Environment")+":\n\n")
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleColoredDark)
 		t.AppendHeader(table.Row{"Property", "Value"})
-		t.AppendRow(table.Row{"API Endpoint", zrd.Env.ApiEndpoint})
 		t.AppendRow(table.Row{"Secret Token", zrd.Env.Token})
 		t.AppendRow(table.Row{"Ziti Identity", zrd.Env.ZId})
 		t.Render()
 	}
-
-	_, _ = fmt.Fprintf(os.Stderr, "\n")
+	_, _ = fmt.Fprintf(os.Stdout, "\n")
 }

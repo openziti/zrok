@@ -69,7 +69,8 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: zrd.ApiEndpoint()}
+	apiEndpoint, _ := zrd.ApiEndpoint()
+	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
 	if err := zrd.Save(); err != nil {
 		if !panicInstead {
 			showError("there was an error saving the new environment", err)
