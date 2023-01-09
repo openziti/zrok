@@ -20,7 +20,7 @@ func checkMetadata() error {
 	}
 	data, err := os.ReadFile(mf)
 	if err != nil {
-		tui.Warning("unable to open zrokdir metadata; ignoring")
+		tui.Warning("unable to open zrokdir metadata; ignoring\n")
 		return nil
 	}
 	m := &Metadata{}

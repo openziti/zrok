@@ -15,9 +15,9 @@ var CodeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF"))
 
 func Error(msg string, err error) {
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v: %v (%v)\n", ErrorLabel, msg, strings.TrimSpace(err.Error()))
+		_, _ = fmt.Fprintf(os.Stderr, "[%v]: %v (%v)\n", ErrorLabel, msg, strings.TrimSpace(err.Error()))
 	} else {
-		_, _ = fmt.Fprintf(os.Stderr, "%v %v\n", ErrorLabel, msg)
+		_, _ = fmt.Fprintf(os.Stderr, "[%v] %v\n", ErrorLabel, msg)
 	}
 	os.Exit(1)
 }

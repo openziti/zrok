@@ -48,7 +48,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
 	if zrd.Env == nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v: Unable to load your local environment!\n\n", tui.WarningLabel)
+		tui.Warning("Unable to load your local environment!\n")
 		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.CodeStyle.Render("zrok enable"))
 	} else {
 		_, _ = fmt.Fprintf(os.Stdout, tui.CodeStyle.Render("Environment")+":\n\n")
