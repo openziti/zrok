@@ -10,25 +10,16 @@ import (
 
 type Invite struct {
 	Model
-	Token  string
-	Status string `db:"token_status"`
+	Token string
 }
 
-const (
-	INVITE_STATUS_UNUSED = "UNUSED"
-	INVITE_STATUS_TAKEN  = "TAKEN"
-)
-
 func (str *Store) CreateInvites(invites []*Invite, tx *sqlx.Tx) error {
-	sql := "insert into invites (token, token_status) values %s"
-	invs := make([]any, len(invites)*2)
+	sql := "insert into invites (token) values %s"
+	invs := make([]any, len(invites))
 	queries := make([]string, len(invites))
-	ct := 1
 	for i, inv := range invites {
 		invs[i] = inv.Token
-		invs[i+1] = inv.Status
-		queries[i] = fmt.Sprintf("($%d, $%d)", ct, ct+1)
-		ct = ct + 2
+		queries[i] = fmt.Sprintf("($%d)", i+1)
 	}
 	stmt, err := tx.Prepare(fmt.Sprintf(sql, strings.Join(queries, ",")))
 	if err != nil {
@@ -40,22 +31,34 @@ func (str *Store) CreateInvites(invites []*Invite, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (str *Store) GetInvite(tx *sqlx.Tx) (*Invite, error) {
+func (str *Store) GetInviteByToken(token string, tx *sqlx.Tx) (*Invite, error) {
 	invite := &Invite{}
-	if err := tx.QueryRowx("select * from invites where token_status = $1 limit 1", INVITE_STATUS_UNUSED).StructScan(invite); err != nil {
+	if err := tx.QueryRowx("select * from invites where token = $1", token).StructScan(invite); err != nil {
 		return nil, errors.Wrap(err, "error getting unused invite")
 	}
 	return invite, nil
 }
 
 func (str *Store) UpdateInvite(invite *Invite, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update invites set token = $1, token_status = $2")
+	stmt, err := tx.Prepare("update invites set token = $1")
 	if err != nil {
 		return errors.Wrap(err, "error perparing invites update statement")
 	}
-	_, err = stmt.Exec(invite.Token, invite.Status)
+	_, err = stmt.Exec(invite.Token)
 	if err != nil {
 		return errors.Wrap(err, "error executing invites update statement")
+	}
+	return nil
+}
+
+func (str *Store) DeleteInvite(id int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from invites where id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing invites delete statement")
+	}
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "error executing invites delete statement")
 	}
 	return nil
 }

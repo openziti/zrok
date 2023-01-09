@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/util"
@@ -15,7 +16,8 @@ func init() {
 }
 
 type inviteCommand struct {
-	cmd *cobra.Command
+	cmd   *cobra.Command
+	Token string
 }
 
 func newInviteCommand() *inviteCommand {
@@ -24,8 +26,12 @@ func newInviteCommand() *inviteCommand {
 		Short: "Invite a new user to zrok",
 		Args:  cobra.ExactArgs(0),
 	}
+
 	command := &inviteCommand{cmd: cmd}
 	cmd.Run = command.run
+
+	cmd.Flags().StringVar(&command.Token, "token", "", "Invite token required when Zrok running in token store mode")
+
 	return command
 }
 
@@ -55,6 +61,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	req := account.NewInviteParams()
 	req.Body = &rest_model_zrok.InviteRequest{
 		Email: email,
+		Token: cmd.Token,
 	}
 	_, err = zrok.Account.Invite(req)
 	if err != nil {

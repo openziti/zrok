@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/jaevor/go-nanoid"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/invite"
@@ -12,36 +11,32 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newGenerateCommand().cmd)
+	adminCmd.AddCommand(newGenerateCommand().cmd)
 }
 
 type generateCommand struct {
-	cmd *cobra.Command
+	cmd    *cobra.Command
+	amount int
 }
 
 func newGenerateCommand() *generateCommand {
 	cmd := &cobra.Command{
-		Use:   "generate <optional-amount>",
+		Use:   "generate",
 		Short: "Generate invite tokens (default: 5)",
-		Args:  cobra.RangeArgs(0, 1),
+		Args:  cobra.ExactArgs(0),
 	}
 	command := &generateCommand{cmd: cmd}
 	cmd.Run = command.run
+
+	cmd.Flags().IntVar(&command.amount, "amount", 5, "Amount of tokens to generate")
+
 	return command
 }
 
 func (cmd *generateCommand) run(_ *cobra.Command, args []string) {
-	var iterations int64 = 5
-	if len(args) == 1 {
-		i, err := strconv.ParseInt(args[0], 10, 64)
-		if err != nil {
-			showError("unable to parse amount", err)
-		}
-		iterations = i
-	}
 	var err error
-	tokens := make([]string, iterations)
-	for i := 0; i < int(iterations); i++ {
+	tokens := make([]string, cmd.amount)
+	for i := 0; i < int(cmd.amount); i++ {
 		tokens[i], err = createToken()
 		if err != nil {
 			showError("error creating token", err)

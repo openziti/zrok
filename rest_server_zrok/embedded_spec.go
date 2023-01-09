@@ -903,6 +903,9 @@ func init() {
       "properties": {
         "email": {
           "type": "string"
+        },
+        "token": {
+          "type": "string"
         }
       }
     },
@@ -2059,6 +2062,9 @@ func init() {
       "type": "object",
       "properties": {
         "email": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         }
       }

@@ -39,23 +39,21 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	defer func() { _ = tx.Rollback() }()
 
 	if self.cfg.Registration.TokenStrategy == "store" {
-		invite, err := str.GetInvite(tx)
+		invite, err := str.GetInviteByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Error(err)
-			return account.NewInviteInternalServerError()
+			return account.NewInviteBadRequest()
 		}
-		invite.Status = store.INVITE_STATUS_TAKEN
-		if err := str.UpdateInvite(invite, tx); err != nil {
+		if err := str.DeleteInvite(invite.Id, tx); err != nil {
 			logrus.Error(err)
 			return account.NewInviteInternalServerError()
 		}
-		token = invite.Token
-	} else {
-		token, err = createToken()
-		if err != nil {
-			logrus.Error(err)
-			return account.NewInviteInternalServerError()
-		}
+	}
+
+	token, err = createToken()
+	if err != nil {
+		logrus.Error(err)
+		return account.NewInviteInternalServerError()
 	}
 	ar := &store.AccountRequest{
 		Token:         token,
@@ -120,8 +118,7 @@ func (handler *inviteGenerateHandler) Handle(params invite.InviteGenerateParams)
 	invites := make([]*store.Invite, len(params.Body.Tokens))
 	for i, token := range params.Body.Tokens {
 		invites[i] = &store.Invite{
-			Token:  token,
-			Status: store.INVITE_STATUS_UNUSED,
+			Token: token,
 		}
 	}
 	tx, err := str.Begin()

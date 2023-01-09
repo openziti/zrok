@@ -19,6 +19,9 @@ type InviteRequest struct {
 
 	// email
 	Email string `json:"email,omitempty"`
+
+	// token
+	Token string `json:"token,omitempty"`
 }
 
 // Validate validates this invite request

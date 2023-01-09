@@ -96,6 +96,7 @@
  * @memberof module:types
  * 
  * @property {string} email 
+ * @property {string} token 
  */
 
 /**
