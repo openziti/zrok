@@ -431,6 +431,34 @@ func init() {
         }
       }
     },
+    "/invite/generate": {
+      "post": {
+        "tags": [
+          "invite"
+        ],
+        "operationId": "inviteGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -858,6 +886,17 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "inviteRequest": {
       "type": "object",
@@ -1549,6 +1588,34 @@ func init() {
         }
       }
     },
+    "/invite/generate": {
+      "post": {
+        "tags": [
+          "invite"
+        ],
+        "operationId": "inviteGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -1976,6 +2043,17 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "inviteRequest": {
       "type": "object",

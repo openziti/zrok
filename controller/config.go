@@ -39,6 +39,7 @@ type EmailConfig struct {
 type RegistrationConfig struct {
 	EmailFrom               string
 	RegistrationUrlTemplate string
+	TokenStrategy           string
 }
 
 type ZitiConfig struct {

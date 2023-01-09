@@ -230,3 +230,10 @@
  * 
  * @property {string} email 
  */
+
+/**
+ * @typedef inviteGenerateRequest
+ * @memberof module:types
+ * 
+ * @property {string[]} tokens 
+ */

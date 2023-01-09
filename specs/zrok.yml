@@ -446,6 +446,27 @@ paths:
           schema:
             $ref: "#/definitions/errorMessage"
 
+  #
+  # invite
+  #
+  /invite/generate:
+    post:
+      tags:
+        - invite
+      operationId: inviteGenerate
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/inviteGenerateRequest"
+      responses:
+        201:
+          description: invitation tokens created
+        400:
+          description: invitation tokens not created
+        500:
+          description: internal server error
+
 definitions:
   accessRequest:
     type: object
@@ -739,6 +760,14 @@ definitions:
 
   version:
     type: string
+
+  inviteGenerateRequest:
+    type: object
+    properties:
+      tokens:
+        type: array
+        items:
+          type: string
 
 produces:
 - application/zrok.v1+json

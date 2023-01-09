@@ -4,15 +4,19 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/invite"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 
 type inviteHandler struct {
+	cfg *Config
 }
 
-func newInviteHandler() *inviteHandler {
-	return &inviteHandler{}
+func newInviteHandler(cfg *Config) *inviteHandler {
+	return &inviteHandler{
+		cfg: cfg,
+	}
 }
 
 func (self *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
@@ -25,17 +29,7 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		return account.NewInviteBadRequest()
 	}
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
-
-	token, err := createToken()
-	if err != nil {
-		logrus.Error(err)
-		return account.NewInviteInternalServerError()
-	}
-	ar := &store.AccountRequest{
-		Token:         token,
-		Email:         params.Body.Email,
-		SourceAddress: params.HTTPRequest.RemoteAddr,
-	}
+	var token string
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -43,6 +37,31 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		return account.NewInviteInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
+
+	if self.cfg.Registration.TokenStrategy == "store" {
+		invite, err := str.GetInvite(tx)
+		if err != nil {
+			logrus.Error(err)
+			return account.NewInviteInternalServerError()
+		}
+		invite.Status = store.INVITE_STATUS_TAKEN
+		if err := str.UpdateInvite(invite, tx); err != nil {
+			logrus.Error(err)
+			return account.NewInviteInternalServerError()
+		}
+		token = invite.Token
+	} else {
+		token, err = createToken()
+		if err != nil {
+			logrus.Error(err)
+			return account.NewInviteInternalServerError()
+		}
+	}
+	ar := &store.AccountRequest{
+		Token:         token,
+		Email:         params.Body.Email,
+		SourceAddress: params.HTTPRequest.RemoteAddr,
+	}
 
 	if _, err := str.FindAccountWithEmail(params.Body.Email, tx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
@@ -82,4 +101,45 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)
 
 	return account.NewInviteCreated()
+}
+
+type inviteGenerateHandler struct {
+}
+
+func newInviteGenerateHandler() *inviteGenerateHandler {
+	return &inviteGenerateHandler{}
+}
+
+func (handler *inviteGenerateHandler) Handle(params invite.InviteGenerateParams) middleware.Responder {
+	if params.Body == nil || len(params.Body.Tokens) == 0 {
+		logrus.Error("missing tokens")
+		return invite.NewInviteGenerateBadRequest()
+	}
+	logrus.Infof("received invite generate request with %d tokens", len(params.Body.Tokens))
+
+	invites := make([]*store.Invite, len(params.Body.Tokens))
+	for i, token := range params.Body.Tokens {
+		invites[i] = &store.Invite{
+			Token:  token,
+			Status: store.INVITE_STATUS_UNUSED,
+		}
+	}
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return invite.NewInviteGenerateInternalServerError()
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if err := str.CreateInvites(invites, tx); err != nil {
+		logrus.Error(err)
+		return invite.NewInviteGenerateInternalServerError()
+	}
+
+	if err := tx.Commit(); err != nil {
+		logrus.Errorf("error committing inviteGenerate request: %v", err)
+		return account.NewInviteInternalServerError()
+	}
+
+	return invite.NewInviteGenerateCreated()
 }
