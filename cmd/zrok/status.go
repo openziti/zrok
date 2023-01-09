@@ -40,9 +40,9 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
-	t.AppendHeader(table.Row{"Property", "Value", "Source"})
+	t.AppendHeader(table.Row{"Config", "Value", "Source"})
 	apiEndpoint, from := zrd.ApiEndpoint()
-	t.AppendRow(table.Row{"API Endpoint", apiEndpoint, from})
+	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, from})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 

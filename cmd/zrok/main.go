@@ -19,6 +19,7 @@ func init() {
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
 	rootCmd.AddCommand(adminCmd)
+	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
 }
@@ -63,6 +64,11 @@ var adminListCmd = &cobra.Command{
 var adminUpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update global resources",
+}
+
+var configCmd = &cobra.Command{
+	Use:   "config",
+	Short: "Configure your zrok environment",
 }
 
 var shareCmd = &cobra.Command{
