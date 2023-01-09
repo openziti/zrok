@@ -36,6 +36,10 @@ func Initialize() (*ZrokDir, error) {
 }
 
 func Load() (*ZrokDir, error) {
+	if err := checkMetadata(); err != nil {
+		return nil, err
+	}
+
 	zrd := &ZrokDir{}
 
 	ids, err := listIdentities()
@@ -72,6 +76,9 @@ func Load() (*ZrokDir, error) {
 }
 
 func (zrd *ZrokDir) Save() error {
+	if err := writeMetadata(); err != nil {
+		return errors.Wrap(err, "error saving metadata")
+	}
 	if zrd.Env != nil {
 		if err := saveEnvironment(zrd.Env); err != nil {
 			return errors.Wrap(err, "error saving environment")
@@ -145,6 +152,14 @@ func identitiesDir() (string, error) {
 		return "", err
 	}
 	return filepath.Join(zrd, "identities"), nil
+}
+
+func metadataFile() (string, error) {
+	zrd, err := zrokDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "metadata.json"), nil
 }
 
 func zrokDir() (string, error) {
