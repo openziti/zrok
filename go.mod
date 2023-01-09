@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/charmbracelet/lipgloss v0.6.0
-	github.com/gizak/termui/v3 v3.1.0
 	github.com/go-openapi/errors v0.20.2
 	github.com/go-openapi/loads v0.21.1
 	github.com/go-openapi/runtime v0.24.1
@@ -15,13 +14,13 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/influxdata/influxdb-client-go/v2 v2.11.0
 	github.com/jaevor/go-nanoid v1.3.0
+	github.com/jedib0t/go-pretty/v6 v6.4.3
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.0
 	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/michaelquigley/cf v0.0.13
 	github.com/michaelquigley/pfxlog v0.6.9
-	github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/openziti/edge v0.22.39
 	github.com/openziti/foundation/v2 v2.0.4
@@ -31,9 +30,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.8
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
-	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
-	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/wneessen/go-mail v0.2.7
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
@@ -58,7 +55,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.4.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
@@ -69,7 +65,6 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/muesli/reflow v0.2.1-0.20210115123740-9e1d0d53df68 // indirect
 	github.com/muesli/termenv v0.11.1-0.20220204035834-5ac8409525e0 // indirect
@@ -86,6 +81,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect

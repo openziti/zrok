@@ -1,6 +1,7 @@
 package webBackend
 
 import (
+	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
@@ -38,7 +39,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 	return &backend{
 		cfg:      cfg,
 		listener: listener,
-		handler:  http.FileServer(http.Dir(cfg.WebRoot)),
+		handler:  &requestLogger{handler: http.FileServer(http.Dir(cfg.WebRoot))},
 	}, nil
 }
 
@@ -51,4 +52,13 @@ func (self *backend) Run() error {
 
 func (self *backend) Requests() func() int32 {
 	return func() int32 { return 0 }
+}
+
+type requestLogger struct {
+	handler http.Handler
+}
+
+func (rl *requestLogger) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	fmt.Printf("web <= %v %v <= %v\n", req.Method, req.URL.String(), req.Header["X-Real-Ip"])
+	rl.handler.ServeHTTP(resp, req)
 }

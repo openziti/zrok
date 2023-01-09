@@ -2,6 +2,7 @@ package proxyBackend
 
 import (
 	"context"
+	"fmt"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -80,6 +81,7 @@ func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
 	proxy.Transport = tpt
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
+		fmt.Printf("proxy <= %v %v <= %v\n", req.Method, req.URL.String(), req.Header["X-Real-Ip"])
 		director(req)
 		logrus.Debugf("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")

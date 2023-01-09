@@ -1,7 +1,6 @@
 package main
 
 import (
-	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
@@ -53,7 +52,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("error loading zrokdir", err)
 		}
@@ -61,13 +59,11 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if zrd.Env == nil {
-		ui.Close()
 		showError("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zrok, err := zrd.Client()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create zrok client", err)
 		}
@@ -89,7 +85,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to load ziti identity configuration", err)
 		}
@@ -121,7 +116,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	httpProxy, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create http backend", err)
 		}

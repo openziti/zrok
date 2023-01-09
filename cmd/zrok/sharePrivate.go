@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	ui "github.com/gizak/termui/v3"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
@@ -103,7 +102,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               zrd.Env.ZId,
 		ShareMode:            "private",
-		BackendMode:          "proxy",
+		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 	}
@@ -121,7 +120,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create share", err)
 		}
@@ -145,7 +143,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
 				showError("unable to create proxy backend handler", err)
 			}
@@ -160,7 +157,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
 				showError("unable to create web backend handler", err)
 			}
@@ -168,7 +164,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	default:
-		ui.Close()
 		showError("invalid backend mode", nil)
 	}
 

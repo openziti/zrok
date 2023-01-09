@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	tb "github.com/nsf/termbox-go"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
@@ -30,7 +27,6 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	quiet             bool
 	basicAuth         []string
 	frontendSelection []string
 	backendMode       string
@@ -44,7 +40,6 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	cmd.Flags().BoolVarP(&command.quiet, "quiet", "q", false, "Disable TUI 'chrome' for quiet operation")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
@@ -76,20 +71,8 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	if !cmd.quiet {
-		if err := ui.Init(); err != nil {
-			if !panicInstead {
-				showError("unable to initialize user interface", err)
-			}
-			panic(err)
-		}
-		defer ui.Close()
-		tb.SetInputMode(tb.InputEsc)
-	}
-
 	zrd, err := zrokdir.Load()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to load zrokdir", nil)
 		}
@@ -97,13 +80,11 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if zrd.Env == nil {
-		ui.Close()
 		showError("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to load ziti identity configuration", err)
 		}
@@ -112,7 +93,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	zrok, err := zrd.Client()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create zrok client", err)
 		}
@@ -124,7 +104,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		EnvZID:               zrd.Env.ZId,
 		ShareMode:            "public",
 		FrontendSelection:    cmd.frontendSelection,
-		BackendMode:          "proxy",
+		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 	}
@@ -142,7 +122,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
 			showError("unable to create tunnel", err)
 		}
@@ -167,7 +146,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		bh, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
 				showError("unable to create proxy backend handler", err)
 			}
@@ -182,7 +160,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		bh, err = cmd.webBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
 				showError("unable to create web backend handler", err)
 			}
@@ -190,75 +167,13 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	default:
-		ui.Close()
 		showError("invalid backend mode", nil)
 	}
 
-	if !cmd.quiet {
-		ui.Clear()
-		w, h := ui.TerminalDimensions()
-
-		p := widgets.NewParagraph()
-		p.Border = true
-		p.Title = " access your zrok share "
-		p.Text = fmt.Sprintf("%v%v", strings.Repeat(" ", (((w-12)-len(resp.Payload.FrontendProxyEndpoints[0]))/2)-1), resp.Payload.FrontendProxyEndpoints[0])
-		p.TextStyle = ui.Style{Fg: ui.ColorWhite}
-		p.PaddingTop = 1
-		p.SetRect(5, 5, w-10, 10)
-
-		lastRequests := float64(0)
-		var requestData []float64
-		spk := widgets.NewSparkline()
-		spk.Title = " requests "
-		spk.Data = requestData
-		spk.LineColor = ui.ColorCyan
-
-		slg := widgets.NewSparklineGroup(spk)
-		slg.SetRect(5, 11, w-10, h-5)
-
-		ui.Render(p, slg)
-
-		ticker := time.NewTicker(time.Second).C
-		uiEvents := ui.PollEvents()
-		for {
-			select {
-			case e := <-uiEvents:
-				switch e.Type {
-				case ui.ResizeEvent:
-					ui.Clear()
-					w, h = ui.TerminalDimensions()
-					p.SetRect(5, 5, w-10, 10)
-					slg.SetRect(5, 11, w-10, h-5)
-					ui.Render(p, slg)
-
-				case ui.KeyboardEvent:
-					switch e.ID {
-					case "q", "<C-c>":
-						ui.Close()
-						cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
-						os.Exit(0)
-					}
-				}
-
-			case <-ticker:
-				currentRequests := float64(bh.Requests()())
-				deltaRequests := currentRequests - lastRequests
-				requestData = append(requestData, deltaRequests)
-				lastRequests = currentRequests
-				requestData = append(requestData, deltaRequests)
-				for len(requestData) > w-17 {
-					requestData = requestData[1:]
-				}
-				spk.Title = fmt.Sprintf(" requests (%d) ", int(currentRequests))
-				spk.Data = requestData
-				ui.Render(p, slg)
-			}
-		}
-	} else {
-		logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
-		for {
-			time.Sleep(30 * time.Second)
-		}
+	logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
+	for {
+		time.Sleep(5 * time.Second)
+		logrus.Infof("requests: %d", bh.Requests()())
 	}
 }
 
