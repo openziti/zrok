@@ -23,5 +23,5 @@ func Error(msg string, err error) {
 }
 
 func Warning(msg string, v ...interface{}) {
-	_, _ = fmt.Fprintf(os.Stderr, "%v: "+msg, append([]interface{}{WarningLabel}, v...))
+	_, _ = fmt.Fprintf(os.Stderr, "%v: "+msg+"\n", append([]interface{}{WarningLabel}, v...))
 }
