@@ -14,7 +14,7 @@ type shareModel struct {
 	frontendDescriptions []string
 	shareMode            string
 	backendMode          string
-	requests             []*endpoints.BackendRequest
+	requests             []*endpoints.Request
 	logMessages          []string
 	width                int
 	height               int
@@ -33,8 +33,8 @@ func (m *shareModel) Init() tea.Cmd { return nil }
 
 func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case *endpoints.BackendRequest:
-		m.requests = append([]*endpoints.BackendRequest{msg}, m.requests...)
+	case *endpoints.Request:
+		m.requests = append([]*endpoints.Request{msg}, m.requests...)
 		if len(m.requests) > 2048 {
 			m.requests = m.requests[:2048]
 		}

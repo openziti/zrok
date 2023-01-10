@@ -12,7 +12,7 @@ import (
 type accessModel struct {
 	shrToken      string
 	localEndpoint string
-	requests      []*endpoints.BackendRequest
+	requests      []*endpoints.Request
 	width         int
 	height        int
 }
@@ -28,8 +28,8 @@ func (m *accessModel) Init() tea.Cmd { return nil }
 
 func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case *endpoints.BackendRequest:
-		m.requests = append([]*endpoints.BackendRequest{msg}, m.requests...)
+	case *endpoints.Request:
+		m.requests = append([]*endpoints.Request{msg}, m.requests...)
 		if len(m.requests) > 2048 {
 			m.requests = m.requests[:2048]
 		}

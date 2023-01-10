@@ -6,19 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/url"
 	"strings"
-	"time"
 )
-
-type BackendHandler interface {
-	Requests() func() int32
-}
-
-type BackendRequest struct {
-	Stamp      time.Time
-	RemoteAddr string
-	Method     string
-	Path       string
-}
 
 func GetRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
 	svc, found := ctx.GetService(name)

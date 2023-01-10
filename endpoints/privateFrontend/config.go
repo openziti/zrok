@@ -6,7 +6,7 @@ type Config struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
-	RequestsChan chan *endpoints.BackendRequest
+	RequestsChan chan *endpoints.Request
 }
 
 func DefaultConfig(identityName string) *Config {

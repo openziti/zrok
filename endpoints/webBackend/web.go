@@ -15,7 +15,7 @@ type Config struct {
 	IdentityPath string
 	WebRoot      string
 	ShrToken     string
-	RequestsChan chan *endpoints.BackendRequest
+	RequestsChan chan *endpoints.Request
 }
 
 type backend struct {
@@ -62,13 +62,13 @@ func (self *backend) Requests() func() int32 {
 }
 
 type requestGrabber struct {
-	requests chan *endpoints.BackendRequest
+	requests chan *endpoints.Request
 	handler  http.Handler
 }
 
 func (rl *requestGrabber) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if rl.requests != nil {
-		rl.requests <- &endpoints.BackendRequest{
+		rl.requests <- &endpoints.Request{
 			Stamp:      time.Now(),
 			RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
 			Method:     req.Method,

@@ -77,7 +77,7 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		if cfg.RequestsChan != nil {
-			cfg.RequestsChan <- &endpoints.BackendRequest{
+			cfg.RequestsChan <- &endpoints.Request{
 				Stamp:      time.Now(),
 				RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
 				Method:     req.Method,

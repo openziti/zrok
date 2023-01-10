@@ -86,7 +86,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	cfg := privateFrontend.DefaultConfig("backend")
 	cfg.ShrToken = shrToken
 	cfg.Address = cmd.bindAddress
-	cfg.RequestsChan = make(chan *endpoints.BackendRequest, 1024)
+	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)

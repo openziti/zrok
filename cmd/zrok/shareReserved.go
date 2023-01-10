@@ -103,7 +103,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
-	requestsChan := make(chan *endpoints.BackendRequest, 1024)
+	requestsChan := make(chan *endpoints.Request, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
@@ -182,7 +182,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.BackendHandler, error) {
+func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -197,7 +197,7 @@ func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxyBackend.Config) (end
 	return be, nil
 }
 
-func (cmd *shareReservedCommand) webBackendMode(cfg *webBackend.Config) (endpoints.BackendHandler, error) {
+func (cmd *shareReservedCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")

@@ -141,7 +141,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	requestsChan := make(chan *endpoints.BackendRequest, 1024)
+	requestsChan := make(chan *endpoints.Request, 1024)
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
@@ -208,7 +208,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.BackendHandler, error) {
+func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -223,7 +223,7 @@ func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpo
 	return be, nil
 }
 
-func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (endpoints.BackendHandler, error) {
+func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
