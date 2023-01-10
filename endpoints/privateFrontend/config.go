@@ -1,9 +1,12 @@
 package privateFrontend
 
+import "github.com/openziti-test-kitchen/zrok/endpoints"
+
 type Config struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
+	RequestsChan chan *endpoints.BackendRequest
 }
 
 func DefaultConfig(identityName string) *Config {

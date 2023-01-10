@@ -10,7 +10,7 @@ import (
 )
 
 type shareModel struct {
-	shareToken           string
+	shrToken             string
 	frontendDescriptions []string
 	shareMode            string
 	backendMode          string
@@ -20,9 +20,9 @@ type shareModel struct {
 	height               int
 }
 
-func newShareModel(shareToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
+func newShareModel(shrToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
 	return &shareModel{
-		shareToken:           shareToken,
+		shrToken:             shrToken,
 		frontendDescriptions: frontendEndpoints,
 		shareMode:            shareMode,
 		backendMode:          backendMode,
@@ -42,10 +42,11 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		shareHeaderStyle.Width(m.width - 30)
-		configHeaderStyle.Width(26)
+		shareConfigStyle.Width(26)
+		shareRequestsStyle.Width(m.width - 2)
+
 		m.height = msg.Height
-		requestsStyle.Width(m.width - 2)
-		requestsStyle.Height(m.height - (len(m.frontendDescriptions) + 6))
+		shareRequestsStyle.Height(m.height - (len(m.frontendDescriptions) + 6))
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -62,9 +63,9 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *shareModel) View() string {
 	topRow := lipgloss.JoinHorizontal(lipgloss.Top,
 		shareHeaderStyle.Render(strings.Join(m.frontendDescriptions, "\n")),
-		configHeaderStyle.Render(m.renderConfig()),
+		shareConfigStyle.Render(m.renderConfig()),
 	)
-	requests := requestsStyle.Render(m.renderBackendRequests())
+	requests := shareRequestsStyle.Render(m.renderBackendRequests())
 	all := lipgloss.JoinVertical(lipgloss.Left, topRow, requests)
 	return all
 }
@@ -88,7 +89,7 @@ func (m *shareModel) renderConfig() string {
 
 func (m *shareModel) renderBackendRequests() string {
 	out := ""
-	maxRows := requestsStyle.GetHeight()
+	maxRows := shareRequestsStyle.GetHeight()
 	for i := 0; i < maxRows && i < len(m.requests); i++ {
 		req := m.requests[i]
 		out += fmt.Sprintf("%v %v -> %v %v",
@@ -122,14 +123,14 @@ var shareHeaderStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("63")).
 	Align(lipgloss.Center)
 
-var configHeaderStyle = lipgloss.NewStyle().
+var shareConfigStyle = lipgloss.NewStyle().
 	Height(3).
 	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63")).
 	Align(lipgloss.Center)
 
-var requestsStyle = lipgloss.NewStyle().
+var shareRequestsStyle = lipgloss.NewStyle().
 	Height(3).
 	PaddingLeft(2).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
