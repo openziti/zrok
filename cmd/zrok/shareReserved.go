@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
@@ -13,7 +15,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 func init() {
@@ -22,6 +23,7 @@ func init() {
 
 type shareReservedCommand struct {
 	overrideEndpoint string
+	headless         bool
 	cmd              *cobra.Command
 }
 
@@ -32,6 +34,7 @@ func newShareReservedCommand() *shareReservedCommand {
 	}
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Run = command.run
 	return command
 }
@@ -100,12 +103,14 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
+	requestsChan := make(chan *endpoints.BackendRequest, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        shrToken,
+			RequestsChan:    requestsChan,
 		}
 		_, err := cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -120,6 +125,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     shrToken,
+			RequestsChan: requestsChan,
 		}
 		_, err := cmd.webBackendMode(cfg)
 		if err != nil {
@@ -133,16 +139,46 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid backend mode", nil)
 	}
 
-	switch resp.Payload.ShareMode {
-	case "public":
-		logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
+	if cmd.headless {
+		switch resp.Payload.ShareMode {
+		case "public":
+			logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
 
-	case "private":
-		logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
-	}
+		case "private":
+			logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
+		}
+		for {
+			select {
+			case req := <-requestsChan:
+				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+			}
+		}
+	} else {
+		var shareDescription string
+		switch resp.Payload.ShareMode {
+		case "public":
+			shareDescription = resp.Payload.FrontendEndpoint
+		case "private":
+			shareDescription = fmt.Sprintf("access your share with: %v", tui.CodeStyle.Render(fmt.Sprintf("zrok access private %v", shrToken)))
+		}
 
-	for {
-		time.Sleep(30 * time.Second)
+		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)
+		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+
+		go func() {
+			for {
+				select {
+				case req := <-requestsChan:
+					prg.Send(req)
+				}
+			}
+		}()
+
+		if _, err := prg.Run(); err != nil {
+			tui.Error("An error occurred", err)
+		}
+
+		close(requestsChan)
 	}
 }
 
