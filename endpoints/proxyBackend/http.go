@@ -91,7 +91,6 @@ func newReverseProxy(target string, requests chan *endpoints.BackendRequest) (*h
 				Path:       req.URL.String(),
 			}
 		}
-		fmt.Printf("proxy <= %v %v <= %v\n", req.Method, req.URL.String(), req.Header["X-Real-Ip"])
 		director(req)
 		req.Header.Set("X-Proxy", "zrok")
 	}
