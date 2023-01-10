@@ -13,7 +13,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/invite"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 )
@@ -63,7 +62,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 	cli.Account = account.New(transport, formats)
 	cli.Admin = admin.New(transport, formats)
 	cli.Environment = environment.New(transport, formats)
-	cli.Invite = invite.New(transport, formats)
 	cli.Metadata = metadata.New(transport, formats)
 	cli.Share = share.New(transport, formats)
 	return cli
@@ -116,8 +114,6 @@ type Zrok struct {
 
 	Environment environment.ClientService
 
-	Invite invite.ClientService
-
 	Metadata metadata.ClientService
 
 	Share share.ClientService
@@ -131,7 +127,6 @@ func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Account.SetTransport(transport)
 	c.Admin.SetTransport(transport)
 	c.Environment.SetTransport(transport)
-	c.Invite.SetTransport(transport)
 	c.Metadata.SetTransport(transport)
 	c.Share.SetTransport(transport)
 }

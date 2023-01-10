@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/invite"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/spf13/cobra"
@@ -49,11 +49,11 @@ func (cmd *generateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	req := invite.NewInviteGenerateParams()
+	req := admin.NewInviteGenerateParams()
 	req.Body = &rest_model_zrok.InviteGenerateRequest{
 		Tokens: tokens,
 	}
-	_, err = zrok.Invite.InviteGenerate(req)
+	_, err = zrok.Admin.InviteGenerate(req, mustGetAdminAuth())
 	if err != nil {
 		if !panicInstead {
 			showError("error creating invite tokens", err)

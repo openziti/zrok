@@ -202,6 +202,28 @@ paths:
           description: unauthorized
         500:
           description: internal server error
+
+  /invite/generate:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: inviteGenerate
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/inviteGenerateRequest"
+      responses:
+        201:
+          description: invitation tokens created
+        400:
+          description: invitation tokens not created
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
   #
   # environment
   #
@@ -445,27 +467,6 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
-
-  #
-  # invite
-  #
-  /invite/generate:
-    post:
-      tags:
-        - invite
-      operationId: inviteGenerate
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/inviteGenerateRequest"
-      responses:
-        201:
-          description: invitation tokens created
-        400:
-          description: invitation tokens not created
-        500:
-          description: internal server error
 
 definitions:
   accessRequest:

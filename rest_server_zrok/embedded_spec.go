@@ -433,8 +433,13 @@ func init() {
     },
     "/invite/generate": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
-          "invite"
+          "admin"
         ],
         "operationId": "inviteGenerate",
         "parameters": [
@@ -452,6 +457,9 @@ func init() {
           },
           "400": {
             "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"
@@ -1593,8 +1601,13 @@ func init() {
     },
     "/invite/generate": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
-          "invite"
+          "admin"
         ],
         "operationId": "inviteGenerate",
         "parameters": [
@@ -1612,6 +1625,9 @@ func init() {
           },
           "400": {
             "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"

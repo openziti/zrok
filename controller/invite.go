@@ -3,8 +3,9 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/invite"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/sirupsen/logrus"
 )
@@ -108,10 +109,15 @@ func newInviteGenerateHandler() *inviteGenerateHandler {
 	return &inviteGenerateHandler{}
 }
 
-func (handler *inviteGenerateHandler) Handle(params invite.InviteGenerateParams) middleware.Responder {
+func (handler *inviteGenerateHandler) Handle(params admin.InviteGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	if !principal.Admin {
+		logrus.Errorf("invalid admin principal")
+		return admin.NewListFrontendsUnauthorized()
+	}
+
 	if params.Body == nil || len(params.Body.Tokens) == 0 {
 		logrus.Error("missing tokens")
-		return invite.NewInviteGenerateBadRequest()
+		return admin.NewInviteGenerateBadRequest()
 	}
 	logrus.Infof("received invite generate request with %d tokens", len(params.Body.Tokens))
 
@@ -124,13 +130,13 @@ func (handler *inviteGenerateHandler) Handle(params invite.InviteGenerateParams)
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Error(err)
-		return invite.NewInviteGenerateInternalServerError()
+		return admin.NewInviteGenerateInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	if err := str.CreateInvites(invites, tx); err != nil {
 		logrus.Error(err)
-		return invite.NewInviteGenerateInternalServerError()
+		return admin.NewInviteGenerateInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -138,5 +144,5 @@ func (handler *inviteGenerateHandler) Handle(params invite.InviteGenerateParams)
 		return account.NewInviteInternalServerError()
 	}
 
-	return invite.NewInviteGenerateCreated()
+	return admin.NewInviteGenerateCreated()
 }
