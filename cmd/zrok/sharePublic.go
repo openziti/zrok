@@ -181,7 +181,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		bh.Requests()()
 	}()
 
-	prg := tea.NewProgram(newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints), tea.WithAltScreen())
+	prg := tea.NewProgram(newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode), tea.WithAltScreen())
 	if _, err := prg.Run(); err != nil {
 		tui.Error("An error occurred", err)
 	}
