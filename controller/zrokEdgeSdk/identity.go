@@ -12,10 +12,10 @@ import (
 	"time"
 )
 
-func CreateEnvironmentIdentity(secretToken, accountEmail, envDescription string, edge *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
+func CreateEnvironmentIdentity(uniqueToken, accountEmail, envDescription string, edge *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
 	identityType := rest_model_edge.IdentityTypeUser
 	moreTags := map[string]interface{}{"zrokEmail": accountEmail}
-	return CreateIdentity(accountEmail+"-"+secretToken+"-"+envDescription, identityType, moreTags, edge)
+	return CreateIdentity(accountEmail+"-"+uniqueToken+"-"+envDescription, identityType, moreTags, edge)
 }
 
 func CreateIdentity(name string, identityType rest_model_edge.IdentityType, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (*identity.CreateIdentityCreated, error) {
