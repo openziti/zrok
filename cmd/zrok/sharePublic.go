@@ -78,7 +78,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", nil)
+			tui.Error("unable to load zrokdir", err)
 		}
 		panic(err)
 	}
@@ -102,6 +102,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
+
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
@@ -127,7 +128,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to create tunnel", err)
+			tui.Error("unable to create share", err)
 		}
 		panic(err)
 	}
@@ -140,7 +141,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	var bh endpoints.BackendHandler
 	requestsChan := make(chan *endpoints.BackendRequest, 1024)
 	switch cmd.backendMode {
 	case "proxy":
@@ -150,7 +150,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			ShrToken:        resp.Payload.ShrToken,
 			RequestsChan:    requestsChan,
 		}
-		bh, err = cmd.proxyBackendMode(cfg)
+		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
 			if !panicInstead {
 				tui.Error("unable to create proxy backend handler", err)
@@ -165,7 +165,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			ShrToken:     resp.Payload.ShrToken,
 			RequestsChan: requestsChan,
 		}
-		bh, err = cmd.webBackendMode(cfg)
+		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
 			if !panicInstead {
 				tui.Error("unable to create web backend handler", err)
@@ -176,8 +176,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	default:
 		tui.Error("invalid backend mode", nil)
 	}
-
-	_ = bh.Requests()()
 
 	if cmd.headless {
 		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(resp.Payload.FrontendProxyEndpoints, "\n"))
