@@ -32,6 +32,7 @@ type sharePublicCommand struct {
 	basicAuth         []string
 	frontendSelection []string
 	backendMode       string
+	headless          bool
 	cmd               *cobra.Command
 }
 
@@ -45,6 +46,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Run = command.run
 	return command
 }
@@ -177,30 +179,35 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	_ = bh.Requests()()
 
-	//logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
-	//for {
-	//	time.Sleep(5 * time.Second)
-	//	logrus.Infof("requests: %d", bh.Requests()())
-	//}
-
-	mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
-	prg := tea.NewProgram(mdl, tea.WithAltScreen())
-
-	go func() {
+	if cmd.headless {
+		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(resp.Payload.FrontendProxyEndpoints, "\n"))
 		for {
 			select {
 			case req := <-requestsChan:
-				prg.Send(req)
+				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
-	}()
 
-	if _, err := prg.Run(); err != nil {
-		tui.Error("An error occurred", err)
+	} else {
+		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
+		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+
+		go func() {
+			for {
+				select {
+				case req := <-requestsChan:
+					prg.Send(req)
+				}
+			}
+		}()
+
+		if _, err := prg.Run(); err != nil {
+			tui.Error("An error occurred", err)
+		}
+
+		close(requestsChan)
+		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 	}
-
-	close(requestsChan)
-	cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 }
 
 func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.BackendHandler, error) {

@@ -10,22 +10,22 @@ import (
 )
 
 type shareModel struct {
-	shareToken        string
-	frontendEndpoints []string
-	shareMode         string
-	backendMode       string
-	requests          []*endpoints.BackendRequest
-	logMessages       []string
-	width             int
-	height            int
+	shareToken           string
+	frontendDescriptions []string
+	shareMode            string
+	backendMode          string
+	requests             []*endpoints.BackendRequest
+	logMessages          []string
+	width                int
+	height               int
 }
 
 func newShareModel(shareToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
 	return &shareModel{
-		shareToken:        shareToken,
-		frontendEndpoints: frontendEndpoints,
-		shareMode:         shareMode,
-		backendMode:       backendMode,
+		shareToken:           shareToken,
+		frontendDescriptions: frontendEndpoints,
+		shareMode:            shareMode,
+		backendMode:          backendMode,
 	}
 }
 
@@ -45,7 +45,7 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		configHeaderStyle.Width(26)
 		m.height = msg.Height
 		requestsStyle.Width(m.width - 2)
-		requestsStyle.Height(m.height - (len(m.frontendEndpoints) + 6))
+		requestsStyle.Height(m.height - (len(m.frontendDescriptions) + 6))
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -61,7 +61,7 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *shareModel) View() string {
 	topRow := lipgloss.JoinHorizontal(lipgloss.Top,
-		shareHeaderStyle.Render(strings.Join(m.frontendEndpoints, "\n")),
+		shareHeaderStyle.Render(strings.Join(m.frontendDescriptions, "\n")),
 		configHeaderStyle.Render(m.renderConfig()),
 	)
 	requests := requestsStyle.Render(m.renderBackendRequests())
