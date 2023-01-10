@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"strings"
 	"time"
 )
@@ -12,17 +14,10 @@ type shareModel struct {
 	frontendEndpoints []string
 	shareMode         string
 	backendMode       string
-	requests          []*shareRequestModel
+	requests          []*endpoints.BackendRequest
 	logMessages       []string
 	width             int
 	height            int
-}
-
-type shareRequestModel struct {
-	stamp      time.Time
-	remoteAddr string
-	verb       string
-	path       string
 }
 
 func newShareModel(shareToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
@@ -38,6 +33,12 @@ func (m *shareModel) Init() tea.Cmd { return nil }
 
 func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case *endpoints.BackendRequest:
+		m.requests = append([]*endpoints.BackendRequest{msg}, m.requests...)
+		if len(m.requests) > 2048 {
+			m.requests = m.requests[:2048]
+		}
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		shareHeaderStyle.Width(m.width - 30)
@@ -63,7 +64,7 @@ func (m *shareModel) View() string {
 		shareHeaderStyle.Render(strings.Join(m.frontendEndpoints, "\n")),
 		configHeaderStyle.Render(m.renderConfig()),
 	)
-	requests := requestsStyle.Render("hello")
+	requests := requestsStyle.Render(m.renderBackendRequests())
 	all := lipgloss.JoinVertical(lipgloss.Left, topRow, requests)
 	return all
 }
@@ -85,6 +86,35 @@ func (m *shareModel) renderConfig() string {
 	return out
 }
 
+func (m *shareModel) renderBackendRequests() string {
+	out := ""
+	maxRows := requestsStyle.GetHeight()
+	for i := 0; i < maxRows && i < len(m.requests); i++ {
+		req := m.requests[i]
+		out += fmt.Sprintf("%v %v -> %v %v",
+			timeStyle.Render(req.Stamp.Format(time.RFC850)),
+			addressStyle.Render(req.RemoteAddr),
+			m.renderMethod(req.Method),
+			req.Path,
+		)
+		if i != maxRows-1 {
+			out += "\n"
+		}
+	}
+	return out
+}
+
+func (m *shareModel) renderMethod(method string) string {
+	switch strings.ToLower(method) {
+	case "get":
+		return getStyle.Render(method)
+	case "post":
+		return postStyle.Render(method)
+	default:
+		return otherMethodStyle.Render(method)
+	}
+}
+
 var shareHeaderStyle = lipgloss.NewStyle().
 	Height(3).
 	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
@@ -101,7 +131,7 @@ var configHeaderStyle = lipgloss.NewStyle().
 
 var requestsStyle = lipgloss.NewStyle().
 	Height(3).
-	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
+	PaddingLeft(2).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63"))
 
@@ -109,3 +139,8 @@ var shareModePublicStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#0F0")
 var shareModePrivateStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F00"))
 var backendModeProxyStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500"))
 var backendModeWebStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#0CC"))
+var timeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#444"))
+var addressStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500"))
+var getStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("98"))
+var postStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("101"))
+var otherMethodStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("166"))

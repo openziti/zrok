@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
@@ -175,7 +176,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.BackendHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -190,7 +191,7 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (back
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoints.BackendHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")

@@ -2,6 +2,7 @@ package webBackend
 
 import (
 	"fmt"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
@@ -14,6 +15,7 @@ type Config struct {
 	IdentityPath string
 	WebRoot      string
 	ShrToken     string
+	RequestsChan chan *endpoints.BackendRequest
 }
 
 type backend struct {
@@ -36,11 +38,16 @@ func NewBackend(cfg *Config) (*backend, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	return &backend{
+	be := &backend{
 		cfg:      cfg,
 		listener: listener,
-		handler:  &requestLogger{handler: http.FileServer(http.Dir(cfg.WebRoot))},
-	}, nil
+	}
+	if cfg.RequestsChan != nil {
+		be.handler = &requestGrabber{requests: cfg.RequestsChan, handler: http.FileServer(http.Dir(cfg.WebRoot))}
+	} else {
+		be.handler = http.FileServer(http.Dir(cfg.WebRoot))
+	}
+	return be, nil
 }
 
 func (self *backend) Run() error {
@@ -54,11 +61,19 @@ func (self *backend) Requests() func() int32 {
 	return func() int32 { return 0 }
 }
 
-type requestLogger struct {
-	handler http.Handler
+type requestGrabber struct {
+	requests chan *endpoints.BackendRequest
+	handler  http.Handler
 }
 
-func (rl *requestLogger) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	fmt.Printf("web <= %v %v <= %v\n", req.Method, req.URL.String(), req.Header["X-Real-Ip"])
+func (rl *requestGrabber) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	if rl.requests != nil {
+		rl.requests <- &endpoints.BackendRequest{
+			Stamp:      time.Now(),
+			RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
+			Method:     req.Method,
+			Path:       req.URL.String(),
+		}
+	}
 	rl.handler.ServeHTTP(resp, req)
 }

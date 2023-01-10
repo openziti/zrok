@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
@@ -137,13 +138,15 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	var bh backendHandler
+	var bh endpoints.BackendHandler
+	requestsChan := make(chan *endpoints.BackendRequest, 1024)
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
 		}
 		bh, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -158,6 +161,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
+			RequestsChan: requestsChan,
 		}
 		bh, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -171,25 +175,35 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid backend mode", nil)
 	}
 
+	_ = bh.Requests()()
+
 	//logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
 	//for {
 	//	time.Sleep(5 * time.Second)
 	//	logrus.Infof("requests: %d", bh.Requests()())
 	//}
 
+	mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
+	prg := tea.NewProgram(mdl, tea.WithAltScreen())
+
 	go func() {
-		bh.Requests()()
+		for {
+			select {
+			case req := <-requestsChan:
+				prg.Send(req)
+			}
+		}
 	}()
 
-	prg := tea.NewProgram(newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode), tea.WithAltScreen())
 	if _, err := prg.Run(); err != nil {
 		tui.Error("An error occurred", err)
 	}
 
+	close(requestsChan)
 	cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 }
 
-func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (backendHandler, error) {
+func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.BackendHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -204,7 +218,7 @@ func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (backe
 	return be, nil
 }
 
-func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (backendHandler, error) {
+func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (endpoints.BackendHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
