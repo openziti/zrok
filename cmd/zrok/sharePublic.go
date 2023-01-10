@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
@@ -20,7 +21,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 )
 
 func init() {
@@ -171,11 +171,22 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid backend mode", nil)
 	}
 
-	logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
-	for {
-		time.Sleep(5 * time.Second)
-		logrus.Infof("requests: %d", bh.Requests()())
+	//logrus.Infof("access your zrok share: %v", resp.Payload.FrontendProxyEndpoints[0])
+	//for {
+	//	time.Sleep(5 * time.Second)
+	//	logrus.Infof("requests: %d", bh.Requests()())
+	//}
+
+	go func() {
+		bh.Requests()()
+	}()
+
+	prg := tea.NewProgram(newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints), tea.WithAltScreen())
+	if _, err := prg.Run(); err != nil {
+		tui.Error("An error occurred", err)
 	}
+
+	cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 }
 
 func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxyBackend.Config) (backendHandler, error) {
