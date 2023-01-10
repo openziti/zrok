@@ -16,19 +16,19 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 )
 
-// NewInviteGenerateParams creates a new InviteGenerateParams object
+// NewInviteTokenGenerateParams creates a new InviteTokenGenerateParams object
 //
 // There are no default values defined in the spec.
-func NewInviteGenerateParams() InviteGenerateParams {
+func NewInviteTokenGenerateParams() InviteTokenGenerateParams {
 
-	return InviteGenerateParams{}
+	return InviteTokenGenerateParams{}
 }
 
-// InviteGenerateParams contains all the bound params for the invite generate operation
+// InviteTokenGenerateParams contains all the bound params for the invite token generate operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters inviteGenerate
-type InviteGenerateParams struct {
+// swagger:parameters inviteTokenGenerate
+type InviteTokenGenerateParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -36,21 +36,21 @@ type InviteGenerateParams struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.InviteGenerateRequest
+	Body *rest_model_zrok.InviteTokenGenerateRequest
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewInviteGenerateParams() beforehand.
-func (o *InviteGenerateParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewInviteTokenGenerateParams() beforehand.
+func (o *InviteTokenGenerateParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.InviteGenerateRequest
+		var body rest_model_zrok.InviteTokenGenerateRequest
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

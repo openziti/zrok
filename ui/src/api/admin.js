@@ -70,17 +70,17 @@ export function createIdentity(options) {
 
 /**
  * @param {object} options Optional options
- * @param {module:types.inviteGenerateRequest} [options.body] 
+ * @param {module:types.inviteTokenGenerateRequest} [options.body] 
  * @return {Promise<object>} invitation tokens created
  */
-export function inviteGenerate(options) {
+export function inviteTokenGenerate(options) {
   if (!options) options = {}
   const parameters = {
     body: {
       body: options.body
     }
   }
-  return gateway.request(inviteGenerateOperation, parameters)
+  return gateway.request(inviteTokenGenerateOperation, parameters)
 }
 
 const createFrontendOperation = {
@@ -137,8 +137,8 @@ const createIdentityOperation = {
   ]
 }
 
-const inviteGenerateOperation = {
-  path: '/invite/generate',
+const inviteTokenGenerateOperation = {
+  path: '/invite/token/generate',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
   security: [

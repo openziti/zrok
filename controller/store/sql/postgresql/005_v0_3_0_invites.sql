@@ -1,10 +1,10 @@
 -- +migrate Up
 
 --
--- invites
+-- invite_tokens
 ---
 
-create table invites (
+create table invite_tokens (
   id                    serial                primary key,
   token                 varchar(32)           not null unique,
   created_at            timestamptz           not null default(current_timestamp),

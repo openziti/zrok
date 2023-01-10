@@ -3,9 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/sirupsen/logrus"
 )
@@ -40,12 +38,12 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	defer func() { _ = tx.Rollback() }()
 
 	if self.cfg.Registration.TokenStrategy == "store" {
-		invite, err := str.GetInviteByToken(params.Body.Token, tx)
+		invite, err := str.GetInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Error(err)
 			return account.NewInviteBadRequest()
 		}
-		if err := str.DeleteInvite(invite.Id, tx); err != nil {
+		if err := str.DeleteInviteToken(invite.Id, tx); err != nil {
 			logrus.Error(err)
 			return account.NewInviteInternalServerError()
 		}
@@ -100,49 +98,4 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	logrus.Infof("account request for '%v' has registration token '%v'", params.Body.Email, ar.Token)
 
 	return account.NewInviteCreated()
-}
-
-type inviteGenerateHandler struct {
-}
-
-func newInviteGenerateHandler() *inviteGenerateHandler {
-	return &inviteGenerateHandler{}
-}
-
-func (handler *inviteGenerateHandler) Handle(params admin.InviteGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
-		return admin.NewInviteGenerateUnauthorized()
-	}
-
-	if params.Body == nil || len(params.Body.Tokens) == 0 {
-		logrus.Error("missing tokens")
-		return admin.NewInviteGenerateBadRequest()
-	}
-	logrus.Infof("received invite generate request with %d tokens", len(params.Body.Tokens))
-
-	invites := make([]*store.Invite, len(params.Body.Tokens))
-	for i, token := range params.Body.Tokens {
-		invites[i] = &store.Invite{
-			Token: token,
-		}
-	}
-	tx, err := str.Begin()
-	if err != nil {
-		logrus.Error(err)
-		return admin.NewInviteGenerateInternalServerError()
-	}
-	defer func() { _ = tx.Rollback() }()
-
-	if err := str.CreateInvites(invites, tx); err != nil {
-		logrus.Error(err)
-		return admin.NewInviteGenerateInternalServerError()
-	}
-
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing inviteGenerate request: %v", err)
-		return account.NewInviteInternalServerError()
-	}
-
-	return admin.NewInviteGenerateCreated()
 }

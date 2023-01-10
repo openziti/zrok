@@ -11,21 +11,21 @@ import (
 )
 
 func init() {
-	adminCmd.AddCommand(newGenerateCommand().cmd)
+	adminCmd.AddCommand(newAdminGenerateCommand().cmd)
 }
 
-type generateCommand struct {
+type adminGenerateCommand struct {
 	cmd    *cobra.Command
 	amount int
 }
 
-func newGenerateCommand() *generateCommand {
+func newAdminGenerateCommand() *adminGenerateCommand {
 	cmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate invite tokens (default: 5)",
 		Args:  cobra.ExactArgs(0),
 	}
-	command := &generateCommand{cmd: cmd}
+	command := &adminGenerateCommand{cmd: cmd}
 	cmd.Run = command.run
 
 	cmd.Flags().IntVar(&command.amount, "amount", 5, "Amount of tokens to generate")
@@ -33,7 +33,7 @@ func newGenerateCommand() *generateCommand {
 	return command
 }
 
-func (cmd *generateCommand) run(_ *cobra.Command, args []string) {
+func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 	var err error
 	tokens := make([]string, cmd.amount)
 	for i := 0; i < int(cmd.amount); i++ {
@@ -49,11 +49,11 @@ func (cmd *generateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	req := admin.NewInviteGenerateParams()
-	req.Body = &rest_model_zrok.InviteGenerateRequest{
+	req := admin.NewInviteTokenGenerateParams()
+	req.Body = &rest_model_zrok.InviteTokenGenerateRequest{
 		Tokens: tokens,
 	}
-	_, err = zrok.Admin.InviteGenerate(req, mustGetAdminAuth())
+	_, err = zrok.Admin.InviteTokenGenerate(req, mustGetAdminAuth())
 	if err != nil {
 		if !panicInstead {
 			showError("error creating invite tokens", err)

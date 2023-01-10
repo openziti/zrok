@@ -431,7 +431,7 @@ func init() {
         }
       }
     },
-    "/invite/generate": {
+    "/invite/token/generate": {
       "post": {
         "security": [
           {
@@ -441,13 +441,13 @@ func init() {
         "tags": [
           "admin"
         ],
-        "operationId": "inviteGenerate",
+        "operationId": "inviteTokenGenerate",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteGenerateRequest"
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
             }
           }
         ],
@@ -895,17 +895,6 @@ func init() {
     "errorMessage": {
       "type": "string"
     },
-    "inviteGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "inviteRequest": {
       "type": "object",
       "properties": {
@@ -914,6 +903,17 @@ func init() {
         },
         "token": {
           "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1599,7 +1599,7 @@ func init() {
         }
       }
     },
-    "/invite/generate": {
+    "/invite/token/generate": {
       "post": {
         "security": [
           {
@@ -1609,13 +1609,13 @@ func init() {
         "tags": [
           "admin"
         ],
-        "operationId": "inviteGenerate",
+        "operationId": "inviteTokenGenerate",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteGenerateRequest"
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
             }
           }
         ],
@@ -2063,17 +2063,6 @@ func init() {
     "errorMessage": {
       "type": "string"
     },
-    "inviteGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "inviteRequest": {
       "type": "object",
       "properties": {
@@ -2082,6 +2071,17 @@ func init() {
         },
         "token": {
           "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

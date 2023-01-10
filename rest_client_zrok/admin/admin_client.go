@@ -36,7 +36,7 @@ type ClientService interface {
 
 	DeleteFrontend(params *DeleteFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteFrontendOK, error)
 
-	InviteGenerate(params *InviteGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteGenerateCreated, error)
+	InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteTokenGenerateCreated, error)
 
 	ListFrontends(params *ListFrontendsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendsOK, error)
 
@@ -163,22 +163,22 @@ func (a *Client) DeleteFrontend(params *DeleteFrontendParams, authInfo runtime.C
 }
 
 /*
-InviteGenerate invite generate API
+InviteTokenGenerate invite token generate API
 */
-func (a *Client) InviteGenerate(params *InviteGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteGenerateCreated, error) {
+func (a *Client) InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteTokenGenerateCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewInviteGenerateParams()
+		params = NewInviteTokenGenerateParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "inviteGenerate",
+		ID:                 "inviteTokenGenerate",
 		Method:             "POST",
-		PathPattern:        "/invite/generate",
+		PathPattern:        "/invite/token/generate",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &InviteGenerateReader{formats: a.formats},
+		Reader:             &InviteTokenGenerateReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -191,13 +191,13 @@ func (a *Client) InviteGenerate(params *InviteGenerateParams, authInfo runtime.C
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*InviteGenerateCreated)
+	success, ok := result.(*InviteTokenGenerateCreated)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for inviteGenerate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for inviteTokenGenerate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

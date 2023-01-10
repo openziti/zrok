@@ -92,6 +92,13 @@
  */
 
 /**
+ * @typedef inviteTokenGenerateRequest
+ * @memberof module:types
+ * 
+ * @property {string[]} tokens 
+ */
+
+/**
  * @typedef inviteRequest
  * @memberof module:types
  * 
@@ -230,11 +237,4 @@
  * @memberof module:types
  * 
  * @property {string} email 
- */
-
-/**
- * @typedef inviteGenerateRequest
- * @memberof module:types
- * 
- * @property {string[]} tokens 
  */

@@ -17,7 +17,7 @@ func init() {
 
 type inviteCommand struct {
 	cmd   *cobra.Command
-	Token string
+	token string
 }
 
 func newInviteCommand() *inviteCommand {
@@ -30,7 +30,7 @@ func newInviteCommand() *inviteCommand {
 	command := &inviteCommand{cmd: cmd}
 	cmd.Run = command.run
 
-	cmd.Flags().StringVar(&command.Token, "token", "", "Invite token required when Zrok running in token store mode")
+	cmd.Flags().StringVar(&command.token, "token", "", "Invite token required when zrok running in token store mode")
 
 	return command
 }
@@ -61,7 +61,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	req := account.NewInviteParams()
 	req.Body = &rest_model_zrok.InviteRequest{
 		Email: email,
-		Token: cmd.Token,
+		Token: cmd.token,
 	}
 	_, err = zrok.Account.Invite(req)
 	if err != nil {

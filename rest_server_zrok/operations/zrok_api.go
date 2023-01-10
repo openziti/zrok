@@ -76,8 +76,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
 		}),
-		AdminInviteGenerateHandler: admin.InviteGenerateHandlerFunc(func(params admin.InviteGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation admin.InviteGenerate has not yet been implemented")
+		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
 		AdminListFrontendsHandler: admin.ListFrontendsHandlerFunc(func(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
@@ -180,8 +180,8 @@ type ZrokAPI struct {
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
-	// AdminInviteGenerateHandler sets the operation handler for the invite generate operation
-	AdminInviteGenerateHandler admin.InviteGenerateHandler
+	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
+	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// AccountLoginHandler sets the operation handler for the login operation
@@ -312,8 +312,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
 	}
-	if o.AdminInviteGenerateHandler == nil {
-		unregistered = append(unregistered, "admin.InviteGenerateHandler")
+	if o.AdminInviteTokenGenerateHandler == nil {
+		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
 	}
 	if o.AdminListFrontendsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendsHandler")
@@ -486,7 +486,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/invite/generate"] = admin.NewInviteGenerate(o.context, o.AdminInviteGenerateHandler)
+	o.handlers["POST"]["/invite/token/generate"] = admin.NewInviteTokenGenerate(o.context, o.AdminInviteTokenGenerateHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

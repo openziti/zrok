@@ -1,10 +1,10 @@
 -- +migrate Up
 
 --
--- invites
+-- invite_tokens
 ---
 
-create table invites (
+create table invite_tokens (
   id                    integer             primary key,
   token                 string              not null unique,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
