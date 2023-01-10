@@ -46,7 +46,7 @@ func writeMetadata() error {
 	if err := os.MkdirAll(filepath.Dir(mf), os.FileMode(0700)); err != nil {
 		return err
 	}
-	if err := os.WriteFile(mf, data, os.FileMode(0400)); err != nil {
+	if err := os.WriteFile(mf, data, os.FileMode(0600)); err != nil {
 		return err
 	}
 	return nil
