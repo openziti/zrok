@@ -112,7 +112,7 @@ func newInviteGenerateHandler() *inviteGenerateHandler {
 func (handler *inviteGenerateHandler) Handle(params admin.InviteGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
 		logrus.Errorf("invalid admin principal")
-		return admin.NewListFrontendsUnauthorized()
+		return admin.NewInviteGenerateUnauthorized()
 	}
 
 	if params.Body == nil || len(params.Body.Tokens) == 0 {
