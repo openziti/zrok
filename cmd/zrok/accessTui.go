@@ -4,18 +4,26 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/reflow/wordwrap"
 	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"strings"
 	"time"
 )
 
+const accessBacklog = 64
+
 type accessModel struct {
 	shrToken      string
 	localEndpoint string
 	requests      []*endpoints.Request
+	log           []string
+	showLog       bool
 	width         int
 	height        int
+	prg           *tea.Program
 }
+
+type accessLogLine string
 
 func newAccessModel(shrToken, localEndpoint string) *accessModel {
 	return &accessModel{
@@ -29,18 +37,36 @@ func (m *accessModel) Init() tea.Cmd { return nil }
 func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case *endpoints.Request:
-		m.requests = append([]*endpoints.Request{msg}, m.requests...)
-		if len(m.requests) > 2048 {
-			m.requests = m.requests[:2048]
+		m.requests = append(m.requests, msg)
+		if len(m.requests) > accessBacklog {
+			m.requests = m.requests[1:]
+		}
+
+	case accessLogLine:
+		m.showLog = true
+		splitHeight := m.height - 5
+		accessRequestsStyle.Height(splitHeight/2 - 1)
+		accessLogStyle.Height(splitHeight/2 - 1)
+
+		m.log = append(m.log, string(msg))
+		if len(m.log) > accessBacklog {
+			m.log = m.log[1:]
 		}
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		accessHeaderStyle.Width(m.width - 2)
 		accessRequestsStyle.Width(m.width - 2)
+		accessLogStyle.Width(m.width - 2)
 
 		m.height = msg.Height
-		accessRequestsStyle.Height(m.height - 7)
+		if !m.showLog {
+			accessRequestsStyle.Height(m.height - 5)
+		} else {
+			splitHeight := m.height - 5
+			accessRequestsStyle.Height(splitHeight/2 - 1)
+			accessLogStyle.Height(splitHeight/2 - 1)
+		}
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -48,6 +74,15 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "ctrl+l":
 			return m, tea.ClearScreen
+		case "l":
+			m.showLog = !m.showLog
+			if !m.showLog {
+				accessRequestsStyle.Height(m.height - 5)
+			} else {
+				splitHeight := m.height - 5
+				accessRequestsStyle.Height(splitHeight/2 - 1)
+				accessLogStyle.Height(splitHeight/2 - 1)
+			}
 		}
 	}
 
@@ -55,27 +90,53 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *accessModel) View() string {
+	var panes string
+	if m.showLog {
+		panes = lipgloss.JoinVertical(lipgloss.Left,
+			accessRequestsStyle.Render(m.renderRequests()),
+			accessLogStyle.Render(m.renderLog()),
+		)
+	} else {
+		panes = accessRequestsStyle.Render(m.renderRequests())
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		accessHeaderStyle.Render(fmt.Sprintf("%v -> %v", m.localEndpoint, m.shrToken)),
-		accessRequestsStyle.Render(m.renderRequests()),
+		panes,
 	)
 }
 
 func (m *accessModel) renderRequests() string {
-	out := ""
-	maxRows := accessRequestsStyle.GetHeight()
-	for i := 0; i < maxRows && i < len(m.requests); i++ {
-		req := m.requests[i]
-		out += fmt.Sprintf("%v %v -> %v %v",
+	var requestLines []string
+	for _, req := range m.requests {
+		reqLine := fmt.Sprintf("%v %v -> %v %v",
 			timeStyle.Render(req.Stamp.Format(time.RFC850)),
 			addressStyle.Render(req.RemoteAddr),
 			m.renderMethod(req.Method),
 			req.Path,
 		)
-		if i != maxRows-1 {
-			out += "\n"
+		reqLineWrapped := wordwrap.String(reqLine, m.width-2)
+		splitWrapped := strings.Split(reqLineWrapped, "\n")
+		for _, splitLine := range splitWrapped {
+			splitLine := strings.ReplaceAll(splitLine, "\n", "")
+			if splitLine != "" {
+				requestLines = append(requestLines, splitLine)
+			}
 		}
+	}
+	maxRows := accessRequestsStyle.GetHeight()
+	startRow := 0
+	if len(requestLines) > maxRows {
+		startRow = len(requestLines) - maxRows
+	}
+	out := ""
+	for i := startRow; i < len(requestLines); i++ {
+		outLine := requestLines[i]
+		if i < len(requestLines)-1 {
+			outLine += "\n"
+		}
+		out += outLine
 	}
 	return out
 }
@@ -91,21 +152,55 @@ func (m *accessModel) renderMethod(method string) string {
 	}
 }
 
+func (m *accessModel) renderLog() string {
+	var splitLines []string
+	for _, line := range m.log {
+		wrapped := wordwrap.String(line, m.width-2)
+		wrappedLines := strings.Split(wrapped, "\n")
+		for _, wrappedLine := range wrappedLines {
+			splitLine := strings.ReplaceAll(wrappedLine, "\n", "")
+			if splitLine != "" {
+				splitLines = append(splitLines, splitLine)
+			}
+		}
+	}
+	maxRows := accessLogStyle.GetHeight()
+	startRow := 0
+	if len(splitLines) > maxRows {
+		startRow = len(splitLines) - maxRows
+	}
+	out := ""
+	for i := startRow; i < len(splitLines); i++ {
+		outLine := splitLines[i]
+		if i < len(splitLines)-1 {
+			outLine += "\n"
+		}
+		out += outLine
+	}
+	return out
+}
+
+func (m *accessModel) Write(p []byte) (n int, err error) {
+	in := string(p)
+	lines := strings.Split(in, "\n")
+	for _, line := range lines {
+		cleanLine := strings.ReplaceAll(line, "\n", "")
+		if cleanLine != "" {
+			m.prg.Send(accessLogLine(cleanLine))
+		}
+	}
+	return len(p), nil
+}
+
 var accessHeaderStyle = lipgloss.NewStyle().
-	Height(3).
-	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63")).
 	Align(lipgloss.Center)
 
 var accessRequestsStyle = lipgloss.NewStyle().
-	Height(3).
-	PaddingLeft(2).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63"))
 
-type accessLogWriter struct{}
-
-func (w accessLogWriter) Write(p []byte) (n int, err error) {
-	return len(p), nil
-}
+var accessLogStyle = lipgloss.NewStyle().
+	BorderStyle(lipgloss.RoundedBorder()).
+	BorderForeground(lipgloss.Color("63"))

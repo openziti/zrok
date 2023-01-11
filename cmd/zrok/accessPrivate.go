@@ -113,7 +113,9 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}()
 
 	mdl := newAccessModel(shrToken, endpointUrl.String())
+	logrus.SetOutput(mdl)
 	prg := tea.NewProgram(mdl, tea.WithAltScreen())
+	mdl.prg = prg
 
 	go func() {
 		for {
@@ -125,8 +127,6 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	}()
-
-	logrus.SetOutput(&accessLogWriter{})
 
 	if _, err := prg.Run(); err != nil {
 		tui.Error("An error occurred", err)
