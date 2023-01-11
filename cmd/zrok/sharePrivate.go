@@ -186,7 +186,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	} else {
 		shareDescription := fmt.Sprintf("access your share with: %v", tui.CodeStyle.Render(fmt.Sprintf("zrok access private %v", resp.Payload.ShrToken)))
 		mdl := newShareModel(resp.Payload.ShrToken, []string{shareDescription}, "private", cmd.backendMode)
+		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
 
 		go func() {
 			for {

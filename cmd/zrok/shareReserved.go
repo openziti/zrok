@@ -163,7 +163,9 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)
+		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
 
 		go func() {
 			for {

@@ -4,10 +4,13 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/reflow/wordwrap"
 	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"strings"
 	"time"
 )
+
+const shareTuiBacklog = 256
 
 type shareModel struct {
 	shrToken             string
@@ -15,10 +18,15 @@ type shareModel struct {
 	shareMode            string
 	backendMode          string
 	requests             []*endpoints.Request
-	logMessages          []string
+	log                  []string
+	showLog              bool
 	width                int
 	height               int
+	headerHeight         int
+	prg                  *tea.Program
 }
+
+type shareLogLine string
 
 func newShareModel(shrToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
 	return &shareModel{
@@ -34,9 +42,18 @@ func (m *shareModel) Init() tea.Cmd { return nil }
 func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case *endpoints.Request:
-		m.requests = append([]*endpoints.Request{msg}, m.requests...)
-		if len(m.requests) > 2048 {
-			m.requests = m.requests[:2048]
+		m.requests = append(m.requests, msg)
+		if len(m.requests) > shareTuiBacklog {
+			m.requests = m.requests[1:]
+		}
+
+	case shareLogLine:
+		m.showLog = true
+		m.adjustPaneHeights()
+
+		m.log = append(m.log, string(msg))
+		if len(m.log) > shareTuiBacklog {
+			m.log = m.log[1:]
 		}
 
 	case tea.WindowSizeMsg:
@@ -44,9 +61,11 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		shareHeaderStyle.Width(m.width - 30)
 		shareConfigStyle.Width(26)
 		shareRequestsStyle.Width(m.width - 2)
+		shareLogStyle.Width(m.width - 2)
 
 		m.height = msg.Height
-		shareRequestsStyle.Height(m.height - (len(m.frontendDescriptions) + 6))
+		m.headerHeight = len(m.frontendDescriptions) + 4
+		m.adjustPaneHeights()
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -54,6 +73,9 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "ctrl+l":
 			return m, tea.ClearScreen
+		case "l":
+			m.showLog = !m.showLog
+			m.adjustPaneHeights()
 		}
 	}
 
@@ -65,9 +87,26 @@ func (m *shareModel) View() string {
 		shareHeaderStyle.Render(strings.Join(m.frontendDescriptions, "\n")),
 		shareConfigStyle.Render(m.renderConfig()),
 	)
-	requests := shareRequestsStyle.Render(m.renderBackendRequests())
-	all := lipgloss.JoinVertical(lipgloss.Left, topRow, requests)
-	return all
+	var panes string
+	if m.showLog {
+		panes = lipgloss.JoinVertical(lipgloss.Left,
+			shareRequestsStyle.Render(m.renderRequests()),
+			shareLogStyle.Render(m.renderLog()),
+		)
+	} else {
+		panes = shareRequestsStyle.Render(m.renderRequests())
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, topRow, panes)
+}
+
+func (m *shareModel) adjustPaneHeights() {
+	if !m.showLog {
+		shareRequestsStyle.Height(m.height - m.headerHeight)
+	} else {
+		splitHeight := m.height - m.headerHeight
+		shareRequestsStyle.Height(splitHeight/2 - 1)
+		shareLogStyle.Height(splitHeight/2 - 1)
+	}
 }
 
 func (m *shareModel) renderConfig() string {
@@ -87,20 +126,36 @@ func (m *shareModel) renderConfig() string {
 	return out
 }
 
-func (m *shareModel) renderBackendRequests() string {
-	out := ""
-	maxRows := shareRequestsStyle.GetHeight()
-	for i := 0; i < maxRows && i < len(m.requests); i++ {
-		req := m.requests[i]
-		out += fmt.Sprintf("%v %v -> %v %v",
+func (m *shareModel) renderRequests() string {
+	var requestLines []string
+	for _, req := range m.requests {
+		reqLine := fmt.Sprintf("%v %v -> %v %v",
 			timeStyle.Render(req.Stamp.Format(time.RFC850)),
 			addressStyle.Render(req.RemoteAddr),
 			m.renderMethod(req.Method),
 			req.Path,
 		)
-		if i != maxRows-1 {
-			out += "\n"
+		reqLineWrapped := wordwrap.String(reqLine, m.width-2)
+		splitWrapped := strings.Split(reqLineWrapped, "\n")
+		for _, splitLine := range splitWrapped {
+			splitLine := strings.ReplaceAll(splitLine, "\n", "")
+			if splitLine != "" {
+				requestLines = append(requestLines, splitLine)
+			}
 		}
+	}
+	maxRows := shareRequestsStyle.GetHeight()
+	startRow := 0
+	if len(requestLines) > maxRows {
+		startRow = len(requestLines) - maxRows
+	}
+	out := ""
+	for i := startRow; i < len(requestLines); i++ {
+		outLine := requestLines[i]
+		if i < len(requestLines)-1 {
+			outLine += "\n"
+		}
+		out += outLine
 	}
 	return out
 }
@@ -116,23 +171,61 @@ func (m *shareModel) renderMethod(method string) string {
 	}
 }
 
+func (m *shareModel) renderLog() string {
+	var splitLines []string
+	for _, line := range m.log {
+		wrapped := wordwrap.String(line, m.width-2)
+		wrappedLines := strings.Split(wrapped, "\n")
+		for _, wrappedLine := range wrappedLines {
+			splitLine := strings.ReplaceAll(wrappedLine, "\n", "")
+			if splitLine != "" {
+				splitLines = append(splitLines, splitLine)
+			}
+		}
+	}
+	maxRows := shareLogStyle.GetHeight()
+	startRow := 0
+	if len(splitLines) > maxRows {
+		startRow = len(splitLines) - maxRows
+	}
+	out := ""
+	for i := startRow; i < len(splitLines); i++ {
+		outLine := splitLines[i]
+		if i < len(splitLines)-1 {
+			outLine += "\n"
+		}
+		out += outLine
+	}
+	return out
+}
+
+func (m *shareModel) Write(p []byte) (n int, err error) {
+	in := string(p)
+	lines := strings.Split(in, "\n")
+	for _, line := range lines {
+		cleanLine := strings.ReplaceAll(line, "\n", "")
+		if cleanLine != "" {
+			m.prg.Send(shareLogLine(cleanLine))
+		}
+	}
+	return len(p), nil
+}
+
 var shareHeaderStyle = lipgloss.NewStyle().
-	Height(3).
-	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63")).
 	Align(lipgloss.Center)
 
 var shareConfigStyle = lipgloss.NewStyle().
-	Height(3).
-	PaddingTop(1).PaddingLeft(2).PaddingBottom(1).PaddingRight(2).
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63")).
 	Align(lipgloss.Center)
 
 var shareRequestsStyle = lipgloss.NewStyle().
-	Height(3).
-	PaddingLeft(2).PaddingRight(2).
+	BorderStyle(lipgloss.RoundedBorder()).
+	BorderForeground(lipgloss.Color("63"))
+
+var shareLogStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.RoundedBorder()).
 	BorderForeground(lipgloss.Color("63"))
 

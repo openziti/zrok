@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const accessBacklog = 64
+const accessTuiBacklog = 256
 
 type accessModel struct {
 	shrToken      string
@@ -38,18 +38,16 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case *endpoints.Request:
 		m.requests = append(m.requests, msg)
-		if len(m.requests) > accessBacklog {
+		if len(m.requests) > accessTuiBacklog {
 			m.requests = m.requests[1:]
 		}
 
 	case accessLogLine:
 		m.showLog = true
-		splitHeight := m.height - 5
-		accessRequestsStyle.Height(splitHeight/2 - 1)
-		accessLogStyle.Height(splitHeight/2 - 1)
+		m.adjustPaneHeights()
 
 		m.log = append(m.log, string(msg))
-		if len(m.log) > accessBacklog {
+		if len(m.log) > accessTuiBacklog {
 			m.log = m.log[1:]
 		}
 
@@ -60,13 +58,7 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		accessLogStyle.Width(m.width - 2)
 
 		m.height = msg.Height
-		if !m.showLog {
-			accessRequestsStyle.Height(m.height - 5)
-		} else {
-			splitHeight := m.height - 5
-			accessRequestsStyle.Height(splitHeight/2 - 1)
-			accessLogStyle.Height(splitHeight/2 - 1)
-		}
+		m.adjustPaneHeights()
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -76,13 +68,7 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.ClearScreen
 		case "l":
 			m.showLog = !m.showLog
-			if !m.showLog {
-				accessRequestsStyle.Height(m.height - 5)
-			} else {
-				splitHeight := m.height - 5
-				accessRequestsStyle.Height(splitHeight/2 - 1)
-				accessLogStyle.Height(splitHeight/2 - 1)
-			}
+			m.adjustPaneHeights()
 		}
 	}
 
@@ -105,6 +91,16 @@ func (m *accessModel) View() string {
 		accessHeaderStyle.Render(fmt.Sprintf("%v -> %v", m.localEndpoint, m.shrToken)),
 		panes,
 	)
+}
+
+func (m *accessModel) adjustPaneHeights() {
+	if !m.showLog {
+		accessRequestsStyle.Height(m.height - 5)
+	} else {
+		splitHeight := m.height - 5
+		accessRequestsStyle.Height(splitHeight/2 - 1)
+		accessLogStyle.Height(splitHeight/2 - 1)
+	}
 }
 
 func (m *accessModel) renderRequests() string {

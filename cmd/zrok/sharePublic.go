@@ -188,7 +188,9 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	} else {
 		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
+		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
 
 		go func() {
 			for {
