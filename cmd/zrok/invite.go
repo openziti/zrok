@@ -105,9 +105,9 @@ func newInviteTui() inviteTui {
 	m.helpStyle = m.blurredStyle.Copy()
 	m.focusedButton = m.focusedStyle.Copy().Render("[ Submit ]")
 	m.blurredButton = fmt.Sprintf("[ %v ]", m.blurredStyle.Render("Submit"))
-	m.msgOk = m.noStyle.Render("Enter and confirm your email address...")
+	m.msgOk = m.noStyle.Render("enter and confirm your email address...")
 	m.msg = m.msgOk
-	m.msgMismatch = m.errorStyle.Render("Email is invalid or does not match confirmation...")
+	m.msgMismatch = m.errorStyle.Render("email is invalid or does not match confirmation...")
 
 	var t textinput.Model
 	for i := range m.inputs {
