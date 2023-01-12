@@ -23,12 +23,14 @@ func newMaintenanceAgent(ctx context.Context, cfg *MaintenanceConfig) *maintenan
 }
 
 func (ma *maintenanceAgent) run() {
+	logrus.Info("starting")
+	defer logrus.Info("stopping")
+
 	ticker := time.NewTicker(ma.Registration.CheckFrequency)
 	for {
 		select {
 		case <-ma.ctx.Done():
 			{
-				logrus.Info("stopping maintenance loop...")
 				ticker.Stop()
 				return
 			}
@@ -49,22 +51,23 @@ func (ma *maintenanceAgent) deleteExpiredAccountRequests() error {
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	expir := time.Now().UTC().Add(-ma.Registration.ExpirationTimeout)
-	accountRequests, err := str.FindExpiredAccountRequests(expir, ma.Registration.BatchLimit, tx)
+	timeout := time.Now().UTC().Add(-ma.Registration.ExpirationTimeout)
+	accountRequests, err := str.FindExpiredAccountRequests(timeout, ma.Registration.BatchLimit, tx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding expire account requests before %v", expir)
+		return errors.Wrapf(err, "error finding expire account requests before %v", timeout)
 	}
 	if len(accountRequests) > 0 {
+		logrus.Infof("found %d expired account requests to remove", len(accountRequests))
 		acctStrings := make([]string, len(accountRequests))
 		ids := make([]int, len(accountRequests))
 		for i, acct := range accountRequests {
 			ids[i] = acct.Id
 			acctStrings[i] = fmt.Sprintf("{%d:%s}", acct.Id, acct.Email)
 		}
-		logrus.Infof("starting deleting for expired account requests: %v", strings.Join(acctStrings, ","))
 
+		logrus.Infof("deleting expired account requests: %v", strings.Join(acctStrings, ","))
 		if err := str.DeleteMultipleAccountRequests(ids, tx); err != nil {
-			return errors.Wrapf(err, "error deleting expired account requests before %v", expir)
+			return errors.Wrapf(err, "error deleting expired account requests before %v", timeout)
 		}
 		if err := tx.Commit(); err != nil {
 			return errors.Wrapf(err, "error committing expired acount requests deletion")

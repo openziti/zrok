@@ -45,7 +45,19 @@ func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*Acco
 }
 
 func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*AccountRequest, error) {
-	rows, err := tx.Queryx(fmt.Sprintf("select * from account_requests where created_at < $1 limit %d for update", limit), before)
+	var sql string
+	switch self.cfg.Type {
+	case "postgres":
+		sql = "select * from account_requests where created_at < $1 limit %d for update"
+
+	case "sqlite3":
+		sql = "select * from account_requests where created_at < $1 limit %d"
+
+	default:
+		return nil, errors.Errorf("unknown database type '%v'", self.cfg.Type)
+	}
+
+	rows, err := tx.Queryx(fmt.Sprintf(sql, limit), before)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting expired account_requests")
 	}

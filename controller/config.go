@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"time"
 	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/pkg/errors"
+	"time"
 )
 
 const ConfigVersion = 1
@@ -76,7 +76,7 @@ func DefaultConfig() *Config {
 		Metrics: &MetricsConfig{ServiceName: "metrics"},
 		Maintenance: &MaintenanceConfig{
 			Registration: &RegistrationMaintenanceConfig{
-				ExpirationTimeout: time.Hour * 24 * 30, //30 days
+				ExpirationTimeout: time.Hour * 24,
 				CheckFrequency:    time.Hour,
 				BatchLimit:        500,
 			},
