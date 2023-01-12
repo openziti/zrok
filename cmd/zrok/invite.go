@@ -44,6 +44,20 @@ func newInviteCommand() *inviteCommand {
 }
 
 func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		tui.Error("error loading zrokdir", err)
+	}
+
+	zrok, err := zrd.Client()
+	if err != nil {
+		if !panicInstead {
+			cmd.endpointError(zrd.ApiEndpoint())
+			tui.Error("error creating zrok api client", err)
+		}
+		panic(err)
+	}
+
 	if _, err := tea.NewProgram(&cmd.tui).Run(); err != nil {
 		tui.Error("unable to run interface", err)
 		os.Exit(1)
@@ -51,18 +65,6 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	if cmd.tui.done {
 		email := cmd.tui.inputs[0].Value()
 
-		zrd, err := zrokdir.Load()
-		if err != nil {
-			tui.Error("error loading zrokdir", err)
-		}
-
-		zrok, err := zrd.Client()
-		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating zrok api client", err)
-			}
-			panic(err)
-		}
 		req := account.NewInviteParams()
 		req.Body = &rest_model_zrok.InviteRequest{
 			Email: email,
@@ -70,14 +72,20 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		}
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating invitation", err)
-			}
-			panic(err)
+			cmd.endpointError(zrd.ApiEndpoint())
+			tui.Error("error creating invitation", err)
 		}
 
 		fmt.Printf("invitation sent to '%v'!\n", email)
 	}
+}
+
+func (cmd *inviteCommand) endpointError(apiEndpoint, _ string) {
+	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem creating an invitation!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
+	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
 }
 
 type inviteTui struct {
