@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
@@ -20,7 +22,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 )
 
 func init() {
@@ -30,18 +31,20 @@ func init() {
 type sharePrivateCommand struct {
 	basicAuth   []string
 	backendMode string
+	headless    bool
 	cmd         *cobra.Command
 }
 
 func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "private <targetEndpoint>",
-		Short: "Share a target endpoint privately",
+		Use:   "private <target>",
+		Short: "Share a target resource privately",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Run = command.run
 	return command
 }
@@ -135,12 +138,14 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
+	requestsChan := make(chan *endpoints.Request, 1024)
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -155,6 +160,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
+			RequestsChan: requestsChan,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -168,14 +174,41 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid backend mode", nil)
 	}
 
-	logrus.Infof("share with others; they will use this command for access: 'zrok access private %v'", resp.Payload.ShrToken)
+	if cmd.headless {
+		logrus.Infof("allow other to access your share with the following command:\nzrok access private %v", resp.Payload.ShrToken)
+		for {
+			select {
+			case req := <-requestsChan:
+				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+			}
+		}
 
-	for {
-		time.Sleep(30 * time.Second)
+	} else {
+		shareDescription := fmt.Sprintf("access your share with: %v", tui.CodeStyle.Render(fmt.Sprintf("zrok access private %v", resp.Payload.ShrToken)))
+		mdl := newShareModel(resp.Payload.ShrToken, []string{shareDescription}, "private", cmd.backendMode)
+		logrus.SetOutput(mdl)
+		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
+
+		go func() {
+			for {
+				select {
+				case req := <-requestsChan:
+					prg.Send(req)
+				}
+			}
+		}()
+
+		if _, err := prg.Run(); err != nil {
+			tui.Error("An error occurred", err)
+		}
+
+		close(requestsChan)
+		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 	}
 }
 
-func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -190,7 +223,7 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (back
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")

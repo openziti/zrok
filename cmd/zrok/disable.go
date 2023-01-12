@@ -70,5 +70,5 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 			tui.Error("error removing zrok backend identity", err)
 		}
 	}
-	fmt.Printf("zrok environment '%v' disabled for '%v'\n", zrd.Env.ZId, zrd.Env.Token)
+	fmt.Println("zrok environment disabled...")
 }

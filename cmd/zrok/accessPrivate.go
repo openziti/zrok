@@ -1,8 +1,10 @@
 package main
 
 import (
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/privateFrontend"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
@@ -84,6 +86,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	cfg := privateFrontend.DefaultConfig("backend")
 	cfg.ShrToken = shrToken
 	cfg.Address = cmd.bindAddress
+	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -101,13 +104,36 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("access your share at: %v", endpointUrl.String())
-
-	if err := frontend.Run(); err != nil {
-		if !panicInstead {
-			tui.Error("unable to run frontend", err)
+	go func() {
+		if err := frontend.Run(); err != nil {
+			if !panicInstead {
+				tui.Error("unable to run frontend", err)
+			}
 		}
+	}()
+
+	mdl := newAccessModel(shrToken, endpointUrl.String())
+	logrus.SetOutput(mdl)
+	prg := tea.NewProgram(mdl, tea.WithAltScreen())
+	mdl.prg = prg
+
+	go func() {
+		for {
+			select {
+			case req := <-cfg.RequestsChan:
+				if req != nil {
+					prg.Send(req)
+				}
+			}
+		}
+	}()
+
+	if _, err := prg.Run(); err != nil {
+		tui.Error("An error occurred", err)
 	}
+
+	close(cfg.RequestsChan)
+	cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
 }
 
 func (cmd *accessPrivateCommand) destroy(frotendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {

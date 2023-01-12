@@ -21,18 +21,20 @@ func init() {
 type reserveCommand struct {
 	basicAuth         []string
 	frontendSelection []string
+	backendMode       string
 	cmd               *cobra.Command
 }
 
 func newReserveCommand() *reserveCommand {
 	cmd := &cobra.Command{
-		Use:   "reserve <public|private> <targetEndpoint>",
+		Use:   "reserve <public|private> <target>",
 		Short: "Create a reserved share",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
 	cmd.Run = command.run
 	return command
 }
@@ -43,15 +45,23 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
-	targetEndpoint, err := url.Parse(args[1])
-	if err != nil {
-		if !panicInstead {
-			tui.Error("invalid target endpoint URL", err)
+	var target string
+	switch cmd.backendMode {
+	case "proxy":
+		targetEndpoint, err := url.Parse(args[1])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
 		}
-		panic(err)
-	}
-	if targetEndpoint.Scheme == "" {
-		targetEndpoint.Scheme = "https"
+		if targetEndpoint.Scheme == "" {
+			targetEndpoint.Scheme = "https"
+		}
+		target = targetEndpoint.String()
+
+	case "web":
+		target = args[1]
 	}
 
 	zrd, err := zrokdir.Load()
@@ -78,8 +88,8 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               zrd.Env.ZId,
 		ShareMode:            shareMode,
-		BackendMode:          "proxy",
-		BackendProxyEndpoint: targetEndpoint.String(),
+		BackendMode:          cmd.backendMode,
+		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 		Reserved:             true,
 	}
