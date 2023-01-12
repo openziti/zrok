@@ -44,8 +44,8 @@ func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*Acco
 	return ar, nil
 }
 
-func (self *Store) FindExpiredAccountRequests(before time.Time, tx *sqlx.Tx) ([]*AccountRequest, error) {
-	rows, err := tx.Queryx("select * from account_requests where created_at < $1", before)
+func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*AccountRequest, error) {
+	rows, err := tx.Queryx(fmt.Sprintf("select * from account_requests where created_at < $1 limit %d for update", limit), before)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting expired account_requests")
 	}

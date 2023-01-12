@@ -11,21 +11,19 @@ import (
 )
 
 type maintenanceAgent struct {
-	ctx        context.Context
-	frequency  time.Duration
-	expiration time.Duration
+	*MaintenanceConfig
+	ctx context.Context
 }
 
-func newMaintenanceAgent(ctx context.Context, frequency, expiration time.Duration) *maintenanceAgent {
+func newMaintenanceAgent(ctx context.Context, cfg *MaintenanceConfig) *maintenanceAgent {
 	return &maintenanceAgent{
-		ctx:        ctx,
-		frequency:  frequency,
-		expiration: expiration,
+		MaintenanceConfig: cfg,
+		ctx:               ctx,
 	}
 }
 
 func (ma *maintenanceAgent) run() {
-	ticker := time.NewTicker(ma.frequency)
+	ticker := time.NewTicker(ma.Registration.CheckFrequency)
 	for {
 		select {
 		case <-ma.ctx.Done():
@@ -51,8 +49,8 @@ func (ma *maintenanceAgent) deleteExpiredAccountRequests() error {
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	expir := time.Now().UTC().Add(-ma.expiration)
-	accountRequests, err := str.FindExpiredAccountRequests(expir, tx)
+	expir := time.Now().UTC().Add(-ma.Registration.ExpirationTimeout)
+	accountRequests, err := str.FindExpiredAccountRequests(expir, ma.Registration.BatchLimit, tx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding expire account requests before %v", expir)
 	}
@@ -68,10 +66,9 @@ func (ma *maintenanceAgent) deleteExpiredAccountRequests() error {
 		if err := str.DeleteMultipleAccountRequests(ids, tx); err != nil {
 			return errors.Wrapf(err, "error deleting expired account requests before %v", expir)
 		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		return errors.Wrapf(err, "error committing expired acount requests deletion")
+		if err := tx.Commit(); err != nil {
+			return errors.Wrapf(err, "error committing expired acount requests deletion")
+		}
 	}
 
 	return nil

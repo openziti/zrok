@@ -78,7 +78,7 @@ func Run(inCfg *Config) error {
 	}()
 
 	if cfg.Maintenance != nil && cfg.Maintenance.Registration != nil {
-		go newMaintenanceAgent(ctx, cfg.Maintenance.Registration.CheckFrequency, cfg.Maintenance.Registration.ExpirationTimeout).run()
+		go newMaintenanceAgent(ctx, cfg.Maintenance).run()
 	}
 
 	server := rest_server_zrok.NewServer(api)

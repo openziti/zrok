@@ -68,12 +68,11 @@ type MaintenanceConfig struct {
 type RegistrationMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
+	BatchLimit        int
 }
 
 func LoadConfig(path string) (*Config, error) {
-	cfg := &Config{
-		Metrics: &MetricsConfig{ServiceName: "metrics"},
-	}
+	cfg := DefaultConfig()
 	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
@@ -81,4 +80,17 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, errors.Errorf("expecting configuration version '%v', your configuration is version '%v'; please see zrok.io for changelog and configuration documentation", ConfigVersion, cfg.V)
 	}
 	return cfg, nil
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		Metrics: &MetricsConfig{ServiceName: "metrics"},
+		Maintenance: &MaintenanceConfig{
+			Registration: &RegistrationMaintenanceConfig{
+				ExpirationTimeout: time.Hour * 24 * 30, //30 days
+				CheckFrequency:    time.Hour,
+				BatchLimit:        500,
+			},
+		},
+	}
 }
