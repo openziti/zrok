@@ -28,12 +28,12 @@ func (ma *maintenanceAgent) run() {
 		select {
 		case <-ma.ctx.Done():
 			{
+				logrus.Info("Stopping maintenance loop...")
 				ticker.Stop()
 				return
 			}
 		case <-ticker.C:
 			{
-				logrus.Info("TICK")
 				if err := ma.deleteExpiredAccountRequests(); err != nil {
 					logrus.Error(err)
 				}
