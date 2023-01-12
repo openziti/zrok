@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/pkg/errors"
@@ -18,6 +20,7 @@ type Config struct {
 	Ziti         *ZitiConfig
 	Metrics      *MetricsConfig
 	Influx       *InfluxConfig
+	Maintenance  *MaintenanceConfig
 }
 
 type AdminConfig struct {
@@ -56,6 +59,15 @@ type InfluxConfig struct {
 	Bucket string
 	Org    string
 	Token  string `cf:"+secret"`
+}
+
+type MaintenanceConfig struct {
+	Registration *RegistrationMaintenanceConfig
+}
+
+type RegistrationMaintenanceConfig struct {
+	ExpirationTimeout time.Duration
+	CheckFrequency    time.Duration
 }
 
 func LoadConfig(path string) (*Config, error) {

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"context"
+
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
@@ -68,6 +70,15 @@ func Run(inCfg *Config) error {
 			mtr.stop()
 			mtr.join()
 		}()
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer func() {
+		cancel()
+	}()
+
+	if cfg.Maintenance != nil && cfg.Maintenance.Registration != nil {
+		go newMaintenanceAgent(ctx, cfg.Maintenance.Registration.CheckFrequency, cfg.Maintenance.Registration.ExpirationTimeout).run()
 	}
 
 	server := rest_server_zrok.NewServer(api)

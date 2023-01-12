@@ -1,8 +1,11 @@
 package store
 
 import (
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type AccountRequest struct {
@@ -56,6 +59,19 @@ func (self *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return errors.Wrap(err, "error executing account_requests delete statement")
+	}
+	return nil
+}
+
+func (self *Store) DeleteExpiredAccountRequests(before time.Time, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from account_requests where created_at < $1")
+	logrus.Infof("Trying to delete account requests older than %v", before)
+	if err != nil {
+		return errors.Wrap(err, "error preparing account_requests delete expired statement")
+	}
+	_, err = stmt.Exec(before)
+	if err != nil {
+		return errors.Wrap(err, "error executing account_requests delete expired statement")
 	}
 	return nil
 }
