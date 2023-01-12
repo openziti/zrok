@@ -23,7 +23,7 @@ func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) e
 	}
 	stmt, err := tx.Prepare(fmt.Sprintf(sql, strings.Join(queries, ",")))
 	if err != nil {
-		return errors.Wrap(err, "error preparing invite_tokenss insert statement")
+		return errors.Wrap(err, "error preparing invite_tokens insert statement")
 	}
 	if _, err := stmt.Exec(invs...); err != nil {
 		return errors.Wrap(err, "error executing invites_tokens insert statement")

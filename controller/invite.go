@@ -38,15 +38,16 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	defer func() { _ = tx.Rollback() }()
 
 	if self.cfg.Registration != nil && self.cfg.Registration.TokenStrategy == "store" {
-		invite, err := str.GetInviteTokenByToken(params.Body.Token, tx)
+		inviteToken, err := str.GetInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
-			logrus.Error(err)
+			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
 			return account.NewInviteBadRequest()
 		}
-		if err := str.DeleteInviteToken(invite.Id, tx); err != nil {
+		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
 			logrus.Error(err)
 			return account.NewInviteInternalServerError()
 		}
+		logrus.Infof("using invite token '%v' to process invite request for '%v'", inviteToken.Token, params.Body.Email)
 	}
 
 	token, err = createToken()
