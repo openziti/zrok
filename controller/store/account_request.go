@@ -1,11 +1,12 @@
 package store
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type AccountRequest struct {
@@ -43,6 +44,22 @@ func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*Acco
 	return ar, nil
 }
 
+func (self *Store) FindExpiredAccountRequests(before time.Time, tx *sqlx.Tx) ([]*AccountRequest, error) {
+	rows, err := tx.Queryx("select * from account_requests where created_at < $1", before)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting expired account_requests")
+	}
+	var ars []*AccountRequest
+	for rows.Next() {
+		ar := &AccountRequest{}
+		if err := rows.StructScan(ar); err != nil {
+			return nil, errors.Wrap(err, "error scanning account_request")
+		}
+		ars = append(ars, ar)
+	}
+	return ars, nil
+}
+
 func (self *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
 	if err := tx.QueryRowx("select * from account_requests where email = $1", email).StructScan(ar); err != nil {
@@ -63,15 +80,26 @@ func (self *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (self *Store) DeleteExpiredAccountRequests(before time.Time, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from account_requests where created_at < $1")
-	logrus.Infof("Trying to delete account requests older than %v", before)
-	if err != nil {
-		return errors.Wrap(err, "error preparing account_requests delete expired statement")
+func (self *Store) DeleteMultipleAccountRequests(ids []int, tx *sqlx.Tx) error {
+	if len(ids) == 0 {
+		return nil
 	}
-	_, err = stmt.Exec(before)
+
+	anyIds := make([]any, len(ids))
+	indexes := make([]string, len(ids))
+
+	for i, id := range ids {
+		anyIds[i] = id
+		indexes[i] = fmt.Sprintf("$%d", i+1)
+	}
+
+	stmt, err := tx.Prepare(fmt.Sprintf("delete from account_requests where id in (%s)", strings.Join(indexes, ",")))
 	if err != nil {
-		return errors.Wrap(err, "error executing account_requests delete expired statement")
+		return errors.Wrap(err, "error preparing account_requests delete multiple statement")
+	}
+	_, err = stmt.Exec(anyIds...)
+	if err != nil {
+		return errors.Wrap(err, "error executing account_requests delete multiple statement")
 	}
 	return nil
 }
