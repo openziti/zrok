@@ -2,8 +2,6 @@ import * as metadata from "../../../api/metadata";
 import {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
 import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
-import {mdiConsoleNetwork} from "@mdi/js";
-import Icon from "@mdi/react";
 
 const SharesTab = (props) => {
     const [detail, setDetail] = useState({});

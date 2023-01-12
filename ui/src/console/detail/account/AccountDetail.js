@@ -1,4 +1,4 @@
-import {mdiCardAccountDetails, mdiEyeOutline, mdiEyeOffOutline} from "@mdi/js";
+import {mdiCardAccountDetails} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
