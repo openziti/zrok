@@ -38,7 +38,12 @@ func (cmd *adminUpdateFrontendCommand) run(_ *cobra.Command, args []string) {
 		panic("must specify at least one of public name or url template")
 	}
 
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		panic(err)
 	}

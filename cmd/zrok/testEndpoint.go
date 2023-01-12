@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/opentracing/opentracing-go/log"
 	"github.com/openziti-test-kitchen/zrok/cmd/zrok/endpointUi"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"html/template"
@@ -33,7 +34,7 @@ func newTestEndpointCommand() *testEndpointCommand {
 	var err error
 	if command.t, err = template.ParseFS(endpointUi.FS, "index.gohtml"); err != nil {
 		if !panicInstead {
-			showError("unable to parse index template", err)
+			tui.Error("unable to parse index template", err)
 		}
 		panic(err)
 	}
@@ -47,7 +48,7 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 	http.HandleFunc("/", cmd.serveIndex)
 	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
 		if !panicInstead {
-			showError("unable to start http listener", err)
+			tui.Error("unable to start http listener", err)
 		}
 		panic(err)
 	}

@@ -2,6 +2,8 @@ package proxyBackend
 
 import (
 	"context"
+	"fmt"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -19,6 +21,7 @@ type Config struct {
 	IdentityPath    string
 	EndpointAddress string
 	ShrToken        string
+	RequestsChan    chan *endpoints.Request
 }
 
 type backend struct {
@@ -42,7 +45,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	proxy, err := newReverseProxy(cfg.EndpointAddress)
+	proxy, err := newReverseProxy(cfg.EndpointAddress, cfg.RequestsChan)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +70,7 @@ func (self *backend) Requests() func() int32 {
 	return self.requests
 }
 
-func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
+func newReverseProxy(target string, requests chan *endpoints.Request) (*httputil.ReverseProxy, error) {
 	targetURL, err := url.Parse(target)
 	if err != nil {
 		return nil, err
@@ -80,8 +83,15 @@ func newReverseProxy(target string) (*httputil.ReverseProxy, error) {
 	proxy.Transport = tpt
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
+		if requests != nil {
+			requests <- &endpoints.Request{
+				Stamp:      time.Now(),
+				RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
+				Method:     req.Method,
+				Path:       req.URL.String(),
+			}
+		}
 		director(req)
-		logrus.Debugf("-> %v", req.URL.String())
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {

@@ -31,7 +31,12 @@ func newAdminDeleteFrontendCommand() *adminDeleteFrontendCommand {
 func (cmd *adminDeleteFrontendCommand) run(_ *cobra.Command, args []string) {
 	feToken := args[0]
 
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		panic(err)
 	}

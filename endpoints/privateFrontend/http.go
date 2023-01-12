@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 )
 
 type httpFrontend struct {
@@ -75,6 +76,14 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	proxy := serviceTargetProxy(cfg, ctx)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
+		if cfg.RequestsChan != nil {
+			cfg.RequestsChan <- &endpoints.Request{
+				Stamp:      time.Now(),
+				RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
+				Method:     req.Method,
+				Path:       req.URL.String(),
+			}
+		}
 		director(req)
 		req.Header.Set("X-Proxy", "zrok")
 	}
@@ -98,7 +107,7 @@ func serviceTargetProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 				logrus.Warn("no config!")
 			}
 			if target, err := url.Parse(fmt.Sprintf("http://%v", targetShrToken)); err == nil {
-				logrus.Infof("[%v] -> %v", targetShrToken, req.URL)
+				logrus.Debugf("[%v] -> %v", targetShrToken, req.URL)
 
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme

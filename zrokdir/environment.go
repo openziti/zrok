@@ -13,7 +13,22 @@ type Environment struct {
 	ApiEndpoint string `json:"api_endpoint"`
 }
 
-func LoadEnvironment() (*Environment, error) {
+func hasEnvironment() (bool, error) {
+	ef, err := environmentFile()
+	if err != nil {
+		return false, errors.Wrap(err, "error getting environment file path")
+	}
+	_, err = os.Stat(ef)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, errors.Wrapf(err, "error stat-ing environment file '%v'", ef)
+	}
+	return true, nil
+}
+
+func loadEnvironment() (*Environment, error) {
 	ef, err := environmentFile()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting environment file")
@@ -29,7 +44,7 @@ func LoadEnvironment() (*Environment, error) {
 	return env, nil
 }
 
-func SaveEnvironment(env *Environment) error {
+func saveEnvironment(env *Environment) error {
 	data, err := json.MarshalIndent(env, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "error marshaling environment")

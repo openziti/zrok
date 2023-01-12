@@ -30,8 +30,13 @@ func newAdminListFrontendsCommand() *adminListFrontendsCommand {
 	return command
 }
 
-func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, args []string) {
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		panic(err)
 	}

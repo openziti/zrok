@@ -1,11 +1,11 @@
 package main
 
 import (
-	ui "github.com/gizak/termui/v3"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -21,18 +21,20 @@ func init() {
 type reserveCommand struct {
 	basicAuth         []string
 	frontendSelection []string
+	backendMode       string
 	cmd               *cobra.Command
 }
 
 func newReserveCommand() *reserveCommand {
 	cmd := &cobra.Command{
-		Use:   "reserve <public|private> <targetEndpoint>",
+		Use:   "reserve <public|private> <target>",
 		Short: "Create a reserved share",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
 	cmd.Run = command.run
 	return command
 }
@@ -40,44 +42,54 @@ func newReserveCommand() *reserveCommand {
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	shareMode := args[0]
 	if shareMode != "public" && shareMode != "private" {
-		showError("invalid sharing mode; expecting 'public' or 'private'", nil)
+		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
-	targetEndpoint, err := url.Parse(args[1])
+	var target string
+	switch cmd.backendMode {
+	case "proxy":
+		targetEndpoint, err := url.Parse(args[1])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		if targetEndpoint.Scheme == "" {
+			targetEndpoint.Scheme = "https"
+		}
+		target = targetEndpoint.String()
+
+	case "web":
+		target = args[1]
+	}
+
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("invalid target endpoint URL", err)
+			tui.Error("error loading zrokdir", err)
 		}
 		panic(err)
 	}
-	if targetEndpoint.Scheme == "" {
-		targetEndpoint.Scheme = "https"
+
+	if zrd.Env == nil {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrok, err := zrd.Client()
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
-	if err != nil {
-		ui.Close()
-		if !panicInstead {
-			showError("unable to create zrok client", err)
-		}
-		panic(err)
-	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.ZId,
+		EnvZID:               zrd.Env.ZId,
 		ShareMode:            shareMode,
-		BackendMode:          "proxy",
-		BackendProxyEndpoint: targetEndpoint.String(),
+		BackendMode:          cmd.backendMode,
+		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 		Reserved:             true,
 	}
@@ -100,7 +112,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create tunnel", err)
+			tui.Error("unable to create tunnel", err)
 		}
 		panic(err)
 	}

@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
-	ui "github.com/gizak/termui/v3"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti-test-kitchen/zrok/endpoints/proxyBackend"
 	"github.com/openziti-test-kitchen/zrok/endpoints/webBackend"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -20,7 +22,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 )
 
 func init() {
@@ -30,18 +31,20 @@ func init() {
 type sharePrivateCommand struct {
 	basicAuth   []string
 	backendMode string
+	headless    bool
 	cmd         *cobra.Command
 }
 
 func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "private <targetEndpoint>",
-		Short: "Share a target endpoint privately",
+		Use:   "private <target>",
+		Short: "Share a target resource privately",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Run = command.run
 	return command
 }
@@ -54,7 +57,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		targetEndpoint, err := url.Parse(args[0])
 		if err != nil {
 			if !panicInstead {
-				showError("invalid target endpoint URL", err)
+				tui.Error("invalid target endpoint URL", err)
 			}
 			panic(err)
 		}
@@ -67,38 +70,43 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = args[0]
 
 	default:
-		showError(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	env, err := zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load environment; did you 'zrok enable'?", err)
+			tui.Error("unable to load zrokdir", err)
 		}
 		panic(err)
 	}
+
+	if zrd.Env == nil {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
 	zif, err := zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
-			showError("unable to load ziti identity configuration", err)
+			tui.Error("unable to load ziti identity configuration", err)
 		}
 		panic(err)
 	}
 
-	zrok, err := zrokdir.ZrokClient(env.ApiEndpoint)
+	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("unable to create zrok client", err)
+			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.ZId,
+		EnvZID:               zrd.Env.ZId,
 		ShareMode:            "private",
-		BackendMode:          "proxy",
+		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 	}
@@ -116,9 +124,8 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {
-		ui.Close()
 		if !panicInstead {
-			showError("unable to create share", err)
+			tui.Error("unable to create share", err)
 		}
 		panic(err)
 	}
@@ -127,22 +134,23 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
+	requestsChan := make(chan *endpoints.Request, 1024)
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxyBackend.Config{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
-				showError("unable to create proxy backend handler", err)
+				tui.Error("unable to create proxy backend handler", err)
 			}
 			panic(err)
 		}
@@ -152,29 +160,55 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
+			RequestsChan: requestsChan,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
-			ui.Close()
 			if !panicInstead {
-				showError("unable to create web backend handler", err)
+				tui.Error("unable to create web backend handler", err)
 			}
 			panic(err)
 		}
 
 	default:
-		ui.Close()
-		showError("invalid backend mode", nil)
+		tui.Error("invalid backend mode", nil)
 	}
 
-	logrus.Infof("share with others; they will use this command for access: 'zrok access private %v'", resp.Payload.ShrToken)
+	if cmd.headless {
+		logrus.Infof("allow other to access your share with the following command:\nzrok access private %v", resp.Payload.ShrToken)
+		for {
+			select {
+			case req := <-requestsChan:
+				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+			}
+		}
 
-	for {
-		time.Sleep(30 * time.Second)
+	} else {
+		shareDescription := fmt.Sprintf("access your share with: %v", tui.CodeStyle.Render(fmt.Sprintf("zrok access private %v", resp.Payload.ShrToken)))
+		mdl := newShareModel(resp.Payload.ShrToken, []string{shareDescription}, "private", cmd.backendMode)
+		logrus.SetOutput(mdl)
+		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
+
+		go func() {
+			for {
+				select {
+				case req := <-requestsChan:
+					prg.Send(req)
+				}
+			}
+		}()
+
+		if _, err := prg.Run(); err != nil {
+			tui.Error("An error occurred", err)
+		}
+
+		close(requestsChan)
+		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
 	}
 }
 
-func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := proxyBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
@@ -189,7 +223,7 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (back
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (backendHandler, error) {
+func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
 	be, err := webBackend.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")

@@ -10,6 +10,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
@@ -170,16 +171,21 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l *looper) startup() {
 	logrus.Infof("starting #%d", l.id)
 
-	var err error
-	l.env, err = zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		panic(err)
 	}
+
+	if zrd.Env == nil {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+	l.env = zrd.Env
+
 	l.zif, err = zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		panic(err)
 	}
-	l.zrok, err = zrokdir.ZrokClient(l.env.ApiEndpoint)
+	l.zrok, err = zrd.Client()
 	if err != nil {
 		panic(err)
 	}
