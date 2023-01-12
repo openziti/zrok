@@ -111,9 +111,9 @@ func newInviteTui() inviteTui {
 	m := inviteTui{
 		inputs: make([]textinput.Model, 2),
 	}
-	m.focusedStyle = tui.WarningStyle
-	m.blurredStyle = tui.CodeStyle
-	m.errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F00"))
+	m.focusedStyle = tui.WarningStyle.Copy()
+	m.blurredStyle = tui.CodeStyle.Copy()
+	m.errorStyle = tui.ErrorStyle.Copy()
 	m.cursorStyle = m.focusedStyle.Copy()
 	m.noStyle = lipgloss.NewStyle()
 	m.helpStyle = m.blurredStyle.Copy()
