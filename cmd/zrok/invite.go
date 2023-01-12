@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,8 +14,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 func init() {
@@ -20,8 +21,9 @@ func init() {
 }
 
 type inviteCommand struct {
-	cmd *cobra.Command
-	tui inviteTui
+	cmd   *cobra.Command
+	token string
+	tui   inviteTui
 }
 
 func newInviteCommand() *inviteCommand {
@@ -35,6 +37,9 @@ func newInviteCommand() *inviteCommand {
 		tui: newInviteTui(),
 	}
 	cmd.Run = command.run
+
+	cmd.Flags().StringVar(&command.token, "token", "", "Invite token required when zrok running in token store mode")
+
 	return command
 }
 
@@ -61,6 +66,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		req := account.NewInviteParams()
 		req.Body = &rest_model_zrok.InviteRequest{
 			Email: email,
+			Token: cmd.token,
 		}
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
