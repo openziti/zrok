@@ -7,6 +7,7 @@ import (
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -39,13 +40,19 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 	for i := 0; i < int(cmd.amount); i++ {
 		tokens[i], err = createToken()
 		if err != nil {
-			showError("error creating token", err)
+			logrus.Error("error creating token", err)
 		}
 	}
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		logrus.Error("error loading zrokdir", err)
+	}
+
+	zrok, err := zrd.Client()
 	if err != nil {
 		if !panicInstead {
-			showError("error creating zrok api client", err)
+			logrus.Error("error creating zrok api client", err)
 		}
 		panic(err)
 	}
@@ -56,7 +63,7 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 	_, err = zrok.Admin.InviteTokenGenerate(req, mustGetAdminAuth())
 	if err != nil {
 		if !panicInstead {
-			showError("error creating invite tokens", err)
+			logrus.Error("error creating invite tokens", err)
 		}
 		panic(err)
 	}
