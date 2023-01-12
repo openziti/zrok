@@ -59,10 +59,14 @@ type InfluxConfig struct {
 	Token  string `cf:"+secret"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	cfg := &Config{
+func DefaultConfig() *Config {
+	return &Config{
 		Metrics: &MetricsConfig{ServiceName: "metrics"},
 	}
+}
+
+func LoadConfig(path string) (*Config, error) {
+	cfg := DefaultConfig()
 	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
