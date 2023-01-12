@@ -22,9 +22,13 @@ const Network = (props) => {
             case "environment":
                 nodeColor = "#444";
                 break;
-            case "share":
+
+            case "share": // share
                 nodeColor = "#291A66";
                 break;
+
+            default:
+                //
         }
 
         ctx.textBaseline = "middle";
@@ -41,10 +45,9 @@ const Network = (props) => {
             ctx.strokeStyle = "#c4bdde";
             ctx.stroke();
         } else {
-            switch(node.type) {
-                case "share":
-                    ctx.strokeStyle = "#433482";
-                    ctx.stroke();
+            if(node.type === "share") {
+                ctx.strokeStyle = "#433482";
+                ctx.stroke();
             }
         }
 

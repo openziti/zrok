@@ -431,6 +431,42 @@ func init() {
         }
       }
     },
+    "/invite/token/generate": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "inviteTokenGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -864,6 +900,20 @@ func init() {
       "properties": {
         "email": {
           "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1549,6 +1599,42 @@ func init() {
         }
       }
     },
+    "/invite/token/generate": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "inviteTokenGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/login": {
       "post": {
         "tags": [
@@ -1982,6 +2068,20 @@ func init() {
       "properties": {
         "email": {
           "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

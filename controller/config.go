@@ -2,7 +2,6 @@ package controller
 
 import (
 	"time"
-
 	"github.com/michaelquigley/cf"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/pkg/errors"
@@ -42,6 +41,7 @@ type EmailConfig struct {
 type RegistrationConfig struct {
 	EmailFrom               string
 	RegistrationUrlTemplate string
+	TokenStrategy           string
 }
 
 type ZitiConfig struct {
@@ -71,17 +71,6 @@ type RegistrationMaintenanceConfig struct {
 	BatchLimit        int
 }
 
-func LoadConfig(path string) (*Config, error) {
-	cfg := DefaultConfig()
-	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
-		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
-	}
-	if cfg.V != ConfigVersion {
-		return nil, errors.Errorf("expecting configuration version '%v', your configuration is version '%v'; please see zrok.io for changelog and configuration documentation", ConfigVersion, cfg.V)
-	}
-	return cfg, nil
-}
-
 func DefaultConfig() *Config {
 	return &Config{
 		Metrics: &MetricsConfig{ServiceName: "metrics"},
@@ -93,4 +82,15 @@ func DefaultConfig() *Config {
 			},
 		},
 	}
+}
+
+func LoadConfig(path string) (*Config, error) {
+	cfg := DefaultConfig()
+	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
+		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
+	}
+	if cfg.V != ConfigVersion {
+		return nil, errors.Errorf("expecting configuration version '%v', your configuration is version '%v'; please see zrok.io for changelog and configuration documentation", ConfigVersion, cfg.V)
+	}
+	return cfg, nil
 }

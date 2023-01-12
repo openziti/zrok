@@ -57,7 +57,8 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 	zrok, err := zrd.Client()
 	if err != nil {
-		panic(err)
+		cmd.endpointError(zrd.ApiEndpoint())
+		tui.Error("error creating service client", err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := environment.NewEnableParams()
@@ -87,6 +88,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		prg.Send(fmt.Sprintf("the zrok service returned an error: %v", err))
 		prg.Quit()
 		<-done
+		cmd.endpointError(zrd.ApiEndpoint())
 		os.Exit(1)
 	}
 	prg.Send("writing the environment details...")
@@ -108,6 +110,14 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
 	prg.Quit()
 	<-done
+}
+
+func (cmd *enableCommand) endpointError(apiEndpoint, _ string) {
+	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem enabling your environment!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
+	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
 }
 
 func getHost() (string, string, error) {

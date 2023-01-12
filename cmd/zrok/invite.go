@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,8 +14,6 @@ import (
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 func init() {
@@ -20,8 +21,9 @@ func init() {
 }
 
 type inviteCommand struct {
-	cmd *cobra.Command
-	tui inviteTui
+	cmd   *cobra.Command
+	token string
+	tui   inviteTui
 }
 
 func newInviteCommand() *inviteCommand {
@@ -35,10 +37,27 @@ func newInviteCommand() *inviteCommand {
 		tui: newInviteTui(),
 	}
 	cmd.Run = command.run
+
+	cmd.Flags().StringVar(&command.token, "token", "", "Invite token required when zrok running in token store mode")
+
 	return command
 }
 
 func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		tui.Error("error loading zrokdir", err)
+	}
+
+	zrok, err := zrd.Client()
+	if err != nil {
+		if !panicInstead {
+			cmd.endpointError(zrd.ApiEndpoint())
+			tui.Error("error creating zrok api client", err)
+		}
+		panic(err)
+	}
+
 	if _, err := tea.NewProgram(&cmd.tui).Run(); err != nil {
 		tui.Error("unable to run interface", err)
 		os.Exit(1)
@@ -46,32 +65,27 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	if cmd.tui.done {
 		email := cmd.tui.inputs[0].Value()
 
-		zrd, err := zrokdir.Load()
-		if err != nil {
-			tui.Error("error loading zrokdir", err)
-		}
-
-		zrok, err := zrd.Client()
-		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating zrok api client", err)
-			}
-			panic(err)
-		}
 		req := account.NewInviteParams()
 		req.Body = &rest_model_zrok.InviteRequest{
 			Email: email,
+			Token: cmd.token,
 		}
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating invitation", err)
-			}
-			panic(err)
+			cmd.endpointError(zrd.ApiEndpoint())
+			tui.Error("error creating invitation", err)
 		}
 
 		fmt.Printf("invitation sent to '%v'!\n", email)
 	}
+}
+
+func (cmd *inviteCommand) endpointError(apiEndpoint, _ string) {
+	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem creating an invitation!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
+	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
 }
 
 type inviteTui struct {
@@ -97,9 +111,9 @@ func newInviteTui() inviteTui {
 	m := inviteTui{
 		inputs: make([]textinput.Model, 2),
 	}
-	m.focusedStyle = tui.WarningStyle
-	m.blurredStyle = tui.CodeStyle
-	m.errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F00"))
+	m.focusedStyle = tui.WarningStyle.Copy()
+	m.blurredStyle = tui.CodeStyle.Copy()
+	m.errorStyle = tui.ErrorStyle.Copy()
 	m.cursorStyle = m.focusedStyle.Copy()
 	m.noStyle = lipgloss.NewStyle()
 	m.helpStyle = m.blurredStyle.Copy()

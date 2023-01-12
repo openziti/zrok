@@ -25,9 +25,11 @@ const ShareDetail = (props) => {
         let interval = setInterval(() => {
             metadata.getShareDetail(props.selection.id)
                 .then(resp => {
-                    let detail = resp.data;
-                    detail.envZId = props.selection.envZId;
-                    setDetail(detail);
+                    if(mounted) {
+                        let detail = resp.data;
+                        detail.envZId = props.selection.envZId;
+                        setDetail(detail);
+                    }
                 });
         }, 1000);
         return () => {

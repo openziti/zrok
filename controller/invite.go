@@ -9,10 +9,13 @@ import (
 )
 
 type inviteHandler struct {
+	cfg *Config
 }
 
-func newInviteHandler() *inviteHandler {
-	return &inviteHandler{}
+func newInviteHandler(cfg *Config) *inviteHandler {
+	return &inviteHandler{
+		cfg: cfg,
+	}
 }
 
 func (self *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
@@ -25,8 +28,29 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		return account.NewInviteBadRequest()
 	}
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
+	var token string
 
-	token, err := createToken()
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return account.NewInviteInternalServerError()
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if self.cfg.Registration != nil && self.cfg.Registration.TokenStrategy == "store" {
+		inviteToken, err := str.GetInviteTokenByToken(params.Body.Token, tx)
+		if err != nil {
+			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
+			return account.NewInviteBadRequest()
+		}
+		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
+			logrus.Error(err)
+			return account.NewInviteInternalServerError()
+		}
+		logrus.Infof("using invite token '%v' to process invite request for '%v'", inviteToken.Token, params.Body.Email)
+	}
+
+	token, err = createToken()
 	if err != nil {
 		logrus.Error(err)
 		return account.NewInviteInternalServerError()
@@ -36,13 +60,6 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		Email:         params.Body.Email,
 		SourceAddress: params.HTTPRequest.RemoteAddr,
 	}
-
-	tx, err := str.Begin()
-	if err != nil {
-		logrus.Error(err)
-		return account.NewInviteInternalServerError()
-	}
-	defer func() { _ = tx.Rollback() }()
 
 	if _, err := str.FindAccountWithEmail(params.Body.Email, tx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
