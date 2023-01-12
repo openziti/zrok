@@ -37,7 +37,7 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if self.cfg.Registration.TokenStrategy == "store" {
+	if self.cfg.Registration != nil && self.cfg.Registration.TokenStrategy == "store" {
 		invite, err := str.GetInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Error(err)
