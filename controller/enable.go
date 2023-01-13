@@ -100,7 +100,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 }
 
 func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, tx *sqlx.Tx) error {
-	if h.cfg.Environments > Unlimited {
+	if !principal.Limitless && h.cfg.Environments > Unlimited {
 		envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 		if err != nil {
 			return errors.Errorf("unable to find environments for account '%v': %v", principal.Email, err)

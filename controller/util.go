@@ -30,9 +30,10 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 
 	if a, err := str.FindAccountWithToken(token, tx); err == nil {
 		principal := &rest_model_zrok.Principal{
-			ID:    int64(a.Id),
-			Token: a.Token,
-			Email: a.Email,
+			ID:        int64(a.Id),
+			Token:     a.Token,
+			Email:     a.Email,
+			Limitless: a.Limitless,
 		}
 		return principal, nil
 	} else {

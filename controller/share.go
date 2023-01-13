@@ -143,7 +143,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 }
 
 func (h *shareHandler) checkLimits(principal *rest_model_zrok.Principal, envs []*store.Environment, tx *sqlx.Tx) error {
-	if h.cfg.Shares > Unlimited {
+	if !principal.Limitless && h.cfg.Shares > Unlimited {
 		total := 0
 		for i := range envs {
 			shrs, err := str.FindSharesForEnvironment(envs[i].Id, tx)

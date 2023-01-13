@@ -26,6 +26,9 @@ type Principal struct {
 	// id
 	ID int64 `json:"id,omitempty"`
 
+	// limitless
+	Limitless bool `json:"limitless,omitempty"`
+
 	// token
 	Token string `json:"token,omitempty"`
 }

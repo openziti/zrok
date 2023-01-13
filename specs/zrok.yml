@@ -610,6 +610,8 @@ definitions:
         type: string
       token:
         type: string
+      limitless:
+        type: boolean
       admin:
         type: boolean
 

@@ -943,6 +943,9 @@ func init() {
         "id": {
           "type": "integer"
         },
+        "limitless": {
+          "type": "boolean"
+        },
         "token": {
           "type": "string"
         }
@@ -2110,6 +2113,9 @@ func init() {
         },
         "id": {
           "type": "integer"
+        },
+        "limitless": {
+          "type": "boolean"
         },
         "token": {
           "type": "string"
