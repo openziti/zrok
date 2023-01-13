@@ -14,12 +14,13 @@ type Config struct {
 	Admin        *AdminConfig
 	Endpoint     *EndpointConfig
 	Email        *EmailConfig
+	Influx       *InfluxConfig
+	Limits       *LimitsConfig
+	Maintenance  *MaintenanceConfig
+	Metrics      *MetricsConfig
 	Registration *RegistrationConfig
 	Store        *store.Config
 	Ziti         *ZitiConfig
-	Metrics      *MetricsConfig
-	Influx       *InfluxConfig
-	Maintenance  *MaintenanceConfig
 }
 
 type AdminConfig struct {
@@ -71,9 +72,22 @@ type RegistrationMaintenanceConfig struct {
 	BatchLimit        int
 }
 
+const Unlimited = -1
+
+type LimitsConfig struct {
+	Environments int
+	Shares       int
+}
+
 func DefaultConfig() *Config {
 	return &Config{
-		Metrics: &MetricsConfig{ServiceName: "metrics"},
+		Limits: &LimitsConfig{
+			Environments: Unlimited,
+			Shares:       Unlimited,
+		},
+		Metrics: &MetricsConfig{
+			ServiceName: "metrics",
+		},
 		Maintenance: &MaintenanceConfig{
 			Registration: &RegistrationMaintenanceConfig{
 				ExpirationTimeout: time.Hour * 24,
