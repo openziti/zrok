@@ -2,16 +2,20 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type shareHandler struct{}
+type shareHandler struct {
+	cfg *LimitsConfig
+}
 
-func newShareHandler() *shareHandler {
-	return &shareHandler{}
+func newShareHandler(cfg *LimitsConfig) *shareHandler {
+	return &shareHandler{cfg: cfg}
 }
 
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -26,7 +30,8 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	envZId := params.Body.EnvZID
 	envId := 0
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
+	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
+	if err == nil {
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
@@ -43,6 +48,11 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	} else {
 		logrus.Errorf("error finding environments for account '%v'", principal.Email)
 		return share.NewShareInternalServerError()
+	}
+
+	if err := h.checkLimits(principal, envs, tx); err != nil {
+		logrus.Errorf("limits error: %v", err)
+		return share.NewShareUnauthorized()
 	}
 
 	edge, err := edgeClient()
@@ -130,4 +140,21 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		FrontendProxyEndpoints: frontendEndpoints,
 		ShrToken:               shrToken,
 	})
+}
+
+func (h *shareHandler) checkLimits(principal *rest_model_zrok.Principal, envs []*store.Environment, tx *sqlx.Tx) error {
+	if h.cfg.Shares > Unlimited {
+		total := 0
+		for i := range envs {
+			shrs, err := str.FindSharesForEnvironment(envs[i].Id, tx)
+			if err != nil {
+				return errors.Errorf("unable to find shares for environment '%v': %v", envs[i].ZId, err)
+			}
+			total += len(shrs)
+			if total+1 > h.cfg.Shares {
+				return errors.Errorf("would exceed shares limit of %d for '%v'", h.cfg.Shares, principal.Email)
+			}
+		}
+	}
+	return nil
 }
