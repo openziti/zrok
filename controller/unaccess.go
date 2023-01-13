@@ -3,10 +3,10 @@ package controller
 import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

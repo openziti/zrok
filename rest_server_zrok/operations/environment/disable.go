@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // DisableHandlerFunc turns a function with the right signature into a disable handler

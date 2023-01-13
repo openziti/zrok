@@ -8,11 +8,11 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/tui"
-	"github.com/openziti-test-kitchen/zrok/util"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/zrok/rest_client_zrok/account"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 )
 

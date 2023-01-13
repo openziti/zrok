@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti-test-kitchen/zrok/util"
+	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 

@@ -6,9 +6,9 @@ import (
 	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
+	"github.com/openziti/zrok/rest_model_zrok"
 	"net/http"
 	"strings"
 )

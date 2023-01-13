@@ -10,11 +10,11 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/account"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
+	"github.com/openziti/zrok/rest_client_zrok/account"
+	"github.com/openziti/zrok/rest_client_zrok/admin"
+	"github.com/openziti/zrok/rest_client_zrok/environment"
+	"github.com/openziti/zrok/rest_client_zrok/metadata"
+	"github.com/openziti/zrok/rest_client_zrok/share"
 )
 
 // Default zrok HTTP client.

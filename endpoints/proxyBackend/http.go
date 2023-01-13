@@ -3,11 +3,11 @@ package proxyBackend
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/endpoints"
-	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"

@@ -5,11 +5,11 @@ import (
 
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
+	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/rest_server_zrok"
+	"github.com/openziti/zrok/rest_server_zrok/operations"
+	"github.com/openziti/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
 )
 

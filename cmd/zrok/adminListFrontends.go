@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/zrok/rest_client_zrok/admin"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"os"
 	"time"

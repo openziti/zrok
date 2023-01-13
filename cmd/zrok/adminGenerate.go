@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/admin"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/zrok/rest_client_zrok/admin"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

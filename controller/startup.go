@@ -3,9 +3,9 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
+	"github.com/openziti/zrok/model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"

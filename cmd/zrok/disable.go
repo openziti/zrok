@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/tui"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/zrok/rest_client_zrok/environment"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

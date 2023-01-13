@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // LoginOKCode is the HTTP code returned for type LoginOK

@@ -5,7 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
-	"github.com/openziti-test-kitchen/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints"
 	"strings"
 	"time"
 )

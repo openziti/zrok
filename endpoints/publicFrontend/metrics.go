@@ -1,10 +1,10 @@
 package publicFrontend
 
 import (
-	"github.com/openziti-test-kitchen/zrok/model"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"

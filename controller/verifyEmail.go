@@ -2,7 +2,7 @@ package controller
 
 import (
 	"bytes"
-	"github.com/openziti-test-kitchen/zrok/controller/emailUi"
+	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/wneessen/go-mail"

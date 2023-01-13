@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
 
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewRegisterParams creates a new RegisterParams object

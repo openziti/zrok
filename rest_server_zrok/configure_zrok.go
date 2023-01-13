@@ -4,13 +4,13 @@ package rest_server_zrok
 
 import (
 	"crypto/tls"
-	"github.com/openziti-test-kitchen/zrok/ui"
+	"github.com/openziti/zrok/ui"
 	"github.com/sirupsen/logrus"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations"
+	"github.com/openziti/zrok/rest_server_zrok/operations"
 )
 
 //go:generate swagger generate server --target ../../zrok --name Zrok --spec ../specs/zrok.yml --model-package rest_model_zrok --server-package rest_server_zrok --principal interface{} --exclude-main

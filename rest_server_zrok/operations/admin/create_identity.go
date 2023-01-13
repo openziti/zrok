@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // CreateIdentityHandlerFunc turns a function with the right signature into a create identity handler

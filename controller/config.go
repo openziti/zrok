@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/michaelquigley/cf"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/pkg/errors"
 	"time"
 )

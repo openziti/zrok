@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/opentracing/opentracing-go/log"
-	"github.com/openziti-test-kitchen/zrok/cmd/zrok/endpointUi"
-	"github.com/openziti-test-kitchen/zrok/tui"
+	"github.com/openziti/zrok/cmd/zrok/endpointUi"
+	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"html/template"

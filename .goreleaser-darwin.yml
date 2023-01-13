@@ -2,7 +2,7 @@ builds:
   - id: zrok-amd64
     main: ./cmd/zrok
     binary: zrok
-    ldflags: "-s -w -X github.com/openziti-test-kitchen/zrok/build.Version={{.Tag}} -X github.com/openziti-test-kitchen/zrok/build.Hash={{.ShortCommit}}"
+    ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
     env:
       - CGO_ENABLED=1
     goos:
@@ -15,7 +15,7 @@ builds:
   - id: zrok-arm64
     main: ./cmd/zrok
     binary: zrok
-    ldflags: "-s -w -X github.com/openziti-test-kitchen/zrok/build.Version={{.Tag}} -X github.com/openziti-test-kitchen/zrok/build.Hash={{.ShortCommit}}"
+    ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
     env:
       - CGO_ENABLED=1
     goos:

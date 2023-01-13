@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ShareReader is a Reader for the Share structure.

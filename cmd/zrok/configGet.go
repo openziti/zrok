@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/zrokdir"
+	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 )
 

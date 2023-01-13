@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/michaelquigley/cf"
-	"github.com/openziti-test-kitchen/zrok/controller"
+	"github.com/openziti/zrok/controller"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

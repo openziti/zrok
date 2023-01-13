@@ -1,8 +1,8 @@
 package zrokEdgeSdk
 
 import (
-	"github.com/openziti-test-kitchen/zrok/build"
 	"github.com/openziti/edge/rest_model"
+	"github.com/openziti/zrok/build"
 )
 
 func ZrokTags() *rest_model.Tags {

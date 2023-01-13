@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti/zrok/controller/store"
 )
 
 func sparkDataForShares(shrs []*store.Share) (map[string][]int64, error) {

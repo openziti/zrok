@@ -2,7 +2,7 @@ package zrokdir
 
 import (
 	"encoding/json"
-	"github.com/openziti-test-kitchen/zrok/tui"
+	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/michaelquigley/cf"
-	"github.com/openziti-test-kitchen/zrok/endpoints/publicFrontend"
-	"github.com/openziti-test-kitchen/zrok/tui"
+	"github.com/openziti/zrok/endpoints/publicFrontend"
+	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

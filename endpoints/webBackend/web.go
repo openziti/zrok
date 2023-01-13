@@ -2,10 +2,10 @@ package webBackend
 
 import (
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/endpoints"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"

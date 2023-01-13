@@ -1,6 +1,6 @@
 package privateFrontend
 
-import "github.com/openziti-test-kitchen/zrok/endpoints"
+import "github.com/openziti/zrok/endpoints"
 
 type Config struct {
 	IdentityName string

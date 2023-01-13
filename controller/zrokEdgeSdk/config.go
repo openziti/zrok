@@ -3,10 +3,10 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
-	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_model"
+	"github.com/openziti/zrok/model"
 	"github.com/sirupsen/logrus"
 	"time"
 )

@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti-test-kitchen/zrok/model"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 )
 
 type publicResourceAllocator struct{}
