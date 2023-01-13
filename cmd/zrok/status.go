@@ -37,7 +37,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("unable to load zrokdir", err)
 	}
 
-	_, _ = fmt.Fprintf(os.Stdout, tui.CodeStyle.Render("Config")+":\n\n")
+	_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Config")+":\n\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
@@ -49,9 +49,9 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 
 	if zrd.Env == nil {
 		tui.Warning("Unable to load your local environment!\n")
-		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.CodeStyle.Render("zrok enable"))
+		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.Code.Render("zrok enable"))
 	} else {
-		_, _ = fmt.Fprintf(os.Stdout, tui.CodeStyle.Render("Environment")+":\n\n")
+		_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Environment")+":\n\n")
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)

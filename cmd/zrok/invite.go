@@ -81,11 +81,11 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 }
 
 func (cmd *inviteCommand) endpointError(apiEndpoint, _ string) {
-	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem creating an invitation!"))
-	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("%v\n\n", tui.SeriousBusiness.Render("there was a problem creating an invitation!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.Code.Render(apiEndpoint))
 	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
-	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
-	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
+	fmt.Printf("%v\n\n", tui.Code.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.Code.Render("https://some.zrok.io"))
 }
 
 type inviteTui struct {
@@ -111,9 +111,9 @@ func newInviteTui() inviteTui {
 	m := inviteTui{
 		inputs: make([]textinput.Model, 2),
 	}
-	m.focusedStyle = tui.WarningStyle.Copy()
-	m.blurredStyle = tui.CodeStyle.Copy()
-	m.errorStyle = tui.ErrorStyle.Copy()
+	m.focusedStyle = tui.Attention.Copy()
+	m.blurredStyle = tui.Code.Copy()
+	m.errorStyle = tui.SeriousBusiness.Copy()
 	m.cursorStyle = m.focusedStyle.Copy()
 	m.noStyle = lipgloss.NewStyle()
 	m.helpStyle = m.blurredStyle.Copy()

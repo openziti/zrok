@@ -159,7 +159,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		case "public":
 			shareDescription = resp.Payload.FrontendEndpoint
 		case "private":
-			shareDescription = fmt.Sprintf("access your share with: %v", tui.CodeStyle.Render(fmt.Sprintf("zrok access private %v", shrToken)))
+			shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 		}
 
 		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)

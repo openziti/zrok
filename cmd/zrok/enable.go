@@ -115,11 +115,11 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (cmd *enableCommand) endpointError(apiEndpoint, _ string) {
-	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem enabling your environment!"))
-	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("%v\n\n", tui.SeriousBusiness.Render("there was a problem enabling your environment!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.Code.Render(apiEndpoint))
 	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
-	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
-	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
+	fmt.Printf("%v\n\n", tui.Code.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.Code.Render("https://some.zrok.io"))
 }
 
 func getHost() (string, string, error) {
@@ -141,7 +141,7 @@ type enableTuiModel struct {
 func newEnableTuiModel() enableTuiModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-	s.Style = tui.WarningStyle
+	s.Style = tui.Attention
 	return enableTuiModel{spinner: s}
 }
 

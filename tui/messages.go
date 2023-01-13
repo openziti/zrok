@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-var ErrorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166"))
-var ErrorLabel = ErrorStyle.Render("ERROR")
-var WarningStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500"))
-var WarningLabel = WarningStyle.Render("WARNING")
-var CodeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF"))
+var SeriousBusiness = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166"))
+var ErrorLabel = SeriousBusiness.Render("ERROR")
+var Attention = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFA500"))
+var WarningLabel = Attention.Render("WARNING")
+var Code = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FFFF"))
 
 func Error(msg string, err error) {
 	if err != nil {
