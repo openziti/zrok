@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	user2 "os/user"
+	"time"
 )
 
 func init() {
@@ -85,7 +86,8 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 
 	resp, err := zrok.Environment.Enable(req, auth)
 	if err != nil {
-		prg.Send(fmt.Sprintf("the zrok service returned an error: %v", err))
+		time.Sleep(250 * time.Millisecond)
+		prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
 		prg.Quit()
 		<-done
 		cmd.endpointError(zrd.ApiEndpoint())

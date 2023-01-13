@@ -4,17 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
 	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type enableHandler struct{}
+type enableHandler struct {
+	cfg *LimitsConfig
+}
 
-func newEnableHandler() *enableHandler {
-	return &enableHandler{}
+func newEnableHandler(cfg *LimitsConfig) *enableHandler {
+	return &enableHandler{cfg: cfg}
 }
 
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -26,31 +30,41 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	}
 	defer func() { _ = tx.Rollback() }()
 
+	if err := h.checkLimits(principal, tx); err != nil {
+		logrus.Errorf("limits error: %v", err)
+		return environment.NewEnableUnauthorized()
+	}
+
 	client, err := edgeClient()
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
+
 	uniqueToken, err := createShareToken()
 	if err != nil {
 		logrus.Errorf("error creating unique identity token: %v", err)
 		return environment.NewEnableInternalServerError()
 	}
+
 	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(uniqueToken, principal.Email, params.Body.Description, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
+
 	envZId := ident.Payload.Data.ID
 	cfg, err := zrokEdgeSdk.EnrollIdentity(envZId, client)
 	if err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
+
 	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
 		logrus.Error(err)
 		return environment.NewEnableInternalServerError()
 	}
+
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
 		Description: params.Body.Description,
 		Host:        params.Body.Host,
@@ -62,6 +76,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		_ = tx.Rollback()
 		return environment.NewEnableInternalServerError()
 	}
+
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing: %v", err)
 		return environment.NewEnableInternalServerError()
@@ -82,4 +97,17 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	resp.Payload.Cfg = out.String()
 
 	return resp
+}
+
+func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, tx *sqlx.Tx) error {
+	if h.cfg.Environments > Unlimited {
+		envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
+		if err != nil {
+			return errors.Errorf("unable to find environments for account '%v': %v", principal.Email, err)
+		}
+		if len(envs)+1 > h.cfg.Environments {
+			return errors.Errorf("would exceed environments limit of %d for '%v'", h.cfg.Environments, principal.Email)
+		}
+	}
+	return nil
 }
