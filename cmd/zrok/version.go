@@ -26,5 +26,5 @@ func newVersionCommand() *versionCommand {
 }
 
 func (cmd *versionCommand) run(_ *cobra.Command, _ []string) {
-	fmt.Println(tui.SeriousBusiness.Render("               _    \n _____ __ ___ | | __\n|_  / '__/ _ \\| |/ /\n / /| | | (_) |   < \n/___|_|  \\___/|_|\\_\\") + "\n\n" + tui.Code.Render(build.String()) + "\n")
+	fmt.Println(tui.SeriousBusiness.Render("               _    \n _____ __ ___ | | __\n|_  / '__/ _ \\| |/ /\n / /| | | (_) |   < \n/___|_|  \\___/|_|\\_\\") + "\n\n" + tui.Attention.Render(build.String()) + "\n")
 }
