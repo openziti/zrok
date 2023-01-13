@@ -2,10 +2,18 @@
 // Auto-generated, edits will be overwritten
 
 /**
- * @typedef accountRequest
+ * @typedef accessRequest
  * @memberof module:types
  * 
- * @property {string} email 
+ * @property {string} envZId 
+ * @property {string} shrToken 
+ */
+
+/**
+ * @typedef accessResponse
+ * @memberof module:types
+ * 
+ * @property {string} frontendToken 
  */
 
 /**
@@ -14,6 +22,36 @@
  * 
  * @property {string} username 
  * @property {string} password 
+ */
+
+/**
+ * @typedef createFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} zId 
+ * @property {string} url_template 
+ * @property {string} public_name 
+ */
+
+/**
+ * @typedef createFrontendResponse
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ */
+
+/**
+ * @typedef deleteFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} frontendToken 
+ */
+
+/**
+ * @typedef disableRequest
+ * @memberof module:types
+ * 
+ * @property {string} identity 
  */
 
 /**
@@ -33,13 +71,6 @@
  */
 
 /**
- * @typedef disableRequest
- * @memberof module:types
- * 
- * @property {string} identity 
- */
-
-/**
  * @typedef environment
  * @memberof module:types
  * 
@@ -53,11 +84,26 @@
  */
 
 /**
- * @typedef environmentServices
+ * @typedef environmentShares
  * @memberof module:types
  * 
  * @property {module:types.environment} environment 
- * @property {module:types.services} services 
+ * @property {module:types.shares} shares 
+ */
+
+/**
+ * @typedef inviteTokenGenerateRequest
+ * @memberof module:types
+ * 
+ * @property {string[]} tokens 
+ */
+
+/**
+ * @typedef inviteRequest
+ * @memberof module:types
+ * 
+ * @property {string} email 
+ * @property {string} token 
  */
 
 /**
@@ -75,6 +121,20 @@
  * @property {number} id 
  * @property {string} email 
  * @property {string} token 
+ * @property {boolean} limitless 
+ * @property {boolean} admin 
+ */
+
+/**
+ * @typedef publicFrontend
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ * @property {string} zId 
+ * @property {string} urlTemplate 
+ * @property {string} publicName 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**
@@ -93,42 +153,77 @@
  */
 
 /**
- * @typedef service
+ * @typedef share
  * @memberof module:types
  * 
+ * @property {string} token 
  * @property {string} zId 
- * @property {string} name 
- * @property {string} frontend 
- * @property {string} backend 
- * @property {module:types.serviceMetrics} metrics 
+ * @property {string} shareMode 
+ * @property {string} backendMode 
+ * @property {string} frontendSelection 
+ * @property {string} frontendEndpoint 
+ * @property {string} backendProxyEndpoint 
+ * @property {boolean} reserved 
+ * @property {module:types.shareMetrics} metrics 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */
 
 /**
- * @typedef tunnelRequest
+ * @typedef shareRequest
  * @memberof module:types
  * 
- * @property {string} zId 
- * @property {string} endpoint 
+ * @property {string} envZId 
+ * @property {string} shareMode 
+ * @property {string[]} frontendSelection 
+ * @property {string} backendMode 
+ * @property {string} backendProxyEndpoint 
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
+ * @property {boolean} reserved 
  */
 
 /**
- * @typedef tunnelResponse
+ * @typedef shareResponse
  * @memberof module:types
  * 
- * @property {string} proxyEndpoint 
- * @property {string} svcName 
+ * @property {string[]} frontendProxyEndpoints 
+ * @property {string} shrToken 
  */
 
 /**
- * @typedef untunnelRequest
+ * @typedef unaccessRequest
  * @memberof module:types
  * 
- * @property {string} zId 
- * @property {string} svcName 
+ * @property {string} frontendToken 
+ * @property {string} envZId 
+ * @property {string} shrToken 
+ */
+
+/**
+ * @typedef unshareRequest
+ * @memberof module:types
+ * 
+ * @property {string} envZId 
+ * @property {string} shrToken 
+ * @property {boolean} reserved 
+ */
+
+/**
+ * @typedef updateFrontendRequest
+ * @memberof module:types
+ * 
+ * @property {string} frontendToken 
+ * @property {string} publicName 
+ * @property {string} urlTemplate 
+ */
+
+/**
+ * @typedef updateShareRequest
+ * @memberof module:types
+ * 
+ * @property {string} shrToken 
+ * @property {string} backendProxyEndpoint 
  */
 
 /**

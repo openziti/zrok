@@ -13,20 +13,44 @@ import (
 	"strings"
 )
 
-func ZrokAuthenticate(token string) (*rest_model_zrok.Principal, error) {
+type zrokAuthenticator struct {
+	cfg *Config
+}
+
+func newZrokAuthenticator(cfg *Config) *zrokAuthenticator {
+	return &zrokAuthenticator{cfg}
+}
+
+func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Principal, error) {
 	tx, err := str.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = tx.Rollback() }()
+
 	if a, err := str.FindAccountWithToken(token, tx); err == nil {
-		principal := rest_model_zrok.Principal{
-			ID:    int64(a.Id),
-			Token: a.Token,
-			Email: a.Email,
+		principal := &rest_model_zrok.Principal{
+			ID:        int64(a.Id),
+			Token:     a.Token,
+			Email:     a.Email,
+			Limitless: a.Limitless,
 		}
-		return &principal, nil
+		return principal, nil
 	} else {
+		// check for admin secret
+		if cfg.Admin != nil {
+			for _, secret := range cfg.Admin.Secrets {
+				if token == secret {
+					principal := &rest_model_zrok.Principal{
+						ID:    int64(-1),
+						Admin: true,
+					}
+					return principal, nil
+				}
+			}
+		}
+
+		// no match
 		return nil, errors2.New(401, "invalid api key")
 	}
 }
@@ -43,7 +67,7 @@ func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
 	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
 }
 
-func createServiceName() (string, error) {
+func createShareToken() (string, error) {
 	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyz0123456789", 12)
 	if err != nil {
 		return "", err
@@ -77,4 +101,8 @@ func realRemoteAddress(req *http.Request) string {
 		}
 	}
 	return ip
+}
+
+func proxyUrl(shrToken, template string) string {
+	return strings.Replace(template, "{token}", shrToken, -1)
 }

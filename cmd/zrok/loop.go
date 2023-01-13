@@ -8,8 +8,9 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti-test-kitchen/zrok/model"
 	"github.com/openziti-test-kitchen/zrok/rest_client_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/tunnel"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/share"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/util"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/openziti/sdk-golang/ziti"
@@ -20,6 +21,9 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -28,17 +32,18 @@ func init() {
 }
 
 type loopCmd struct {
-	cmd            *cobra.Command
-	loopers        int
-	iterations     int
-	statusEvery    int
-	timeoutSeconds int
-	minPayload     int
-	maxPayload     int
-	minDwellMs     int
-	maxDwellMs     int
-	minPacingMs    int
-	maxPacingMs    int
+	cmd               *cobra.Command
+	loopers           int
+	iterations        int
+	statusEvery       int
+	timeoutSeconds    int
+	minPayload        int
+	maxPayload        int
+	minDwellMs        int
+	maxDwellMs        int
+	minPacingMs       int
+	maxPacingMs       int
+	frontendSelection []string
 }
 
 func newLoopCmd() *loopCmd {
@@ -59,6 +64,7 @@ func newLoopCmd() *loopCmd {
 	cmd.Flags().IntVar(&r.maxDwellMs, "max-dwell-ms", 1000, "Maximum dwell time in milliseconds")
 	cmd.Flags().IntVar(&r.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
 	cmd.Flags().IntVar(&r.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
+	cmd.Flags().StringArrayVar(&r.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	return r
 }
 
@@ -69,21 +75,32 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 		loopers = append(loopers, l)
 		go l.run()
 	}
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		for _, looper := range loopers {
+			looper.stop = true
+		}
+	}()
 	for _, l := range loopers {
 		<-l.done
 	}
 	totalMismatches := 0
 	totalXfer := int64(0)
+	totalLoops := int64(0)
 	for _, l := range loopers {
 		deltaSeconds := l.stopTime.Sub(l.startTime).Seconds()
 		xfer := int64(float64(l.bytes) / deltaSeconds)
 		totalXfer += xfer
 		totalMismatches += l.mismatches
 		xferSec := util.BytesToSize(xfer)
-		logrus.Infof("looper #%d: %d mismatches, %s/sec", l.id, l.mismatches, xferSec)
+		totalLoops += l.loops
+		logrus.Infof("looper #%d: %d loops, %d mismatches, %s/sec", l.id, l.loops, l.mismatches, xferSec)
 	}
 	totalXferSec := util.BytesToSize(totalXfer)
-	logrus.Infof("total: %d mismatches, %s/sec", totalMismatches, totalXferSec)
+	logrus.Infof("total: %d loops, %d mismatches, %s/sec", totalLoops, totalMismatches, totalXferSec)
+	os.Exit(0)
 }
 
 type looper struct {
@@ -94,13 +111,15 @@ type looper struct {
 	listener      edge.Listener
 	zif           string
 	zrok          *rest_client_zrok.Zrok
-	service       string
+	shrToken      string
 	proxyEndpoint string
 	auth          runtime.ClientAuthInfoWriter
 	mismatches    int
 	bytes         int64
+	loops         int64
 	startTime     time.Time
 	stopTime      time.Time
+	stop          bool
 }
 
 func newLooper(id int, cmd *loopCmd) *looper {
@@ -116,7 +135,7 @@ func (l *looper) run() {
 	defer logrus.Infof("stopping #%d", l.id)
 
 	l.startup()
-	logrus.Infof("looper #%d, service: %v, frontend: %v", l.id, l.service, l.proxyEndpoint)
+	logrus.Infof("looper #%d, shrToken: %v, frontend: %v", l.id, l.shrToken, l.proxyEndpoint)
 	go l.serviceListener()
 	l.dwell()
 	l.iterate()
@@ -134,7 +153,7 @@ func (l *looper) serviceListener() {
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 10,
 	}
-	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.service, &opts); err == nil {
+	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.shrToken, &opts); err == nil {
 		if err := http.Serve(l.listener, l); err != nil {
 			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}
@@ -152,33 +171,41 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l *looper) startup() {
 	logrus.Infof("starting #%d", l.id)
 
-	var err error
-	l.env, err = zrokdir.LoadEnvironment()
+	zrd, err := zrokdir.Load()
 	if err != nil {
 		panic(err)
 	}
+
+	if zrd.Env == nil {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+	l.env = zrd.Env
+
 	l.zif, err = zrokdir.ZitiIdentityFile("backend")
 	if err != nil {
 		panic(err)
 	}
-	l.zrok, err = zrokdir.ZrokClient(l.env.ApiEndpoint)
+	l.zrok, err = zrd.Client()
 	if err != nil {
 		panic(err)
 	}
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
-	tunnelReq := tunnel.NewTunnelParams()
-	tunnelReq.Body = &rest_model_zrok.TunnelRequest{
-		ZID:        l.env.ZId,
-		Endpoint:   fmt.Sprintf("looper#%d", l.id),
-		AuthScheme: string(model.None),
+	tunnelReq := share.NewShareParams()
+	tunnelReq.Body = &rest_model_zrok.ShareRequest{
+		EnvZID:               l.env.ZId,
+		ShareMode:            "public",
+		FrontendSelection:    l.cmd.frontendSelection,
+		BackendMode:          "proxy",
+		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
+		AuthScheme:           string(model.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
-	tunnelResp, err := l.zrok.Tunnel.Tunnel(tunnelReq, l.auth)
+	tunnelResp, err := l.zrok.Share.Share(tunnelReq, l.auth)
 	if err != nil {
 		panic(err)
 	}
-	l.service = tunnelResp.Payload.SvcName
-	l.proxyEndpoint = tunnelResp.Payload.ProxyEndpoint
+	l.shrToken = tunnelResp.Payload.ShrToken
+	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoints[0]
 }
 
 func (l *looper) dwell() {
@@ -193,7 +220,7 @@ func (l *looper) iterate() {
 	l.startTime = time.Now()
 	defer func() { l.stopTime = time.Now() }()
 
-	for i := 0; i < l.cmd.iterations; i++ {
+	for i := 0; i < l.cmd.iterations && !l.stop; i++ {
 		if i > 0 && i%l.cmd.statusEvery == 0 {
 			logrus.Infof("looper #%d: iteration #%d", l.id, i)
 		}
@@ -228,6 +255,7 @@ func (l *looper) iterate() {
 			pacingMs = rand.Intn(l.cmd.maxPacingMs-l.cmd.minPacingMs) + l.cmd.minPacingMs
 			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		l.loops++
 	}
 }
 
@@ -238,12 +266,12 @@ func (l *looper) shutdown() {
 		}
 	}
 
-	untunnelReq := tunnel.NewUntunnelParams()
-	untunnelReq.Body = &rest_model_zrok.UntunnelRequest{
-		ZID:     l.env.ZId,
-		SvcName: l.service,
+	untunnelReq := share.NewUnshareParams()
+	untunnelReq.Body = &rest_model_zrok.UnshareRequest{
+		EnvZID:   l.env.ZId,
+		ShrToken: l.shrToken,
 	}
-	if _, err := l.zrok.Tunnel.Untunnel(untunnelReq, l.auth); err != nil {
+	if _, err := l.zrok.Share.Unshare(untunnelReq, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
 	}
 }

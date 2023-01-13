@@ -17,11 +17,17 @@ import (
 // swagger:model principal
 type Principal struct {
 
+	// admin
+	Admin bool `json:"admin,omitempty"`
+
 	// email
 	Email string `json:"email,omitempty"`
 
 	// id
 	ID int64 `json:"id,omitempty"`
+
+	// limitless
+	Limitless bool `json:"limitless,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`

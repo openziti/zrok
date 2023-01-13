@@ -1,152 +1,115 @@
 body {
-  margin: 0;
-  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: 'Russo One', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-bottom: 15px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+code, pre {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Russo One', sans-serif;
+#navbar {
+    border-radius: 0 0 15px 15px;
+    padding: 15px 50px 20px;
 }
 
-#zrok-enable {
-  text-align: center;
-  margin-top: 100px;
-}
-#zrok-enable h1 {
-  margin-bottom: 50px;
+.header-title {
+    font-family: 'Russo One', sans-serif;
+    font-size: 3em;
+    margin-left: 0.53em;
+    vertical-align: center;
+    line-height: 1.7;
 }
 
-.container {
-  display: grid;
-  margin-left: 10%;
-  margin-right: 10%;
+.visualizer-container {
+    padding: 10px;
+    background: #3b2693;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+.visualizer-controls {
+    text-align: right;
+    margin-top: 5px;
+}
+
+.detail-container {
+    margin-top: 15px;
+}
+
+.zrok-datatable {
+    margin-top: 30px;
+}
+
+.zrok-big-sparkline {
+    margin-top: 30px;
+    padding: 50px;
+}
+
+.btn-close {
+    background: transparent url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3E%3C/svg%3E") 50%/1em auto no-repeat;
+    height: 25px;
+    width: 25px;
+    border: 0;
+}
+
+.rdt_TableRow {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+.nav-tabs {
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .fullscreen {
-  background-color: #3b2693;
-  text-align: center;
-  padding: 25px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  justify-content: center;
+    background-color: #3b2693;
+    padding: 25px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
+
+.fullscreen .row {
+    text-align: center;
+    justify-content: center;
+}
+
 .fullscreen h1 {
-  font-size: 64pt;
-}
-.fullscreen fieldset {
-  width: 500px;
-  border-radius: 25px;
-}
-.fullscreen label {
-  text-align: right;
-  width: 100px;
-  float: left;
-  font-family: 'Russo One', sans-serif;
-  margin-right: 10px;
-}
-.fullscreen fieldset legend {
-  font-family: 'Russo One', sans-serif;
-}
-.fullscreen fieldset p {
-  clear: both;
-  padding: 5px;
-}
-.fullscreen input {
-  width: 300px;
-  float: left;
-}
-.fullscreen p a {
-  color: white;
-  font-weight: bold;
+    font-size: 64pt;
 }
 
-.header {
-  background-color: #3b2693;
-  color: white;
-  padding-left: 2em;
-  padding-right: 2em;
-  display: flex;
-  align-items: center;
-  border-radius: 0 0 25px 25px;
-}
-.header-title {
-  font-family: 'Russo One', sans-serif;
-  font-size: 3em;
-  margin-left: 0.53em;
-}
-.header-status {
-  width: 100%;
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-}
-.header-status div p {
-  font-size: 75%;
-}
-.header-status div {
-  text-align: right;
-}
-.header-controls {
-  display: flex;
-  justify-content: right;
-  align-items: flex-end;
-}
-.header-controls button {
-  margin-left: 30px;
-  display: flex;
-  align-items: center;
-  background-color: #30205d;
-  border-radius: 5px 5px 5px 5px;
-  border: 1px solid #7733ff;
-  color: #7733ff;
-  padding: 5px;
-  width: 100px;
-  justify-content: center;
-  height: 2em;
-  margin-bottom: 1em;
-}
-.header-controls button:hover {
-  color: white;
-  border-color: white;
+.fullscreen-body {
+    margin-top: 6em;
 }
 
-.main {
-  padding: 2em;
+.fullscreen form {
+    margin: 15px;
 }
 
-.rdt_TableCol_Sortable div {
-  font-family: 'Russo One', sans-serif;
-  font-size: 1.25em;
+.fullscreen form input {
+    margin: 15px 0;
+    width: 400px;
 }
 
-.network {
-  height: 400px;
+.fullscreen a {
+    color: #bbb;
 }
 
-.react-flow__attribution {
-  display: none;
-}
-
-.nested-services {
-  padding-left: 10em;
-}
-
-.popover {
-  padding: 0 25px;
-}
-
-svg.flowNode {
-  vertical-align: middle;
+.fullscreen pre {
+    color: #bbb;
 }
 
 .errorMessage {
-  color: deeppink;
+    color: deeppink;
+}
+
+.actions-tab {
+    margin-top: 50px;
+}
+.actions-tab p {
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }

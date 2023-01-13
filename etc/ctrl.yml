@@ -4,39 +4,36 @@
 #   /___|_|  \___/|_|\_\
 # controller configuration
 
+v:                  1
+
 endpoint:
   host:             0.0.0.0
-  port:             8080
-
-proxy:
-  url_template:     "https://{svcName}.in.zrok.io/"
-  identities:
-    - "e6gMfeD4y"
+  port:             18080
 
 email:
-  host:             smtp.email.us-ashburn-1.oci.oraclecloud.com
+  host:             smtp.server.com
   port:             587
   username:         ""
   password:         ""
 
 registration:
-  email_from:       ziggy@zrok.io
-  registration_url_template: https://api.zrok.io/register
+  email_from:       ziggy@server.com
+  registration_url_template: https://zrok.server.com/register
 
 store:
-  path:             "host=10.0.0.84 user=zrok password=zrok dbname=zrok"
+  path:             "host=127.0.0.1 user=zrok password=zrok dbname=zrok"
   type:             "postgres"
 
 ziti:
-  api_endpoint:     "https://10.0.0.41:1280"
+  api_endpoint:     "https://127.0.0.1:1280"
   username:         admin
-  password:         ""
+  password:         "admin"
 
 metrics:
   service_name:     metrics
 
 influx:
-  url:              "http://10.0.0.84:8086"
+  url:              "http://127.0.0.1:8086"
   bucket:           zrok
   org:              zrok
   token:            ""

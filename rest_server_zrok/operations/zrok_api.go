@@ -20,9 +20,11 @@ import (
 	"github.com/go-openapi/swag"
 
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/admin"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/tunnel"
+	"github.com/openziti-test-kitchen/zrok/rest_server_zrok/operations/share"
 )
 
 // NewZrokAPI creates a new Zrok instance
@@ -47,32 +49,65 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		IdentityCreateAccountHandler: identity.CreateAccountHandlerFunc(func(params identity.CreateAccountParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.CreateAccount has not yet been implemented")
+		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
-		IdentityDisableHandler: identity.DisableHandlerFunc(func(params identity.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Disable has not yet been implemented")
+		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
 		}),
-		IdentityEnableHandler: identity.EnableHandlerFunc(func(params identity.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Enable has not yet been implemented")
+		AdminCreateIdentityHandler: admin.CreateIdentityHandlerFunc(func(params admin.CreateIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.CreateIdentity has not yet been implemented")
 		}),
-		IdentityLoginHandler: identity.LoginHandlerFunc(func(params identity.LoginParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Login has not yet been implemented")
+		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
+		}),
+		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
+		}),
+		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
+		}),
+		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
+		}),
+		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
+		}),
+		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
+		}),
+		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
+		}),
+		AdminListFrontendsHandler: admin.ListFrontendsHandlerFunc(func(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
+		}),
+		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
-		IdentityRegisterHandler: identity.RegisterHandlerFunc(func(params identity.RegisterParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Register has not yet been implemented")
+		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
-		TunnelTunnelHandler: tunnel.TunnelHandlerFunc(func(params tunnel.TunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation tunnel.Tunnel has not yet been implemented")
+		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
-		TunnelUntunnelHandler: tunnel.UntunnelHandlerFunc(func(params tunnel.UntunnelParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation tunnel.Untunnel has not yet been implemented")
+		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
 		}),
-		IdentityVerifyHandler: identity.VerifyHandlerFunc(func(params identity.VerifyParams) middleware.Responder {
-			return middleware.NotImplemented("operation identity.Verify has not yet been implemented")
+		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
+		}),
+		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
+		}),
+		ShareUpdateShareHandler: share.UpdateShareHandlerFunc(func(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.UpdateShare has not yet been implemented")
+		}),
+		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
+			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
 		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
@@ -127,24 +162,46 @@ type ZrokAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
-	// IdentityCreateAccountHandler sets the operation handler for the create account operation
-	IdentityCreateAccountHandler identity.CreateAccountHandler
-	// IdentityDisableHandler sets the operation handler for the disable operation
-	IdentityDisableHandler identity.DisableHandler
-	// IdentityEnableHandler sets the operation handler for the enable operation
-	IdentityEnableHandler identity.EnableHandler
-	// IdentityLoginHandler sets the operation handler for the login operation
-	IdentityLoginHandler identity.LoginHandler
+	// ShareAccessHandler sets the operation handler for the access operation
+	ShareAccessHandler share.AccessHandler
+	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
+	AdminCreateFrontendHandler admin.CreateFrontendHandler
+	// AdminCreateIdentityHandler sets the operation handler for the create identity operation
+	AdminCreateIdentityHandler admin.CreateIdentityHandler
+	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
+	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
+	// EnvironmentDisableHandler sets the operation handler for the disable operation
+	EnvironmentDisableHandler environment.DisableHandler
+	// EnvironmentEnableHandler sets the operation handler for the enable operation
+	EnvironmentEnableHandler environment.EnableHandler
+	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
+	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
+	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
+	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
+	// AccountInviteHandler sets the operation handler for the invite operation
+	AccountInviteHandler account.InviteHandler
+	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
+	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
+	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
+	AdminListFrontendsHandler admin.ListFrontendsHandler
+	// AccountLoginHandler sets the operation handler for the login operation
+	AccountLoginHandler account.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
-	// IdentityRegisterHandler sets the operation handler for the register operation
-	IdentityRegisterHandler identity.RegisterHandler
-	// TunnelTunnelHandler sets the operation handler for the tunnel operation
-	TunnelTunnelHandler tunnel.TunnelHandler
-	// TunnelUntunnelHandler sets the operation handler for the untunnel operation
-	TunnelUntunnelHandler tunnel.UntunnelHandler
-	// IdentityVerifyHandler sets the operation handler for the verify operation
-	IdentityVerifyHandler identity.VerifyHandler
+	// AccountRegisterHandler sets the operation handler for the register operation
+	AccountRegisterHandler account.RegisterHandler
+	// ShareShareHandler sets the operation handler for the share operation
+	ShareShareHandler share.ShareHandler
+	// ShareUnaccessHandler sets the operation handler for the unaccess operation
+	ShareUnaccessHandler share.UnaccessHandler
+	// ShareUnshareHandler sets the operation handler for the unshare operation
+	ShareUnshareHandler share.UnshareHandler
+	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
+	AdminUpdateFrontendHandler admin.UpdateFrontendHandler
+	// ShareUpdateShareHandler sets the operation handler for the update share operation
+	ShareUpdateShareHandler share.UpdateShareHandler
+	// AccountVerifyHandler sets the operation handler for the verify operation
+	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
 
@@ -228,32 +285,65 @@ func (o *ZrokAPI) Validate() error {
 		unregistered = append(unregistered, "XTokenAuth")
 	}
 
-	if o.IdentityCreateAccountHandler == nil {
-		unregistered = append(unregistered, "identity.CreateAccountHandler")
+	if o.ShareAccessHandler == nil {
+		unregistered = append(unregistered, "share.AccessHandler")
 	}
-	if o.IdentityDisableHandler == nil {
-		unregistered = append(unregistered, "identity.DisableHandler")
+	if o.AdminCreateFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.CreateFrontendHandler")
 	}
-	if o.IdentityEnableHandler == nil {
-		unregistered = append(unregistered, "identity.EnableHandler")
+	if o.AdminCreateIdentityHandler == nil {
+		unregistered = append(unregistered, "admin.CreateIdentityHandler")
 	}
-	if o.IdentityLoginHandler == nil {
-		unregistered = append(unregistered, "identity.LoginHandler")
+	if o.AdminDeleteFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteFrontendHandler")
+	}
+	if o.EnvironmentDisableHandler == nil {
+		unregistered = append(unregistered, "environment.DisableHandler")
+	}
+	if o.EnvironmentEnableHandler == nil {
+		unregistered = append(unregistered, "environment.EnableHandler")
+	}
+	if o.MetadataGetEnvironmentDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetEnvironmentDetailHandler")
+	}
+	if o.MetadataGetShareDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
+	}
+	if o.AccountInviteHandler == nil {
+		unregistered = append(unregistered, "account.InviteHandler")
+	}
+	if o.AdminInviteTokenGenerateHandler == nil {
+		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
+	}
+	if o.AdminListFrontendsHandler == nil {
+		unregistered = append(unregistered, "admin.ListFrontendsHandler")
+	}
+	if o.AccountLoginHandler == nil {
+		unregistered = append(unregistered, "account.LoginHandler")
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
-	if o.IdentityRegisterHandler == nil {
-		unregistered = append(unregistered, "identity.RegisterHandler")
+	if o.AccountRegisterHandler == nil {
+		unregistered = append(unregistered, "account.RegisterHandler")
 	}
-	if o.TunnelTunnelHandler == nil {
-		unregistered = append(unregistered, "tunnel.TunnelHandler")
+	if o.ShareShareHandler == nil {
+		unregistered = append(unregistered, "share.ShareHandler")
 	}
-	if o.TunnelUntunnelHandler == nil {
-		unregistered = append(unregistered, "tunnel.UntunnelHandler")
+	if o.ShareUnaccessHandler == nil {
+		unregistered = append(unregistered, "share.UnaccessHandler")
 	}
-	if o.IdentityVerifyHandler == nil {
-		unregistered = append(unregistered, "identity.VerifyHandler")
+	if o.ShareUnshareHandler == nil {
+		unregistered = append(unregistered, "share.UnshareHandler")
+	}
+	if o.AdminUpdateFrontendHandler == nil {
+		unregistered = append(unregistered, "admin.UpdateFrontendHandler")
+	}
+	if o.ShareUpdateShareHandler == nil {
+		unregistered = append(unregistered, "share.UpdateShareHandler")
+	}
+	if o.AccountVerifyHandler == nil {
+		unregistered = append(unregistered, "account.VerifyHandler")
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
@@ -360,19 +450,51 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/account"] = identity.NewCreateAccount(o.context, o.IdentityCreateAccountHandler)
+	o.handlers["POST"]["/access"] = share.NewAccess(o.context, o.ShareAccessHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/disable"] = identity.NewDisable(o.context, o.IdentityDisableHandler)
+	o.handlers["POST"]["/frontend"] = admin.NewCreateFrontend(o.context, o.AdminCreateFrontendHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/enable"] = identity.NewEnable(o.context, o.IdentityEnableHandler)
+	o.handlers["POST"]["/identity"] = admin.NewCreateIdentity(o.context, o.AdminCreateIdentityHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/frontend"] = admin.NewDeleteFrontend(o.context, o.AdminDeleteFrontendHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/login"] = identity.NewLogin(o.context, o.IdentityLoginHandler)
+	o.handlers["POST"]["/disable"] = environment.NewDisable(o.context, o.EnvironmentDisableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/environment/{envZId}"] = metadata.NewGetEnvironmentDetail(o.context, o.MetadataGetEnvironmentDetailHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/share/{shrToken}"] = metadata.NewGetShareDetail(o.context, o.MetadataGetShareDetailHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/invite"] = account.NewInvite(o.context, o.AccountInviteHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/invite/token/generate"] = admin.NewInviteTokenGenerate(o.context, o.AdminInviteTokenGenerateHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/frontends"] = admin.NewListFrontends(o.context, o.AdminListFrontendsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -380,19 +502,31 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/register"] = identity.NewRegister(o.context, o.IdentityRegisterHandler)
+	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/tunnel"] = tunnel.NewTunnel(o.context, o.TunnelTunnelHandler)
+	o.handlers["POST"]["/share"] = share.NewShare(o.context, o.ShareShareHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/untunnel"] = tunnel.NewUntunnel(o.context, o.TunnelUntunnelHandler)
+	o.handlers["DELETE"]["/unaccess"] = share.NewUnaccess(o.context, o.ShareUnaccessHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/unshare"] = share.NewUnshare(o.context, o.ShareUnshareHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
+	o.handlers["PATCH"]["/frontend"] = admin.NewUpdateFrontend(o.context, o.AdminUpdateFrontendHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
+	o.handlers["PATCH"]["/share"] = share.NewUpdateShare(o.context, o.ShareUpdateShareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/verify"] = identity.NewVerify(o.context, o.IdentityVerifyHandler)
+	o.handlers["POST"]["/verify"] = account.NewVerify(o.context, o.AccountVerifyHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

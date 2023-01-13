@@ -1,7 +1,7 @@
 info:
   description: zrok client access
   title: zrok
-  version: 1.0.0
+  version: 0.3.0
 
 basePath: /api/v1
 
@@ -13,82 +13,30 @@ securityDefinitions:
 
 paths:
   #
-  # identity
+  # account
   #
-  /account:
+  /invite:
     post:
       tags:
-        - identity
-      operationId: createAccount
+        - account
+      operationId: invite
       parameters:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/accountRequest"
+            $ref: "#/definitions/inviteRequest"
       responses:
         201:
-          description: account created
+          description: invitation created
         400:
-          description: account not created (already exists)
-          schema:
-            $ref: "#/definitions/errorMessage"
+          description: invitation not created (already exists)
         500:
           description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
-
-  /enable:
-    post:
-      tags:
-        - identity
-      security:
-        - key: []
-      operationId: enable
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/enableRequest"
-      responses:
-        201:
-          description: environment enabled
-          schema:
-            $ref: "#/definitions/enableResponse"
-        401:
-          description: invalid api key
-        404:
-          description: account not found
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
-
-  /disable:
-    post:
-      tags:
-        - identity
-      security:
-        - key: []
-      operationId: disable
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/disableRequest"
-      responses:
-        200:
-          description: environment disabled
-        401:
-          description: invalid environment
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
 
   /login:
     post:
       tags:
-        - identity
+        - account
       operationId: login
       parameters:
         - name: body
@@ -106,7 +54,7 @@ paths:
   /register:
     post:
       tags:
-        - identity
+        - account
       operationId: register
       parameters:
         - name: body
@@ -122,13 +70,11 @@ paths:
           description: request not found
         500:
           description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
 
   /verify:
     post:
       tags:
-        - identity
+        - account
       operationId: verify
       parameters:
         - name: body
@@ -144,11 +90,238 @@ paths:
           description: token not found
         500:
           description: internal server error
+
+  #
+  # admin
+  #
+  /frontend:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createFrontend
+      parameters:
+        - name: body
+          in: body
           schema:
-            $ref: "#/definitions/errorMessage"
+            $ref: "#/definitions/createFrontendRequest"
+      responses:
+        201:
+          description: frontend created
+          schema:
+            $ref: "#/definitions/createFrontendResponse"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    patch:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: updateFrontend
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/updateFrontendRequest"
+      responses:
+        200:
+          description: frontend updated
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteFrontend
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/deleteFrontendRequest"
+      responses:
+        200:
+          description: frontend deleted
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /frontends:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listFrontends
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/publicFrontendList"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /identity:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createIdentity
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              name:
+                type: string
+      responses:
+        201:
+          description: created
+          schema:
+            properties:
+              identity:
+                type: string
+              cfg:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /invite/token/generate:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: inviteTokenGenerate
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/inviteTokenGenerateRequest"
+      responses:
+        201:
+          description: invitation tokens created
+        400:
+          description: invitation tokens not created
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+  #
+  # environment
+  #
+  /enable:
+    post:
+      tags:
+        - environment
+      security:
+        - key: []
+      operationId: enable
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/enableRequest"
+      responses:
+        201:
+          description: environment enabled
+          schema:
+            $ref: "#/definitions/enableResponse"
+        401:
+          description: unauthorized
+        404:
+          description: account not found
+        500:
+          description: internal server error
+
+  /disable:
+    post:
+      tags:
+        - environment
+      security:
+        - key: []
+      operationId: disable
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/disableRequest"
+      responses:
+        200:
+          description: environment disabled
+        401:
+          description: invalid environment
+        500:
+          description: internal server error
+
   #
   # metadata
   #
+  /detail/environment/{envZId}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getEnvironmentDetail
+      parameters:
+        - name: envZId
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/environmentShares"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /detail/share/{shrToken}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getShareDetail
+      parameters:
+        - name: shrToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/share"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /overview:
     get:
       tags:
@@ -160,7 +333,7 @@ paths:
         200:
           description: overview returned
           schema:
-            $ref: "#/definitions/environmentServicesList"
+            $ref: "#/definitions/environmentSharesList"
         500:
           description: internal server error
           schema:
@@ -177,62 +350,137 @@ paths:
           schema:
             $ref: "#/definitions/version"
   #
-  # tunnel
+  # share
   #
-  /tunnel:
+  /access:
     post:
       tags:
-        - tunnel
+        - share
       security:
         - key: []
-      operationId: tunnel
+      operationId: access
       parameters:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/tunnelRequest"
+            $ref: "#/definitions/accessRequest"
       responses:
         201:
-          description: tunnel created
+          description: access created
           schema:
-            $ref: "#/definitions/tunnelResponse"
+            $ref: "#/definitions/accessResponse"
         401:
-          description: invalid environment identity
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /share:
+    post:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: share
+      parameters:
+        - name: body
+          in: body
           schema:
-            $ref: "#/definitions/errorMessage"
+            $ref: "#/definitions/shareRequest"
+      responses:
+        201:
+          description: share created
+          schema:
+            $ref: "#/definitions/shareResponse"
+        401:
+          description: unauthorized
+        404:
+          description: not found
         500:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
-  /untunnel:
-    delete:
+    patch:
       tags:
-        - tunnel
+        - share
       security:
         - key: []
-      operationId: untunnel
+      operationId: updateShare
       parameters:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/untunnelRequest"
+            $ref: "#/definitions/updateShareRequest"
       responses:
         200:
-          description: tunnel removed
+          description: share updated
+        401:
+          description: unauthorized
         404:
           description: not found
+        500:
+          description: internal server error
+
+  /unaccess:
+    delete:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: unaccess
+      parameters:
+        - name: body
+          in: body
           schema:
-            $ref: "#/definitions/errorMessage"
+            $ref: "#/definitions/unaccessRequest"
+      responses:
+        200:
+          description: access removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /unshare:
+    delete:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: unshare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/unshareRequest"
+      responses:
+        200:
+          description: share removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
         500:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
 
 definitions:
-  accountRequest:
+  accessRequest:
     type: object
     properties:
-      email:
+      envZId:
+        type: string
+      shrToken:
+        type: string
+
+  accessResponse:
+    type: object
+    properties:
+      frontendToken:
         type: string
 
   authUser:
@@ -243,19 +491,26 @@ definitions:
       password:
         type: string
 
-  enableRequest:
+  createFrontendRequest:
     type: object
     properties:
-      description:
+      zId:
         type: string
-      host:
+      url_template:
         type: string
-  enableResponse:
+      public_name:
+        type: string
+
+  createFrontendResponse:
     type: object
     properties:
-      identity:
+      token:
         type: string
-      cfg:
+
+  deleteFrontendRequest:
+    type: object
+    properties:
+      frontendToken:
         type: string
 
   disableRequest:
@@ -264,10 +519,22 @@ definitions:
       identity:
         type: string
 
-  environments:
-    type: array
-    items:
-      $ref: "#/definitions/environment"
+  enableRequest:
+    type: object
+    properties:
+      description:
+        type: string
+      host:
+        type: string
+
+  enableResponse:
+    type: object
+    properties:
+      identity:
+        type: string
+      cfg:
+        type: string
+
   environment:
     type: object
     properties:
@@ -286,20 +553,42 @@ definitions:
       updatedAt:
         type: integer
 
-  environmentServicesList:
+  environments:
     type: array
     items:
-      $ref: "#/definitions/environmentServices"
-  environmentServices:
+      $ref: "#/definitions/environment"
+
+  environmentSharesList:
+    type: array
+    items:
+      $ref: "#/definitions/environmentShares"
+
+  environmentShares:
     type: object
     properties:
       environment:
         $ref: "#/definitions/environment"
-      services:
-        $ref: "#/definitions/services"
+      shares:
+        $ref: "#/definitions/shares"
 
   errorMessage:
     type: string
+
+  inviteTokenGenerateRequest:
+    type: object
+    properties:
+      tokens:
+        type: array
+        items:
+          type: string
+
+  inviteRequest:
+    type: object
+    properties:
+      email:
+        type: string
+      token:
+        type: string
 
   loginRequest:
     type: object
@@ -308,6 +597,7 @@ definitions:
         type: string
       password:
         type: string
+
   loginResponse:
     type: string
 
@@ -320,6 +610,31 @@ definitions:
         type: string
       token:
         type: string
+      limitless:
+        type: boolean
+      admin:
+        type: boolean
+
+  publicFrontend:
+    type: object
+    properties:
+      token:
+        type: string
+      zId:
+        type: string
+      urlTemplate:
+        type: string
+      publicName:
+        type: string
+      createdAt:
+        type: integer
+      updatedAt:
+        type: integer
+
+  publicFrontendList:
+    type: array
+    items:
+      $ref: "#/definitions/publicFrontend"
 
   registerRequest:
     type: object
@@ -328,45 +643,65 @@ definitions:
         type: string
       password:
         type: string
+
   registerResponse:
     type: object
     properties:
       token:
         type: string
 
-  services:
-    type: array
-    items:
-      $ref: "#/definitions/service"
-  service:
+  share:
     type: object
     properties:
+      token:
+        type: string
       zId:
         type: string
-      name:
+      shareMode:
         type: string
-      frontend:
+      backendMode:
         type: string
-      backend:
+      frontendSelection:
         type: string
+      frontendEndpoint:
+        type: string
+      backendProxyEndpoint:
+        type: string
+      reserved:
+        type: boolean
       metrics:
-        $ref: "#/definitions/serviceMetrics"
+        $ref: "#/definitions/shareMetrics"
       createdAt:
         type: integer
       updatedAt:
         type: integer
 
-  serviceMetrics:
+  shares:
+    type: array
+    items:
+      $ref: "#/definitions/share"
+
+  shareMetrics:
     type: array
     items:
       type: integer
 
-  tunnelRequest:
+  shareRequest:
     type: object
     properties:
-      zId:
+      envZId:
         type: string
-      endpoint:
+      shareMode:
+        type: string
+        enum: ["public", "private"]
+      frontendSelection:
+        type: array
+        items:
+          type: string
+      backendMode:
+        type: string
+        enum: ["proxy", "web", "dav"]
+      backendProxyEndpoint:
         type: string
       authScheme:
         type: string
@@ -374,20 +709,55 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/authUser"
-  tunnelResponse:
+      reserved:
+        type: boolean
+
+  shareResponse:
     type: object
     properties:
-      proxyEndpoint:
-        type: string
-      svcName:
+      frontendProxyEndpoints:
+        type: array
+        items:
+          type: string
+      shrToken:
         type: string
 
-  untunnelRequest:
+  unaccessRequest:
     type: object
     properties:
-      zId:
+      frontendToken:
         type: string
-      svcName:
+      envZId:
+        type: string
+      shrToken:
+        type: string
+
+  unshareRequest:
+    type: object
+    properties:
+      envZId:
+        type: string
+      shrToken:
+        type: string
+      reserved:
+        type: boolean
+
+  updateFrontendRequest:
+    type: object
+    properties:
+      frontendToken:
+        type: string
+      publicName:
+        type: string
+      urlTemplate:
+        type: string
+
+  updateShareRequest:
+    type: object
+    properties:
+      shrToken:
+        type: string
+      backendProxyEndpoint:
         type: string
 
   verifyRequest:

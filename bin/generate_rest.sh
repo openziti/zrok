@@ -26,3 +26,5 @@ swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_clie
 
 echo "...generating js client"
 openapi -s specs/zrok.yml -o ui/src/api -l js
+
+git checkout rest_server_zrok/configure_zrok.go

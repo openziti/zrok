@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/identity"
+	"github.com/openziti-test-kitchen/zrok/rest_client_zrok/environment"
 	"github.com/openziti-test-kitchen/zrok/rest_model_zrok"
+	"github.com/openziti-test-kitchen/zrok/tui"
 	"github.com/openziti-test-kitchen/zrok/zrokdir"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/spf13/cobra"
 	"os"
 	user2 "os/user"
-	"strings"
+	"time"
 )
 
 func init() {
@@ -36,11 +38,10 @@ func newEnableCommand() *enableCommand {
 }
 
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
-	env, err := zrokdir.LoadEnvironment()
-	if err == nil {
-		showError(fmt.Sprintf("you already have an environment '%v' for '%v'", env.ZId, env.Token), nil)
+	zrd, err := zrokdir.Load()
+	if err != nil {
+		panic(err)
 	}
-
 	token := args[0]
 
 	hostName, hostDetail, err := getHost()
@@ -55,38 +56,70 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if cmd.description == "<user>@<hostname>" {
 		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
-
-	zrok, err := zrokdir.ZrokClient(apiEndpoint)
+	zrok, err := zrd.Client()
 	if err != nil {
-		panic(err)
+		cmd.endpointError(zrd.ApiEndpoint())
+		tui.Error("error creating service client", err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
-	req := identity.NewEnableParams()
+	req := environment.NewEnableParams()
 	req.Body = &rest_model_zrok.EnableRequest{
 		Description: cmd.description,
 		Host:        hostDetail,
 	}
-	resp, err := zrok.Identity.Enable(req, auth)
+
+	var prg *tea.Program
+	var mdl enableTuiModel
+	var done = make(chan struct{})
+	go func() {
+		mdl = newEnableTuiModel()
+		mdl.msg = "contacting the zrok service..."
+		prg = tea.NewProgram(mdl)
+		if _, err := prg.Run(); err != nil {
+			fmt.Println(err)
+		}
+		close(done)
+		if mdl.quitting {
+			os.Exit(1)
+		}
+	}()
+
+	resp, err := zrok.Environment.Enable(req, auth)
 	if err != nil {
-		if !panicInstead {
-			showError("the zrok service returned an error", err)
-		}
-		panic(err)
+		time.Sleep(250 * time.Millisecond)
+		prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
+		prg.Quit()
+		<-done
+		cmd.endpointError(zrd.ApiEndpoint())
+		os.Exit(1)
 	}
-	if err := zrokdir.SaveEnvironment(&zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
-		if !panicInstead {
-			showError("there was an error saving the new environment", err)
-		}
-		panic(err)
+	prg.Send("writing the environment details...")
+	apiEndpoint, _ := zrd.ApiEndpoint()
+	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
+	if err := zrd.Save(); err != nil {
+		prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
+		prg.Quit()
+		<-done
+		os.Exit(1)
 	}
 	if err := zrokdir.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
-		if !panicInstead {
-			showError("there was an error writing the environment file", err)
-		}
-		panic(err)
+		prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
+		prg.Quit()
+		<-done
+		os.Exit(1)
 	}
 
-	fmt.Printf("zrok environment '%v' enabled for '%v'\n", resp.Payload.Identity, token)
+	prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
+	prg.Quit()
+	<-done
+}
+
+func (cmd *enableCommand) endpointError(apiEndpoint, _ string) {
+	fmt.Printf("%v\n\n", tui.ErrorStyle.Render("there was a problem enabling your environment!"))
+	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.CodeStyle.Render(apiEndpoint))
+	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
+	fmt.Printf("%v\n\n", tui.CodeStyle.Render("$ zrok config set apiEndpoint <newEndpoint>"))
+	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.CodeStyle.Render("https://some.zrok.io"))
 }
 
 func getHost() (string, string, error) {
@@ -99,14 +132,51 @@ func getHost() (string, string, error) {
 	return info.Hostname, thisHost, nil
 }
 
-var errorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#D90166")).Background(lipgloss.Color("0"))
+type enableTuiModel struct {
+	spinner  spinner.Model
+	msg      string
+	quitting bool
+}
 
-func showError(msg string, err error) {
-	errorLabel := errorStyle.Render("ERROR:")
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v %v (%v)\n", errorLabel, msg, strings.TrimSpace(err.Error()))
-	} else {
-		_, _ = fmt.Fprintf(os.Stderr, "%v %v\n", errorLabel, msg)
+func newEnableTuiModel() enableTuiModel {
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = tui.WarningStyle
+	return enableTuiModel{spinner: s}
+}
+
+func (m enableTuiModel) Init() tea.Cmd { return m.spinner.Tick }
+
+func (m enableTuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case string:
+		m.msg = msg
+		return m, nil
+
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "esc", "ctrl+c":
+			m.quitting = true
+			return m, tea.Quit
+
+		default:
+			return m, nil
+		}
+
+	case struct{}:
+		return m, tea.Quit
+
+	default:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	}
-	os.Exit(1)
+}
+
+func (m enableTuiModel) View() string {
+	str := fmt.Sprintf("%s %s\n", m.spinner.View(), m.msg)
+	if m.quitting {
+		return str
+	}
+	return str
 }

@@ -7,18 +7,19 @@ import (
 
 type Account struct {
 	Model
-	Email    string
-	Password string
-	Token    string
+	Email     string
+	Password  string
+	Token     string
+	Limitless bool
 }
 
 func (self *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into accounts (email, password, token) values ($1, $2, $3) returning id")
+	stmt, err := tx.Prepare("insert into accounts (email, password, token, limitless) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(a.Email, a.Password, a.Token).Scan(&id); err != nil {
+	if err := stmt.QueryRow(a.Email, a.Password, a.Token, a.Limitless).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing accounts insert statement")
 	}
 	return id, nil

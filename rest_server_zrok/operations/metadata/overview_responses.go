@@ -26,7 +26,7 @@ type OverviewOK struct {
 	/*
 	  In: Body
 	*/
-	Payload rest_model_zrok.EnvironmentServicesList `json:"body,omitempty"`
+	Payload rest_model_zrok.EnvironmentSharesList `json:"body,omitempty"`
 }
 
 // NewOverviewOK creates OverviewOK with default headers values
@@ -36,13 +36,13 @@ func NewOverviewOK() *OverviewOK {
 }
 
 // WithPayload adds the payload to the overview o k response
-func (o *OverviewOK) WithPayload(payload rest_model_zrok.EnvironmentServicesList) *OverviewOK {
+func (o *OverviewOK) WithPayload(payload rest_model_zrok.EnvironmentSharesList) *OverviewOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the overview o k response
-func (o *OverviewOK) SetPayload(payload rest_model_zrok.EnvironmentServicesList) {
+func (o *OverviewOK) SetPayload(payload rest_model_zrok.EnvironmentSharesList) {
 	o.Payload = payload
 }
 
@@ -53,7 +53,7 @@ func (o *OverviewOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = rest_model_zrok.EnvironmentServicesList{}
+		payload = rest_model_zrok.EnvironmentSharesList{}
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

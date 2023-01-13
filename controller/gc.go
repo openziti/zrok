@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti-test-kitchen/zrok/controller/store"
+	"github.com/openziti-test-kitchen/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_management_api_client/config"
 	"github.com/openziti/edge/rest_management_api_client/service"
@@ -36,13 +37,13 @@ func GC(inCfg *Config) error {
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
-	dbSvcs, err := str.GetAllServices(tx)
+	sshrs, err := str.GetAllShares(tx)
 	if err != nil {
 		return err
 	}
 	liveMap := make(map[string]struct{})
-	for _, dbSvc := range dbSvcs {
-		liveMap[dbSvc.Name] = struct{}{}
+	for _, sshr := range sshrs {
+		liveMap[sshr.Token] = struct{}{}
 	}
 	if err := gcServices(edge, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting services")
@@ -71,19 +72,19 @@ func gcServices(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map
 		for _, svc := range listResp.Payload.Data {
 			if _, found := liveMap[*svc.Name]; !found {
 				logrus.Infof("garbage collecting, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
-				if err := deleteServiceEdgeRouterPolicy("gc", *svc.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
 				}
-				if err := deleteServicePolicyDial("gc", *svc.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteServicePolicyDial("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service dial policy: %v", err)
 				}
-				if err := deleteServicePolicyBind("gc", *svc.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteServicePolicyBind("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service bind policy: %v", err)
 				}
-				if err := deleteConfig("gc", *svc.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteConfig("gc", *svc.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
-				if err := deleteService("gc", *svc.ID, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteService("gc", *svc.ID, edge); err != nil {
 					logrus.Errorf("error garbage collecting service: %v", err)
 				}
 			} else {
@@ -108,7 +109,7 @@ func gcServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManage
 		for _, serp := range listResp.Payload.Data {
 			if _, found := liveMap[*serp.Name]; !found {
 				logrus.Infof("garbage collecting, svcId='%v'", *serp.Name)
-				if err := deleteServiceEdgeRouterPolicy("gc", *serp.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy("gc", *serp.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting service edge router policy: %v", err)
 				}
 			} else {
@@ -135,7 +136,7 @@ func gcServicePolicies(edge *rest_management_api_client.ZitiEdgeManagement, live
 			if _, found := liveMap[spName]; !found {
 				logrus.Infof("garbage collecting, svcId='%v'", spName)
 				deleteFilter := fmt.Sprintf("id=\"%v\"", *sp.ID)
-				if err := deleteServicePolicy("gc", deleteFilter, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteServicePolicy("gc", deleteFilter, edge); err != nil {
 					logrus.Errorf("error garbage collecting service policy: %v", err)
 				}
 			} else {
@@ -159,7 +160,7 @@ func gcConfigs(edge *rest_management_api_client.ZitiEdgeManagement, liveMap map[
 	if listResp, err := edge.Config.ListConfigs(listReq, nil); err == nil {
 		for _, c := range listResp.Payload.Data {
 			if _, found := liveMap[*c.Name]; !found {
-				if err := deleteConfig("gc", *c.Name, edge); err != nil {
+				if err := zrokEdgeSdk.DeleteConfig("gc", *c.Name, edge); err != nil {
 					logrus.Errorf("error garbage collecting config: %v", err)
 				}
 			} else {

@@ -51,7 +51,7 @@ OverviewOK describes a response with status code 200, with default header values
 overview returned
 */
 type OverviewOK struct {
-	Payload rest_model_zrok.EnvironmentServicesList
+	Payload rest_model_zrok.EnvironmentSharesList
 }
 
 // IsSuccess returns true when this overview o k response has a 2xx status code
@@ -87,7 +87,7 @@ func (o *OverviewOK) String() string {
 	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
 }
 
-func (o *OverviewOK) GetPayload() rest_model_zrok.EnvironmentServicesList {
+func (o *OverviewOK) GetPayload() rest_model_zrok.EnvironmentSharesList {
 	return o.Payload
 }
 

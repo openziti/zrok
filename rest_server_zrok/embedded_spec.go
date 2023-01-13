@@ -31,40 +31,121 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "1.0.0"
+    "version": "0.3.0"
   },
   "basePath": "/api/v1",
   "paths": {
-    "/account": {
+    "/access": {
       "post": {
-        "tags": [
-          "identity"
+        "security": [
+          {
+            "key": []
+          }
         ],
-        "operationId": "createAccount",
+        "tags": [
+          "share"
+        ],
+        "operationId": "access",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accountRequest"
+              "$ref": "#/definitions/accessRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "account created"
-          },
-          "400": {
-            "description": "account not created (already exists)",
+            "description": "access created",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/accessResponse"
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/environment/{envZId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envZId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/environmentShares"
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getShareDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/share"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -77,7 +158,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "disable",
         "parameters": [
@@ -97,10 +178,7 @@ func init() {
             "description": "invalid environment"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -113,7 +191,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "enable",
         "parameters": [
@@ -133,16 +211,258 @@ func init() {
             }
           },
           "401": {
-            "description": "invalid api key"
+            "description": "unauthorized"
           },
           "404": {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/frontend": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/createFrontendRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "frontend created",
+            "schema": {
+              "$ref": "#/definitions/createFrontendResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/deleteFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listFrontends",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/publicFrontendList"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/identity": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created",
+            "schema": {
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "invite",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation created"
+          },
+          "400": {
+            "description": "invitation not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite/token/generate": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "inviteTokenGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -150,7 +470,7 @@ func init() {
     "/login": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "login",
         "parameters": [
@@ -190,7 +510,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServicesList"
+              "$ref": "#/definitions/environmentSharesList"
             }
           },
           "500": {
@@ -205,7 +525,7 @@ func init() {
     "/register": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "register",
         "parameters": [
@@ -228,15 +548,12 @@ func init() {
             "description": "request not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
     },
-    "/tunnel": {
+    "/share": {
       "post": {
         "security": [
           {
@@ -244,30 +561,30 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "share"
         ],
-        "operationId": "tunnel",
+        "operationId": "share",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/tunnelRequest"
+              "$ref": "#/definitions/shareRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "tunnel created",
+            "description": "share created",
             "schema": {
-              "$ref": "#/definitions/tunnelResponse"
+              "$ref": "#/definitions/shareResponse"
             }
           },
           "401": {
-            "description": "invalid environment identity",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -276,9 +593,43 @@ func init() {
             }
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateShareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
-    "/untunnel": {
+    "/unaccess": {
       "delete": {
         "security": [
           {
@@ -286,27 +637,63 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "share"
         ],
-        "operationId": "untunnel",
+        "operationId": "unaccess",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/untunnelRequest"
+              "$ref": "#/definitions/unaccessRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "tunnel removed"
+            "description": "access removed"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "404": {
-            "description": "not found",
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/unshare": {
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "unshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/unshareRequest"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -320,7 +707,7 @@ func init() {
     "/verify": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "verify",
         "parameters": [
@@ -343,10 +730,7 @@ func init() {
             "description": "token not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -369,10 +753,21 @@ func init() {
     }
   },
   "definitions": {
-    "accountRequest": {
+    "accessRequest": {
       "type": "object",
       "properties": {
-        "email": {
+        "envZId": {
+          "type": "string"
+        },
+        "shrToken": {
+          "type": "string"
+        }
+      }
+    },
+    "accessResponse": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -384,6 +779,36 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "public_name": {
+          "type": "string"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "deleteFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -444,21 +869,21 @@ func init() {
         }
       }
     },
-    "environmentServices": {
+    "environmentShares": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
-        "services": {
-          "$ref": "#/definitions/services"
+        "shares": {
+          "$ref": "#/definitions/shares"
         }
       }
     },
-    "environmentServicesList": {
+    "environmentSharesList": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/environmentServices"
+        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -469,6 +894,28 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "loginRequest": {
       "type": "object",
@@ -487,15 +934,50 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "admin": {
+          "type": "boolean"
+        },
         "email": {
           "type": "string"
         },
         "id": {
           "type": "integer"
         },
+        "limitless": {
+          "type": "boolean"
+        },
         "token": {
           "type": "string"
         }
+      }
+    },
+    "publicFrontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "urlTemplate": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "publicFrontendList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publicFrontend"
       }
     },
     "registerRequest": {
@@ -517,22 +999,34 @@ func init() {
         }
       }
     },
-    "service": {
+    "share": {
       "type": "object",
       "properties": {
-        "backend": {
+        "backendMode": {
+          "type": "string"
+        },
+        "backendProxyEndpoint": {
           "type": "string"
         },
         "createdAt": {
           "type": "integer"
         },
-        "frontend": {
+        "frontendEndpoint": {
+          "type": "string"
+        },
+        "frontendSelection": {
           "type": "string"
         },
         "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
+          "$ref": "#/definitions/shareMetrics"
         },
-        "name": {
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -543,19 +1037,13 @@ func init() {
         }
       }
     },
-    "serviceMetrics": {
+    "shareMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
       }
     },
-    "services": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/service"
-      }
-    },
-    "tunnelRequest": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "authScheme": {
@@ -567,32 +1055,107 @@ func init() {
             "$ref": "#/definitions/authUser"
           }
         },
-        "endpoint": {
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "dav"
+          ]
+        },
+        "backendProxyEndpoint": {
           "type": "string"
         },
-        "zId": {
+        "envZId": {
+          "type": "string"
+        },
+        "frontendSelection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
+        }
+      }
+    },
+    "shareResponse": {
+      "type": "object",
+      "properties": {
+        "frontendProxyEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shrToken": {
           "type": "string"
         }
       }
     },
-    "tunnelResponse": {
+    "shares": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/share"
+      }
+    },
+    "unaccessRequest": {
       "type": "object",
       "properties": {
-        "proxyEndpoint": {
+        "envZId": {
           "type": "string"
         },
-        "svcName": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "shrToken": {
           "type": "string"
         }
       }
     },
-    "untunnelRequest": {
+    "unshareRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "reserved": {
+          "type": "boolean"
+        },
+        "shrToken": {
+          "type": "string"
+        }
+      }
+    },
+    "updateFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
+          "type": "string"
+        }
+      }
+    },
+    "updateShareRequest": {
+      "type": "object",
+      "properties": {
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "shrToken": {
           "type": "string"
         }
       }
@@ -639,40 +1202,121 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "1.0.0"
+    "version": "0.3.0"
   },
   "basePath": "/api/v1",
   "paths": {
-    "/account": {
+    "/access": {
       "post": {
-        "tags": [
-          "identity"
+        "security": [
+          {
+            "key": []
+          }
         ],
-        "operationId": "createAccount",
+        "tags": [
+          "share"
+        ],
+        "operationId": "access",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accountRequest"
+              "$ref": "#/definitions/accessRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "account created"
-          },
-          "400": {
-            "description": "account not created (already exists)",
+            "description": "access created",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/accessResponse"
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/environment/{envZId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envZId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/environmentShares"
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getShareDetail",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/share"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -685,7 +1329,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "disable",
         "parameters": [
@@ -705,10 +1349,7 @@ func init() {
             "description": "invalid environment"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -721,7 +1362,7 @@ func init() {
           }
         ],
         "tags": [
-          "identity"
+          "environment"
         ],
         "operationId": "enable",
         "parameters": [
@@ -741,16 +1382,258 @@ func init() {
             }
           },
           "401": {
-            "description": "invalid api key"
+            "description": "unauthorized"
           },
           "404": {
             "description": "account not found"
           },
           "500": {
-            "description": "internal server error",
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/frontend": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/createFrontendRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "frontend created",
+            "schema": {
+              "$ref": "#/definitions/createFrontendResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/deleteFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateFrontend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateFrontendRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "frontend updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listFrontends",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/publicFrontendList"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/identity": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "createIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created",
+            "schema": {
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "invite",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation created"
+          },
+          "400": {
+            "description": "invitation not created (already exists)"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/invite/token/generate": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "inviteTokenGenerate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/inviteTokenGenerateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "invitation tokens created"
+          },
+          "400": {
+            "description": "invitation tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -758,7 +1641,7 @@ func init() {
     "/login": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "login",
         "parameters": [
@@ -798,7 +1681,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentServicesList"
+              "$ref": "#/definitions/environmentSharesList"
             }
           },
           "500": {
@@ -813,7 +1696,7 @@ func init() {
     "/register": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "register",
         "parameters": [
@@ -836,15 +1719,12 @@ func init() {
             "description": "request not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
     },
-    "/tunnel": {
+    "/share": {
       "post": {
         "security": [
           {
@@ -852,30 +1732,30 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "share"
         ],
-        "operationId": "tunnel",
+        "operationId": "share",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/tunnelRequest"
+              "$ref": "#/definitions/shareRequest"
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "tunnel created",
+            "description": "share created",
             "schema": {
-              "$ref": "#/definitions/tunnelResponse"
+              "$ref": "#/definitions/shareResponse"
             }
           },
           "401": {
-            "description": "invalid environment identity",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -884,9 +1764,43 @@ func init() {
             }
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/updateShareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share updated"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
-    "/untunnel": {
+    "/unaccess": {
       "delete": {
         "security": [
           {
@@ -894,27 +1808,63 @@ func init() {
           }
         ],
         "tags": [
-          "tunnel"
+          "share"
         ],
-        "operationId": "untunnel",
+        "operationId": "unaccess",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/untunnelRequest"
+              "$ref": "#/definitions/unaccessRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "tunnel removed"
+            "description": "access removed"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "404": {
-            "description": "not found",
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/unshare": {
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "unshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/errorMessage"
+              "$ref": "#/definitions/unshareRequest"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error",
@@ -928,7 +1878,7 @@ func init() {
     "/verify": {
       "post": {
         "tags": [
-          "identity"
+          "account"
         ],
         "operationId": "verify",
         "parameters": [
@@ -951,10 +1901,7 @@ func init() {
             "description": "token not found"
           },
           "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
+            "description": "internal server error"
           }
         }
       }
@@ -977,10 +1924,21 @@ func init() {
     }
   },
   "definitions": {
-    "accountRequest": {
+    "accessRequest": {
       "type": "object",
       "properties": {
-        "email": {
+        "envZId": {
+          "type": "string"
+        },
+        "shrToken": {
+          "type": "string"
+        }
+      }
+    },
+    "accessResponse": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -992,6 +1950,36 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "public_name": {
+          "type": "string"
+        },
+        "url_template": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "createFrontendResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "deleteFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
           "type": "string"
         }
       }
@@ -1052,21 +2040,21 @@ func init() {
         }
       }
     },
-    "environmentServices": {
+    "environmentShares": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
-        "services": {
-          "$ref": "#/definitions/services"
+        "shares": {
+          "$ref": "#/definitions/shares"
         }
       }
     },
-    "environmentServicesList": {
+    "environmentSharesList": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/environmentServices"
+        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -1077,6 +2065,28 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "inviteRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "inviteTokenGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "loginRequest": {
       "type": "object",
@@ -1095,15 +2105,50 @@ func init() {
     "principal": {
       "type": "object",
       "properties": {
+        "admin": {
+          "type": "boolean"
+        },
         "email": {
           "type": "string"
         },
         "id": {
           "type": "integer"
         },
+        "limitless": {
+          "type": "boolean"
+        },
         "token": {
           "type": "string"
         }
+      }
+    },
+    "publicFrontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "urlTemplate": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "publicFrontendList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publicFrontend"
       }
     },
     "registerRequest": {
@@ -1125,22 +2170,34 @@ func init() {
         }
       }
     },
-    "service": {
+    "share": {
       "type": "object",
       "properties": {
-        "backend": {
+        "backendMode": {
+          "type": "string"
+        },
+        "backendProxyEndpoint": {
           "type": "string"
         },
         "createdAt": {
           "type": "integer"
         },
-        "frontend": {
+        "frontendEndpoint": {
+          "type": "string"
+        },
+        "frontendSelection": {
           "type": "string"
         },
         "metrics": {
-          "$ref": "#/definitions/serviceMetrics"
+          "$ref": "#/definitions/shareMetrics"
         },
-        "name": {
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -1151,19 +2208,13 @@ func init() {
         }
       }
     },
-    "serviceMetrics": {
+    "shareMetrics": {
       "type": "array",
       "items": {
         "type": "integer"
       }
     },
-    "services": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/service"
-      }
-    },
-    "tunnelRequest": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "authScheme": {
@@ -1175,32 +2226,107 @@ func init() {
             "$ref": "#/definitions/authUser"
           }
         },
-        "endpoint": {
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "dav"
+          ]
+        },
+        "backendProxyEndpoint": {
           "type": "string"
         },
-        "zId": {
+        "envZId": {
+          "type": "string"
+        },
+        "frontendSelection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
+        }
+      }
+    },
+    "shareResponse": {
+      "type": "object",
+      "properties": {
+        "frontendProxyEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shrToken": {
           "type": "string"
         }
       }
     },
-    "tunnelResponse": {
+    "shares": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/share"
+      }
+    },
+    "unaccessRequest": {
       "type": "object",
       "properties": {
-        "proxyEndpoint": {
+        "envZId": {
           "type": "string"
         },
-        "svcName": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "shrToken": {
           "type": "string"
         }
       }
     },
-    "untunnelRequest": {
+    "unshareRequest": {
       "type": "object",
       "properties": {
-        "svcName": {
+        "envZId": {
           "type": "string"
         },
-        "zId": {
+        "reserved": {
+          "type": "boolean"
+        },
+        "shrToken": {
+          "type": "string"
+        }
+      }
+    },
+    "updateFrontendRequest": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
+          "type": "string"
+        }
+      }
+    },
+    "updateShareRequest": {
+      "type": "object",
+      "properties": {
+        "backendProxyEndpoint": {
+          "type": "string"
+        },
+        "shrToken": {
           "type": "string"
         }
       }
