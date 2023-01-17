@@ -14,15 +14,15 @@ Like other competitors in this space, `zrok` allows users to create ephemeral re
 
 You can be up and sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved.
 
-### One-time Setup
+### First-time Setup
 
 * Download the binary for your platform [here](https://zrok.io/downloads)
 * `zrok invite` to create an account with the service
 * `zrok enable` to enable your shell environment for sharing with the service
 
-### Sharing
+### And then... sharing...
 
-* `zrok share` to share resources immediately
+* `zrok share` to share resources immediately, simply and securely
 
 See the [Concepts and Getting Started Guide](docs/v0.3_getting_started/getting_started.md) for a full overview.
 

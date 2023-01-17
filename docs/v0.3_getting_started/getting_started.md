@@ -215,7 +215,52 @@ Your environment is fully ready to go. Now we can move on to the good stuff... v
 
 ## Sharing
 
+`zrok` is designed to make sharing resources as effortless as possible, while providing a high degree of security and control.
 
+### Ephemeral by Default
+
+Shared resources are _ephemeral_ by default; as soon as you terminate the `zrok share` command, the entire share is removed and is no longer available to any users. Identifiers for shared resources are randomly allocated when the share is created.
+
+### Public Shares and Frontends
+
+Resources that are shared _publicly_ are exposed to any users on the internet who have access to the `zrok` service instance's "frontend".
+
+A frontend is an HTTPS listener exposed to the internet, that lets any user with your ephemeral share token access your publicly shared resources.
+
+For example, I might create a public share using the `zrok share public` command, which results in my `zrok` service instance exposing the following URL to access my resources:
+
+https://59wepuo4tcd8.in.staging.zrok.io/
+
+In this case my share was given the "share token" of `59wepuo4tcd8`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
+
+And as soon as I terminate the `zrok share` client, the resources are removed from the `zrok` environment.
+
+### Private Shares
+
+`zrok` also provides a powerful _private_ sharing model. If I execute the following command:
+
+```
+$ zrok share private --backend-mode web docs
+```
+
+The `zrok` service will respond with the following:
+```
+access your share with: zrok access private 3l6e6fuxmffr
+```
+
+Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying Ziti network, and can only be accessed using the `zrok access` command.
+
+The `zrok access private 3l6e6fuxmffr` command can be run by any `zrok` user, allowing them to create and bind a local HTTP listener, that allows for private access to your shared resources.
+
+### Proxy Backend Mode
+
+Without specifying a _backend mode_, the `zrok share` command will assume that you're trying to share a `proxy` resource. A `proxy` resource is usually some private HTTP/HTTPS endpoint (like a development server) running in your local environment. Usually such an endpoint would have no inbound connectivity except for however it is reachable from a physical network. It might be running on `localhost`, or only listening on a private LAN segment behind a firewall. 
+
+For these services a `proxy` share will allow those endpoints to be reached, either _publicly_ or _privately_ through the `zrok` service.
+
+### Web Backend Mode
+
+The `zrok share` command accepts a `--backend-mode` option. Besides `proxy`, the current `v0.3` release (as of this writing) also supports a `web` mode. The `web` mode allows you to specify a local folder on your filesystem, and instantly turns your `zrok` client into a web server, exposing your share either _publicly_ or _privately_.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io/download "Zrok Download"
