@@ -19,6 +19,7 @@ alter table services rename backend to backend_proxy_endpoint;
 alter table services rename name to token;
 
 alter table services rename to services_old;
+alter sequence services_id_seq rename to services_id_seq_old;
 
 create table services (
   id                        serial              primary key,
@@ -40,5 +41,7 @@ create table services (
 
 insert into services (id, environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at)
     select id, environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, created_at, updated_at from services_old;
+
+select setval('services_id_seq', (select max(id) from services));
 
 drop table services_old;
