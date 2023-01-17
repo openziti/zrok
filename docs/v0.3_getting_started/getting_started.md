@@ -150,6 +150,71 @@ Congratulations! Your `zrok` account is ready to go!
 
 ## Enabling Your zrok Environment
 
+When your `zrok` account was created, the service generated a "secret token" that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
+
+When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the Ziti network hosting the `zrok` service.
+
+From the web UI, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
+
+![Enable Modal Dialog](images/zrok_enable_modal.png)
+
+This dialog box shows you the `zrok enable` command that you can use to enable any shell to work with your `zrok` account with a single command.
+
+Let's copy that command and paste it into your shell:
+
+```
+$ zrok enable Ts8SzCOZJbzz
+⣻  contacting the zrok service...
+```
+
+After a few seconds, the message will change and indicate that the enable operation suceeded:
+
+```
+$ zrok enable Ts8SzCOZJbzz
+⣻  the zrok environment was successfully enabled...
+```
+
+Now, if we run a `zrok status` command, you will see the details of your environment:
+
+```
+$ zrok status
+
+Config:
+
+ CONFIG       VALUE                    SOURCE 
+ apiEndpoint  https://staging.zrok.io  env    
+
+Environment:
+
+ PROPERTY       VALUE        
+ Secret Token   Ts8SzCOZJbzz 
+ Ziti Identity  X1PJCfYK36   
+```
+
+Excellent... our environment is now fully enabled.
+
+If we return to the web UI, we'll now see the new environment reflected in the explorer view:
+
+![New Environment in Web UI](images/zrok_web_ui_new_environment.png)
+
+In my case, the environment is named `michael@ziti-li`, which is the username of my shell and the hostname of the system the shell is running on.
+
+> Should you want to use a non-default name for your environment, you can pass the `-d` option to the `zrok enable` command. See `zrok enable --help` for details.
+
+If you click on the environment node in the explorer in you web console, the details panel showed at the bottom of the page will change:
+
+![Empty Environment](images/zrok_web_ui_empty_shares.png)
+
+The explorer supports clicking, dragging, mouse wheel zooming, and selecting the nodes in the graph for more information (and available actions) for the selected node.
+
+If we click on the `Details` tab for our environment, we'll see something like:
+
+![Environment Detail](images/zrok_web_ui_empty_environment_detail.png)
+
+Your environment is fully ready to go. Now we can move on to the good stuff... various types of sharing.
+
+## Sharing
+
 
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
