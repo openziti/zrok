@@ -1,8 +1,6 @@
 ![zrok](docs/images/zrok.png)
 
-# zrok
-
-`zrok` is a next-generation sharing platform built on top of [Ziti][https://docs.openziti.io], a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [Ziti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
 
 `zrok` facilitates sharing resources publicly and privately, exposing them to an audience you can easily control.
 
@@ -14,18 +12,23 @@ Like other competitors in this space, `zrok` allows users to create ephemeral re
 
 ## Frictionless
 
-You can be up an sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved.
+You can be up and sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved.
+
+### One-time Setup
 
 * Download the binary for your platform [here](https://zrok.io/downloads)
 * `zrok invite` to create an account with the service
 * `zrok enable` to enable your shell environment for sharing with the service
+
+### Sharing
+
 * `zrok share` to share resources immediately
 
 See the [Concepts and Getting Started Guide](docs/v0.3_getting_started/getting_started.md) for a full overview.
 
 ## Self-Hosting
 
-`zrok` is designed to scale up to support extremely large service instances. `zrok.io` is run by NetFoundry using the same codebase that is available to self-hosted environments.
+`zrok` is designed to scale up to support extremely large service instances. `zrok.io` is run by NetFoundry using the same code base that is available to self-hosted environments.
 
 `zrok` is also designed to scale down to support extremely small deployments. Run an OpenZiti network with `zrok` layered on top of it on a Raspberry Pi!
 
