@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -12,12 +13,14 @@ import (
 type verificationEmail struct {
 	EmailAddress string
 	VerifyUrl    string
+	Version      string
 }
 
 func sendVerificationEmail(emailAddress, token string) error {
 	emailData := &verificationEmail{
 		EmailAddress: emailAddress,
 		VerifyUrl:    cfg.Registration.RegistrationUrlTemplate + "/" + token,
+		Version:      build.String(),
 	}
 
 	plainBody, err := mergeTemplate(emailData, "verify.gotext")
