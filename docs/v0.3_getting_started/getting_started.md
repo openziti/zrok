@@ -262,5 +262,54 @@ For these services a `proxy` share will allow those endpoints to be reached, eit
 
 The `zrok share` command accepts a `--backend-mode` option. Besides `proxy`, the current `v0.3` release (as of this writing) also supports a `web` mode. The `web` mode allows you to specify a local folder on your filesystem, and instantly turns your `zrok` client into a web server, exposing your share either _publicly_ or _privately_.
 
+### Reserved Shares
+
+`zrok` shares are _ephemeral_ unless you specifically create a "reserved" share.
+
+A reserved share can be re-used multiple times; it will survive termination of the `zrok share` command, allowing for longer-lasting semi-permanent access to shared resources.
+
+The first step is to create the reserved share:
+
+```
+$ zrok reserve public --backend-mode web docs
+[   0.357]    INFO main.(*reserveCommand).run: your reserved share token is 'n3y7dxiawqf6'
+[   0.357]    INFO main.(*reserveCommand).run: reserved frontend endpoint: https://n3y7dxiawqf6.in.staging.zrok.io/
+```
+
+I'm asking the `zrok` service to reserve a share with a `web` backend mode, pointing at my local `docs` folder.
+
+You'll want to remember the share token (`n3y7dxiawqf6` in this case), and the frontend endpoint URL. If this were a _private_ reserved share, there would not be a frontend URL.
+
+If we do nothing else, and then point a web browser at the frontend endpoint, we get:
+
+![Not Found](images/zrok_endpoint_not_found.png)
+
+This is the `404` error message returned by the `zrok` frontend. We're getting this because we haven't yet started up a `zrok share` for the service. Let's do that:
+
+This command:
+
+```
+$ zrok share reserved n3y7dxiawqf6
+```
+
+...results in a new share backend starting up and connecting to the existing reserved share:
+
+![zrok share reserved](images/zrok_share_reserved.png)
+
+And now if we refresh the frontend endpoint URL in the web browser, we'll see an index of the `docs` directory:
+
+![zrok docs share](images/zrok_docs_share.png)
+
+With the reserved share, we're free stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
+
+When we're done with the reserved share, we can _release_ it using this command:
+
+```
+$ zrok release n3y7dxiawqf6
+[   0.307]    INFO main.(*releaseCommand).run: reserved share 'n3y7dxiawqf6' released
+```
+
+
+
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io/download "Zrok Download"
