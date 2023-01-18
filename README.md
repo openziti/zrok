@@ -2,7 +2,7 @@
 
 `zrok` is a next-generation sharing platform built on top of [Ziti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
 
-`zrok` facilitates sharing resources publicly and privately, exposing them to an audience you can easily control.
+`zrok` facilitates sharing resources both publicly and privately, exposing them to an audience you can easily control.
 
 Like other offerings in this space, `zrok` allows users to create ephemeral reverse proxies ("tunnels") for `http` resources. Additionally:
 
