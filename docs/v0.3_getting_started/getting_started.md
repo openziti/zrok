@@ -75,9 +75,9 @@ v0.3.0-rc1 [0d43b55]
 
 ## Configure Your zrok Service
 
-`zrok` is both an installable utility that you interact with from your local computer, and also a service that exists on the network. NetFoundry operates the service that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service.
+`zrok` is both an installable utility that you interact with from your local computer, and also a service that exists on the network. NetFoundry operates the service that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service instance.
 
-The `zrok` executable defaults to using the `zrok` service at `api.zrok.io`. Should you need to change the service endpoint, you can do that with the following command:
+The `zrok` executable defaults to using the `zrok` service instance at `api.zrok.io`. Should you need to change the endpoint to use a different service instance, you can do that with the following command:
 
 ```
 $ zrok config set apiEndpoint https://staging.zrok.io
@@ -86,9 +86,9 @@ $ zrok config set apiEndpoint https://staging.zrok.io
 zrok configuration updated
 ```
 
-> The `WARNING` about `zrokdir metadata` is ignorable. Running the `zrok config set` command writes a small piece of metadata into a `.zrok` folder inside your home directory. This allows `zrok` to identify the version of its settings, providing a mechanism to upgrade your installation as new versions are released.
+> The `WARNING` about `zrokdir metadata` is ignorable. Running the `zrok config set` command writes a small piece of metadata into a `.zrok` folder inside your home directory. This allows `zrok` to identify the version of its settings, providing a mechanism to upgrade your installation as new versions are released. This `WARNING` is letting you know that your current environment has not be initialized by `zrok`.
 
-You can use the `zrok status` command to inspect the state of your local shell. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as as an "environment".
+You can use the `zrok status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as as an _environment_.
 
 ```
 $ zrok status
@@ -105,13 +105,13 @@ To create a local environment use the zrok enable command.
 
 > The `WARNING` about being `unable to load your local environment` will go away once you've done a `zrok enable` for your shell (we'll get to that below). For now, this warning is ignorable.
 
-The `zrok status` command shows the configured API service that your environment is using, as well as the "source" where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
+The `zrok status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
 
 ## Generating an Invitation
 
-In order to create an account with the `zrok` service, you will need to create an invitation. 
+In order to create an account with the `zrok` service instance, you will need to create an invitation. 
 
-> Some environments take advantage of "invitation tokens", which limits who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to utilize your token to generate your invitation.
+> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to utilize your token to generate your invitation.
 
 We generate an invitation with the `zrok invite` command:
 
@@ -128,7 +128,7 @@ enter and confirm your email address...
 invitation sent to 'michael.quigley@netfoundry.io'!
 ```
 
-The `zrok invite` command presents a form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
+The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
 
 Next, check the email where you sent the invite. You should receive a message asking you to click a link to create your `zrok` account. When you click that link, you will be brought to a web page that will allow you to set a password for your new account:
 
@@ -142,7 +142,7 @@ For now, we'll ignore the "enable your shell for zrok" section. Just click the `
 
 ![Web Login](images/zrok_web_login.png)
 
-After clicking the `Log In` button, you'll be brought into the `zrok` Web Console:
+After clicking the `Log In` button, you'll be brought into the `zrok` _web console_:
 
 ![Web Console; Empty](images/zrok_web_console_empty.png)
 
@@ -150,11 +150,11 @@ Congratulations! Your `zrok` account is ready to go!
 
 ## Enabling Your zrok Environment
 
-When your `zrok` account was created, the service generated a "secret token" that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
+When your `zrok` account was created, the service generated a _secret token_ that identifies and authenticates in a single step. Protect your _secret token_ as if it were a password, or an important account number; it's a _secret_, protect it.
 
 When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the Ziti network hosting the `zrok` service.
 
-From the web UI, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
+From the _web console_, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
 
 ![Enable Modal Dialog](images/zrok_enable_modal.png)
 
@@ -193,15 +193,15 @@ Environment:
 
 Excellent... our environment is now fully enabled.
 
-If we return to the web UI, we'll now see the new environment reflected in the explorer view:
+If we return to the _web console_, we'll now see the new environment reflected in the explorer view:
 
 ![New Environment in Web UI](images/zrok_web_ui_new_environment.png)
 
-In my case, the environment is named `michael@ziti-li`, which is the username of my shell and the hostname of the system the shell is running on.
+In my case, the environment is named `michael@ziti-lx`, which is the username of my shell and the hostname of the system the shell is running on.
 
 > Should you want to use a non-default name for your environment, you can pass the `-d` option to the `zrok enable` command. See `zrok enable --help` for details.
 
-If you click on the environment node in the explorer in you web console, the details panel showed at the bottom of the page will change:
+If you click on the environment node in the explorer in the _web console_, the details panel shown at the bottom of the page will change:
 
 ![Empty Environment](images/zrok_web_ui_empty_shares.png)
 
