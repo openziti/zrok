@@ -20,7 +20,7 @@ In order to use `zrok`, you will need a `zrok` executable. [Download][zrok-downl
 Move the downloaded `zrok` distribution into a directory on your system. In my case, I've placed it in my home directory:
 
 ```
-$ l zrok*
+$ ls -lF zrok*
 -rwxr-xr-x 1 michael michael 12724747 Jan 17 12:57 zrok_0.3.0-rc1_linux_amd64.tar.gz*
 ```
 
@@ -73,9 +73,9 @@ $ zrok version
 v0.3.0-rc1 [0d43b55]
 ```
 
-## Configure Your zrok Service
+## Configure Your zrok Service Instance
 
-`zrok` is both an installable utility that you interact with from your local computer, and also a service that exists on the network. NetFoundry operates the service that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service instance.
+`zrok` is both an installable utility that you interact with from your local computer, and also a service that exists on the network. NetFoundry operates the public service instance that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service instance.
 
 The `zrok` executable defaults to using the `zrok` service instance at `api.zrok.io`. Should you need to change the endpoint to use a different service instance, you can do that with the following command:
 
