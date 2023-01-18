@@ -13,7 +13,7 @@ Let's take a look at how to get started with `zrok`.
 
 ## Downloading zrok
 
-In order to use `zrok`, you will need a `zrok` executable. [Download][zrok-download] a binary executable package for your platform at https://zrok.io/download.
+In order to use `zrok`, you will need a `zrok` executable. [Download][zrok-download] a binary executable package for your platform at https://zrok.io.
 
 ### Extract zrok Distribution
 
