@@ -309,7 +309,37 @@ $ zrok release n3y7dxiawqf6
 [   0.307]    INFO main.(*releaseCommand).run: reserved share 'n3y7dxiawqf6' released
 ```
 
+## Concepts Review
 
+In summary, `zrok` lets you easily and securely share resources with both general internet users (through _public_ sharing) and also with other `zrok` users (through _private_ sharing).
+
+Here's a quick review of the `zrok` mental model and the vocabulary.
+
+### Service Instance and Account
+
+You create an _account_ with a `zrok` _service instance_. Your account is identified by a username and a password, which you use to log into the _web console_. Your account also has a _secret token_, which you will use to authenticate from the `zrok` command-line to interact with the _service instance_.
+
+You create a new _account_ with a `zrok` _service instance_ through the `zrok invite` command.
+
+### Environment
+
+Using your _secret token_ you use the `zrok` command-line interface to create an _environment_. An _environment_ corresponds to a single command-line user on a specific _host system_. 
+
+You create a new _environment_ by using the `zrok enable` command.
+
+### Shares
+
+Once you've enabled an _environment_, you then create one or more _shares_. Shares have either a _public_ or _private_ _sharing mode_. _Shares_ share a specific type of resource using a _backend mode_. As of this writing `zrok` supports a `proxy` _backend mode_ to share local HTTP resources as a _reverse proxy_. `zrok` also supports a `web` _backend mode_ to share local file and HTML resources by enabling a basic HTTP server.
+
+Every _share_ is identified by a _share token_. _Public shares_ can be accessed through either a _frontend_ instance offered through the `zrok` _service instance_, or through the `zrok access` command. _Private shares_ can only be accessed through the `zrok access` command.
+
+You use the `zrok share` command to create and enable _ephemeral shares_.
+
+### Reserved Shares
+
+`zrok` supports creating _shares_ that have a consistent _share token_ that survives restarts of the `zrok share` command. These are considered _non-ephemeral_, and is callled a _reserved share_.
+
+You use the `zrok reserve` command to create _reserved shares_. Reserved shares last until you use the `zrok release` command to delete them.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io/download "Zrok Download"
