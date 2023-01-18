@@ -80,7 +80,7 @@ v0.3.0-rc1 [0d43b55]
 The `zrok` executable defaults to using the `zrok` service instance at `api.zrok.io`. Should you need to change the endpoint to use a different service instance, you can do that with the following command:
 
 ```
-$ zrok config set apiEndpoint https://staging.zrok.io
+$ zrok config set apiEndpoint https://zrok.mydomain.com
 [WARNING]: unable to open zrokdir metadata; ignoring
 
 zrok configuration updated
@@ -95,8 +95,8 @@ $ zrok status
 
 Config:
 
- CONFIG       VALUE                    SOURCE 
- apiEndpoint  https://staging.zrok.io  config 
+ CONFIG       VALUE                      SOURCE 
+ apiEndpoint  https://zrok.mydomain.com  config 
 
 [WARNING]: Unable to load your local environment!
 
@@ -181,8 +181,8 @@ $ zrok status
 
 Config:
 
- CONFIG       VALUE                    SOURCE 
- apiEndpoint  https://staging.zrok.io  env    
+ CONFIG       VALUE                SOURCE 
+ apiEndpoint  https://api.zrok.io  env    
 
 Environment:
 
@@ -229,7 +229,7 @@ A frontend is an HTTPS listener exposed to the internet, that lets any user with
 
 For example, I might create a public share using the `zrok share public` command, which results in my `zrok` service instance exposing the following URL to access my resources:
 
-https://59wepuo4tcd8.in.staging.zrok.io/
+https://59wepuo4tcd8.in.zrok.io/
 
 In this case my share was given the "share token" of `59wepuo4tcd8`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
 
@@ -273,7 +273,7 @@ The first step is to create the reserved share:
 ```
 $ zrok reserve public --backend-mode web docs
 [   0.357]    INFO main.(*reserveCommand).run: your reserved share token is 'n3y7dxiawqf6'
-[   0.357]    INFO main.(*reserveCommand).run: reserved frontend endpoint: https://n3y7dxiawqf6.in.staging.zrok.io/
+[   0.357]    INFO main.(*reserveCommand).run: reserved frontend endpoint: https://n3y7dxiawqf6.in.zrok.io/
 ```
 
 I'm asking the `zrok` service to reserve a share with a `web` backend mode, pointing at my local `docs` folder.
