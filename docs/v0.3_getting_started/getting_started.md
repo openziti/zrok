@@ -342,4 +342,4 @@ You use the `zrok share` command to create and enable _ephemeral shares_.
 You use the `zrok reserve` command to create _reserved shares_. Reserved shares last until you use the `zrok release` command to delete them.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
-[ zrok-download]: https://zrok.io/download "Zrok Download"
+[ zrok-download]: https://zrok.io "Zrok Download"
