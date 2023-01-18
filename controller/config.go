@@ -1,16 +1,18 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/pkg/errors"
-	"time"
 )
 
 const ConfigVersion = 1
 
 type Config struct {
 	V            int
+	Account      *AccountConfig
 	Admin        *AdminConfig
 	Endpoint     *EndpointConfig
 	Email        *EmailConfig
@@ -21,6 +23,10 @@ type Config struct {
 	Registration *RegistrationConfig
 	Store        *store.Config
 	Ziti         *ZitiConfig
+}
+
+type AccountConfig struct {
+	ForgotPasswordUrlTemplate string
 }
 
 type AdminConfig struct {

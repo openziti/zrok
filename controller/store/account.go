@@ -48,3 +48,15 @@ func (self *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, er
 	}
 	return a, nil
 }
+
+func (self *Store) UpdateAccount(a *Account, tx *sqlx.Tx) (int, error) {
+	stmt, err := tx.Prepare("update accounts set email=$1, password=$2, token=$3, limitless=$4 where id = $5")
+	if err != nil {
+		return 0, errors.Wrap(err, "error preparing accounts update statement")
+	}
+	var id int
+	if _, err := stmt.Exec(a.Email, a.Password, a.Token, a.Limitless, a.Id); err != nil {
+		return 0, errors.Wrap(err, "error executing accounts update statement")
+	}
+	return id, nil
+}

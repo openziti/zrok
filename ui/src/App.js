@@ -3,6 +3,7 @@ import Register from "./register/Register";
 import Console from "./console/Console";
 import {useEffect, useState} from "react";
 import Login from "./console/login/Login";
+import ForgotPassword from "./console/forgotPassword/ForgotPassword"
 
 const App = () => {
     const [user, setUser] = useState();
@@ -27,6 +28,7 @@ const App = () => {
             <Routes>
                 <Route path={"/"} element={consoleComponent}/>
                 <Route path={"register/:token"} element={<Register />} />
+                <Route path={"forgotpassword"} element={<ForgotPassword />}/>
             </Routes>
         </Router>
     );

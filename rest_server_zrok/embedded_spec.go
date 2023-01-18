@@ -222,6 +222,31 @@ func init() {
         }
       }
     },
+    "/forgotPassword": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "forgotPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/forgotPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "forgot password request created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/frontend": {
       "post": {
         "security": [
@@ -543,6 +568,34 @@ func init() {
             "schema": {
               "$ref": "#/definitions/registerResponse"
             }
+          },
+          "404": {
+            "description": "request not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/resetPassword": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/resetPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "password reset"
           },
           "404": {
             "description": "request not found"
@@ -895,6 +948,14 @@ func init() {
     "errorMessage": {
       "type": "string"
     },
+    "forgotPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
     "inviteRequest": {
       "type": "object",
       "properties": {
@@ -994,6 +1055,17 @@ func init() {
     "registerResponse": {
       "type": "object",
       "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "resetPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
         "token": {
           "type": "string"
         }
@@ -1393,6 +1465,31 @@ func init() {
         }
       }
     },
+    "/forgotPassword": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "forgotPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/forgotPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "forgot password request created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/frontend": {
       "post": {
         "security": [
@@ -1714,6 +1811,34 @@ func init() {
             "schema": {
               "$ref": "#/definitions/registerResponse"
             }
+          },
+          "404": {
+            "description": "request not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/resetPassword": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/resetPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "password reset"
           },
           "404": {
             "description": "request not found"
@@ -2066,6 +2191,14 @@ func init() {
     "errorMessage": {
       "type": "string"
     },
+    "forgotPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
     "inviteRequest": {
       "type": "object",
       "properties": {
@@ -2165,6 +2298,17 @@ func init() {
     "registerResponse": {
       "type": "object",
       "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "resetPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
         "token": {
           "type": "string"
         }

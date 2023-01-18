@@ -1,6 +1,7 @@
 import {useState} from "react";
 import * as account from '../../api/account';
 import {Button, Container, Form, Row} from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
@@ -64,6 +65,12 @@ const Login = (props) => {
                                         value={password}
                                     />
                                 </Form.Group>
+
+                                <div className="text-right">
+                                <Link to="/forgotpassword" className="">
+                                    Forgot Password?
+                                </Link>
+                                </div>
 
                                 <Button variant={"light"} type={"submit"}>Log In</Button>
                             </Form>

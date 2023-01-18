@@ -1,0 +1,129 @@
+package controller
+
+import (
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/util"
+	"github.com/sirupsen/logrus"
+)
+
+type forgetPasswordHandler struct{}
+
+func newForgetPasswordHandler() *forgetPasswordHandler {
+	return &forgetPasswordHandler{}
+}
+
+func (handler *forgetPasswordHandler) Handle(params account.ForgotPasswordParams) middleware.Responder {
+	if params.Body == nil || params.Body.Email == "" {
+		logrus.Errorf("missing email")
+		return account.NewInviteBadRequest()
+	}
+	if !util.IsValidEmail(params.Body.Email) {
+		logrus.Errorf("'%v' is not a valid email address", params.Body.Email)
+		return account.NewInviteBadRequest()
+	}
+	logrus.Infof("received forgot password request for email '%v'", params.Body.Email)
+	var token string
+
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return account.NewForgotPasswordInternalServerError()
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	token, err = createToken()
+	if err != nil {
+		logrus.Error(err)
+		return account.NewForgotPasswordInternalServerError()
+	}
+
+	acct, err := str.FindAccountWithEmail(params.Body.Email, tx)
+	if err != nil {
+		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
+		return account.NewForgotPasswordInternalServerError()
+	}
+
+	prr := &store.PasswordResetRequest{
+		Token:     token,
+		AccountId: acct.Id,
+	}
+
+	if _, err := str.CreatePasswordResetRequest(prr, tx); err != nil {
+		logrus.Errorf("error creating forgot password request for '%v': %v", params.Body.Email, err)
+		return account.NewInviteInternalServerError()
+	}
+
+	if err := tx.Commit(); err != nil {
+		logrus.Errorf("error committing forgot password request for '%v': %v", params.Body.Email, err)
+		return account.NewInviteInternalServerError()
+	}
+
+	if cfg.Email != nil && cfg.Registration != nil && cfg.Account != nil {
+		if err := sendForgotPasswordEmail(acct.Email, token); err != nil {
+			logrus.Errorf("error sending forgot password email for '%v': %v", acct.Email, err)
+			return account.NewForgotPasswordInternalServerError()
+		}
+	} else {
+		logrus.Errorf("'email', 'registration', and 'account' configuration missing; skipping forgot password email")
+	}
+
+	logrus.Infof("forgot password request for '%v' has token '%v'", params.Body.Email, prr.Token)
+
+	return account.NewForgotPasswordCreated()
+}
+
+type resetPasswordHandler struct{}
+
+func newResetPasswordHandler() *resetPasswordHandler {
+	return &resetPasswordHandler{}
+}
+
+func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) middleware.Responder {
+	if params.Body == nil || params.Body.Token == "" || params.Body.Password == "" {
+		logrus.Error("missing token or password")
+		return account.NewResetPasswordNotFound()
+	}
+	logrus.Infof("received password reset request for token '%v'", params.Body.Token)
+
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordInternalServerError()
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	prr, err := str.FindPasswordResetRequestWithToken(params.Body.Token, tx)
+	if err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordNotFound()
+	}
+
+	a, err := str.GetAccount(prr.AccountId, tx)
+	if err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordNotFound()
+	}
+	a.Password = hashPassword(params.Body.Password)
+
+	if _, err := str.UpdateAccount(a, tx); err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordInternalServerError()
+	}
+
+	if err := str.DeletePasswordResetRequest(prr.Id, tx); err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordInternalServerError()
+	}
+
+	if err := tx.Commit(); err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordInternalServerError()
+	}
+
+	logrus.Infof("reset password for '%v'", a.Email)
+
+	return account.NewResetPasswordOK()
+
+}

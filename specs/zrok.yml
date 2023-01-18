@@ -15,6 +15,22 @@ paths:
   #
   # account
   #
+  /forgotPassword:
+    post:
+      tags:
+        - account
+      operationId: forgotPassword
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/forgotPasswordRequest"
+      responses:
+        201:
+          description: forgot password request created
+        500:
+          description: internal server error
+
   /invite:
     post:
       tags:
@@ -66,6 +82,24 @@ paths:
           description: account created
           schema:
             $ref: "#/definitions/registerResponse"
+        404:
+          description: request not found
+        500:
+          description: internal server error
+
+  /resetPassword:
+    post:
+      tags:
+        - account
+      operationId: resetPassword
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/resetPasswordRequest"
+      responses:
+        200:
+          description: password reset
         404:
           description: request not found
         500:
@@ -574,6 +608,12 @@ definitions:
   errorMessage:
     type: string
 
+  forgotPasswordRequest:
+    type: object
+    properties:
+      email:
+        type: string
+
   inviteTokenGenerateRequest:
     type: object
     properties:
@@ -648,6 +688,14 @@ definitions:
     type: object
     properties:
       token:
+        type: string
+
+  resetPasswordRequest:
+    type: object
+    properties:
+      token:
+        type: string
+      password:
         type: string
 
   share:
