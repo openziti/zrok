@@ -117,6 +117,15 @@ func (h *disableHandler) removeEnvironment(envId int, tx *sqlx.Tx) error {
 			return errors.Wrapf(err, "error deleting share '%d' for environment '%d'", shr.Id, envId)
 		}
 	}
+	fes, err := str.FindFrontendsForEnvironment(envId, tx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding frontends for environment '%d'", envId)
+	}
+	for _, fe := range fes {
+		if err := str.DeleteFrontend(fe.Id, tx); err != nil {
+			return errors.Wrapf(err, "error deleting frontend '%d' for environment '%d'", fe.Id, envId)
+		}
+	}
 	if err := str.DeleteEnvironment(envId, tx); err != nil {
 		return errors.Wrapf(err, "error deleting environment '%d'", envId)
 	}
