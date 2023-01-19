@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -42,6 +43,10 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 	}
 	if err := h.removeSharesForEnvironment(envId, tx, edge); err != nil {
 		logrus.Errorf("error removing shares for environment: %v", err)
+		return environment.NewDisableInternalServerError()
+	}
+	if err := h.removeFrontendsForEnvironment(envId, tx, edge); err != nil {
+		logrus.Errorf("error removing frontends for environment: %v", err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := h.removeEnvironment(envId, tx); err != nil {
@@ -103,6 +108,23 @@ func (h *disableHandler) removeSharesForEnvironment(envId int, tx *sqlx.Tx, edge
 			logrus.Error(err)
 		}
 		logrus.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
+	}
+	return nil
+}
+
+func (h *disableHandler) removeFrontendsForEnvironment(envId int, tx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	env, err := str.GetEnvironment(envId, tx)
+	if err != nil {
+		return err
+	}
+	fes, err := str.FindFrontendsForEnvironment(envId, tx)
+	if err != nil {
+		return err
+	}
+	for _, fe := range fes {
+		if err := zrokEdgeSdk.DeleteServicePolicy(env.ZId, fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token), edge); err != nil {
+			logrus.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
+		}
 	}
 	return nil
 }
