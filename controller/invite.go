@@ -41,7 +41,7 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		inviteToken, err := str.GetInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
-			return account.NewInviteBadRequest()
+			return account.NewInviteUnauthorized()
 		}
 		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
 			logrus.Error(err)

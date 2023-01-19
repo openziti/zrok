@@ -32,6 +32,12 @@ func (o *InviteReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return nil, result
+	case 401:
+		result := NewInviteUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewInviteInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -141,6 +147,57 @@ func (o *InviteBadRequest) String() string {
 }
 
 func (o *InviteBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewInviteUnauthorized creates a InviteUnauthorized with default headers values
+func NewInviteUnauthorized() *InviteUnauthorized {
+	return &InviteUnauthorized{}
+}
+
+/*
+InviteUnauthorized describes a response with status code 401, with default header values.
+
+unauthorized
+*/
+type InviteUnauthorized struct {
+}
+
+// IsSuccess returns true when this invite unauthorized response has a 2xx status code
+func (o *InviteUnauthorized) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this invite unauthorized response has a 3xx status code
+func (o *InviteUnauthorized) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this invite unauthorized response has a 4xx status code
+func (o *InviteUnauthorized) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this invite unauthorized response has a 5xx status code
+func (o *InviteUnauthorized) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this invite unauthorized response a status code equal to that given
+func (o *InviteUnauthorized) IsCode(code int) bool {
+	return code == 401
+}
+
+func (o *InviteUnauthorized) Error() string {
+	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized ", 401)
+}
+
+func (o *InviteUnauthorized) String() string {
+	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized ", 401)
+}
+
+func (o *InviteUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

@@ -83,6 +83,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 func (cmd *inviteCommand) endpointError(apiEndpoint, _ string) {
 	fmt.Printf("%v\n\n", tui.SeriousBusiness.Render("there was a problem creating an invitation!"))
 	fmt.Printf("you are trying to use the zrok service at: %v\n\n", tui.Code.Render(apiEndpoint))
+	fmt.Printf("%v\n\n", tui.Attention.Render("should you be using a --token? check with your instance administrator!"))
 	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
 	fmt.Printf("%v\n\n", tui.Code.Render("$ zrok config set apiEndpoint <newEndpoint>"))
 	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.Code.Render("https://some.zrok.io"))

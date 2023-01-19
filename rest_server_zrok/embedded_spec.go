@@ -425,6 +425,9 @@ func init() {
           "400": {
             "description": "invitation not created (already exists)"
           },
+          "401": {
+            "description": "unauthorized"
+          },
           "500": {
             "description": "internal server error"
           }
@@ -1595,6 +1598,9 @@ func init() {
           },
           "400": {
             "description": "invitation not created (already exists)"
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"

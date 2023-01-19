@@ -61,6 +61,31 @@ func (o *InviteBadRequest) WriteResponse(rw http.ResponseWriter, producer runtim
 	rw.WriteHeader(400)
 }
 
+// InviteUnauthorizedCode is the HTTP code returned for type InviteUnauthorized
+const InviteUnauthorizedCode int = 401
+
+/*
+InviteUnauthorized unauthorized
+
+swagger:response inviteUnauthorized
+*/
+type InviteUnauthorized struct {
+}
+
+// NewInviteUnauthorized creates InviteUnauthorized with default headers values
+func NewInviteUnauthorized() *InviteUnauthorized {
+
+	return &InviteUnauthorized{}
+}
+
+// WriteResponse to the client
+func (o *InviteUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(401)
+}
+
 // InviteInternalServerErrorCode is the HTTP code returned for type InviteInternalServerError
 const InviteInternalServerErrorCode int = 500
 
