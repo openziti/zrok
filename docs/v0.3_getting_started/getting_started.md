@@ -364,5 +364,9 @@ You use the `zrok share` command to create and enable _ephemeral shares_.
 
 You use the `zrok reserve` command to create _reserved shares_. Reserved shares last until you use the `zrok release` command to delete them.
 
+## Self-Hosting a Service Instance
+
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../v0.3_self_hosting_guide.md) for details.
+
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"
