@@ -115,7 +115,7 @@ The `zrok status` command shows the configured API service that your environment
 
 In order to create an account with the `zrok` service instance, you will need to create an invitation. 
 
-> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to utilize your token to generate your invitation.
+> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
 
 We generate an invitation with the `zrok invite` command:
 
