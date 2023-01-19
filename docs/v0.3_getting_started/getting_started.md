@@ -115,7 +115,7 @@ The `zrok status` command shows the configured API service that your environment
 
 In order to create an account with the `zrok` service instance, you will need to create an invitation. 
 
-> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to utilize your token to generate your invitation.
+> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
 
 We generate an invitation with the `zrok invite` command:
 
@@ -323,7 +323,7 @@ And now if we refresh the frontend endpoint URL in the web browser, we'll see an
 
 ![zrok docs share](images/zrok_docs_share.png)
 
-With the reserved share, we're free stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
+With the reserved share, we're free to stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
 
 When we're done with the reserved share, we can _release_ it using this command:
 
@@ -363,6 +363,10 @@ You use the `zrok share` command to create and enable _ephemeral shares_.
 `zrok` supports creating _shares_ that have a consistent _share token_ that survives restarts of the `zrok share` command. These are considered _non-ephemeral_, and is callled a _reserved share_.
 
 You use the `zrok reserve` command to create _reserved shares_. Reserved shares last until you use the `zrok release` command to delete them.
+
+## Self-Hosting a Service Instance
+
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../v0.3_self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"
