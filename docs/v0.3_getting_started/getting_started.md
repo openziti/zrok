@@ -300,7 +300,7 @@ And now if we refresh the frontend endpoint URL in the web browser, we'll see an
 
 ![zrok docs share](images/zrok_docs_share.png)
 
-With the reserved share, we're free stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
+With the reserved share, we're free to stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
 
 When we're done with the reserved share, we can _release_ it using this command:
 
