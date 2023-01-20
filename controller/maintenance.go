@@ -11,14 +11,14 @@ import (
 )
 
 type maintenanceRegistrationAgent struct {
-	*RegistrationMaintenanceConfig
+	cfg *RegistrationMaintenanceConfig
 	ctx context.Context
 }
 
 func newRegistrationMaintenanceAgent(ctx context.Context, cfg *RegistrationMaintenanceConfig) *maintenanceRegistrationAgent {
 	return &maintenanceRegistrationAgent{
-		RegistrationMaintenanceConfig: cfg,
-		ctx:                           ctx,
+		cfg: cfg,
+		ctx: ctx,
 	}
 }
 
@@ -26,7 +26,7 @@ func (ma *maintenanceRegistrationAgent) run() {
 	logrus.Infof("started")
 	defer logrus.Info("exited")
 
-	ticker := time.NewTicker(ma.CheckFrequency)
+	ticker := time.NewTicker(ma.cfg.CheckFrequency)
 	for {
 		select {
 		case <-ma.ctx.Done():
@@ -51,8 +51,8 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	timeout := time.Now().UTC().Add(-ma.ExpirationTimeout)
-	accountRequests, err := str.FindExpiredAccountRequests(timeout, ma.BatchLimit, tx)
+	timeout := time.Now().UTC().Add(-ma.cfg.ExpirationTimeout)
+	accountRequests, err := str.FindExpiredAccountRequests(timeout, ma.cfg.BatchLimit, tx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding expire account requests before %v", timeout)
 	}
@@ -78,14 +78,14 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 }
 
 type maintenanceResetPasswordAgent struct {
-	*ResetPasswordMaintenanceConfig
+	cfg *ResetPasswordMaintenanceConfig
 	ctx context.Context
 }
 
 func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *ResetPasswordMaintenanceConfig) *maintenanceResetPasswordAgent {
 	return &maintenanceResetPasswordAgent{
-		ResetPasswordMaintenanceConfig: cfg,
-		ctx:                            ctx,
+		cfg: cfg,
+		ctx: ctx,
 	}
 }
 
@@ -93,7 +93,7 @@ func (ma *maintenanceResetPasswordAgent) run() {
 	logrus.Infof("started")
 	defer logrus.Info("exited")
 
-	ticker := time.NewTicker(ma.CheckFrequency)
+	ticker := time.NewTicker(ma.cfg.CheckFrequency)
 	for {
 		select {
 		case <-ma.ctx.Done():
@@ -117,8 +117,8 @@ func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() e
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	timeout := time.Now().UTC().Add(-ma.ExpirationTimeout)
-	passwordResetRequests, err := str.FindExpiredPasswordResetRequests(timeout, ma.BatchLimit, tx)
+	timeout := time.Now().UTC().Add(-ma.cfg.ExpirationTimeout)
+	passwordResetRequests, err := str.FindExpiredPasswordResetRequests(timeout, ma.cfg.BatchLimit, tx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding expired password reset requests before %v", timeout)
 	}
