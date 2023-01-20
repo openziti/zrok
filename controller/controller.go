@@ -80,8 +80,13 @@ func Run(inCfg *Config) error {
 		cancel()
 	}()
 
-	if cfg.Maintenance != nil && cfg.Maintenance.Registration != nil {
-		go newMaintenanceAgent(ctx, cfg.Maintenance).run()
+	if cfg.Maintenance != nil {
+		if cfg.Maintenance.Registration != nil {
+			go newRegistrationMaintenanceAgent(ctx, cfg.Maintenance.Registration).run()
+		}
+		if cfg.Maintenance.Account != nil {
+			go newAccountMaintenanceAgent(ctx, cfg.Maintenance.Account).run()
+		}
 	}
 
 	server := rest_server_zrok.NewServer(api)

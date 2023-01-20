@@ -66,13 +66,13 @@ const Login = (props) => {
                                     />
                                 </Form.Group>
 
-                                <div className="text-right">
+                                <Button variant={"light"} type={"submit"}>Log In</Button>
+                                
+                                <div>
                                 <Link to="/forgotpassword" className="">
                                     Forgot Password?
                                 </Link>
                                 </div>
-
-                                <Button variant={"light"} type={"submit"}>Log In</Button>
                             </Form>
                         </Row>
                         <Row>

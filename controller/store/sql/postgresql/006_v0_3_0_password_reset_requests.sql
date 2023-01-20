@@ -1,4 +1,4 @@
--- +migrate up
+-- +migrate Up
 
 --
 -- password_reset_requests

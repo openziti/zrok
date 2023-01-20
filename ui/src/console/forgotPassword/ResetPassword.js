@@ -1,7 +1,7 @@
 import {useState} from "react";
 import * as account from '../../api/account';
 import {Button, Container, Form, Row} from "react-bootstrap";
-import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ResetPassword = (props) => {
     const [password, setPassword] = useState('');
@@ -30,11 +30,10 @@ const ResetPassword = (props) => {
                     setMessage(undefined);
                     setComplete(true);
                 } else {
-                    setMessage(errorMessage)
+                    setMessage(errorMessage);
                 }
             })
             .catch(resp => {
-                console.log("reset password failed", resp);
                 setMessage(errorMessage);
             })
     }
@@ -83,7 +82,24 @@ const ResetPassword = (props) => {
     }
 
     return (
-        <Navigate to="/" />
+        <Container fluid>
+            <Row>
+                <img alt="ziggy" src={"/ziggy.svg"} width={200}/>
+            </Row>
+            <Row>
+                <h1>Password Reset</h1>
+            </Row>
+            <Row>
+                Password reset successful! You can now return to the login page and login.
+            </Row>
+            <Row>
+                <div>
+                    <Link to="/" className="">
+                        Login
+                    </Link>
+                </div>
+            </Row>
+        </Container>
     )
 }
 

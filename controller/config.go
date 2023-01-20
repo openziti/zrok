@@ -69,10 +69,17 @@ type InfluxConfig struct {
 }
 
 type MaintenanceConfig struct {
+	Account      *AccountMaintenanceConfig
 	Registration *RegistrationMaintenanceConfig
 }
 
 type RegistrationMaintenanceConfig struct {
+	ExpirationTimeout time.Duration
+	CheckFrequency    time.Duration
+	BatchLimit        int
+}
+
+type AccountMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
@@ -95,6 +102,11 @@ func DefaultConfig() *Config {
 			ServiceName: "metrics",
 		},
 		Maintenance: &MaintenanceConfig{
+			Account: &AccountMaintenanceConfig{
+				ExpirationTimeout: time.Minute * 15,
+				CheckFrequency:    time.Minute * 15,
+				BatchLimit:        500,
+			},
 			Registration: &RegistrationMaintenanceConfig{
 				ExpirationTimeout: time.Hour * 24,
 				CheckFrequency:    time.Hour,
