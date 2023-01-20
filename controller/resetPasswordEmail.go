@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	"fmt"
+	"github.com/openziti/zrok/build"
 	"html/template"
 
 	"github.com/openziti/zrok/controller/emailUi"
@@ -14,12 +15,14 @@ import (
 type resetPasswordEmail struct {
 	EmailAddress string
 	Url          string
+	Version      string
 }
 
 func sendResetPasswordEmail(emailAddress, token string) error {
 	emailData := &resetPasswordEmail{
 		EmailAddress: emailAddress,
 		Url:          fmt.Sprintf("%s/%s", cfg.ResetPassword.ResetUrlTemplate, token),
+		Version:      build.String(),
 	}
 
 	plainBody, err := emailData.mergeTemplate("resetPassword.gotext")
