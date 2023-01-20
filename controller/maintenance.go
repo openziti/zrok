@@ -23,8 +23,8 @@ func newRegistrationMaintenanceAgent(ctx context.Context, cfg *RegistrationMaint
 }
 
 func (ma *maintenanceRegistrationAgent) run() {
-	logrus.Infof("starting maintenance registration agent")
-	defer logrus.Info("stopping maintenance registration agent")
+	logrus.Infof("started")
+	defer logrus.Info("exited")
 
 	ticker := time.NewTicker(ma.CheckFrequency)
 	for {
@@ -90,8 +90,8 @@ func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *ResetPasswordMai
 }
 
 func (ma *maintenanceResetPasswordAgent) run() {
-	logrus.Infof("starting maintenance account agent")
-	defer logrus.Info("stopping maintenance account agent")
+	logrus.Infof("started")
+	defer logrus.Info("exited")
 
 	ticker := time.NewTicker(ma.CheckFrequency)
 	for {
