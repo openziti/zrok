@@ -26,6 +26,12 @@ func (o *ForgotPasswordReader) ReadResponse(response runtime.ClientResponse, con
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewForgotPasswordBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewForgotPasswordInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -84,6 +90,57 @@ func (o *ForgotPasswordCreated) String() string {
 }
 
 func (o *ForgotPasswordCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewForgotPasswordBadRequest creates a ForgotPasswordBadRequest with default headers values
+func NewForgotPasswordBadRequest() *ForgotPasswordBadRequest {
+	return &ForgotPasswordBadRequest{}
+}
+
+/*
+ForgotPasswordBadRequest describes a response with status code 400, with default header values.
+
+forgot password request not created
+*/
+type ForgotPasswordBadRequest struct {
+}
+
+// IsSuccess returns true when this forgot password bad request response has a 2xx status code
+func (o *ForgotPasswordBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this forgot password bad request response has a 3xx status code
+func (o *ForgotPasswordBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this forgot password bad request response has a 4xx status code
+func (o *ForgotPasswordBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this forgot password bad request response has a 5xx status code
+func (o *ForgotPasswordBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this forgot password bad request response a status code equal to that given
+func (o *ForgotPasswordBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+func (o *ForgotPasswordBadRequest) Error() string {
+	return fmt.Sprintf("[POST /forgotPassword][%d] forgotPasswordBadRequest ", 400)
+}
+
+func (o *ForgotPasswordBadRequest) String() string {
+	return fmt.Sprintf("[POST /forgotPassword][%d] forgotPasswordBadRequest ", 400)
+}
+
+func (o *ForgotPasswordBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

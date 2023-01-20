@@ -17,11 +17,11 @@ func newForgetPasswordHandler() *forgetPasswordHandler {
 func (handler *forgetPasswordHandler) Handle(params account.ForgotPasswordParams) middleware.Responder {
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
-		return account.NewInviteBadRequest()
+		return account.NewForgotPasswordBadRequest()
 	}
 	if !util.IsValidEmail(params.Body.Email) {
 		logrus.Errorf("'%v' is not a valid email address", params.Body.Email)
-		return account.NewInviteBadRequest()
+		return account.NewForgotPasswordBadRequest()
 	}
 	logrus.Infof("received forgot password request for email '%v'", params.Body.Email)
 	var token string

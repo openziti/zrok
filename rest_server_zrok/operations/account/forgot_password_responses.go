@@ -36,6 +36,31 @@ func (o *ForgotPasswordCreated) WriteResponse(rw http.ResponseWriter, producer r
 	rw.WriteHeader(201)
 }
 
+// ForgotPasswordBadRequestCode is the HTTP code returned for type ForgotPasswordBadRequest
+const ForgotPasswordBadRequestCode int = 400
+
+/*
+ForgotPasswordBadRequest forgot password request not created
+
+swagger:response forgotPasswordBadRequest
+*/
+type ForgotPasswordBadRequest struct {
+}
+
+// NewForgotPasswordBadRequest creates ForgotPasswordBadRequest with default headers values
+func NewForgotPasswordBadRequest() *ForgotPasswordBadRequest {
+
+	return &ForgotPasswordBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *ForgotPasswordBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // ForgotPasswordInternalServerErrorCode is the HTTP code returned for type ForgotPasswordInternalServerError
 const ForgotPasswordInternalServerErrorCode int = 500
 

@@ -241,6 +241,9 @@ func init() {
           "201": {
             "description": "forgot password request created"
           },
+          "400": {
+            "description": "forgot password request not created"
+          },
           "500": {
             "description": "internal server error"
           }
@@ -1483,6 +1486,9 @@ func init() {
         "responses": {
           "201": {
             "description": "forgot password request created"
+          },
+          "400": {
+            "description": "forgot password request not created"
           },
           "500": {
             "description": "internal server error"
