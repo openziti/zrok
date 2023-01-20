@@ -92,6 +92,13 @@
  */
 
 /**
+ * @typedef forgotPasswordRequest
+ * @memberof module:types
+ * 
+ * @property {string} email 
+ */
+
+/**
  * @typedef inviteTokenGenerateRequest
  * @memberof module:types
  * 
@@ -150,6 +157,14 @@
  * @memberof module:types
  * 
  * @property {string} token 
+ */
+
+/**
+ * @typedef resetPasswordRequest
+ * @memberof module:types
+ * 
+ * @property {string} token 
+ * @property {string} password 
  */
 
 /**

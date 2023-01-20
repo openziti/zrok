@@ -30,15 +30,57 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	ForgotPassword(params *ForgotPasswordParams, opts ...ClientOption) (*ForgotPasswordCreated, error)
+
 	Invite(params *InviteParams, opts ...ClientOption) (*InviteCreated, error)
 
 	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
 
 	Register(params *RegisterParams, opts ...ClientOption) (*RegisterOK, error)
 
+	ResetPassword(params *ResetPasswordParams, opts ...ClientOption) (*ResetPasswordOK, error)
+
 	Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+ForgotPassword forgot password API
+*/
+func (a *Client) ForgotPassword(params *ForgotPasswordParams, opts ...ClientOption) (*ForgotPasswordCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewForgotPasswordParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "forgotPassword",
+		Method:             "POST",
+		PathPattern:        "/forgotPassword",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ForgotPasswordReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ForgotPasswordCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for forgotPassword: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -152,6 +194,44 @@ func (a *Client) Register(params *RegisterParams, opts ...ClientOption) (*Regist
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for register: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ResetPassword reset password API
+*/
+func (a *Client) ResetPassword(params *ResetPasswordParams, opts ...ClientOption) (*ResetPasswordOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewResetPasswordParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "resetPassword",
+		Method:             "POST",
+		PathPattern:        "/resetPassword",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ResetPasswordReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ResetPasswordOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for resetPassword: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

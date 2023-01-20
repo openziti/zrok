@@ -29,8 +29,10 @@ func Run(inCfg *Config) error {
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = newZrokAuthenticator(cfg).authenticate
 	api.AccountInviteHandler = newInviteHandler(cfg)
+	api.AccountForgotPasswordHandler = newForgetPasswordHandler()
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
 	api.AccountRegisterHandler = newRegisterHandler()
+	api.AccountResetPasswordHandler = newResetPasswordHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()
@@ -78,8 +80,13 @@ func Run(inCfg *Config) error {
 		cancel()
 	}()
 
-	if cfg.Maintenance != nil && cfg.Maintenance.Registration != nil {
-		go newMaintenanceAgent(ctx, cfg.Maintenance).run()
+	if cfg.Maintenance != nil {
+		if cfg.Maintenance.Registration != nil {
+			go newRegistrationMaintenanceAgent(ctx, cfg.Maintenance.Registration).run()
+		}
+		if cfg.Maintenance.Account != nil {
+			go newAccountMaintenanceAgent(ctx, cfg.Maintenance.Account).run()
+		}
 	}
 
 	server := rest_server_zrok.NewServer(api)
