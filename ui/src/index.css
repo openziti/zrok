@@ -113,3 +113,7 @@ code, pre {
 .actions-tab p {
     font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 }
+
+#zrok-reset-password {
+    margin-top: 25px;
+}

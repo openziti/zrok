@@ -68,10 +68,10 @@ const Login = (props) => {
 
                                 <Button variant={"light"} type={"submit"}>Log In</Button>
                                 
-                                <div>
-                                <Link to="/forgotpassword" className="">
-                                    Forgot Password?
-                                </Link>
+                                <div id={"zrok-reset-password"}>
+                                    <Link to="/resetPassword" className="">
+                                        Forgot Password?
+                                    </Link>
                                 </div>
                             </Form>
                         </Row>

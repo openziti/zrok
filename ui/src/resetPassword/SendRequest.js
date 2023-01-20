@@ -1,9 +1,8 @@
 import { useState } from "react";
-import * as account from '../../api/account';
+import * as account from '../api/account';
 import { Button, Container, Form, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
-const SendRequest = (props) => {
+const SendRequest = () => {
     const [email, setEmail] = useState('');
     const [complete, setComplete] = useState(false);
 
@@ -11,7 +10,7 @@ const SendRequest = (props) => {
         e.preventDefault();
         console.log(email);
 
-        account.forgotPassword({ body: { "email": email } })
+        account.resetPasswordRequest({ body: { "emailAddress": email } })
             .then(resp => {
                 if (!resp.error) {
                     setComplete(true)
@@ -66,14 +65,7 @@ const SendRequest = (props) => {
                     <h1>Reset Password</h1>
                 </Row>
                 <Row>
-                    We will get back to you shortly with a link to reset your password!
-                </Row>
-                <Row>
-                    <div>
-                        <Link to="/" className="">
-                            Login
-                        </Link>
-                    </div>
+                    Check your email for a password reset message!
                 </Row>
         </Container>
     )

@@ -4,21 +4,6 @@ import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
- * @param {module:types.forgotPasswordRequest} [options.body] 
- * @return {Promise<object>} forgot password request created
- */
-export function forgotPassword(options) {
-  if (!options) options = {}
-  const parameters = {
-    body: {
-      body: options.body
-    }
-  }
-  return gateway.request(forgotPasswordOperation, parameters)
-}
-
-/**
- * @param {object} options Optional options
  * @param {module:types.inviteRequest} [options.body] 
  * @return {Promise<object>} invitation created
  */
@@ -79,6 +64,21 @@ export function resetPassword(options) {
 
 /**
  * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} forgot password request created
+ */
+export function resetPasswordRequest(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(resetPasswordRequestOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.verifyRequest} [options.body] 
  * @return {Promise<module:types.verifyResponse>} token ready
  */
@@ -90,12 +90,6 @@ export function verify(options) {
     }
   }
   return gateway.request(verifyOperation, parameters)
-}
-
-const forgotPasswordOperation = {
-  path: '/forgotPassword',
-  contentTypes: ['application/zrok.v1+json'],
-  method: 'post'
 }
 
 const inviteOperation = {
@@ -118,6 +112,12 @@ const registerOperation = {
 
 const resetPasswordOperation = {
   path: '/resetPassword',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post'
+}
+
+const resetPasswordRequestOperation = {
+  path: '/resetPasswordRequest',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post'
 }

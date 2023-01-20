@@ -1,9 +1,9 @@
 import {useState} from "react";
-import * as account from '../../api/account';
+import * as account from '../api/account';
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-const ResetPassword = (props) => {
+const SetNewPassword = (props) => {
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
     const [message, setMessage] = useState();
@@ -93,9 +93,9 @@ const ResetPassword = (props) => {
                 Password reset successful! You can now return to the login page and login.
             </Row>
             <Row>
-                <div>
+                <div id={"zrok-reset-password"}>
                     <Link to="/" className="">
-                        Login
+                        <Button variant={"light"}>Login</Button>
                     </Link>
                 </div>
             </Row>
@@ -103,4 +103,4 @@ const ResetPassword = (props) => {
     )
 }
 
-export default ResetPassword;
+export default SetNewPassword;

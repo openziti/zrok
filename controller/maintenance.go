@@ -77,19 +77,19 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 	return nil
 }
 
-type maintenanceAccountAgent struct {
-	*AccountMaintenanceConfig
+type maintenanceResetPasswordAgent struct {
+	*ResetPasswordMaintenanceConfig
 	ctx context.Context
 }
 
-func newAccountMaintenanceAgent(ctx context.Context, cfg *AccountMaintenanceConfig) *maintenanceAccountAgent {
-	return &maintenanceAccountAgent{
-		AccountMaintenanceConfig: cfg,
-		ctx:                      ctx,
+func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *ResetPasswordMaintenanceConfig) *maintenanceResetPasswordAgent {
+	return &maintenanceResetPasswordAgent{
+		ResetPasswordMaintenanceConfig: cfg,
+		ctx:                            ctx,
 	}
 }
 
-func (ma *maintenanceAccountAgent) run() {
+func (ma *maintenanceResetPasswordAgent) run() {
 	logrus.Infof("starting maintenance account agent")
 	defer logrus.Info("stopping maintenance account agent")
 
@@ -110,7 +110,7 @@ func (ma *maintenanceAccountAgent) run() {
 		}
 	}
 }
-func (ma *maintenanceAccountAgent) deleteExpiredForgetPasswordRequests() error {
+func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() error {
 	tx, err := str.Begin()
 	if err != nil {
 		return err

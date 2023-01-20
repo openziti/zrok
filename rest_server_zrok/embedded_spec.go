@@ -222,34 +222,6 @@ func init() {
         }
       }
     },
-    "/forgotPassword": {
-      "post": {
-        "tags": [
-          "account"
-        ],
-        "operationId": "forgotPassword",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/forgotPasswordRequest"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "forgot password request created"
-          },
-          "400": {
-            "description": "forgot password request not created"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/frontend": {
       "post": {
         "security": [
@@ -612,6 +584,38 @@ func init() {
         }
       }
     },
+    "/resetPasswordRequest": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetPasswordRequest",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "forgot password request created"
+          },
+          "400": {
+            "description": "forgot password request not created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -953,14 +957,6 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
-    },
-    "forgotPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        }
-      }
     },
     "inviteRequest": {
       "type": "object",
@@ -1471,34 +1467,6 @@ func init() {
         }
       }
     },
-    "/forgotPassword": {
-      "post": {
-        "tags": [
-          "account"
-        ],
-        "operationId": "forgotPassword",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/forgotPasswordRequest"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "forgot password request created"
-          },
-          "400": {
-            "description": "forgot password request not created"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/frontend": {
       "post": {
         "security": [
@@ -1861,6 +1829,38 @@ func init() {
         }
       }
     },
+    "/resetPasswordRequest": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetPasswordRequest",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "forgot password request created"
+          },
+          "400": {
+            "description": "forgot password request not created"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -2202,14 +2202,6 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
-    },
-    "forgotPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        }
-      }
     },
     "inviteRequest": {
       "type": "object",

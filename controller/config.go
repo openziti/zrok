@@ -11,22 +11,18 @@ import (
 const ConfigVersion = 1
 
 type Config struct {
-	V            int
-	Account      *AccountConfig
-	Admin        *AdminConfig
-	Endpoint     *EndpointConfig
-	Email        *EmailConfig
-	Influx       *InfluxConfig
-	Limits       *LimitsConfig
-	Maintenance  *MaintenanceConfig
-	Metrics      *MetricsConfig
-	Registration *RegistrationConfig
-	Store        *store.Config
-	Ziti         *ZitiConfig
-}
-
-type AccountConfig struct {
-	ForgotPasswordUrlTemplate string
+	V             int
+	ResetPassword *ResetPasswordConfig
+	Admin         *AdminConfig
+	Endpoint      *EndpointConfig
+	Email         *EmailConfig
+	Influx        *InfluxConfig
+	Limits        *LimitsConfig
+	Maintenance   *MaintenanceConfig
+	Metrics       *MetricsConfig
+	Registration  *RegistrationConfig
+	Store         *store.Config
+	Ziti          *ZitiConfig
 }
 
 type AdminConfig struct {
@@ -51,6 +47,10 @@ type RegistrationConfig struct {
 	TokenStrategy           string
 }
 
+type ResetPasswordConfig struct {
+	ResetUrlTemplate string
+}
+
 type ZitiConfig struct {
 	ApiEndpoint string
 	Username    string
@@ -69,8 +69,8 @@ type InfluxConfig struct {
 }
 
 type MaintenanceConfig struct {
-	Account      *AccountMaintenanceConfig
-	Registration *RegistrationMaintenanceConfig
+	ResetPassword *ResetPasswordMaintenanceConfig
+	Registration  *RegistrationMaintenanceConfig
 }
 
 type RegistrationMaintenanceConfig struct {
@@ -79,7 +79,7 @@ type RegistrationMaintenanceConfig struct {
 	BatchLimit        int
 }
 
-type AccountMaintenanceConfig struct {
+type ResetPasswordMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
@@ -102,7 +102,7 @@ func DefaultConfig() *Config {
 			ServiceName: "metrics",
 		},
 		Maintenance: &MaintenanceConfig{
-			Account: &AccountMaintenanceConfig{
+			ResetPassword: &ResetPasswordMaintenanceConfig{
 				ExpirationTimeout: time.Minute * 15,
 				CheckFrequency:    time.Minute * 15,
 				BatchLimit:        500,

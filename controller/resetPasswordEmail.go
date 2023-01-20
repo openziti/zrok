@@ -11,35 +11,35 @@ import (
 	"github.com/wneessen/go-mail"
 )
 
-type forgotPasswordEmail struct {
-	EmailAddress      string
-	ForgotPasswordUrl string
+type resetPasswordEmail struct {
+	EmailAddress string
+	Url          string
 }
 
-func sendForgotPasswordEmail(emailAddress, token string) error {
-	emailData := &forgotPasswordEmail{
-		EmailAddress:      emailAddress,
-		ForgotPasswordUrl: fmt.Sprintf("%s?token=%s", cfg.Account.ForgotPasswordUrlTemplate, token),
+func sendResetPasswordEmail(emailAddress, token string) error {
+	emailData := &resetPasswordEmail{
+		EmailAddress: emailAddress,
+		Url:          fmt.Sprintf("%s/%s", cfg.ResetPassword.ResetUrlTemplate, token),
 	}
 
-	plainBody, err := emailData.mergeTemplate("forgotPassword.gotext")
+	plainBody, err := emailData.mergeTemplate("resetPassword.gotext")
 	if err != nil {
 		return err
 	}
-	htmlBody, err := emailData.mergeTemplate("forgotPassword.gohtml")
+	htmlBody, err := emailData.mergeTemplate("resetPassword.gohtml")
 	if err != nil {
 		return err
 	}
 
 	msg := mail.NewMsg()
 	if err := msg.From(cfg.Registration.EmailFrom); err != nil {
-		return errors.Wrap(err, "failed to set from address in forgot password email")
+		return errors.Wrap(err, "failed to set from address in reset password email")
 	}
 	if err := msg.To(emailAddress); err != nil {
-		return errors.Wrap(err, "failed to set to address in forgot password email")
+		return errors.Wrap(err, "failed to set to address in reset password email")
 	}
 
-	msg.Subject("zrok Forgot Password")
+	msg.Subject("Password Reset Request")
 	msg.SetDate()
 	msg.SetMessageID()
 	msg.SetBulk()
@@ -56,17 +56,17 @@ func sendForgotPasswordEmail(emailAddress, token string) error {
 	)
 
 	if err != nil {
-		return errors.Wrap(err, "error creating forgot password email client")
+		return errors.Wrap(err, "error creating reset password email client")
 	}
 	if err := client.DialAndSend(msg); err != nil {
-		return errors.Wrap(err, "error sending forgot password email")
+		return errors.Wrap(err, "error sending reset password email")
 	}
 
-	logrus.Infof("forgot password email sent to '%v'", emailAddress)
+	logrus.Infof("reset password email sent to '%v'", emailAddress)
 	return nil
 }
 
-func (fpe forgotPasswordEmail) mergeTemplate(filename string) (string, error) {
+func (fpe resetPasswordEmail) mergeTemplate(filename string) (string, error) {
 	t, err := template.ParseFS(emailUi.FS, filename)
 	if err != nil {
 		return "", errors.Wrapf(err, "error parsing verification email template '%v'", filename)
