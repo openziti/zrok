@@ -1,6 +1,6 @@
 # v0.3.0-rc3 (WiP)
 
-CHANGE: Replaced un-salted sha512 password hashing with salted hashing based on Argon2 (https://github.com/openziti/zrok/issues/156)
+CHANGE: Replaced un-salted sha512 password hashing with salted hashing based on Argon2 **NOTE: This version will _invalidate_ all account passwords, and will require all users to use the 'Forgot Password?' function to reset their password.** (https://github.com/openziti/zrok/issues/156)
 
 # v0.3.0-rc2
 
