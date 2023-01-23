@@ -1,3 +1,7 @@
+# v0.3.0-rc3 (WiP)
+
+CHANGE: Replaced un-salted sha512 password hashing with salted hashing based on Argon2 (https://github.com/openziti/zrok/issues/156)
+
 # v0.3.0-rc2
 
 FEATURE: Allow users to reset their password (https://github.com/openziti/zrok/issues/65)
