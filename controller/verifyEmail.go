@@ -34,7 +34,7 @@ func sendVerificationEmail(emailAddress, token string) error {
 	}
 
 	msg := mail.NewMsg()
-	if err := msg.From(cfg.Registration.EmailFrom); err != nil {
+	if err := msg.From(cfg.Email.From); err != nil {
 		return errors.Wrap(err, "failed to set from address in verification email")
 	}
 	if err := msg.To(emailAddress); err != nil {

@@ -8,11 +8,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ConfigVersion = 1
+const ConfigVersion = 2
 
 type Config struct {
 	V             int
-	ResetPassword *ResetPasswordConfig
 	Admin         *AdminConfig
 	Endpoint      *EndpointConfig
 	Email         *EmailConfig
@@ -21,6 +20,7 @@ type Config struct {
 	Maintenance   *MaintenanceConfig
 	Metrics       *MetricsConfig
 	Registration  *RegistrationConfig
+	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
 	Ziti          *ZitiConfig
 }
@@ -39,10 +39,10 @@ type EmailConfig struct {
 	Port     int
 	Username string
 	Password string `cf:"+secret"`
+	From     string
 }
 
 type RegistrationConfig struct {
-	EmailFrom               string
 	RegistrationUrlTemplate string
 	TokenStrategy           string
 }
