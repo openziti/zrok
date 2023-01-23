@@ -37,7 +37,13 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 		logrus.Error(err)
 		return account.NewResetPasswordNotFound()
 	}
-	a.Password = hashPassword(params.Body.Password)
+	hpwd, err := hashPassword(params.Body.Password)
+	if err != nil {
+		logrus.Error(err)
+		return account.NewResetPasswordRequestInternalServerError()
+	}
+	a.Salt = hpwd.Salt
+	a.Password = hpwd.Password
 
 	if _, err := str.UpdateAccount(a, tx); err != nil {
 		logrus.Error(err)

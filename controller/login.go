@@ -26,7 +26,12 @@ func loginHandler(params account.LoginParams) middleware.Responder {
 		logrus.Errorf("error finding account '%v': %v", params.Body.Email, err)
 		return account.NewLoginUnauthorized()
 	}
-	if a.Password != hashPassword(params.Body.Password) {
+	hpwd, err := rehashPassword(params.Body.Password, a.Salt)
+	if err != nil {
+		logrus.Errorf("error hashing password for '%v': %v", params.Body.Email, err)
+		return account.NewLoginUnauthorized()
+	}
+	if a.Password != hpwd.Password {
 		logrus.Errorf("password mismatch for account '%v'", params.Body.Email)
 		return account.NewLoginUnauthorized()
 	}
