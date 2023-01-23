@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"crypto/sha512"
 	"crypto/x509"
-	"encoding/hex"
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
 	"github.com/openziti/edge/rest_management_api_client"
@@ -81,12 +79,6 @@ func createToken() (string, error) {
 		return "", err
 	}
 	return gen(), nil
-}
-
-func hashPassword(raw string) string {
-	hash := sha512.New()
-	hash.Write([]byte(raw))
-	return hex.EncodeToString(hash.Sum(nil))
 }
 
 func realRemoteAddress(req *http.Request) string {

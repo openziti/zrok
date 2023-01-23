@@ -38,9 +38,15 @@ func (self *registerHandler) Handle(params account.RegisterParams) middleware.Re
 		logrus.Error(err)
 		return account.NewRegisterInternalServerError()
 	}
+	hpwd, err := hashPassword(params.Body.Password)
+	if err != nil {
+		logrus.Error(err)
+		return account.NewRegisterInternalServerError()
+	}
 	a := &store.Account{
 		Email:    ar.Email,
-		Password: hashPassword(params.Body.Password),
+		Salt:     hpwd.Salt,
+		Password: hpwd.Password,
 		Token:    token,
 	}
 	if _, err := str.CreateAccount(a, tx); err != nil {

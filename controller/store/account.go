@@ -8,18 +8,19 @@ import (
 type Account struct {
 	Model
 	Email     string
+	Salt      string
 	Password  string
 	Token     string
 	Limitless bool
 }
 
 func (self *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into accounts (email, password, token, limitless) values ($1, $2, $3, $4) returning id")
+	stmt, err := tx.Prepare("insert into accounts (email, salt, password, token, limitless) values ($1, $2, $3, $4, $5) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(a.Email, a.Password, a.Token, a.Limitless).Scan(&id); err != nil {
+	if err := stmt.QueryRow(a.Email, a.Salt, a.Password, a.Token, a.Limitless).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing accounts insert statement")
 	}
 	return id, nil
@@ -50,12 +51,12 @@ func (self *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, er
 }
 
 func (self *Store) UpdateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("update accounts set email=$1, password=$2, token=$3, limitless=$4 where id = $5")
+	stmt, err := tx.Prepare("update accounts set email=$1, salt=$2, password=$3, token=$4, limitless=$5 where id = $6")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts update statement")
 	}
 	var id int
-	if _, err := stmt.Exec(a.Email, a.Password, a.Token, a.Limitless, a.Id); err != nil {
+	if _, err := stmt.Exec(a.Email, a.Salt, a.Password, a.Token, a.Limitless, a.Id); err != nil {
 		return 0, errors.Wrap(err, "error executing accounts update statement")
 	}
 	return id, nil
