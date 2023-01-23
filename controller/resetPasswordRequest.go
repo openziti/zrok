@@ -66,7 +66,7 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 			return account.NewResetPasswordRequestInternalServerError()
 		}
 	} else {
-		logrus.Errorf("'email', 'registration', and 'account' configuration missing; skipping reset password email")
+		logrus.Errorf("'email', 'registration', and 'reset_password' configuration missing; skipping reset password email")
 	}
 
 	logrus.Infof("reset password request for '%v' has token '%v'", params.Body.EmailAddress, prr.Token)
