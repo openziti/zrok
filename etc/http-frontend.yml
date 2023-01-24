@@ -1,1 +1,5 @@
+# Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
+# configured string. This will allow you to let a load balancer access the frontend by IP address for health check
+# purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
+#
 host_match: zrok.io
