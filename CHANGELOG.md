@@ -8,6 +8,8 @@ CHANGE: Replaced un-salted sha512 password hashing with salted hashing based on 
 
 CHANGE: Switched from `ubuntu-latest` (`22.04`) for the Linux builds to `ubuntu-20.04`. Should improve `glibc` compatibility with older Linux distributions (https://github.com/openziti/zrok/issues/179)
 
+CHANGE: `zrok admin generate` now outputs the generated tokens to `stdout` after successfully provisioning the tokens (https://github.com/openziti/zrok/issues/181)
+
 FIX: Fixed log message in `resetPasswordRequest.go` (https://github.com/openziti/zrok/issues/175)
 
 FIX: Fixed `-v` (verbose mode) on in TUI-based `zrok share` and `zrok access` (https://github.com/openziti/zrok/issues/174)
