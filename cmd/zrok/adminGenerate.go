@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/jaevor/go-nanoid"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -23,13 +22,13 @@ type adminGenerateCommand struct {
 func newAdminGenerateCommand() *adminGenerateCommand {
 	cmd := &cobra.Command{
 		Use:   "generate",
-		Short: "Generate invite tokens (default: 5)",
+		Short: "Generate invite tokens",
 		Args:  cobra.ExactArgs(0),
 	}
 	command := &adminGenerateCommand{cmd: cmd}
 	cmd.Run = command.run
 
-	cmd.Flags().IntVar(&command.amount, "amount", 5, "Amount of tokens to generate")
+	cmd.Flags().IntVarP(&command.amount, "count", "n", 5, "Number of tokens to generate")
 
 	return command
 }
@@ -67,7 +66,10 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	fmt.Printf("generated %d tokens\n", len(tokens))
+
+	for _, token := range tokens {
+		fmt.Println(token)
+	}
 }
 
 func createToken() (string, error) {
