@@ -10,6 +10,8 @@ CHANGE: Switched from `ubuntu-latest` (`22.04`) for the Linux builds to `ubuntu-
 
 FIX: Fixed log message in `resetPasswordRequest.go` (https://github.com/openziti/zrok/issues/175)
 
+FIX: Fixed `-v` (verbose mode) on in TUI-based `zrok share` and `zrok access` (https://github.com/openziti/zrok/issues/174)
+
 # v0.3.0-rc2
 
 FEATURE: Allow users to reset their password (https://github.com/openziti/zrok/issues/65)
