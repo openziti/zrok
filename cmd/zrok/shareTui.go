@@ -204,7 +204,7 @@ func (m *shareModel) Write(p []byte) (n int, err error) {
 	lines := strings.Split(in, "\n")
 	for _, line := range lines {
 		cleanLine := strings.ReplaceAll(line, "\n", "")
-		if cleanLine != "" {
+		if cleanLine != "" && m.prg != nil {
 			m.prg.Send(shareLogLine(cleanLine))
 		}
 	}
