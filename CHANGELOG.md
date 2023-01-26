@@ -1,4 +1,8 @@
-# v0.3.0-rc3 (WiP)
+# v0.3.0-rc4
+
+CHANGE: Enable notarization for macos binaries (https://github.com/openziti/zrok/issues/92)
+
+# v0.3.0-rc3
 
 > This release increments the configuration version from `1` to `2`. See the note below.
 
