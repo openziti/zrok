@@ -28,7 +28,7 @@ Combine this kind of resource sharing with our private sharing model, and you've
 
 We're still just getting started on building out these aspects of `zrok`. But as of this writing, `zrok` already provides built-in single-command file sharing. Combine this with private sharing and you can see this powerful model in action today.
 
-## zrok.io; Production zrok
+## Production zrok
 
 [NetFoundry](https://netfoundry.io) is offering [zrok.io](https://zrok.io), a managed `zrok` service instance you can use to try out `zrok` and even run small production workloads. This service is currently in limited beta and is available through an invitation process. Visit [zrok.io](https://zrok.io) for details about requesting an invite.
 
