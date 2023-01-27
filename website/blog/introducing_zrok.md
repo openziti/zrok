@@ -1,6 +1,6 @@
 # Introducing zrok
 
-I'm fortunate that I've had the opportunity to work on many interesting projects throughout my career. I was one of the original developers who broke ground on the [OpenZiti](https://github.com/openziti/ziti) project back in 2017. Most of my work on OpenZiti centered on the [fabric](https://github.com/openziti/fabric), data and control plane design, and designing abstractions that would support a lot of what became the "edge" layers. It's been quite exciting to watch OpenZiti blossom and grow into what it's becoming. 
+I'm fortunate that I've had the opportunity to work on many interesting projects throughout my career. I was one of the original developers who broke ground on the [OpenZiti](https://github.com/openziti/ziti) project back in 2017. Most of my work on OpenZiti centered on the [fabric](https://github.com/openziti/fabric), data and control plane design, and designing abstractions that would support a lot of what became the "edge" layers. It's been quite exciting to watch OpenZiti blossom and grow. 
 
 For the last six months, I've had the opportunity to re-approach the world of zero-trust and next-generation networking from the other side of the stack. Instead of working in the lowest layers of protocols and abstractions, I'm working from the perspective of end users and enabling an amazing end-user experience. I'm excited to introduce you to a new set of tools designed to empower end users at the network edge to seamlessly and transparently share resources. Imagine network sharing that is equally secure and transparent.
 
