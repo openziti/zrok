@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Zrok',
-  staticDirectories: ['website/static', 'docs/images'],
+  staticDirectories: ['static', '../docs/images'],
   tagline: 'Globally distributed reverse proxy',
   url: 'https://zrok.io',
   baseUrl: '/',
@@ -37,16 +37,17 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: require.resolve('./website/sidebars.js'),
+          sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
             'https://github.com/openziti/zrok/tree/main/',
-          path: './docs',
+          path: '../docs',
+          include: ['**/*.md', '**/*.mdx', '**/*.svg', '**/*.png'],
         },
         theme: {
-          customCss: require.resolve('./website/src/css/custom.css'),
+          customCss: require.resolve('./src/css/custom.css'),
         },
         pages: {
-          path: './website/src/pages'
+          path: './src/pages'
         },
         // googleAnalytics: {
         //
