@@ -4,28 +4,33 @@
  * work well for content-centric websites.
  */
 
+ /* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #3e2693;
+  --ifm-color-primary-dark: #372284;
+  --ifm-color-primary-darker: #2c196e;
+  --ifm-color-primary-darkest: #211158;
+  --ifm-color-primary-light: #3e2693;
+  --ifm-color-primary-lighter: #5a3cc2;
+  --ifm-color-primary-lightest: #6747d9;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-menu-color: #252525;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #9bf316;
+  --ifm-color-primary-dark: #8cdb14;
+  --ifm-color-primary-darker: #80c814;
+  --ifm-color-primary-darkest: #70b409;
+  --ifm-color-primary-light: #9bf316;
+  --ifm-color-primary-lighter: #9af90a;
+  --ifm-color-primary-lightest: #99ff00;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
@@ -45,4 +50,102 @@
 .main-wrapper {
   display: flex;
   flex-direction: column;
+}
+
+[data-theme='dark'] {
+  --ifm-navbar-background-color: #0d0235;
+  --ifm-background-color: unset;
+  --ifm-link-color: #9bf316;
+  --ifm-menu-color: #ffffff;
+  
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #0d0235;
+}
+
+[data-theme='dark'] 
+#__docusaurus {
+  background: linear-gradient(180deg, rgba(14,2,56,1) 0%, rgba(35,16,105,1) 100%);
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background-color: rgba(62,38,147,.1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ifm-heading-color);
+  font-family: 'Russo One', sans-serif;
+  font-weight: 400;
+  line-height: var(--ifm-heading-line-height);
+  margin: var(--ifm-heading-margin-top) 0 var(--ifm-heading-margin-bottom) 0;
+}
+
+p {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 400;
+}
+
+html {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 400;
+  letter-spacing: 1;
+}
+
+.menu__link {
+    color: #252525;
+    font-weight: 600;
+}
+
+[data-theme='dark']
+.menu__link {
+    color: #ffffff;
+}
+
+.navbar__link:hover, .navbar__link--active {
+   font-weight: 600;
+}
+
+code {
+  vertical-align: middle;
+  word-wrap: break-word;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 800;
+  white-space: break-spaces;
+  background-color: #f2f2f2;
+  color: #ff0048;
+  border-radius: 6px;
+  border-width: 0px;
+  border-color: rgba(240, 240, 240, 1);
+}
+
+[data-theme='dark']
+pre {
+  background-color: #0b0031;
+}
+
+[data-theme='dark']
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #ffffff;
+}
+
+[data-theme='dark']
+.docSidebarContainer_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-Sidebar-styles-module {
+    border-right: 1px solid #9bf316;
+}
+[data-theme='dark']
+.table-of-contents__left-border {
+    border-left: 1px solid #9bf316;
+}
+
+a code {
+    color: #ff0048;
 }

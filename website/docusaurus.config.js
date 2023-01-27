@@ -65,8 +65,9 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      
       navbar: {
-        title: 'Zrok',
+        title: 'zrok',
         logo: {
           alt: 'Ziggy Goes to Space',
           src: 'img/space-ziggy.png',
@@ -94,6 +95,11 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
       },
     }),
 };
