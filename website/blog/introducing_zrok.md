@@ -6,7 +6,7 @@ For the last six months, I've had the opportunity to re-approach the world of ze
 
 This new project is called... `zrok`.
 
-`zrok` focuses on streamlining sharing for both developers and less technical users alike. `zrok` takes inspiration from several other offerings that focus on streamlining developer endpoint sharing. Starting from that recipe, `zrok` adds powerful capabilities that are made possible by building on the foundation provided by OpenZiti. 
+`zrok` focuses on streamlining sharing for both developers and end users alike. `zrok` takes inspiration from several other offerings that streamline developer endpoint sharing. Starting from that recipe, `zrok` adds powerful capabilities that are made possible by building on the foundation provided by OpenZiti.
 
 Here are some of the things that make `zrok` different...
 
