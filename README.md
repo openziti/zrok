@@ -35,3 +35,12 @@ See the [Concepts and Getting Started Guide](docs/v0.3_getting_started/getting_s
 The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add a Ziti network and you're up and running.
 
 See the [v0.3 Quick Start](docs/v0.3_quickstart.md) for details on getting your own `zrok` service instance running. This builds on top of the [Ziti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have you running a `zrok` service instance in minutes.
+
+## Building
+
+If you are interested in building `zrok` for yourself instead of using a released package, please rerfer to [BUILD.md](./BUIlD.md)
+
+## Contributing
+
+If you'd like to contribute back to `zrok`, that'd be great. Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) page and
+abide by the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
