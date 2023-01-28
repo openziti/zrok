@@ -41,7 +41,7 @@ const config = {
           editUrl:
             'https://github.com/openziti/zrok/tree/main/',
           path: '../docs',
-          include: ['**/*.md', '**/*.mdx', '**/*.svg', '**/*.png'],
+          include: ['**/*.md', '**/*.mdx'],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
