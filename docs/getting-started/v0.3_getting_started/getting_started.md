@@ -1,6 +1,6 @@
 # Getting Started with zrok v0.3
 
-`zrok` is a next-generation sharing platform built on top of [Ziti][openziti], a programmable zero trust network overlay. `zrok` is a _Ziti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [OpenZiti][https://github.com/openziti/ziti/stargazers], a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing resources publicly and privately with an audience of your choosing.
 
@@ -156,7 +156,7 @@ Congratulations! Your `zrok` account is ready to go!
 
 When your `zrok` account was created, the service generated a _secret token_ that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
 
-When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the Ziti network hosting the `zrok` service.
+When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the OpenZiti network hosting the `zrok` service.
 
 From the web console, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
 
@@ -271,7 +271,7 @@ The `zrok` service will respond with the following:
 access your share with: zrok access private wvszln4dyz9q
 ```
 
-Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying Ziti network, and can only be accessed using the `zrok access` command.
+Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying OpenZiti network, and can only be accessed using the `zrok access` command.
 
 The `zrok access private wvszln4dyz9q` command can be run by any `zrok` user, allowing them to create and bind a local HTTP listener, that allows for private access to your shared resources.
 

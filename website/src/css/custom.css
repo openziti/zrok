@@ -40,7 +40,7 @@
   --ifm-color-primary-lightest: #99ff00;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --code-background-color: rgba(76, 55, 123, 0.53);
-  --code-font-color: rgb(197, 160, 247);
+  --code-font-color: rgb(205, 180, 247);
   --selection-color: #0f023b;
 }
 
@@ -160,7 +160,7 @@ h6 {
 }
 
 a code {
-    color: rgb(167, 130, 217);
+    color: var(--code-font-color);
 }
 ::-moz-selection { /* Code for Firefox */
   color: var(--selection-font-color);

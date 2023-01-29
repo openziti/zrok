@@ -1,10 +1,10 @@
 # Reserved Services
 
-The `v0.3` series introduces a concept of "reserving" services. The intention is that the `zrok` control plane will support limits on the number of reserved services (and eventually `frontend`instances) that an account is allowed to utilize. Service reservations could also be time-limited, or possibly even bandwidth-limited (the reservation expires after a bandwidth threshold is crossed).
+With v0.3, `zrok` introduced a concept of "reserving" services. The intention is that the `zrok` control plane will support limits on the number of reserved services (and eventually `frontend`instances) that an account is allowed to utilize. Service reservations could also be time-limited, or possibly even bandwidth-limited (the reservation expires after a bandwidth threshold is crossed).
 
 ## Reserved Services Example
 
-`v0.3` introduces the `zrok reserve` command:
+With v0.3 `zrok` introduced the `zrok reserve` command:
 
 ```
 $ zrok reserve private http://localhost:9090

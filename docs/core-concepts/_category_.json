@@ -1,8 +1,7 @@
 {
-  "label": "Core Concepts",
+  "label": "Sharing",
   "position": 10,
   "link": {
     "type": "generated-index",
-    "title": "Tutorial overview"
   }
 }
