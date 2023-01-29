@@ -1,7 +1,8 @@
 ---
 sidebar_position: 0
+sidebar_label: What is zrok
 ---
-# What is zrok
+# What is `zrok`
 
 ## Overview
 

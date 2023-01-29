@@ -24,6 +24,9 @@
   --code-font-color: #252525;
   --selection-font-color: #0f023b;
   --selection-background: #9BF316;
+  --ifm-menu-color-background-hover: #6747d955;
+  --ifm-menu-color-background-active: #FF0;
+  --sidebar-selected: #6747d955;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -37,7 +40,7 @@
   --ifm-color-primary-lightest: #99ff00;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --code-background-color: rgba(76, 55, 123, 0.53);
-  --code-font-color: rgb(167, 130, 217);
+  --code-font-color: rgb(197, 160, 247);
   --selection-color: #0f023b;
 }
 
@@ -77,7 +80,7 @@
 }
 
 .menu__link--active:not(.menu__link--sublist) {
-  background-color: rgba(62,38,147,.1);
+  background-color: var(--sidebar-selected);
 }
 
 h1, h2, h3, h4, h5, h6 {

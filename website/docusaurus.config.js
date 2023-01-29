@@ -87,7 +87,7 @@ const config = {
           },
           {
             type: 'doc',
-            docId: 'overview',
+            docId: 'downloads',
             position: 'right',
             label: 'Downloads',
           },
