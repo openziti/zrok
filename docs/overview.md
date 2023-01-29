@@ -1,6 +1,9 @@
-# zrok v0.1.x
+---
+sidebar_position: 0
+---
+# What is zrok
 
-## What Is `zrok`?
+## Overview
 
 `zrok` is a super-lightweight tool for providing on-demand access to dark, unreachable resources. 
 The super-power of `zrok` is providing a single-step solution to creating ephemeral network connectivity. From an end-user perspective, `zrok` is a tool packaged as a single executable, which can be used as a "shim" to quickly create public endpoints for dark resources.

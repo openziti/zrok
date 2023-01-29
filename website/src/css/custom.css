@@ -20,6 +20,10 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-menu-color: #252525;
+  --code-background-color: rgba(62,38,147,.1);
+  --code-font-color: #252525;
+  --selection-font-color: #0f023b;
+  --selection-background: #9BF316;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -32,6 +36,9 @@
   --ifm-color-primary-lighter: #9af90a;
   --ifm-color-primary-lightest: #99ff00;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --code-background-color: rgba(76, 55, 123, 0.53);
+  --code-font-color: rgb(167, 130, 217);
+  --selection-color: #0f023b;
 }
 
 @media (min-width: 1416px) {
@@ -56,17 +63,17 @@
   --ifm-navbar-background-color: #0d0235;
   --ifm-background-color: unset;
   --ifm-link-color: #9bf316;
-  --ifm-menu-color: #ffffff;
-  
+  --ifm-menu-color: #FFFFFFD4;
+
 }
 
 .footer--dark {
   --ifm-footer-background-color: #0d0235;
 }
 
-[data-theme='dark'] 
+[data-theme='dark']
 #__docusaurus {
-  background: linear-gradient(180deg, rgba(14,2,56,1) 0%, rgba(35,16,105,1) 100%);
+  background: linear-gradient(180deg, rgba(20,12,66,1) 0%, rgba(35,16,105,1) 100%);
 }
 
 .menu__link--active:not(.menu__link--sublist) {
@@ -99,7 +106,7 @@ html {
 
 [data-theme='dark']
 .menu__link {
-    color: #ffffff;
+    color: #FFFFFFD4;
 }
 
 .navbar__link:hover, .navbar__link--active {
@@ -116,10 +123,13 @@ code {
   font-weight: 800;
   white-space: break-spaces;
   background-color: #f2f2f2;
-  color: #ff0048;
+  color2: rgb(167, 130, 217);
+  color: var(--code-font-color);
   border-radius: 6px;
   border-width: 0px;
-  border-color: rgba(240, 240, 240, 1);
+  border-color: var(--code-background-color);
+  background-color2: rgba(76, 55, 123, 0.53);
+  background-color: var(--code-background-color);
 }
 
 [data-theme='dark']
@@ -134,7 +144,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #ffffff;
+  color: var(--ifm-heading-color);
 }
 
 [data-theme='dark']
@@ -147,5 +157,14 @@ h6 {
 }
 
 a code {
-    color: #ff0048;
+    color: rgb(167, 130, 217);
+}
+::-moz-selection { /* Code for Firefox */
+  color: var(--selection-font-color);
+  background: var(--selection-background);
+}
+
+::selection {
+  color: var(--selection-font-color);
+  background: var(--selection-background);
 }

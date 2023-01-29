@@ -124,12 +124,12 @@ $ zrok invite
 
 enter and confirm your email address...
 
-> michael.quigley@netfoundry.io 
-> michael.quigley@netfoundry.io 
+> user@domain.com
+> user@domain.com
 
 [ Submit ]
 
-invitation sent to 'michael.quigley@netfoundry.io'!
+invitation sent to 'user@domain.com'!
 ```
 
 The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
@@ -366,7 +366,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting a Service Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../v0.3_self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../../guides/v0.3_self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"

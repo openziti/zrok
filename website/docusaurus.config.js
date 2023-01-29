@@ -75,9 +75,21 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'index',
-            position: 'left',
+            docId: 'overview',
+            position: 'right',
+            label: 'What is zrok?',
+          },
+          {
+            type: 'doc',
+            docId: 'overview',
+            position: 'right',
             label: 'Docs',
+          },
+          {
+            type: 'doc',
+            docId: 'overview',
+            position: 'right',
+            label: 'Downloads',
           },
           {
             href: 'https://github.com/openziti/zrok',
