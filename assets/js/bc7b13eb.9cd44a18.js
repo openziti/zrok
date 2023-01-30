@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[448],{2925:e=>{e.exports=JSON.parse('{"title":"Sharing","slug":"/category/sharing","permalink":"/docs/category/sharing","navigation":{"previous":{"title":"What is zrok","permalink":"/docs/overview"},"next":{"title":"Reserved Services","permalink":"/docs/core-concepts/reserved_services"}}}')}}]);
