@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/edge/rest_util"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -22,6 +23,7 @@ func newZrokAuthenticator(cfg *Config) *zrokAuthenticator {
 func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Principal, error) {
 	tx, err := str.Begin()
 	if err != nil {
+		logrus.Errorf("error starting transaction for '%v': %v", token, err)
 		return nil, err
 	}
 	defer func() { _ = tx.Rollback() }()
@@ -49,6 +51,7 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 		}
 
 		// no match
+		logrus.Warnf("invalid api key '%v'", token)
 		return nil, errors2.New(401, "invalid api key")
 	}
 }
