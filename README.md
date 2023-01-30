@@ -1,6 +1,6 @@
 ![zrok](docs/images/zrok.png)
 
-`zrok` is a next-generation sharing platform built on top of [Ziti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing resources both publicly and privately, exposing them to an audience you can easily control.
 
@@ -24,7 +24,7 @@ You can be up and sharing using the `zrok.io` service in minutes. Here is a syno
 
 * `zrok share` to share resources immediately, simply and securely
 
-See the [Concepts and Getting Started Guide](docs/v0.3_getting_started/getting_started.md) for a full overview.
+See the [Concepts and Getting Started Guide](docs/getting-started/getting_started.md) for a full overview.
 
 ## Self-Hosting
 
@@ -32,6 +32,15 @@ See the [Concepts and Getting Started Guide](docs/v0.3_getting_started/getting_s
 
 `zrok` is also designed to scale down to support extremely small deployments. Run an OpenZiti network with `zrok` layered on top of it on a Raspberry Pi!
 
-The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add a Ziti network and you're up and running.
+The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add an OpenZiti network and you're up and running.
 
-See the [v0.3 Quick Start](docs/v0.3_quickstart.md) for details on getting your own `zrok` service instance running. This builds on top of the [Ziti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have you running a `zrok` service instance in minutes.
+See the [Quick Start](docs/v0.3_quickstart.md) for details on getting your own `zrok` service instance running. This builds on top of the [OpenZiti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have you running a `zrok` service instance in minutes.
+
+## Building
+
+If you are interested in building `zrok` for yourself instead of using a released package, please rerfer to [BUILD.md](./BUIlD.md)
+
+## Contributing
+
+If you'd like to contribute back to `zrok`, that'd be great. Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) page and
+abide by the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).

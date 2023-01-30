@@ -1,0 +1,173 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+ /* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #3e2693;
+  --ifm-color-primary-dark: #372284;
+  --ifm-color-primary-darker: #2c196e;
+  --ifm-color-primary-darkest: #211158;
+  --ifm-color-primary-light: #3e2693;
+  --ifm-color-primary-lighter: #5a3cc2;
+  --ifm-color-primary-lightest: #6747d9;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-menu-color: #252525;
+  --code-background-color: rgba(62,38,147,.1);
+  --code-font-color: #252525;
+  --selection-font-color: #0f023b;
+  --selection-background: #9BF316;
+  --ifm-menu-color-background-hover: #6747d955;
+  --ifm-menu-color-background-active: #FF0;
+  --sidebar-selected: #6747d955;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #9bf316;
+  --ifm-color-primary-dark: #8cdb14;
+  --ifm-color-primary-darker: #80c814;
+  --ifm-color-primary-darkest: #70b409;
+  --ifm-color-primary-light: #9bf316;
+  --ifm-color-primary-lighter: #9af90a;
+  --ifm-color-primary-lightest: #99ff00;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --code-background-color: rgba(76, 55, 123, 0.53);
+  --code-font-color: rgb(205, 180, 247);
+  --selection-color: #0f023b;
+}
+
+@media (min-width: 1416px) {
+  .main-wrapper {
+    align-self: center;
+    max-width: 1400px;
+    width: 1400px;
+  }
+}
+
+.navbar .navbar__inner {
+  margin: 0 auto;
+  max-width: 1360px;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-theme='dark'] {
+  --ifm-navbar-background-color: #0d0235;
+  --ifm-background-color: unset;
+  --ifm-link-color: #9bf316;
+  --ifm-menu-color: #FFFFFFD4;
+
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #0d0235;
+}
+
+[data-theme='dark']
+#__docusaurus {
+  background: linear-gradient(180deg, rgba(20,12,66,1) 0%, rgba(35,16,105,1) 100%);
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background-color: var(--sidebar-selected);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ifm-heading-color);
+  font-family: 'Russo One', sans-serif;
+  font-weight: 400;
+  line-height: var(--ifm-heading-line-height);
+  margin: var(--ifm-heading-margin-top) 0 var(--ifm-heading-margin-bottom) 0;
+}
+
+p {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 400;
+}
+
+html {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 400;
+  letter-spacing: 1;
+}
+
+.menu__link {
+    color: #252525;
+    font-weight: 600;
+}
+
+[data-theme='dark']
+.menu__link {
+    color: #FFFFFFD4;
+}
+
+.navbar__link:hover, .navbar__link--active {
+   font-weight: 600;
+}
+
+code {
+  vertical-align: middle;
+  word-wrap: break-word;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-weight: 800;
+  white-space: break-spaces;
+  background-color: #f2f2f2;
+  color2: rgb(167, 130, 217);
+  color: var(--code-font-color);
+  border-radius: 6px;
+  border-width: 0px;
+  border-color: var(--code-background-color);
+  background-color2: rgba(76, 55, 123, 0.53);
+  background-color: var(--code-background-color);
+}
+
+[data-theme='dark']
+pre {
+  background-color: #0b0031;
+}
+
+[data-theme='dark']
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ifm-heading-color);
+}
+
+[data-theme='dark']
+.docSidebarContainer_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-Sidebar-styles-module {
+    border-right: 1px solid #9bf316;
+}
+[data-theme='dark']
+.table-of-contents__left-border {
+    border-left: 1px solid #9bf316;
+}
+
+a code {
+    color: var(--code-font-color);
+}
+::-moz-selection { /* Code for Firefox */
+  color: var(--selection-font-color);
+  background: var(--selection-background);
+}
+
+::selection {
+  color: var(--selection-font-color);
+  background: var(--selection-background);
+}

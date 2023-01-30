@@ -1,6 +1,6 @@
-# Getting Started with zrok v0.3
+# Getting Started with zrok
 
-`zrok` is a next-generation sharing platform built on top of [Ziti][openziti], a programmable zero trust network overlay. `zrok` is a _Ziti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://github.com/openziti/ziti/stargazers), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing resources publicly and privately with an audience of your choosing.
 
@@ -13,7 +13,7 @@ Let's take a look at how to get started with `zrok`.
 
 ## Downloading zrok
 
-In order to use `zrok`, you will need a `zrok` executable. [Download][zrok-download] a binary executable package for your platform at https://zrok.io.
+In order to use `zrok`, you will need a `zrok` executable. [Download](../downloads.md) a binary executable package for your platform at https://zrok.io.
 
 > Releases are also available from the `zrok` project repository on Github: https://github.com/openziti/zrok
 
@@ -124,12 +124,12 @@ $ zrok invite
 
 enter and confirm your email address...
 
-> michael.quigley@netfoundry.io 
-> michael.quigley@netfoundry.io 
+> user@domain.com
+> user@domain.com
 
 [ Submit ]
 
-invitation sent to 'michael.quigley@netfoundry.io'!
+invitation sent to 'user@domain.com'!
 ```
 
 The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
@@ -156,7 +156,7 @@ Congratulations! Your `zrok` account is ready to go!
 
 When your `zrok` account was created, the service generated a _secret token_ that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
 
-When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the Ziti network hosting the `zrok` service.
+When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the OpenZiti network hosting the `zrok` service.
 
 From the web console, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
 
@@ -271,7 +271,7 @@ The `zrok` service will respond with the following:
 access your share with: zrok access private wvszln4dyz9q
 ```
 
-Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying Ziti network, and can only be accessed using the `zrok access` command.
+Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying OpenZiti network, and can only be accessed using the `zrok access` command.
 
 The `zrok access private wvszln4dyz9q` command can be run by any `zrok` user, allowing them to create and bind a local HTTP listener, that allows for private access to your shared resources.
 
@@ -366,7 +366,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting a Service Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../v0.3_self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../guides/v0.3_self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"
