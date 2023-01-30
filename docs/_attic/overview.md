@@ -41,7 +41,7 @@ This URL can be shared with anyone, anywhere, allowing access to the developer's
 
 At a high level, the `zrok` stack looks like this:
 
-![zrok v0.1 overview](images/zrok_v0.1_overview.png)
+![zrok v0.1 overview](../images/zrok_v0.1_overview.png)
 
 Let's discuss a couple of the flows through the above use case and talk about what's happening.
 
