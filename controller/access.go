@@ -18,7 +18,7 @@ func newAccessHandler() *accessHandler {
 func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
@@ -62,7 +62,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	}
 
 	if _, err := str.CreateFrontend(envId, &store.Frontend{Token: feToken, ZId: envZId}, tx); err != nil {
-		logrus.Errorf("error creating frontend record: %v", err)
+		logrus.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 
@@ -77,7 +77,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		"zrokShareToken":     shrToken,
 	}
 	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+sshr.ZId+"-dial", sshr.ZId, []string{envZId}, addlTags, edge); err != nil {
-		logrus.Errorf("unable to create dial policy: %v", err)
+		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 

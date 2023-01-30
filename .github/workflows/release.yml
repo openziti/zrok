@@ -47,6 +47,47 @@ jobs:
           name: release-builds
           path: ./dist/*.gz
 
+  build-linux-arm:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: sudo apt-get install gcc-arm-linux-gnueabi
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - run: git fetch --force --tags
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.19.3'
+          cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - run: npm install
+        working-directory: ui
+
+      - run: npm run build
+        working-directory: ui
+        env:
+          CI: ""
+
+      - uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --skip-publish --config .goreleaser-linux-arm.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: release-builds
+          path: ./dist/*.gz
+
   build-darwin:
     runs-on: macos-latest
     steps:
@@ -140,7 +181,7 @@ jobs:
           path: ./dist/*.gz
 
   publish-release:
-    needs: [build-linux, build-darwin, build-windows]
+    needs: [build-linux, build-linux-arm, build-darwin, build-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

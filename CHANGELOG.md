@@ -1,4 +1,14 @@
-# v0.3.0-rc3 (WiP)
+# v0.3.0-rc5
+
+CHANGE: Improvements to controller log messages to assist in operations (https://github.com/openziti/zrok/issues/186)
+
+CHANGE: `armv7` builds for Linux are now shipped with releases; these builds were tested against a Raspberry Pi 4 (https://github.com/openziti/zrok/issues/93)
+
+# v0.3.0-rc4
+
+CHANGE: Enable notarization for macos binaries (https://github.com/openziti/zrok/issues/92)
+
+# v0.3.0-rc3
 
 > This release increments the configuration version from `1` to `2`. See the note below.
 

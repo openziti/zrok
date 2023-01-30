@@ -22,47 +22,47 @@ func newDisableHandler() *disableHandler {
 func (h *disableHandler) Handle(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 	envId, err := h.checkZitiIdentity(params.Body.Identity, principal, tx)
 	if err != nil {
-		logrus.Errorf("identity check failed: %v", err)
+		logrus.Errorf("identity check failed for user '%v': %v", principal.Email, err)
 		return environment.NewDisableUnauthorized()
 	}
 	env, err := str.GetEnvironment(envId, tx)
 	if err != nil {
-		logrus.Errorf("error getting environment: %v", err)
+		logrus.Errorf("error getting environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	edge, err := edgeClient()
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := h.removeSharesForEnvironment(envId, tx, edge); err != nil {
-		logrus.Errorf("error removing shares for environment: %v", err)
+		logrus.Errorf("error removing shares for environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := h.removeFrontendsForEnvironment(envId, tx, edge); err != nil {
-		logrus.Errorf("error removing frontends for environment: %v", err)
+		logrus.Errorf("error removing frontends for environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := h.removeEnvironment(envId, tx); err != nil {
-		logrus.Errorf("error removing environment: %v", err)
+		logrus.Errorf("error removing environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
-		logrus.Errorf("error deleting edge router policy: %v", err)
+		logrus.Errorf("error deleting edge router policy for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := zrokEdgeSdk.DeleteIdentity(params.Body.Identity, edge); err != nil {
-		logrus.Errorf("error deleting identity: %v", err)
+		logrus.Errorf("error deleting identity for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing: %v", err)
+		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
 	}
 	return environment.NewDisableOK()
 }
