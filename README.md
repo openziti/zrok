@@ -1,6 +1,6 @@
 ![zrok](docs/images/zrok.png)
 
-`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is an _OpenZiti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io), a programmable zero-trust network overlay. `zrok` is an OpenZiti _Native Application_.
 
 `zrok` facilitates sharing resources both publicly and privately, exposing them to an audience you can easily control.
 
@@ -38,7 +38,7 @@ See the [Quick Start](docs/getting-started/getting_started.md) for details on ge
 
 ## Building
 
-If you are interested in building `zrok` for yourself instead of using a released package, please rerfer to [BUILD.md](./BUILD.md)
+If you are interested in building `zrok` for yourself instead of using a released package, please refer to [BUILD.md](./BUILD.md)
 
 ## Contributing
 
