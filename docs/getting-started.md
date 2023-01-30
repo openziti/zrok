@@ -82,7 +82,9 @@ v0.3.0-rc1 [0d43b55]
 
 ## Configure Your zrok Service Instance
 
-> NOTE: This section can be safely skipped if you're only interested in using the `zrok` service instance at `zrok.io`. This section only applies to users who want to interact with a non-default service instance. Otherwise you can skip to "Generating an Invitation" below.
+> NOTE: Most users can safely skip this section and proceed to "Generating an Inviation" below.
+>
+> This section is relevant if you want to use the `zrok` CLI with an alternate service instance (in the case of self-hosting, etc.).
 
 `zrok` is both an installable utility that you interact with from your local computer, and also a _service_ that exists on the network. NetFoundry operates the public _service instance_ that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service instance.
 
