@@ -2,6 +2,8 @@
 
 CHANGE: Prevent multiple `zrok enable` commands from succeeding (https://github.com/openziti/zrok/issues/190)
 
+CHANGE: New `--insecure` flag for `share <public|private|reserved>` commands (https://github.com/openziti/zrok/issues/195)
+
 # v0.3.0-rc5
 
 CHANGE: Improvements to controller log messages to assist in operations (https://github.com/openziti/zrok/issues/186)
