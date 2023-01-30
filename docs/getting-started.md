@@ -16,9 +16,7 @@ Let's take a look at how to get started with `zrok`.
 
 ## Downloading zrok
 
-In order to use `zrok`, you will need a `zrok` executable. [Download](downloads.md) a binary executable package for your platform at https://zrok.io.
-
-> Releases are also available from the `zrok` project repository on Github: https://github.com/openziti/zrok
+Releases are also available from the `zrok` project repository on Github: https://github.com/openziti/zrok/releases
 
 ### Extract zrok Distribution
 
@@ -124,7 +122,9 @@ The `zrok status` command shows the configured API service that your environment
 
 In order to create an account with the `zrok` service instance, you will need to create an invitation. 
 
-> Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
+:::note
+Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
+:::
 
 We generate an invitation with the `zrok invite` command:
 
@@ -212,7 +212,9 @@ If we return to the _web console_, we'll now see the new environment reflected i
 
 In my case, the environment is named `michael@ziti-lx`, which is the username of my shell and the hostname of the system the shell is running on.
 
-> Should you want to use a non-default name for your environment, you can pass the `-d` option to the `zrok enable` command. See `zrok enable --help` for details.
+:::note
+Should you want to use a non-default name for your environment, you can pass the `-d` option to the `zrok enable` command. See `zrok enable --help` for details.
+:::
 
 If you click on the environment node in the explorer in the _web console_, the details panel shown at the bottom of the page will change:
 
