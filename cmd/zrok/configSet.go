@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"os"
@@ -54,5 +55,8 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 		fmt.Println("zrok configuration updated")
+		if zrd.Env != nil && configName == "apiEndpoint" {
+			fmt.Printf("\n[%v]: because you have a %v-d environment, you won't see your config change until you run %v first!\n\n", tui.WarningLabel, tui.Code.Render("zrok enable"), tui.Code.Render("zrok disable"))
+		}
 	}
 }
