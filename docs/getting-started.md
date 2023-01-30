@@ -116,7 +116,9 @@ Config:
 To create a local environment use the zrok enable command.
 ```
 
-> The `WARNING` about being `unable to load your local environment` will go away once you've successfully enabled (`zrok enable`) for your shell (we'll get to that below). For now, this warning is ignorable.
+:::note
+The `WARNING` about being `unable to load your local environment` will go away once you've successfully enabled (`zrok enable`) for your shell (we'll get to that below). For now, this warning is ignorable.
+:::
 
 The `zrok status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
 
