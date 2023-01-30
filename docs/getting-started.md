@@ -82,7 +82,7 @@ v0.3.0-rc1 [0d43b55]
 
 ## Configure Your zrok Service Instance
 
-> NOTE: Most users can safely skip this section and proceed to "Generating an Inviation" below.
+> NOTE: Most users can safely skip this section and proceed to "Generating an Invitation" below.
 >
 > This section is relevant if you want to use the `zrok` CLI with an alternate service instance (in the case of self-hosting, etc.).
 
