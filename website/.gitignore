@@ -1,9 +1,3 @@
-.$*
-.idea
-*.db
-automated-release-build
-etc/dev.yml
-
 # Dependencies
 /node_modules
 
@@ -25,3 +19,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+.yarn
