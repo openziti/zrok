@@ -3,7 +3,7 @@ name: Deploy Doc Site
 on:
   push:
     branches:
-      - docusaurus-site-from-root
+      - main
 
 jobs:
   build:
