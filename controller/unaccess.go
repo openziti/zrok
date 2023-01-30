@@ -7,7 +7,6 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,8 +44,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 			}
 		}
 		if senv == nil {
-			err := errors.Errorf("environment with id '%v' not found for '%v", envZId, principal.Email)
-			logrus.Error(err)
+			logrus.Errorf("environment with id '%v' not found for '%v", envZId, principal.Email)
 			return share.NewUnaccessUnauthorized()
 		}
 	} else {
@@ -56,7 +54,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 
 	sfe, err := str.FindFrontendWithToken(feToken, tx)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error finding frontend for '%v': %v", principal.Email, err)
 		return share.NewUnaccessInternalServerError()
 	}
 

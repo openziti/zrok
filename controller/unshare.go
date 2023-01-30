@@ -24,20 +24,20 @@ func newUnshareHandler() *unshareHandler {
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	edge, err := edgeClient()
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 	shrToken := params.Body.ShrToken
 	shrZId, err := h.findShareZId(shrToken, edge)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error finding share identity for '%v' (%v): %v", shrToken, principal.Email, err)
 		return share.NewUnshareNotFound()
 	}
 	var senv *store.Environment
@@ -49,8 +49,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 			}
 		}
 		if senv == nil {
-			err := errors.Errorf("environment with id '%v' not found for '%v", params.Body.EnvZID, principal.Email)
-			logrus.Error(err)
+			logrus.Errorf("environment with id '%v' not found for '%v", params.Body.EnvZID, principal.Email)
 			return share.NewUnshareNotFound()
 		}
 	} else {
@@ -67,8 +66,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 			}
 		}
 		if sshr == nil {
-			err := errors.Errorf("share with id '%v' not found for '%v'", shrZId, principal.Email)
-			logrus.Error(err)
+			logrus.Errorf("share with id '%v' not found for '%v'", shrZId, principal.Email)
 			return share.NewUnshareNotFound()
 		}
 	} else {

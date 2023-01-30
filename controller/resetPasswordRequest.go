@@ -24,22 +24,23 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 		return account.NewResetPasswordRequestBadRequest()
 	}
 	logrus.Infof("received reset password request for email '%v'", params.Body.EmailAddress)
+
 	var token string
 
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error starting transaction for request '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	token, err = createToken()
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating token for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
-	acct, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
+	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
 	if err != nil {
 		logrus.Infof("no account found for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
@@ -47,29 +48,29 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 
 	prr := &store.PasswordResetRequest{
 		Token:     token,
-		AccountId: acct.Id,
+		AccountId: a.Id,
 	}
 
 	if _, err := str.CreatePasswordResetRequest(prr, tx); err != nil {
-		logrus.Errorf("error creating reset password request for '%v': %v", params.Body.EmailAddress, err)
+		logrus.Errorf("error creating reset password request for '%v': %v", a.Email, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing reset password request for '%v': %v", params.Body.EmailAddress, err)
+		logrus.Errorf("error committing reset password request for '%v': %v", a.Email, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
 	if cfg.Email != nil && cfg.Registration != nil && cfg.ResetPassword != nil {
-		if err := sendResetPasswordEmail(acct.Email, token); err != nil {
-			logrus.Errorf("error sending reset password email for '%v': %v", acct.Email, err)
+		if err := sendResetPasswordEmail(a.Email, token); err != nil {
+			logrus.Errorf("error sending reset password email for '%v': %v", a.Email, err)
 			return account.NewResetPasswordRequestInternalServerError()
 		}
 	} else {
 		logrus.Errorf("'email', 'registration', and 'reset_password' configuration missing; skipping reset password email")
 	}
 
-	logrus.Infof("reset password request for '%v' has token '%v'", params.Body.EmailAddress, prr.Token)
+	logrus.Infof("reset password request for '%v' has token '%v'", a.Email, prr.Token)
 
 	return account.NewResetPasswordRequestCreated()
 }

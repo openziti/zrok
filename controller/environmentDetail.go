@@ -16,7 +16,7 @@ func newEnvironmentDetailHandler() *environmentDetailHandler {
 func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
@@ -37,14 +37,14 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 	}
 	shrs, err := str.FindSharesForEnvironment(senv.Id, tx)
 	if err != nil {
-		logrus.Errorf("error finding shares for environment '%v': %v", senv.ZId, err)
+		logrus.Errorf("error finding shares for environment '%v' for user '%v': %v", senv.ZId, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
 		sparkData, err = sparkDataForShares(shrs)
 		if err != nil {
-			logrus.Errorf("error querying spark data for shares: %v", err)
+			logrus.Errorf("error querying spark data for shares for user '%v': %v", principal.Email, err)
 		}
 	}
 	for _, shr := range shrs {

@@ -13,7 +13,7 @@ type registerHandler struct{}
 func newRegisterHandler() *registerHandler {
 	return &registerHandler{}
 }
-func (self *registerHandler) Handle(params account.RegisterParams) middleware.Responder {
+func (h *registerHandler) Handle(params account.RegisterParams) middleware.Responder {
 	if params.Body == nil || params.Body.Token == "" || params.Body.Password == "" {
 		logrus.Error("missing token or password")
 		return account.NewRegisterNotFound()
@@ -22,25 +22,25 @@ func (self *registerHandler) Handle(params account.RegisterParams) middleware.Re
 
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error starting transaction for token '%v': %v", params.Body.Token, err)
 		return account.NewRegisterInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	ar, err := str.FindAccountRequestWithToken(params.Body.Token, tx)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error finding account request with token '%v': %v", params.Body.Token, err)
 		return account.NewRegisterNotFound()
 	}
 
 	token, err := createToken()
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating token for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 	hpwd, err := hashPassword(params.Body.Password)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error hashing password for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 	a := &store.Account{
@@ -50,17 +50,17 @@ func (self *registerHandler) Handle(params account.RegisterParams) middleware.Re
 		Token:    token,
 	}
 	if _, err := str.CreateAccount(a, tx); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating account for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 
 	if err := str.DeleteAccountRequest(ar.Id, tx); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error deleteing account request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error committing '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 

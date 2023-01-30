@@ -25,43 +25,43 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	// start transaction early; if it fails, don't bother creating ziti resources
 	tx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	if err := h.checkLimits(principal, tx); err != nil {
-		logrus.Errorf("limits error: %v", err)
+		logrus.Errorf("limits error for user '%v': %v", principal.Email, err)
 		return environment.NewEnableUnauthorized()
 	}
 
 	client, err := edgeClient()
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	uniqueToken, err := createShareToken()
 	if err != nil {
-		logrus.Errorf("error creating unique identity token: %v", err)
+		logrus.Errorf("error creating unique identity token for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(uniqueToken, principal.Email, params.Body.Description, client)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating environment identity for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	envZId := ident.Payload.Data.ID
 	cfg, err := zrokEdgeSdk.EnrollIdentity(envZId, client)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error enrolling environment identity for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error creating edge router policy for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -72,13 +72,13 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		ZId:         envZId,
 	}, tx)
 	if err != nil {
-		logrus.Errorf("error storing created identity: %v", err)
+		logrus.Errorf("error storing created identity for user '%v': %v", principal.Email, err)
 		_ = tx.Rollback()
 		return environment.NewEnableInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing: %v", err)
+		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
