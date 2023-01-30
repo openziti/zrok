@@ -65,7 +65,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      
       navbar: {
         title: 'zrok',
         logo: {
@@ -112,6 +111,11 @@ const config = {
         defaultMode: 'dark',
         disableSwitch: false,
         respectPrefersColorScheme: false,
+      },
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
+        }
       },
     }),
 };
