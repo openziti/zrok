@@ -4,6 +4,8 @@ CHANGE: Improvements to controller log messages to assist in operations (https:/
 
 CHANGE: `armv7` builds for Linux are now shipped with releases; these builds were tested against a Raspberry Pi 4 (https://github.com/openziti/zrok/issues/93)
 
+CHANGE: `zrok config set` now includes a warning when the `apiEndpoint` config is changed and an environment is already enabled; the user will not see the change until `zrok disable` is run. The CLI now includes a `zrok config unset` command (https://github.com/openziti/zrok/issues/188)
+
 # v0.3.0-rc4
 
 CHANGE: Enable notarization for macos binaries (https://github.com/openziti/zrok/issues/92)
