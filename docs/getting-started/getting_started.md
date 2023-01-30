@@ -1,6 +1,6 @@
-# Getting Started with zrok v0.3
+# Getting Started with zrok
 
-`zrok` is a next-generation sharing platform built on top of [OpenZiti][https://github.com/openziti/ziti/stargazers], a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
+`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://github.com/openziti/ziti/stargazers), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing resources publicly and privately with an audience of your choosing.
 
@@ -13,7 +13,7 @@ Let's take a look at how to get started with `zrok`.
 
 ## Downloading zrok
 
-In order to use `zrok`, you will need a `zrok` executable. [Download][zrok-download] a binary executable package for your platform at https://zrok.io.
+In order to use `zrok`, you will need a `zrok` executable. [Download](../downloads.md) a binary executable package for your platform at https://zrok.io.
 
 > Releases are also available from the `zrok` project repository on Github: https://github.com/openziti/zrok
 
@@ -366,7 +366,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting a Service Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../../guides/v0.3_self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](../guides/v0.3_self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"

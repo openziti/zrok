@@ -24,7 +24,7 @@ You can be up and sharing using the `zrok.io` service in minutes. Here is a syno
 
 * `zrok share` to share resources immediately, simply and securely
 
-See the [Concepts and Getting Started Guide](docs/getting-started/v0.3_getting_started/getting_started.md) for a full overview.
+See the [Concepts and Getting Started Guide](docs/getting-started/getting_started.md) for a full overview.
 
 ## Self-Hosting
 

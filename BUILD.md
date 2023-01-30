@@ -2,12 +2,12 @@
 
 ## zrok
 
-At this time, building `zrok` is pretty straight-forward. You will require `npm` to be installed in order to complete
+At this time, building `zrok` is pretty straightforward. You will require `node` v16+ to be installed in order to complete
 the build as well as `go`.
 
 To build, follow these steps:
 * clone the repository
-* change to the existing `build` folder
+* change to the existing `ui` folder
 * run `npm install`
 * run `npm run build` (this process takes a while the first time and only needs to be run if the ui changes)
 * change back to the checkout root
