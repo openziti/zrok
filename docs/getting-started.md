@@ -16,7 +16,7 @@ Let's take a look at how to get started with `zrok`.
 
 ## Downloading zrok
 
-Releases are also available from the `zrok` project repository on Github: https://github.com/openziti/zrok/releases
+Releases are also available from the `zrok` project repository on GitHub at https://github.com/openziti/zrok/releases/latest
 
 ### Extract zrok Distribution
 
