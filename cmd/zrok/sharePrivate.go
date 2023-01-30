@@ -32,6 +32,7 @@ type sharePrivateCommand struct {
 	basicAuth   []string
 	backendMode string
 	headless    bool
+	insecure    bool
 	cmd         *cobra.Command
 }
 
@@ -45,6 +46,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
 	return command
 }
@@ -145,6 +147,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
+			Insecure:        cmd.insecure,
 			RequestsChan:    requestsChan,
 		}
 		_, err = cmd.proxyBackendMode(cfg)

@@ -24,6 +24,7 @@ func init() {
 type shareReservedCommand struct {
 	overrideEndpoint string
 	headless         bool
+	insecure         bool
 	cmd              *cobra.Command
 }
 
@@ -35,6 +36,7 @@ func newShareReservedCommand() *shareReservedCommand {
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation")
 	cmd.Run = command.run
 	return command
 }
@@ -110,6 +112,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        shrToken,
+			Insecure:        cmd.insecure,
 			RequestsChan:    requestsChan,
 		}
 		_, err := cmd.proxyBackendMode(cfg)

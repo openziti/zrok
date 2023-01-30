@@ -2,6 +2,7 @@ package proxyBackend
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
@@ -21,6 +22,7 @@ type Config struct {
 	IdentityPath    string
 	EndpointAddress string
 	ShrToken        string
+	Insecure        bool
 	RequestsChan    chan *endpoints.Request
 }
 
@@ -45,7 +47,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	proxy, err := newReverseProxy(cfg.EndpointAddress, cfg.RequestsChan)
+	proxy, err := newReverseProxy(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -70,21 +72,24 @@ func (self *backend) Requests() func() int32 {
 	return self.requests
 }
 
-func newReverseProxy(target string, requests chan *endpoints.Request) (*httputil.ReverseProxy, error) {
-	targetURL, err := url.Parse(target)
+func newReverseProxy(cfg *Config) (*httputil.ReverseProxy, error) {
+	targetURL, err := url.Parse(cfg.EndpointAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	tpt := http.DefaultTransport.(*http.Transport).Clone()
 	tpt.DialContext = metricsDial
+	if cfg.Insecure {
+		tpt.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 
 	proxy := httputil.NewSingleHostReverseProxy(targetURL)
 	proxy.Transport = tpt
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
-		if requests != nil {
-			requests <- &endpoints.Request{
+		if cfg.RequestsChan != nil {
+			cfg.RequestsChan <- &endpoints.Request{
 				Stamp:      time.Now(),
 				RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
 				Method:     req.Method,
