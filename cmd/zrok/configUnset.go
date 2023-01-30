@@ -9,27 +9,26 @@ import (
 )
 
 func init() {
-	configCmd.AddCommand(newConfigSetCommand().cmd)
+	configCmd.AddCommand(newConfigUnsetCommand().cmd)
 }
 
-type configSetCommand struct {
+type configUnsetCommand struct {
 	cmd *cobra.Command
 }
 
-func newConfigSetCommand() *configSetCommand {
+func newConfigUnsetCommand() *configUnsetCommand {
 	cmd := &cobra.Command{
-		Use:   "set <configName> <value>",
-		Short: "Set a value into the environment config",
-		Args:  cobra.ExactArgs(2),
+		Use:   "unset <configName>",
+		Short: "Unset a value from the environment config",
+		Args:  cobra.ExactArgs(1),
 	}
-	command := &configSetCommand{cmd: cmd}
+	command := &configUnsetCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
+func (cmd *configUnsetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
-	value := args[1]
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
@@ -39,11 +38,10 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	modified := false
 	switch configName {
 	case "apiEndpoint":
-		if zrd.Cfg == nil {
-			zrd.Cfg = &zrokdir.Config{}
+		if zrd.Cfg != nil && zrd.Cfg.ApiEndpoint != "" {
+			zrd.Cfg.ApiEndpoint = ""
+			modified = true
 		}
-		zrd.Cfg.ApiEndpoint = value
-		modified = true
 
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)
