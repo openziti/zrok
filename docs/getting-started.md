@@ -268,7 +268,7 @@ If we click on the environment in the explorer, we're shown all of the shares fo
 
 And as soon as I terminate the `zrok share` client, the resources are removed from the `zrok` environment.
 
-If we try to reload the frontend endpoing in our web browser, we'll see:
+If we try to reload the frontend endpoint in our web browser, we'll see:
 
 ![Not Found](images/zrok_not_found.png)
 
