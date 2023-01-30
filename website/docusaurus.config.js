@@ -74,13 +74,13 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'overview',
+            docId: 'getting-started',
             position: 'right',
             label: 'What is zrok?',
           },
           {
             type: 'doc',
-            docId: 'overview',
+            docId: 'getting-started',
             position: 'right',
             label: 'Docs',
           },
