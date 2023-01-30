@@ -44,6 +44,10 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 	token := args[0]
 
+	if zrd.Env != nil {
+		tui.Error(fmt.Sprintf("you already have an enabled environment, %v first before you %v", tui.Code.Render("zrok disable"), tui.Code.Render("zrok enable")), nil)
+	}
+
 	hostName, hostDetail, err := getHost()
 	if err != nil {
 		panic(err)
