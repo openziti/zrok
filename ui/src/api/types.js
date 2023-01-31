@@ -25,6 +25,14 @@
  */
 
 /**
+ * @typedef configuration
+ * @memberof module:types
+ * 
+ * @property {string} version 
+ * @property {string} touLink 
+ */
+
+/**
  * @typedef createFrontendRequest
  * @memberof module:types
  * 

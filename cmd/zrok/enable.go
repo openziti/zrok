@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+	user2 "os/user"
+	"time"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -11,9 +15,6 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/spf13/cobra"
-	"os"
-	user2 "os/user"
-	"time"
 )
 
 func init() {
@@ -89,6 +90,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}()
 
 	resp, err := zrok.Environment.Enable(req, auth)
+	//Switch on err type (401, 400, 500, etc...)
 	if err != nil {
 		time.Sleep(250 * time.Millisecond)
 		prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))

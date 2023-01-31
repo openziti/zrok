@@ -1,5 +1,6 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import * as account from "../api/account";
+import * as metadata from "../api/metadata"
 import Success from "./Success";
 import {Button, Container, Form, Row} from "react-bootstrap";
 
@@ -9,10 +10,24 @@ const SetPasswordForm = (props) => {
     const [message, setMessage] = useState();
     const [authToken, setAuthToken] = useState('');
     const [complete, setComplete] = useState(false);
+    const [tou, setTou] = useState();
 
     const passwordMismatchMessage = <h2 className={"errorMessage"}>Entered passwords do not match!</h2>
     const passwordTooShortMessage = <h2 className={"errorMessage"}>Entered password too short! (4 characters, minimum)</h2>
     const registerFailed = <h2 className={"errorMessage"}>Account creation failed!</h2>
+
+    useEffect(() => {
+        metadata.configuration().then(resp => {
+            console.log(resp)
+            if(!resp.error) {
+                if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
+                    setTou(<div>Please read the <a href={resp.data.touLink}>Terms of Use</a></div>)
+                }
+            }
+        }).catch(err => {
+            console.log("err", err);
+        });
+    }, [])
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -74,7 +89,7 @@ const SetPasswordForm = (props) => {
                                         value={confirm}
                                     />
                                 </Form.Group>
-
+                                {tou}
                                 <Button variant={"light"} type={"submit"}>Register Account</Button>
                             </Form>
                         </Row>
