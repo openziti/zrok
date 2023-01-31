@@ -1,0 +1,10 @@
+{
+    "framework": "docusaurus-2",
+    "outputDirectory": "build",
+    "github": {
+        "silent": false
+    },
+    "cleanUrls": false,
+    "public": true,
+    "ignoreCommand": "[[ \"${VERCEL_GIT_COMMIT_REF}\" =~ ^(gh-pages)$ ]] || git diff --quiet HEAD^ HEAD -- ./website/ ./docs/"
+}
