@@ -1,5 +1,6 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import * as account from '../../api/account';
+import * as metadata from "../../api/metadata"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -7,8 +8,22 @@ const Login = (props) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState();
+    const [tou, setTou] = useState();
 
     const errorMessage = <h2 className={"errorMessage"}>Login Failed!</h2>;
+
+    useEffect(() => {
+        metadata.configuration().then(resp => {
+            console.log(resp)
+            if(!resp.error) {
+                if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
+                    setTou(<div>Please read the <a href={resp.data.touLink}>Terms of Use</a></div>)
+                }
+            }
+        }).catch(err => {
+            console.log("err", err);
+        });
+    }, [])
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -65,7 +80,7 @@ const Login = (props) => {
                                         value={password}
                                     />
                                 </Form.Group>
-
+                                {tou}
                                 <Button variant={"light"} type={"submit"}>Log In</Button>
                                 
                                 <div id={"zrok-reset-password"}>

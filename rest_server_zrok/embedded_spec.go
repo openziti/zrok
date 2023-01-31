@@ -74,6 +74,22 @@ func init() {
         }
       }
     },
+    "/configuration": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "configuration",
+        "responses": {
+          "200": {
+            "description": "current configuration",
+            "schema": {
+              "$ref": "#/definitions/configuration"
+            }
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -842,6 +858,17 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "touLink": {
+          "type": "string"
+        },
+        "version": {
           "type": "string"
         }
       }
@@ -1319,6 +1346,22 @@ func init() {
         }
       }
     },
+    "/configuration": {
+      "get": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "configuration",
+        "responses": {
+          "200": {
+            "description": "current configuration",
+            "schema": {
+              "$ref": "#/definitions/configuration"
+            }
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -2087,6 +2130,17 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "touLink": {
+          "type": "string"
+        },
+        "version": {
           "type": "string"
         }
       }

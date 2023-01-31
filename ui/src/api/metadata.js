@@ -3,6 +3,12 @@
 import * as gateway from './gateway'
 
 /**
+ */
+export function configuration() {
+  return gateway.request(configurationOperation)
+}
+
+/**
  * @param {string} envZId 
  * @return {Promise<module:types.environmentShares>} ok
  */
@@ -38,6 +44,11 @@ export function overview() {
  */
 export function version() {
   return gateway.request(versionOperation)
+}
+
+const configurationOperation = {
+  path: '/configuration',
+  method: 'get'
 }
 
 const getEnvironmentDetailOperation = {

@@ -314,6 +314,17 @@ paths:
   #
   # metadata
   #
+  /configuration:
+    get:
+      tags:
+        - metadata
+      operationId: configuration
+      responses:
+        200:
+          description: current configuration
+          schema:
+            $ref: "#/definitions/configuration"
+
   /detail/environment/{envZId}:
     get:
       tags:
@@ -529,6 +540,14 @@ definitions:
       username:
         type: string
       password:
+        type: string
+
+  configuration:
+    type: object
+    properties:
+      version:
+        type: string
+      touLink:
         type: string
 
   createFrontendRequest:

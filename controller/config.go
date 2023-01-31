@@ -27,6 +27,7 @@ type Config struct {
 
 type AdminConfig struct {
 	Secrets []string `cf:"+secret"`
+	TouLink string
 }
 
 type EndpointConfig struct {

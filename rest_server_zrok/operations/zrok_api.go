@@ -52,6 +52,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
+		MetadataConfigurationHandler: metadata.ConfigurationHandlerFunc(func(params metadata.ConfigurationParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.Configuration has not yet been implemented")
+		}),
 		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
 		}),
@@ -170,6 +173,8 @@ type ZrokAPI struct {
 
 	// ShareAccessHandler sets the operation handler for the access operation
 	ShareAccessHandler share.AccessHandler
+	// MetadataConfigurationHandler sets the operation handler for the configuration operation
+	MetadataConfigurationHandler metadata.ConfigurationHandler
 	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
 	AdminCreateFrontendHandler admin.CreateFrontendHandler
 	// AdminCreateIdentityHandler sets the operation handler for the create identity operation
@@ -297,6 +302,9 @@ func (o *ZrokAPI) Validate() error {
 
 	if o.ShareAccessHandler == nil {
 		unregistered = append(unregistered, "share.AccessHandler")
+	}
+	if o.MetadataConfigurationHandler == nil {
+		unregistered = append(unregistered, "metadata.ConfigurationHandler")
 	}
 	if o.AdminCreateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.CreateFrontendHandler")
@@ -467,6 +475,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/access"] = share.NewAccess(o.context, o.ShareAccessHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/configuration"] = metadata.NewConfiguration(o.context, o.MetadataConfigurationHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
