@@ -10,6 +10,8 @@ Like other offerings in this space, `zrok` allows users to create ephemeral reve
 * `zrok` allows sharing other types of resources; rather than just proxying `http` endpoints, `zrok` allows users to easily and rapidly share files and web content
 * `zrok` is ready to be extended to easily support many kinds of decentralized resource sharing; `zrok` provides a framework that makes this kind of peer-to-peer resource sharing simple and secure
 
+![zrok](docs/images/zrok_deployment.png)
+
 ## Frictionless
 
 You can be up and sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved.
