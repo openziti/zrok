@@ -11,14 +11,17 @@
 #
 v:                                2
 
-# The `admin/secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
-# administration of the `zrok` controller.
-#
-# Change this for your installation.
-#
 admin:
+  # The `secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
+  # administration of the `zrok` controller.
+  #
+  # Change this for your installation.
+  #
   secrets:
     -                             77623cad-1847-4d6d-8ffe-37defc33c909
+  # if `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
+  #
+  tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
 
 # The `endpoint` section determines where the HTTP listener that serves the API and web console will be bound.
 #

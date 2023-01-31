@@ -17,7 +17,7 @@ const Login = (props) => {
             console.log(resp)
             if(!resp.error) {
                 if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
-                    setTou(<div>Please read the <a href={resp.data.touLink}>Terms of Use</a></div>)
+                    setTou(resp.data.touLink)
                 }
             }
         }).catch(err => {
@@ -80,7 +80,7 @@ const Login = (props) => {
                                         value={password}
                                     />
                                 </Form.Group>
-                                {tou}
+
                                 <Button variant={"light"} type={"submit"}>Log In</Button>
                                 
                                 <div id={"zrok-reset-password"}>
@@ -88,6 +88,7 @@ const Login = (props) => {
                                         Forgot Password?
                                     </Link>
                                 </div>
+                                <div id={"zrok-tou"} dangerouslySetInnerHTML={{__html: tou}}></div>
                             </Form>
                         </Row>
                         <Row>
