@@ -6,5 +6,5 @@
     },
     "cleanUrls": false,
     "public": true,
-    "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./website/"
+    "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./website/ ./docs/"
 }
