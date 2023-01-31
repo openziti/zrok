@@ -1,0 +1,10 @@
+{
+    "framework": "docusaurus-2",
+    "outputDirectory": "build",
+    "github": {
+        "silent": false
+    },
+    "cleanUrls": false,
+    "public": true,
+    "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./website/"
+}
