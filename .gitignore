@@ -1,5 +1,6 @@
 .$*
 .idea
+.vscode
 *.db
 automated-release-build
 etc/dev.yml

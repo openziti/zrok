@@ -58,6 +58,31 @@ func (o *CreateFrontendCreated) WriteResponse(rw http.ResponseWriter, producer r
 	}
 }
 
+// CreateFrontendBadRequestCode is the HTTP code returned for type CreateFrontendBadRequest
+const CreateFrontendBadRequestCode int = 400
+
+/*
+CreateFrontendBadRequest bad request
+
+swagger:response createFrontendBadRequest
+*/
+type CreateFrontendBadRequest struct {
+}
+
+// NewCreateFrontendBadRequest creates CreateFrontendBadRequest with default headers values
+func NewCreateFrontendBadRequest() *CreateFrontendBadRequest {
+
+	return &CreateFrontendBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *CreateFrontendBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // CreateFrontendUnauthorizedCode is the HTTP code returned for type CreateFrontendUnauthorized
 const CreateFrontendUnauthorizedCode int = 401
 
