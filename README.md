@@ -32,7 +32,7 @@ See the [Concepts and Getting Started Guide](docs/getting-started/getting_starte
 
 `zrok` is designed to scale up to support extremely large service instances. `zrok.io` is a public service instance operated by NetFoundry using the same code base that is available to self-hosted environments.
 
-`zrok` is also designed to scale down to support extremely small deployments. Run an OpenZiti network with `zrok` layered on top of it on a Raspberry Pi!
+`zrok` is also designed to scale down to support extremely small deployments. Run `zrok` and OpenZiti on a Raspberry Pi!
 
 The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add an OpenZiti network and you're up and running.
 
