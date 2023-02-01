@@ -252,6 +252,37 @@ https://h0fz2ts9c84t.share.zrok.io
 
 In this case my share was given the "share token" of `h0fz2ts9c84t`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
 
+:::note
+Here is the `--help` output from `zrok share public`:
+
+```
+$ zrok share public
+Error: accepts 1 arg(s), received 0
+Usage:
+  zrok share public <target> [flags]
+
+Flags:
+      --backend-mode string      The backend mode {proxy, web} (default "proxy")
+      --basic-auth stringArray   Basic authentication users (<username:password>,...)
+      --frontends stringArray    Selected frontends to use for the share (default [public])
+      --headless                 Disable TUI and run headless
+  -h, --help                     help for public
+      --insecure                 Enable insecure TLS certificate validation for <target>
+
+Global Flags:
+  -p, --panic     Panic instead of showing pretty errors
+  -v, --verbose   Enable verbose logging
+
+[ERROR]: an error occurred (accepts 1 arg(s), received 0)
+```
+
+`<target>` defines the path to the local resource that you intend to share. The form of `<target>` depends on the `--backend-mode` that you're using. 
+
+In the case of `--backend-mode proxy`, `<target>` should be a URL to an HTTP endpoint.
+
+In the case of `--backend-mode web`, `<target>` is the path to a file on disk that serves as the "root" of the file tree to be shared.
+:::
+
 If we return to the web console, we see our share in the explorer:
 
 ![Web Console Share](images/zrok_web_console_explorer_share.png)
