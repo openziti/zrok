@@ -230,6 +230,10 @@ If we click on the `Detail` tab for our environment, we'll see something like:
 
 ![Environment Detail](images/zrok_web_ui_empty_environment_detail.png)
 
+:::note
+With your `zrok` account you can `zrok enable` multiple environments. This will allow you to run `zrok share` in one environment, and `zrok access` in other environments.
+:::
+
 Your environment is fully ready to go. Now we can move on to the fun stuff...
 
 ## Sharing
