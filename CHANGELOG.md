@@ -1,5 +1,7 @@
 # v0.3.0-rc6
 
+CHANGE: Gentler CLI error messages by default (https://github.com/openziti/zrok/issues/203)
+
 CHANGE: Add favicon to web console (https://github.com/openziti/zrok/issues/198)
 
 CHANGE: Add configurable "terms of use" link in the controller configuration, and optionally display the link on the login form and registration forms (https://github.com/openziti/zrok/issues/184)

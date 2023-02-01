@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -83,6 +84,9 @@ var testCmd = &cobra.Command{
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
-		panic(err)
+		if panicInstead {
+			panic(err)
+		}
+		tui.Error("an error occurred", err)
 	}
 }
