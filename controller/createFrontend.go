@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"errors"
+
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/lib/pq"
+	"github.com/mattn/go-sqlite3"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -60,6 +64,19 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		Reserved:    true,
 	}
 	if _, err := str.CreateGlobalFrontend(fe, tx); err != nil {
+		perr := &pq.Error{}
+		sqliteErr := &sqlite3.Error{}
+		switch {
+		case errors.As(err, &perr):
+			if perr.Code == pq.ErrorCode("23505") {
+				return admin.NewCreateFrontendBadRequest()
+			}
+		case errors.As(err, sqliteErr):
+			if errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
+				return admin.NewCreateFrontendBadRequest()
+			}
+		}
+
 		logrus.Errorf("error creating frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}

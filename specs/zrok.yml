@@ -151,6 +151,8 @@ paths:
           description: frontend created
           schema:
             $ref: "#/definitions/createFrontendResponse"
+        400:
+          description: bad request
         401:
           description: unauthorized
         404:

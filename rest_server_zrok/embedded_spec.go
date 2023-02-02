@@ -265,6 +265,9 @@ func init() {
               "$ref": "#/definitions/createFrontendResponse"
             }
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
           },
@@ -1536,6 +1539,9 @@ func init() {
             "schema": {
               "$ref": "#/definitions/createFrontendResponse"
             }
+          },
+          "400": {
+            "description": "bad request"
           },
           "401": {
             "description": "unauthorized"
