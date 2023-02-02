@@ -4,7 +4,7 @@ sidebar_position: 30
 # File Sharing
 
 With `zrok` it is possible to share files quickly and easily as well. To share files using `zrok` use
-the `--backend-mode web`, for example: `zrok share private --backend-mode web`.
+the `--backend-mode web`, for example: `zrok share private . --backend-mode web`.
 
 Running with this mode will make it trivially easy to share files from the directory which the command
 was run from.
