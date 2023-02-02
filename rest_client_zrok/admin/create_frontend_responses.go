@@ -29,6 +29,12 @@ func (o *CreateFrontendReader) ReadResponse(response runtime.ClientResponse, con
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewCreateFrontendBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewCreateFrontendUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -111,6 +117,57 @@ func (o *CreateFrontendCreated) readResponse(response runtime.ClientResponse, co
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
+
+	return nil
+}
+
+// NewCreateFrontendBadRequest creates a CreateFrontendBadRequest with default headers values
+func NewCreateFrontendBadRequest() *CreateFrontendBadRequest {
+	return &CreateFrontendBadRequest{}
+}
+
+/*
+CreateFrontendBadRequest describes a response with status code 400, with default header values.
+
+bad request
+*/
+type CreateFrontendBadRequest struct {
+}
+
+// IsSuccess returns true when this create frontend bad request response has a 2xx status code
+func (o *CreateFrontendBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this create frontend bad request response has a 3xx status code
+func (o *CreateFrontendBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this create frontend bad request response has a 4xx status code
+func (o *CreateFrontendBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this create frontend bad request response has a 5xx status code
+func (o *CreateFrontendBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this create frontend bad request response a status code equal to that given
+func (o *CreateFrontendBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+func (o *CreateFrontendBadRequest) Error() string {
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
+}
+
+func (o *CreateFrontendBadRequest) String() string {
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
+}
+
+func (o *CreateFrontendBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
