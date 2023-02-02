@@ -6,6 +6,8 @@ sidebar_position: 10
 `zrok` was built to share and access digital resources. a `public` share allows something to be shared through 
 a publicly available endpoint.
 
+## Public Sharing
+
 ![zrok_public_share](../images/zrok_public_share.png)
 
 Sharing something with `public` is useful when the person or service accessing the thing being shared doesn't
