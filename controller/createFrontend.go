@@ -75,8 +75,6 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 			if errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
 				return admin.NewCreateFrontendBadRequest()
 			}
-		default:
-			logrus.Error("None?", err)
 		}
 
 		logrus.Errorf("error creating frontend record: %v", err)
