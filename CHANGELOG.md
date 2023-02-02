@@ -1,5 +1,7 @@
 # v0.3.0-rc6
 
+CHANGE: Better error message when `zrok admin create frontend` runs into a duplicate name collision (https://github.com/openziti/zrok/issues/168)
+
 CHANGE: Gentler CLI error messages by default (https://github.com/openziti/zrok/issues/203)
 
 CHANGE: Add favicon to web console (https://github.com/openziti/zrok/issues/198)
