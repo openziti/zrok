@@ -25,6 +25,6 @@ be done in a public way, for more secure access.
 Using `private` shares is easy and is accomplished using the `zrok share private` command. Run `zrok share private`
 to see the usage output and to further learn how to use the command. 
 
-Unlike public shares, `private` shares do not need to be [reserved](./sharing-reserved.md). When sharing a
+Unlike public shares, `private` shares do not need to be [reserved](./sharing-reserved.md) to be predictable. When sharing a
 resource with `private`, the resource is shared at a known location. Resources shared with `private` do not
 need to be `reserved`.
