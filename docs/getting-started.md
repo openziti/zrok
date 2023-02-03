@@ -20,7 +20,7 @@ Let's take a look at how to get started with `zrok`.
 :::note `zrok` moves fast!
 
 `zrok` is currently in a closed-beta phase and requires an invitation token. If you would like to try `zrok` and provide
-feedback, please send an email to help@openziti.org. `zrok` is an open source project and is in its early development
+feedback, please send an email to invite@zrok.io. `zrok` is an open source project and is in its early development
 phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details
 about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in
 [Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach
