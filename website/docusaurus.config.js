@@ -79,6 +79,11 @@ const config = {
             label: 'What is zrok?',
           },
           {
+            href: 'https://github.com/orgs/openziti/projects/16',
+            label: 'Roadmap',
+            position: 'right',
+          },
+          {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',

@@ -22,5 +22,5 @@ project named OpenZiti.
 OpenZiti is a secure overlay network focusing on bringing zero trust to applications. It is the __backbone__ of `zrok`.
 In fact, `zrok` proudly proclaims itself as an OpenZiti _native_ application.
 
-If you are interested in learning more about OpenZiti head over to https://openziti.io, read the docs, try the
-quickstart, and don't forget to star that project too. We couldn't build `zrok` without OpenZiti!
+If you are interested in learning more about OpenZiti head over to [the docs](https://docs.openziti.io/docs/learn/introduction/),
+try the quickstart, and don't forget to star that project too. We couldn't build `zrok` without OpenZiti!

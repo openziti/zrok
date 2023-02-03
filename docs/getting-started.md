@@ -3,7 +3,18 @@ sidebar_position: 0
 ---
 # Getting Started with zrok
 
-`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://github.com/openziti/ziti/stargazers), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
+:::note `zrok` moves fast!
+
+`zrok` is currently in a closed-beta phase and requires an invitation token. If you would like to try `zrok` and provide
+feedback, please send an email to help@openziti.org. `zrok` is an open source project and is in its early development
+phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details
+about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in 
+[Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach 
+out directly.
+
+:::
+
+`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing resources publicly and privately with an audience of your choosing.
 
@@ -418,5 +429,5 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](guides/v0.3_self_hosting_guide.md) for details.
 
-[openziti]: https://docs.openziti.io/	"OpenZiti"
+[openziti]: https://docs.openziti.io/docs/learn/introduction/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"

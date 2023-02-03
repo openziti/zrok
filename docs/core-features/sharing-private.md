@@ -18,8 +18,8 @@ Sharing something with `private` is similar to sharing something publicly. The m
 obvious, the shared resource is `private` and the share is __not__ open to the public. With `zrok`, you
 can share resources on a private network without needing to expose the service to the internet. The share is not 
 through an obfuscated, difficult to guess url. Instead the sharing is accomplished using a secure, zero trust overlay
-network provided by [OpenZiti](https://openziti.io). With this private, peer to peer sharing model, there will
-never an attack surface available to the open internet.
+network provided by [OpenZiti](https://docs.openziti.io/docs/learn/introduction/). With this private, peer to peer 
+sharing model, there will never an attack surface available to the open internet.
 
 The shared resource can be a development web server to share with friends and colleagues or perhaps,
 it could be a webhook from a server running in the cloud which has `zrok` running and has been instructed
