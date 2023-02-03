@@ -16,7 +16,11 @@ out directly.
 
 `zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
-`zrok` facilitates sharing resources publicly and privately with an audience of your choosing.
+`zrok` facilitates sharing [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies. 
+But `zrok` __also__ supports sharing [privately](./core-features/sharing-private.md). It does this by leveraging 
+[OpenZiti](https://docs.openziti.io/docs/learn/introduction/) to support zero trust, peer to peer connections without
+the need for any open ports on the internet.
+
 
 As of version `v0.3.0`, `zrok` provides users the ability to publicly proxy local HTTP endpoints (similar to other offerings in this space). Additionally, `zrok` provides the ability to:
 
