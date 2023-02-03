@@ -70,6 +70,8 @@ const config = {
         logo: {
           alt: 'Ziggy Goes to Space',
           src: 'img/space-ziggy.png',
+          href: 'https://zrok.io',
+          target: '_self',
         },
         items: [
           {

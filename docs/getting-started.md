@@ -6,7 +6,7 @@ sidebar_position: 0
 :::note `zrok` moves fast!
 
 `zrok` is currently in a closed-beta phase and requires an invitation token. If you would like to try `zrok` and provide
-feedback, please send an email to help@openziti.org. `zrok` is an open source project and is in its early development
+feedback, please send an email to help@zrok.io. `zrok` is an open source project and is in its early development
 phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details
 about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in 
 [Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach 
@@ -14,7 +14,8 @@ out directly.
 
 :::
 
-`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
+`zrok` is an open source, Apache v2 licensed sharing platform, built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), 
+a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_.
 
 `zrok` facilitates sharing [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies. 
 But `zrok` __also__ supports sharing [privately](./core-features/sharing-private.md). It does this by leveraging 
