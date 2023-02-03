@@ -30,7 +30,7 @@ const Register = () => {
         return () => {
             mounted = false;
         }
-    }, []);
+    }, [token]);
 
     if(activeRequest) {
         step = <SetPasswordForm email={email} token={token}/>
