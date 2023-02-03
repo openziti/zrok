@@ -170,3 +170,11 @@ a code {
   color: var(--selection-font-color);
   background: var(--selection-background);
 }
+
+.navbar__link:hover, .navbar__link--active {
+  text-decoration: none;
+}
+.navbar__link {
+  color: var(--ifm-navbar-link-color);
+  font-weight: var(--ifm-font-weight-semibold);
+}
