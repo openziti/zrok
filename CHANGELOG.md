@@ -1,3 +1,7 @@
+# v0.3.0
+
+CHANGE: Removed some minor web console lint and warnings (https://github.com/openziti/zrok/issues/205)
+
 # v0.3.0-rc6
 
 CHANGE: Better error message when `zrok admin create frontend` runs into a duplicate name collision (https://github.com/openziti/zrok/issues/168)
