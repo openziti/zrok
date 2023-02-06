@@ -5,7 +5,7 @@ sidebar_position: 200
 
 ## Self-Hosted
 
-`zrok` is not limited to a managed offering. You can host your own version of `zrok` as well. `zrok` is
+`zrok` is not limited to a managed offering. You can host your own version of `zrok` as well and there's [a self-hosting guide](../guides/v0.3_self_hosting_guide.md). `zrok` is
 also freely available as open source software hosted by GitHub under a very permissive Apache v2 license.
 
 ## Managed Service
