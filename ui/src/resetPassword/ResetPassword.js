@@ -1,9 +1,8 @@
-import {useLocation, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import SendRequest from "./SendRequest"
 import SetNewPassword from "./SetNewPassword";
 
 const ResetPassword = () => {
-    const { search } = useLocation();
     const { token } = useParams();
     console.log(token)
     let component = undefined

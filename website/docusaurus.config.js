@@ -70,6 +70,8 @@ const config = {
         logo: {
           alt: 'Ziggy Goes to Space',
           src: 'img/space-ziggy.png',
+          href: 'https://zrok.io',
+          target: '_self',
         },
         items: [
           {
@@ -77,6 +79,11 @@ const config = {
             docId: 'getting-started',
             position: 'right',
             label: 'What is zrok?',
+          },
+          {
+            href: 'https://github.com/orgs/openziti/projects/16',
+            label: 'Roadmap',
+            position: 'right',
           },
           {
             type: 'doc',
