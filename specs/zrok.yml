@@ -30,6 +30,8 @@ paths:
           description: invitation created
         400:
           description: invitation not created (already exists)
+          schema:
+            $ref: '#/definitions/errorMessage'
         401:
           description: unauthorized
         500:

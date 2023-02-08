@@ -118,7 +118,7 @@ func newInviteTui() inviteTui {
 	m.cursorStyle = m.focusedStyle.Copy()
 	m.noStyle = lipgloss.NewStyle()
 	m.helpStyle = m.blurredStyle.Copy()
-	m.focusedButton = m.focusedStyle.Copy().Render("[ Submit ]")
+	m.focusedButton = m.focusedStyle.Copy().Render("[*Submit*]")
 	m.blurredButton = fmt.Sprintf("[ %v ]", m.blurredStyle.Render("Submit"))
 	m.msgOk = m.noStyle.Render("enter and confirm your email address...")
 	m.msg = m.msgOk

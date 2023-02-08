@@ -7,9 +7,12 @@ package account
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // InviteReader is a Reader for the Invite structure.
@@ -111,6 +114,7 @@ InviteBadRequest describes a response with status code 400, with default header 
 invitation not created (already exists)
 */
 type InviteBadRequest struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 // IsSuccess returns true when this invite bad request response has a 2xx status code
@@ -139,14 +143,23 @@ func (o *InviteBadRequest) IsCode(code int) bool {
 }
 
 func (o *InviteBadRequest) Error() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest ", 400)
+	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *InviteBadRequest) String() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest ", 400)
+	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *InviteBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *InviteBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
