@@ -1,6 +1,11 @@
 name: CI Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
 
 jobs:
   ubuntu-build:
