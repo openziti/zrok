@@ -17,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -56,17 +55,14 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	switch cmd.backendMode {
 	case "proxy":
-		targetEndpoint, err := url.Parse(args[0])
+		v, err := parseUrl(args[0])
 		if err != nil {
 			if !panicInstead {
 				tui.Error("invalid target endpoint URL", err)
 			}
 			panic(err)
 		}
-		if targetEndpoint.Scheme == "" {
-			targetEndpoint.Scheme = "https"
-		}
-		target = targetEndpoint.String()
+		target = v
 
 	case "web":
 		target = args[0]
