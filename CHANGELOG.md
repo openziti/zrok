@@ -1,3 +1,9 @@
+# v0.3.1
+
+CHANGE: Improve usability of `zrok invite` TUI in low-color environments (https://github.com/openziti/zrok/issues/206)
+
+CHANGE: Better error responses when `zrok invite` fails due to missing token (https://github.com/openziti/zrok/issues/207)
+
 # v0.3.0
 
 CHANGE: Removed some minor web console lint and warnings (https://github.com/openziti/zrok/issues/205)
