@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/pkg/errors"
 	"net/url"
 	"os"
 	"strconv"
@@ -21,7 +22,13 @@ func mustGetAdminAuth() runtime.ClientAuthInfoWriter {
 func parseUrl(in string) (string, error) {
 	// parse port-only urls
 	if iv, err := strconv.ParseInt(in, 10, 0); err == nil {
-		return fmt.Sprintf("http://127.0.0.1:%d", iv), nil
+		if iv > 0 && iv < 65536 {
+			if iv == 443 {
+				return fmt.Sprintf("https://127.0.0.1:%d", iv), nil
+			}
+			return fmt.Sprintf("http://127.0.0.1:%d", iv), nil
+		}
+		return "", errors.Errorf("ports must be between 1 and 65536; %d is not", iv)
 	}
 
 	// make sure either https:// or http:// was specified
