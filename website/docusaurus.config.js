@@ -39,7 +39,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
-            'https://github.com/openziti/zrok/tree/main/',
+            'https://github.com/openziti/zrok/blob/main/docs',
           path: '../docs',
           include: ['**/*.md', '**/*.mdx'],
         },
