@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // InviteCreatedCode is the HTTP code returned for type InviteCreated
@@ -45,6 +47,11 @@ InviteBadRequest invitation not created (already exists)
 swagger:response inviteBadRequest
 */
 type InviteBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewInviteBadRequest creates InviteBadRequest with default headers values
@@ -53,12 +60,25 @@ func NewInviteBadRequest() *InviteBadRequest {
 	return &InviteBadRequest{}
 }
 
+// WithPayload adds the payload to the invite bad request response
+func (o *InviteBadRequest) WithPayload(payload rest_model_zrok.ErrorMessage) *InviteBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the invite bad request response
+func (o *InviteBadRequest) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *InviteBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // InviteUnauthorizedCode is the HTTP code returned for type InviteUnauthorized

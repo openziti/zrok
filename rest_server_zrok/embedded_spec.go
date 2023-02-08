@@ -442,7 +442,10 @@ func init() {
             "description": "invitation created"
           },
           "400": {
-            "description": "invitation not created (already exists)"
+            "description": "invitation not created (already exists)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "401": {
             "description": "unauthorized"
@@ -1717,7 +1720,10 @@ func init() {
             "description": "invitation created"
           },
           "400": {
-            "description": "invitation not created (already exists)"
+            "description": "invitation not created (already exists)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "401": {
             "description": "unauthorized"

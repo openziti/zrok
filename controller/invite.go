@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
@@ -41,7 +42,7 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		inviteToken, err := str.GetInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
-			return account.NewInviteUnauthorized()
+			return account.NewInviteBadRequest().WithPayload(rest_model_zrok.ErrorMessage("Missing invite token"))
 		}
 		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
 			logrus.Error(err)
@@ -63,7 +64,7 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 
 	if _, err := str.FindAccountWithEmail(params.Body.Email, tx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
-		return account.NewInviteBadRequest()
+		return account.NewInviteBadRequest().WithPayload(rest_model_zrok.ErrorMessage("Duplicate email found"))
 	} else {
 		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
 	}
