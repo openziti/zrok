@@ -1,4 +1,4 @@
-// @ts-check
+/// @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
@@ -39,7 +39,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
-            'https://github.com/openziti/zrok/tree/main/',
+            'https://github.com/openziti/zrok/blob/main/docs',
           path: '../docs',
           include: ['**/*.md', '**/*.mdx'],
         },
