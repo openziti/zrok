@@ -1,10 +1,15 @@
 builds:
-- main: ./cmd/zrok
+- id: zrok-armv8
+  main: ./cmd/zrok
   binary: zrok
   ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
   env:
+    - CC=aarch64-linux-gnu-gcc
     - CGO_ENABLED=1
+    - CC_FOR_TARGET=gcc-aarch64-linux-gnu
   goos:
     - linux
   goarch:
-    - amd64
+    - arm64
+  goarm:
+    - 8
