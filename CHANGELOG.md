@@ -1,5 +1,7 @@
 # v0.3.1
 
+CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok/issues/217)
+
 CHANGE: Improve usability of `zrok invite` TUI in low-color environments (https://github.com/openziti/zrok/issues/206)
 
 CHANGE: Better error responses when `zrok invite` fails due to missing token (https://github.com/openziti/zrok/issues/207)
