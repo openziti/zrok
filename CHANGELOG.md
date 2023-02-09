@@ -2,6 +2,8 @@
 
 CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok/issues/217)
 
+CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
+
 CHANGE: Improve usability of `zrok invite` TUI in low-color environments (https://github.com/openziti/zrok/issues/206)
 
 CHANGE: Better error responses when `zrok invite` fails due to missing token (https://github.com/openziti/zrok/issues/207)
