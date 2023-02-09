@@ -4,6 +4,12 @@ CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok
 
 CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
 
+	New and improved URL handling for proxy backends:
+
+	9090 -> http://127.0.0.1:9090
+	localhost:9090 -> http://127.0.0.1:9090
+	https://localhost:9090 -> https://localhost:9090
+
 CHANGE: Improve usability of `zrok invite` TUI in low-color environments (https://github.com/openziti/zrok/issues/206)
 
 CHANGE: Better error responses when `zrok invite` fails due to missing token (https://github.com/openziti/zrok/issues/207)
