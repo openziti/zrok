@@ -11,6 +11,7 @@ const config = {
   tagline: 'Globally distributed reverse proxy',
   url: 'https://docs.zrok.io',
   baseUrl: '/',
+  trailingSlash: true,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/space-ziggy.png',
