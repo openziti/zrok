@@ -9,7 +9,7 @@ const config = {
   title: 'Zrok',
   staticDirectories: ['static', '../docs/images'],
   tagline: 'Globally distributed reverse proxy',
-  url: 'https://zrok.io',
+  url: 'https://docs.zrok.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
