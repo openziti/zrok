@@ -32,6 +32,14 @@ out directly.
 
 Releases are also available from the `zrok` project repository on GitHub at https://github.com/openziti/zrok/releases/latest
 
+You need the right download for your OS and CPU. This can be confusing for Raspberry Pi users because their Raspberry Pi OS could be 32bit or 64bit. Linux users can find the right version by looking up the result of `uname -m` in this table.
+
+|                            |macOS       |Windows      |Linux       |
+|----------------------------|------------|-------------|------------|
+| AMD (x86_64) 64bit         |darwin-amd64|windows-amd64|linux-amd64 |
+| ARM (aarch64, arm/v8) 64bit|darwin-arm64|             |linux-arm64 |
+| ARM (armhf, arm/v7) 32bit  |            |             |linux-armv7 |
+
 ### Extract zrok Distribution
 
 Move the downloaded `zrok` distribution into a directory on your system. In my case, I've placed it in my home directory:
