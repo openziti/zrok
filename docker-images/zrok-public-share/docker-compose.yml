@@ -1,0 +1,58 @@
+version: '3'
+services:
+  zrok-enable-init:
+    image: busybox
+    # matches uid:gid of "nobody" in zrok container image
+    command: chown -Rc 65534:65534 /mnt/.zrok
+    user: root
+    volumes:
+    - zrok_env:/mnt/.zrok
+  zrok-enable:
+    depends_on:
+      zrok-enable-init:
+        condition: service_completed_successfully
+    entrypoint:
+      - bash
+      - -c
+      - |
+        # set -x
+        if [[ -s /mnt/.zrok/environment.json ]]; then
+          echo "INFO: noop: zrok environment is already enabled"
+          exit 0
+        else
+          echo "INFO: running: zrok $$(sed -E 's/[a-zA-Z0-9]{12,}/************/' <<< $${@})"
+          exec zrok $${@}
+        fi
+    command: -- enable --headless ${ZROK_ENABLE_TOKEN}
+    stdin_open: true  # FIXME: remove when --headless is available
+    tty: true         # FIXME: remove when --headless is available
+    volumes:
+    - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      ZROK_ENABLE_TOKEN:
+      ZROK_API_ENDPOINT: https://api.staging.zrok.io/
+  zrok-public-share:
+    image: docker.io/openziti/zrok
+    command: share public --headless http://httpbin-test:8080
+    depends_on:
+      zrok-enable:
+        condition: service_completed_successfully
+    volumes:
+    - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      PFXLOG_NO_JSON: "true"
+    volumes:
+    - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      PFXLOG_NO_JSON: "true"
+  zrok-test:
+    image: docker.io/openziti/zrok
+    command: test endpoint --address 0.0.0.0
+  httpbin-test:
+    image: mccutchen/go-httpbin  # 8080/tcp
+
+volumes:
+  zrok_env:
