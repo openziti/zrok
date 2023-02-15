@@ -1,3 +1,7 @@
+# v0.3.2
+
+CHANGE: Fix for `zrok enable` error path handling (https://github.com/openziti/zrok/issues/244)
+
 # v0.3.1
 
 CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok/issues/217)
