@@ -36,3 +36,16 @@ jobs:
 
       - name: test
         run: go test -v ./...
+
+      - name: solve GOBIN
+        id: solve_go_bin
+        run: |
+          echo DEBUG: go_path="$(go env GOPATH)"
+          echo go_bin="$(go env GOPATH)/bin" >> $GITHUB_OUTPUT
+
+      - name: upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-amd64
+          path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
+          if-no-files-found: error
