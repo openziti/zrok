@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	user2 "os/user"
 	"time"
@@ -93,8 +94,12 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	//Switch on err type (401, 400, 500, etc...)
 	if err != nil {
 		time.Sleep(250 * time.Millisecond)
-		prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
-		prg.Quit()
+		if prg != nil {
+			prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
+			prg.Quit()
+		} else {
+			logrus.Errorf("the zrok service returned an error: %v", err)
+		}
 		<-done
 		cmd.endpointError(zrd.ApiEndpoint())
 		os.Exit(1)
