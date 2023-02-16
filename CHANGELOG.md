@@ -74,7 +74,7 @@ FIX: Fixed PostgreSQL migration issue where sequences got reset and resulted in 
 
 FIX: Remove `frontend` instances when `zrok disable`-ing an environment containing them (https://github.com/openziti/zrok/issues/171)
 
-# v0.3.0
+# v0.3.x Series
 
 The `v0.2` series was a _proof-of-concept_ implementation for the overall `zrok` architecture and the concept.
 
