@@ -24,6 +24,7 @@ func init() {
 
 type enableCommand struct {
 	description string
+	headless    bool
 	cmd         *cobra.Command
 }
 
@@ -34,6 +35,7 @@ func newEnableCommand() *enableCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &enableCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().StringVarP(&command.description, "description", "d", "<user>@<hostname>", "Description of this environment")
 	cmd.Run = command.run
 	return command
@@ -75,32 +77,39 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	var prg *tea.Program
-	var mdl enableTuiModel
 	var done = make(chan struct{})
-	go func() {
-		mdl = newEnableTuiModel()
-		mdl.msg = "contacting the zrok service..."
-		prg = tea.NewProgram(mdl)
-		if _, err := prg.Run(); err != nil {
-			fmt.Println(err)
-		}
-		close(done)
-		if mdl.quitting {
-			os.Exit(1)
-		}
-	}()
+	if !cmd.headless {
+		var mdl enableTuiModel
+		go func() {
+			mdl = newEnableTuiModel()
+			mdl.msg = "contacting the zrok service..."
+			prg = tea.NewProgram(mdl)
+			if _, err := prg.Run(); err != nil {
+				fmt.Println(err)
+			}
+			close(done)
+			if mdl.quitting {
+				os.Exit(1)
+			}
+		}()
+	} else {
+		logrus.Infof("contacting the zrok service...")
+	}
 
 	resp, err := zrok.Environment.Enable(req, auth)
 	//Switch on err type (401, 400, 500, etc...)
 	if err != nil {
 		time.Sleep(250 * time.Millisecond)
-		if prg != nil {
+		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
 			prg.Quit()
 		} else {
 			logrus.Errorf("the zrok service returned an error: %v", err)
 		}
-		<-done
+		select {
+		case <-done:
+		case <-time.After(1 * time.Second):
+		}
 		cmd.endpointError(zrd.ApiEndpoint())
 		os.Exit(1)
 	}
@@ -110,27 +119,42 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	apiEndpoint, _ := zrd.ApiEndpoint()
 	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
 	if err := zrd.Save(); err != nil {
-		if prg != nil {
+		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
 			prg.Quit()
+		} else {
+			logrus.Errorf("there was an error saving the new environment: %v", err)
 		}
-		<-done
+		select {
+		case <-done:
+		case <-time.After(1 * time.Second):
+		}
 		os.Exit(1)
 	}
 	if err := zrokdir.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
-		if prg != nil {
+		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
 			prg.Quit()
+		} else {
+			logrus.Errorf("there was an error writing the environment: %v", err)
 		}
-		<-done
+		select {
+		case <-done:
+		case <-time.After(1 * time.Second):
+		}
 		os.Exit(1)
 	}
 
-	if prg != nil {
+	if !cmd.headless && prg != nil {
 		prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
 		prg.Quit()
+	} else {
+		logrus.Infof("the zrok environment was successfully enabled...")
 	}
-	<-done
+	select {
+	case <-done:
+	case <-time.After(1 * time.Second):
+	}
 }
 
 func (cmd *enableCommand) endpointError(apiEndpoint, _ string) {
