@@ -19,6 +19,7 @@ func init() {
 	adminCmd.AddCommand(adminDeleteCmd)
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
+	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(shareCmd)
@@ -70,6 +71,12 @@ var adminUpdateCmd = &cobra.Command{
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure your zrok environment",
+}
+
+var loopCmd = &cobra.Command{
+	Use:     "loopback",
+	Aliases: []string{"loop"},
+	Short:   "Loopback testing utilities",
 }
 
 var shareCmd = &cobra.Command{

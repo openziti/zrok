@@ -28,10 +28,10 @@ import (
 )
 
 func init() {
-	testCmd.AddCommand(newLoopCmd().cmd)
+	loopCmd.AddCommand(newTestLoopPublicCommand().cmd)
 }
 
-type loopCmd struct {
+type testLoopPublicCommand struct {
 	cmd               *cobra.Command
 	loopers           int
 	iterations        int
@@ -46,13 +46,13 @@ type loopCmd struct {
 	frontendSelection []string
 }
 
-func newLoopCmd() *loopCmd {
+func newTestLoopPublicCommand() *testLoopPublicCommand {
 	cmd := &cobra.Command{
-		Use:   "loop",
-		Short: "Start a loop agent",
+		Use:   "public",
+		Short: "Start a loop agent testing public proxy shares",
 		Args:  cobra.ExactArgs(0),
 	}
-	r := &loopCmd{cmd: cmd}
+	r := &testLoopPublicCommand{cmd: cmd}
 	cmd.Run = r.run
 	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
 	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
@@ -68,10 +68,10 @@ func newLoopCmd() *loopCmd {
 	return r
 }
 
-func (r *loopCmd) run(_ *cobra.Command, _ []string) {
+func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 	var loopers []*looper
-	for i := 0; i < r.loopers; i++ {
-		l := newLooper(i, r)
+	for i := 0; i < cmd.loopers; i++ {
+		l := newLooper(i, cmd)
 		loopers = append(loopers, l)
 		go l.run()
 	}
@@ -105,7 +105,7 @@ func (r *loopCmd) run(_ *cobra.Command, _ []string) {
 
 type looper struct {
 	id            int
-	cmd           *loopCmd
+	cmd           *testLoopPublicCommand
 	env           *zrokdir.Environment
 	done          chan struct{}
 	listener      edge.Listener
@@ -122,7 +122,7 @@ type looper struct {
 	stop          bool
 }
 
-func newLooper(id int, cmd *loopCmd) *looper {
+func newLooper(id int, cmd *testLoopPublicCommand) *looper {
 	return &looper{
 		id:   id,
 		cmd:  cmd,
