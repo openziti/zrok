@@ -1,5 +1,7 @@
 # v0.3.2
 
+CHANGE: Include missing `--headless` flag for `zrok enable` and `zrok access private` (https://github.com/openziti/zrok/issues/246)
+
 CHANGE: Fix for `zrok enable` error path handling (https://github.com/openziti/zrok/issues/244)
 
 FEATURE: `zrok controller validate` and `zrok access public validate` will both perform a quick syntax validation on controller and public frontend configuration documents (https://github.com/openziti/zrok/issues/238)
