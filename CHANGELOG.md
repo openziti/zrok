@@ -1,3 +1,7 @@
+# v0.3.2
+
+CHANGE: `zrok status` no longer shows secrets (secret token, ziti identity) unless the `--secrets` flag is passed (https://github.com/openziti/zrok/issues/243)
+
 # v0.3.1
 
 CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok/issues/217)
