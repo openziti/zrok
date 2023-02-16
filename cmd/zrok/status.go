@@ -14,7 +14,8 @@ func init() {
 }
 
 type statusCommand struct {
-	cmd *cobra.Command
+	secrets bool
+	cmd     *cobra.Command
 }
 
 func newStatusCommand() *statusCommand {
@@ -25,6 +26,7 @@ func newStatusCommand() *statusCommand {
 		Args:    cobra.ExactArgs(0),
 	}
 	command := &statusCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.secrets, "secrets", false, "Show secrets in status output")
 	cmd.Run = command.run
 	return command
 }
@@ -57,8 +59,22 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleColoredDark)
 		t.AppendHeader(table.Row{"Property", "Value"})
-		t.AppendRow(table.Row{"Secret Token", zrd.Env.Token})
-		t.AppendRow(table.Row{"Ziti Identity", zrd.Env.ZId})
+		if cmd.secrets {
+			t.AppendRow(table.Row{"Secret Token", zrd.Env.Token})
+			t.AppendRow(table.Row{"Ziti Identity", zrd.Env.ZId})
+		} else {
+			secretToken := "<<SET>>"
+			if zrd.Env.Token == "" {
+				secretToken = "<<UNSET>>"
+			}
+			t.AppendRow(table.Row{"Secret Token", secretToken})
+
+			zId := "<<SET>>"
+			if zrd.Env.ZId == "" {
+				zId = "<<UNSET>>"
+			}
+			t.AppendRow(table.Row{"Ziti Identity", zId})
+		}
 		t.Render()
 	}
 	_, _ = fmt.Fprintf(os.Stdout, "\n")

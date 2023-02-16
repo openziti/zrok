@@ -7,8 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var controllerCmd *controllerCommand
+
 func init() {
-	rootCmd.AddCommand(newControllerCommand().cmd)
+	controllerCmd = newControllerCommand()
+	rootCmd.AddCommand(controllerCmd.cmd)
 }
 
 type controllerCommand struct {

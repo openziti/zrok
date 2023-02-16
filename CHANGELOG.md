@@ -2,6 +2,13 @@
 
 CHANGE: Fix for `zrok enable` error path handling (https://github.com/openziti/zrok/issues/244)
 
+FEATURE: `zrok controller validate` and `zrok access public validate` will both perform a quick syntax validation on controller and public frontend configuration documents (https://github.com/openziti/zrok/issues/238)
+
+	$ zrok controller validate etc/dev.yml 
+	[ERROR]: controller config validation failed (error loading controller config 'etc/dev.yml': field 'maintenance': field 'registration': field 'expiration_timeout': got [bool], expected [time.Duration])
+
+CHANGE: `zrok status` no longer shows secrets (secret token, ziti identity) unless the `--secrets` flag is passed (https://github.com/openziti/zrok/issues/243)
+
 # v0.3.1
 
 CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok/issues/217)
@@ -78,7 +85,7 @@ FIX: Fixed PostgreSQL migration issue where sequences got reset and resulted in 
 
 FIX: Remove `frontend` instances when `zrok disable`-ing an environment containing them (https://github.com/openziti/zrok/issues/171)
 
-# v0.3.0
+# v0.3.x Series
 
 The `v0.2` series was a _proof-of-concept_ implementation for the overall `zrok` architecture and the concept.
 
