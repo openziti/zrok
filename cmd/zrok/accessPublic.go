@@ -9,8 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var accessPublicCmd *accessPublicCommand
+
 func init() {
-	accessCmd.AddCommand(newAccessPublicCommand().cmd)
+	accessPublicCmd = newAccessPublicCommand()
+	accessCmd.AddCommand(accessPublicCmd.cmd)
 }
 
 type accessPublicCommand struct {
@@ -29,7 +32,7 @@ func newAccessPublicCommand() *accessPublicCommand {
 	return command
 }
 
-func (self *accessPublicCommand) run(_ *cobra.Command, args []string) {
+func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 	cfg := publicFrontend.DefaultConfig()
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
