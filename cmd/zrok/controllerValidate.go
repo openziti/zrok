@@ -19,7 +19,7 @@ type controllerValidateCommand struct {
 func newControllerValidateCommand() *controllerValidateCommand {
 	cmd := &cobra.Command{
 		Use:   "validate <configPath>",
-		Short: "Validate a zrok controlle configuration document",
+		Short: "Validate a zrok controller configuration document",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &controllerValidateCommand{cmd: cmd}
