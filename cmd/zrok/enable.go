@@ -104,24 +104,32 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		cmd.endpointError(zrd.ApiEndpoint())
 		os.Exit(1)
 	}
-	prg.Send("writing the environment details...")
+	if err != nil {
+		prg.Send("writing the environment details...")
+	}
 	apiEndpoint, _ := zrd.ApiEndpoint()
 	zrd.Env = &zrokdir.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
 	if err := zrd.Save(); err != nil {
-		prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
-		prg.Quit()
+		if prg != nil {
+			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
+			prg.Quit()
+		}
 		<-done
 		os.Exit(1)
 	}
 	if err := zrokdir.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
-		prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
-		prg.Quit()
+		if prg != nil {
+			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
+			prg.Quit()
+		}
 		<-done
 		os.Exit(1)
 	}
 
-	prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
-	prg.Quit()
+	if prg != nil {
+		prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
+		prg.Quit()
+	}
 	<-done
 }
 
