@@ -24,8 +24,9 @@ func init() {
 }
 
 type accessPrivateCommand struct {
-	cmd         *cobra.Command
 	bindAddress string
+	headless    bool
+	cmd         *cobra.Command
 }
 
 func newAccessPrivateCommand() *accessPrivateCommand {
@@ -35,6 +36,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &accessPrivateCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Run = command.run
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	return command
@@ -112,28 +114,40 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	mdl := newAccessModel(shrToken, endpointUrl.String())
-	logrus.SetOutput(mdl)
-	prg := tea.NewProgram(mdl, tea.WithAltScreen())
-	mdl.prg = prg
-
-	go func() {
+	if cmd.headless {
+		logrus.Infof("access the zrok share at the followind endpoint: %v", endpointUrl.String())
 		for {
 			select {
 			case req := <-cfg.RequestsChan:
-				if req != nil {
-					prg.Send(req)
-				}
+				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
-	}()
 
-	if _, err := prg.Run(); err != nil {
-		tui.Error("An error occurred", err)
+	} else {
+		mdl := newAccessModel(shrToken, endpointUrl.String())
+		logrus.SetOutput(mdl)
+		prg := tea.NewProgram(mdl, tea.WithAltScreen())
+		mdl.prg = prg
+
+		go func() {
+			for {
+				select {
+				case req := <-cfg.RequestsChan:
+					if req != nil {
+						prg.Send(req)
+					}
+				}
+			}
+		}()
+
+		if _, err := prg.Run(); err != nil {
+			tui.Error("An error occurred", err)
+		}
+
+		close(cfg.RequestsChan)
+		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
+
 	}
-
-	close(cfg.RequestsChan)
-	cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
 }
 
 func (cmd *accessPrivateCommand) destroy(frotendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
