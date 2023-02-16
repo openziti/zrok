@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/opentracing/opentracing-go/log"
 	"github.com/openziti/zrok/cmd/zrok/endpointUi"
 	"github.com/openziti/zrok/tui"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/time/rate"
 	"html/template"
+	"io"
 	"net"
 	"net/http"
+	"nhooyr.io/websocket"
 	"time"
 )
 
@@ -46,6 +50,7 @@ func newTestEndpointCommand() *testEndpointCommand {
 
 func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 	http.HandleFunc("/", cmd.serveIndex)
+	http.HandleFunc("/echo", cmd.websocketEcho)
 	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
 		if !panicInstead {
 			tui.Error("unable to start http listener", err)
@@ -57,8 +62,58 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("%v {%v} | %v -> /index.gohtml", r.RemoteAddr, r.Host, r.RequestURI)
 	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
-		log.Error(err)
+		logrus.Error(err)
 	}
+}
+
+func (cmd *testEndpointCommand) websocketEcho(w http.ResponseWriter, r *http.Request) {
+	c, err := websocket.Accept(w, r, nil)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+	defer func() { _ = c.Close(websocket.StatusInternalError, "connection terminated") }()
+
+	l := rate.NewLimiter(rate.Every(time.Millisecond*100), 10)
+	for {
+		err = cmd.doEcho(r.Context(), c, l)
+		if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+			return
+		}
+		if err != nil {
+			logrus.Errorf("failed to echo for '%v': %v", r.RemoteAddr, err)
+			return
+		}
+	}
+}
+
+func (cmd *testEndpointCommand) doEcho(ctx context.Context, c *websocket.Conn, l *rate.Limiter) error {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	err := l.Wait(ctx)
+	if err != nil {
+		return err
+	}
+
+	typ, r, err := c.Reader(ctx)
+	if err != nil {
+		return err
+	}
+
+	w, err := c.Writer(ctx, typ)
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write([]byte("i received: "))
+	_, err = io.Copy(w, r)
+	if err != nil {
+		return errors.Wrap(err, "failed to copy")
+	}
+
+	err = w.Close()
+	return err
 }
 
 type endpointData struct {
