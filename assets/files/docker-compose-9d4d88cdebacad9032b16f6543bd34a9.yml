@@ -1,0 +1,66 @@
+version: '3'
+services:
+  zrok-enable-init:
+    image: busybox
+    # matches uid:gid of "nobody" in zrok container image
+    command: chown -Rc 65534:65534 /mnt/.zrok
+    user: root
+    volumes:
+      - zrok_env:/mnt/.zrok
+  zrok-enable:
+    image: docker.io/openziti/zrok:enable-headless  # FIXME: resume :latest if >= :0.3.2
+    depends_on:
+      zrok-enable-init:
+        condition: service_completed_successfully
+    entrypoint:
+      - bash
+      - -c
+      - |
+        if [[ -s /mnt/.zrok/environment.json ]]; then
+          echo "INFO: noop: zrok environment is already enabled"
+          exit 0
+        else
+          echo "INFO: running: zrok $$(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
+          exec zrok $${@}
+        fi
+    command: -- enable --headless ${ZROK_ENABLE_TOKEN}
+    volumes:
+      - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      ZROK_ENABLE_TOKEN:
+      ZROK_API_ENDPOINT: https://api.zrok.io/
+  zrok-private-access:
+    image: docker.io/openziti/zrok
+    command: access private --bind 0.0.0.0:9191 ${ZROK_ACCESS_TOKEN}
+    depends_on:
+      zrok-enable:
+        condition: service_completed_successfully
+    ports:
+      - 9191:9191  # expose the zrok private access proxy to the Docker host
+    stdin_open: true  # FIXME: remove when --headless is available
+    tty: true         # FIXME: remove when --headless is available
+    volumes:
+      - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      PFXLOG_NO_JSON: "true"
+      ZROK_ACCESS_TOKEN:
+
+  # alternatively, access the zrok private access proxy from another container
+  demo-client:
+    depends_on:
+      - zrok-private-access
+    image: busybox
+    entrypoint:
+      - sh
+      - -c
+      - |
+        while true; do 
+          echo 'INFO: trying wget';
+          wget -q -O - http://zrok-private-access:9191/ip; 
+          sleep 3; 
+        done
+
+volumes:
+  zrok_env:
