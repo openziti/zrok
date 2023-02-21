@@ -6,6 +6,9 @@ on:
       - '**'
     tags-ignore:
       - '**'
+    paths-ignore:
+      - 'docs/**'
+      - 'website/**'
 
 jobs:
   ubuntu-build:
