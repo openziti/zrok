@@ -1,5 +1,7 @@
 # v0.3.2
 
+FEATURE: New docker infrastructure, including `docker-compose.yml` examples (and documentation) illustrating how to deploy `zrok` in `docker`-based environments
+
 CHANGE: Include missing `--headless` flag for `zrok enable` and `zrok access private` (https://github.com/openziti/zrok/issues/246)
 
 CHANGE: Fix for `zrok enable` error path handling (https://github.com/openziti/zrok/issues/244)
