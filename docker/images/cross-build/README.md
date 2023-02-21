@@ -15,7 +15,7 @@ docker buildx build \
     --build-arg gid=$GID \
     --build-arg golang_version=$(grep -Po '^go\s+\K\d+\.\d+(\.\d+)?$' go.mod) \
     --load \
-    ./docker-images/cross-build/
+    ./docker/images/cross-build/
 ```
 
 ## Run the Container to Build Executables for the Desired Architectures

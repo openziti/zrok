@@ -87,11 +87,11 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ${{ github.workspace }}/
-          file: ${{ github.workspace }}/docker-images/zrok/Dockerfile
+          file: ${{ github.workspace }}/docker/images/zrok/Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.tagprep_cli.outputs.DOCKER_TAGS }}
           build-args: |
-            DOCKER_BUILD_DIR=./docker-images/zrok
+            DOCKER_BUILD_DIR=./docker/images/zrok
             ARTIFACTS_DIR=./dist
           push: true
 
@@ -113,7 +113,7 @@ jobs:
       #   uses: docker/build-push-action@v3
       #   with:
       #     builder: ${{ steps.buildx.outputs.name }}
-      #     context: ${{ github.workspace }}/docker-images/zrok-controller/
+      #     context: ${{ github.workspace }}/docker/images/zrok-controller/
       #     platforms: linux/amd64,linux/arm64
       #     tags: ${{ steps.tagprep_ctrl.outputs.DOCKER_TAGS }}
       #     build-args: |
@@ -135,7 +135,7 @@ jobs:
       #   uses: docker/build-push-action@v3
       #   with:
       #     builder: ${{ steps.buildx.outputs.name }}
-      #     context: ${{ github.workspace }}/docker-images/zrok-frontend/
+      #     context: ${{ github.workspace }}/docker/images/zrok-frontend/
       #     platforms: linux/amd64,linux/arm64
       #     tags: ${{ steps.tagprep_frontend.outputs.DOCKER_TAGS }}
       #     build-args: |
@@ -157,7 +157,7 @@ jobs:
       #   uses: docker/build-push-action@v3
       #   with:
       #     builder: ${{ steps.buildx.outputs.name }}
-      #     context: ${{ github.workspace }}/docker-images/zrok-share/
+      #     context: ${{ github.workspace }}/docker/images/zrok-share/
       #     platforms: linux/amd64,linux/arm64
       #     tags: ${{ steps.tagprep_share.outputs.DOCKER_TAGS }}
       #     build-args: |
@@ -179,7 +179,7 @@ jobs:
       #   uses: docker/build-push-action@v3
       #   with:
       #     builder: ${{ steps.buildx.outputs.name }}
-      #     context: ${{ github.workspace }}/docker-images/zrok-access/
+      #     context: ${{ github.workspace }}/docker/images/zrok-access/
       #     platforms: linux/amd64,linux/arm64
       #     tags: ${{ steps.tagprep_access.outputs.DOCKER_TAGS }}
       #     build-args: |
