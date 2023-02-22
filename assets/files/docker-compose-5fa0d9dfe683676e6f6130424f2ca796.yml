@@ -8,7 +8,7 @@ services:
     volumes:
       - zrok_env:/mnt/.zrok
   zrok-enable:
-    image: docker.io/openziti/zrok:enable-headless  # FIXME: resume :latest if >= :0.3.2
+    image: docker.io/openziti/zrok
     depends_on:
       zrok-enable-init:
         condition: service_completed_successfully
@@ -29,25 +29,36 @@ services:
     environment:
       HOME: /mnt
       ZROK_ENABLE_TOKEN:
-      ZROK_API_ENDPOINT: https://api.zrok.io/
-  zrok-private-share:
+      ZROK_API_ENDPOINT: ${ZROK_API_ENDPOINT:-https://api.zrok.io/}
+  zrok-private-access:
     image: docker.io/openziti/zrok
-    command: share private --headless http://zrok-test:8080
+    command: access private --headless --bind 0.0.0.0:9191 ${ZROK_ACCESS_TOKEN}
     depends_on:
       zrok-enable:
         condition: service_completed_successfully
+    ports:
+      - 9191:9191  # expose the zrok private access proxy to the Docker host
     volumes:
       - zrok_env:/mnt/.zrok
     environment:
       HOME: /mnt
       PFXLOG_NO_JSON: "true"
+      ZROK_ACCESS_TOKEN:
 
-  # demo servers you can share with zrok
-  zrok-test:
-    image: docker.io/openziti/zrok
-    command: test endpoint --address 0.0.0.0  # 9090
-  httpbin-test:
-    image: mccutchen/go-httpbin  # 8080/tcp
+  # alternatively, access the zrok private access proxy from another container
+  demo-client:
+    depends_on:
+      - zrok-private-access
+    image: busybox
+    entrypoint:
+      - sh
+      - -c
+      - |
+        while true; do 
+          echo 'INFO: trying wget';
+          wget -q -O - http://zrok-private-access:9191/ip; 
+          sleep 3; 
+        done
 
 volumes:
   zrok_env:
