@@ -8,10 +8,10 @@ import (
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/model"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
+// TODO: Create options struct
+func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*model.AuthUser, oauthProvider string, oauthEmailDomains []string, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	authScheme, err := model.ParseAuthScheme(authSchemeStr)
 	if err != nil {
 		return "", err
@@ -23,6 +23,12 @@ func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, aut
 		cfg.BasicAuth = &model.BasicAuth{}
 		for _, authUser := range authUsers {
 			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &model.AuthUser{Username: authUser.Username, Password: authUser.Password})
+		}
+	}
+	if cfg.AuthScheme == model.Oauth {
+		cfg.OauthAuth = &model.OauthAuth{
+			Provider:     oauthProvider,
+			EmailDomains: oauthEmailDomains,
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{

@@ -41,6 +41,12 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 			return nil, err
 		}
 		return nil, result
+	case 422:
+		result := NewShareUnprocessableEntity()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewShareInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -213,6 +219,57 @@ func (o *ShareNotFound) String() string {
 }
 
 func (o *ShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewShareUnprocessableEntity creates a ShareUnprocessableEntity with default headers values
+func NewShareUnprocessableEntity() *ShareUnprocessableEntity {
+	return &ShareUnprocessableEntity{}
+}
+
+/*
+ShareUnprocessableEntity describes a response with status code 422, with default header values.
+
+Unprocessable entity. Incorrect enum?
+*/
+type ShareUnprocessableEntity struct {
+}
+
+// IsSuccess returns true when this share unprocessable entity response has a 2xx status code
+func (o *ShareUnprocessableEntity) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this share unprocessable entity response has a 3xx status code
+func (o *ShareUnprocessableEntity) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this share unprocessable entity response has a 4xx status code
+func (o *ShareUnprocessableEntity) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this share unprocessable entity response has a 5xx status code
+func (o *ShareUnprocessableEntity) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this share unprocessable entity response a status code equal to that given
+func (o *ShareUnprocessableEntity) IsCode(code int) bool {
+	return code == 422
+}
+
+func (o *ShareUnprocessableEntity) Error() string {
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
+}
+
+func (o *ShareUnprocessableEntity) String() string {
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
+}
+
+func (o *ShareUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

@@ -108,6 +108,31 @@ func (o *ShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	rw.WriteHeader(404)
 }
 
+// ShareUnprocessableEntityCode is the HTTP code returned for type ShareUnprocessableEntity
+const ShareUnprocessableEntityCode int = 422
+
+/*
+ShareUnprocessableEntity Unprocessable entity. Incorrect enum?
+
+swagger:response shareUnprocessableEntity
+*/
+type ShareUnprocessableEntity struct {
+}
+
+// NewShareUnprocessableEntity creates ShareUnprocessableEntity with default headers values
+func NewShareUnprocessableEntity() *ShareUnprocessableEntity {
+
+	return &ShareUnprocessableEntity{}
+}
+
+// WriteResponse to the client
+func (o *ShareUnprocessableEntity) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(422)
+}
+
 // ShareInternalServerErrorCode is the HTTP code returned for type ShareInternalServerError
 const ShareInternalServerErrorCode int = 500
 

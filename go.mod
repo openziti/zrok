@@ -3,6 +3,8 @@ module github.com/openziti/zrok
 go 1.20
 
 require (
+	github.com/aws/aws-sdk-go-v2/config v1.18.13
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.22.2
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
@@ -51,6 +53,17 @@ require (
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20211106181442-e4c1a74c66bd // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.17.4 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.13 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.28 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.22 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.29 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.22 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.3 // indirect
+	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/biogo/store v0.0.0-20200525035639-8c94ae1e7c9c // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect

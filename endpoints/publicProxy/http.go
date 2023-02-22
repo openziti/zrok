@@ -3,6 +3,12 @@ package publicProxy
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
@@ -12,11 +18,6 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
 )
 
 type httpFrontend struct {
@@ -180,6 +181,18 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 							}
 
 							handler.ServeHTTP(w, r)
+
+						case string(model.Oauth):
+							logrus.Debugf("auth scheme oauth '%v'", shrToken)
+							awsUrl := "https://oauth2/authorize" // COGNITO URL OR WHATEVER OAUTH PROVIDER URL
+							responseType := "code"
+							clientId := "" // PROVIDER CLIENT ID
+							scope := "email"
+							redirectUri := "http://localhost:18080/api/v1/oauth/authorize"
+							redirectUrl := fmt.Sprintf("%s?response_type=%s&client_id=%s&redirect_uri=%s&state=STATE&scope=%s", awsUrl, responseType, clientId, redirectUri, scope)
+							http.Redirect(w, r, redirectUrl, http.StatusFound)
+							handler.ServeHTTP(w, r)
+							return
 
 						default:
 							logrus.Infof("invalid auth scheme '%v'", scheme)

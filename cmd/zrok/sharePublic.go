@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -16,10 +21,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
 )
 
 func init() {
@@ -32,6 +33,8 @@ type sharePublicCommand struct {
 	backendMode       string
 	headless          bool
 	insecure          bool
+	oauthProvider     string
+	oauthEmailDomains []string
 	cmd               *cobra.Command
 }
 
@@ -47,6 +50,10 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
+
+	cmd.Flags().StringVar(&command.oauthProvider, "provider", "", "Provider to authenticate against with oauth")
+	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-domains", []string{}, "Valid email domains for oauth authentication")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth", "provider")
 	cmd.Run = command.run
 	return command
 }
@@ -121,6 +128,13 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 				panic(errors.Errorf("invalid username:password pair '%v'", pair))
 			}
 		}
+	}
+	if cmd.oauthProvider != "" {
+		req.Body.AuthScheme = string(model.Oauth)
+		req.Body.OauthProvider = cmd.oauthProvider
+	}
+	if len(cmd.oauthEmailDomains) > 0 {
+		req.Body.OauthEmailDomains = cmd.oauthEmailDomains
 	}
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {

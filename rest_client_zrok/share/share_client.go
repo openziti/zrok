@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Access(params *AccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AccessCreated, error)
 
+	OauthAuthenticate(params *OauthAuthenticateParams, opts ...ClientOption) (*OauthAuthenticateOK, error)
+
 	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
 
 	Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error)
@@ -79,6 +81,44 @@ func (a *Client) Access(params *AccessParams, authInfo runtime.ClientAuthInfoWri
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for access: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+OauthAuthenticate oauth authenticate API
+*/
+func (a *Client) OauthAuthenticate(params *OauthAuthenticateParams, opts ...ClientOption) (*OauthAuthenticateOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewOauthAuthenticateParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "oauthAuthenticate",
+		Method:             "GET",
+		PathPattern:        "/oauth/authorize",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &OauthAuthenticateReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*OauthAuthenticateOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for oauthAuthenticate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

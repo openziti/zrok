@@ -18,7 +18,7 @@ func (a *privateResourceAllocator) allocate(envZId, shrToken string, params shar
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
 	}
-	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, edge)
+	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, params.Body.OauthProvider, params.Body.OauthEmailDomains, edge)
 	if err != nil {
 		return "", nil, err
 	}
