@@ -12,17 +12,19 @@ import (
 	"github.com/openziti/fabric/event"
 	"github.com/openziti/fabric/pb/mgmt_pb"
 	"github.com/openziti/identity"
+	"github.com/openziti/sdk-golang/ziti/constants"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 type usageAgent struct{}
 
 func RunUsageAgent(cfg *Config) error {
-	wsUrl := "wss://127.0.0.1:1280/ws-api"
+	wsUrl := "wss://127.0.0.1:1280/fabric/v1/ws-api"
 
 	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.Ziti.ApiEndpoint)
 	if err != nil {
@@ -33,6 +35,17 @@ func RunUsageAgent(cfg *Config) error {
 		caPool.AddCert(ca)
 	}
 
+	authenticator := rest_util.NewAuthenticatorUpdb(cfg.Ziti.Username, cfg.Ziti.Password)
+	authenticator.RootCas = caPool
+	ctrlUrl, err := url.Parse(cfg.Ziti.ApiEndpoint)
+	if err != nil {
+		return err
+	}
+	apiSession, err := authenticator.Authenticate(ctrlUrl)
+	if err != nil {
+		return err
+	}
+
 	dialer := &websocket.Dialer{
 		TLSClientConfig: &tls.Config{
 			RootCAs: caPool,
@@ -40,7 +53,7 @@ func RunUsageAgent(cfg *Config) error {
 		HandshakeTimeout: 5 * time.Second,
 	}
 
-	conn, resp, err := dialer.Dial(wsUrl, http.Header{})
+	conn, resp, err := dialer.Dial(wsUrl, http.Header{constants.ZitiSession: []string{*apiSession.Token}})
 	if err != nil {
 		if resp != nil {
 			if body, rerr := io.ReadAll(resp.Body); rerr == nil {
