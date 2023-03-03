@@ -6,5 +6,5 @@ type Source interface {
 }
 
 type Ingester interface {
-	Ingest(msg map[string]interface{})
+	Ingest(msg map[string]interface{}) error
 }
