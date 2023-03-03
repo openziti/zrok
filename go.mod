@@ -25,6 +25,7 @@ require (
 	github.com/michaelquigley/cf v0.0.13
 	github.com/michaelquigley/pfxlog v0.6.9
 	github.com/muesli/reflow v0.3.0
+	github.com/nxadm/tail v1.4.8
 	github.com/openziti/channel/v2 v2.0.30
 	github.com/openziti/edge v0.22.39
 	github.com/openziti/fabric v0.22.33
@@ -110,6 +111,7 @@ require (
 	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -18,10 +18,23 @@ func Run(cfg *Config) error {
 		return errors.New("invalid 'source'; exiting")
 	}
 
-	srcJoin, err := src.Start()
+	events := make(chan map[string]interface{}, 1024)
+	srcJoin, err := src.Start(events)
 	if err != nil {
 		return errors.Wrap(err, "error starting source")
 	}
+
+	go func() {
+		ingester := &UsageIngester{}
+		for {
+			select {
+			case event := <-events:
+				if err := ingester.Ingest(event); err != nil {
+					logrus.Error(err)
+				}
+			}
+		}
+	}()
 
 	<-srcJoin
 

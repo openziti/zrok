@@ -12,6 +12,9 @@ func loadWebsocketSourceConfig(v interface{}, opts *cf.Options) (interface{}, er
 
 type websocketSource struct{}
 
-func (s *websocketSource) Start() (chan struct{}, error) {
+func (s *websocketSource) Start(events chan map[string]interface{}) (chan struct{}, error) {
 	return nil, nil
+}
+
+func (s *websocketSource) Stop() {
 }

@@ -3,6 +3,7 @@ package metrics
 import (
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
+	"reflect"
 )
 
 type UsageIngester struct{}
@@ -70,7 +71,7 @@ func (i *UsageIngester) Ingest(event map[string]interface{}) error {
 					logrus.Error("missing 'usage/egress.rx'")
 				}
 			} else {
-				logrus.Error("unabel to assert 'usage'")
+				logrus.Errorf("unable to assert 'usage' (%v) %v", reflect.TypeOf(v), event)
 			}
 		} else {
 			logrus.Error("missing 'usage'")
