@@ -1,41 +1,28 @@
 package metrics
 
 import (
-	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"reflect"
+	"time"
 )
 
-type UsageIngester struct{}
-
-func (i *UsageIngester) Ingest(event map[string]interface{}) error {
+func Ingest(event map[string]interface{}) *Usage {
+	u := &Usage{ProcessedStamp: time.Now()}
 	if ns, found := event["namespace"]; found && ns == "fabric.usage" {
-		start := float64(0)
 		if v, found := event["interval_start_utc"]; found {
 			if vFloat64, ok := v.(float64); ok {
-				start = vFloat64
+				u.IntervalStart = time.Unix(int64(vFloat64), 0)
 			} else {
 				logrus.Error("unable to assert 'interval_start_utc'")
 			}
 		} else {
 			logrus.Error("missing 'interval_start_utc'")
 		}
-		clientId := ""
-		serviceId := ""
 		if v, found := event["tags"]; found {
 			if tags, ok := v.(map[string]interface{}); ok {
-				if v, found := tags["clientId"]; found {
-					if vStr, ok := v.(string); ok {
-						clientId = vStr
-					} else {
-						logrus.Error("unable to assert 'tags/clientId'")
-					}
-				} else {
-					logrus.Errorf("missing 'tags/clientId'")
-				}
 				if v, found := tags["serviceId"]; found {
 					if vStr, ok := v.(string); ok {
-						serviceId = vStr
+						u.ZitiServiceId = vStr
 					} else {
 						logrus.Error("unable to assert 'tags/serviceId'")
 					}
@@ -48,49 +35,61 @@ func (i *UsageIngester) Ingest(event map[string]interface{}) error {
 		} else {
 			logrus.Errorf("missing 'tags'")
 		}
-		tx := int64(0)
-		rx := int64(0)
 		if v, found := event["usage"]; found {
 			if usage, ok := v.(map[string]interface{}); ok {
+				if v, found := usage["ingress.tx"]; found {
+					if vFloat64, ok := v.(float64); ok {
+						u.FrontendTx = int64(vFloat64)
+					} else {
+						logrus.Error("unable to assert 'usage/ingress.tx'")
+					}
+				} else {
+					logrus.Warn("missing 'usage/ingress.tx'")
+				}
+				if v, found := usage["ingress.rx"]; found {
+					if vFloat64, ok := v.(float64); ok {
+						u.FrontendRx = int64(vFloat64)
+					} else {
+						logrus.Error("unable to assert 'usage/ingress.rx")
+					}
+				} else {
+					logrus.Warn("missing 'usage/ingress.rx")
+				}
 				if v, found := usage["egress.tx"]; found {
 					if vFloat64, ok := v.(float64); ok {
-						tx = int64(vFloat64)
+						u.BackendTx = int64(vFloat64)
 					} else {
 						logrus.Error("unable to assert 'usage/egress.tx'")
 					}
 				} else {
-					logrus.Error("missing 'usage/egress.tx'")
+					logrus.Warn("missing 'usage/egress.tx'")
 				}
 				if v, found := usage["egress.rx"]; found {
 					if vFloat64, ok := v.(float64); ok {
-						rx = int64(vFloat64)
+						u.BackendRx = int64(vFloat64)
 					} else {
 						logrus.Error("unable to assert 'usage/egress.rx'")
 					}
 				} else {
-					logrus.Error("missing 'usage/egress.rx'")
+					logrus.Warn("missing 'usage/egress.rx'")
 				}
 			} else {
 				logrus.Errorf("unable to assert 'usage' (%v) %v", reflect.TypeOf(v), event)
 			}
 		} else {
-			logrus.Error("missing 'usage'")
+			logrus.Warnf("missing 'usage'")
 		}
-		circuitId := ""
 		if v, found := event["circuit_id"]; found {
 			if vStr, ok := v.(string); ok {
-				circuitId = vStr
+				u.ZitiCircuitId = vStr
 			} else {
 				logrus.Error("unable to assert 'circuit_id'")
 			}
 		} else {
-			logrus.Error("missing 'circuit_id'")
+			logrus.Warn("missing 'circuit_id'")
 		}
-
-		logrus.Infof("usage: start '%d', serviceId '%v', clientId '%v', circuitId '%v' [rx: %v, tx: %v]", int64(start), serviceId, clientId, circuitId, util.BytesToSize(rx), util.BytesToSize(tx))
-
 	} else {
 		logrus.Errorf("not 'fabric.usage'")
 	}
-	return nil
+	return u
 }
