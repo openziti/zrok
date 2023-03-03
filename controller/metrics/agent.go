@@ -25,13 +25,10 @@ func Run(cfg *Config) error {
 	}
 
 	go func() {
-		ingester := &UsageIngester{}
 		for {
 			select {
 			case event := <-events:
-				if err := ingester.Ingest(event); err != nil {
-					logrus.Error(err)
-				}
+				logrus.Info(Ingest(event))
 			}
 		}
 	}()

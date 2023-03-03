@@ -132,10 +132,7 @@ func (ua *usageAgent) HandleReceive(msg *channel.Message, _ channel.Channel) {
 			break
 		}
 		if err == nil {
-			ui := &metrics.UsageIngester{}
-			if err := ui.Ingest(event); err != nil {
-				logrus.Errorf("error ingesting '%v': %v", string(msg.Body), err)
-			}
+			logrus.Info(metrics.Ingest(event))
 		} else {
 			logrus.Errorf("error parsing '%v': %v", string(msg.Body), err)
 		}
