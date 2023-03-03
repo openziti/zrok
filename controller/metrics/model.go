@@ -1,7 +1,7 @@
 package metrics
 
 type Source interface {
-	Start() (chan struct{}, error)
+	Start(chan map[string]interface{}) (chan struct{}, error)
 	Stop()
 }
 
