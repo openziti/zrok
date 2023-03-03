@@ -1,0 +1,4 @@
+source:
+  type:               file
+  path:               /tmp/fabric-usage.log
+  
