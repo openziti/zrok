@@ -1,3 +1,11 @@
+# v0.3.4
+
+CHANGE: `zrok test endpoint` incorporates `--ziti` mode (and related flags) to allow direct endpoint listening on a Ziti service
+
+CHANGE: `zrok test websocket` command to test websockets, whether over TCP or over Ziti
+
+FIX: Websocket support now functional
+
 # v0.3.3
 
 CHANGE: `zrok test loop` has been moved to `zrok test loop public`, making way for additional types of loopback testing tools. The `zrok test endpoint` server now includes an `/echo` endpoint, which provides a simple echo websocket (https://github.com/openziti/zrok/issues/237)
