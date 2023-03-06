@@ -1,3 +1,7 @@
+# v0.4.0
+
+Work in progress.
+
 # v0.3.3
 
 CHANGE: `zrok test loop` has been moved to `zrok test loop public`, making way for additional types of loopback testing tools. The `zrok test endpoint` server now includes an `/echo` endpoint, which provides a simple echo websocket (https://github.com/openziti/zrok/issues/237)
