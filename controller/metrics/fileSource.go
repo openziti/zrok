@@ -19,13 +19,14 @@ func loadFileSourceConfig(v interface{}, opts *cf.Options) (interface{}, error) 
 		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
 			return nil, err
 		}
-		return &fileSource{cfg}, nil
+		return &fileSource{cfg: cfg}, nil
 	}
 	return nil, errors.New("invalid config structure for 'file' source")
 }
 
 type fileSource struct {
 	cfg *FileSourceConfig
+	t   *tail.Tail
 }
 
 func (s *fileSource) Start(events chan map[string]interface{}) (chan struct{}, error) {
@@ -45,18 +46,29 @@ func (s *fileSource) Start(events chan map[string]interface{}) (chan struct{}, e
 }
 
 func (s *fileSource) Stop() {
+	if err := s.t.Stop(); err != nil {
+		logrus.Error(err)
+	}
 }
 
 func (s *fileSource) tail(events chan map[string]interface{}) {
-	t, err := tail.TailFile(s.cfg.Path, tail.Config{Follow: true, ReOpen: true})
+	logrus.Infof("started")
+	defer logrus.Infof("stopped")
+
+	var err error
+	s.t, err = tail.TailFile(s.cfg.Path, tail.Config{
+		ReOpen: true,
+		Follow: true,
+	})
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
 
-	for line := range t.Lines {
+	for line := range s.t.Lines {
 		event := make(map[string]interface{})
 		if err := json.Unmarshal([]byte(line.Text), &event); err == nil {
+			logrus.Infof("seekinfo: offset: %d", line.SeekInfo.Offset)
 			events <- event
 		} else {
 			logrus.Errorf("error parsing line #%d: %v", line.Num, err)

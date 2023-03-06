@@ -5,23 +5,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Run(cfg *Config) error {
+type MetricsAgent struct {
+	src  Source
+	join chan struct{}
+}
+
+func Run(cfg *Config) (*MetricsAgent, error) {
 	logrus.Info("starting")
 	defer logrus.Warn("stopping")
 
 	if cfg.Source == nil {
-		return errors.New("no 'source' configured; exiting")
+		return nil, errors.New("no 'source' configured; exiting")
 	}
 
 	src, ok := cfg.Source.(Source)
 	if !ok {
-		return errors.New("invalid 'source'; exiting")
+		return nil, errors.New("invalid 'source'; exiting")
 	}
 
 	events := make(chan map[string]interface{}, 1024)
-	srcJoin, err := src.Start(events)
+	join, err := src.Start(events)
 	if err != nil {
-		return errors.Wrap(err, "error starting source")
+		return nil, errors.Wrap(err, "error starting source")
 	}
 
 	go func() {
@@ -33,7 +38,13 @@ func Run(cfg *Config) error {
 		}
 	}()
 
-	<-srcJoin
+	return &MetricsAgent{src, join}, nil
+}
 
-	return nil
+func (ma *MetricsAgent) Stop() {
+	ma.src.Stop()
+}
+
+func (ma *MetricsAgent) Join() {
+	<-ma.join
 }
