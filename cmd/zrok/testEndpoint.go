@@ -2,19 +2,25 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
+	"html/template"
+	"io"
+	"net"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/openziti/sdk-golang/ziti"
+	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/cmd/zrok/endpointUi"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/time/rate"
-	"html/template"
-	"io"
-	"net"
-	"net/http"
 	"nhooyr.io/websocket"
-	"time"
 )
 
 func init() {
@@ -26,6 +32,10 @@ type testEndpointCommand struct {
 	port    uint16
 	t       *template.Template
 	cmd     *cobra.Command
+
+	enableZiti       bool
+	serviceName      string
+	identityJsonFile string
 }
 
 func newTestEndpointCommand() *testEndpointCommand {
@@ -44,14 +54,60 @@ func newTestEndpointCommand() *testEndpointCommand {
 	}
 	cmd.Flags().StringVarP(&command.address, "address", "a", "127.0.0.1", "The address for the HTTP listener")
 	cmd.Flags().Uint16VarP(&command.port, "port", "P", 9090, "The port for the HTTP listener")
+
+	cmd.Flags().BoolVar(&command.enableZiti, "ziti", false, "Enable the usage of a ziti network")
+	cmd.Flags().StringVar(&command.identityJsonFile, "ziti-identity", "", "Path to Ziti Identity json file")
+	cmd.Flags().StringVar(&command.serviceName, "ziti-name", "", "Name of the Ziti Service")
+
 	cmd.Run = command.run
 	return command
 }
 
 func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
+	var listener net.Listener
+	var err error
+
+	if cmd.enableZiti {
+		identityJsonBytes, err := os.ReadFile(cmd.identityJsonFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: failed to read identity config JSON from file %s: %s\n", cmd.identityJsonFile, err)
+			os.Exit(1)
+		}
+
+		if len(identityJsonBytes) == 0 {
+			fmt.Fprintf(os.Stderr, "Error: When running a ziti enabled service must have ziti identity provided\n\n")
+			flag.Usage()
+			os.Exit(1)
+		}
+		config := config.Config{}
+		err = json.Unmarshal(identityJsonBytes, &config)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to load ziti configuration JSON: %v", err)
+			os.Exit(1)
+		}
+		zitiContext := ziti.NewContextWithConfig(&config)
+		if err := zitiContext.Authenticate(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Unable to authenticate ziti: %v\n\n", err)
+			os.Exit(1)
+		}
+
+		listener, err = zitiContext.Listen(cmd.serviceName)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Unable to listen on ziti network: %v\n\n", err)
+			os.Exit(1)
+		}
+	} else {
+		listener, err = net.Listen("tcp", fmt.Sprintf("%v:%d", cmd.address, cmd.port))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Unable to listen on %s: %v\n\n", fmt.Sprintf("%v:%d", cmd.address, cmd.port), err)
+			os.Exit(1)
+		}
+	}
+	server := &http.Server{}
+
 	http.HandleFunc("/", cmd.serveIndex)
 	http.HandleFunc("/echo", cmd.websocketEcho)
-	if err := http.ListenAndServe(fmt.Sprintf("%v:%d", cmd.address, cmd.port), nil); err != nil {
+	if err := server.Serve(listener); err != nil {
 		if !panicInstead {
 			tui.Error("unable to start http listener", err)
 		}
