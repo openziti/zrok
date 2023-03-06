@@ -5,6 +5,10 @@ import (
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func init() {
@@ -33,7 +37,21 @@ func (cmd *metricsCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof(cf.Dump(cfg, metrics.GetCfOptions()))
 
-	if err := metrics.Run(cfg); err != nil {
+	ma, err := metrics.Run(cfg)
+	if err != nil {
 		panic(err)
+	}
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		ma.Stop()
+		ma.Join()
+		os.Exit(0)
+	}()
+
+	for {
+		time.Sleep(30 * time.Minute)
 	}
 }
