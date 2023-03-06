@@ -11,8 +11,8 @@ import (
 )
 
 type FileSourceConfig struct {
-	Path     string
-	DataPath string
+	Path      string
+	IndexPath string
 }
 
 func loadFileSourceConfig(v interface{}, opts *cf.Options) (interface{}, error) {
@@ -38,10 +38,9 @@ func (s *fileSource) Start(events chan map[string]interface{}) (join chan struct
 	}
 	_ = f.Close()
 
-	idxPath := s.cfg.Path + ".idx"
-	idxF, err := os.OpenFile(idxPath, os.O_CREATE|os.O_RDWR, os.ModePerm)
+	idxF, err := os.OpenFile(s.indexPath(), os.O_CREATE|os.O_RDWR, os.ModePerm)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening '%v'", idxPath)
+		return nil, errors.Wrapf(err, "error opening '%v'", s.indexPath())
 	}
 
 	pos := int64(0)
@@ -96,5 +95,13 @@ func (s *fileSource) tail(pos int64, events chan map[string]interface{}, idxF *o
 		} else {
 			logrus.Errorf("error parsing line #%d: %v", line.Num, err)
 		}
+	}
+}
+
+func (s *fileSource) indexPath() string {
+	if s.cfg.IndexPath == "" {
+		return s.cfg.Path + ".idx"
+	} else {
+		return s.cfg.IndexPath
 	}
 }
