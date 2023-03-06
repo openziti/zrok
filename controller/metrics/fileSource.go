@@ -15,7 +15,7 @@ type FileSourceConfig struct {
 	IndexPath string
 }
 
-func loadFileSourceConfig(v interface{}, opts *cf.Options) (interface{}, error) {
+func loadFileSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
 	if submap, ok := v.(map[string]interface{}); ok {
 		cfg := &FileSourceConfig{}
 		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {

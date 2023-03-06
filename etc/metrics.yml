@@ -1,4 +1,10 @@
 source:
   type:               file
   path:               /tmp/fabric-usage.log
-  
+
+#source:
+#  type:                 websocket
+#  websocket_endpoint:   wss://127.0.0.1:1280/fabric/v1/ws-api
+#  api_endpoint:         https://127.0.0.1:1280
+#  username:             admin
+#  password:             ""
