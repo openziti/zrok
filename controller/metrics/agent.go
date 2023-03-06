@@ -12,7 +12,6 @@ type MetricsAgent struct {
 
 func Run(cfg *Config) (*MetricsAgent, error) {
 	logrus.Info("starting")
-	defer logrus.Warn("stopping")
 
 	if cfg.Source == nil {
 		return nil, errors.New("no 'source' configured; exiting")
@@ -42,6 +41,7 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 }
 
 func (ma *MetricsAgent) Stop() {
+	logrus.Info("stopping")
 	ma.src.Stop()
 }
 
