@@ -7,6 +7,14 @@ import (
 
 type Config struct {
 	Source interface{}
+	Influx *InfluxConfig
+}
+
+type InfluxConfig struct {
+	Url    string
+	Bucket string
+	Org    string
+	Token  string `cf:"+secret"`
 }
 
 func LoadConfig(path string) (*Config, error) {

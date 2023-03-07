@@ -1,7 +1,6 @@
 package proxyBackend
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
@@ -11,7 +10,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -79,7 +77,6 @@ func newReverseProxy(cfg *Config) (*httputil.ReverseProxy, error) {
 	}
 
 	tpt := http.DefaultTransport.(*http.Transport).Clone()
-	tpt.DialContext = metricsDial
 	if cfg.Insecure {
 		tpt.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
@@ -104,12 +101,4 @@ func newReverseProxy(cfg *Config) (*httputil.ReverseProxy, error) {
 	}
 
 	return proxy, nil
-}
-
-func metricsDial(_ context.Context, network string, addr string) (net.Conn, error) {
-	conn, err := net.Dial(network, addr)
-	if err != nil {
-		return conn, err
-	}
-	return newMetricsConn("backend", conn), nil
 }

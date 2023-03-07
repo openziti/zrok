@@ -18,7 +18,6 @@ type Config struct {
 	Influx        *InfluxConfig
 	Limits        *LimitsConfig
 	Maintenance   *MaintenanceConfig
-	Metrics       *MetricsConfig
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
@@ -58,10 +57,6 @@ type ZitiConfig struct {
 	Password    string `cf:"+secret"`
 }
 
-type MetricsConfig struct {
-	ServiceName string
-}
-
 type InfluxConfig struct {
 	Url    string
 	Bucket string
@@ -98,9 +93,6 @@ func DefaultConfig() *Config {
 		Limits: &LimitsConfig{
 			Environments: Unlimited,
 			Shares:       Unlimited,
-		},
-		Metrics: &MetricsConfig{
-			ServiceName: "metrics",
 		},
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{

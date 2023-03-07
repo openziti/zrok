@@ -15,7 +15,6 @@ import (
 
 var cfg *Config
 var str *store.Store
-var mtr *metricsAgent
 var idb influxdb2.Client
 
 func Run(inCfg *Config) error {
@@ -65,15 +64,6 @@ func Run(inCfg *Config) error {
 
 	if cfg.Influx != nil {
 		idb = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
-	}
-
-	if cfg.Metrics != nil {
-		mtr = newMetricsAgent()
-		go mtr.run()
-		defer func() {
-			mtr.stop()
-			mtr.join()
-		}()
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
