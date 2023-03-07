@@ -22,7 +22,7 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 		return nil, errors.New("invalid 'source'; exiting")
 	}
 
-	events := make(chan map[string]interface{}, 1024)
+	events := make(chan map[string]interface{})
 	join, err := src.Start(events)
 	if err != nil {
 		return nil, errors.Wrap(err, "error starting source")
