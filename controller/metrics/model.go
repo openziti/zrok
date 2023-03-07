@@ -11,6 +11,7 @@ type Usage struct {
 	IntervalStart  time.Time
 	ZitiServiceId  string
 	ZitiCircuitId  string
+	ShareToken     string
 	FrontendTx     int64
 	FrontendRx     int64
 	BackendTx      int64
@@ -23,6 +24,7 @@ func (u Usage) String() string {
 	out += ", " + fmt.Sprintf("interval '%v'", u.IntervalStart)
 	out += ", " + fmt.Sprintf("service '%v'", u.ZitiServiceId)
 	out += ", " + fmt.Sprintf("circuit '%v'", u.ZitiCircuitId)
+	out += ", " + fmt.Sprintf("share '%v'", u.ShareToken)
 	out += ", " + fmt.Sprintf("fe {rx %v, tx %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))
 	out += ", " + fmt.Sprintf("be {rx %v, tx %v}", util.BytesToSize(u.BackendRx), util.BytesToSize(u.BackendTx))
 	out += "}"

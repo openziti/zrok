@@ -31,6 +31,12 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 		return nil, errors.New("invalid 'source'; exiting")
 	}
 
+	if cfg.Influx == nil {
+		return nil, errors.New("no 'influx' configured; exiting")
+	}
+
+	idb := openInfluxDb(cfg.Influx)
+
 	events := make(chan map[string]interface{})
 	join, err := src.Start(events)
 	if err != nil {
@@ -43,7 +49,10 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 			case event := <-events:
 				usage := Ingest(event)
 				if shrToken, err := cache.getToken(usage.ZitiServiceId); err == nil {
-					logrus.Infof("share: %v, circuit: %v, rx: %d, tx: %d", shrToken, usage.ZitiCircuitId, usage.BackendRx, usage.BackendTx)
+					usage.ShareToken = shrToken
+					if err := idb.Write(usage); err != nil {
+						logrus.Error(err)
+					}
 				} else {
 					logrus.Error(err)
 				}

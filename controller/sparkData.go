@@ -49,7 +49,7 @@ func sparkFluxQuery(shrs []*store.Share) string {
 		"|> range(start: -5m)" +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")" +
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\" or r[\"_field\"] == \"bytesWritten\")" +
-		"|> filter(fn: (r) => r[\"namespace\"] == \"frontend\")" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")" +
 		shrFilter +
 		"|> aggregateWindow(every: 5s, fn: sum, createEmpty: true)\n" +
 		"|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")" +
