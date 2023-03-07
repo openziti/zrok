@@ -6,12 +6,21 @@ import (
 )
 
 type MetricsAgent struct {
-	src  Source
-	join chan struct{}
+	src   Source
+	cache *shareCache
+	join  chan struct{}
 }
 
 func Run(cfg *Config) (*MetricsAgent, error) {
 	logrus.Info("starting")
+
+	if cfg.Store == nil {
+		return nil, errors.New("no 'store' configured; exiting")
+	}
+	cache, err := newShareCache(cfg.Store)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating share cache")
+	}
 
 	if cfg.Source == nil {
 		return nil, errors.New("no 'source' configured; exiting")
@@ -32,12 +41,17 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 		for {
 			select {
 			case event := <-events:
-				logrus.Info(Ingest(event))
+				usage := Ingest(event)
+				if shrToken, err := cache.getToken(usage.ZitiServiceId); err == nil {
+					logrus.Infof("share: %v, circuit: %v, rx: %d, tx: %d", shrToken, usage.ZitiCircuitId, usage.BackendRx, usage.BackendTx)
+				} else {
+					logrus.Error(err)
+				}
 			}
 		}
 	}()
 
-	return &MetricsAgent{src, join}, nil
+	return &MetricsAgent{src: src, join: join}, nil
 }
 
 func (ma *MetricsAgent) Stop() {

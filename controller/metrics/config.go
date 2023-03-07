@@ -2,12 +2,14 @@ package metrics
 
 import (
 	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/pkg/errors"
 )
 
 type Config struct {
 	Source interface{}
 	Influx *InfluxConfig
+	Store  *store.Config
 }
 
 type InfluxConfig struct {
