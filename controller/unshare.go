@@ -29,7 +29,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()

@@ -28,7 +28,7 @@ func GC(inCfg *Config) error {
 			logrus.Errorf("error closing store: %v", err)
 		}
 	}()
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		return err
 	}

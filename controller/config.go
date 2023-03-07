@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
 	"github.com/michaelquigley/cf"
@@ -21,7 +22,7 @@ type Config struct {
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
-	Ziti          *ZitiConfig
+	Ziti          *zrokEdgeSdk.ZitiConfig
 }
 
 type AdminConfig struct {
@@ -49,12 +50,6 @@ type RegistrationConfig struct {
 
 type ResetPasswordConfig struct {
 	ResetUrlTemplate string
-}
-
-type ZitiConfig struct {
-	ApiEndpoint string
-	Username    string
-	Password    string `cf:"+secret"`
 }
 
 type InfluxConfig struct {

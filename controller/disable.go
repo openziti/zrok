@@ -36,7 +36,7 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error getting environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()

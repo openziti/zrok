@@ -25,7 +25,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		return admin.NewCreateFrontendUnauthorized()
 	}
 
-	client, err := edgeClient()
+	client, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return admin.NewCreateFrontendInternalServerError()

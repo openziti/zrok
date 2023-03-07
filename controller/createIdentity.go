@@ -25,7 +25,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityUnauthorized()
 	}
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client: %v", err)
 		return admin.NewCreateIdentityInternalServerError()

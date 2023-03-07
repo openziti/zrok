@@ -32,7 +32,7 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 	}
 
 	logrus.Info("connecting to the ziti edge management api")
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}

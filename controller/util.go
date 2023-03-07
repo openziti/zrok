@@ -1,11 +1,8 @@
 package controller
 
 import (
-	"crypto/x509"
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_util"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -54,18 +51,6 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 		logrus.Warnf("invalid api key '%v'", token)
 		return nil, errors2.New(401, "invalid api key")
 	}
-}
-
-func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
-	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.Ziti.ApiEndpoint)
-	if err != nil {
-		return nil, err
-	}
-	caPool := x509.NewCertPool()
-	for _, ca := range caCerts {
-		caPool.AddCert(ca)
-	}
-	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
 }
 
 func createShareToken() (string, error) {
