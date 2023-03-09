@@ -30,7 +30,7 @@ out directly.
 
 ## Downloading zrok
 
-Releases are also available from the `zrok` project repository on GitHub at https://github.com/openziti/zrok/releases/latest
+Releases are also available from the `zrok` project repository on GitHub at https://github.com/openziti/zrok/releases/latest. If you're a Linux user and you're not sure which download to use then check out the hints on [the Downloads page](./downloads.md).
 
 ### Extract zrok Distribution
 
