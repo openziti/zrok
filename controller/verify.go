@@ -26,7 +26,11 @@ func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Respon
 
 		ar, err := str.FindAccountRequestWithToken(params.Body.Token, tx)
 		if err != nil {
-			logrus.Errorf("error finding account with token '%v': %v", params.Body.Token, err)
+			logrus.Errorf("error finding account request with token '%v': %v", params.Body.Token, err)
+			return account.NewVerifyNotFound()
+		}
+		if ar.Deleted {
+			logrus.Errorf("account request for '%v' with token '%v' deleted", ar.Email, params.Body.Token)
 			return account.NewVerifyNotFound()
 		}
 

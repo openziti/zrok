@@ -69,7 +69,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
 	}
 
-	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil {
+	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil && !oldAr.Deleted {
 		logrus.Warnf("found previous account request for '%v', removing", params.Body.Email)
 		if err := str.DeleteAccountRequest(oldAr.Id, tx); err != nil {
 			logrus.Errorf("error deleteing previous account request for '%v': %v", params.Body.Email, err)
