@@ -62,6 +62,14 @@ func (self *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, err
 	return shr, nil
 }
 
+func (self *Store) FindShareWithZId(zId string, tx *sqlx.Tx) (*Share, error) {
+	shr := &Share{}
+	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
+		return nil, errors.Wrap(err, "error selecting share by z_id")
+	}
+	return shr, nil
+}
+
 func (self *Store) FindSharesForEnvironment(envId int, tx *sqlx.Tx) ([]*Share, error) {
 	rows, err := tx.Queryx("select shares.* from shares where environment_id = $1", envId)
 	if err != nil {

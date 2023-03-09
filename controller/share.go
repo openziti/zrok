@@ -4,6 +4,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
@@ -55,7 +56,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareUnauthorized()
 	}
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
 		return share.NewShareInternalServerError()

@@ -35,7 +35,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableUnauthorized()
 	}
 
-	client, err := edgeClient()
+	client, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()

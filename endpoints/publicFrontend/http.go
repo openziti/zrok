@@ -24,16 +24,9 @@ type httpFrontend struct {
 	cfg     *Config
 	zCtx    ziti.Context
 	handler http.Handler
-	metrics *metricsAgent
 }
 
 func NewHTTP(cfg *Config) (*httpFrontend, error) {
-	ma, err := newMetricsAgent(cfg)
-	if err != nil {
-		return nil, err
-	}
-	go ma.run()
-
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.Identity)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.Identity)
@@ -44,7 +37,7 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
-	zDialCtx := zitiDialContext{ctx: zCtx, updates: ma.updates}
+	zDialCtx := zitiDialContext{ctx: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
@@ -59,7 +52,6 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 		cfg:     cfg,
 		zCtx:    zCtx,
 		handler: handler,
-		metrics: ma,
 	}, nil
 }
 
@@ -68,8 +60,7 @@ func (self *httpFrontend) Run() error {
 }
 
 type zitiDialContext struct {
-	ctx     ziti.Context
-	updates chan metricsUpdate
+	ctx ziti.Context
 }
 
 func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
@@ -78,7 +69,7 @@ func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net
 	if err != nil {
 		return conn, err
 	}
-	return newMetricsConn(shrToken, conn, self.updates), nil
+	return conn, nil
 }
 
 func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {

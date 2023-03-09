@@ -45,6 +45,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 	var sparkData map[string][]int64
 	if cfg.Influx != nil {
 		sparkData, err = sparkDataForShares([]*store.Share{shr})
+		logrus.Info(sparkData)
 		if err != nil {
 			logrus.Errorf("error querying spark data for share: %v", err)
 		}

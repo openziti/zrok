@@ -29,7 +29,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
 		return share.NewUnaccessInternalServerError()

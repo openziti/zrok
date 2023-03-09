@@ -1,6 +1,6 @@
 # v0.4.0
 
-Work in progress.
+FEATURE: New metrics infrastructure based on OpenZiti usage events (https://github.com/openziti/zrok/issues/128). See the [v0.4 Metrics Guide](docs/guides/v0.4_metrics.md) for more information.
 
 # v0.3.4
 

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
 	"github.com/michaelquigley/cf"
@@ -18,11 +19,10 @@ type Config struct {
 	Influx        *InfluxConfig
 	Limits        *LimitsConfig
 	Maintenance   *MaintenanceConfig
-	Metrics       *MetricsConfig
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
-	Ziti          *ZitiConfig
+	Ziti          *zrokEdgeSdk.ZitiConfig
 }
 
 type AdminConfig struct {
@@ -50,16 +50,6 @@ type RegistrationConfig struct {
 
 type ResetPasswordConfig struct {
 	ResetUrlTemplate string
-}
-
-type ZitiConfig struct {
-	ApiEndpoint string
-	Username    string
-	Password    string `cf:"+secret"`
-}
-
-type MetricsConfig struct {
-	ServiceName string
 }
 
 type InfluxConfig struct {
@@ -98,9 +88,6 @@ func DefaultConfig() *Config {
 		Limits: &LimitsConfig{
 			Environments: Unlimited,
 			Shares:       Unlimited,
-		},
-		Metrics: &MetricsConfig{
-			ServiceName: "metrics",
 		},
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{

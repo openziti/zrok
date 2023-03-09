@@ -4,6 +4,7 @@
 *.db
 automated-release-build
 etc/dev.yml
+etc/dev-metrics.yml
 
 # Dependencies
 /node_modules/
@@ -28,3 +29,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+.obsidian
