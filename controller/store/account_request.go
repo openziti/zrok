@@ -14,6 +14,7 @@ type AccountRequest struct {
 	Token         string
 	Email         string
 	SourceAddress string
+	Deleted       bool
 }
 
 func (self *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, error) {

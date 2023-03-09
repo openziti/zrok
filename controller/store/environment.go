@@ -12,6 +12,7 @@ type Environment struct {
 	Host        string
 	Address     string
 	ZId         string
+	Deleted     bool
 }
 
 func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx) (int, error) {

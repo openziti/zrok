@@ -13,6 +13,7 @@ type PasswordResetRequest struct {
 	Model
 	Token     string
 	AccountId int
+	Deleted   bool
 }
 
 func (self *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sqlx.Tx) (int, error) {

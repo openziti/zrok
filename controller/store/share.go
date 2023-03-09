@@ -16,6 +16,7 @@ type Share struct {
 	FrontendEndpoint     *string
 	BackendProxyEndpoint *string
 	Reserved             bool
+	Deleted              bool
 }
 
 func (self *Store) CreateShare(envId int, shr *Share, tx *sqlx.Tx) (int, error) {

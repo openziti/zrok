@@ -10,7 +10,8 @@ import (
 
 type InviteToken struct {
 	Model
-	Token string
+	Token   string
+	Deleted bool
 }
 
 func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) error {

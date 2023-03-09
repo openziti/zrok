@@ -12,6 +12,7 @@ type Account struct {
 	Password  string
 	Token     string
 	Limitless bool
+	Deleted   bool
 }
 
 func (self *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {

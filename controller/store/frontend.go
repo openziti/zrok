@@ -13,6 +13,7 @@ type Frontend struct {
 	PublicName    *string
 	UrlTemplate   *string
 	Reserved      bool
+	Deleted       bool
 }
 
 func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, error) {
