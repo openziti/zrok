@@ -25,7 +25,7 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if a, err := str.FindAccountWithToken(token, tx); err == nil {
+	if a, err := str.FindAccountWithToken(token, tx); err == nil && !a.Deleted {
 		principal := &rest_model_zrok.Principal{
 			ID:        int64(a.Id),
 			Token:     a.Token,
