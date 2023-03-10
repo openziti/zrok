@@ -39,7 +39,7 @@ func (self *Store) GetAccountRequest(id int, tx *sqlx.Tx) (*AccountRequest, erro
 
 func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
-	if err := tx.QueryRowx("select * from account_requests where token = $1", token).StructScan(ar); err != nil {
+	if err := tx.QueryRowx("select * from account_requests where token = $1 and not deleted", token).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by token")
 	}
 	return ar, nil
@@ -75,7 +75,7 @@ func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *s
 
 func (self *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
-	if err := tx.QueryRowx("select * from account_requests where email = $1", email).StructScan(ar); err != nil {
+	if err := tx.QueryRowx("select * from account_requests where email = $1 and not deleted", email).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by email")
 	}
 	return ar, nil

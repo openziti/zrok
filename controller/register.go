@@ -32,10 +32,6 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		logrus.Errorf("error finding account request with token '%v': %v", params.Body.Token, err)
 		return account.NewRegisterNotFound()
 	}
-	if ar.Deleted {
-		logrus.Errorf("account request with token '%v' deleted", params.Body.Token)
-		return account.NewRegisterNotFound()
-	}
 
 	token, err := createToken()
 	if err != nil {

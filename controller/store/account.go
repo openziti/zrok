@@ -37,15 +37,23 @@ func (self *Store) GetAccount(id int, tx *sqlx.Tx) (*Account, error) {
 
 func (self *Store) FindAccountWithEmail(email string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where email = $1", email).StructScan(a); err != nil {
+	if err := tx.QueryRowx("select * from accounts where email = $1 and not deleted", email).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by email")
+	}
+	return a, nil
+}
+
+func (self *Store) FindAccountWithEmailAndDeleted(email string, tx *sqlx.Tx) (*Account, error) {
+	a := &Account{}
+	if err := tx.QueryRowx("select * from accounts where email = $1", email).StructScan(a); err != nil {
+		return nil, errors.Wrap(err, "error selecting acount by email")
 	}
 	return a, nil
 }
 
 func (self *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where token = $1", token).StructScan(a); err != nil {
+	if err := tx.QueryRowx("select * from accounts where token = $1 and not deleted", token).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by token")
 	}
 	return a, nil

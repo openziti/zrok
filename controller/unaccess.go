@@ -38,7 +38,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
-			if env.ZId == envZId {
+			if !env.Deleted && env.ZId == envZId {
 				senv = env
 				break
 			}

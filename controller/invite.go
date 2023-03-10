@@ -62,14 +62,14 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	}
 
 	// deleted accounts still exist as far as invites are concerned (ignore deleted flag)
-	if _, err := str.FindAccountWithEmail(params.Body.Email, tx); err == nil {
+	if _, err := str.FindAccountWithEmailAndDeleted(params.Body.Email, tx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
 		return account.NewInviteBadRequest().WithPayload("duplicate email found")
 	} else {
 		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
 	}
 
-	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil && !oldAr.Deleted {
+	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil {
 		logrus.Warnf("found previous account request for '%v', removing", params.Body.Email)
 		if err := str.DeleteAccountRequest(oldAr.Id, tx); err != nil {
 			logrus.Errorf("error deleteing previous account request for '%v': %v", params.Body.Email, err)

@@ -26,10 +26,6 @@ func loginHandler(params account.LoginParams) middleware.Responder {
 		logrus.Errorf("error finding account '%v': %v", params.Body.Email, err)
 		return account.NewLoginUnauthorized()
 	}
-	if a.Deleted {
-		logrus.Errorf("account '%v' deleted", params.Body.Email)
-		return account.NewLoginUnauthorized()
-	}
 	hpwd, err := rehashPassword(params.Body.Password, a.Salt)
 	if err != nil {
 		logrus.Errorf("error hashing password for '%v': %v", params.Body.Email, err)

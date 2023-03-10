@@ -29,10 +29,6 @@ func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Respon
 			logrus.Errorf("error finding account request with token '%v': %v", params.Body.Token, err)
 			return account.NewVerifyNotFound()
 		}
-		if ar.Deleted {
-			logrus.Errorf("account request for '%v' with token '%v' deleted", ar.Email, params.Body.Token)
-			return account.NewVerifyNotFound()
-		}
 
 		return account.NewVerifyOK().WithPayload(&rest_model_zrok.VerifyResponse{Email: ar.Email})
 	}

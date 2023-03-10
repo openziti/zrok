@@ -43,7 +43,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
-			if env.ZId == params.Body.EnvZID {
+			if !env.Deleted && env.ZId == params.Body.EnvZID {
 				senv = env
 				break
 			}
