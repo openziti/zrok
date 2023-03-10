@@ -39,8 +39,8 @@ func (self *Store) GetShare(id int, tx *sqlx.Tx) (*Share, error) {
 	return shr, nil
 }
 
-func (self *Store) GetAllShares(tx *sqlx.Tx) ([]*Share, error) {
-	rows, err := tx.Queryx("select * from shares order by id")
+func (self *Store) FindAllShares(tx *sqlx.Tx) ([]*Share, error) {
+	rows, err := tx.Queryx("select * from shares where not deleted order by id")
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting all shares")
 	}
@@ -57,7 +57,7 @@ func (self *Store) GetAllShares(tx *sqlx.Tx) ([]*Share, error) {
 
 func (self *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where token = $1", shrToken).StructScan(shr); err != nil {
+	if err := tx.QueryRowx("select * from shares where token = $1 and not deleted", shrToken).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by token")
 	}
 	return shr, nil
@@ -65,14 +65,14 @@ func (self *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, err
 
 func (self *Store) FindShareWithZId(zId string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
+	if err := tx.QueryRowx("select * from shares where z_id = $1 and not deleted", zId).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by z_id")
 	}
 	return shr, nil
 }
 
 func (self *Store) FindSharesForEnvironment(envId int, tx *sqlx.Tx) ([]*Share, error) {
-	rows, err := tx.Queryx("select shares.* from shares where environment_id = $1", envId)
+	rows, err := tx.Queryx("select shares.* from shares where environment_id = $1 and not deleted", envId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting shares by environment id")
 	}
@@ -101,7 +101,7 @@ func (self *Store) UpdateShare(shr *Share, tx *sqlx.Tx) error {
 }
 
 func (self *Store) DeleteShare(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from shares where id = $1")
+	stmt, err := tx.Prepare("update shares set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares delete statement")
 	}
