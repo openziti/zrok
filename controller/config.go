@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
@@ -17,12 +18,12 @@ type Config struct {
 	Endpoint      *EndpointConfig
 	Email         *EmailConfig
 	Influx        *InfluxConfig
-	Limits        *LimitsConfig
+	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
-	Ziti          *zrokEdgeSdk.ZitiConfig
+	Ziti          *zrokEdgeSdk.Config
 }
 
 type AdminConfig struct {
@@ -76,19 +77,9 @@ type ResetPasswordMaintenanceConfig struct {
 	BatchLimit        int
 }
 
-const Unlimited = -1
-
-type LimitsConfig struct {
-	Environments int
-	Shares       int
-}
-
 func DefaultConfig() *Config {
 	return &Config{
-		Limits: &LimitsConfig{
-			Environments: Unlimited,
-			Shares:       Unlimited,
-		},
+		Limits: limits.DefaultConfig(),
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{
 				ExpirationTimeout: time.Minute * 15,
