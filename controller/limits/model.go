@@ -17,10 +17,15 @@ type BandwidthConfig struct {
 }
 
 type BandwidthPerPeriod struct {
-	Period time.Duration
-	Rx     int64
-	Tx     int64
-	Total  int64
+	Period  time.Duration
+	Warning *Bandwidth
+	Limit   *Bandwidth
+}
+
+type Bandwidth struct {
+	Rx    int64
+	Tx    int64
+	Total int64
 }
 
 func DefaultConfig() *Config {
@@ -30,21 +35,42 @@ func DefaultConfig() *Config {
 		Bandwidth: &BandwidthConfig{
 			PerAccount: &BandwidthPerPeriod{
 				Period: 365 * (24 * time.Hour),
-				Rx:     Unlimited,
-				Tx:     Unlimited,
-				Total:  Unlimited,
+				Warning: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
+				Limit: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
 			},
 			PerEnvironment: &BandwidthPerPeriod{
 				Period: 365 * (24 * time.Hour),
-				Rx:     Unlimited,
-				Tx:     Unlimited,
-				Total:  Unlimited,
+				Warning: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
+				Limit: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
 			},
 			PerShare: &BandwidthPerPeriod{
 				Period: 365 * (24 * time.Hour),
-				Rx:     Unlimited,
-				Tx:     Unlimited,
-				Total:  Unlimited,
+				Warning: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
+				Limit: &Bandwidth{
+					Rx:    Unlimited,
+					Tx:    Unlimited,
+					Total: Unlimited,
+				},
 			},
 		},
 	}
