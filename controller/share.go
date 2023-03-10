@@ -35,7 +35,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	if err == nil {
 		found := false
 		for _, env := range envs {
-			if !env.Deleted && env.ZId == envZId {
+			if env.ZId == envZId {
 				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
 				envId = env.Id
 				found = true

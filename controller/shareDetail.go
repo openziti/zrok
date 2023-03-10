@@ -33,7 +33,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 	}
 	found := false
 	for _, env := range envs {
-		if !env.Deleted && shr.EnvironmentId == env.Id {
+		if shr.EnvironmentId == env.Id {
 			found = true
 			break
 		}
