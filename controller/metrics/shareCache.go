@@ -23,7 +23,7 @@ func (sc *shareCache) getToken(svcZId string) (string, error) {
 		return "", err
 	}
 	defer func() { _ = tx.Rollback() }()
-	shr, err := sc.str.FindShareWithZId(svcZId, tx)
+	shr, err := sc.str.FindShareWithZIdAndDeleted(svcZId, tx)
 	if err != nil {
 		return "", err
 	}

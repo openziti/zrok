@@ -63,9 +63,9 @@ func (self *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, err
 	return shr, nil
 }
 
-func (self *Store) FindShareWithZId(zId string, tx *sqlx.Tx) (*Share, error) {
+func (self *Store) FindShareWithZIdAndDeleted(zId string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where z_id = $1 and not deleted", zId).StructScan(shr); err != nil {
+	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by z_id")
 	}
 	return shr, nil
