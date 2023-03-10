@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+	"os"
+
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -42,6 +44,13 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 		if zrd.Cfg == nil {
 			zrd.Cfg = &zrokdir.Config{}
 		}
+		ok, err := isFullyValidUrl(value)
+		if err != nil {
+			tui.Error("unable to validate api endpoint", err)
+		}
+		if !ok {
+			tui.Error("invalid apiEndpoint; please make sure URL starts with http:// or https://", nil)
+		}
 		zrd.Cfg.ApiEndpoint = value
 		modified = true
 
@@ -61,4 +70,15 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	} else {
 		fmt.Println("zrok configuration not changed")
 	}
+}
+
+func isFullyValidUrl(rawUrl string) (bool, error) {
+	u, err := url.Parse(rawUrl)
+	if err != nil {
+		return false, err
+	}
+	if u.Scheme == "" || u.Host == "" {
+		return false, nil
+	}
+	return true, nil
 }
