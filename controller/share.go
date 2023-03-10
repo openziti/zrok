@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -12,10 +13,10 @@ import (
 )
 
 type shareHandler struct {
-	cfg *LimitsConfig
+	cfg *limits.Config
 }
 
-func newShareHandler(cfg *LimitsConfig) *shareHandler {
+func newShareHandler(cfg *limits.Config) *shareHandler {
 	return &shareHandler{cfg: cfg}
 }
 
@@ -144,7 +145,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 }
 
 func (h *shareHandler) checkLimits(principal *rest_model_zrok.Principal, envs []*store.Environment, tx *sqlx.Tx) error {
-	if !principal.Limitless && h.cfg.Shares > Unlimited {
+	if !principal.Limitless && h.cfg.Shares > limits.Unlimited {
 		total := 0
 		for i := range envs {
 			shrs, err := str.FindSharesForEnvironment(envs[i].Id, tx)

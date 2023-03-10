@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -14,10 +15,10 @@ import (
 )
 
 type enableHandler struct {
-	cfg *LimitsConfig
+	cfg *limits.Config
 }
 
-func newEnableHandler(cfg *LimitsConfig) *enableHandler {
+func newEnableHandler(cfg *limits.Config) *enableHandler {
 	return &enableHandler{cfg: cfg}
 }
 
@@ -100,7 +101,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 }
 
 func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, tx *sqlx.Tx) error {
-	if !principal.Limitless && h.cfg.Environments > Unlimited {
+	if !principal.Limitless && h.cfg.Environments > limits.Unlimited {
 		envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
 		if err != nil {
 			return errors.Errorf("unable to find environments for account '%v': %v", principal.Email, err)
