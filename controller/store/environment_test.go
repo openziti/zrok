@@ -26,6 +26,7 @@ func TestEphemeralEnvironment(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, env)
 	assert.Nil(t, env.AccountId)
+	assert.False(t, env.Deleted)
 }
 
 func TestEnvironment(t *testing.T) {
@@ -57,4 +58,5 @@ func TestEnvironment(t *testing.T) {
 	assert.NotNil(t, env)
 	assert.NotNil(t, env.AccountId)
 	assert.Equal(t, acctId, *env.AccountId)
+	assert.False(t, env.Deleted)
 }

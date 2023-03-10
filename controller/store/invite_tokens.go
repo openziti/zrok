@@ -32,16 +32,16 @@ func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) e
 	return nil
 }
 
-func (str *Store) GetInviteTokenByToken(token string, tx *sqlx.Tx) (*InviteToken, error) {
+func (str *Store) FindInviteTokenByToken(token string, tx *sqlx.Tx) (*InviteToken, error) {
 	inviteToken := &InviteToken{}
-	if err := tx.QueryRowx("select * from invite_tokens where token = $1", token).StructScan(inviteToken); err != nil {
+	if err := tx.QueryRowx("select * from invite_tokens where token = $1 and not deleted", token).StructScan(inviteToken); err != nil {
 		return nil, errors.Wrap(err, "error getting unused invite_token")
 	}
 	return inviteToken, nil
 }
 
 func (str *Store) DeleteInviteToken(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from invite_tokens where id = $1")
+	stmt, err := tx.Prepare("update invite_tokens set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing invite_tokens delete statement")
 	}

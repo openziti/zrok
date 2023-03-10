@@ -30,7 +30,7 @@ func (self *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sql
 
 func (self *Store) FindPasswordResetRequestWithToken(token string, tx *sqlx.Tx) (*PasswordResetRequest, error) {
 	prr := &PasswordResetRequest{}
-	if err := tx.QueryRowx("select * from password_reset_requests where token = $1", token).StructScan(prr); err != nil {
+	if err := tx.QueryRowx("select * from password_reset_requests where token = $1 and not deleted", token).StructScan(prr); err != nil {
 		return nil, errors.Wrap(err, "error selecting password_reset_requests by token")
 	}
 	return prr, nil
@@ -40,10 +40,10 @@ func (self *Store) FindExpiredPasswordResetRequests(before time.Time, limit int,
 	var sql string
 	switch self.cfg.Type {
 	case "postgres":
-		sql = "select * from password_reset_requests where created_at < $1 limit %d for update"
+		sql = "select * from password_reset_requests where created_at < $1 and not deleted limit %d for update"
 
 	case "sqlite3":
-		sql = "select * from password_reset_requests where created_at < $1 limit %d"
+		sql = "select * from password_reset_requests where created_at < $1 and not deleted limit %d"
 	default:
 		return nil, errors.Errorf("unknown database type '%v'", self.cfg.Type)
 	}
@@ -64,7 +64,7 @@ func (self *Store) FindExpiredPasswordResetRequests(before time.Time, limit int,
 }
 
 func (self *Store) DeletePasswordResetRequest(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from password_reset_requests where id = $1")
+	stmt, err := tx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing password_reset_requests delete statement")
 	}
@@ -88,7 +88,7 @@ func (self *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) e
 		indexes[i] = fmt.Sprintf("$%d", i+1)
 	}
 
-	stmt, err := tx.Prepare(fmt.Sprintf("delete from password_reset_requests where id in (%s)", strings.Join(indexes, ",")))
+	stmt, err := tx.Prepare(fmt.Sprintf("update password_reset_requests set updated_at = current_timestamp, deleted = true where id in (%s)", strings.Join(indexes, ",")))
 	if err != nil {
 		return errors.Wrap(err, "error preparing password_reset_requests delete multiple statement")
 	}

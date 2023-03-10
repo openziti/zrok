@@ -36,6 +36,10 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		logrus.Errorf("error getting environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
+	if env.Deleted {
+		logrus.Errorf("environment '%v' for user '%v' deleted", env.ZId, principal.Email)
+		return environment.NewDisableUnauthorized()
+	}
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
@@ -85,29 +89,31 @@ func (h *disableHandler) removeSharesForEnvironment(envId int, tx *sqlx.Tx, edge
 	if err != nil {
 		return err
 	}
-	shrs, err := str.FindSharesForEnvironment(envId, tx)
-	if err != nil {
-		return err
-	}
-	for _, shr := range shrs {
-		shrToken := shr.Token
-		logrus.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
-		if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(env.ZId, shrToken, edge); err != nil {
-			logrus.Error(err)
+	if !env.Deleted {
+		shrs, err := str.FindSharesForEnvironment(envId, tx)
+		if err != nil {
+			return err
 		}
-		if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, shrToken, edge); err != nil {
-			logrus.Error(err)
+		for _, shr := range shrs {
+			shrToken := shr.Token
+			logrus.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
+			if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(env.ZId, shrToken, edge); err != nil {
+				logrus.Error(err)
+			}
+			if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, shrToken, edge); err != nil {
+				logrus.Error(err)
+			}
+			if err := zrokEdgeSdk.DeleteServicePolicyBind(env.ZId, shrToken, edge); err != nil {
+				logrus.Error(err)
+			}
+			if err := zrokEdgeSdk.DeleteConfig(env.ZId, shrToken, edge); err != nil {
+				logrus.Error(err)
+			}
+			if err := zrokEdgeSdk.DeleteService(env.ZId, shr.ZId, edge); err != nil {
+				logrus.Error(err)
+			}
+			logrus.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
 		}
-		if err := zrokEdgeSdk.DeleteServicePolicyBind(env.ZId, shrToken, edge); err != nil {
-			logrus.Error(err)
-		}
-		if err := zrokEdgeSdk.DeleteConfig(env.ZId, shrToken, edge); err != nil {
-			logrus.Error(err)
-		}
-		if err := zrokEdgeSdk.DeleteService(env.ZId, shr.ZId, edge); err != nil {
-			logrus.Error(err)
-		}
-		logrus.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
 	}
 	return nil
 }
@@ -117,13 +123,15 @@ func (h *disableHandler) removeFrontendsForEnvironment(envId int, tx *sqlx.Tx, e
 	if err != nil {
 		return err
 	}
-	fes, err := str.FindFrontendsForEnvironment(envId, tx)
-	if err != nil {
-		return err
-	}
-	for _, fe := range fes {
-		if err := zrokEdgeSdk.DeleteServicePolicy(env.ZId, fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token), edge); err != nil {
-			logrus.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
+	if !env.Deleted {
+		fes, err := str.FindFrontendsForEnvironment(envId, tx)
+		if err != nil {
+			return err
+		}
+		for _, fe := range fes {
+			if err := zrokEdgeSdk.DeleteServicePolicy(env.ZId, fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token), edge); err != nil {
+				logrus.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
+			}
 		}
 	}
 	return nil

@@ -37,7 +37,7 @@ func GC(inCfg *Config) error {
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
-	sshrs, err := str.GetAllShares(tx)
+	sshrs, err := str.FindAllShares(tx)
 	if err != nil {
 		return err
 	}

@@ -37,6 +37,10 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 		logrus.Errorf("error finding account for '%v': %v", params.Body.Token, err)
 		return account.NewResetPasswordNotFound()
 	}
+	if a.Deleted {
+		logrus.Errorf("account '%v' for '%v' deleted", a.Email, a.Token)
+		return account.NewResetPasswordNotFound()
+	}
 	hpwd, err := hashPassword(params.Body.Password)
 	if err != nil {
 		logrus.Errorf("error hashing password for '%v' (%v): %v", params.Body.Token, a.Email, err)
