@@ -44,14 +44,12 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 		if zrd.Cfg == nil {
 			zrd.Cfg = &zrokdir.Config{}
 		}
-		ok, err := isValidUrl(value)
+		ok, err := isFullyValidUrl(value)
 		if err != nil {
-			fmt.Println("unable to validate api endpoint")
-			os.Exit(1)
+			tui.Error("unable to validate api endpoint", err)
 		}
 		if !ok {
-			fmt.Println("invalid apiEndpoint, please make sure scheme and host is provided")
-			os.Exit(1)
+			tui.Error("invalid apiEndpoint; please make sure URL starts with http:// or https://", nil)
 		}
 		zrd.Cfg.ApiEndpoint = value
 		modified = true
@@ -74,7 +72,7 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func isValidUrl(rawUrl string) (bool, error) {
+func isFullyValidUrl(rawUrl string) (bool, error) {
 	u, err := url.Parse(rawUrl)
 	if err != nil {
 		return false, err
