@@ -24,16 +24,19 @@ func openInfluxDb(cfg *InfluxConfig) *influxDb {
 func (i *influxDb) Write(u *Usage) error {
 	out := fmt.Sprintf("share: %v, circuit: %v", u.ShareToken, u.ZitiCircuitId)
 
+	envId := fmt.Sprintf("%d", u.EnvironmentId)
+	acctId := fmt.Sprintf("%d", u.AccountId)
+
 	var pts []*write.Point
 	circuitPt := influxdb2.NewPoint("circuits",
-		map[string]string{"share": u.ShareToken},
+		map[string]string{"share": u.ShareToken, "envId": envId, "acctId": acctId},
 		map[string]interface{}{"circuit": u.ZitiCircuitId},
 		u.IntervalStart)
 	pts = append(pts, circuitPt)
 
 	if u.BackendTx > 0 || u.BackendRx > 0 {
 		pt := influxdb2.NewPoint("xfer",
-			map[string]string{"namespace": "backend", "share": u.ShareToken},
+			map[string]string{"namespace": "backend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
 			map[string]interface{}{"bytesRead": u.BackendRx, "bytesWritten": u.BackendTx},
 			u.IntervalStart)
 		pts = append(pts, pt)
@@ -41,7 +44,7 @@ func (i *influxDb) Write(u *Usage) error {
 	}
 	if u.FrontendTx > 0 || u.FrontendRx > 0 {
 		pt := influxdb2.NewPoint("xfer",
-			map[string]string{"namespace": "frontend", "share": u.ShareToken},
+			map[string]string{"namespace": "frontend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
 			map[string]interface{}{"bytesRead": u.FrontendRx, "bytesWritten": u.FrontendTx},
 			u.IntervalStart)
 		pts = append(pts, pt)

@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newMetricsCommand().cmd)
+	controllerCmd.cmd.AddCommand(newMetricsCommand().cmd)
 }
 
 type metricsCommand struct {
