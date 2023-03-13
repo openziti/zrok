@@ -23,7 +23,14 @@ func openInfluxDb(cfg *InfluxConfig) *influxDb {
 
 func (i *influxDb) Write(u *Usage) error {
 	out := fmt.Sprintf("share: %v, circuit: %v", u.ShareToken, u.ZitiCircuitId)
+
 	var pts []*write.Point
+	circuitPt := influxdb2.NewPoint("circuits",
+		map[string]string{"share": u.ShareToken},
+		map[string]interface{}{"circuit": u.ZitiCircuitId},
+		u.IntervalStart)
+	pts = append(pts, circuitPt)
+
 	if u.BackendTx > 0 || u.BackendRx > 0 {
 		pt := influxdb2.NewPoint("xfer",
 			map[string]string{"namespace": "backend", "share": u.ShareToken},
@@ -40,12 +47,12 @@ func (i *influxDb) Write(u *Usage) error {
 		pts = append(pts, pt)
 		out += fmt.Sprintf(" frontend {rx: %v, tx: %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))
 	}
-	if len(pts) > 0 {
-		if err := i.writeApi.WritePoint(context.Background(), pts...); err == nil {
-			logrus.Info(out)
-		} else {
-			return err
-		}
+
+	if err := i.writeApi.WritePoint(context.Background(), pts...); err == nil {
+		logrus.Info(out)
+	} else {
+		return err
 	}
+
 	return nil
 }
