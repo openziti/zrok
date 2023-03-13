@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/util"
@@ -9,10 +10,10 @@ import (
 )
 
 type inviteHandler struct {
-	cfg *Config
+	cfg *config.Config
 }
 
-func newInviteHandler(cfg *Config) *inviteHandler {
+func newInviteHandler(cfg *config.Config) *inviteHandler {
 	return &inviteHandler{
 		cfg: cfg,
 	}

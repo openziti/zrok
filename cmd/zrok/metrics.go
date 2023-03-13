@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,13 +33,13 @@ func newMetricsCommand() *metricsCommand {
 }
 
 func (cmd *metricsCommand) run(_ *cobra.Command, args []string) {
-	cfg, err := metrics.LoadConfig(args[0])
+	cfg, err := config.LoadConfig(args[0])
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof(cf.Dump(cfg, metrics.GetCfOptions()))
+	logrus.Infof(cf.Dump(cfg, env.GetCfOptions()))
 
-	ma, err := metrics.Run(cfg)
+	ma, err := metrics.Run(cfg.Metrics, cfg.Store)
 	if err != nil {
 		panic(err)
 	}

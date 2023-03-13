@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/openziti/zrok/controller/store"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -11,24 +12,21 @@ type MetricsAgent struct {
 	join  chan struct{}
 }
 
-func Run(cfg *Config) (*MetricsAgent, error) {
+func Run(cfg *Config, strCfg *store.Config) (*MetricsAgent, error) {
 	logrus.Info("starting")
 
-	if cfg.Store == nil {
-		return nil, errors.New("no 'store' configured; exiting")
-	}
-	cache, err := newShareCache(cfg.Store)
+	cache, err := newShareCache(strCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating share cache")
 	}
 
-	if cfg.Source == nil {
-		return nil, errors.New("no 'source' configured; exiting")
+	if cfg.Strategies == nil || cfg.Strategies.Source == nil {
+		return nil, errors.New("no 'strategies/source' configured; exiting")
 	}
 
-	src, ok := cfg.Source.(Source)
+	src, ok := cfg.Strategies.Source.(Source)
 	if !ok {
-		return nil, errors.New("invalid 'source'; exiting")
+		return nil, errors.New("invalid 'strategies/source'; exiting")
 	}
 
 	if cfg.Influx == nil {

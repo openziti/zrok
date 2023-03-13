@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,7 @@ func newControllerCommand() *controllerCommand {
 }
 
 func (cmd *controllerCommand) run(_ *cobra.Command, args []string) {
-	cfg, err := controller.LoadConfig(args[0])
+	cfg, err := config.LoadConfig(args[0])
 	if err != nil {
 		panic(err)
 	}

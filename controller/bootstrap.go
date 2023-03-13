@@ -12,7 +12,8 @@ import (
 	"github.com/openziti/edge/rest_model"
 	rest_model_edge "github.com/openziti/edge/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	config2 "github.com/openziti/sdk-golang/ziti/config"
+	ziti_config "github.com/openziti/sdk-golang/ziti/config"
+	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/model"
@@ -22,7 +23,7 @@ import (
 	"time"
 )
 
-func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
+func Bootstrap(skipCtrl, skipFrontend bool, inCfg *zrok_config.Config) error {
 	cfg = inCfg
 
 	if v, err := store.Open(cfg.Store); err == nil {
@@ -138,7 +139,7 @@ func getIdentityId(identityName string) (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir", identityName)
 	}
-	zcfg, err := config2.NewFromFile(zif)
+	zcfg, err := ziti_config.NewFromFile(zif)
 	if err != nil {
 		return "", errors.Wrapf(err, "error loading ziti config from file '%v'", zif)
 	}

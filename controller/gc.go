@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/edge/rest_management_api_client/service"
 	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge/rest_management_api_client/service_policy"
+	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
@@ -16,7 +17,7 @@ import (
 	"time"
 )
 
-func GC(inCfg *Config) error {
+func GC(inCfg *zrok_config.Config) error {
 	cfg = inCfg
 	if v, err := store.Open(cfg.Store); err == nil {
 		str = v

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +33,7 @@ func newAdminBootstrap() *adminBootstrap {
 
 func (cmd *adminBootstrap) run(_ *cobra.Command, args []string) {
 	configPath := args[0]
-	inCfg, err := controller.LoadConfig(configPath)
+	inCfg, err := config.LoadConfig(configPath)
 	if err != nil {
 		panic(err)
 	}

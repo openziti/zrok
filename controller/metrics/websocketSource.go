@@ -14,6 +14,7 @@ import (
 	"github.com/openziti/fabric/pb/mgmt_pb"
 	"github.com/openziti/identity"
 	"github.com/openziti/sdk-golang/ziti/constants"
+	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -21,6 +22,10 @@ import (
 	"net/url"
 	"time"
 )
+
+func init() {
+	env.GetCfOptions().AddFlexibleSetter("websocket", loadWebsocketSourceConfig)
+}
 
 type WebsocketSourceConfig struct {
 	WebsocketEndpoint string

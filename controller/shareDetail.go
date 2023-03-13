@@ -43,12 +43,14 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		return metadata.NewGetShareDetailNotFound()
 	}
 	var sparkData map[string][]int64
-	if cfg.Influx != nil {
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		sparkData, err = sparkDataForShares([]*store.Share{shr})
 		logrus.Info(sparkData)
 		if err != nil {
 			logrus.Errorf("error querying spark data for share: %v", err)
 		}
+	} else {
+		logrus.Debug("skipping spark data; no influx configuration")
 	}
 	feEndpoint := ""
 	if shr.FrontendEndpoint != nil {

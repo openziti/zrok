@@ -1,7 +1,9 @@
-package controller
+package config
 
 import (
+	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
+	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
@@ -17,9 +19,9 @@ type Config struct {
 	Admin         *AdminConfig
 	Endpoint      *EndpointConfig
 	Email         *EmailConfig
-	Influx        *InfluxConfig
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
+	Metrics       *metrics.Config
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
@@ -51,13 +53,6 @@ type RegistrationConfig struct {
 
 type ResetPasswordConfig struct {
 	ResetUrlTemplate string
-}
-
-type InfluxConfig struct {
-	Url    string
-	Bucket string
-	Org    string
-	Token  string `cf:"+secret"`
 }
 
 type MaintenanceConfig struct {
@@ -97,7 +92,7 @@ func DefaultConfig() *Config {
 
 func LoadConfig(path string) (*Config, error) {
 	cfg := DefaultConfig()
-	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
+	if err := cf.BindYaml(cfg, path, env.GetCfOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
 	if cfg.V != ConfigVersion {
