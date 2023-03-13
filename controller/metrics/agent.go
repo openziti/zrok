@@ -8,7 +8,7 @@ import (
 
 type MetricsAgent struct {
 	src   Source
-	cache *shareCache
+	cache *cache
 	join  chan struct{}
 }
 
@@ -46,8 +46,7 @@ func Run(cfg *Config, strCfg *store.Config) (*MetricsAgent, error) {
 			select {
 			case event := <-events:
 				usage := Ingest(event)
-				if shrToken, err := cache.getToken(usage.ZitiServiceId); err == nil {
-					usage.ShareToken = shrToken
+				if err := cache.addZrokDetail(usage); err == nil {
 					if err := idb.Write(usage); err != nil {
 						logrus.Error(err)
 					}
