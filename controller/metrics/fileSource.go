@@ -5,10 +5,15 @@ import (
 	"encoding/json"
 	"github.com/michaelquigley/cf"
 	"github.com/nxadm/tail"
+	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"os"
 )
+
+func init() {
+	env.GetCfOptions().AddFlexibleSetter("file", loadFileSourceConfig)
+}
 
 type FileSourceConfig struct {
 	Path      string

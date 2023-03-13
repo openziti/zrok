@@ -2,6 +2,8 @@ package controller
 
 import (
 	"context"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -13,11 +15,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-var cfg *Config
+var cfg *config.Config
 var str *store.Store
 var idb influxdb2.Client
 
-func Run(inCfg *Config) error {
+func Run(inCfg *config.Config) error {
 	cfg = inCfg
 
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
@@ -62,8 +64,10 @@ func Run(inCfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
-	if cfg.Influx != nil {
-		idb = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
+		idb = influxdb2.NewClient(cfg.Metrics.Influx.Url, cfg.Metrics.Influx.Token)
+	} else {
+		logrus.Warn("skipping influx client; no configuration")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

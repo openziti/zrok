@@ -41,11 +41,13 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	var sparkData map[string][]int64
-	if cfg.Influx != nil {
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		sparkData, err = sparkDataForShares(shrs)
 		if err != nil {
 			logrus.Errorf("error querying spark data for shares for user '%v': %v", principal.Email, err)
 		}
+	} else {
+		logrus.Debug("skipping spark data for shares; no influx configuration")
 	}
 	for _, shr := range shrs {
 		feEndpoint := ""

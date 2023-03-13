@@ -10,7 +10,7 @@ func sparkDataForShares(shrs []*store.Share) (map[string][]int64, error) {
 	out := make(map[string][]int64)
 
 	if len(shrs) > 0 {
-		qapi := idb.QueryAPI(cfg.Influx.Org)
+		qapi := idb.QueryAPI(cfg.Metrics.Influx.Org)
 
 		result, err := qapi.Query(context.Background(), sparkFluxQuery(shrs))
 		if err != nil {

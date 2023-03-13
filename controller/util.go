@@ -3,6 +3,7 @@ package controller
 import (
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -10,10 +11,10 @@ import (
 )
 
 type zrokAuthenticator struct {
-	cfg *Config
+	cfg *config.Config
 }
 
-func newZrokAuthenticator(cfg *Config) *zrokAuthenticator {
+func newZrokAuthenticator(cfg *config.Config) *zrokAuthenticator {
 	return &zrokAuthenticator{cfg}
 }
 
