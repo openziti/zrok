@@ -32,6 +32,7 @@ require (
 	github.com/openziti/identity v1.0.37
 	github.com/openziti/sdk-golang v0.18.61
 	github.com/pkg/errors v0.9.1
+	github.com/rabbitmq/amqp091-go v1.7.0
 	github.com/rubenv/sql-migrate v1.1.2
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/sirupsen/logrus v1.9.0
@@ -41,7 +42,6 @@ require (
 	golang.org/x/crypto v0.6.0
 	golang.org/x/net v0.8.0
 	golang.org/x/time v0.3.0
-	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 	nhooyr.io/websocket v1.8.7
 )
 
