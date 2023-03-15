@@ -1,8 +1,12 @@
 package metrics
 
 type Config struct {
-	Influx     *InfluxConfig
-	Strategies *StrategiesConfig
+	Influx *InfluxConfig
+	Agent  *AgentConfig
+}
+
+type AgentConfig struct {
+	Source interface{}
 }
 
 type InfluxConfig struct {
@@ -10,8 +14,4 @@ type InfluxConfig struct {
 	Bucket string
 	Org    string
 	Token  string `cf:"+secret"`
-}
-
-type StrategiesConfig struct {
-	Source interface{}
 }

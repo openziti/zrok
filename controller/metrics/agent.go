@@ -6,48 +6,45 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type MetricsAgent struct {
-	src   Source
-	cache *cache
-	join  chan struct{}
+type Agent struct {
+	events  chan ZitiEventJson
+	src     ZitiEventJsonSource
+	srcJoin chan struct{}
+	cache   *cache
+	snk     UsageSink
 }
 
-func Run(cfg *Config, strCfg *store.Config) (*MetricsAgent, error) {
-	logrus.Info("starting")
+func NewAgent(cfg *AgentConfig, str *store.Store, ifxCfg *InfluxConfig) (*Agent, error) {
+	a := &Agent{}
+	if v, ok := cfg.Source.(ZitiEventJsonSource); ok {
+		a.src = v
+	} else {
+		return nil, errors.New("invalid event json source")
+	}
+	a.cache = newShareCache(str)
+	a.snk = newInfluxWriter(ifxCfg)
+	return a, nil
+}
 
-	cache, err := newShareCache(strCfg)
+func (a *Agent) Start() error {
+	a.events = make(chan ZitiEventJson)
+	srcJoin, err := a.src.Start(a.events)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating share cache")
+		return err
 	}
-
-	if cfg.Strategies == nil || cfg.Strategies.Source == nil {
-		return nil, errors.New("no 'strategies/source' configured; exiting")
-	}
-
-	src, ok := cfg.Strategies.Source.(Source)
-	if !ok {
-		return nil, errors.New("invalid 'strategies/source'; exiting")
-	}
-
-	if cfg.Influx == nil {
-		return nil, errors.New("no 'influx' configured; exiting")
-	}
-
-	idb := openInfluxDb(cfg.Influx)
-
-	events := make(chan map[string]interface{})
-	join, err := src.Start(events)
-	if err != nil {
-		return nil, errors.Wrap(err, "error starting source")
-	}
+	a.srcJoin = srcJoin
 
 	go func() {
+		logrus.Info("started")
+		defer logrus.Info("stopped")
 		for {
 			select {
-			case event := <-events:
-				usage := Ingest(event)
-				if err := cache.addZrokDetail(usage); err == nil {
-					if err := idb.Write(usage); err != nil {
+			case event := <-a.events:
+				if usage, err := Ingest(event); err == nil {
+					if err := a.cache.addZrokDetail(usage); err != nil {
+						logrus.Error(err)
+					}
+					if err := a.snk.Handle(usage); err != nil {
 						logrus.Error(err)
 					}
 				} else {
@@ -57,14 +54,10 @@ func Run(cfg *Config, strCfg *store.Config) (*MetricsAgent, error) {
 		}
 	}()
 
-	return &MetricsAgent{src: src, join: join}, nil
+	return nil
 }
 
-func (ma *MetricsAgent) Stop() {
-	logrus.Info("stopping")
-	ma.src.Stop()
-}
-
-func (ma *MetricsAgent) Join() {
-	<-ma.join
+func (a *Agent) Stop() {
+	a.src.Stop()
+	close(a.events)
 }

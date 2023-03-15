@@ -35,11 +35,17 @@ func (u Usage) String() string {
 	return out
 }
 
-type Source interface {
-	Start(chan map[string]interface{}) (chan struct{}, error)
+type UsageSink interface {
+	Handle(u *Usage) error
+}
+
+type ZitiEventJson string
+
+type ZitiEventJsonSource interface {
+	Start(chan ZitiEventJson) (join chan struct{}, err error)
 	Stop()
 }
 
-type Ingester interface {
-	Ingest(msg map[string]interface{}) error
+type ZitiEventJsonSink interface {
+	Handle(event ZitiEventJson) error
 }
