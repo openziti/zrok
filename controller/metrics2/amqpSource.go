@@ -2,10 +2,15 @@ package metrics2
 
 import (
 	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 )
+
+func init() {
+	env.GetCfOptions().AddFlexibleSetter("amqpSource", loadAmqpSourceConfig)
+}
 
 type AmqpSourceConfig struct {
 	Url       string `cf:"+secret"`
