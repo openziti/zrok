@@ -35,6 +35,10 @@ func (u Usage) String() string {
 	return out
 }
 
+type UsageSink interface {
+	Handle(u *Usage) error
+}
+
 type ZitiEventJson string
 
 type ZitiEventJsonSource interface {
