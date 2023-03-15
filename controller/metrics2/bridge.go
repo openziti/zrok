@@ -54,7 +54,7 @@ func (b *Bridge) Start() (join chan struct{}, err error) {
 			case eventJson := <-b.events:
 				logrus.Info(eventJson)
 				if err := b.snk.Handle(eventJson); err == nil {
-					logrus.Info("-> %v", eventJson)
+					logrus.Infof("-> %v", eventJson)
 				} else {
 					logrus.Error(err)
 				}
