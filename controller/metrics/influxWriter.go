@@ -10,18 +10,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type influxDb struct {
+type influxWriter struct {
 	idb      influxdb2.Client
 	writeApi api.WriteAPIBlocking
 }
 
-func openInfluxDb(cfg *InfluxConfig) *influxDb {
+func newInfluxWriter(cfg *InfluxConfig) *influxWriter {
 	idb := influxdb2.NewClient(cfg.Url, cfg.Token)
-	wapi := idb.WriteAPIBlocking(cfg.Org, cfg.Bucket)
-	return &influxDb{idb, wapi}
+	writeApi := idb.WriteAPIBlocking(cfg.Org, cfg.Bucket)
+	return &influxWriter{idb, writeApi}
 }
 
-func (i *influxDb) Write(u *Usage) error {
+func (w *influxWriter) Handle(u *Usage) error {
 	out := fmt.Sprintf("share: %v, circuit: %v", u.ShareToken, u.ZitiCircuitId)
 
 	envId := fmt.Sprintf("%d", u.EnvironmentId)
@@ -51,7 +51,7 @@ func (i *influxDb) Write(u *Usage) error {
 		out += fmt.Sprintf(" frontend {rx: %v, tx: %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))
 	}
 
-	if err := i.writeApi.WritePoint(context.Background(), pts...); err == nil {
+	if err := w.writeApi.WritePoint(context.Background(), pts...); err == nil {
 		logrus.Info(out)
 	} else {
 		return err

@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
-	"github.com/openziti/zrok/controller/metrics2"
+	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
@@ -17,12 +17,12 @@ const ConfigVersion = 2
 type Config struct {
 	V             int
 	Admin         *AdminConfig
-	Bridge        *metrics2.BridgeConfig
+	Bridge        *metrics.BridgeConfig
 	Endpoint      *EndpointConfig
 	Email         *EmailConfig
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
-	Metrics       *metrics2.Config
+	Metrics       *metrics.Config
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config

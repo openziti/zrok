@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"github.com/michaelquigley/cf"
 	"github.com/nxadm/tail"
 	"github.com/openziti/zrok/controller/env"
@@ -12,12 +11,12 @@ import (
 )
 
 func init() {
-	env.GetCfOptions().AddFlexibleSetter("file", loadFileSourceConfig)
+	env.GetCfOptions().AddFlexibleSetter("fileSource", loadFileSourceConfig)
 }
 
 type FileSourceConfig struct {
-	Path      string
-	IndexPath string
+	Path        string
+	PointerPath string
 }
 
 func loadFileSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
@@ -28,36 +27,36 @@ func loadFileSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
 		}
 		return &fileSource{cfg: cfg}, nil
 	}
-	return nil, errors.New("invalid config structure for 'file' source")
+	return nil, errors.New("invalid config structure for 'fileSource'")
 }
 
 type fileSource struct {
-	cfg *FileSourceConfig
-	t   *tail.Tail
+	cfg  *FileSourceConfig
+	ptrF *os.File
+	t    *tail.Tail
 }
 
-func (s *fileSource) Start(events chan map[string]interface{}) (join chan struct{}, err error) {
+func (s *fileSource) Start(events chan ZitiEventJson) (join chan struct{}, err error) {
 	f, err := os.Open(s.cfg.Path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening '%v'", s.cfg.Path)
 	}
 	_ = f.Close()
 
-	idxF, err := os.OpenFile(s.indexPath(), os.O_CREATE|os.O_RDWR, os.ModePerm)
+	s.ptrF, err = os.OpenFile(s.pointerPath(), os.O_CREATE|os.O_RDWR, os.ModePerm)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening '%v'", s.indexPath())
+		return nil, errors.Wrapf(err, "error opening pointer '%v'", s.pointerPath())
 	}
 
-	pos := int64(0)
-	posBuf := make([]byte, 8)
-	if n, err := idxF.Read(posBuf); err == nil && n == 8 {
-		pos = int64(binary.LittleEndian.Uint64(posBuf))
-		logrus.Infof("recovered stored position: %d", pos)
+	ptr, err := s.readPtr()
+	if err != nil {
+		logrus.Errorf("error reading pointer: %v", err)
 	}
+	logrus.Infof("retrieved stored position pointer at '%d'", ptr)
 
 	join = make(chan struct{})
 	go func() {
-		s.tail(pos, events, idxF)
+		s.tail(ptr, events)
 		close(join)
 	}()
 
@@ -70,43 +69,62 @@ func (s *fileSource) Stop() {
 	}
 }
 
-func (s *fileSource) tail(pos int64, events chan map[string]interface{}, idxF *os.File) {
-	logrus.Infof("started")
-	defer logrus.Infof("stopped")
-
-	posBuf := make([]byte, 8)
+func (s *fileSource) tail(ptr int64, events chan ZitiEventJson) {
+	logrus.Info("started")
+	defer logrus.Info("stopped")
 
 	var err error
 	s.t, err = tail.TailFile(s.cfg.Path, tail.Config{
 		ReOpen:   true,
 		Follow:   true,
-		Location: &tail.SeekInfo{Offset: pos},
+		Location: &tail.SeekInfo{Offset: ptr},
 	})
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error starting tail: %v", err)
 		return
 	}
 
-	for line := range s.t.Lines {
-		event := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(line.Text), &event); err == nil {
-			binary.LittleEndian.PutUint64(posBuf, uint64(line.SeekInfo.Offset))
-			if n, err := idxF.Seek(0, 0); err == nil && n == 0 {
-				if n, err := idxF.Write(posBuf); err != nil || n != 8 {
-					logrus.Errorf("error writing index (%d): %v", n, err)
-				}
-			}
-			events <- event
-		} else {
-			logrus.Errorf("error parsing line #%d: %v", line.Num, err)
+	for event := range s.t.Lines {
+		events <- ZitiEventJson(event.Text)
+
+		if err := s.writePtr(event.SeekInfo.Offset); err != nil {
+			logrus.Error(err)
 		}
 	}
 }
 
-func (s *fileSource) indexPath() string {
-	if s.cfg.IndexPath == "" {
-		return s.cfg.Path + ".idx"
+func (s *fileSource) pointerPath() string {
+	if s.cfg.PointerPath == "" {
+		return s.cfg.Path + ".ptr"
 	} else {
-		return s.cfg.IndexPath
+		return s.cfg.PointerPath
 	}
+}
+
+func (s *fileSource) readPtr() (int64, error) {
+	ptr := int64(0)
+	buf := make([]byte, 8)
+	if n, err := s.ptrF.Seek(0, 0); err == nil && n == 0 {
+		if n, err := s.ptrF.Read(buf); err == nil && n == 8 {
+			ptr = int64(binary.LittleEndian.Uint64(buf))
+			return ptr, nil
+		} else {
+			return 0, errors.Wrapf(err, "error reading pointer (%d): %v", n, err)
+		}
+	} else {
+		return 0, errors.Wrapf(err, "error seeking pointer (%d): %v", n, err)
+	}
+}
+
+func (s *fileSource) writePtr(ptr int64) error {
+	buf := make([]byte, 8)
+	binary.LittleEndian.PutUint64(buf, uint64(ptr))
+	if n, err := s.ptrF.Seek(0, 0); err == nil && n == 0 {
+		if n, err := s.ptrF.Write(buf); err != nil || n != 8 {
+			return errors.Wrapf(err, "error writing pointer (%d): %v", n, err)
+		}
+	} else {
+		return errors.Wrapf(err, "error seeking pointer (%d): %v", n, err)
+	}
+	return nil
 }

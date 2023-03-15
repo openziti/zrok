@@ -1,4 +1,4 @@
-package metrics2
+package metrics
 
 import (
 	"github.com/michaelquigley/cf"

@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/metrics2"
+	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
 
 	"github.com/go-openapi/loads"
@@ -72,7 +72,7 @@ func Run(inCfg *config.Config) error {
 	}
 
 	if cfg.Metrics != nil && cfg.Metrics.Agent != nil && cfg.Metrics.Influx != nil {
-		ma, err := metrics2.NewAgent(cfg.Metrics.Agent, str, cfg.Metrics.Influx)
+		ma, err := metrics.NewAgent(cfg.Metrics.Agent, str, cfg.Metrics.Influx)
 		if err != nil {
 			return errors.Wrap(err, "error creating metrics agent")
 		}

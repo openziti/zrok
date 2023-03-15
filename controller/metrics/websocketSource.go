@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -24,14 +23,14 @@ import (
 )
 
 func init() {
-	env.GetCfOptions().AddFlexibleSetter("websocket", loadWebsocketSourceConfig)
+	env.GetCfOptions().AddFlexibleSetter("websocketSource", loadWebsocketSourceConfig)
 }
 
 type WebsocketSourceConfig struct {
 	WebsocketEndpoint string
 	ApiEndpoint       string
 	Username          string
-	Password          string
+	Password          string `cf:"+secret"`
 }
 
 func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
@@ -42,17 +41,17 @@ func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error
 		}
 		return &websocketSource{cfg: cfg}, nil
 	}
-	return nil, errors.New("invalid config structure for 'websocket' source")
+	return nil, errors.New("invalid config struture for 'websocketSource'")
 }
 
 type websocketSource struct {
 	cfg    *WebsocketSourceConfig
 	ch     channel.Channel
-	events chan map[string]interface{}
+	events chan ZitiEventJson
 	join   chan struct{}
 }
 
-func (s *websocketSource) Start(events chan map[string]interface{}) (chan struct{}, error) {
+func (s *websocketSource) Start(events chan ZitiEventJson) (join chan struct{}, err error) {
 	caCerts, err := rest_util.GetControllerWellKnownCas(s.cfg.ApiEndpoint)
 	if err != nil {
 		return nil, err
@@ -151,17 +150,5 @@ func (s *websocketSource) Stop() {
 }
 
 func (s *websocketSource) HandleReceive(msg *channel.Message, _ channel.Channel) {
-	decoder := json.NewDecoder(bytes.NewReader(msg.Body))
-	for {
-		ev := make(map[string]interface{})
-		err := decoder.Decode(&ev)
-		if err == io.EOF {
-			break
-		}
-		if err == nil {
-			s.events <- ev
-		} else {
-			logrus.Errorf("error parsing '%v': %v", string(msg.Body), err)
-		}
-	}
+	s.events <- ZitiEventJson(msg.Body)
 }

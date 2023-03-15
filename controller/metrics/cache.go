@@ -2,34 +2,29 @@ package metrics
 
 import (
 	"github.com/openziti/zrok/controller/store"
-	"github.com/pkg/errors"
 )
 
 type cache struct {
 	str *store.Store
 }
 
-func newShareCache(cfg *store.Config) (*cache, error) {
-	str, err := store.Open(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error opening store")
-	}
-	return &cache{str}, nil
+func newShareCache(str *store.Store) *cache {
+	return &cache{str}
 }
 
-func (sc *cache) addZrokDetail(u *Usage) error {
-	tx, err := sc.str.Begin()
+func (c *cache) addZrokDetail(u *Usage) error {
+	tx, err := c.str.Begin()
 	if err != nil {
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	shr, err := sc.str.FindShareWithZIdAndDeleted(u.ZitiServiceId, tx)
+	shr, err := c.str.FindShareWithZIdAndDeleted(u.ZitiServiceId, tx)
 	if err != nil {
 		return err
 	}
 	u.ShareToken = shr.Token
-	env, err := sc.str.GetEnvironment(shr.EnvironmentId, tx)
+	env, err := c.str.GetEnvironment(shr.EnvironmentId, tx)
 	if err != nil {
 		return err
 	}

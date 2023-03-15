@@ -4,7 +4,7 @@ import (
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/env"
-	"github.com/openziti/zrok/controller/metrics2"
+	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -39,7 +39,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof(cf.Dump(cfg, env.GetCfOptions()))
 
-	bridge, err := metrics2.NewBridge(cfg.Bridge)
+	bridge, err := metrics.NewBridge(cfg.Bridge)
 	if err != nil {
 		panic(err)
 	}
