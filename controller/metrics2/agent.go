@@ -35,10 +35,15 @@ func (a *Agent) Start() error {
 	a.srcJoin = srcJoin
 
 	go func() {
+		logrus.Info("started")
+		defer logrus.Info("stopped")
 		for {
 			select {
 			case event := <-a.events:
 				if usage, err := Ingest(event); err == nil {
+					if err := a.cache.addZrokDetail(usage); err != nil {
+						logrus.Error(err)
+					}
 					if err := a.snk.Handle(usage); err != nil {
 						logrus.Error(err)
 					}

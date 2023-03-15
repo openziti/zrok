@@ -1,6 +1,8 @@
 package metrics2
 
-import "github.com/openziti/zrok/controller/store"
+import (
+	"github.com/openziti/zrok/controller/store"
+)
 
 type cache struct {
 	str *store.Store

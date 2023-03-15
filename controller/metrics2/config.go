@@ -1,5 +1,10 @@
 package metrics2
 
+type Config struct {
+	Influx *InfluxConfig
+	Agent  *AgentConfig
+}
+
 type AgentConfig struct {
 	Source interface{}
 }

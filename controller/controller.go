@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/metrics2"
 	"github.com/sirupsen/logrus"
 
 	"github.com/go-openapi/loads"
@@ -68,6 +69,17 @@ func Run(inCfg *config.Config) error {
 		idb = influxdb2.NewClient(cfg.Metrics.Influx.Url, cfg.Metrics.Influx.Token)
 	} else {
 		logrus.Warn("skipping influx client; no configuration")
+	}
+
+	if cfg.Metrics != nil && cfg.Metrics.Agent != nil && cfg.Metrics.Influx != nil {
+		ma, err := metrics2.NewAgent(cfg.Metrics.Agent, str, cfg.Metrics.Influx)
+		if err != nil {
+			return errors.Wrap(err, "error creating metrics agent")
+		}
+		if err := ma.Start(); err != nil {
+			return errors.Wrap(err, "error starting metrics agent")
+		}
+		defer func() { ma.Stop() }()
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
