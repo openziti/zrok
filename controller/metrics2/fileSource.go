@@ -50,7 +50,7 @@ func (s *fileSource) Start(events chan ZitiEventJson) (join chan struct{}, err e
 
 	ptr, err := s.readPtr()
 	if err != nil {
-		return nil, errors.Wrap(err, "error reading pointer")
+		logrus.Errorf("error reading pointer: %v", err)
 	}
 	logrus.Infof("retrieved stored position pointer at '%d'", ptr)
 
@@ -80,7 +80,7 @@ func (s *fileSource) tail(ptr int64, events chan ZitiEventJson) {
 		Location: &tail.SeekInfo{Offset: ptr},
 	})
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error starting tail: %v", err)
 		return
 	}
 
@@ -109,10 +109,10 @@ func (s *fileSource) readPtr() (int64, error) {
 			ptr = int64(binary.LittleEndian.Uint64(buf))
 			return ptr, nil
 		} else {
-			return -1, errors.Wrapf(err, "error reading pointer (%d): %v", n, err)
+			return 0, errors.Wrapf(err, "error reading pointer (%d): %v", n, err)
 		}
 	} else {
-		return -1, errors.Wrapf(err, "error seeking pointer (%d): %v", n, err)
+		return 0, errors.Wrapf(err, "error seeking pointer (%d): %v", n, err)
 	}
 }
 
