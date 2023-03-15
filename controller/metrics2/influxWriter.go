@@ -15,13 +15,13 @@ type influxWriter struct {
 	writeApi api.WriteAPIBlocking
 }
 
-func openInfluxWriter(cfg *InfluxConfig) *influxWriter {
+func newInfluxWriter(cfg *InfluxConfig) *influxWriter {
 	idb := influxdb2.NewClient(cfg.Url, cfg.Token)
 	writeApi := idb.WriteAPIBlocking(cfg.Org, cfg.Bucket)
 	return &influxWriter{idb, writeApi}
 }
 
-func (w *influxWriter) Write(u *Usage) error {
+func (w *influxWriter) Handle(u *Usage) error {
 	out := fmt.Sprintf("share: %v, circuit: %v", u.ShareToken, u.ZitiCircuitId)
 
 	envId := fmt.Sprintf("%d", u.EnvironmentId)
