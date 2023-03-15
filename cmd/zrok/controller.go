@@ -10,8 +10,14 @@ import (
 
 var controllerCmd *controllerCommand
 
+var metricsCmd = &cobra.Command{
+	Use:   "metrics",
+	Short: "Metrics related commands",
+}
+
 func init() {
 	controllerCmd = newControllerCommand()
+	controllerCmd.cmd.AddCommand(metricsCmd)
 	rootCmd.AddCommand(controllerCmd.cmd)
 }
 
