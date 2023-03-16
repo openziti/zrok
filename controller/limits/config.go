@@ -8,7 +8,7 @@ type Config struct {
 	Environments int
 	Shares       int
 	Bandwidth    *BandwidthConfig
-	Cycle        time.Duration
+	Enforcing    bool
 }
 
 type BandwidthConfig struct {
