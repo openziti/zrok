@@ -88,9 +88,7 @@ func Run(inCfg *config.Config) error {
 				return errors.Wrap(err, "error creating limits agent")
 			}
 			ma.AddUsageSink(la)
-			if err := la.Start(); err != nil {
-				return errors.Wrap(err, "error starting limits agent")
-			}
+			la.Start()
 			defer func() { la.Stop() }()
 		}
 	}

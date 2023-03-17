@@ -8,6 +8,7 @@ type Config struct {
 	Environments int
 	Shares       int
 	Bandwidth    *BandwidthConfig
+	Cycle        time.Duration
 	Enforcing    bool
 }
 
@@ -74,5 +75,7 @@ func DefaultConfig() *Config {
 				},
 			},
 		},
+		Enforcing: false,
+		Cycle:     15 * time.Minute,
 	}
 }
