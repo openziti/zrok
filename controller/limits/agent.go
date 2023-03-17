@@ -40,15 +40,36 @@ func (a *Agent) Stop() {
 
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Infof("handling: %v", u)
-	rxTotal, err := a.ifx.totalRxForShare(u.ShareToken, 24*time.Hour)
+	acctRx, err := a.ifx.totalRxForAccount(u.AccountId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	txTotal, err := a.ifx.totalTxForShare(u.ShareToken, 24*time.Hour)
+	acctTx, err := a.ifx.totalTxForAccount(u.AccountId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	logrus.Infof("'%v': {rx: %v, tx: %v}", u.ShareToken, util.BytesToSize(rxTotal), util.BytesToSize(txTotal))
+	envRx, err := a.ifx.totalRxForEnvironment(u.EnvironmentId, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	envTx, err := a.ifx.totalTxForEnvironment(u.EnvironmentId, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	shareRx, err := a.ifx.totalRxForShare(u.ShareToken, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	shareTx, err := a.ifx.totalTxForShare(u.ShareToken, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	logrus.Infof("'%v': acct:{rx: %v, tx: %v}, env:{rx: %v, tx: %v}, share:{rx: %v, tx: %v}",
+		u.ShareToken,
+		util.BytesToSize(acctRx), util.BytesToSize(acctTx),
+		util.BytesToSize(envRx), util.BytesToSize(envTx),
+		util.BytesToSize(shareRx), util.BytesToSize(shareTx),
+	)
 	return nil
 }
 
