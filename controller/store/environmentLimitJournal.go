@@ -8,16 +8,18 @@ import (
 type EnvironmentLimitJournal struct {
 	Model
 	EnvironmentId int
+	RxBytes       int64
+	TxBytes       int64
 	Action        string
 }
 
 func (self *Store) CreateEnvironmentLimitJournal(j *EnvironmentLimitJournal, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into environment_limit_journal (environment_id, action) values ($1, $2) returning id")
+	stmt, err := tx.Prepare("insert into environment_limit_journal (environment_id, rx_bytes, tx_bytes, action) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing environment_limit_journal insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(j.EnvironmentId, j.Action).Scan(&id); err != nil {
+	if err := stmt.QueryRow(j.EnvironmentId, j.RxBytes, j.TxBytes, j.Action).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing environment_limit_journal insert statement")
 	}
 	return id, nil

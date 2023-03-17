@@ -8,16 +8,18 @@ import (
 type AccountLimitJournal struct {
 	Model
 	AccountId int
+	RxBytes   int64
+	TxBytes   int64
 	Action    string
 }
 
 func (self *Store) CreateAccountLimitJournal(j *AccountLimitJournal, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into account_limit_journal (account_id, action) values ($1, $2) returning id")
+	stmt, err := tx.Prepare("insert into account_limit_journal (account_id, rx_bytes, tx_bytes, action) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing account_limit_journal insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(j.AccountId, j.AccountId).Scan(&id); err != nil {
+	if err := stmt.QueryRow(j.AccountId, j.RxBytes, j.TxBytes, j.AccountId).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing account_limit_journal insert statement")
 	}
 	return id, nil
