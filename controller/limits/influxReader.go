@@ -24,6 +24,50 @@ func newInfluxReader(cfg *metrics.InfluxConfig) *influxReader {
 	return &influxReader{cfg, idb, queryApi}
 }
 
+func (r *influxReader) totalRxForAccount(acctId int64, duration time.Duration) (int64, error) {
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", acctId) +
+		"|> sum()"
+	return r.runQueryForSum(query)
+}
+
+func (r *influxReader) totalTxForAccount(acctId int64, duration time.Duration) (int64, error) {
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesWritten\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", acctId) +
+		"|> sum()"
+	return r.runQueryForSum(query)
+}
+
+func (r *influxReader) totalRxForEnvironment(envId int64, duration time.Duration) (int64, error) {
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", envId) +
+		"|> sum()"
+	return r.runQueryForSum(query)
+}
+
+func (r *influxReader) totalTxForEnvironment(envId int64, duration time.Duration) (int64, error) {
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"bytesWritten\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", envId) +
+		"|> sum()"
+	return r.runQueryForSum(query)
+}
+
 func (r *influxReader) totalRxForShare(shrToken string, duration time.Duration) (int64, error) {
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
