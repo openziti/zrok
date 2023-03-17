@@ -8,16 +8,18 @@ import (
 type ShareLimitJournal struct {
 	Model
 	ShareId int
+	RxBytes int64
+	TxBytes int64
 	Action  string
 }
 
 func (self *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into share_limit_journal (share_id, action) values ($1, $2) returning id")
+	stmt, err := tx.Prepare("insert into share_limit_journal (share_id, rx_bytes, tx_bytes, action) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing share_limit_journal insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(j.ShareId, j.Action).Scan(&id); err != nil {
+	if err := stmt.QueryRow(j.ShareId, j.RxBytes, j.TxBytes, j.Action).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing share_limit_journal insert statement")
 	}
 	return id, nil
