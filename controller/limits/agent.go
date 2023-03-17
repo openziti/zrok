@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -39,6 +40,15 @@ func (a *Agent) Stop() {
 
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Infof("handling: %v", u)
+	rxTotal, err := a.ifx.totalRxForShare(u.ShareToken, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	txTotal, err := a.ifx.totalTxForShare(u.ShareToken, 24*time.Hour)
+	if err != nil {
+		logrus.Error(err)
+	}
+	logrus.Infof("'%v': {rx: %v, tx: %v}", u.ShareToken, util.BytesToSize(rxTotal), util.BytesToSize(txTotal))
 	return nil
 }
 
