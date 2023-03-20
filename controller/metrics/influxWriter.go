@@ -37,7 +37,7 @@ func (w *influxWriter) Handle(u *Usage) error {
 	if u.BackendTx > 0 || u.BackendRx > 0 {
 		pt := influxdb2.NewPoint("xfer",
 			map[string]string{"namespace": "backend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
-			map[string]interface{}{"bytesRead": u.BackendRx, "bytesWritten": u.BackendTx},
+			map[string]interface{}{"rx": u.BackendRx, "tx": u.BackendTx},
 			u.IntervalStart)
 		pts = append(pts, pt)
 		out += fmt.Sprintf(" backend {rx: %v, tx: %v}", util.BytesToSize(u.BackendRx), util.BytesToSize(u.BackendTx))
@@ -45,7 +45,7 @@ func (w *influxWriter) Handle(u *Usage) error {
 	if u.FrontendTx > 0 || u.FrontendRx > 0 {
 		pt := influxdb2.NewPoint("xfer",
 			map[string]string{"namespace": "frontend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
-			map[string]interface{}{"bytesRead": u.FrontendRx, "bytesWritten": u.FrontendTx},
+			map[string]interface{}{"rx": u.FrontendRx, "tx": u.FrontendTx},
 			u.IntervalStart)
 		pts = append(pts, pt)
 		out += fmt.Sprintf(" frontend {rx: %v, tx: %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))

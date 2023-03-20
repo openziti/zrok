@@ -19,11 +19,11 @@ func sparkDataForShares(shrs []*store.Share) (map[string][]int64, error) {
 
 		for result.Next() {
 			combinedRate := int64(0)
-			readRate := result.Record().ValueByKey("bytesRead")
+			readRate := result.Record().ValueByKey("tx")
 			if readRate != nil {
 				combinedRate += readRate.(int64)
 			}
-			writeRate := result.Record().ValueByKey("bytesWritten")
+			writeRate := result.Record().ValueByKey("tx")
 			if writeRate != nil {
 				combinedRate += writeRate.(int64)
 			}
@@ -48,7 +48,7 @@ func sparkFluxQuery(shrs []*store.Share) string {
 	query := "read = from(bucket: \"zrok\")" +
 		"|> range(start: -5m)" +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")" +
-		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\" or r[\"_field\"] == \"bytesWritten\")" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")" +
 		shrFilter +
 		"|> aggregateWindow(every: 5s, fn: sum, createEmpty: true)\n" +
