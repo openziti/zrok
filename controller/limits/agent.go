@@ -40,27 +40,15 @@ func (a *Agent) Stop() {
 
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Infof("handling: %v", u)
-	acctRx, err := a.ifx.totalRxForAccount(u.AccountId, 24*time.Hour)
+	acctRx, acctTx, err := a.ifx.totalForAccount(u.AccountId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	acctTx, err := a.ifx.totalTxForAccount(u.AccountId, 24*time.Hour)
+	envRx, envTx, err := a.ifx.totalForEnvironment(u.EnvironmentId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	envRx, err := a.ifx.totalRxForEnvironment(u.EnvironmentId, 24*time.Hour)
-	if err != nil {
-		logrus.Error(err)
-	}
-	envTx, err := a.ifx.totalTxForEnvironment(u.EnvironmentId, 24*time.Hour)
-	if err != nil {
-		logrus.Error(err)
-	}
-	shareRx, err := a.ifx.totalRxForShare(u.ShareToken, 24*time.Hour)
-	if err != nil {
-		logrus.Error(err)
-	}
-	shareTx, err := a.ifx.totalTxForShare(u.ShareToken, 24*time.Hour)
+	shareRx, shareTx, err := a.ifx.totalForShare(u.ShareToken, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -81,7 +69,7 @@ mainLoop:
 	for {
 		select {
 		case <-time.After(a.cfg.Cycle):
-			logrus.Info("insepection cycle")
+			logrus.Info("inspection cycle")
 
 		case <-a.close:
 			close(a.join)
