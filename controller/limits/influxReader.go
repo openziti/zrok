@@ -31,6 +31,7 @@ func (r *influxReader) totalRxForAccount(acctId int64, duration time.Duration) (
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\")\n" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", acctId) +
+		"|> set(key: \"share\", value: \"*\")\n" +
 		"|> sum()"
 	return r.runQueryForSum(query)
 }
@@ -42,6 +43,7 @@ func (r *influxReader) totalTxForAccount(acctId int64, duration time.Duration) (
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesWritten\")\n" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", acctId) +
+		"|> set(key: \"share\", value: \"*\")\n" +
 		"|> sum()"
 	return r.runQueryForSum(query)
 }
@@ -53,6 +55,7 @@ func (r *influxReader) totalRxForEnvironment(envId int64, duration time.Duration
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesRead\")\n" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", envId) +
+		"|> set(key: \"share\", value: \"*\")\n" +
 		"|> sum()"
 	return r.runQueryForSum(query)
 }
@@ -64,6 +67,7 @@ func (r *influxReader) totalTxForEnvironment(envId int64, duration time.Duration
 		"|> filter(fn: (r) => r[\"_field\"] == \"bytesWritten\")\n" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", envId) +
+		"|> set(key: \"share\", value: \"*\")\n" +
 		"|> sum()"
 	return r.runQueryForSum(query)
 }
