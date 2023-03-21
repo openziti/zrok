@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -20,14 +21,14 @@ func newEnableHandler() *enableHandler {
 
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	// start transaction early; if it fails, don't bother creating ziti resources
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	if err := h.checkLimits(principal); err != nil {
+	if err := h.checkLimits(principal, trx); err != nil {
 		logrus.Errorf("limits error for user '%v': %v", principal.Email, err)
 		return environment.NewEnableUnauthorized()
 	}
@@ -67,14 +68,14 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		Host:        params.Body.Host,
 		Address:     realRemoteAddress(params.HTTPRequest),
 		ZId:         envZId,
-	}, tx)
+	}, trx)
 	if err != nil {
 		logrus.Errorf("error storing created identity for user '%v': %v", principal.Email, err)
-		_ = tx.Rollback()
+		_ = trx.Rollback()
 		return environment.NewEnableInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
@@ -96,15 +97,15 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	return resp
 }
 
-func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal) error {
+func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
 	if !principal.Limitless {
 		if limitsAgent != nil {
-			ok, err := limitsAgent.CanCreateEnvironment(int(principal.ID))
+			ok, err := limitsAgent.CanCreateEnvironment(int(principal.ID), trx)
 			if err != nil {
-				return errors.Wrapf(err, "error checking limits for '%v'", principal.Email)
+				return errors.Wrapf(err, "error checking environment limits for '%v'", principal.Email)
 			}
 			if !ok {
-				return errors.Wrapf(err, "environment limit check failed for '%v'", principal.Email)
+				return errors.Errorf("environment limit check failed for '%v'", principal.Email)
 			}
 		}
 	}

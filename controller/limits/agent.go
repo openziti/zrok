@@ -43,20 +43,36 @@ func (a *Agent) Stop() {
 	<-a.join
 }
 
-func (a *Agent) CanCreateEnvironment(acctId int) (bool, error) {
-	if a.cfg.Environments > Unlimited {
-		trx, err := a.str.Begin()
-		if err != nil {
-			return false, errors.Wrap(err, "error creating transaction")
-		}
-		defer func() { _ = trx.Rollback() }()
-
+func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing && a.cfg.Environments > Unlimited {
 		envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 		if err != nil {
 			return false, err
 		}
 		if len(envs)+1 > a.cfg.Environments {
 			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (a *Agent) CanCreateShare(acctId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing && a.cfg.Shares > Unlimited {
+		envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
+		if err != nil {
+			return false, err
+		}
+		total := 0
+		for i := range envs {
+			shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
+			if err != nil {
+				return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
+			}
+			total += len(shrs)
+			if total+1 > a.cfg.Shares {
+				return false, nil
+			}
+			logrus.Infof("total = %d", total)
 		}
 	}
 	return true, nil
