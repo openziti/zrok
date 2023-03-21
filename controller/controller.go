@@ -52,7 +52,7 @@ func Run(inCfg *config.Config) error {
 	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
-	api.ShareShareHandler = newShareHandler(cfg.Limits)
+	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
