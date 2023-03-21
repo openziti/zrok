@@ -43,6 +43,25 @@ func (a *Agent) Stop() {
 	<-a.join
 }
 
+func (a *Agent) CanCreateEnvironment(acctId int) (bool, error) {
+	if a.cfg.Environments > Unlimited {
+		trx, err := a.str.Begin()
+		if err != nil {
+			return false, errors.Wrap(err, "error creating transaction")
+		}
+		defer func() { _ = trx.Rollback() }()
+
+		envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
+		if err != nil {
+			return false, err
+		}
+		if len(envs)+1 > a.cfg.Environments {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Debugf("handling: %v", u)
 	a.queue <- u
