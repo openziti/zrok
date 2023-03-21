@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -14,12 +12,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type enableHandler struct {
-	cfg *limits.Config
-}
+type enableHandler struct{}
 
-func newEnableHandler(cfg *limits.Config) *enableHandler {
-	return &enableHandler{cfg: cfg}
+func newEnableHandler() *enableHandler {
+	return &enableHandler{}
 }
 
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -31,7 +27,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if err := h.checkLimits(principal, tx); err != nil {
+	if err := h.checkLimits(principal); err != nil {
 		logrus.Errorf("limits error for user '%v': %v", principal.Email, err)
 		return environment.NewEnableUnauthorized()
 	}
@@ -100,14 +96,16 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	return resp
 }
 
-func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, tx *sqlx.Tx) error {
-	if !principal.Limitless && h.cfg.Environments > limits.Unlimited {
-		envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
-		if err != nil {
-			return errors.Errorf("unable to find environments for account '%v': %v", principal.Email, err)
-		}
-		if len(envs)+1 > h.cfg.Environments {
-			return errors.Errorf("would exceed environments limit of %d for '%v'", h.cfg.Environments, principal.Email)
+func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal) error {
+	if !principal.Limitless {
+		if limitsAgent != nil {
+			ok, err := limitsAgent.CanCreateEnvironment(int(principal.ID))
+			if err != nil {
+				return errors.Wrapf(err, "error checking limits for '%v'", principal.Email)
+			}
+			if !ok {
+				return errors.Wrapf(err, "environment limit check failed for '%v'", principal.Email)
+			}
 		}
 	}
 	return nil

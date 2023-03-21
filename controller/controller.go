@@ -20,6 +20,7 @@ import (
 var cfg *config.Config
 var str *store.Store
 var idb influxdb2.Client
+var limitsAgent *limits.Agent
 
 func Run(inCfg *config.Config) error {
 	cfg = inCfg
@@ -43,7 +44,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()
 	api.AdminListFrontendsHandler = newListFrontendsHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
-	api.EnvironmentEnableHandler = newEnableHandler(cfg.Limits)
+	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
@@ -83,13 +84,13 @@ func Run(inCfg *config.Config) error {
 		defer func() { ma.Stop() }()
 
 		if cfg.Limits != nil && cfg.Limits.Enforcing {
-			la, err := limits.NewAgent(cfg.Limits, cfg.Metrics.Influx, cfg.Ziti, str)
+			limitsAgent, err = limits.NewAgent(cfg.Limits, cfg.Metrics.Influx, cfg.Ziti, str)
 			if err != nil {
 				return errors.Wrap(err, "error creating limits agent")
 			}
-			ma.AddUsageSink(la)
-			la.Start()
-			defer func() { la.Stop() }()
+			ma.AddUsageSink(limitsAgent)
+			limitsAgent.Start()
+			defer func() { limitsAgent.Stop() }()
 		}
 	}
 
