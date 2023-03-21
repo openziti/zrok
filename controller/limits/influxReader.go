@@ -24,7 +24,7 @@ func newInfluxReader(cfg *metrics.InfluxConfig) *influxReader {
 	return &influxReader{cfg, idb, queryApi}
 }
 
-func (r *influxReader) totalForAccount(acctId int64, duration time.Duration) (int64, int64, error) {
+func (r *influxReader) totalRxTxForAccount(acctId int64, duration time.Duration) (int64, int64, error) {
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
@@ -33,10 +33,10 @@ func (r *influxReader) totalForAccount(acctId int64, duration time.Duration) (in
 		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", acctId) +
 		"|> drop(columns: [\"share\", \"envId\"])\n" +
 		"|> sum()"
-	return r.runQueryForSum(query)
+	return r.runQueryForRxTx(query)
 }
 
-func (r *influxReader) totalForEnvironment(envId int64, duration time.Duration) (int64, int64, error) {
+func (r *influxReader) totalRxTxForEnvironment(envId int64, duration time.Duration) (int64, int64, error) {
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
@@ -45,10 +45,10 @@ func (r *influxReader) totalForEnvironment(envId int64, duration time.Duration) 
 		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", envId) +
 		"|> drop(columns: [\"share\", \"acctId\"])\n" +
 		"|> sum()"
-	return r.runQueryForSum(query)
+	return r.runQueryForRxTx(query)
 }
 
-func (r *influxReader) totalForShare(shrToken string, duration time.Duration) (int64, int64, error) {
+func (r *influxReader) totalRxTxForShare(shrToken string, duration time.Duration) (int64, int64, error) {
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", r.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
@@ -56,10 +56,10 @@ func (r *influxReader) totalForShare(shrToken string, duration time.Duration) (i
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 		fmt.Sprintf("|> filter(fn: (r) => r[\"share\"] == \"%v\")\n", shrToken) +
 		"|> sum()"
-	return r.runQueryForSum(query)
+	return r.runQueryForRxTx(query)
 }
 
-func (r *influxReader) runQueryForSum(query string) (rx int64, tx int64, err error) {
+func (r *influxReader) runQueryForRxTx(query string) (rx int64, tx int64, err error) {
 	result, err := r.queryApi.Query(context.Background(), query)
 	if err != nil {
 		return -1, -1, err

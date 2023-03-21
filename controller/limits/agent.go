@@ -40,15 +40,15 @@ func (a *Agent) Stop() {
 
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Infof("handling: %v", u)
-	acctRx, acctTx, err := a.ifx.totalForAccount(u.AccountId, 24*time.Hour)
+	acctRx, acctTx, err := a.ifx.totalRxTxForAccount(u.AccountId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	envRx, envTx, err := a.ifx.totalForEnvironment(u.EnvironmentId, 24*time.Hour)
+	envRx, envTx, err := a.ifx.totalRxTxForEnvironment(u.EnvironmentId, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
-	shareRx, shareTx, err := a.ifx.totalForShare(u.ShareToken, 24*time.Hour)
+	shareRx, shareTx, err := a.ifx.totalRxTxForShare(u.ShareToken, 24*time.Hour)
 	if err != nil {
 		logrus.Error(err)
 	}
