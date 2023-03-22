@@ -10,7 +10,7 @@ type ShareLimitJournal struct {
 	ShareId int
 	RxBytes int64
 	TxBytes int64
-	Action  string
+	Action  LimitJournalAction
 }
 
 func (self *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (int, error) {
@@ -25,9 +25,17 @@ func (self *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (i
 	return id, nil
 }
 
+func (self *Store) IsShareLimitJournalEmpty(shrId int, trx *sqlx.Tx) (bool, error) {
+	count := 0
+	if err := trx.QueryRowx("select count(0) from share_limit_journal where share_id = $1", shrId).Scan(&count); err != nil {
+		return false, err
+	}
+	return count == 0, nil
+}
+
 func (self *Store) FindLatestShareLimitJournal(shrId int, tx *sqlx.Tx) (*ShareLimitJournal, error) {
 	j := &ShareLimitJournal{}
-	if err := tx.QueryRowx("select * from share_limit_journal where share_id = $1", shrId).StructScan(j); err != nil {
+	if err := tx.QueryRowx("select * from share_limit_journal where share_id = $1 order by created_at desc limit 1", shrId).StructScan(j); err != nil {
 		return nil, errors.Wrap(err, "error finding share_limit_journal by share_id")
 	}
 	return j, nil

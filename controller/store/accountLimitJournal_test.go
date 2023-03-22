@@ -21,7 +21,7 @@ func TestAccountLimitJournal(t *testing.T) {
 	acctId, err := str.CreateAccount(&Account{Email: "nobody@nowehere.com", Salt: "salt", Password: "password", Token: "token", Limitless: false, Deleted: false}, trx)
 	assert.Nil(t, err)
 
-	_, err = str.CreateAccountLimitJournal(&AccountLimitJournal{AccountId: acctId, RxBytes: 1024, TxBytes: 2048, Action: "warning"}, trx)
+	_, err = str.CreateAccountLimitJournal(&AccountLimitJournal{AccountId: acctId, RxBytes: 1024, TxBytes: 2048, Action: WarningAction}, trx)
 	assert.Nil(t, err)
 
 	aljEmpty, err = str.IsAccountLimitJournalEmpty(acctId, trx)
@@ -33,9 +33,9 @@ func TestAccountLimitJournal(t *testing.T) {
 	assert.NotNil(t, latestAlj)
 	assert.Equal(t, int64(1024), latestAlj.RxBytes)
 	assert.Equal(t, int64(2048), latestAlj.TxBytes)
-	assert.Equal(t, "warning", latestAlj.Action)
+	assert.Equal(t, WarningAction, latestAlj.Action)
 
-	_, err = str.CreateAccountLimitJournal(&AccountLimitJournal{AccountId: acctId, RxBytes: 2048, TxBytes: 4096, Action: "limit"}, trx)
+	_, err = str.CreateAccountLimitJournal(&AccountLimitJournal{AccountId: acctId, RxBytes: 2048, TxBytes: 4096, Action: LimitAction}, trx)
 	assert.Nil(t, err)
 
 	latestAlj, err = str.FindLatestAccountLimitJournal(acctId, trx)
@@ -43,5 +43,5 @@ func TestAccountLimitJournal(t *testing.T) {
 	assert.NotNil(t, latestAlj)
 	assert.Equal(t, int64(2048), latestAlj.RxBytes)
 	assert.Equal(t, int64(4096), latestAlj.TxBytes)
-	assert.Equal(t, "limit", latestAlj.Action)
+	assert.Equal(t, LimitAction, latestAlj.Action)
 }
