@@ -133,7 +133,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					return err
 				}
 
-				logrus.Warnf("enforcing account limit for '#%d': %v", u.AccountId, a.describeLimit(a.cfg.Bandwidth.PerAccount, u.BackendRx, u.BackendTx))
+				logrus.Warnf("enforcing account limit for '#%d'", u.AccountId)
 
 				if err := trx.Commit(); err != nil {
 					return err
@@ -163,7 +163,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					return err
 				}
 
-				logrus.Warnf("warning account '#%d': %v", u.AccountId, a.describeLimit(a.cfg.Bandwidth.PerAccount, u.BackendRx, u.BackendTx))
+				logrus.Warnf("warning account '#%d'", u.AccountId)
 
 				if err := trx.Commit(); err != nil {
 					return err
@@ -195,7 +195,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							return err
 						}
 
-						logrus.Warnf("enforcing environment limit for environment '#%d': %v", u.EnvironmentId, a.describeLimit(a.cfg.Bandwidth.PerEnvironment, u.BackendRx, u.BackendTx))
+						logrus.Warnf("enforcing environment limit for environment '#%d'", u.EnvironmentId)
 
 						if err := trx.Commit(); err != nil {
 							return err
@@ -225,7 +225,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							return err
 						}
 
-						logrus.Warnf("warning environment '#%d': %v", u.EnvironmentId, a.describeLimit(a.cfg.Bandwidth.PerEnvironment, u.BackendRx, u.BackendTx))
+						logrus.Warnf("warning environment '#%d'", u.EnvironmentId)
 
 						if err := trx.Commit(); err != nil {
 							return err
@@ -262,7 +262,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 									return err
 								}
 
-								logrus.Warnf("enforcing share limit for share '%v': %v", shr.Token, a.describeLimit(a.cfg.Bandwidth.PerShare, u.BackendRx, u.BackendTx))
+								logrus.Warnf("enforcing share limit for share '%v'", shr.Token)
 
 								if err := trx.Commit(); err != nil {
 									return err
@@ -297,7 +297,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 									return err
 								}
 
-								logrus.Warnf("warning share '%v': %v", shr.Token, a.describeLimit(a.cfg.Bandwidth.PerShare, u.BackendRx, u.BackendTx))
+								logrus.Warnf("warning share '%v'", shr.Token)
 
 								if err := trx.Commit(); err != nil {
 									return err
@@ -342,7 +342,7 @@ func (a *Agent) checkAccountLimits(u *metrics.Usage, trx *sqlx.Tx) (enforce, war
 
 	enforce, warning = a.checkLimit(limit, rx, tx)
 	if enforce || warning {
-		logrus.Warnf("'%v': %v", acct.Email, a.describeLimit(limit, rx, tx))
+		logrus.Debugf("'%v': %v", acct.Email, a.describeLimit(limit, rx, tx))
 	}
 
 	return enforce, warning, nil
@@ -369,7 +369,7 @@ func (a *Agent) checkEnvironmentLimit(u *metrics.Usage, trx *sqlx.Tx) (enforce, 
 
 	enforce, warning = a.checkLimit(limit, rx, tx)
 	if enforce || warning {
-		logrus.Warnf("'%v': %v", env.ZId, a.describeLimit(limit, rx, tx))
+		logrus.Debugf("'%v': %v", env.ZId, a.describeLimit(limit, rx, tx))
 	}
 
 	return enforce, warning, nil
@@ -391,7 +391,7 @@ func (a *Agent) checkShareLimit(u *metrics.Usage) (enforce, warning bool, err er
 
 	enforce, warning = a.checkLimit(limit, rx, tx)
 	if enforce || warning {
-		logrus.Warnf("'%v': %v", u.ShareToken, a.describeLimit(limit, rx, tx))
+		logrus.Debugf("'%v': %v", u.ShareToken, a.describeLimit(limit, rx, tx))
 	}
 
 	return enforce, warning, nil
