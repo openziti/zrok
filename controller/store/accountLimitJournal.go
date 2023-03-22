@@ -40,3 +40,19 @@ func (str *Store) FindLatestAccountLimitJournal(acctId int, trx *sqlx.Tx) (*Acco
 	}
 	return j, nil
 }
+
+func (str *Store) FindAllLatestAccountLimitJournal(trx *sqlx.Tx) ([]*AccountLimitJournal, error) {
+	rows, err := trx.Queryx("select id, account_id, rx_bytes, tx_bytes, action, created_at, updated_at from account_limit_journal where id in (select max(id) as id from account_limit_journal group by account_id)")
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting distinct account_limit_jounal")
+	}
+	var is []*AccountLimitJournal
+	for rows.Next() {
+		i := &AccountLimitJournal{}
+		if err := rows.StructScan(i); err != nil {
+			return nil, errors.Wrap(err, "error scanning account_limit_journal")
+		}
+		is = append(is, i)
+	}
+	return is, nil
+}
