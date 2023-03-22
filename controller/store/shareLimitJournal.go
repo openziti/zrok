@@ -13,7 +13,7 @@ type ShareLimitJournal struct {
 	Action  LimitJournalAction
 }
 
-func (self *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (int, error) {
+func (str *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into share_limit_journal (share_id, rx_bytes, tx_bytes, action) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing share_limit_journal insert statement")
@@ -25,7 +25,7 @@ func (self *Store) CreateShareLimitJournal(j *ShareLimitJournal, tx *sqlx.Tx) (i
 	return id, nil
 }
 
-func (self *Store) IsShareLimitJournalEmpty(shrId int, trx *sqlx.Tx) (bool, error) {
+func (str *Store) IsShareLimitJournalEmpty(shrId int, trx *sqlx.Tx) (bool, error) {
 	count := 0
 	if err := trx.QueryRowx("select count(0) from share_limit_journal where share_id = $1", shrId).Scan(&count); err != nil {
 		return false, err
@@ -33,7 +33,7 @@ func (self *Store) IsShareLimitJournalEmpty(shrId int, trx *sqlx.Tx) (bool, erro
 	return count == 0, nil
 }
 
-func (self *Store) FindLatestShareLimitJournal(shrId int, tx *sqlx.Tx) (*ShareLimitJournal, error) {
+func (str *Store) FindLatestShareLimitJournal(shrId int, tx *sqlx.Tx) (*ShareLimitJournal, error) {
 	j := &ShareLimitJournal{}
 	if err := tx.QueryRowx("select * from share_limit_journal where share_id = $1 order by created_at desc limit 1", shrId).StructScan(j); err != nil {
 		return nil, errors.Wrap(err, "error finding share_limit_journal by share_id")

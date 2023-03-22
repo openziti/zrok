@@ -62,15 +62,15 @@ func Open(cfg *Config) (*Store, error) {
 	return store, nil
 }
 
-func (self *Store) Begin() (*sqlx.Tx, error) {
-	return self.db.Beginx()
+func (str *Store) Begin() (*sqlx.Tx, error) {
+	return str.db.Beginx()
 }
 
-func (self *Store) Close() error {
-	return self.db.Close()
+func (str *Store) Close() error {
+	return str.db.Close()
 }
 
-func (self *Store) migrate(cfg *Config) error {
+func (str *Store) migrate(cfg *Config) error {
 	switch cfg.Type {
 	case "sqlite3":
 		migrations := &migrate.EmbedFileSystemMigrationSource{
@@ -78,7 +78,7 @@ func (self *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(self.db.DB, "sqlite3", migrations, migrate.Up)
+		n, err := migrate.Exec(str.db.DB, "sqlite3", migrations, migrate.Up)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
@@ -90,7 +90,7 @@ func (self *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(self.db.DB, "postgres", migrations, migrate.Up)
+		n, err := migrate.Exec(str.db.DB, "postgres", migrations, migrate.Up)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
