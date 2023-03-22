@@ -114,6 +114,12 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 	if enforce, warning, err := a.checkAccountLimits(u, trx); err == nil {
 		if enforce {
 			logrus.Warn("enforcing account limit")
+
+			alje, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx)
+			if err != nil {
+				return err
+			}
+
 		} else if warning {
 			logrus.Warn("reporting account warning")
 		} else {
