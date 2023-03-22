@@ -113,27 +113,198 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 
 	if enforce, warning, err := a.checkAccountLimits(u, trx); err == nil {
 		if enforce {
-			logrus.Warn("enforcing account limit")
+			enforced := false
+			var enforcedAt time.Time
+			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
+					enforced = latest.Action == store.LimitAction
+					enforcedAt = latest.UpdatedAt
+				}
+			}
 
-			alje, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx)
-			if err != nil {
-				return err
+			if !enforced {
+				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
+					AccountId: int(u.AccountId),
+					RxBytes:   u.BackendRx,
+					TxBytes:   u.BackendTx,
+					Action:    store.LimitAction,
+				}, trx)
+				if err != nil {
+					return err
+				}
+
+				logrus.Warnf("enforcing account limit for '#%d': %v", u.AccountId, a.describeLimit(a.cfg.Bandwidth.PerAccount, u.BackendRx, u.BackendTx))
+
+				if err := trx.Commit(); err != nil {
+					return err
+				}
+			} else {
+				logrus.Debugf("already enforced limit for account '#%d' at %v", u.AccountId, enforcedAt)
 			}
 
 		} else if warning {
-			logrus.Warn("reporting account warning")
+			warned := false
+			var warnedAt time.Time
+			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
+					warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+					warnedAt = latest.UpdatedAt
+				}
+			}
+
+			if !warned {
+				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
+					AccountId: int(u.AccountId),
+					RxBytes:   u.BackendRx,
+					TxBytes:   u.BackendTx,
+					Action:    store.WarningAction,
+				}, trx)
+				if err != nil {
+					return err
+				}
+
+				logrus.Warnf("warning account '#%d': %v", u.AccountId, a.describeLimit(a.cfg.Bandwidth.PerAccount, u.BackendRx, u.BackendTx))
+
+				if err := trx.Commit(); err != nil {
+					return err
+				}
+			} else {
+				logrus.Debugf("already warned account '#%d' at %v", u.AccountId, warnedAt)
+			}
+
 		} else {
 			if enforce, warning, err := a.checkEnvironmentLimit(u, trx); err == nil {
 				if enforce {
-					logrus.Warn("enforcing environment limit")
+					enforced := false
+					var enforcedAt time.Time
+					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
+						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
+							enforced = latest.Action == store.LimitAction
+							enforcedAt = latest.UpdatedAt
+						}
+					}
+
+					if !enforced {
+						_, err := a.str.CreateEnvironmentLimitJournal(&store.EnvironmentLimitJournal{
+							EnvironmentId: int(u.EnvironmentId),
+							RxBytes:       u.BackendRx,
+							TxBytes:       u.BackendTx,
+							Action:        store.LimitAction,
+						}, trx)
+						if err != nil {
+							return err
+						}
+
+						logrus.Warnf("enforcing environment limit for environment '#%d': %v", u.EnvironmentId, a.describeLimit(a.cfg.Bandwidth.PerEnvironment, u.BackendRx, u.BackendTx))
+
+						if err := trx.Commit(); err != nil {
+							return err
+						}
+					} else {
+						logrus.Debugf("already enforced limit for environment '#%d' at %v", u.EnvironmentId, enforcedAt)
+					}
+
 				} else if warning {
-					logrus.Warn("reporting environment warning")
+					warned := false
+					var warnedAt time.Time
+					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
+						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
+							warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+							warnedAt = latest.UpdatedAt
+						}
+					}
+
+					if !warned {
+						_, err := a.str.CreateEnvironmentLimitJournal(&store.EnvironmentLimitJournal{
+							EnvironmentId: int(u.EnvironmentId),
+							RxBytes:       u.BackendRx,
+							TxBytes:       u.BackendTx,
+							Action:        store.WarningAction,
+						}, trx)
+						if err != nil {
+							return err
+						}
+
+						logrus.Warnf("warning environment '#%d': %v", u.EnvironmentId, a.describeLimit(a.cfg.Bandwidth.PerEnvironment, u.BackendRx, u.BackendTx))
+
+						if err := trx.Commit(); err != nil {
+							return err
+						}
+					} else {
+						logrus.Debugf("already warned environment '#%d' at %v", u.EnvironmentId, warnedAt)
+					}
+
 				} else {
 					if enforce, warning, err := a.checkShareLimit(u); err == nil {
 						if enforce {
-							logrus.Warn("enforcing share limit")
+							shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
+							if err != nil {
+								return err
+							}
+
+							enforced := false
+							var enforcedAt time.Time
+							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
+								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
+									enforced = latest.Action == store.LimitAction
+									enforcedAt = latest.UpdatedAt
+								}
+							}
+
+							if !enforced {
+								_, err := a.str.CreateShareLimitJournal(&store.ShareLimitJournal{
+									ShareId: shr.Id,
+									RxBytes: u.BackendRx,
+									TxBytes: u.BackendTx,
+									Action:  store.LimitAction,
+								}, trx)
+								if err != nil {
+									return err
+								}
+
+								logrus.Warnf("enforcing share limit for share '%v': %v", shr.Token, a.describeLimit(a.cfg.Bandwidth.PerShare, u.BackendRx, u.BackendTx))
+
+								if err := trx.Commit(); err != nil {
+									return err
+								}
+							} else {
+								logrus.Debugf("already enforced limit for share '%v' at %v", shr.Token, enforcedAt)
+							}
+
 						} else if warning {
-							logrus.Warn("reporting share warning")
+							shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
+							if err != nil {
+								return err
+							}
+
+							warned := false
+							var warnedAt time.Time
+							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
+								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
+									warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+									warnedAt = latest.UpdatedAt
+								}
+							}
+
+							if !warned {
+								_, err := a.str.CreateShareLimitJournal(&store.ShareLimitJournal{
+									ShareId: shr.Id,
+									RxBytes: u.BackendRx,
+									TxBytes: u.BackendTx,
+									Action:  store.WarningAction,
+								}, trx)
+								if err != nil {
+									return err
+								}
+
+								logrus.Warnf("warning share '%v': %v", shr.Token, a.describeLimit(a.cfg.Bandwidth.PerShare, u.BackendRx, u.BackendTx))
+
+								if err := trx.Commit(); err != nil {
+									return err
+								}
+							} else {
+								logrus.Debugf("already warned share '%v' at %v", shr.Token, warnedAt)
+							}
 						}
 					} else {
 						logrus.Error(err)
