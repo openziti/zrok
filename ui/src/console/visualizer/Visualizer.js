@@ -17,12 +17,14 @@ const Visualizer = (props) => {
             console.log("resetting selection", props.selection);
             props.setSelection(props.defaultSelection);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.overview]);
 
     markSelected(networkGraph, props.selection);
 
     useEffect(() => {
         markSelected(networkGraph, props.selection);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.selection]);
 
     // fgRef to access force graph controls from this component
