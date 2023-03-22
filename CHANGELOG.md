@@ -8,6 +8,8 @@ CHANGE: The underlying database store now utilizes a `deleted` flag on all table
 
 CHANGE: `zrok config set apiEndpoint` now validates that the new API endpoint correctly starts with `http://` or `https://` (https://github.com/openziti/zrok/issues/258)
 
+CHANGE: Additional linting to support homebrew (https://github.com/openziti/zrok/issues/264)
+
 # v0.3.4
 
 CHANGE: `zrok test endpoint` incorporates `--ziti` mode (and related flags) to allow direct endpoint listening on a Ziti service
