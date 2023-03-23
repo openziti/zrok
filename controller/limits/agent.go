@@ -13,13 +13,22 @@ import (
 )
 
 type Agent struct {
-	cfg   *Config
-	ifx   *influxReader
-	zCfg  *zrokEdgeSdk.Config
-	str   *store.Store
-	queue chan *metrics.Usage
-	close chan struct{}
-	join  chan struct{}
+	cfg                *Config
+	ifx                *influxReader
+	zCfg               *zrokEdgeSdk.Config
+	str                *store.Store
+	queue              chan *metrics.Usage
+	acctWarningEnforce []AccountAction
+	acctLimitEnforce   []AccountAction
+	acctLimitRelax     []AccountAction
+	envWarningEnforce  []EnvironmentAction
+	envLimitEnforce    []EnvironmentAction
+	envLimitRelax      []EnvironmentAction
+	shrWarningEnforce  []ShareAction
+	shrLimitEnforce    []ShareAction
+	shrLimitRelax      []ShareAction
+	close              chan struct{}
+	join               chan struct{}
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, str *store.Store) (*Agent, error) {
