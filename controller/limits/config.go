@@ -32,7 +32,7 @@ type Bandwidth struct {
 
 func DefaultBandwidthPerPeriod() *BandwidthPerPeriod {
 	return &BandwidthPerPeriod{
-		Period: 15 * (24 * time.Hour),
+		Period: 24 * time.Hour,
 		Warning: &Bandwidth{
 			Rx:    Unlimited,
 			Tx:    Unlimited,
