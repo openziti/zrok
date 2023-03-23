@@ -44,15 +44,22 @@ func (str *Store) FindLatestAccountLimitJournal(acctId int, trx *sqlx.Tx) (*Acco
 func (str *Store) FindAllLatestAccountLimitJournal(trx *sqlx.Tx) ([]*AccountLimitJournal, error) {
 	rows, err := trx.Queryx("select id, account_id, rx_bytes, tx_bytes, action, created_at, updated_at from account_limit_journal where id in (select max(id) as id from account_limit_journal group by account_id)")
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting distinct account_limit_jounal")
+		return nil, errors.Wrap(err, "error selecting all latest account_limit_journal")
 	}
-	var is []*AccountLimitJournal
+	var aljs []*AccountLimitJournal
 	for rows.Next() {
-		i := &AccountLimitJournal{}
-		if err := rows.StructScan(i); err != nil {
+		alj := &AccountLimitJournal{}
+		if err := rows.StructScan(alj); err != nil {
 			return nil, errors.Wrap(err, "error scanning account_limit_journal")
 		}
-		is = append(is, i)
+		aljs = append(aljs, alj)
 	}
-	return is, nil
+	return aljs, nil
+}
+
+func (str *Store) DeleteAccountLimitJournalForAccount(acctId int, trx *sqlx.Tx) error {
+	if _, err := trx.Exec("delete from account_limit_journal where account_id = $1", acctId); err != nil {
+		return errors.Wrapf(err, "error deleting account_limit journal for '#%d'", acctId)
+	}
+	return nil
 }

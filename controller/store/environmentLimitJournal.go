@@ -40,3 +40,26 @@ func (str *Store) FindLatestEnvironmentLimitJournal(envId int, trx *sqlx.Tx) (*E
 	}
 	return j, nil
 }
+
+func (str *Store) FindAllLatestEnvironmentLimitJournal(trx *sqlx.Tx) ([]*EnvironmentLimitJournal, error) {
+	rows, err := trx.Queryx("select id, environment_id, rx_bytes, tx_bytes, action, created_at, updated_at from environment_limit_journal where id in (select max(id) as id from environment_limit_journal group by environment_id)")
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting all latest environment_limit_journal")
+	}
+	var eljs []*EnvironmentLimitJournal
+	for rows.Next() {
+		elj := &EnvironmentLimitJournal{}
+		if err := rows.StructScan(elj); err != nil {
+			return nil, errors.Wrap(err, "error scanning environment_limit_journal")
+		}
+		eljs = append(eljs, elj)
+	}
+	return eljs, nil
+}
+
+func (str *Store) DeleteEnvironmentLimitJournalForEnvironment(envId int, trx *sqlx.Tx) error {
+	if _, err := trx.Exec("delete from environment_limit_journal where environment_id = $1", envId); err != nil {
+		return errors.Wrapf(err, "error deleteing environment_limit_journal for '#%d'", envId)
+	}
+	return nil
+}
