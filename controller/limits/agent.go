@@ -3,6 +3,7 @@ package limits
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
@@ -31,7 +32,7 @@ type Agent struct {
 	join               chan struct{}
 }
 
-func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, str *store.Store) (*Agent, error) {
+func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	edge, err := zrokEdgeSdk.Client(zCfg)
 	if err != nil {
 		return nil, err
@@ -42,13 +43,13 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Confi
 		zCfg:               zCfg,
 		str:                str,
 		queue:              make(chan *metrics.Usage, 1024),
-		acctWarningActions: []AccountAction{newAccountWarningAction(str, edge)},
+		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str, edge)},
 		acctLimitActions:   []AccountAction{newAccountLimitAction(str, edge)},
 		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, edge)},
-		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(str, edge)},
+		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(emailCfg, str, edge)},
 		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, edge)},
 		envRelaxActions:    []EnvironmentAction{newEnvironmentRelaxAction(str, edge)},
-		shrWarningActions:  []ShareAction{newShareWarningAction(str, edge)},
+		shrWarningActions:  []ShareAction{newShareWarningAction(emailCfg, str, edge)},
 		shrLimitActions:    []ShareAction{newShareLimitAction(str, edge)},
 		shrRelaxActions:    []ShareAction{newShareRelaxAction(str, edge)},
 		close:              make(chan struct{}),
@@ -550,7 +551,7 @@ func (a *Agent) checkShareLimit(shrToken string) (enforce, warning bool, rxBytes
 
 	enforce, warning = a.checkLimit(limit, rx, tx)
 	if enforce || warning {
-		logrus.Debugf("'%v': %v", shrToken, a.describeLimit(limit, rx, tx))
+		logrus.Debugf("'%v': %v", shrToken, describeLimit(limit, rx, tx))
 	}
 
 	return enforce, warning, rx, tx, nil
@@ -580,7 +581,7 @@ func (a *Agent) checkLimit(cfg *BandwidthPerPeriod, rx, tx int64) (enforce, warn
 	return false, false
 }
 
-func (a *Agent) describeLimit(cfg *BandwidthPerPeriod, rx, tx int64) string {
+func describeLimit(cfg *BandwidthPerPeriod, rx, tx int64) string {
 	out := ""
 
 	if cfg.Limit.Rx != Unlimited && rx > cfg.Limit.Rx {

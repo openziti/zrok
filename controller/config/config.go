@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
@@ -19,7 +20,7 @@ type Config struct {
 	Admin         *AdminConfig
 	Bridge        *metrics.BridgeConfig
 	Endpoint      *EndpointConfig
-	Email         *EmailConfig
+	Email         *emailUi.Config
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
 	Metrics       *metrics.Config
@@ -37,14 +38,6 @@ type AdminConfig struct {
 type EndpointConfig struct {
 	Host string
 	Port int
-}
-
-type EmailConfig struct {
-	Host     string
-	Port     int
-	Username string
-	Password string `cf:"+secret"`
-	From     string
 }
 
 type RegistrationConfig struct {
