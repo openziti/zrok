@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Transfer limit warning!</title>
+    <meta name="description" content="zrok Transfer Limit Warning">
+    <meta name="viewport" content="width=device-width">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 25;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #ffffff;
+            background-color: #3b2693;
+
+        }
+
+        a:link {
+            color: #00d7e4;
+        }
+
+        a:visited {
+            color: #00d7e4;
+        }
+
+        a:hover,
+        a:active {
+            color: #ff0100;
+        }
+
+        .claim {
+            font-size: 2em;
+            margin: 0.5em 0 1em 0;
+        }
+
+        .container {
+            width: 62em;
+            margin: 2em auto;
+            max-width: 100%;
+            text-align: center;
+        }
+
+
+
+        .btn {
+            display: inline-block;
+            margin: .25em;
+            padding: 10px 16px;
+            font-size: 1.15em;
+            line-height: 1.33;
+            border-radius: 6px;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            color: #ffffff;
+            background-color: #ff0100;
+            border-color: #ff0100;
+        }
+
+        a.btn-primary:link,
+        a.btn-primary:visited {
+            color: #ffffff;
+        }
+
+        a.btn-primary:hover,
+        a.btn-primary:active {
+            background-color: #cf0100;
+        }
+
+        .btn-secondary {
+            background-color: #b3b3b3;
+            border-color: #b3b3b3;
+            color: #252525;
+            font-weight: 800;
+        }
+
+        a.btn-secondary:link,
+        a.btn-secondary:visited {
+            color: #666;
+        }
+
+        a.btn-secondary:hover,
+        a.btn-secondary:hover {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .about {
+            margin: 1em auto;
+        }
+
+        .about td {
+            text-align: left;
+        }
+
+        .about td:first-child {
+            width: 80px;
+        }
+
+        @media screen and (max-width: 600px) {
+            img {
+                height: auto !important;
+            }
+        }
+
+        @media screen and (max-width: 400px) {
+            body {
+                font-size: 14px;
+            }
+        }
+
+        @media screen and (max-width: 320px) {
+            body {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body style="font-family: 'JetBrains Mono', 'Courier New', monospace; color: #ffffff; background-color: #3b2693; font-weight: 600;">
+
+<div class="container">
+    <div class="banner" style="margin: auto;">
+        <img src="https://zrok.io/wp-content/uploads/2023/01/reset.jpg" width="363px" height="500px" style="padding-bottom: 10px;"/>
+    </div>
+    <div class="cta" style="text-align: center;">
+        <p style="text-align: center;">Your account is reaching a transfer size limit, {{ .EmailAddress }}.</p>
+        <p style="text-align: center;">{{ .Detail }}}</p>
+    </div>
+
+    <table border="0" cellpadding="0" cellspacing="0" align="center" class="about">
+        <tr>
+            <td><a href="https://github.com/openziti/zrok" target="_blank">github.com/openziti/zrok</a></td>
+        </tr>
+        <tr>
+            <td>{{ .Version }}</td>
+        </tr>
+    </table>
+    <p style="text-align: center;"></a>Copyright © 2023 <a href="http://www.netfoundry.io" target="_blank" style="color: #00d7e4;">NetFoundry, Inc.</a></p>
+</div>
+</body>
+</html>
