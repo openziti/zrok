@@ -18,15 +18,15 @@ type Agent struct {
 	zCfg               *zrokEdgeSdk.Config
 	str                *store.Store
 	queue              chan *metrics.Usage
-	acctWarningEnforce []AccountAction
-	acctLimitEnforce   []AccountAction
-	acctLimitRelax     []AccountAction
-	envWarningEnforce  []EnvironmentAction
-	envLimitEnforce    []EnvironmentAction
-	envLimitRelax      []EnvironmentAction
-	shrWarningEnforce  []ShareAction
-	shrLimitEnforce    []ShareAction
-	shrLimitRelax      []ShareAction
+	acctWarningActions []AccountAction
+	acctLimitActions   []AccountAction
+	acctRelaxActions   []AccountAction
+	envWarningActions  []EnvironmentAction
+	envLimitActions    []EnvironmentAction
+	envRelaxActions    []EnvironmentAction
+	shrWarningActions  []ShareAction
+	shrLimitActions    []ShareAction
+	shrRelaxActions    []ShareAction
 	close              chan struct{}
 	join               chan struct{}
 }
@@ -42,9 +42,12 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Confi
 		zCfg:              zCfg,
 		str:               str,
 		queue:             make(chan *metrics.Usage, 1024),
-		shrWarningEnforce: []ShareAction{newShareWarningAction(str, edge)},
-		shrLimitEnforce:   []ShareAction{newShareLimitAction(str, edge)},
-		shrLimitRelax:     []ShareAction{newShareRelaxAction(str, edge)},
+		envWarningActions: []EnvironmentAction{newEnvironmentWarningAction(str, edge)},
+		envLimitActions:   []EnvironmentAction{newEnvironmentLimitAction(str, edge)},
+		envRelaxActions:   []EnvironmentAction{newEnvironmentRelaxAction(str, edge)},
+		shrWarningActions: []ShareAction{newShareWarningAction(str, edge)},
+		shrLimitActions:   []ShareAction{newShareLimitAction(str, edge)},
+		shrRelaxActions:   []ShareAction{newShareRelaxAction(str, edge)},
 		close:             make(chan struct{}),
 		join:              make(chan struct{}),
 	}
