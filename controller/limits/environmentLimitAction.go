@@ -1,6 +1,7 @@
 package limits
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ func newEnvironmentLimitAction(str *store.Store, edge *rest_management_api_clien
 	return &environmentLimitAction{str, edge}
 }
 
-func (a *environmentLimitAction) HandleEnvironment(e *store.Environment, rxBytes, txBytes int64, limit *BandwidthPerPeriod) error {
+func (a *environmentLimitAction) HandleEnvironment(e *store.Environment, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("limiting '%v'", e.ZId)
 	return nil
 }
