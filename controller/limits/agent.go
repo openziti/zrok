@@ -32,15 +32,23 @@ type Agent struct {
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, str *store.Store) (*Agent, error) {
-	return &Agent{
-		cfg:   cfg,
-		ifx:   newInfluxReader(ifxCfg),
-		zCfg:  zCfg,
-		str:   str,
-		queue: make(chan *metrics.Usage, 1024),
-		close: make(chan struct{}),
-		join:  make(chan struct{}),
-	}, nil
+	edge, err := zrokEdgeSdk.Client(zCfg)
+	if err != nil {
+		return nil, err
+	}
+	a := &Agent{
+		cfg:               cfg,
+		ifx:               newInfluxReader(ifxCfg),
+		zCfg:              zCfg,
+		str:               str,
+		queue:             make(chan *metrics.Usage, 1024),
+		shrWarningEnforce: []ShareAction{newShareWarningAction(str, edge)},
+		shrLimitEnforce:   []ShareAction{newShareLimitAction(str, edge)},
+		shrLimitRelax:     []ShareAction{newShareRelaxAction(str, edge)},
+		close:             make(chan struct{}),
+		join:              make(chan struct{}),
+	}
+	return a, nil
 }
 
 func (a *Agent) Start() {
