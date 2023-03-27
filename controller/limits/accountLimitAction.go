@@ -1,6 +1,7 @@
 package limits
 
 import (
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ func newAccountLimitAction(str *store.Store, edge *rest_management_api_client.Zi
 	return &accountLimitAction{str, edge}
 }
 
-func (a *accountLimitAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod) error {
+func (a *accountLimitAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("limiting '%v'", acct.Email)
 	return nil
 }

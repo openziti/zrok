@@ -115,6 +115,9 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
 	}
+	if len(params.Body.FrontendSelection) > 0 {
+		sshr.FrontendSelection = &params.Body.FrontendSelection[0]
+	}
 	if len(frontendEndpoints) > 0 {
 		sshr.FrontendEndpoint = &frontendEndpoints[0]
 	} else if sshr.ShareMode == "private" {

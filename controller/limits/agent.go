@@ -165,7 +165,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				}
 				// run account limit actions
 				for _, action := range a.acctLimitActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount); err != nil {
+					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
 						return err
 					}
 				}
@@ -202,7 +202,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				}
 				// run account warning actions
 				for _, action := range a.acctWarningActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount); err != nil {
+					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
 						return err
 					}
 				}
@@ -241,7 +241,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 						}
 						// run environment limit actions
 						for _, action := range a.envLimitActions {
-							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment); err != nil {
+							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
 								return err
 							}
 						}
@@ -278,7 +278,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 						}
 						// run environment warning actions
 						for _, action := range a.envWarningActions {
-							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment); err != nil {
+							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
 								return err
 							}
 						}
@@ -318,7 +318,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 								}
 								// run share limit actions
 								for _, action := range a.shrLimitActions {
-									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare); err != nil {
+									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
 										return err
 									}
 								}
@@ -356,7 +356,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 								}
 								// run share warning actions
 								for _, action := range a.shrWarningActions {
-									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare); err != nil {
+									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
 										return err
 									}
 								}
@@ -401,7 +401,7 @@ func (a *Agent) relax() error {
 						if !enforce && !warning {
 							// run relax actions for share
 							for _, action := range a.shrRelaxActions {
-								if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare); err != nil {
+								if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
 									return err
 								}
 							}
@@ -433,7 +433,7 @@ func (a *Agent) relax() error {
 						if !enforce && !warning {
 							// run relax actions for environment
 							for _, action := range a.envRelaxActions {
-								if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment); err != nil {
+								if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
 									return err
 								}
 							}
@@ -465,7 +465,7 @@ func (a *Agent) relax() error {
 						if !enforce && !warning {
 							// run relax actions for account
 							for _, action := range a.acctRelaxActions {
-								if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount); err != nil {
+								if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
 									return err
 								}
 							}
