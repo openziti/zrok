@@ -84,7 +84,7 @@ func Run(inCfg *config.Config) error {
 		defer func() { ma.Stop() }()
 
 		if cfg.Limits != nil && cfg.Limits.Enforcing {
-			limitsAgent, err = limits.NewAgent(cfg.Limits, cfg.Metrics.Influx, cfg.Ziti, str)
+			limitsAgent, err = limits.NewAgent(cfg.Limits, cfg.Metrics.Influx, cfg.Ziti, cfg.Email, str)
 			if err != nil {
 				return errors.Wrap(err, "error creating limits agent")
 			}
