@@ -17,18 +17,18 @@ func newShareLimitAction(str *store.Store, edge *rest_management_api_client.Ziti
 	return &shareLimitAction{str, edge}
 }
 
-func (a *shareLimitAction) HandleShare(s *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
-	logrus.Infof("limiting '%v'", s.Token)
+func (a *shareLimitAction) HandleShare(shr *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
+	logrus.Infof("limiting '%v'", shr.Token)
 
-	env, err := a.str.GetEnvironment(s.EnvironmentId, trx)
+	env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
 	if err != nil {
 		return err
 	}
 
-	if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, s.Token, a.edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, shr.Token, a.edge); err != nil {
 		return err
 	}
-	logrus.Infof("removed service dial policy for '%v'", s.Token)
+	logrus.Infof("removed dial service policy for '%v'", shr.Token)
 
 	return nil
 }
