@@ -37,19 +37,22 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Confi
 		return nil, err
 	}
 	a := &Agent{
-		cfg:               cfg,
-		ifx:               newInfluxReader(ifxCfg),
-		zCfg:              zCfg,
-		str:               str,
-		queue:             make(chan *metrics.Usage, 1024),
-		envWarningActions: []EnvironmentAction{newEnvironmentWarningAction(str, edge)},
-		envLimitActions:   []EnvironmentAction{newEnvironmentLimitAction(str, edge)},
-		envRelaxActions:   []EnvironmentAction{newEnvironmentRelaxAction(str, edge)},
-		shrWarningActions: []ShareAction{newShareWarningAction(str, edge)},
-		shrLimitActions:   []ShareAction{newShareLimitAction(str, edge)},
-		shrRelaxActions:   []ShareAction{newShareRelaxAction(str, edge)},
-		close:             make(chan struct{}),
-		join:              make(chan struct{}),
+		cfg:                cfg,
+		ifx:                newInfluxReader(ifxCfg),
+		zCfg:               zCfg,
+		str:                str,
+		queue:              make(chan *metrics.Usage, 1024),
+		acctWarningActions: []AccountAction{newAccountWarningAction(str, edge)},
+		acctLimitActions:   []AccountAction{newAccountLimitAction(str, edge)},
+		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, edge)},
+		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(str, edge)},
+		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, edge)},
+		envRelaxActions:    []EnvironmentAction{newEnvironmentRelaxAction(str, edge)},
+		shrWarningActions:  []ShareAction{newShareWarningAction(str, edge)},
+		shrLimitActions:    []ShareAction{newShareLimitAction(str, edge)},
+		shrRelaxActions:    []ShareAction{newShareRelaxAction(str, edge)},
+		close:              make(chan struct{}),
+		join:               make(chan struct{}),
 	}
 	return a, nil
 }
