@@ -10,6 +10,7 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"reflect"
 	"time"
 )
 
@@ -167,7 +168,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				// run account limit actions
 				for _, action := range a.acctLimitActions {
 					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-						return err
+						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 					}
 				}
 				if err := trx.Commit(); err != nil {
@@ -204,7 +205,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				// run account warning actions
 				for _, action := range a.acctWarningActions {
 					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-						return err
+						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 					}
 				}
 				if err := trx.Commit(); err != nil {
@@ -243,7 +244,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 						// run environment limit actions
 						for _, action := range a.envLimitActions {
 							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-								return err
+								return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 							}
 						}
 						if err := trx.Commit(); err != nil {
@@ -280,7 +281,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 						// run environment warning actions
 						for _, action := range a.envWarningActions {
 							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-								return err
+								return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 							}
 						}
 						if err := trx.Commit(); err != nil {
@@ -320,7 +321,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 								// run share limit actions
 								for _, action := range a.shrLimitActions {
 									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-										return err
+										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 									}
 								}
 								if err := trx.Commit(); err != nil {
@@ -358,7 +359,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 								// run share warning actions
 								for _, action := range a.shrWarningActions {
 									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-										return err
+										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 									}
 								}
 								if err := trx.Commit(); err != nil {
@@ -403,7 +404,7 @@ func (a *Agent) relax() error {
 							// run relax actions for share
 							for _, action := range a.shrRelaxActions {
 								if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-									return err
+									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 								}
 							}
 							if err := a.str.DeleteShareLimitJournalForShare(shr.Id, trx); err == nil {
@@ -435,7 +436,7 @@ func (a *Agent) relax() error {
 							// run relax actions for environment
 							for _, action := range a.envRelaxActions {
 								if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-									return err
+									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 								}
 							}
 							if err := a.str.DeleteEnvironmentLimitJournalForEnvironment(env.Id, trx); err == nil {
@@ -467,7 +468,7 @@ func (a *Agent) relax() error {
 							// run relax actions for account
 							for _, action := range a.acctRelaxActions {
 								if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-									return err
+									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 								}
 							}
 							if err := a.str.DeleteAccountLimitJournalForAccount(acct.Id, trx); err == nil {

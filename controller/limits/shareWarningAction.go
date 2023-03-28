@@ -27,13 +27,15 @@ func (a *shareWarningAction) HandleShare(shr *store.Share, rxBytes, txBytes int6
 		return err
 	}
 
-	acct, err := a.str.GetAccount(env.Id, trx)
-	if err != nil {
-		return err
-	}
+	if env.AccountId != nil {
+		acct, err := a.str.GetAccount(*env.AccountId, trx)
+		if err != nil {
+			return err
+		}
 
-	if err := sendLimitWarningEmail(a.cfg, acct.Email, limit, rxBytes, txBytes); err != nil {
-		return errors.Wrapf(err, "error sending limit warning email to '%v'", acct.Email)
+		if err := sendLimitWarningEmail(a.cfg, acct.Email, limit, rxBytes, txBytes); err != nil {
+			return errors.Wrapf(err, "error sending limit warning email to '%v'", acct.Email)
+		}
 	}
 
 	return nil
