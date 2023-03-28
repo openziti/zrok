@@ -9,6 +9,7 @@ import (
 type WarningEmail struct {
 	EmailAddress string
 	Detail       string
+	Version      string
 }
 
 func (we WarningEmail) MergeTemplate(filename string) (string, error) {

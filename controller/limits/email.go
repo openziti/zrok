@@ -1,6 +1,7 @@
 package limits
 
 import (
+	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -11,13 +12,14 @@ func sendLimitWarningEmail(cfg *emailUi.Config, emailTo string, limit *Bandwidth
 	emailData := &emailUi.WarningEmail{
 		EmailAddress: emailTo,
 		Detail:       describeLimit(limit, rxBytes, txBytes),
+		Version:      build.String(),
 	}
 
 	plainBody, err := emailData.MergeTemplate("limitWarning.gotext")
 	if err != nil {
 		return err
 	}
-	htmlBody, err := emailData.MergeTemplate("resetPassword.gohtml")
+	htmlBody, err := emailData.MergeTemplate("limitWarning.gohtml")
 	if err != nil {
 		return err
 	}
