@@ -81,7 +81,7 @@ func (r *influxReader) runQueryForRxTx(query string) (rx int64, tx int64, err er
 		}
 		count++
 	}
-	if count != 2 {
+	if count != 0 && count != 2 {
 		return -1, -1, errors.Errorf("expected 2 results; got '%d' (%v)", count, strings.ReplaceAll(query, "\n", ""))
 	}
 	return rx, tx, nil
