@@ -385,7 +385,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 }
 
 func (a *Agent) relax() error {
-	logrus.Info("relaxing")
+	logrus.Debug("relaxing")
 
 	trx, err := a.str.Begin()
 	if err != nil {
