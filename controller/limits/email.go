@@ -32,7 +32,7 @@ func sendLimitWarningEmail(cfg *emailUi.Config, emailTo, detail string) error {
 		return errors.Wrap(err, "failed to set to address in limit warning email")
 	}
 
-	msg.Subject("Limit Warning Notification")
+	msg.Subject("zrok Limit Warning Notification")
 	msg.SetDate()
 	msg.SetMessageID()
 	msg.SetBulk()
