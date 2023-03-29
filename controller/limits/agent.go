@@ -69,35 +69,71 @@ func (a *Agent) Stop() {
 }
 
 func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
-	if a.cfg.Enforcing && a.cfg.Environments > Unlimited {
-		envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
+	if a.cfg.Enforcing {
+		alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
 		if err != nil {
 			return false, err
 		}
-		if len(envs)+1 > a.cfg.Environments {
+		if alj.Action == store.LimitAction {
 			return false, nil
+		}
+
+		if a.cfg.Environments > Unlimited {
+			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
+			if err != nil {
+				return false, err
+			}
+			if len(envs)+1 > a.cfg.Environments {
+				return false, nil
+			}
 		}
 	}
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId int, trx *sqlx.Tx) (bool, error) {
-	if a.cfg.Enforcing && a.cfg.Shares > Unlimited {
-		envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
-		if err != nil {
-			return false, err
-		}
-		total := 0
-		for i := range envs {
-			shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
+func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing {
+		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
+			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
 			if err != nil {
-				return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
+				return false, err
 			}
-			total += len(shrs)
-			if total+1 > a.cfg.Shares {
+			if alj.Action == store.LimitAction {
 				return false, nil
 			}
-			logrus.Infof("total = %d", total)
+		} else if err != nil {
+			return false, err
+		}
+
+		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(envId, trx); err == nil && !empty {
+			elj, err := a.str.FindLatestEnvironmentLimitJournal(envId, trx)
+			if err != nil {
+				return false, err
+			}
+			if elj.Action == store.LimitAction {
+				return false, nil
+			}
+		} else if err != nil {
+			return false, err
+		}
+
+		if a.cfg.Shares > Unlimited {
+			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
+			if err != nil {
+				return false, err
+			}
+			total := 0
+			for i := range envs {
+				shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
+				if err != nil {
+					return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
+				}
+				total += len(shrs)
+				if total+1 > a.cfg.Shares {
+					return false, nil
+				}
+				logrus.Infof("total = %d", total)
+			}
 		}
 	}
 	return true, nil
