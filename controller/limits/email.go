@@ -8,10 +8,10 @@ import (
 	"github.com/wneessen/go-mail"
 )
 
-func sendLimitWarningEmail(cfg *emailUi.Config, emailTo string, limit *BandwidthPerPeriod, rxBytes, txBytes int64) error {
+func sendLimitWarningEmail(cfg *emailUi.Config, emailTo, detail string) error {
 	emailData := &emailUi.WarningEmail{
 		EmailAddress: emailTo,
-		Detail:       describeLimit(limit, rxBytes, txBytes),
+		Detail:       detail,
 		Version:      build.String(),
 	}
 
