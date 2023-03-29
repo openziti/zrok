@@ -45,12 +45,12 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	}
 
 	shrToken := params.Body.ShrToken
-	sshr, err := str.FindShareWithToken(shrToken, tx)
+	shr, err := str.FindShareWithToken(shrToken, tx)
 	if err != nil {
 		logrus.Errorf("error finding share")
 		return share.NewAccessNotFound()
 	}
-	if sshr == nil {
+	if shr == nil {
 		logrus.Errorf("unable to find share '%v' for user '%v'", shrToken, principal.Email)
 		return share.NewAccessNotFound()
 	}
@@ -76,7 +76,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		"zrokFrontendToken":  feToken,
 		"zrokShareToken":     shrToken,
 	}
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+sshr.ZId+"-dial", sshr.ZId, []string{envZId}, addlTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+shr.ZId+"-dial", shr.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
