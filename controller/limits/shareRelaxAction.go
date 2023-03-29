@@ -18,30 +18,66 @@ func newShareRelaxAction(str *store.Store, edge *rest_management_api_client.Ziti
 	return &shareRelaxAction{str, edge}
 }
 
-func (a *shareRelaxAction) HandleShare(shr *store.Share, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *shareRelaxAction) HandleShare(shr *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("relaxing '%v'", shr.Token)
 
 	if !shr.Deleted {
-		if shr.ShareMode == "public" {
-			env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
-			if err != nil {
-				return errors.Wrap(err, "error finding environment")
+		switch shr.ShareMode {
+		case "public":
+			if err := relaxPublicShare(a.str, a.edge, shr, trx); err != nil {
+				return err
 			}
-
-			fe, err := a.str.FindFrontendPubliclyNamed(*shr.FrontendSelection, trx)
-			if err != nil {
-				return errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token)
+		case "private":
+			if err := relaxPrivateShare(a.str, a.edge, shr, trx); err != nil {
+				return err
 			}
-
-			if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{fe.ZId}, zrokEdgeSdk.ZrokShareTags(shr.Token).SubTags, a.edge); err != nil {
-				return errors.Wrapf(err, "error creating dial service policy for '%v'", shr.Token)
-			}
-			logrus.Infof("added dial service policy for '%v'", shr.Token)
-
-		} else if shr.ShareMode == "private" {
-			return errors.New("share relax for private share not implemented")
 		}
 	}
 
+	return nil
+}
+
+func relaxPublicShare(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement, shr *store.Share, trx *sqlx.Tx) error {
+	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
+	if err != nil {
+		return errors.Wrap(err, "error finding environment")
+	}
+
+	fe, err := str.FindFrontendPubliclyNamed(*shr.FrontendSelection, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token)
+	}
+
+	if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{fe.ZId}, zrokEdgeSdk.ZrokShareTags(shr.Token).SubTags, edge); err != nil {
+		return errors.Wrapf(err, "error creating dial service policy for '%v'", shr.Token)
+	}
+	logrus.Infof("added dial service policy for '%v'", shr.Token)
+	return nil
+}
+
+func relaxPrivateShare(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement, shr *store.Share, trx *sqlx.Tx) error {
+	fes, err := str.FindFrontendsForPrivateShare(shr.Id, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding frontends for share '%v'", shr.Token)
+	}
+	for _, fe := range fes {
+		if fe.EnvironmentId != nil {
+			env, err := str.GetEnvironment(*fe.EnvironmentId, trx)
+			if err != nil {
+				return errors.Wrapf(err, "error getting environment for frontend '%v'", fe.Token)
+			}
+
+			addlTags := map[string]interface{}{
+				"zrokEnvironmentZId": env.ZId,
+				"zrokFrontendToken":  fe.Token,
+				"zrokShareToken":     shr.Token,
+			}
+			if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{env.ZId}, addlTags, edge); err != nil {
+				return errors.Wrapf(err, "unable to create dial policy for frontend '%v'", fe.Token)
+			}
+
+			logrus.Infof("added dial service policy for share '%v' to private frontend '%v'", shr.Token, fe.Token)
+		}
+	}
 	return nil
 }
