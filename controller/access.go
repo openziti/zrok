@@ -61,7 +61,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	if _, err := str.CreateFrontend(envId, &store.Frontend{Token: feToken, ZId: envZId}, tx); err != nil {
+	if _, err := str.CreateFrontend(envId, &store.Frontend{PrivateShareId: &shr.Id, Token: feToken, ZId: envZId}, tx); err != nil {
 		logrus.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
