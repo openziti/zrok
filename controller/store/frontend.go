@@ -7,22 +7,23 @@ import (
 
 type Frontend struct {
 	Model
-	EnvironmentId *int
-	Token         string
-	ZId           string
-	PublicName    *string
-	UrlTemplate   *string
-	Reserved      bool
-	Deleted       bool
+	EnvironmentId  *int
+	PrivateShareId *int
+	Token          string
+	ZId            string
+	PublicName     *string
+	UrlTemplate    *string
+	Reserved       bool
+	Deleted        bool
 }
 
 func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (environment_id, token, z_id, public_name, url_template, reserved) values ($1, $2, $3, $4, $5, $6) returning id")
+	stmt, err := tx.Prepare("insert into frontends (environment_id, private_share_id, token, z_id, public_name, url_template, reserved) values ($1, $2, $3, $4, $5, $6, $7) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing frontends insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, f.PrivateShareId, f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing frontends insert statement")
 	}
 	return id, nil
@@ -104,13 +105,29 @@ func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
 	return frontends, nil
 }
 
+func (str *Store) FindFrontendsForPrivateShare(shrId int, tx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := tx.Queryx("select frontends.* from frontends where private_share_id = $1 and not deleted", shrId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting frontends by private_share_id")
+	}
+	var is []*Frontend
+	for rows.Next() {
+		i := &Frontend{}
+		if err := rows.StructScan(i); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend")
+		}
+		is = append(is, i)
+	}
+	return is, nil
+}
+
 func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
-	sql := "update frontends set environment_id = $1, token = $2, z_id = $3, public_name = $4, url_template = $5, reserved = $6, updated_at = current_timestamp where id = $7"
+	sql := "update frontends set environment_id = $1, private_share_id = $2, token = $3, z_id = $4, public_name = $5, url_template = $6, reserved = $7, updated_at = current_timestamp where id = $8"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends update statement")
 	}
-	_, err = stmt.Exec(fe.EnvironmentId, fe.Token, fe.ZId, fe.PublicName, fe.UrlTemplate, fe.Reserved, fe.Id)
+	_, err = stmt.Exec(fe.EnvironmentId, fe.PrivateShareId, fe.Token, fe.ZId, fe.PublicName, fe.UrlTemplate, fe.Reserved, fe.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing frontends update statement")
 	}
