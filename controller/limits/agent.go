@@ -437,10 +437,12 @@ func (a *Agent) relax() error {
 				if slj.Action == store.WarningAction || slj.Action == store.LimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkShareLimit(shr.Token); err == nil {
 						if !enforce && !warning {
-							// run relax actions for share
-							for _, action := range a.shrRelaxActions {
-								if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+							if slj.Action == store.LimitAction {
+								// run relax actions for share
+								for _, action := range a.shrRelaxActions {
+									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
+										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+									}
 								}
 							}
 							if err := a.str.DeleteShareLimitJournalForShare(shr.Id, trx); err == nil {
@@ -469,10 +471,12 @@ func (a *Agent) relax() error {
 				if elj.Action == store.WarningAction || elj.Action == store.LimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkEnvironmentLimit(int64(elj.EnvironmentId)); err == nil {
 						if !enforce && !warning {
-							// run relax actions for environment
-							for _, action := range a.envRelaxActions {
-								if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+							if elj.Action == store.LimitAction {
+								// run relax actions for environment
+								for _, action := range a.envRelaxActions {
+									if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
+										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+									}
 								}
 							}
 							if err := a.str.DeleteEnvironmentLimitJournalForEnvironment(env.Id, trx); err == nil {
@@ -501,10 +505,12 @@ func (a *Agent) relax() error {
 				if alj.Action == store.WarningAction || alj.Action == store.LimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(int64(alj.AccountId)); err == nil {
 						if !enforce && !warning {
-							// run relax actions for account
-							for _, action := range a.acctRelaxActions {
-								if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-									return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+							if alj.Action == store.LimitAction {
+								// run relax actions for account
+								for _, action := range a.acctRelaxActions {
+									if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
+										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+									}
 								}
 							}
 							if err := a.str.DeleteAccountLimitJournalForAccount(acct.Id, trx); err == nil {
