@@ -5,7 +5,7 @@ import "fmt"
 var Version string
 var Hash string
 
-const Series = "v0.3"
+const Series = "v0.4"
 
 func String() string {
 	if Version != "" {
