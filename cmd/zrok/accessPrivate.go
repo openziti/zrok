@@ -1,6 +1,11 @@
 package main
 
 import (
+	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -13,10 +18,6 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/url"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func init() {
@@ -91,7 +92,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
 
 	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
 	go func() {
 		<-c
 		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)

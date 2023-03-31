@@ -4,6 +4,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io"
+	"math/rand"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/sdk-golang/ziti"
@@ -18,13 +26,6 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io"
-	"math/rand"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -76,7 +77,7 @@ func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 		go l.run()
 	}
 	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
 	go func() {
 		<-c
 		for _, looper := range loopers {
