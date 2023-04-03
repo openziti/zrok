@@ -1,6 +1,7 @@
 package limits
 
 import (
+	"fmt"
 	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
@@ -8,17 +9,48 @@ import (
 	"github.com/wneessen/go-mail"
 )
 
-func sendLimitWarningEmail(cfg *emailUi.Config, emailTo, detail string) error {
+type detailMessage struct {
+	lines []string
+}
+
+func newDetailMessage() *detailMessage {
+	return &detailMessage{}
+}
+
+func (m *detailMessage) append(msg string, args ...interface{}) *detailMessage {
+	m.lines = append(m.lines, fmt.Sprintf(msg, args...))
+	return m
+}
+
+func (m *detailMessage) html() string {
+	out := ""
+	for i := range m.lines {
+		out += fmt.Sprintf("<p style=\"text-align: left;\">%s</p>\n", m.lines[i])
+	}
+	return out
+}
+
+func (m *detailMessage) plain() string {
+	out := ""
+	for i := range m.lines {
+		out += fmt.Sprintf("%s\n\n", m.lines[i])
+	}
+	return out
+}
+
+func sendLimitWarningEmail(cfg *emailUi.Config, emailTo string, d *detailMessage) error {
 	emailData := &emailUi.WarningEmail{
 		EmailAddress: emailTo,
-		Detail:       detail,
 		Version:      build.String(),
 	}
 
+	emailData.Detail = d.plain()
 	plainBody, err := emailData.MergeTemplate("limitWarning.gotext")
 	if err != nil {
 		return err
 	}
+
+	emailData.Detail = d.html()
 	htmlBody, err := emailData.MergeTemplate("limitWarning.gohtml")
 	if err != nil {
 		return err
