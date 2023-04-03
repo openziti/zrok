@@ -3,7 +3,7 @@ package emailUi
 import (
 	"bytes"
 	"github.com/pkg/errors"
-	"html/template"
+	"text/template"
 )
 
 type WarningEmail struct {

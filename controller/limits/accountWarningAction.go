@@ -1,7 +1,6 @@
 package limits
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge/rest_management_api_client"
 	"github.com/openziti/zrok/controller/emailUi"
@@ -36,9 +35,11 @@ func (a *accountWarningAction) HandleAccount(acct *store.Account, rxBytes, txByt
 	if limit.Limit.Total != Unlimited {
 		totalLimit = util.BytesToSize(limit.Limit.Total)
 	}
-	detail := fmt.Sprintf("Your account has received %v and sent %v (for a total of %v), which has triggered a transfer limit warning.", util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes)) +
-		fmt.Sprintf(" This zrok instance only allows an account to receive %v, send %v, totalling not more than %v for each %v.", rxLimit, txLimit, totalLimit, limit.Period) +
-		fmt.Sprintf(" If you exceed the transfer limit, access to your shares will be temporarily disabled (until the last %v falls below the transfer limit)", limit.Period)
+
+	detail := newDetailMessage()
+	detail = detail.append("Your account has received %v and sent %v (for a total of %v), which has triggered a transfer limit warning.", util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
+	detail = detail.append("This zrok instance only allows an account to receive %v, send %v, totalling not more than %v for each %v.", rxLimit, txLimit, totalLimit, limit.Period)
+	detail = detail.append("If you exceed the transfer limit, access to your shares will be temporarily disabled (until the last %v falls below the transfer limit)", limit.Period)
 
 	if err := sendLimitWarningEmail(a.cfg, acct.Email, detail); err != nil {
 		return errors.Wrapf(err, "error sending limit warning email to '%v'", acct.Email)
