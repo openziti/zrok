@@ -48,3 +48,65 @@ Be sure to restart all of the components of your OpenZiti network after making t
 
 ## Configuring the zrok Metrics Bridge
 
+`zrok` currently uses a "metrics bridge" component (running as a separate process) to consume the `fabric.usage` events from the OpenZiti controller, and publish them onto an AMQP queue. Add a stanza like the following to your `zrok` controller configuration:
+
+```yaml
+bridge:
+  source:
+    type:           fileSource
+    path:           /tmp/fabric-usage.json
+  sink:
+    type:           amqpSink
+    url:            amqp://guest:guest@localhost:5672
+    queue_name:     events
+```
+
+This configuration consumes the `fabric.usage` events from the file we previously specified in our OpenZiti controller configuration, and publishes them onto an AMQP queue. 
+
+### RabbitMQ
+
+For this example, we're going to use RabbitMQ as our AMQP implementation. The stock, default RabbitMQ configuration, launched as a `docker` container will work just fine:
+
+```
+$ docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
+```
+
+Once RabbitMQ is running, you can start the `zrok` metrics bridge by pointing it at your `zrok` controller configuration, like this:
+
+```
+$ zrok ctrl metrics bridge <path/to/zrok-controller.yaml>
+```
+
+## Configuring zrok Metrics
+
+Configure the `metrics` section of your `zrok` controller. Here is an example:
+
+```yaml
+metrics:
+  agent:
+    source:
+      type:         amqpSource
+      url:          amqp://guest:guest@localhost:5672
+      queue_name:   events
+  influx:
+    url:            "http://127.0.0.1:8086"
+    bucket:         zrok
+    org:            zrok
+    token:          "<secret token>"
+```
+
+This configures the `zrok` controller to consume usage events from the AMQP queue, and configures the InfluxDB metrics store.
+
+## Testing Metrics
+
+With all of the components configured and running, either use `zrok test loop` or manually create share(s) to generate traffic on the `zrok` instance. If everything is working correctly, you should see log messages from the controller like the following, which indicate that that the controller is processing OpenZiti usage events, and generating `zrok` metrics:
+
+```
+[5339.658]    INFO zrok/controller/metrics.(*influxWriter).Handle: share: 736z80mr4syu, circuit: Ad1V-6y48 backend {rx: 4.5 kB, tx: 4.6 kB} frontend {rx: 4.6 kB, tx: 4.5 kB}
+[5349.652]    INFO zrok/controller/metrics.(*influxWriter).Handle: share: 736z80mr4syu, circuit: Ad1V-6y48 backend {rx: 2.5 kB, tx: 2.6 kB} frontend {rx: 2.6 kB, tx: 2.5 kB}
+[5354.657]    INFO zrok/controller/metrics.(*influxWriter).Handle: share: 5a4u7lqxb7pa, circuit: iG1--6H4S backend {rx: 13.2 kB, tx: 13.3 kB} frontend {rx: 13.3 kB, tx: 13.2 kB}
+```
+
+The `zrok` web console should also be showing activity for your share(s) like the following:
+
+![zrok web console activity](/home/michael/Repos/nf/zrok/docs/guides/metrics-and-limits/images/zrok-console-activity.png)
