@@ -12,6 +12,8 @@ Environments that horizontally scale the `zrok` control plane with multiple cont
 
 ## Configuring the OpenZiti Controller
 
+> This requires a version of OpenZiti with a `fabric` dependency of `v0.22.52` or newer.
+
 Emitting `fabric.usage` events to a file is currently the most reliable mechanism to capture usage events into `zrok`. We're going to configure the OpenZiti controller to append `fabric.usage` events to a file, by adding this stanza to the OpenZiti controller configuration:
 
 ```yaml
