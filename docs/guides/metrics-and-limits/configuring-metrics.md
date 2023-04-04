@@ -109,4 +109,4 @@ With all of the components configured and running, either use `zrok test loop` o
 
 The `zrok` web console should also be showing activity for your share(s) like the following:
 
-![zrok web console activity](/home/michael/Repos/nf/zrok/docs/guides/metrics-and-limits/images/zrok-console-activity.png)
+![zrok web console activity](images/zrok-console-activity.png)
