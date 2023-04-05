@@ -26,7 +26,7 @@ func newAdminBootstrap() *adminBootstrap {
 	command := &adminBootstrap{cmd: cmd}
 	cmd.Run = command.run
 	cmd.Flags().BoolVar(&command.skipCtrl, "skip-ctrl", false, "Skip controller (ctrl) identity bootstrapping")
-	cmd.Flags().BoolVar(&command.skipFrontend, "skip-frontend", false, "Slip frontend identity bootstrapping")
+	cmd.Flags().BoolVar(&command.skipFrontend, "skip-frontend", false, "Skip frontend identity bootstrapping")
 	return command
 }
 
