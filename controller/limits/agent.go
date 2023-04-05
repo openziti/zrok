@@ -70,12 +70,16 @@ func (a *Agent) Stop() {
 
 func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
-		alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
-		if err != nil {
+		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
+			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
+			if err != nil {
+				return false, err
+			}
+			if alj.Action == store.LimitAction {
+				return false, nil
+			}
+		} else if err != nil {
 			return false, err
-		}
-		if alj.Action == store.LimitAction {
-			return false, nil
 		}
 
 		if a.cfg.Environments > Unlimited {

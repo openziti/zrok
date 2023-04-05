@@ -6,6 +6,7 @@ import (
 	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -57,6 +58,7 @@ func newAmqpSink(cfg *AmqpSinkConfig) (*amqpSink, error) {
 func (s *amqpSink) Handle(event ZitiEventJson) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	logrus.Infof("pushing '%v'", event)
 	return s.ch.PublishWithContext(ctx, "", s.queue.Name, false, false, amqp.Publishing{
 		ContentType: "application/json",
 		Body:        []byte(event),
