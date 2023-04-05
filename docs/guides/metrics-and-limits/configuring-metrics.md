@@ -112,3 +112,5 @@ With all of the components configured and running, either use `zrok test loop` o
 The `zrok` web console should also be showing activity for your share(s) like the following:
 
 ![zrok web console activity](images/zrok-console-activity.png)
+
+With metrics configured, you might be interested in [configuring limits](configuring-limits.md).
