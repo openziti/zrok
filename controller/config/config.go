@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ConfigVersion = 2
+const ConfigVersion = 3
 
 type Config struct {
 	V             int
