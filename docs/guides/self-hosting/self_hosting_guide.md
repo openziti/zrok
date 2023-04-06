@@ -179,7 +179,9 @@ Nice work! The `zrok` controller is fully configured now that you have created t
 
 ## Configure the Public Frontend
 
-Create `etc/http-frontend.yml`. You must reiterate the pattern you expressed in the public frontend URL template as a `host_match` pattern, and you may change the default address where the frontend will listen for public access requests. The frontend does not provide server TLS, but you may front the server with a reverse proxy. It is essential the reverse proxy forwards the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
+Create `etc/http-frontend.yml`. This frontend config file has a `host_match` pattern that represents the DNS zone you're using with this instance of zrok. Incoming HTTP requests with a matching `Host` header will be handled by this frontend. You may also specify the interface address where the frontend will listen for public access requests.
+
+The frontend does not provide server TLS, but you may front the server with a reverse proxy. It is essential the reverse proxy forwards the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
 
 ```yaml
 host_match: zrok.quigley.com
