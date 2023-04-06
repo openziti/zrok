@@ -47,7 +47,7 @@ Create a controller configuration file in `etc/ctrl.yml`. The controller does no
 #   /___|_|  \___/|_|\_\
 # controller configuration
 
-v:                  2
+v:                  3
 
 admin:
   secrets:
