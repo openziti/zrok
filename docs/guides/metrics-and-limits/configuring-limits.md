@@ -1,5 +1,7 @@
 # Configuring Limits
 
+> If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.
+
 The limits facility in `zrok` is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured thresholds.
 
 Take this `zrok` controller configuration stanza as an example:
