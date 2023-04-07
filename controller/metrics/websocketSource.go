@@ -27,8 +27,8 @@ func init() {
 }
 
 type WebsocketSourceConfig struct {
-	WebsocketEndpoint string
-	ApiEndpoint       string
+	WebsocketEndpoint string // wss://127.0.0.1:1280/fabric/v1/ws-api
+	ApiEndpoint       string // https://127.0.0.1:1280
 	Username          string
 	Password          string `cf:"+secret"`
 }
@@ -41,7 +41,7 @@ func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error
 		}
 		return &websocketSource{cfg: cfg}, nil
 	}
-	return nil, errors.New("invalid config struture for 'websocketSource'")
+	return nil, errors.New("invalid config structure for 'websocketSource'")
 }
 
 type websocketSource struct {
