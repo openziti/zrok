@@ -1,5 +1,5 @@
 # this builds docker.io/openziti/zrok
-FROM docker.io/openziti/ziti-cli:0.27.7
+FROM docker.io/openziti/ziti-cli:0.27.8
 # This build stage grabs artifacts that are copied into the final image.
 # It uses the same base as the final image to maximize docker cache hits.
 
