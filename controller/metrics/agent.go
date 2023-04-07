@@ -1,57 +1,57 @@
 package metrics
 
 import (
+	"github.com/openziti/zrok/controller/store"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type MetricsAgent struct {
-	src   Source
-	cache *shareCache
-	join  chan struct{}
+type Agent struct {
+	events  chan ZitiEventJson
+	src     ZitiEventJsonSource
+	srcJoin chan struct{}
+	cache   *cache
+	snks    []UsageSink
 }
 
-func Run(cfg *Config) (*MetricsAgent, error) {
-	logrus.Info("starting")
-
-	if cfg.Store == nil {
-		return nil, errors.New("no 'store' configured; exiting")
+func NewAgent(cfg *AgentConfig, str *store.Store, ifxCfg *InfluxConfig) (*Agent, error) {
+	a := &Agent{}
+	if v, ok := cfg.Source.(ZitiEventJsonSource); ok {
+		a.src = v
+	} else {
+		return nil, errors.New("invalid event json source")
 	}
-	cache, err := newShareCache(cfg.Store)
+	a.cache = newShareCache(str)
+	a.snks = append(a.snks, newInfluxWriter(ifxCfg))
+	return a, nil
+}
+
+func (a *Agent) AddUsageSink(snk UsageSink) {
+	a.snks = append(a.snks, snk)
+}
+
+func (a *Agent) Start() error {
+	a.events = make(chan ZitiEventJson)
+	srcJoin, err := a.src.Start(a.events)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating share cache")
+		return err
 	}
-
-	if cfg.Source == nil {
-		return nil, errors.New("no 'source' configured; exiting")
-	}
-
-	src, ok := cfg.Source.(Source)
-	if !ok {
-		return nil, errors.New("invalid 'source'; exiting")
-	}
-
-	if cfg.Influx == nil {
-		return nil, errors.New("no 'influx' configured; exiting")
-	}
-
-	idb := openInfluxDb(cfg.Influx)
-
-	events := make(chan map[string]interface{})
-	join, err := src.Start(events)
-	if err != nil {
-		return nil, errors.Wrap(err, "error starting source")
-	}
+	a.srcJoin = srcJoin
 
 	go func() {
+		logrus.Info("started")
+		defer logrus.Info("stopped")
 		for {
 			select {
-			case event := <-events:
-				usage := Ingest(event)
-				if shrToken, err := cache.getToken(usage.ZitiServiceId); err == nil {
-					usage.ShareToken = shrToken
-					if err := idb.Write(usage); err != nil {
+			case event := <-a.events:
+				if usage, err := Ingest(event); err == nil {
+					if err := a.cache.addZrokDetail(usage); err != nil {
 						logrus.Error(err)
+					}
+					for _, snk := range a.snks {
+						if err := snk.Handle(usage); err != nil {
+							logrus.Error(err)
+						}
 					}
 				} else {
 					logrus.Error(err)
@@ -60,14 +60,10 @@ func Run(cfg *Config) (*MetricsAgent, error) {
 		}
 	}()
 
-	return &MetricsAgent{src: src, join: join}, nil
+	return nil
 }
 
-func (ma *MetricsAgent) Stop() {
-	logrus.Info("stopping")
-	ma.src.Stop()
-}
-
-func (ma *MetricsAgent) Join() {
-	<-ma.join
+func (a *Agent) Stop() {
+	a.src.Stop()
+	close(a.events)
 }

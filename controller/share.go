@@ -11,27 +11,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type shareHandler struct {
-	cfg *LimitsConfig
-}
+type shareHandler struct{}
 
-func newShareHandler(cfg *LimitsConfig) *shareHandler {
-	return &shareHandler{cfg: cfg}
+func newShareHandler() *shareHandler {
+	return &shareHandler{}
 }
 
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Infof("handling")
-
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return share.NewShareInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	envZId := params.Body.EnvZID
 	envId := 0
-	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
+	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err == nil {
 		found := false
 		for _, env := range envs {
@@ -51,7 +47,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	if err := h.checkLimits(principal, envs, tx); err != nil {
+	if err := h.checkLimits(envId, principal, trx); err != nil {
 		logrus.Errorf("limits error: %v", err)
 		return share.NewShareUnauthorized()
 	}
@@ -79,7 +75,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		var frontendZIds []string
 		var frontendTemplates []string
 		for _, frontendSelection := range params.Body.FrontendSelection {
-			sfe, err := str.FindFrontendPubliclyNamed(frontendSelection, tx)
+			sfe, err := str.FindFrontendPubliclyNamed(frontendSelection, trx)
 			if err != nil {
 				logrus.Error(err)
 				return share.NewShareNotFound()
@@ -119,19 +115,22 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
 	}
+	if len(params.Body.FrontendSelection) > 0 {
+		sshr.FrontendSelection = &params.Body.FrontendSelection[0]
+	}
 	if len(frontendEndpoints) > 0 {
 		sshr.FrontendEndpoint = &frontendEndpoints[0]
 	} else if sshr.ShareMode == "private" {
 		sshr.FrontendEndpoint = &sshr.ShareMode
 	}
 
-	sid, err := str.CreateShare(envId, sshr, tx)
+	sid, err := str.CreateShare(envId, sshr, trx)
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
@@ -143,17 +142,15 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	})
 }
 
-func (h *shareHandler) checkLimits(principal *rest_model_zrok.Principal, envs []*store.Environment, tx *sqlx.Tx) error {
-	if !principal.Limitless && h.cfg.Shares > Unlimited {
-		total := 0
-		for i := range envs {
-			shrs, err := str.FindSharesForEnvironment(envs[i].Id, tx)
+func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
+	if !principal.Limitless {
+		if limitsAgent != nil {
+			ok, err := limitsAgent.CanCreateShare(int(principal.ID), envId, trx)
 			if err != nil {
-				return errors.Errorf("unable to find shares for environment '%v': %v", envs[i].ZId, err)
+				return errors.Wrapf(err, "error checking share limits for '%v'", principal.Email)
 			}
-			total += len(shrs)
-			if total+1 > h.cfg.Shares {
-				return errors.Errorf("would exceed shares limit of %d for '%v'", h.cfg.Shares, principal.Email)
+			if !ok {
+				return errors.Errorf("share limit check failed for '%v'", principal.Email)
 			}
 		}
 	}

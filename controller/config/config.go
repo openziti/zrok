@@ -1,6 +1,10 @@
-package controller
+package config
 
 import (
+	"github.com/openziti/zrok/controller/emailUi"
+	"github.com/openziti/zrok/controller/env"
+	"github.com/openziti/zrok/controller/limits"
+	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"time"
 
@@ -9,20 +13,21 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ConfigVersion = 2
+const ConfigVersion = 3
 
 type Config struct {
 	V             int
 	Admin         *AdminConfig
+	Bridge        *metrics.BridgeConfig
 	Endpoint      *EndpointConfig
-	Email         *EmailConfig
-	Influx        *InfluxConfig
-	Limits        *LimitsConfig
+	Email         *emailUi.Config
+	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
+	Metrics       *metrics.Config
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
-	Ziti          *zrokEdgeSdk.ZitiConfig
+	Ziti          *zrokEdgeSdk.Config
 }
 
 type AdminConfig struct {
@@ -35,14 +40,6 @@ type EndpointConfig struct {
 	Port int
 }
 
-type EmailConfig struct {
-	Host     string
-	Port     int
-	Username string
-	Password string `cf:"+secret"`
-	From     string
-}
-
 type RegistrationConfig struct {
 	RegistrationUrlTemplate string
 	TokenStrategy           string
@@ -50,13 +47,6 @@ type RegistrationConfig struct {
 
 type ResetPasswordConfig struct {
 	ResetUrlTemplate string
-}
-
-type InfluxConfig struct {
-	Url    string
-	Bucket string
-	Org    string
-	Token  string `cf:"+secret"`
 }
 
 type MaintenanceConfig struct {
@@ -76,19 +66,9 @@ type ResetPasswordMaintenanceConfig struct {
 	BatchLimit        int
 }
 
-const Unlimited = -1
-
-type LimitsConfig struct {
-	Environments int
-	Shares       int
-}
-
 func DefaultConfig() *Config {
 	return &Config{
-		Limits: &LimitsConfig{
-			Environments: Unlimited,
-			Shares:       Unlimited,
-		},
+		Limits: limits.DefaultConfig(),
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{
 				ExpirationTimeout: time.Minute * 15,
@@ -106,7 +86,7 @@ func DefaultConfig() *Config {
 
 func LoadConfig(path string) (*Config, error) {
 	cfg := DefaultConfig()
-	if err := cf.BindYaml(cfg, path, cf.DefaultOptions()); err != nil {
+	if err := cf.BindYaml(cfg, path, env.GetCfOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
 	if cfg.V != ConfigVersion {

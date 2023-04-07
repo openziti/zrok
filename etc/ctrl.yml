@@ -9,7 +9,7 @@
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
 # versions.
 #
-v:                                2
+v: 3
 
 admin:
   # The `secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
@@ -22,6 +22,20 @@ admin:
   # if `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
   #
   tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
+
+# The `bridge` section configures the `zrok controller metrics bridge`, specifying the source and sink where OpenZiti
+# `fabric.usage` events are consumed and then sent into `zrok`. For production environments, we recommend that you use
+# the `fileSource`, tailing the events from a JSON file written to by the OpenZiti controller. The `amqpSink` will then
+# forward the events to an AMQP queue for consumption by multiple `zrok` controllers.
+#
+bridge:
+  source:
+    type:           fileSource
+    path:           /tmp/fabric-usage.log
+  sink:
+    type:           amqpSink
+    url:            amqp://guest:guest@localhost:5672
+    queue_name:     events
 
 # The `endpoint` section determines where the HTTP listener that serves the API and web console will be bound.
 #
@@ -38,20 +52,46 @@ email:
   password:                       ""
   from:                           ziggy@zrok.io
 
-# InfluxDB configuration. InfluxDB is used to support sparkline displays in the web console.
+# Service instance limits configuration.
 #
-influx:
-  url:                            http://127.0.0.1:8086
-  bucket:                         zrok
-  org:                            zrok
-  token:                          ""
-
-# Instance-wide limits for per-user limits. `-1` represents unlimited. Each user can have the `limitless` flag set on
-# their record in the `accounts` table in the database, to allow the user to ignore the instance-wide limits.
+# See `docs/guides/metrics-and-limits/configuring-limits.md` for details.
 #
 limits:
-  environments:                   -1
-  shares:                         -1
+  environments:     -1
+  shares:           -1
+  bandwidth:
+    per_account:
+      period:       5m
+      warning:
+        rx:         -1
+        tx:         -1
+        total:      7242880
+      limit:
+        rx:         -1
+        tx:         -1
+        total:      10485760
+    per_environment:
+      period:       5m
+      warning:
+        rx:         -1
+        tx:         -1
+        total:      -1
+      limit:
+        rx:         -1
+        tx:         -1
+        total:      -1
+    per_share:
+      period:       5m
+      warning:
+        rx:         -1
+        tx:         -1
+        total:      -1
+      limit:
+        rx:         -1
+        tx:         -1
+        total:      -1
+  enforcing:        false
+  cycle:            5m
 
 # Background maintenance job configuration. The `registration` job purges registration requests created through the
 # `zrok invite` tool. The `reset_password` job purges password reset requests.
@@ -66,17 +106,35 @@ maintenance:
     check_frequency:              15m
     batch_limit:                  500
 
-# The name of the service used to report metrics from the frontends (`zrok access public`) to the zrok controller
-# fleet.
+# Metrics configuration.
 #
 metrics:
-  service_name:     metrics
+  agent:
+    # The `source` controls where the `zrok controller` looks to consume OpenZiti `fabric.usage` events. This works in
+    # concert with the `bridge` section above to consume events from an AMQP queue. This can also be configured to work
+    # with a `fileSource` (see the `bridge` section above for details), and also with a `websocketSource`.
+    #
+    source:
+      type:         amqpSource
+      url:          amqp://guest:guest@localhost:5672
+      queue_name:   events
+  #
+  # The `influx` section configures access to the InfluxDB instance used to store `zrok` metrics.
+  #
+  influx:
+    url:            "http://127.0.0.1:8086"
+    bucket:         zrok
+    org:            zrok
+    token:          "<INFLUX TOKEN>"
 
 # Configure the generated URL for the registration email. The registration token will be appended to this URL.
 #
 registration:
   registration_url_template:      https://zrok.server.com/register
-  token_strategy:                 store
+  #
+  # Set `token_strategy` to `store` to require an invite token.
+  #
+  #token_strategy:                 store
 
 # Configure the generated URL for password resets. The reset token will be appended to this URL.
 #

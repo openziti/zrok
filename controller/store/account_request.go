@@ -17,7 +17,7 @@ type AccountRequest struct {
 	Deleted       bool
 }
 
-func (self *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, error) {
+func (str *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into account_requests (token, email, source_address) values ($1, $2, $3) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing account_requests insert statement")
@@ -29,7 +29,7 @@ func (self *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, e
 	return id, nil
 }
 
-func (self *Store) GetAccountRequest(id int, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) GetAccountRequest(id int, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
 	if err := tx.QueryRowx("select * from account_requests where id = $1", id).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by id")
@@ -37,7 +37,7 @@ func (self *Store) GetAccountRequest(id int, tx *sqlx.Tx) (*AccountRequest, erro
 	return ar, nil
 }
 
-func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
 	if err := tx.QueryRowx("select * from account_requests where token = $1 and not deleted", token).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by token")
@@ -45,9 +45,9 @@ func (self *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*Acco
 	return ar, nil
 }
 
-func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*AccountRequest, error) {
+func (str *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*AccountRequest, error) {
 	var sql string
-	switch self.cfg.Type {
+	switch str.cfg.Type {
 	case "postgres":
 		sql = "select * from account_requests where created_at < $1 and not deleted limit %d for update"
 
@@ -55,7 +55,7 @@ func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *s
 		sql = "select * from account_requests where created_at < $1 and not deleted limit %d"
 
 	default:
-		return nil, errors.Errorf("unknown database type '%v'", self.cfg.Type)
+		return nil, errors.Errorf("unknown database type '%v'", str.cfg.Type)
 	}
 
 	rows, err := tx.Queryx(fmt.Sprintf(sql, limit), before)
@@ -73,7 +73,7 @@ func (self *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *s
 	return ars, nil
 }
 
-func (self *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
 	if err := tx.QueryRowx("select * from account_requests where email = $1 and not deleted", email).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by email")
@@ -81,7 +81,7 @@ func (self *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*Acco
 	return ar, nil
 }
 
-func (self *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
+func (str *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
 	stmt, err := tx.Prepare("update account_requests set deleted = true, updated_at = current_timestamp where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing account_requests delete statement")
@@ -93,7 +93,7 @@ func (self *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (self *Store) DeleteMultipleAccountRequests(ids []int, tx *sqlx.Tx) error {
+func (str *Store) DeleteMultipleAccountRequests(ids []int, tx *sqlx.Tx) error {
 	if len(ids) == 0 {
 		return nil
 	}
