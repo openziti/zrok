@@ -1,4 +1,4 @@
-package privateFrontend
+package proxyFrontend
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/publicFrontend/notFoundUi"
+	"github.com/openziti/zrok/endpoints/publicProxyFrontend/notFoundUi"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/util"
 	"github.com/openziti/zrok/zrokdir"

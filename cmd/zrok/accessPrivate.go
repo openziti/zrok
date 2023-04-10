@@ -5,7 +5,7 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/privateFrontend"
+	"github.com/openziti/zrok/endpoints/proxyFrontend"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -85,7 +85,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
-	cfg := privateFrontend.DefaultConfig("backend")
+	cfg := proxyFrontend.DefaultConfig("backend")
 	cfg.ShrToken = shrToken
 	cfg.Address = cmd.bindAddress
 	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
@@ -98,7 +98,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	frontend, err := privateFrontend.NewHTTP(cfg)
+	frontend, err := proxyFrontend.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create private frontend", err)

@@ -1,4 +1,4 @@
-package privateFrontend
+package proxyFrontend
 
 import "github.com/openziti/zrok/endpoints"
 
