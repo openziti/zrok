@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"net/url"
 	"os"
-	"strings"
+	"regexp"
 )
 
 func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
@@ -27,7 +27,10 @@ func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting version from api endpoint '%v': %v", apiEndpoint, err)
 	}
-	if !strings.HasPrefix(string(v.Payload), build.Series) {
+	// allow reported version string to be optionally prefixed with
+	// "refs/heads/" or "refs/tags/"
+	re := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
+	if ! re.MatchString(string(v.Payload)) {
 		return nil, errors.Errorf("expected a '%v' version, received: '%v'", build.Series, v.Payload)
 	}
 
