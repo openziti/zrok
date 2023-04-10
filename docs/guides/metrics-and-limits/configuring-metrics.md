@@ -92,12 +92,12 @@ metrics:
       queue_name:   events
   influx:
     url:            "http://127.0.0.1:8086"
-    bucket:         zrok
-    org:            zrok
+    bucket:         zrok  # the bucket and org must be
+    org:            zrok  # created in advance in InfluxDB
     token:          "<secret token>"
 ```
 
-This configures the `zrok` controller to consume usage events from the AMQP queue, and configures the InfluxDB metrics store.
+This configures the `zrok` controller to consume usage events from the AMQP queue, and configures the InfluxDB metrics store. The InfluxDB organization and bucket must be created in advance. The `zrok` controller will not create these for you.
 
 ## Testing Metrics
 
