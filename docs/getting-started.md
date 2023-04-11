@@ -430,7 +430,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting a Service Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](./guides/self-hosting/v0.3_self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](./guides/self-hosting/self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/docs/learn/introduction/	"OpenZiti"
 [ zrok-download]: https://zrok.io "Zrok Download"
