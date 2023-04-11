@@ -22,9 +22,14 @@ func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middlewar
 	if cfg.Admin != nil {
 		tou = cfg.Admin.TouLink
 	}
+	tokenRequired := false
+	if cfg.Registration != nil {
+		tokenRequired = cfg.Registration.TokenStrategy == "store"
+	}
 	data := &rest_model_zrok.Configuration{
-		Version: build.String(),
-		TouLink: tou,
+		Version:                   build.String(),
+		TouLink:                   tou,
+		RegistrationRequiresToken: tokenRequired,
 	}
 	return metadata.NewConfigurationOK().WithPayload(data)
 }

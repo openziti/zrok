@@ -30,6 +30,7 @@
  * 
  * @property {string} version 
  * @property {string} touLink 
+ * @property {boolean} registrationRequiresToken 
  */
 
 /**

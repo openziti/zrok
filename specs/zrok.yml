@@ -553,6 +553,8 @@ definitions:
         type: string
       touLink:
         type: string
+      registrationRequiresToken:
+        type: boolean
 
   createFrontendRequest:
     type: object

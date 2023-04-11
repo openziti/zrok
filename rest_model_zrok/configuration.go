@@ -17,6 +17,9 @@ import (
 // swagger:model configuration
 type Configuration struct {
 
+	// registration requires token
+	RegistrationRequiresToken bool `json:"registrationRequiresToken,omitempty"`
+
 	// tou link
 	TouLink string `json:"touLink,omitempty"`
 

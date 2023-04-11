@@ -871,6 +871,9 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
+        "registrationRequiresToken": {
+          "type": "boolean"
+        },
         "touLink": {
           "type": "string"
         },
@@ -2149,6 +2152,9 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
+        "registrationRequiresToken": {
+          "type": "boolean"
+        },
         "touLink": {
           "type": "string"
         },
