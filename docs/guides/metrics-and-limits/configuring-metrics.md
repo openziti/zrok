@@ -30,7 +30,7 @@ events:
 
 You'll want to adjust the `events/jsonLogger/handler/path` to wherever you would like to send these events for ingestion into `zrok`. There are additional OpenZiti options that control file rotation. Be sure to consult the OpenZiti docs to tune these settings to be appropriate for your environment.
 
-By default the OpenZiti events infrastructure reports and batches events in 1 minute buckets. 1 minute is too large of an interval to provide a snappy `zrok` metrics experience. So, let's increase the frequency to every 5 seconds. Add this to the `network` stanza of your OpenZiti controller:
+By default, the OpenZiti events infrastructure reports and batches events in 1 minute buckets. 1 minute is too large of an interval to provide a snappy `zrok` metrics experience. So, let's increase the frequency to every 5 seconds. Add this to the `network` stanza of your OpenZiti controller's configuration:
 
 ```yaml
 network:
@@ -38,9 +38,10 @@ network:
   metricsReportInterval: 5s
 ```
 
-And you'll want to add this stanza to the router configuration for every router on your OpenZiti network:
+And you'll want to add this stanza to the tail-end of the router configuration for every router on your OpenZiti network:
 
 ```yaml
+# this must be the last router configuration stanza
 metrics:
   reportInterval: 5s
   intervalAgeThreshold: 5s
