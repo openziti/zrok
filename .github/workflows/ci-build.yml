@@ -91,12 +91,12 @@ jobs:
 
       - name: Set Up Container Image Tags for zrok CLI Container
         env:
-          RELEASE_REPO: openziti/zrok
-          ZROK_VERSION: ${{ steps.slug.outputs.branch_tag }}
+          ZROK_CONTAINER_IMAGE_REPO: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'openziti/zrok' }}
+          ZROK_CONTAINER_IMAGE_TAG: ${{ steps.slug.outputs.branch_tag }}
         id: tagprep_cli
         run: |
           DOCKER_TAGS=""
-          DOCKER_TAGS="${RELEASE_REPO}:${ZROK_VERSION}"
+          DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}"
           echo "DEBUG: DOCKER_TAGS=${DOCKER_TAGS}"
           echo DOCKER_TAGS="${DOCKER_TAGS}" >> $GITHUB_OUTPUT
 
