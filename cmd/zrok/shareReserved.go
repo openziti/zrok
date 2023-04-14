@@ -188,7 +188,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := proxyBackend.NewBackend(cfg)
+	be, err := proxyBackend.New(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
 	}

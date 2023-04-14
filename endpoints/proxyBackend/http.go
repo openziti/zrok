@@ -24,14 +24,14 @@ type Config struct {
 	RequestsChan    chan *endpoints.Request
 }
 
-type backend struct {
+type Backend struct {
 	cfg      *Config
 	requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
 
-func NewBackend(cfg *Config) (*backend, error) {
+func New(cfg *Config) (*Backend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
@@ -51,7 +51,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 	}
 
 	handler := util.NewProxyHandler(proxy)
-	return &backend{
+	return &Backend{
 		cfg:      cfg,
 		requests: handler.Requests,
 		listener: listener,
@@ -59,15 +59,15 @@ func NewBackend(cfg *Config) (*backend, error) {
 	}, nil
 }
 
-func (self *backend) Run() error {
-	if err := http.Serve(self.listener, self.handler); err != nil {
+func (b *Backend) Run() error {
+	if err := http.Serve(b.listener, b.handler); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (self *backend) Requests() func() int32 {
-	return self.requests
+func (b *Backend) Requests() func() int32 {
+	return b.requests
 }
 
 func newReverseProxy(cfg *Config) (*httputil.ReverseProxy, error) {
