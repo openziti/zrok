@@ -7,6 +7,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyBackend"
+	"github.com/openziti/zrok/endpoints/tunnelBackend"
 	"github.com/openziti/zrok/endpoints/webBackend"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
@@ -43,7 +44,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tunnel}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -67,8 +68,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	case "web":
 		target = args[0]
 
+	case "tunnel":
+		target = args[0]
+
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tunnel}", cmd.backendMode), nil)
 	}
 
 	zrd, err := zrokdir.Load()
@@ -98,6 +102,8 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
+
+	logrus.Infof("here")
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
@@ -169,6 +175,19 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 
+	case "tunnel":
+		cfg := &tunnelBackend.Config{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        resp.Payload.ShrToken,
+		}
+		if err := cmd.tunnelBackendMode(cfg); err != nil {
+			if !panicInstead {
+				tui.Error("unable to create tunnel backend", err)
+			}
+			panic(err)
+		}
+
 	default:
 		tui.Error("invalid backend mode", nil)
 	}
@@ -235,6 +254,21 @@ func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoint
 	}()
 
 	return be, nil
+}
+
+func (cmd *sharePrivateCommand) tunnelBackendMode(cfg *tunnelBackend.Config) error {
+	be, err := tunnelBackend.New(cfg)
+	if err != nil {
+		return errors.Wrap(err, "error creating tunnel backend")
+	}
+
+	go func() {
+		if err := be.Run(); err != nil {
+			logrus.Errorf("error running tunnel backend: %v", err)
+		}
+	}()
+
+	return nil
 }
 
 func (cmd *sharePrivateCommand) destroy(id string, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {

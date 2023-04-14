@@ -1167,7 +1167,7 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tunnel"
           ]
         },
         "backendProxyEndpoint": {
@@ -2445,7 +2445,7 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tunnel"
           ]
         },
         "backendProxyEndpoint": {

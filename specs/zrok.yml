@@ -771,7 +771,7 @@ definitions:
           type: string
       backendMode:
         type: string
-        enum: ["proxy", "web", "dav"]
+        enum: ["proxy", "web", "tunnel"]
       backendProxyEndpoint:
         type: string
       authScheme:
