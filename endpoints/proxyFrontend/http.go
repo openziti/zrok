@@ -19,6 +19,20 @@ import (
 	"time"
 )
 
+type Config struct {
+	IdentityName string
+	ShrToken     string
+	Address      string
+	RequestsChan chan *endpoints.Request
+}
+
+func DefaultConfig(identityName string) *Config {
+	return &Config{
+		IdentityName: identityName,
+		Address:      "0.0.0.0:8080",
+	}
+}
+
 type httpFrontend struct {
 	cfg      *Config
 	zCtx     ziti.Context
