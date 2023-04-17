@@ -31,7 +31,7 @@ func New(cfg *Config) (*Backend, error) {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions(cfg.ShrToken, &options)
-	if err == nil {
+	if err != nil {
 		return nil, errors.Wrap(err, "error listening")
 	}
 	b := &Backend{
