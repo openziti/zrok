@@ -11,7 +11,7 @@ sidebar_label: Nginx TLS
 
 ## Before You Begin
 
-I'll assume you have a running zrok controller and public frontend and wish to front both with Nginx providing server TLS. Go back to [Self-Hosting Guide](./v0.3_self_hosting_guide.md) if you still need to spin those up.
+I'll assume you have a running zrok controller and public frontend and wish to front both with Nginx providing server TLS. Go back to [Self-Hosting Guide](./self_hosting_guide.md) if you still need to spin those up.
 
 ## Choose a Reverse Proxy Address
 

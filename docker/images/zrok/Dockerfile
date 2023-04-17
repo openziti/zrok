@@ -1,5 +1,5 @@
 # this builds docker.io/openziti/zrok
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM docker.io/openziti/ziti-cli:0.27.9
 # This build stage grabs artifacts that are copied into the final image.
 # It uses the same base as the final image to maximize docker cache hits.
 
@@ -20,7 +20,7 @@ LABEL name="openziti/zrok" \
 USER root
 
 ### add licenses to this directory
-RUN mkdir -m0755 /licenses
+RUN mkdir -p -m0755 /licenses
 COPY ./LICENSE /licenses/apache.txt
 
 RUN mkdir -p /usr/local/bin

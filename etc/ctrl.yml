@@ -47,7 +47,7 @@ endpoint:
 #
 email:
   host:                           smtp.server.com
-  port:                           587
+  port:                           587  # this must be a STARTTLS port, not the TLS port (465)
   username:                       ""
   password:                       ""
   from:                           ziggy@zrok.io
