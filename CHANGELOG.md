@@ -1,3 +1,7 @@
+# v0.3.6
+
+CHANGE: Additional change to support branch builds (for CI purposes) and additional containerization efforts around k8s.
+
 # v0.3.5
 
 CHANGE: `zrok config set apiEndpoint` now validates that the new API endpoint correctly starts with `http://` or `https://` (https://github.com/openziti/zrok/issues/258)
