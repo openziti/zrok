@@ -19,8 +19,11 @@ import (
 	"syscall"
 )
 
+var accessPrivateCmd *accessPrivateCommand
+
 func init() {
-	accessCmd.AddCommand(newAccessPrivateCommand().cmd)
+	accessPrivateCmd = newAccessPrivateCommand()
+	accessCmd.AddCommand(accessPrivateCmd.cmd)
 }
 
 type accessPrivateCommand struct {
