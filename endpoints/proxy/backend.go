@@ -1,4 +1,4 @@
-package proxyBackend
+package proxy
 
 import (
 	"crypto/tls"
@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-type Config struct {
+type BackendConfig struct {
 	IdentityPath    string
 	EndpointAddress string
 	ShrToken        string
@@ -25,13 +25,13 @@ type Config struct {
 }
 
 type Backend struct {
-	cfg      *Config
+	cfg      *BackendConfig
 	requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
 
-func New(cfg *Config) (*Backend, error) {
+func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
@@ -70,7 +70,7 @@ func (b *Backend) Requests() func() int32 {
 	return b.requests
 }
 
-func newReverseProxy(cfg *Config) (*httputil.ReverseProxy, error) {
+func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
 	targetURL, err := url.Parse(cfg.EndpointAddress)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyBackend"
+	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/webBackend"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -108,7 +108,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	requestsChan := make(chan *endpoints.Request, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
-		cfg := &proxyBackend.Config{
+		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        shrToken,
@@ -187,8 +187,8 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := proxyBackend.New(cfg)
+func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
 	}

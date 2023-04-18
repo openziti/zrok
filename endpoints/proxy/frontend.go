@@ -1,4 +1,4 @@
-package proxyFrontend
+package proxy
 
 import (
 	"context"
@@ -19,28 +19,28 @@ import (
 	"time"
 )
 
-type Config struct {
+type FrontendConfig struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
 	RequestsChan chan *endpoints.Request
 }
 
-func DefaultConfig(identityName string) *Config {
-	return &Config{
+func DefaultFrontendConfig(identityName string) *FrontendConfig {
+	return &FrontendConfig{
 		IdentityName: identityName,
 		Address:      "0.0.0.0:8080",
 	}
 }
 
-type httpFrontend struct {
-	cfg      *Config
+type Frontend struct {
+	cfg      *FrontendConfig
 	zCtx     ziti.Context
 	shrToken string
 	handler  http.Handler
 }
 
-func NewHTTP(cfg *Config) (*httpFrontend, error) {
+func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.IdentityName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.IdentityName)
@@ -62,14 +62,14 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	proxy.Transport = zTransport
 
 	handler := authHandler(cfg.ShrToken, util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
-	return &httpFrontend{
+	return &Frontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
 		handler: handler,
 	}, nil
 }
 
-func (h *httpFrontend) Run() error {
+func (h *Frontend) Run() error {
 	return http.ListenAndServe(h.cfg.Address, h.handler)
 }
 
@@ -86,7 +86,7 @@ func (zdc *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.
 	return conn, nil
 }
 
-func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
+func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReverseProxy, error) {
 	proxy := serviceTargetProxy(cfg, ctx)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
@@ -111,7 +111,7 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	return proxy, nil
 }
 
-func serviceTargetProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
+func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		targetShrToken := cfg.ShrToken
 		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
@@ -144,7 +144,7 @@ func serviceTargetProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func authHandler(shrToken string, handler http.Handler, realm string, cfg *Config, ctx ziti.Context) http.HandlerFunc {
+func authHandler(shrToken string, handler http.Handler, realm string, cfg *FrontendConfig, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
