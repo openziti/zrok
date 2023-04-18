@@ -3,7 +3,6 @@ package tcpTunnel
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
-	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/transport/v2"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
@@ -64,63 +63,11 @@ func (f *Frontend) Stop() {
 
 func (f *Frontend) accept(conn transport.Conn) {
 	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
-		go f.rxer(conn, zConn)
-		go f.txer(conn, zConn)
+		go txer(conn, zConn)
+		go txer(zConn, conn)
 		logrus.Infof("accepted '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
 	} else {
 		logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
 		_ = conn.Close()
-	}
-}
-
-func (f *Frontend) rxer(conn transport.Conn, zConn edge.Conn) {
-	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
-	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
-
-	buf := make([]byte, 10240)
-	for {
-		if rxsz, err := conn.Read(buf); err == nil {
-			if txsz, err := zConn.Write(buf[:rxsz]); err == nil {
-				if txsz != rxsz {
-					logrus.Errorf("short write '%v' (%d != %d)", zConn.RemoteAddr(), txsz, rxsz)
-				}
-			} else {
-				logrus.Errorf("error writing '%v': %v", zConn.RemoteAddr(), err)
-				_ = zConn.Close()
-				_ = conn.Close()
-				return
-			}
-		} else {
-			logrus.Errorf("read error '%v': %v", zConn.RemoteAddr(), err)
-			_ = zConn.Close()
-			_ = conn.Close()
-			return
-		}
-	}
-}
-
-func (f *Frontend) txer(conn transport.Conn, zConn edge.Conn) {
-	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
-	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
-
-	buf := make([]byte, 10240)
-	for {
-		if rxsz, err := zConn.Read(buf); err == nil {
-			if txsz, err := conn.Write(buf[:rxsz]); err == nil {
-				if txsz != rxsz {
-					logrus.Errorf("short write '%v' (%d != %d)'", conn.RemoteAddr(), txsz, rxsz)
-				}
-			} else {
-				logrus.Errorf("error writing '%v': %v", conn.RemoteAddr(), err)
-				_ = zConn.Close()
-				_ = conn.Close()
-				return
-			}
-		} else {
-			logrus.Errorf("read error '%v': %v", conn.RemoteAddr(), err)
-			_ = zConn.Close()
-			_ = conn.Close()
-			return
-		}
 	}
 }
