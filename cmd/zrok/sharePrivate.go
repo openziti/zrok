@@ -7,7 +7,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyBackend"
-	"github.com/openziti/zrok/endpoints/tunnelBackend"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/webBackend"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
@@ -176,7 +176,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "tunnel":
-		cfg := &tunnelBackend.Config{
+		cfg := &tcpTunnel.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
@@ -256,8 +256,8 @@ func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoint
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) tunnelBackendMode(cfg *tunnelBackend.Config) error {
-	be, err := tunnelBackend.New(cfg)
+func (cmd *sharePrivateCommand) tunnelBackendMode(cfg *tcpTunnel.BackendConfig) error {
+	be, err := tcpTunnel.NewBackend(cfg)
 	if err != nil {
 		return errors.Wrap(err, "error creating tunnel backend")
 	}

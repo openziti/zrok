@@ -1,4 +1,4 @@
-package tunnelFrontend
+package tcpTunnel
 
 import (
 	"github.com/openziti/sdk-golang/ziti"
@@ -12,20 +12,20 @@ import (
 	"io"
 )
 
-type Config struct {
+type FrontendConfig struct {
 	BindAddress  string
 	IdentityName string
 	ShrToken     string
 }
 
 type Frontend struct {
-	cfg      *Config
+	cfg      *FrontendConfig
 	zCtx     ziti.Context
 	listener transport.Address
 	closer   io.Closer
 }
 
-func NewFrontend(cfg *Config) (*Frontend, error) {
+func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	addr, err := transport.ParseAddress(cfg.BindAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing '%v'", cfg.BindAddress)

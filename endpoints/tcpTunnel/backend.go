@@ -1,4 +1,4 @@
-package tunnelBackend
+package tcpTunnel
 
 import (
 	"github.com/openziti/sdk-golang/ziti"
@@ -11,18 +11,18 @@ import (
 	"time"
 )
 
-type Config struct {
+type BackendConfig struct {
 	IdentityPath    string
 	EndpointAddress string
 	ShrToken        string
 }
 
 type Backend struct {
-	cfg      *Config
+	cfg      *BackendConfig
 	listener edge.Listener
 }
 
-func New(cfg *Config) (*Backend, error) {
+func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,

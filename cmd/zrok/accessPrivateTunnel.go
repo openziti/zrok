@@ -2,7 +2,7 @@ package main
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/endpoints/tunnelFrontend"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
@@ -63,7 +63,7 @@ func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
-	fe, err := tunnelFrontend.NewFrontend(&tunnelFrontend.Config{
+	fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 		BindAddress:  cmd.bindAddress,
 		IdentityName: "backend",
 		ShrToken:     args[0],
