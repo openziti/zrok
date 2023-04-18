@@ -8,7 +8,6 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
-	"github.com/openziti/zrok/endpoints/webBackend"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -161,7 +160,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "web":
-		cfg := &webBackend.Config{
+		cfg := &proxy.WebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
@@ -241,8 +240,8 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endp
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := webBackend.NewBackend(cfg)
+func (cmd *sharePrivateCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewWebBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
 	}

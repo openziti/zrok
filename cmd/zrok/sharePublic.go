@@ -7,7 +7,6 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
-	"github.com/openziti/zrok/endpoints/webBackend"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -158,7 +157,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "web":
-		cfg := &webBackend.Config{
+		cfg := &proxy.WebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
@@ -224,8 +223,8 @@ func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpo
 	return be, nil
 }
 
-func (cmd *sharePublicCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := webBackend.NewBackend(cfg)
+func (cmd *sharePublicCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewWebBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
 	}
