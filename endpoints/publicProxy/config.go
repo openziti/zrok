@@ -1,4 +1,4 @@
-package publicProxyFrontend
+package publicProxy
 
 import (
 	"github.com/michaelquigley/cf"

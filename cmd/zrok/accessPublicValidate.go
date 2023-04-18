@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/endpoints/publicProxyFrontend"
+	"github.com/openziti/zrok/endpoints/publicProxy"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -29,7 +29,7 @@ func newAccessPublicValidateCommand() *accessPublicValidateCommand {
 }
 
 func (cmd *accessPublicValidateCommand) run(_ *cobra.Command, args []string) {
-	cfg := publicProxyFrontend.DefaultConfig()
+	cfg := publicProxy.DefaultConfig()
 	if err := cfg.Load(args[0]); err != nil {
 		tui.Error(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
 	}
