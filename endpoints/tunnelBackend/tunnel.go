@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/transport/v2/tcp"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -56,7 +57,50 @@ func (b *Backend) Run() error {
 
 func (b *Backend) handle(conn net.Conn) {
 	logrus.Infof("handling '%v'", conn.RemoteAddr())
-	if err := conn.Close(); err != nil {
-		logrus.Errorf("error closing: %v", err)
+	rConn, err := tcp.Dial(b.cfg.EndpointAddress, "tcp", 30*time.Second)
+	if err != nil {
+		logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
+		_ = conn.Close()
+		return
+	}
+	go b.rxer(conn, rConn)
+	go b.txer(conn, rConn)
+}
+
+func (b *Backend) rxer(conn, rConn net.Conn) {
+	buf := make([]byte, 10240)
+	for {
+		if rxsz, err := conn.Read(buf); err == nil {
+			if txsz, err := rConn.Write(buf[:rxsz]); err == nil {
+				if txsz != rxsz {
+					logrus.Errorf("short write '%v' (%d != %d)", rConn.RemoteAddr(), txsz, rxsz)
+				}
+			} else {
+				logrus.Errorf("error writing '%v': %v", rConn.RemoteAddr(), err)
+				return
+			}
+		} else {
+			logrus.Errorf("read error '%v': %v", rConn.RemoteAddr(), err)
+			return
+		}
+	}
+}
+
+func (b *Backend) txer(conn, rConn net.Conn) {
+	buf := make([]byte, 10240)
+	for {
+		if rxsz, err := rConn.Read(buf); err == nil {
+			if txsz, err := conn.Write(buf[:rxsz]); err == nil {
+				if txsz != rxsz {
+					logrus.Errorf("short write '%v' (%d != %d)", conn.RemoteAddr(), txsz, rxsz)
+				}
+			} else {
+				logrus.Errorf("error writing '%v': %v", conn.RemoteAddr(), err)
+				return
+			}
+		} else {
+			logrus.Errorf("read error '%v': %v", conn.RemoteAddr(), err)
+			return
+		}
 	}
 }
