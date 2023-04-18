@@ -153,11 +153,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *accessPrivateCommand) destroy(frotendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendToken: frotendName,
+		FrontendToken: frontendName,
 		ShrToken:      shrToken,
 		EnvZID:        envZId,
 	}

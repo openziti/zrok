@@ -1,14 +1,19 @@
 package main
 
 import (
+	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -63,6 +68,14 @@ func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, args[0], zrok, auth)
+		os.Exit(0)
+	}()
+
 	fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 		BindAddress:  cmd.bindAddress,
 		IdentityName: "backend",
@@ -76,5 +89,20 @@ func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
 	}
 	for {
 		time.Sleep(50)
+	}
+}
+
+func (cmd *accessPrivateTunnelCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+	logrus.Debugf("shutting down '%v'", shrToken)
+	req := share.NewUnaccessParams()
+	req.Body = &rest_model_zrok.UnaccessRequest{
+		FrontendToken: frontendName,
+		ShrToken:      shrToken,
+		EnvZID:        envZId,
+	}
+	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
+		logrus.Debugf("shutdown complete")
+	} else {
+		logrus.Errorf("error shutting down: %v", err)
 	}
 }
