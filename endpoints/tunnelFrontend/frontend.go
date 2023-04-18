@@ -3,6 +3,7 @@ package tunnelFrontend
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/transport/v2"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
@@ -62,16 +63,49 @@ func (f *Frontend) Stop() {
 }
 
 func (f *Frontend) accept(conn transport.Conn) {
+	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
+		go f.rxer(conn, zConn)
+		go f.txer(conn, zConn)
+		logrus.Infof("accepted '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+	} else {
+		logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
+		_ = conn.Close()
+	}
+}
+
+func (f *Frontend) rxer(conn transport.Conn, zConn edge.Conn) {
 	buf := make([]byte, 10240)
 	for {
-		n, err := conn.Read(buf)
-		if err != nil {
-			logrus.Errorf("error reading: %v", err)
+		if rxsz, err := conn.Read(buf); err == nil {
+			if txsz, err := zConn.Write(buf[:rxsz]); err == nil {
+				if txsz != rxsz {
+					logrus.Errorf("short write '%v' (%d != %d)", zConn.RemoteAddr(), txsz, rxsz)
+				}
+			} else {
+				logrus.Errorf("error writing '%v': %v", zConn.RemoteAddr(), err)
+				return
+			}
+		} else {
+			logrus.Errorf("read error '%v': %v", zConn.RemoteAddr(), err)
 			return
 		}
-		n, err = conn.Write(buf[:n])
-		if err != nil {
-			logrus.Errorf("error writing: %v", err)
+	}
+}
+
+func (f *Frontend) txer(conn transport.Conn, zConn edge.Conn) {
+	buf := make([]byte, 10240)
+	for {
+		if rxsz, err := zConn.Read(buf); err == nil {
+			if txsz, err := conn.Write(buf[:rxsz]); err == nil {
+				if txsz != rxsz {
+					logrus.Errorf("short write '%v' (%d != %d)'", conn.RemoteAddr(), txsz, rxsz)
+				}
+			} else {
+				logrus.Errorf("error writing '%v': %v", conn.RemoteAddr(), err)
+				return
+			}
+		} else {
+			logrus.Errorf("read error '%v': %v", conn.RemoteAddr(), err)
 			return
 		}
 	}
