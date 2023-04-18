@@ -68,6 +68,9 @@ func (b *Backend) handle(conn net.Conn) {
 }
 
 func (b *Backend) rxer(conn, rConn net.Conn) {
+	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), rConn.RemoteAddr())
+	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), rConn.RemoteAddr())
+
 	buf := make([]byte, 10240)
 	for {
 		if rxsz, err := conn.Read(buf); err == nil {
@@ -77,16 +80,23 @@ func (b *Backend) rxer(conn, rConn net.Conn) {
 				}
 			} else {
 				logrus.Errorf("error writing '%v': %v", rConn.RemoteAddr(), err)
+				_ = rConn.Close()
+				_ = conn.Close()
 				return
 			}
 		} else {
 			logrus.Errorf("read error '%v': %v", rConn.RemoteAddr(), err)
+			_ = rConn.Close()
+			_ = conn.Close()
 			return
 		}
 	}
 }
 
 func (b *Backend) txer(conn, rConn net.Conn) {
+	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), rConn.RemoteAddr())
+	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), rConn.RemoteAddr())
+
 	buf := make([]byte, 10240)
 	for {
 		if rxsz, err := rConn.Read(buf); err == nil {
@@ -96,10 +106,14 @@ func (b *Backend) txer(conn, rConn net.Conn) {
 				}
 			} else {
 				logrus.Errorf("error writing '%v': %v", conn.RemoteAddr(), err)
+				_ = rConn.Close()
+				_ = conn.Close()
 				return
 			}
 		} else {
 			logrus.Errorf("read error '%v': %v", conn.RemoteAddr(), err)
+			_ = rConn.Close()
+			_ = conn.Close()
 			return
 		}
 	}

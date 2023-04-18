@@ -74,6 +74,9 @@ func (f *Frontend) accept(conn transport.Conn) {
 }
 
 func (f *Frontend) rxer(conn transport.Conn, zConn edge.Conn) {
+	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+
 	buf := make([]byte, 10240)
 	for {
 		if rxsz, err := conn.Read(buf); err == nil {
@@ -83,16 +86,23 @@ func (f *Frontend) rxer(conn transport.Conn, zConn edge.Conn) {
 				}
 			} else {
 				logrus.Errorf("error writing '%v': %v", zConn.RemoteAddr(), err)
+				_ = zConn.Close()
+				_ = conn.Close()
 				return
 			}
 		} else {
 			logrus.Errorf("read error '%v': %v", zConn.RemoteAddr(), err)
+			_ = zConn.Close()
+			_ = conn.Close()
 			return
 		}
 	}
 }
 
 func (f *Frontend) txer(conn transport.Conn, zConn edge.Conn) {
+	logrus.Infof("started '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+	defer logrus.Warnf("exited '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+
 	buf := make([]byte, 10240)
 	for {
 		if rxsz, err := zConn.Read(buf); err == nil {
@@ -102,10 +112,14 @@ func (f *Frontend) txer(conn transport.Conn, zConn edge.Conn) {
 				}
 			} else {
 				logrus.Errorf("error writing '%v': %v", conn.RemoteAddr(), err)
+				_ = zConn.Close()
+				_ = conn.Close()
 				return
 			}
 		} else {
 			logrus.Errorf("read error '%v': %v", conn.RemoteAddr(), err)
+			_ = zConn.Close()
+			_ = conn.Close()
 			return
 		}
 	}
