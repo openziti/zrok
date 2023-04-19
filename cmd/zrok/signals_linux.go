@@ -4,11 +4,11 @@ import (
 	"os"
 	"os/signal"
 
-	"golang.org/x/sys/windows"
+	"golang.org/x/sys/unix"
 )
 
 func newSignalHandler() chan os.Signal {
 	signalHandler := make(chan os.Signal, 1)
-	signal.Notify(signalHandler, windows.SIGINT, windows.SIGTERM, windows.SIGHUP, windows.SIGQUIT)
+	signal.Notify(signalHandler, unix.SIGINT, unix.SIGTERM, unix.SIGHUP, unix.SIGQUIT)
 	return signalHandler
 }
