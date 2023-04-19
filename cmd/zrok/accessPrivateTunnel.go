@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
-	"runtime/pprof"
 	"syscall"
 	"time"
 )
@@ -40,13 +39,6 @@ func newAccessPrivateTunnelCommand() *accessPrivateTunnelCommand {
 }
 
 func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
-	// Start CPU profiling
-	f, err := os.Create("cpu.pprof")
-	if err != nil {
-		panic(err)
-	}
-	pprof.StartCPUProfile(f)
-
 	zrd, err := zrokdir.Load()
 	if err != nil {
 		tui.Error("unable to load zrokdir", err)
@@ -96,13 +88,12 @@ func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	for {
-		time.Sleep(50)
+		time.Sleep(30 * 24 * time.Hour)
 	}
 }
 
 func (cmd *accessPrivateTunnelCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", shrToken)
-	pprof.StopCPUProfile()
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
 		FrontendToken: frontendName,
