@@ -8,8 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/go-openapi/runtime"
@@ -76,8 +74,7 @@ func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 		loopers = append(loopers, l)
 		go l.run()
 	}
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+	c := newSignalHandler()
 	go func() {
 		<-c
 		for _, looper := range loopers {

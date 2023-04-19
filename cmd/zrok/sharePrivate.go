@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
@@ -129,8 +127,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+	c := newSignalHandler()
 	go func() {
 		<-c
 		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)

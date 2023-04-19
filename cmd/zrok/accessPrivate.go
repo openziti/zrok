@@ -3,8 +3,6 @@ package main
 import (
 	"net/url"
 	"os"
-	"os/signal"
-	"syscall"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
@@ -91,8 +89,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	cfg.Address = cmd.bindAddress
 	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGQUIT)
+	c := newSignalHandler()
 	go func() {
 		<-c
 		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
