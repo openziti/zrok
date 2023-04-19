@@ -2,14 +2,15 @@ package tcpTunnel
 
 import (
 	"github.com/sirupsen/logrus"
+	"io"
 	"net"
 )
 
 const bufSz = 10240
 
 func txer(from, to net.Conn) {
-	logrus.Infof("started '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
-	defer logrus.Warnf("exited '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
+	logrus.Debugf("started '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
+	defer logrus.Debugf("exited '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
 
 	buf := make([]byte, bufSz)
 	for {
@@ -28,7 +29,9 @@ func txer(from, to net.Conn) {
 				return
 			}
 		} else {
-			logrus.Errorf("read error '%v' -> '%v': %v", from.RemoteAddr(), to.RemoteAddr(), err)
+			if err != io.EOF {
+				logrus.Errorf("read error '%v' -> '%v': %v", from.RemoteAddr(), to.RemoteAddr(), err)
+			}
 			_ = to.Close()
 			_ = from.Close()
 			return

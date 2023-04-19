@@ -102,8 +102,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("here")
-
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
