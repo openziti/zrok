@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/transport/v2/tcp"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -63,6 +64,6 @@ func (b *Backend) handle(conn net.Conn) {
 		_ = conn.Close()
 		return
 	}
-	go txer(conn, rConn)
-	go txer(rConn, conn)
+	go endpoints.TXer(conn, rConn)
+	go endpoints.TXer(rConn, conn)
 }

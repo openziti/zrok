@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -56,5 +57,18 @@ func (b *Backend) Run() error {
 
 func (b *Backend) handle(conn net.Conn) {
 	logrus.Infof("handling '%v'", conn.RemoteAddr())
-	_ = conn.Close()
+	defer logrus.Infof("completed '%v'", conn.RemoteAddr())
+
+	if rAddr, err := net.ResolveUDPAddr("udp", b.cfg.EndpointAddress); err == nil {
+		if rConn, err := net.DialUDP("udp", nil, rAddr); err == nil {
+			go endpoints.TXer(conn, rConn)
+			go endpoints.TXer(rConn, conn)
+		} else {
+			logrus.Errorf("error dialing '%v': %v", rAddr, err)
+			_ = conn.Close()
+			return
+		}
+	} else {
+		logrus.Errorf("error resolving '%v': %v", b.cfg.EndpointAddress, err)
+	}
 }

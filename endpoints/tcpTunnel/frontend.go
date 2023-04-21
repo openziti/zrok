@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/transport/v2"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
@@ -63,8 +64,8 @@ func (f *Frontend) Stop() {
 
 func (f *Frontend) accept(conn transport.Conn) {
 	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
-		go txer(conn, zConn)
-		go txer(zConn, conn)
+		go endpoints.TXer(conn, zConn)
+		go endpoints.TXer(zConn, conn)
 		logrus.Infof("accepted '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
 	} else {
 		logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)

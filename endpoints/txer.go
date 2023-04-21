@@ -1,4 +1,4 @@
-package tcpTunnel
+package endpoints
 
 import (
 	"github.com/sirupsen/logrus"
@@ -8,7 +8,7 @@ import (
 
 const bufSz = 10240
 
-func txer(from, to net.Conn) {
+func TXer(from, to net.Conn) {
 	logrus.Debugf("started '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
 	defer logrus.Debugf("exited '%v' -> '%v'", from.RemoteAddr(), to.RemoteAddr())
 
