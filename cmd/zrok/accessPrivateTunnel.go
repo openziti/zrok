@@ -35,7 +35,7 @@ func newAccessPrivateTunnelCommand() *accessPrivateTunnelCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &accessPrivateTunnelCommand{cmd: cmd}
-	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "tcp:127.0.0.1:9191", "The address to bind the private tunnel")
+	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private tunnel")
 	cmd.Flags().BoolVar(&command.udp, "udp", false, "Use UDP")
 	cmd.Run = command.run
 	return command

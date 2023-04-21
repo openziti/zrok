@@ -4,7 +4,6 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/transport/v2/tcp"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -58,12 +57,16 @@ func (b *Backend) Run() error {
 
 func (b *Backend) handle(conn net.Conn) {
 	logrus.Infof("handling '%v'", conn.RemoteAddr())
-	rConn, err := tcp.Dial(b.cfg.EndpointAddress, "tcp", 30*time.Second)
-	if err != nil {
-		logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
-		_ = conn.Close()
-		return
+	if rAddr, err := net.ResolveTCPAddr("tcp", b.cfg.EndpointAddress); err == nil {
+		if rConn, err := net.DialTCP("tcp", nil, rAddr); err == nil {
+			go endpoints.TXer(conn, rConn)
+			go endpoints.TXer(rConn, conn)
+		} else {
+			logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
+			_ = conn.Close()
+			return
+		}
+	} else {
+		logrus.Errorf("error resolving '%v': %v", b.cfg.EndpointAddress, err)
 	}
-	go endpoints.TXer(conn, rConn)
-	go endpoints.TXer(rConn, conn)
 }

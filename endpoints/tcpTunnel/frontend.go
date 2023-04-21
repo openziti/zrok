@@ -3,13 +3,12 @@ package tcpTunnel
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
-	"github.com/openziti/transport/v2"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
+	"net"
 )
 
 type FrontendConfig struct {
@@ -19,16 +18,15 @@ type FrontendConfig struct {
 }
 
 type Frontend struct {
-	cfg      *FrontendConfig
-	zCtx     ziti.Context
-	listener transport.Address
-	closer   io.Closer
+	cfg   *FrontendConfig
+	zCtx  ziti.Context
+	lAddr *net.TCPAddr
 }
 
 func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
-	addr, err := transport.ParseAddress(cfg.BindAddress)
+	lAddr, err := net.ResolveTCPAddr("tcp", cfg.BindAddress)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error parsing '%v'", cfg.BindAddress)
+		return nil, errors.Wrapf(err, "error resolving tcp address '%v'", cfg.BindAddress)
 	}
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.IdentityName)
 	if err != nil {
@@ -41,28 +39,28 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
 	return &Frontend{
-		cfg:      cfg,
-		zCtx:     zCtx,
-		listener: addr,
+		cfg:   cfg,
+		zCtx:  zCtx,
+		lAddr: lAddr,
 	}, nil
 }
 
 func (f *Frontend) Run() error {
-	closer, err := f.listener.Listen(f.cfg.ShrToken, nil, f.accept, nil)
+	l, err := net.ListenTCP("tcp", f.lAddr)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error listening at '%v'", f.lAddr)
 	}
-	f.closer = closer
-	return nil
+	for {
+		if conn, err := l.Accept(); err == nil {
+			go f.accept(conn)
+			logrus.Infof("accepted tcp connection from '%v'", conn.RemoteAddr())
+		} else {
+			return err
+		}
+	}
 }
 
-func (f *Frontend) Stop() {
-	if f.closer != nil {
-		_ = f.closer.Close()
-	}
-}
-
-func (f *Frontend) accept(conn transport.Conn) {
+func (f *Frontend) accept(conn net.Conn) {
 	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
 		go endpoints.TXer(conn, zConn)
 		go endpoints.TXer(zConn, conn)

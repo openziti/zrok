@@ -3,13 +3,12 @@ package udpTunnel
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
-	"github.com/openziti/transport/v2"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
+	"net"
 )
 
 type FrontendConfig struct {
@@ -19,16 +18,15 @@ type FrontendConfig struct {
 }
 
 type Frontend struct {
-	cfg      *FrontendConfig
-	zCtx     ziti.Context
-	listener transport.Address
-	closer   io.Closer
+	cfg   *FrontendConfig
+	zCtx  ziti.Context
+	lAddr *net.UDPAddr
 }
 
 func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
-	addr, err := transport.ParseAddress(cfg.BindAddress)
+	lAddr, err := net.ResolveUDPAddr("udp", cfg.BindAddress)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error parsing '%v'", cfg.BindAddress)
+		return nil, errors.Wrapf(err, "error resolving udp address '%v'", cfg.BindAddress)
 	}
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.IdentityName)
 	if err != nil {
@@ -41,28 +39,24 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
 	zCtx := ziti.NewContextWithConfig(zCfg)
 	return &Frontend{
-		cfg:      cfg,
-		zCtx:     zCtx,
-		listener: addr,
+		cfg:   cfg,
+		zCtx:  zCtx,
+		lAddr: lAddr,
 	}, nil
 }
 
 func (f *Frontend) Run() error {
-	closer, err := f.listener.Listen(f.cfg.ShrToken, nil, f.accept, nil)
-	if err != nil {
-		return err
-	}
-	f.closer = closer
-	return nil
-}
-
-func (f *Frontend) Stop() {
-	if f.closer != nil {
-		_ = f.closer.Close()
+	for {
+		if conn, err := net.ListenUDP("udp", f.lAddr); err == nil {
+			go f.accept(conn)
+			logrus.Infof("accepted udp connection from '%v'", conn.RemoteAddr())
+		} else {
+			return err
+		}
 	}
 }
 
-func (f *Frontend) accept(conn transport.Conn) {
+func (f *Frontend) accept(conn *net.UDPConn) {
 	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
 		go endpoints.TXer(conn, zConn)
 		go endpoints.TXer(zConn, conn)
