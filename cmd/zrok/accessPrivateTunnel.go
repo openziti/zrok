@@ -4,7 +4,6 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
-	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -24,7 +23,6 @@ func init() {
 
 type accessPrivateTunnelCommand struct {
 	bindAddress string
-	udp         bool
 	cmd         *cobra.Command
 }
 
@@ -36,7 +34,6 @@ func newAccessPrivateTunnelCommand() *accessPrivateTunnelCommand {
 	}
 	command := &accessPrivateTunnelCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private tunnel")
-	cmd.Flags().BoolVar(&command.udp, "udp", false, "Use UDP")
 	cmd.Run = command.run
 	return command
 }
@@ -78,32 +75,16 @@ func (cmd *accessPrivateTunnelCommand) run(_ *cobra.Command, args []string) {
 		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, args[0], zrok, auth)
 		os.Exit(0)
 	}()
-
-	if cmd.udp {
-		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
-			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
-			ShrToken:     args[0],
-		})
-		if err != nil {
-			panic(err)
-		}
-		if err := fe.Run(); err != nil {
-			panic(err)
-		}
-
-	} else {
-		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
-			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
-			ShrToken:     args[0],
-		})
-		if err != nil {
-			panic(err)
-		}
-		if err := fe.Run(); err != nil {
-			panic(err)
-		}
+	fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
+		BindAddress:  cmd.bindAddress,
+		IdentityName: "backend",
+		ShrToken:     args[0],
+	})
+	if err != nil {
+		panic(err)
+	}
+	if err := fe.Run(); err != nil {
+		panic(err)
 	}
 	for {
 		time.Sleep(30 * 24 * time.Hour)

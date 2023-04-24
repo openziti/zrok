@@ -8,7 +8,6 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
-	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -33,7 +32,6 @@ type sharePrivateCommand struct {
 	backendMode string
 	headless    bool
 	insecure    bool
-	udp         bool
 	cmd         *cobra.Command
 }
 
@@ -48,7 +46,6 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tunnel}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
-	cmd.Flags().BoolVar(&command.udp, "udp", false, "Enable UDP for tunnel backend")
 	cmd.Run = command.run
 	return command
 }
@@ -176,44 +173,23 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "tunnel":
-		if cmd.udp {
-			cfg := &udpTunnel.BackendConfig{
-				IdentityPath:    zif,
-				EndpointAddress: target,
-				ShrToken:        resp.Payload.ShrToken,
-			}
-			be, err := udpTunnel.NewBackend(cfg)
-			if err != nil {
-				if !panicInstead {
-					tui.Error("unable to create udp tunnel backend", err)
-				}
-				panic(err)
-			}
-			go func() {
-				if err := be.Run(); err != nil {
-					logrus.Errorf("error running udp tunnel backend: %v", err)
-				}
-			}()
-			
-		} else {
-			cfg := &tcpTunnel.BackendConfig{
-				IdentityPath:    zif,
-				EndpointAddress: target,
-				ShrToken:        resp.Payload.ShrToken,
-			}
-			be, err := tcpTunnel.NewBackend(cfg)
-			if err != nil {
-				if !panicInstead {
-					tui.Error("unable to create tunnel backend", err)
-				}
-				panic(err)
-			}
-			go func() {
-				if err := be.Run(); err != nil {
-					logrus.Errorf("error running tunnel backend: %v", err)
-				}
-			}()
+		cfg := &tcpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        resp.Payload.ShrToken,
 		}
+		be, err := tcpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create tunnel backend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running tunnel backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
