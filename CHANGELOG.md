@@ -1,3 +1,7 @@
+# v0.3.7
+
+FIX: Improved TUI word-wrapping (https://github.com/openziti/zrok/issues/180)
+
 # v0.3.6
 
 CHANGE: Additional change to support branch builds (for CI purposes) and additional containerization efforts around k8s.
