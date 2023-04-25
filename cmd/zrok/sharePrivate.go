@@ -177,6 +177,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
 		}
 		be, err := tcpTunnel.NewBackend(cfg)
 		if err != nil {

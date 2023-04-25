@@ -15,6 +15,7 @@ type BackendConfig struct {
 	IdentityPath    string
 	EndpointAddress string
 	ShrToken        string
+	RequestsChan    chan *endpoints.Request
 }
 
 type Backend struct {
@@ -56,11 +57,17 @@ func (b *Backend) Run() error {
 }
 
 func (b *Backend) handle(conn net.Conn) {
-	logrus.Infof("handling '%v'", conn.RemoteAddr())
+	logrus.Debugf("handling '%v'", conn.RemoteAddr())
 	if rAddr, err := net.ResolveTCPAddr("tcp", b.cfg.EndpointAddress); err == nil {
 		if rConn, err := net.DialTCP("tcp", nil, rAddr); err == nil {
 			go endpoints.TXer(conn, rConn)
 			go endpoints.TXer(rConn, conn)
+			b.cfg.RequestsChan <- &endpoints.Request{
+				Stamp:      time.Now(),
+				RemoteAddr: conn.RemoteAddr().String(),
+				Method:     "OPEN",
+				Path:       rAddr.String(),
+			}
 		} else {
 			logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
 			_ = conn.Close()
