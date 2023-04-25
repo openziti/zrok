@@ -2,15 +2,19 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/openziti/zrok/endpoints"
-	"strings"
-	"time"
 )
 
 const shareTuiBacklog = 256
+
+var wordwrapCharacters = " -"
+var wordwrapBreakpoints = map[rune]bool{' ': true, '-': true}
 
 type shareModel struct {
 	shrToken             string
@@ -144,6 +148,7 @@ func (m *shareModel) renderRequests() string {
 			}
 		}
 	}
+	requestLines = wrap(requestLines, m.width-2)
 	maxRows := shareRequestsStyle.GetHeight()
 	startRow := 0
 	if len(requestLines) > maxRows {
@@ -183,6 +188,7 @@ func (m *shareModel) renderLog() string {
 			}
 		}
 	}
+	splitLines = wrap(splitLines, m.width-2)
 	maxRows := shareLogStyle.GetHeight()
 	startRow := 0
 	if len(splitLines) > maxRows {
@@ -209,6 +215,38 @@ func (m *shareModel) Write(p []byte) (n int, err error) {
 		}
 	}
 	return len(p), nil
+}
+
+func wrap(lines []string, width int) []string {
+	ret := make([]string, 0)
+	for _, line := range lines {
+		if width <= 0 || len(line) <= width {
+			ret = append(ret, line)
+			continue
+		}
+		for i := 0; i <= len(line); {
+			max := i + width
+			if max > len(line) {
+				max = len(line)
+			}
+			if line[i:max] == "" {
+				continue
+			}
+			nextI := i + width
+			if max < len(line)-1 {
+				if !wordwrapBreakpoints[rune(line[max])] || !wordwrapBreakpoints[rune(line[max+1])] {
+					lastSpace := strings.LastIndexAny(line[:max], wordwrapCharacters)
+					if lastSpace > -1 {
+						max = lastSpace
+						nextI = lastSpace
+					}
+				}
+			}
+			ret = append(ret, strings.TrimSpace(line[i:max]))
+			i = nextI
+		}
+	}
+	return ret
 }
 
 var shareHeaderStyle = lipgloss.NewStyle().
