@@ -852,6 +852,9 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "frontendToken": {
           "type": "string"
         }
@@ -1167,7 +1170,8 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tcpTunnel",
+            "udpTunnel"
           ]
         },
         "backendProxyEndpoint": {
@@ -2130,6 +2134,9 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "frontendToken": {
           "type": "string"
         }
@@ -2445,7 +2452,8 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tcpTunnel",
+            "udpTunnel"
           ]
         },
         "backendProxyEndpoint": {

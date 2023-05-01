@@ -1,4 +1,4 @@
-package webBackend
+package proxy
 
 import (
 	"fmt"
@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-type Config struct {
+type WebBackendConfig struct {
 	IdentityPath string
 	WebRoot      string
 	ShrToken     string
 	RequestsChan chan *endpoints.Request
 }
 
-type backend struct {
-	cfg      *Config
+type WebBackend struct {
+	cfg      *WebBackendConfig
 	listener edge.Listener
 	handler  http.Handler
 }
 
-func NewBackend(cfg *Config) (*backend, error) {
+func NewWebBackend(cfg *WebBackendConfig) (*WebBackend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
@@ -38,7 +38,7 @@ func NewBackend(cfg *Config) (*backend, error) {
 		return nil, errors.Wrap(err, "error listening")
 	}
 
-	be := &backend{
+	be := &WebBackend{
 		cfg:      cfg,
 		listener: listener,
 	}
@@ -50,14 +50,14 @@ func NewBackend(cfg *Config) (*backend, error) {
 	return be, nil
 }
 
-func (self *backend) Run() error {
+func (self *WebBackend) Run() error {
 	if err := http.Serve(self.listener, self.handler); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (self *backend) Requests() func() int32 {
+func (self *WebBackend) Requests() func() int32 {
 	return func() int32 { return 0 }
 }
 
