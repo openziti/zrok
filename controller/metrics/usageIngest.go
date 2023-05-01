@@ -47,8 +47,6 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 						} else {
 							logrus.Error("unable to assert 'usage/ingress.tx'")
 						}
-					} else {
-						logrus.Warn("missing 'usage/ingress.tx'")
 					}
 					if v, found := usage["ingress.rx"]; found {
 						if vFloat64, ok := v.(float64); ok {
@@ -56,8 +54,6 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 						} else {
 							logrus.Error("unable to assert 'usage/ingress.rx")
 						}
-					} else {
-						logrus.Warn("missing 'usage/ingress.rx")
 					}
 					if v, found := usage["egress.tx"]; found {
 						if vFloat64, ok := v.(float64); ok {
@@ -65,8 +61,6 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 						} else {
 							logrus.Error("unable to assert 'usage/egress.tx'")
 						}
-					} else {
-						logrus.Warn("missing 'usage/egress.tx'")
 					}
 					if v, found := usage["egress.rx"]; found {
 						if vFloat64, ok := v.(float64); ok {
@@ -74,8 +68,6 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 						} else {
 							logrus.Error("unable to assert 'usage/egress.rx'")
 						}
-					} else {
-						logrus.Warn("missing 'usage/egress.rx'")
 					}
 				} else {
 					logrus.Errorf("unable to assert 'usage' (%v) %v", reflect.TypeOf(v), event)
