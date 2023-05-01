@@ -1,5 +1,7 @@
 # v0.4.0
 
+FEATURE: New `tcpTunnel` backend mode allowing for private sharing of local TCP sockets with other `zrok` users (https://github.com/openziti/zrok/issues/170)
+
 FEATURE: New metrics infrastructure based on OpenZiti usage events (https://github.com/openziti/zrok/issues/128). See the [v0.4 Metrics Guide](docs/guides/metrics-and-limits/configuring-metrics.md) for more information.
 
 FEATURE: New limits implementation based on the new metrics infrastructure (https://github.com/openziti/zrok/issues/235). See the [v0.4 Limits Guide](docs/guides/metrics-and-limits/configuring-limits.md) for more information.
@@ -56,7 +58,7 @@ CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok
 CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
 
 	New and improved URL handling for proxy backends:
-
+	
 	9090 -> http://127.0.0.1:9090
 	localhost:9090 -> http://127.0.0.1:9090
 	https://localhost:9090 -> https://localhost:9090
