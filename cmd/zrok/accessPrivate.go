@@ -23,8 +23,7 @@ import (
 var accessPrivateCmd *accessPrivateCommand
 
 func init() {
-	accessPrivateCmd = newAccessPrivateCommand()
-	accessCmd.AddCommand(accessPrivateCmd.cmd)
+	accessCmd.AddCommand(newAccessPrivateCommand().cmd)
 }
 
 type accessPrivateCommand struct {
