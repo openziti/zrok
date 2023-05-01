@@ -2,8 +2,11 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/util"
 	"time"
+
+	"github.com/openziti/zrok/util"
+	"github.com/pkg/errors"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Usage struct {
@@ -41,8 +44,41 @@ type UsageSink interface {
 
 type ZitiEventJson string
 
+type ZitiEventJsonMsg struct {
+	data ZitiEventJson
+}
+
+func (e *ZitiEventJsonMsg) Data() ZitiEventJson {
+	return e.data
+}
+
+func (e *ZitiEventJsonMsg) Ack() error {
+	return nil
+}
+
+type ZitiEventAMQP struct {
+	data ZitiEventJson
+	msg  *amqp.Delivery
+}
+
+func (e *ZitiEventAMQP) Data() ZitiEventJson {
+	return e.data
+}
+
+func (e *ZitiEventAMQP) Ack() error {
+	if e.msg != nil {
+		return errors.New("Nil delivery message")
+	}
+	return e.msg.Ack(false)
+}
+
+type ZitiEventMsg interface {
+	Data() ZitiEventJson
+	Ack() error
+}
+
 type ZitiEventJsonSource interface {
-	Start(chan ZitiEventJson) (join chan struct{}, err error)
+	Start(chan ZitiEventMsg) (join chan struct{}, err error)
 	Stop()
 }
 
