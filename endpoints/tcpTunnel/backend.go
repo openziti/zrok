@@ -62,11 +62,13 @@ func (b *Backend) handle(conn net.Conn) {
 		if rConn, err := net.DialTCP("tcp", nil, rAddr); err == nil {
 			go endpoints.TXer(conn, rConn)
 			go endpoints.TXer(rConn, conn)
-			b.cfg.RequestsChan <- &endpoints.Request{
-				Stamp:      time.Now(),
-				RemoteAddr: conn.RemoteAddr().String(),
-				Method:     "OPEN",
-				Path:       rAddr.String(),
+			if b.cfg.RequestsChan != nil {
+				b.cfg.RequestsChan <- &endpoints.Request{
+					Stamp:      time.Now(),
+					RemoteAddr: conn.RemoteAddr().String(),
+					Method:     "ACCEPT",
+					Path:       rAddr.String(),
+				}
 			}
 		} else {
 			logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)

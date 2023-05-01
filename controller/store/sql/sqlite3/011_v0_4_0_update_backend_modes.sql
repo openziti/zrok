@@ -18,7 +18,7 @@ create table shares (
     constraint chk_z_id check (z_id <> ''),
     constraint chk_token check (token <> ''),
     constraint chk_share_mode check (share_mode == 'public' or share_mode == 'private'),
-    constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'tunnel')
+    constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'tcpTunnel' or backend_mode == 'udpTunnel')
 );
 insert into shares select * from shares_old;
 drop table shares_old;

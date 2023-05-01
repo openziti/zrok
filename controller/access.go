@@ -86,5 +86,8 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	return share.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{FrontendToken: feToken})
+	return share.NewAccessCreated().WithPayload(&rest_model_zrok.AccessResponse{
+		FrontendToken: feToken,
+		BackendMode:   shr.BackendMode,
+	})
 }

@@ -9,12 +9,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
+	"time"
 )
 
 type FrontendConfig struct {
 	BindAddress  string
 	IdentityName string
 	ShrToken     string
+	RequestsChan chan *endpoints.Request
 }
 
 type Frontend struct {
@@ -53,7 +55,7 @@ func (f *Frontend) Run() error {
 	for {
 		if conn, err := l.Accept(); err == nil {
 			go f.accept(conn)
-			logrus.Infof("accepted tcp connection from '%v'", conn.RemoteAddr())
+			logrus.Debugf("accepted tcp connection from '%v'", conn.RemoteAddr())
 		} else {
 			return err
 		}
@@ -64,7 +66,14 @@ func (f *Frontend) accept(conn net.Conn) {
 	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
 		go endpoints.TXer(conn, zConn)
 		go endpoints.TXer(zConn, conn)
-		logrus.Infof("accepted '%v' <=> '%v'", conn.RemoteAddr(), zConn.RemoteAddr())
+		if f.cfg.RequestsChan != nil {
+			f.cfg.RequestsChan <- &endpoints.Request{
+				Stamp:      time.Now(),
+				RemoteAddr: conn.RemoteAddr().String(),
+				Method:     "ACCEPT",
+				Path:       f.cfg.ShrToken,
+			}
+		}
 	} else {
 		logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
 		_ = conn.Close()

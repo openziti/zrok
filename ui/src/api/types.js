@@ -14,6 +14,7 @@
  * @memberof module:types
  * 
  * @property {string} frontendToken 
+ * @property {string} backendMode 
  */
 
 /**

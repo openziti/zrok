@@ -28,7 +28,7 @@ type ShareRequest struct {
 	AuthUsers []*AuthUser `json:"authUsers"`
 
 	// backend mode
-	// Enum: [proxy web tunnel]
+	// Enum: [proxy web tcpTunnel udpTunnel]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// backend proxy endpoint
@@ -100,7 +100,7 @@ var shareRequestTypeBackendModePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["proxy","web","tunnel"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -116,8 +116,11 @@ const (
 	// ShareRequestBackendModeWeb captures enum value "web"
 	ShareRequestBackendModeWeb string = "web"
 
-	// ShareRequestBackendModeTunnel captures enum value "tunnel"
-	ShareRequestBackendModeTunnel string = "tunnel"
+	// ShareRequestBackendModeTCPTunnel captures enum value "tcpTunnel"
+	ShareRequestBackendModeTCPTunnel string = "tcpTunnel"
+
+	// ShareRequestBackendModeUDPTunnel captures enum value "udpTunnel"
+	ShareRequestBackendModeUDPTunnel string = "udpTunnel"
 )
 
 // prop value enum

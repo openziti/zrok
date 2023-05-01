@@ -43,7 +43,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tunnel}")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tcpTunnel}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -67,11 +67,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	case "web":
 		target = args[0]
 
-	case "tunnel":
+	case "tcpTunnel":
 		target = args[0]
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tunnel}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel}", cmd.backendMode), nil)
 	}
 
 	zrd, err := zrokdir.Load()
@@ -172,7 +172,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 
-	case "tunnel":
+	case "tcpTunnel":
 		cfg := &tcpTunnel.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
@@ -182,13 +182,13 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := tcpTunnel.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create tunnel backend", err)
+				tui.Error("unable to create tcpTunnel backend", err)
 			}
 			panic(err)
 		}
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running tunnel backend: %v", err)
+				logrus.Errorf("error running tcpTunnel backend: %v", err)
 			}
 		}()
 
