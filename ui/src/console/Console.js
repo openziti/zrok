@@ -66,7 +66,7 @@ const Console = (props) => {
             </Navbar>
             <Container fluid={"xl"}>
                 <Row id={"controls-row"}>
-                    <Col>
+                    <Col lg={6}>
                         <Visualizer
                             user={props.user}
                             overview={overview}
@@ -75,7 +75,7 @@ const Console = (props) => {
                             setSelection={setSelection}
                         />
                     </Col>
-                    <Col>
+                    <Col lg={6}>
                         <Detail user={props.user} selection={selection} />
                     </Col>
                 </Row>

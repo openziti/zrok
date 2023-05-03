@@ -34,21 +34,10 @@ const SharesTab = (props) => {
             name: "Frontend",
             selector: row => <a href={row.frontendEndpoint} target={"_"}>{row.frontendEndpoint}</a>,
             sortable: true,
-            hide: "md"
         },
         {
             name: "Backend",
             selector: row => row.backendProxyEndpoint,
-            sortable: true,
-        },
-        {
-            name: "Share Mode",
-            selector: row => row.shareMode,
-            hide: "md"
-        },
-        {
-            name: "Token",
-            selector: row => row.token,
             sortable: true,
             hide: "md"
         },

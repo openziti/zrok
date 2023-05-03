@@ -64,7 +64,7 @@ code, pre {
 }
 
 .fullscreen {
-    background-color: #3b2693;
+    background: linear-gradient(180deg, #0E0238 0%, #231069 100%);
     padding: 25px;
     color: white;
     display: flex;
