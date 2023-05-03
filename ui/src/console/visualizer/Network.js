@@ -16,20 +16,8 @@ const Network = (props) => {
     }, []);
 
     const paintNode = (node, ctx) => {
-        let nodeColor = "#636363";
-        let textColor = "#ccc";
-        switch(node.type) {
-            case "environment":
-                nodeColor = "#444";
-                break;
-
-            case "share": // share
-                nodeColor = "#291A66";
-                break;
-
-            default:
-                //
-        }
+        let nodeColor = node.selected ? "#04adef" : "#9BF316";
+        let textColor = node.selected ? "white" : "black";
 
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
@@ -40,16 +28,6 @@ const Network = (props) => {
         ctx.fillStyle = nodeColor;
         roundRect(ctx, node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14, 1.25);
         ctx.fill();
-
-        if(node.selected) {
-            ctx.strokeStyle = "#c4bdde";
-            ctx.stroke();
-        } else {
-            if(node.type === "share") {
-                ctx.strokeStyle = "#433482";
-                ctx.stroke();
-            }
-        }
 
         ctx.fillStyle = textColor;
         ctx.fillText(node.label, node.x, node.y);
@@ -64,12 +42,12 @@ const Network = (props) => {
             ref={targetRef}
             graphData={props.networkGraph}
             width={props.size.width}
-            height={500}
+            height={800}
             onNodeClick={nodeClicked}
             linkOpacity={.75}
             linkWidth={1.5}
             nodeCanvasObject={paintNode}
-            backgroundColor={"#3b2693"}
+            backgroundColor={"linear-gradient(180deg, #0E0238 0%, #231069 100%);"}
             cooldownTicks={300}
         />
     )
