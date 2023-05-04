@@ -98,7 +98,7 @@ func (c *clientConn) timeout(idle time.Duration) {
 func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	lAddr, err := net.ResolveUDPAddr("udp", cfg.BindAddress)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error resolving tcp address '%v'", cfg.BindAddress)
+		return nil, errors.Wrapf(err, "error resolving udp address '%v'", cfg.BindAddress)
 	}
 	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.IdentityName)
 	if err != nil {

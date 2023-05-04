@@ -206,13 +206,13 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := udpTunnel.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create tcpTunnel backend", err)
+				tui.Error("unable to create udpTunnel backend", err)
 			}
 			panic(err)
 		}
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running tcpTunnel backend: %v", err)
+				logrus.Errorf("error running udpTunnel backend: %v", err)
 			}
 		}()
 
