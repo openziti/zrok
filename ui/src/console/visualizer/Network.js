@@ -3,6 +3,11 @@ import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
 import {roundRect} from "./draw";
+import {mdiShareVariant, mdiConsoleNetwork, mdiAccountBox} from "@mdi/js";
+
+const accountIcon = new Path2D(mdiAccountBox);
+const environmentIcon = new Path2D(mdiConsoleNetwork);
+const shareIcon = new Path2D(mdiShareVariant);
 
 const Network = (props) => {
     const targetRef = useRef();
@@ -28,6 +33,27 @@ const Network = (props) => {
         ctx.fillStyle = nodeColor;
         roundRect(ctx, node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14, 1.25);
         ctx.fill();
+
+        const nodeIcon = new Path2D();
+        let xform = new DOMMatrix();
+        xform.translateSelf(node.x - (nodeWidth / 2) - 6, node.y - 13);
+        xform.scaleSelf(0.5, 0.5);
+        switch(node.type) {
+            case "share":
+                nodeIcon.addPath(shareIcon, xform);
+                break;
+            case "environment":
+                nodeIcon.addPath(environmentIcon, xform);
+                break;
+            case "account":
+                nodeIcon.addPath(accountIcon, xform);
+                break;
+        }
+
+        ctx.fill(nodeIcon);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 0.5;
+        ctx.stroke(nodeIcon);
 
         ctx.fillStyle = textColor;
         ctx.fillText(node.label, node.x, node.y);
