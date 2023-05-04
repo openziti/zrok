@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -18,6 +19,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var accessPrivateCmd *accessPrivateCommand
@@ -84,6 +86,8 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	switch accessResp.Payload.BackendMode {
 	case "tcpTunnel":
 		protocol = "tcp://"
+	case "udpTunnel":
+		protocol = "udp://"
 	}
 
 	endpointUrl, err := url.Parse(protocol + cmd.bindAddress)
@@ -95,7 +99,8 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	requests := make(chan *endpoints.Request, 1024)
-	if accessResp.Payload.BackendMode == "tcpTunnel" {
+	switch accessResp.Payload.BackendMode {
+	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
 			IdentityName: "backend",
@@ -116,7 +121,31 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 				panic(err)
 			}
 		}()
-	} else {
+
+	case "udpTunnel":
+		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
+			BindAddress:  cmd.bindAddress,
+			IdentityName: "backend",
+			ShrToken:     args[0],
+			RequestsChan: requests,
+			IdleTime:     time.Minute,
+		})
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private frontend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("error starting frontend", err)
+				}
+				panic(err)
+			}
+		}()
+
+	default:
 		cfg := proxy.DefaultFrontendConfig("backend")
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress

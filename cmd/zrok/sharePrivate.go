@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -43,7 +44,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tcpTunnel}")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -68,6 +69,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = args[0]
 
 	case "tcpTunnel":
+		target = args[0]
+
+	case "udpTunnel":
 		target = args[0]
 
 	default:
@@ -189,6 +193,26 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running tcpTunnel backend: %v", err)
+			}
+		}()
+
+	case "udpTunnel":
+		cfg := &udpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
+		}
+		be, err := udpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create udpTunnel backend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running udpTunnel backend: %v", err)
 			}
 		}()
 
