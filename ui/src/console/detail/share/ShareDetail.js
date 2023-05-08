@@ -42,7 +42,7 @@ const ShareDetail = (props) => {
         metrics: row => (
             <ResponsiveContainer width={"100%"} height={"100%"}>
                 <AreaChart data={row.value}>
-                    <Area type="linearClosed" dataKey={(v) => v} stroke={"#231069"} fillOpacity={1} fill={"#655796"} isAnimationActive={false} dot={false} />
+                    <Area type="basis" dataKey={(v) => v} stroke={"#231069"} fillOpacity={1} fill={"#655796"} isAnimationActive={false} dot={false} />
                 </AreaChart>
             </ResponsiveContainer>
         ),
