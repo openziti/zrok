@@ -404,6 +404,62 @@ paths:
           description: current server version
           schema:
             $ref: "#/definitions/version"
+
+  #
+  # metrics
+  #
+  /metrics/account:
+    get:
+      tags:
+        - metrics
+      security:
+        - key: []
+      operationId: getAccountMetrics
+      responses:
+        200:
+          description: account metrics
+          schema:
+            $ref: "#/definitions/metrics"
+
+  /metrics/environment/{envId}:
+    get:
+      tags:
+        - metrics
+      security:
+        - key: []
+      operationId: getEnvironmentMetrics
+      parameters:
+        - name: envId
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: environment metrics
+          schema:
+            $ref: "#/definitions/metrics"
+        401:
+          description: unauthorized
+
+  /metrics/share/{shrToken}:
+    get:
+      tags:
+        - metrics
+      security:
+        - key: []
+      operationId: getShareMetrics
+      parameters:
+        - name: shrToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: share metrics
+          schema:
+            $ref: "#/definitions/metrics"
+        401:
+          description: unauthorized
   #
   # share
   #
@@ -665,6 +721,24 @@ definitions:
 
   loginResponse:
     type: string
+
+  metrics:
+    type: object
+    properties:
+      scope:
+        type: string
+      id:
+        type: string
+      period:
+        type: number
+      rx:
+        type: array
+        items:
+          type: number
+      tx:
+        type: array
+        items:
+          type: number
 
   principal:
     type: object

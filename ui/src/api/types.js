@@ -124,6 +124,17 @@
  */
 
 /**
+ * @typedef metrics
+ * @memberof module:types
+ * 
+ * @property {string} scope 
+ * @property {string} id 
+ * @property {number} period 
+ * @property {number[]} rx 
+ * @property {number[]} tx 
+ */
+
+/**
  * @typedef principal
  * @memberof module:types
  * 

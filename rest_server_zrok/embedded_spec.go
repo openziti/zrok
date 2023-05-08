@@ -520,6 +520,91 @@ func init() {
         }
       }
     },
+    "/metrics/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getAccountMetrics",
+        "responses": {
+          "200": {
+            "description": "account metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          }
+        }
+      }
+    },
+    "/metrics/environment/{envId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getEnvironmentMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        }
+      }
+    },
+    "/metrics/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getShareMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -1029,6 +1114,32 @@ func init() {
     },
     "loginResponse": {
       "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "period": {
+          "type": "number"
+        },
+        "rx": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "scope": {
+          "type": "string"
+        },
+        "tx": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
     },
     "principal": {
       "type": "object",
@@ -1802,6 +1913,91 @@ func init() {
         }
       }
     },
+    "/metrics/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getAccountMetrics",
+        "responses": {
+          "200": {
+            "description": "account metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          }
+        }
+      }
+    },
+    "/metrics/environment/{envId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getEnvironmentMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        }
+      }
+    },
+    "/metrics/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ],
+        "operationId": "getShareMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -2311,6 +2507,32 @@ func init() {
     },
     "loginResponse": {
       "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "period": {
+          "type": "number"
+        },
+        "rx": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "scope": {
+          "type": "string"
+        },
+        "tx": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
     },
     "principal": {
       "type": "object",
