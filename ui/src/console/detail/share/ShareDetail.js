@@ -1,12 +1,12 @@
 import * as metadata from "../../../api/metadata";
-import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
 import ActionsTab from "./ActionsTab";
 import SecretToggle from "../../SecretToggle";
+import {Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis} from "recharts";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -40,10 +40,11 @@ const ShareDetail = (props) => {
 
     const customProperties = {
         metrics: row => (
-            <Sparklines data={row.value} limit={60} height={10}>
-                <SparklinesLine color={"#3b2693"}/>
-                <SparklinesSpots/>
-            </Sparklines>
+            <ResponsiveContainer width={"100%"} height={"100%"}>
+                <AreaChart data={row.value}>
+                    <Area type="linearClosed" dataKey={(v) => v} stroke={"#231069"} fillOpacity={1} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                </AreaChart>
+            </ResponsiveContainer>
         ),
         frontendEndpoint: row => (
             <a href={row.value} target="_">{row.value}</a>

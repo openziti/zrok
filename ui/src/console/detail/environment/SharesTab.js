@@ -1,7 +1,7 @@
 import * as metadata from "../../../api/metadata";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
-import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
+import {Area, AreaChart, ResponsiveContainer} from "recharts";
 
 const SharesTab = (props) => {
     const [detail, setDetail] = useState({});
@@ -44,7 +44,11 @@ const SharesTab = (props) => {
         {
             name: "Activity",
             cell: row => {
-                return <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/><SparklinesSpots/></Sparklines>;
+                return <ResponsiveContainer width={"100%"} height={"100%"}>
+                    <AreaChart data={row.metrics}>
+                        <Area type="linearClosed" dataKey={(v) => v} stroke={"#231069"} fillOpacity={1} fill={"#655796"} isAnimationActive={false} dot={false} />
+                    </AreaChart>
+                </ResponsiveContainer>
             }
         }
     ];
