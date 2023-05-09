@@ -7,7 +7,9 @@ package rest_model_zrok
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -23,23 +25,84 @@ type Metrics struct {
 	// period
 	Period float64 `json:"period,omitempty"`
 
-	// rx
-	Rx []float64 `json:"rx"`
+	// samples
+	Samples []*MetricsSample `json:"samples"`
 
 	// scope
 	Scope string `json:"scope,omitempty"`
-
-	// tx
-	Tx []float64 `json:"tx"`
 }
 
 // Validate validates this metrics
 func (m *Metrics) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateSamples(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this metrics based on context it is used
+func (m *Metrics) validateSamples(formats strfmt.Registry) error {
+	if swag.IsZero(m.Samples) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Samples); i++ {
+		if swag.IsZero(m.Samples[i]) { // not required
+			continue
+		}
+
+		if m.Samples[i] != nil {
+			if err := m.Samples[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("samples" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("samples" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this metrics based on the context it is used
 func (m *Metrics) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateSamples(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Metrics) contextValidateSamples(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Samples); i++ {
+
+		if m.Samples[i] != nil {
+			if err := m.Samples[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("samples" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("samples" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

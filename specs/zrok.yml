@@ -743,14 +743,20 @@ definitions:
         type: string
       period:
         type: number
+      samples:
+        type: array
+        items:
+          $ref: "#/definitions/metricsSample"
+
+  metricsSample:
+    type: object
+    properties:
       rx:
-        type: array
-        items:
-          type: number
+        type: number
       tx:
-        type: array
-        items:
-          type: number
+        type: number
+      timestamp:
+        type: number
 
   principal:
     type: object

@@ -130,8 +130,16 @@
  * @property {string} scope 
  * @property {string} id 
  * @property {number} period 
- * @property {number[]} rx 
- * @property {number[]} tx 
+ * @property {module:types.metricsSample[]} samples 
+ */
+
+/**
+ * @typedef metricsSample
+ * @memberof module:types
+ * 
+ * @property {number} rx 
+ * @property {number} tx 
+ * @property {number} timestamp 
  */
 
 /**

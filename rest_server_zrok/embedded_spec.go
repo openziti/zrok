@@ -1147,20 +1147,28 @@ func init() {
         "period": {
           "type": "number"
         },
-        "rx": {
+        "samples": {
           "type": "array",
           "items": {
-            "type": "number"
+            "$ref": "#/definitions/metricsSample"
           }
         },
         "scope": {
           "type": "string"
+        }
+      }
+    },
+    "metricsSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "number"
         },
         "tx": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          }
+          "type": "number"
         }
       }
     },
@@ -2563,20 +2571,28 @@ func init() {
         "period": {
           "type": "number"
         },
-        "rx": {
+        "samples": {
           "type": "array",
           "items": {
-            "type": "number"
+            "$ref": "#/definitions/metricsSample"
           }
         },
         "scope": {
           "type": "string"
+        }
+      }
+    },
+    "metricsSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "number"
         },
         "tx": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          }
+          "type": "number"
         }
       }
     },

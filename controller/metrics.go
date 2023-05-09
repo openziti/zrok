@@ -42,7 +42,7 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 	slice := duration / 200
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
-		fmt.Sprintf("|> range(start -%v)\n", duration) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
 		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
 		"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
 		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
@@ -50,35 +50,42 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 		"|> drop(columns: [\"share\", \"envId\"])\n" +
 		fmt.Sprintf("|> aggregateWindow(every: %v, fn: sum, createEmpty: true)", slice)
 
-	rx, tx, err := runFluxForRxTxArray(query, h.queryApi)
+	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
 	if err != nil {
 		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountMetricsInternalServerError()
 	}
 
 	response := &rest_model_zrok.Metrics{
+		Scope:  "account",
 		ID:     fmt.Sprintf("%d", principal.ID),
 		Period: duration.Seconds(),
-		Rx:     rx,
-		Tx:     tx,
+	}
+	for i := 0; i < len(rx) && i < len(tx) && i < len(timestamps); i++ {
+		response.Samples = append(response.Samples, &rest_model_zrok.MetricsSample{
+			Rx:        rx[i],
+			Tx:        tx[i],
+			Timestamp: timestamps[i],
+		})
 	}
 	return metadata.NewGetAccountMetricsOK().WithPayload(response)
 }
 
-func runFluxForRxTxArray(query string, queryApi api.QueryAPI) (rx, tx []float64, err error) {
+func runFluxForRxTxArray(query string, queryApi api.QueryAPI) (rx, tx, timestamps []float64, err error) {
 	result, err := queryApi.Query(context.Background(), query)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	for result.Next() {
 		if v, ok := result.Record().Value().(int64); ok {
 			switch result.Record().Field() {
 			case "rx":
 				rx = append(rx, float64(v))
+				timestamps = append(timestamps, float64(result.Record().Time().UnixMilli()))
 			case "tx":
 				tx = append(tx, float64(v))
 			}
 		}
 	}
-	return rx, tx, nil
+	return rx, tx, timestamps, nil
 }
