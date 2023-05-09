@@ -49,6 +49,8 @@ func Run(inCfg *config.Config) error {
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetEnvironmentMetricsHandler = newGetEnvironmentMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
 	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
