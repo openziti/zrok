@@ -528,12 +528,12 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getAccountMetrics",
         "parameters": [
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }
@@ -544,6 +544,12 @@ func init() {
             "schema": {
               "$ref": "#/definitions/metrics"
             }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -556,7 +562,7 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getEnvironmentMetrics",
         "parameters": [
@@ -567,7 +573,7 @@ func init() {
             "required": true
           },
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }
@@ -593,7 +599,7 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getShareMetrics",
         "parameters": [
@@ -604,7 +610,7 @@ func init() {
             "required": true
           },
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }
@@ -1938,12 +1944,12 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getAccountMetrics",
         "parameters": [
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }
@@ -1954,6 +1960,12 @@ func init() {
             "schema": {
               "$ref": "#/definitions/metrics"
             }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -1966,7 +1978,7 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getEnvironmentMetrics",
         "parameters": [
@@ -1977,7 +1989,7 @@ func init() {
             "required": true
           },
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }
@@ -2003,7 +2015,7 @@ func init() {
           }
         ],
         "tags": [
-          "metrics"
+          "metadata"
         ],
         "operationId": "getShareMetrics",
         "parameters": [
@@ -2014,7 +2026,7 @@ func init() {
             "required": true
           },
           {
-            "type": "number",
+            "type": "string",
             "name": "duration",
             "in": "query"
           }

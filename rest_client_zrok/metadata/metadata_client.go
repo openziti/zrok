@@ -32,9 +32,15 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Configuration(params *ConfigurationParams, opts ...ClientOption) (*ConfigurationOK, error)
 
+	GetAccountMetrics(params *GetAccountMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountMetricsOK, error)
+
 	GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error)
 
+	GetEnvironmentMetrics(params *GetEnvironmentMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentMetricsOK, error)
+
 	GetShareDetail(params *GetShareDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareDetailOK, error)
+
+	GetShareMetrics(params *GetShareMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareMetricsOK, error)
 
 	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
 
@@ -82,6 +88,45 @@ func (a *Client) Configuration(params *ConfigurationParams, opts ...ClientOption
 }
 
 /*
+GetAccountMetrics get account metrics API
+*/
+func (a *Client) GetAccountMetrics(params *GetAccountMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountMetricsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountMetricsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getAccountMetrics",
+		Method:             "GET",
+		PathPattern:        "/metrics/account",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountMetricsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetAccountMetricsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getAccountMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 GetEnvironmentDetail get environment detail API
 */
 func (a *Client) GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error) {
@@ -121,6 +166,45 @@ func (a *Client) GetEnvironmentDetail(params *GetEnvironmentDetailParams, authIn
 }
 
 /*
+GetEnvironmentMetrics get environment metrics API
+*/
+func (a *Client) GetEnvironmentMetrics(params *GetEnvironmentMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentMetricsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetEnvironmentMetricsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getEnvironmentMetrics",
+		Method:             "GET",
+		PathPattern:        "/metrics/environment/{envId}",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetEnvironmentMetricsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetEnvironmentMetricsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getEnvironmentMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 GetShareDetail get share detail API
 */
 func (a *Client) GetShareDetail(params *GetShareDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareDetailOK, error) {
@@ -156,6 +240,45 @@ func (a *Client) GetShareDetail(params *GetShareDetailParams, authInfo runtime.C
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getShareDetail: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetShareMetrics get share metrics API
+*/
+func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareMetricsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetShareMetricsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getShareMetrics",
+		Method:             "GET",
+		PathPattern:        "/metrics/share/{shrToken}",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetShareMetricsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetShareMetricsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getShareMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

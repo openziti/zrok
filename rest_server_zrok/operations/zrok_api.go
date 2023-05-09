@@ -24,7 +24,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metrics"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 )
 
@@ -71,20 +70,20 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
-		MetricsGetAccountMetricsHandler: metrics.GetAccountMetricsHandlerFunc(func(params metrics.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metrics.GetAccountMetrics has not yet been implemented")
+		MetadataGetAccountMetricsHandler: metadata.GetAccountMetricsHandlerFunc(func(params metadata.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetAccountMetrics has not yet been implemented")
 		}),
 		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
 		}),
-		MetricsGetEnvironmentMetricsHandler: metrics.GetEnvironmentMetricsHandlerFunc(func(params metrics.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metrics.GetEnvironmentMetrics has not yet been implemented")
+		MetadataGetEnvironmentMetricsHandler: metadata.GetEnvironmentMetricsHandlerFunc(func(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetEnvironmentMetrics has not yet been implemented")
 		}),
 		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
 		}),
-		MetricsGetShareMetricsHandler: metrics.GetShareMetricsHandlerFunc(func(params metrics.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metrics.GetShareMetrics has not yet been implemented")
+		MetadataGetShareMetricsHandler: metadata.GetShareMetricsHandlerFunc(func(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
@@ -195,16 +194,16 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
-	// MetricsGetAccountMetricsHandler sets the operation handler for the get account metrics operation
-	MetricsGetAccountMetricsHandler metrics.GetAccountMetricsHandler
+	// MetadataGetAccountMetricsHandler sets the operation handler for the get account metrics operation
+	MetadataGetAccountMetricsHandler metadata.GetAccountMetricsHandler
 	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
 	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
-	// MetricsGetEnvironmentMetricsHandler sets the operation handler for the get environment metrics operation
-	MetricsGetEnvironmentMetricsHandler metrics.GetEnvironmentMetricsHandler
+	// MetadataGetEnvironmentMetricsHandler sets the operation handler for the get environment metrics operation
+	MetadataGetEnvironmentMetricsHandler metadata.GetEnvironmentMetricsHandler
 	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
-	// MetricsGetShareMetricsHandler sets the operation handler for the get share metrics operation
-	MetricsGetShareMetricsHandler metrics.GetShareMetricsHandler
+	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
+	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -337,20 +336,20 @@ func (o *ZrokAPI) Validate() error {
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
 	}
-	if o.MetricsGetAccountMetricsHandler == nil {
-		unregistered = append(unregistered, "metrics.GetAccountMetricsHandler")
+	if o.MetadataGetAccountMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetAccountMetricsHandler")
 	}
 	if o.MetadataGetEnvironmentDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetEnvironmentDetailHandler")
 	}
-	if o.MetricsGetEnvironmentMetricsHandler == nil {
-		unregistered = append(unregistered, "metrics.GetEnvironmentMetricsHandler")
+	if o.MetadataGetEnvironmentMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetEnvironmentMetricsHandler")
 	}
 	if o.MetadataGetShareDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
 	}
-	if o.MetricsGetShareMetricsHandler == nil {
-		unregistered = append(unregistered, "metrics.GetShareMetricsHandler")
+	if o.MetadataGetShareMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -527,7 +526,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/metrics/account"] = metrics.NewGetAccountMetrics(o.context, o.MetricsGetAccountMetricsHandler)
+	o.handlers["GET"]["/metrics/account"] = metadata.NewGetAccountMetrics(o.context, o.MetadataGetAccountMetricsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -535,7 +534,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/metrics/environment/{envId}"] = metrics.NewGetEnvironmentMetrics(o.context, o.MetricsGetEnvironmentMetricsHandler)
+	o.handlers["GET"]["/metrics/environment/{envId}"] = metadata.NewGetEnvironmentMetrics(o.context, o.MetadataGetEnvironmentMetricsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -543,7 +542,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/metrics/share/{shrToken}"] = metrics.NewGetShareMetrics(o.context, o.MetricsGetShareMetricsHandler)
+	o.handlers["GET"]["/metrics/share/{shrToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

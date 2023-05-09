@@ -394,41 +394,31 @@ paths:
           schema:
             $ref: "#/definitions/errorMessage"
 
-  /version:
-    get:
-      tags:
-        - metadata
-      operationId: version
-      responses:
-        200:
-          description: current server version
-          schema:
-            $ref: "#/definitions/version"
-
-  #
-  # metrics
-  #
   /metrics/account:
     get:
       tags:
-        - metrics
+        - metadata
       security:
         - key: []
       operationId: getAccountMetrics
       parameters:
         - name: duration
           in: query
-          type: number
+          type: string
       responses:
         200:
           description: account metrics
           schema:
             $ref: "#/definitions/metrics"
+        400:
+          description: bad request
+        500:
+          description: internal server error
 
   /metrics/environment/{envId}:
     get:
       tags:
-        - metrics
+        - metadata
       security:
         - key: []
       operationId: getEnvironmentMetrics
@@ -439,7 +429,7 @@ paths:
           required: true
         - name: duration
           in: query
-          type: number
+          type: string
       responses:
         200:
           description: environment metrics
@@ -451,7 +441,7 @@ paths:
   /metrics/share/{shrToken}:
     get:
       tags:
-        - metrics
+        - metadata
       security:
         - key: []
       operationId: getShareMetrics
@@ -462,7 +452,7 @@ paths:
           required: true
         - name: duration
           in: query
-          type: number
+          type: string
       responses:
         200:
           description: share metrics
@@ -470,6 +460,18 @@ paths:
             $ref: "#/definitions/metrics"
         401:
           description: unauthorized
+
+  /version:
+    get:
+      tags:
+        - metadata
+      operationId: version
+      responses:
+        200:
+          description: current server version
+          schema:
+            $ref: "#/definitions/version"
+
   #
   # share
   #

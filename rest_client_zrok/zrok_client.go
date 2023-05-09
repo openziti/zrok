@@ -14,7 +14,6 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
-	"github.com/openziti/zrok/rest_client_zrok/metrics"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 )
 
@@ -64,7 +63,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Zrok {
 	cli.Admin = admin.New(transport, formats)
 	cli.Environment = environment.New(transport, formats)
 	cli.Metadata = metadata.New(transport, formats)
-	cli.Metrics = metrics.New(transport, formats)
 	cli.Share = share.New(transport, formats)
 	return cli
 }
@@ -118,8 +116,6 @@ type Zrok struct {
 
 	Metadata metadata.ClientService
 
-	Metrics metrics.ClientService
-
 	Share share.ClientService
 
 	Transport runtime.ClientTransport
@@ -132,6 +128,5 @@ func (c *Zrok) SetTransport(transport runtime.ClientTransport) {
 	c.Admin.SetTransport(transport)
 	c.Environment.SetTransport(transport)
 	c.Metadata.SetTransport(transport)
-	c.Metrics.SetTransport(transport)
 	c.Share.SetTransport(transport)
 }
