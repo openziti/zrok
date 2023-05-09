@@ -567,7 +567,7 @@ func init() {
         "operationId": "getEnvironmentMetrics",
         "parameters": [
           {
-            "type": "string",
+            "type": "number",
             "name": "envId",
             "in": "path",
             "required": true
@@ -585,8 +585,14 @@ func init() {
               "$ref": "#/definitions/metrics"
             }
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -622,8 +628,14 @@ func init() {
               "$ref": "#/definitions/metrics"
             }
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -1991,7 +2003,7 @@ func init() {
         "operationId": "getEnvironmentMetrics",
         "parameters": [
           {
-            "type": "string",
+            "type": "number",
             "name": "envId",
             "in": "path",
             "required": true
@@ -2009,8 +2021,14 @@ func init() {
               "$ref": "#/definitions/metrics"
             }
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -2046,8 +2064,14 @@ func init() {
               "$ref": "#/definitions/metrics"
             }
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

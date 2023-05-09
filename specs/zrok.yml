@@ -425,7 +425,7 @@ paths:
       parameters:
         - name: envId
           in: path
-          type: string
+          type: number
           required: true
         - name: duration
           in: query
@@ -435,8 +435,13 @@ paths:
           description: environment metrics
           schema:
             $ref: "#/definitions/metrics"
+        400:
+          description: bad request
         401:
           description: unauthorized
+        500:
+          description: internal server error
+
 
   /metrics/share/{shrToken}:
     get:
@@ -458,8 +463,13 @@ paths:
           description: share metrics
           schema:
             $ref: "#/definitions/metrics"
+        400:
+          description: bad request
         401:
           description: unauthorized
+        500:
+          description: internal server error
+
 
   /version:
     get:

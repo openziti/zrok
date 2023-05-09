@@ -58,6 +58,31 @@ func (o *GetShareMetricsOK) WriteResponse(rw http.ResponseWriter, producer runti
 	}
 }
 
+// GetShareMetricsBadRequestCode is the HTTP code returned for type GetShareMetricsBadRequest
+const GetShareMetricsBadRequestCode int = 400
+
+/*
+GetShareMetricsBadRequest bad request
+
+swagger:response getShareMetricsBadRequest
+*/
+type GetShareMetricsBadRequest struct {
+}
+
+// NewGetShareMetricsBadRequest creates GetShareMetricsBadRequest with default headers values
+func NewGetShareMetricsBadRequest() *GetShareMetricsBadRequest {
+
+	return &GetShareMetricsBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *GetShareMetricsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // GetShareMetricsUnauthorizedCode is the HTTP code returned for type GetShareMetricsUnauthorized
 const GetShareMetricsUnauthorizedCode int = 401
 
@@ -81,4 +106,29 @@ func (o *GetShareMetricsUnauthorized) WriteResponse(rw http.ResponseWriter, prod
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
+}
+
+// GetShareMetricsInternalServerErrorCode is the HTTP code returned for type GetShareMetricsInternalServerError
+const GetShareMetricsInternalServerErrorCode int = 500
+
+/*
+GetShareMetricsInternalServerError internal server error
+
+swagger:response getShareMetricsInternalServerError
+*/
+type GetShareMetricsInternalServerError struct {
+}
+
+// NewGetShareMetricsInternalServerError creates GetShareMetricsInternalServerError with default headers values
+func NewGetShareMetricsInternalServerError() *GetShareMetricsInternalServerError {
+
+	return &GetShareMetricsInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *GetShareMetricsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
 }

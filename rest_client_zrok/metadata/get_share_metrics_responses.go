@@ -29,8 +29,20 @@ func (o *GetShareMetricsReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewGetShareMetricsBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewGetShareMetricsUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 500:
+		result := NewGetShareMetricsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -103,6 +115,57 @@ func (o *GetShareMetricsOK) readResponse(response runtime.ClientResponse, consum
 	return nil
 }
 
+// NewGetShareMetricsBadRequest creates a GetShareMetricsBadRequest with default headers values
+func NewGetShareMetricsBadRequest() *GetShareMetricsBadRequest {
+	return &GetShareMetricsBadRequest{}
+}
+
+/*
+GetShareMetricsBadRequest describes a response with status code 400, with default header values.
+
+bad request
+*/
+type GetShareMetricsBadRequest struct {
+}
+
+// IsSuccess returns true when this get share metrics bad request response has a 2xx status code
+func (o *GetShareMetricsBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get share metrics bad request response has a 3xx status code
+func (o *GetShareMetricsBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get share metrics bad request response has a 4xx status code
+func (o *GetShareMetricsBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get share metrics bad request response has a 5xx status code
+func (o *GetShareMetricsBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get share metrics bad request response a status code equal to that given
+func (o *GetShareMetricsBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+func (o *GetShareMetricsBadRequest) Error() string {
+	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsBadRequest ", 400)
+}
+
+func (o *GetShareMetricsBadRequest) String() string {
+	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsBadRequest ", 400)
+}
+
+func (o *GetShareMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
 // NewGetShareMetricsUnauthorized creates a GetShareMetricsUnauthorized with default headers values
 func NewGetShareMetricsUnauthorized() *GetShareMetricsUnauthorized {
 	return &GetShareMetricsUnauthorized{}
@@ -150,6 +213,57 @@ func (o *GetShareMetricsUnauthorized) String() string {
 }
 
 func (o *GetShareMetricsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewGetShareMetricsInternalServerError creates a GetShareMetricsInternalServerError with default headers values
+func NewGetShareMetricsInternalServerError() *GetShareMetricsInternalServerError {
+	return &GetShareMetricsInternalServerError{}
+}
+
+/*
+GetShareMetricsInternalServerError describes a response with status code 500, with default header values.
+
+internal server error
+*/
+type GetShareMetricsInternalServerError struct {
+}
+
+// IsSuccess returns true when this get share metrics internal server error response has a 2xx status code
+func (o *GetShareMetricsInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get share metrics internal server error response has a 3xx status code
+func (o *GetShareMetricsInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get share metrics internal server error response has a 4xx status code
+func (o *GetShareMetricsInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get share metrics internal server error response has a 5xx status code
+func (o *GetShareMetricsInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this get share metrics internal server error response a status code equal to that given
+func (o *GetShareMetricsInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
+func (o *GetShareMetricsInternalServerError) Error() string {
+	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsInternalServerError ", 500)
+}
+
+func (o *GetShareMetricsInternalServerError) String() string {
+	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsInternalServerError ", 500)
+}
+
+func (o *GetShareMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

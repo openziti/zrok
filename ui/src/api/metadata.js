@@ -56,7 +56,7 @@ export function getAccountMetrics(options) {
 }
 
 /**
- * @param {string} envId 
+ * @param {number} envId 
  * @param {object} options Optional options
  * @param {string} [options.duration] 
  * @return {Promise<module:types.metrics>} environment metrics

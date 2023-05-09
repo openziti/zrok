@@ -58,6 +58,31 @@ func (o *GetEnvironmentMetricsOK) WriteResponse(rw http.ResponseWriter, producer
 	}
 }
 
+// GetEnvironmentMetricsBadRequestCode is the HTTP code returned for type GetEnvironmentMetricsBadRequest
+const GetEnvironmentMetricsBadRequestCode int = 400
+
+/*
+GetEnvironmentMetricsBadRequest bad request
+
+swagger:response getEnvironmentMetricsBadRequest
+*/
+type GetEnvironmentMetricsBadRequest struct {
+}
+
+// NewGetEnvironmentMetricsBadRequest creates GetEnvironmentMetricsBadRequest with default headers values
+func NewGetEnvironmentMetricsBadRequest() *GetEnvironmentMetricsBadRequest {
+
+	return &GetEnvironmentMetricsBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *GetEnvironmentMetricsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // GetEnvironmentMetricsUnauthorizedCode is the HTTP code returned for type GetEnvironmentMetricsUnauthorized
 const GetEnvironmentMetricsUnauthorizedCode int = 401
 
@@ -81,4 +106,29 @@ func (o *GetEnvironmentMetricsUnauthorized) WriteResponse(rw http.ResponseWriter
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
+}
+
+// GetEnvironmentMetricsInternalServerErrorCode is the HTTP code returned for type GetEnvironmentMetricsInternalServerError
+const GetEnvironmentMetricsInternalServerErrorCode int = 500
+
+/*
+GetEnvironmentMetricsInternalServerError internal server error
+
+swagger:response getEnvironmentMetricsInternalServerError
+*/
+type GetEnvironmentMetricsInternalServerError struct {
+}
+
+// NewGetEnvironmentMetricsInternalServerError creates GetEnvironmentMetricsInternalServerError with default headers values
+func NewGetEnvironmentMetricsInternalServerError() *GetEnvironmentMetricsInternalServerError {
+
+	return &GetEnvironmentMetricsInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *GetEnvironmentMetricsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
 }

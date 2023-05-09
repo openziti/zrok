@@ -29,8 +29,20 @@ func (o *GetEnvironmentMetricsReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewGetEnvironmentMetricsBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewGetEnvironmentMetricsUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 500:
+		result := NewGetEnvironmentMetricsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -103,6 +115,57 @@ func (o *GetEnvironmentMetricsOK) readResponse(response runtime.ClientResponse, 
 	return nil
 }
 
+// NewGetEnvironmentMetricsBadRequest creates a GetEnvironmentMetricsBadRequest with default headers values
+func NewGetEnvironmentMetricsBadRequest() *GetEnvironmentMetricsBadRequest {
+	return &GetEnvironmentMetricsBadRequest{}
+}
+
+/*
+GetEnvironmentMetricsBadRequest describes a response with status code 400, with default header values.
+
+bad request
+*/
+type GetEnvironmentMetricsBadRequest struct {
+}
+
+// IsSuccess returns true when this get environment metrics bad request response has a 2xx status code
+func (o *GetEnvironmentMetricsBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get environment metrics bad request response has a 3xx status code
+func (o *GetEnvironmentMetricsBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get environment metrics bad request response has a 4xx status code
+func (o *GetEnvironmentMetricsBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get environment metrics bad request response has a 5xx status code
+func (o *GetEnvironmentMetricsBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get environment metrics bad request response a status code equal to that given
+func (o *GetEnvironmentMetricsBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+func (o *GetEnvironmentMetricsBadRequest) Error() string {
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest ", 400)
+}
+
+func (o *GetEnvironmentMetricsBadRequest) String() string {
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest ", 400)
+}
+
+func (o *GetEnvironmentMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
 // NewGetEnvironmentMetricsUnauthorized creates a GetEnvironmentMetricsUnauthorized with default headers values
 func NewGetEnvironmentMetricsUnauthorized() *GetEnvironmentMetricsUnauthorized {
 	return &GetEnvironmentMetricsUnauthorized{}
@@ -150,6 +213,57 @@ func (o *GetEnvironmentMetricsUnauthorized) String() string {
 }
 
 func (o *GetEnvironmentMetricsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewGetEnvironmentMetricsInternalServerError creates a GetEnvironmentMetricsInternalServerError with default headers values
+func NewGetEnvironmentMetricsInternalServerError() *GetEnvironmentMetricsInternalServerError {
+	return &GetEnvironmentMetricsInternalServerError{}
+}
+
+/*
+GetEnvironmentMetricsInternalServerError describes a response with status code 500, with default header values.
+
+internal server error
+*/
+type GetEnvironmentMetricsInternalServerError struct {
+}
+
+// IsSuccess returns true when this get environment metrics internal server error response has a 2xx status code
+func (o *GetEnvironmentMetricsInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get environment metrics internal server error response has a 3xx status code
+func (o *GetEnvironmentMetricsInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get environment metrics internal server error response has a 4xx status code
+func (o *GetEnvironmentMetricsInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get environment metrics internal server error response has a 5xx status code
+func (o *GetEnvironmentMetricsInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this get environment metrics internal server error response a status code equal to that given
+func (o *GetEnvironmentMetricsInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
+func (o *GetEnvironmentMetricsInternalServerError) Error() string {
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError ", 500)
+}
+
+func (o *GetEnvironmentMetricsInternalServerError) String() string {
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError ", 500)
+}
+
+func (o *GetEnvironmentMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
