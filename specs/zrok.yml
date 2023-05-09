@@ -415,6 +415,10 @@ paths:
       security:
         - key: []
       operationId: getAccountMetrics
+      parameters:
+        - name: duration
+          in: query
+          type: number
       responses:
         200:
           description: account metrics
@@ -433,6 +437,9 @@ paths:
           in: path
           type: string
           required: true
+        - name: duration
+          in: query
+          type: number
       responses:
         200:
           description: environment metrics
@@ -453,6 +460,9 @@ paths:
           in: path
           type: string
           required: true
+        - name: duration
+          in: query
+          type: number
       responses:
         200:
           description: share metrics

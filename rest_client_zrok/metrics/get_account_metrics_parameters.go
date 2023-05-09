@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetAccountMetricsParams creates a new GetAccountMetricsParams object,
@@ -60,6 +61,10 @@ GetAccountMetricsParams contains all the parameters to send to the API endpoint
 	Typically these are written to a http.Request.
 */
 type GetAccountMetricsParams struct {
+
+	// Duration.
+	Duration *float64
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -113,6 +118,17 @@ func (o *GetAccountMetricsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDuration adds the duration to the get account metrics params
+func (o *GetAccountMetricsParams) WithDuration(duration *float64) *GetAccountMetricsParams {
+	o.SetDuration(duration)
+	return o
+}
+
+// SetDuration adds the duration to the get account metrics params
+func (o *GetAccountMetricsParams) SetDuration(duration *float64) {
+	o.Duration = duration
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetAccountMetricsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -120,6 +136,23 @@ func (o *GetAccountMetricsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		return err
 	}
 	var res []error
+
+	if o.Duration != nil {
+
+		// query param duration
+		var qrDuration float64
+
+		if o.Duration != nil {
+			qrDuration = *o.Duration
+		}
+		qDuration := swag.FormatFloat64(qrDuration)
+		if qDuration != "" {
+
+			if err := r.SetQueryParam("duration", qDuration); err != nil {
+				return err
+			}
+		}
+	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

@@ -40,7 +40,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
         newGraph.links.push({
             target: accountNode.id,
             source: envNode.id,
-            color: "#9BF316"
+            color: "#04adef"
         });
         if(env.shares) {
             env.shares.forEach(shr => {
@@ -60,7 +60,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                 newGraph.links.push({
                     target: envNode.id,
                     source: shrNode.id,
-                    color: "#9BF316"
+                    color: "#04adef"
                 });
             });
         }

@@ -531,6 +531,13 @@ func init() {
           "metrics"
         ],
         "operationId": "getAccountMetrics",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "account metrics",
@@ -558,6 +565,11 @@ func init() {
             "name": "envId",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
           }
         ],
         "responses": {
@@ -590,6 +602,11 @@ func init() {
             "name": "shrToken",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1924,6 +1941,13 @@ func init() {
           "metrics"
         ],
         "operationId": "getAccountMetrics",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "account metrics",
@@ -1951,6 +1975,11 @@ func init() {
             "name": "envId",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1983,6 +2012,11 @@ func init() {
             "name": "shrToken",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "duration",
+            "in": "query"
           }
         ],
         "responses": {

@@ -10,11 +10,15 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 	"strings"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetEnvironmentMetricsURL generates an URL for the get environment metrics operation
 type GetEnvironmentMetricsURL struct {
 	EnvID string
+
+	Duration *float64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -54,6 +58,18 @@ func (o *GetEnvironmentMetricsURL) Build() (*url.URL, error) {
 		_basePath = "/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var durationQ string
+	if o.Duration != nil {
+		durationQ = swag.FormatFloat64(*o.Duration)
+	}
+	if durationQ != "" {
+		qs.Set("duration", durationQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

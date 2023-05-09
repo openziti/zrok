@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetShareMetricsParams creates a new GetShareMetricsParams object,
@@ -60,6 +61,9 @@ GetShareMetricsParams contains all the parameters to send to the API endpoint
 	Typically these are written to a http.Request.
 */
 type GetShareMetricsParams struct {
+
+	// Duration.
+	Duration *float64
 
 	// ShrToken.
 	ShrToken string
@@ -117,6 +121,17 @@ func (o *GetShareMetricsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDuration adds the duration to the get share metrics params
+func (o *GetShareMetricsParams) WithDuration(duration *float64) *GetShareMetricsParams {
+	o.SetDuration(duration)
+	return o
+}
+
+// SetDuration adds the duration to the get share metrics params
+func (o *GetShareMetricsParams) SetDuration(duration *float64) {
+	o.Duration = duration
+}
+
 // WithShrToken adds the shrToken to the get share metrics params
 func (o *GetShareMetricsParams) WithShrToken(shrToken string) *GetShareMetricsParams {
 	o.SetShrToken(shrToken)
@@ -135,6 +150,23 @@ func (o *GetShareMetricsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		return err
 	}
 	var res []error
+
+	if o.Duration != nil {
+
+		// query param duration
+		var qrDuration float64
+
+		if o.Duration != nil {
+			qrDuration = *o.Duration
+		}
+		qDuration := swag.FormatFloat64(qrDuration)
+		if qDuration != "" {
+
+			if err := r.SetQueryParam("duration", qDuration); err != nil {
+				return err
+			}
+		}
+	}
 
 	// path param shrToken
 	if err := r.SetPathParam("shrToken", o.ShrToken); err != nil {

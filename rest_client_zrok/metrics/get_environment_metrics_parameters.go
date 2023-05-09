@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetEnvironmentMetricsParams creates a new GetEnvironmentMetricsParams object,
@@ -60,6 +61,9 @@ GetEnvironmentMetricsParams contains all the parameters to send to the API endpo
 	Typically these are written to a http.Request.
 */
 type GetEnvironmentMetricsParams struct {
+
+	// Duration.
+	Duration *float64
 
 	// EnvID.
 	EnvID string
@@ -117,6 +121,17 @@ func (o *GetEnvironmentMetricsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDuration adds the duration to the get environment metrics params
+func (o *GetEnvironmentMetricsParams) WithDuration(duration *float64) *GetEnvironmentMetricsParams {
+	o.SetDuration(duration)
+	return o
+}
+
+// SetDuration adds the duration to the get environment metrics params
+func (o *GetEnvironmentMetricsParams) SetDuration(duration *float64) {
+	o.Duration = duration
+}
+
 // WithEnvID adds the envID to the get environment metrics params
 func (o *GetEnvironmentMetricsParams) WithEnvID(envID string) *GetEnvironmentMetricsParams {
 	o.SetEnvID(envID)
@@ -135,6 +150,23 @@ func (o *GetEnvironmentMetricsParams) WriteToRequest(r runtime.ClientRequest, re
 		return err
 	}
 	var res []error
+
+	if o.Duration != nil {
+
+		// query param duration
+		var qrDuration float64
+
+		if o.Duration != nil {
+			qrDuration = *o.Duration
+		}
+		qDuration := swag.FormatFloat64(qrDuration)
+		if qDuration != "" {
+
+			if err := r.SetQueryParam("duration", qDuration); err != nil {
+				return err
+			}
+		}
+	}
 
 	// path param envId
 	if err := r.SetPathParam("envId", o.EnvID); err != nil {
