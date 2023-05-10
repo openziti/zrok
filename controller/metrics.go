@@ -34,12 +34,12 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", params.Duration, principal.Email, err)
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
 	}
-	slice := duration / 50
+	slice := duration / 30
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -108,12 +108,12 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", params.Duration, principal.Email, err)
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
 	}
-	slice := duration / 50
+	slice := duration / 30
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -188,12 +188,12 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", params.Duration, principal.Email, err)
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
 	}
-	slice := duration / 50
+	slice := duration / 30
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
