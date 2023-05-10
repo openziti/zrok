@@ -39,7 +39,7 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 		}
 		duration = v
 	}
-	slice := duration / 30
+	slice := sliceSize(duration)
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -109,7 +109,7 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 		}
 		duration = v
 	}
-	slice := duration / 30
+	slice := sliceSize(duration)
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -189,7 +189,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 		}
 		duration = v
 	}
-	slice := duration / 30
+	slice := sliceSize(duration)
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -238,4 +238,17 @@ func runFluxForRxTxArray(query string, queryApi api.QueryAPI) (rx, tx, timestamp
 		}
 	}
 	return rx, tx, timestamps, nil
+}
+
+func sliceSize(duration time.Duration) time.Duration {
+	switch duration {
+	case 30 * 24 * time.Hour:
+		return 24 * time.Hour
+	case 7 * 24 * time.Hour:
+		return 20 * time.Minute
+	case 24 * time.Hour:
+		return 5 * time.Minute
+	default:
+		return duration
+	}
 }
