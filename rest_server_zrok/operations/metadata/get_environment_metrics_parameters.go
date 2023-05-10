@@ -12,7 +12,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 )
 
 // NewGetEnvironmentMetricsParams creates a new GetEnvironmentMetricsParams object
@@ -40,7 +39,7 @@ type GetEnvironmentMetricsParams struct {
 	  Required: true
 	  In: path
 	*/
-	EnvID float64
+	EnvID string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -96,12 +95,7 @@ func (o *GetEnvironmentMetricsParams) bindEnvID(rawData []string, hasKey bool, f
 
 	// Required: true
 	// Parameter is provided by construction from the route
-
-	value, err := swag.ConvertFloat64(raw)
-	if err != nil {
-		return errors.InvalidType("envId", "path", "float64", raw)
-	}
-	o.EnvID = value
+	o.EnvID = raw
 
 	return nil
 }

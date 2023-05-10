@@ -14,7 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 )
 
 // NewGetEnvironmentMetricsParams creates a new GetEnvironmentMetricsParams object,
@@ -66,7 +65,7 @@ type GetEnvironmentMetricsParams struct {
 	Duration *string
 
 	// EnvID.
-	EnvID float64
+	EnvID string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -133,13 +132,13 @@ func (o *GetEnvironmentMetricsParams) SetDuration(duration *string) {
 }
 
 // WithEnvID adds the envID to the get environment metrics params
-func (o *GetEnvironmentMetricsParams) WithEnvID(envID float64) *GetEnvironmentMetricsParams {
+func (o *GetEnvironmentMetricsParams) WithEnvID(envID string) *GetEnvironmentMetricsParams {
 	o.SetEnvID(envID)
 	return o
 }
 
 // SetEnvID adds the envId to the get environment metrics params
-func (o *GetEnvironmentMetricsParams) SetEnvID(envID float64) {
+func (o *GetEnvironmentMetricsParams) SetEnvID(envID string) {
 	o.EnvID = envID
 }
 
@@ -169,7 +168,7 @@ func (o *GetEnvironmentMetricsParams) WriteToRequest(r runtime.ClientRequest, re
 	}
 
 	// path param envId
-	if err := r.SetPathParam("envId", swag.FormatFloat64(o.EnvID)); err != nil {
+	if err := r.SetPathParam("envId", o.EnvID); err != nil {
 		return err
 	}
 

@@ -425,7 +425,7 @@ paths:
       parameters:
         - name: envId
           in: path
-          type: number
+          type: string
           required: true
         - name: duration
           in: query

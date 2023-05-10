@@ -6,6 +6,7 @@ import {mdiConsoleNetwork} from "@mdi/js";
 import {getEnvironmentDetail} from "../../../api/metadata";
 import DetailTab from "./DetailTab";
 import ActionsTab from "./ActionsTab";
+import MetricsTab from "./MetricsTab";
 
 const EnvironmentDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -24,6 +25,9 @@ const EnvironmentDetail = (props) => {
                 <Tabs defaultActiveKey={"shares"} className={"mb-3"}>
                     <Tab eventKey={"shares"} title={"Shares"}>
                         <SharesTab selection={props.selection} />
+                    </Tab>
+                    <Tab eventKey={"metrics"} title={"Metrics"}>
+                        <MetricsTab selection={props.selection} />
                     </Tab>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <DetailTab environment={detail.environment} />

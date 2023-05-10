@@ -7,6 +7,7 @@ import React, {useEffect, useState} from "react";
 import * as metadata from "../../../api/metadata";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import moment from "moment";
+import {buildMetrics, bytesToSize} from "../../metrics";
 
 const AccountDetail = (props) => {
     const customProperties = {
@@ -28,7 +29,7 @@ const AccountDetail = (props) => {
     );
 }
 
-const MetricsTab = (props) => {
+const MetricsTab = () => {
     const [metrics30, setMetrics30] = useState(buildMetrics([]));
     const [metrics7, setMetrics7] = useState(buildMetrics([]));
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
@@ -145,40 +146,6 @@ const MetricsTab = (props) => {
             </Row>
         </Container>
     );
-}
-
-const buildMetrics = (m) => {
-    let metrics = {
-        data: m.samples,
-        rx: 0,
-        tx: 0
-    }
-    if(m.samples) {
-        m.samples.forEach(s => {
-            metrics.rx += s.rx;
-            metrics.tx += s.tx;
-        });
-    }
-    return metrics;
-}
-
-const bytesToSize = (sz) => {
-    let absSz = sz;
-    if(absSz < 0) {
-        absSz *= -1;
-    }
-    const unit = 1000
-    if(absSz < unit) {
-        return '' + absSz + ' B';
-    }
-    let div = unit
-    let exp = 0
-    for(let n = absSz / unit; n >= unit; n /= unit) {
-        div *= unit;
-        exp++;
-    }
-
-    return '' + (sz / div).toFixed(1) + ' ' + "kMGTPE"[exp] + 'B';
 }
 
 export default AccountDetail;

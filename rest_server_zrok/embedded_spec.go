@@ -567,7 +567,7 @@ func init() {
         "operationId": "getEnvironmentMetrics",
         "parameters": [
           {
-            "type": "number",
+            "type": "string",
             "name": "envId",
             "in": "path",
             "required": true
@@ -2003,7 +2003,7 @@ func init() {
         "operationId": "getEnvironmentMetrics",
         "parameters": [
           {
-            "type": "number",
+            "type": "string",
             "name": "envId",
             "in": "path",
             "required": true

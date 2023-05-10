@@ -94,13 +94,9 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 		return metadata.NewGetEnvironmentMetricsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
-	env, err := str.GetEnvironment(int(params.EnvID), trx)
+	env, err := str.FindEnvironmentForAccount(params.EnvID, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environment '%d': %v", int(params.EnvID), err)
-		return metadata.NewGetEnvironmentMetricsUnauthorized()
-	}
-	if int64(env.Id) != principal.ID {
-		logrus.Errorf("unauthorized environemnt '%d' for '%v'", int(params.EnvID), principal.Email)
+		logrus.Errorf("error finding environment '%s' for '%s': %v", params.EnvID, principal.Email, err)
 		return metadata.NewGetEnvironmentMetricsUnauthorized()
 	}
 
