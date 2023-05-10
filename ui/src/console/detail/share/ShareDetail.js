@@ -7,6 +7,7 @@ import {Tab, Tabs} from "react-bootstrap";
 import ActionsTab from "./ActionsTab";
 import SecretToggle from "../../SecretToggle";
 import {Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis} from "recharts";
+import MetricsTab from "./MetricsTab";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -62,7 +63,10 @@ const ShareDetail = (props) => {
         return (
             <div>
                 <h2><Icon path={mdiShareVariant} size={2} />{" "}{detail.backendProxyEndpoint}</h2>
-                <Tabs defaultActiveKey={"detail"}>
+                <Tabs defaultActiveKey={"metrics"}>
+                    <Tab eventKey={"metrics"} title={"Metrics"}>
+                        <MetricsTab share={detail} />
+                    </Tab>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <PropertyTable object={detail} custom={customProperties} />
                     </Tab>

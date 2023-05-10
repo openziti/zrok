@@ -55,7 +55,6 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                     type: "share",
                     val: 50
                 };
-                console.log('share', shrNode.label);
                 newGraph.nodes.push(shrNode);
                 newGraph.links.push({
                     target: envNode.id,

@@ -175,7 +175,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 		logrus.Errorf("error finding environment '%d' for '%v': %v", shr.EnvironmentId, principal.Email, err)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
-	if int64(env.Id) != principal.ID {
+	if env.AccountId != nil && int64(*env.AccountId) != principal.ID {
 		logrus.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShrToken)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}

@@ -10,8 +10,6 @@ const MetricsTab = (props) => {
 	const [metrics7, setMetrics7] = useState(buildMetrics([]));
 	const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
-	console.log("selection", props.selection);
-
 	useEffect(() => {
 		metadata.getEnvironmentMetrics(props.selection.id)
 			.then(resp => {
