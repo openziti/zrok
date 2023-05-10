@@ -39,7 +39,7 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 		}
 		duration = v
 	}
-	slice := duration / 200
+	slice := duration / 50
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -113,7 +113,7 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 		}
 		duration = v
 	}
-	slice := duration / 200
+	slice := duration / 50
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
@@ -193,7 +193,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 		}
 		duration = v
 	}
-	slice := duration / 200
+	slice := duration / 50
 
 	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
 		fmt.Sprintf("|> range(start: -%v)\n", duration) +
