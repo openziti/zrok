@@ -26,11 +26,11 @@ const EnvironmentDetail = (props) => {
                     <Tab eventKey={"shares"} title={"Shares"}>
                         <SharesTab selection={props.selection} />
                     </Tab>
-                    <Tab eventKey={"metrics"} title={"Metrics"}>
-                        <MetricsTab selection={props.selection} />
-                    </Tab>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <DetailTab environment={detail.environment} />
+                    </Tab>
+                    <Tab eventKey={"metrics"} title={"Metrics"}>
+                        <MetricsTab selection={props.selection} />
                     </Tab>
                     <Tab eventKey={"actions"} title={"Actions"}>
                         <ActionsTab environment={detail.environment} />

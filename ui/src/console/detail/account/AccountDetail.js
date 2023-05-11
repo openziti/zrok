@@ -16,12 +16,12 @@ const AccountDetail = (props) => {
     return (
         <div>
             <h2><Icon path={mdiAccountBox} size={2} />{" "}{props.user.email}</h2>
-            <Tabs defaultActiveKey={"metrics"}>
-                <Tab eventKey={"metrics"} title={"Metrics"}>
-                    <MetricsTab />
-                </Tab>
+            <Tabs defaultActiveKey={"detail"}>
                 <Tab eventKey={"detail"} title={"Detail"}>
                     <PropertyTable object={props.user} custom={customProperties}/>
+                </Tab>
+                <Tab eventKey={"metrics"} title={"Metrics"}>
+                    <MetricsTab />
                 </Tab>
             </Tabs>
         </div>

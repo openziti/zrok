@@ -64,12 +64,12 @@ const ShareDetail = (props) => {
         return (
             <div>
                 <h2><Icon path={mdiShareVariant} size={2} />{" "}{detail.backendProxyEndpoint}</h2>
-                <Tabs defaultActiveKey={"metrics"}>
-                    <Tab eventKey={"metrics"} title={"Metrics"}>
-                        <MetricsTab share={detail} />
-                    </Tab>
+                <Tabs defaultActiveKey={"detail"}>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <PropertyTable object={detail} custom={customProperties} />
+                    </Tab>
+                    <Tab eventKey={"metrics"} title={"Metrics"}>
+                        <MetricsTab share={detail} />
                     </Tab>
                     <Tab eventKey={"actions"} title={"Actions"}>
                         <ActionsTab share={detail} />
