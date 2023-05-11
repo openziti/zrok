@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {buildMetrics, bytesToSize} from "../../metrics";
+import {buildMetrics} from "../../metrics";
 import * as metadata from "../../../api/metadata";
 import MetricsView from "../../metrics/MetricsView";
 
