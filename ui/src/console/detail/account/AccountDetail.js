@@ -5,7 +5,7 @@ import {Tab, Tabs} from "react-bootstrap";
 import SecretToggle from "../../SecretToggle";
 import React, {useEffect, useState} from "react";
 import * as metadata from "../../../api/metadata";
-import {buildMetrics} from "../../metrics";
+import {buildMetrics} from "../../metrics/util";
 import MetricsView from "../../metrics/MetricsView";
 
 const AccountDetail = (props) => {

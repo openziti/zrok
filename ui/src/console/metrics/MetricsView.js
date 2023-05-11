@@ -1,5 +1,5 @@
 import {Col, Container, Row, Tooltip} from "react-bootstrap";
-import {bytesToSize} from "../metrics";
+import {bytesToSize} from "./util";
 import {Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis} from "recharts";
 import moment from "moment/moment";
 import React from "react";
