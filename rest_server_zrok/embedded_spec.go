@@ -1266,6 +1266,9 @@ func init() {
     "share": {
       "type": "object",
       "properties": {
+        "activity": {
+          "$ref": "#/definitions/sparkData"
+        },
         "backendMode": {
           "type": "string"
         },
@@ -1286,9 +1289,6 @@ func init() {
         },
         "shareMode": {
           "type": "string"
-        },
-        "sparkData": {
-          "$ref": "#/definitions/sparkData"
         },
         "token": {
           "type": "string"
@@ -2713,6 +2713,9 @@ func init() {
     "share": {
       "type": "object",
       "properties": {
+        "activity": {
+          "$ref": "#/definitions/sparkData"
+        },
         "backendMode": {
           "type": "string"
         },
@@ -2733,9 +2736,6 @@ func init() {
         },
         "shareMode": {
           "type": "string"
-        },
-        "sparkData": {
-          "$ref": "#/definitions/sparkData"
         },
         "token": {
           "type": "string"

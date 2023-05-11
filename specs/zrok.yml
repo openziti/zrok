@@ -844,7 +844,7 @@ definitions:
         type: string
       reserved:
         type: boolean
-      sparkData:
+      activity:
         $ref: "#/definitions/sparkData"
       createdAt:
         type: integer

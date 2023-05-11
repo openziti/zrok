@@ -200,7 +200,7 @@
  * @property {string} frontendEndpoint 
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
- * @property {module:types.sparkData} sparkData 
+ * @property {module:types.sparkData} activity 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */

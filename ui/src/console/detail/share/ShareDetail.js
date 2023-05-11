@@ -40,7 +40,7 @@ const ShareDetail = (props) => {
     }, [props.selection]);
 
     const customProperties = {
-        sparkData: row => (
+        activity: row => (
             <ResponsiveContainer width={"100%"} height={"100%"}>
                 <AreaChart data={row.value}>
                     <Area type={"basis"} dataKey={(v) => v.rx ? v.rx : 0} stroke={"#231069"} fill={"#04adef"} isAnimationActive={false} dot={false} />

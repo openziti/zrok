@@ -77,7 +77,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		FrontendEndpoint:     feEndpoint,
 		BackendProxyEndpoint: beProxyEndpoint,
 		Reserved:             shr.Reserved,
-		SparkData:            sparkData,
+		Activity:             sparkData,
 		CreatedAt:            shr.CreatedAt.UnixMilli(),
 		UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 	})

@@ -18,6 +18,9 @@ import (
 // swagger:model share
 type Share struct {
 
+	// activity
+	Activity SparkData `json:"activity,omitempty"`
+
 	// backend mode
 	BackendMode string `json:"backendMode,omitempty"`
 
@@ -39,9 +42,6 @@ type Share struct {
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
 
-	// spark data
-	SparkData SparkData `json:"sparkData,omitempty"`
-
 	// token
 	Token string `json:"token,omitempty"`
 
@@ -56,7 +56,7 @@ type Share struct {
 func (m *Share) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateSparkData(formats); err != nil {
+	if err := m.validateActivity(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,16 +66,16 @@ func (m *Share) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Share) validateSparkData(formats strfmt.Registry) error {
-	if swag.IsZero(m.SparkData) { // not required
+func (m *Share) validateActivity(formats strfmt.Registry) error {
+	if swag.IsZero(m.Activity) { // not required
 		return nil
 	}
 
-	if err := m.SparkData.Validate(formats); err != nil {
+	if err := m.Activity.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sparkData")
+			return ve.ValidateName("activity")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("sparkData")
+			return ce.ValidateName("activity")
 		}
 		return err
 	}
@@ -87,7 +87,7 @@ func (m *Share) validateSparkData(formats strfmt.Registry) error {
 func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateSparkData(ctx, formats); err != nil {
+	if err := m.contextValidateActivity(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -97,13 +97,13 @@ func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	return nil
 }
 
-func (m *Share) contextValidateSparkData(ctx context.Context, formats strfmt.Registry) error {
+func (m *Share) contextValidateActivity(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := m.SparkData.ContextValidate(ctx, formats); err != nil {
+	if err := m.Activity.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sparkData")
+			return ve.ValidateName("activity")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("sparkData")
+			return ce.ValidateName("activity")
 		}
 		return err
 	}

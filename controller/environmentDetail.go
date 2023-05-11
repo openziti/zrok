@@ -76,7 +76,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 			FrontendEndpoint:     feEndpoint,
 			BackendProxyEndpoint: beProxyEndpoint,
 			Reserved:             shr.Reserved,
-			SparkData:            sparkData,
+			Activity:             sparkData,
 			CreatedAt:            shr.CreatedAt.UnixMilli(),
 			UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 		})
