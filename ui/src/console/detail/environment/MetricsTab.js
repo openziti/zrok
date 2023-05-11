@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {buildMetrics, bytesToSize} from "../../metrics";
+import {buildMetrics} from "../../metrics";
 import * as metadata from "../../../api/metadata";
-import {Col, Container, Row, Tooltip} from "react-bootstrap";
-import {Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis} from "recharts";
-import moment from "moment/moment";
+import MetricsView from "../../metrics/MetricsView";
 
 const MetricsTab = (props) => {
 	const [metrics30, setMetrics30] = useState(buildMetrics([]));
@@ -50,77 +48,7 @@ const MetricsTab = (props) => {
 	}, []);
 
 	return (
-		<Container>
-			<Row>
-				<Col>
-					<h3>Last 30 Days:</h3>
-				</Col>
-			</Row>
-			<Row>
-				<Col><p>Received: {bytesToSize(metrics30.rx)}</p></Col>
-				<Col><p>Sent: {bytesToSize(metrics30.tx)}</p></Col>
-			</Row>
-			<Row>
-				<Col>
-					<ResponsiveContainer width={"100%"} height={150}>
-						<BarChart data={metrics30.data}>
-							<CartesianGrid strokeDasharay={"3 3"} />
-							<XAxis dataKey={(v) => v.timestamp} scale={"time"} tickFormatter={(v) => moment(v).format("MMM DD") } style={{ fontSize: '75%'}}/>
-							<YAxis tickFormatter={(v) => bytesToSize(v)} style={{ fontSize: '75%' }}/>
-							<Bar stroke={"#231069"} fill={"#04adef"} dataKey={"rx"} legendType={"circle"}/>
-							<Bar stroke={"#231069"} fill={"#9BF316"} dataKey={"tx"} />
-							<Tooltip />
-						</BarChart>
-					</ResponsiveContainer>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					<h3>Last 7 Days:</h3>
-				</Col>
-			</Row>
-			<Row>
-				<Col><p>Received: {bytesToSize(metrics7.rx)}</p></Col>
-				<Col><p>Sent: {bytesToSize(metrics7.tx)}</p></Col>
-			</Row>
-			<Row>
-				<Col>
-					<ResponsiveContainer width={"100%"} height={150}>
-						<BarChart data={metrics7.data}>
-							<CartesianGrid strokeDasharay={"3 3"} />
-							<XAxis dataKey={(v) => v.timestamp} scale={"time"} tickFormatter={(v) => moment(v).format("MMM DD") } style={{ fontSize: '75%'}}/>
-							<YAxis tickFormatter={(v) => bytesToSize(v)} style={{ fontSize: '75%' }}/>
-							<Bar stroke={"#231069"} fill={"#04adef"} dataKey={"rx"} legendType={"circle"}/>
-							<Bar stroke={"#231069"} fill={"#9BF316"} dataKey={"tx"} />
-							<Tooltip />
-						</BarChart>
-					</ResponsiveContainer>
-				</Col>
-			</Row>
-			<Row>
-				<Col>
-					<h3>Last 24 Hours:</h3>
-				</Col>
-			</Row>
-			<Row>
-				<Col><p>Received: {bytesToSize(metrics1.rx)}</p></Col>
-				<Col><p>Sent: {bytesToSize(metrics1.tx)}</p></Col>
-			</Row>
-			<Row>
-				<Col>
-					<ResponsiveContainer width={"100%"} height={150}>
-						<BarChart data={metrics1.data}>
-							<CartesianGrid strokeDasharay={"3 3"} />
-							<XAxis dataKey={(v) => v.timestamp} scale={"time"} tickFormatter={(v) => moment(v).format("MMM DD") } style={{ fontSize: '75%'}}/>
-							<YAxis tickFormatter={(v) => bytesToSize(v)} style={{ fontSize: '75%' }}/>
-							<Bar stroke={"#231069"} fill={"#04adef"} dataKey={"rx"} legendType={"circle"}/>
-							<Bar stroke={"#231069"} fill={"#9BF316"} dataKey={"tx"} />
-							<Tooltip />
-						</BarChart>
-					</ResponsiveContainer>
-				</Col>
-			</Row>
-		</Container>
+		<MetricsView metrics30={metrics30} metrics7={metrics7} metrics1={metrics1} />
 	);
 };
 
