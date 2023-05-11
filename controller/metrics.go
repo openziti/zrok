@@ -227,14 +227,21 @@ func runFluxForRxTxArray(query string, queryApi api.QueryAPI) (rx, tx, timestamp
 		return nil, nil, nil, err
 	}
 	for result.Next() {
-		if v, ok := result.Record().Value().(int64); ok {
-			switch result.Record().Field() {
-			case "rx":
-				rx = append(rx, float64(v))
-				timestamps = append(timestamps, float64(result.Record().Time().UnixMilli()))
-			case "tx":
-				tx = append(tx, float64(v))
+		switch result.Record().Field() {
+		case "rx":
+			rxV := int64(0)
+			if v, ok := result.Record().Value().(int64); ok {
+				rxV = v
 			}
+			rx = append(rx, float64(rxV))
+			timestamps = append(timestamps, float64(result.Record().Time().UnixMilli()))
+
+		case "tx":
+			txV := int64(0)
+			if v, ok := result.Record().Value().(int64); ok {
+				txV = v
+			}
+			tx = append(tx, float64(txV))
 		}
 	}
 	return rx, tx, timestamps, nil
@@ -245,9 +252,9 @@ func sliceSize(duration time.Duration) time.Duration {
 	case 30 * 24 * time.Hour:
 		return 24 * time.Hour
 	case 7 * 24 * time.Hour:
-		return 20 * time.Minute
+		return 4 * time.Hour
 	case 24 * time.Hour:
-		return 5 * time.Minute
+		return 30 * time.Minute
 	default:
 		return duration
 	}

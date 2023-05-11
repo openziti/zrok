@@ -1,4 +1,5 @@
 export const buildMetrics = (m) => {
+    console.log("build", m);
     let metrics = {
         data: m.samples,
         rx: 0,
@@ -6,8 +7,8 @@ export const buildMetrics = (m) => {
     }
     if(m.samples) {
         m.samples.forEach(s => {
-            metrics.rx += s.rx;
-            metrics.tx += s.tx;
+            metrics.rx += s.rx ? s.rx : 0;
+            metrics.tx += s.tx ? s.tx : 0;
         });
     }
     return metrics;
