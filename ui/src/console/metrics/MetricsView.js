@@ -1,6 +1,6 @@
-import {Col, Container, Row, Tooltip} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import {bytesToSize} from "./util";
-import {Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis} from "recharts";
 import moment from "moment/moment";
 import React from "react";
 
@@ -46,14 +46,13 @@ const MetricsGraph = (props) => {
         <Row>
             <Col>
                 <ResponsiveContainer width={"100%"} height={150}>
-                    <BarChart data={props.metrics.data}>
+                    <AreaChart data={props.metrics.data}>
                         <CartesianGrid strokeDasharay={"3 3"} />
                         <XAxis dataKey={(v) => v.timestamp} scale={"time"} tickFormatter={(v) => moment(v).format("MMM DD") } style={{ fontSize: '75%'}}/>
                         <YAxis tickFormatter={(v) => bytesToSize(v)} style={{ fontSize: '75%' }}/>
-                        <Bar stroke={"#231069"} fill={"#04adef"} dataKey={(v) => v.rx ? v.rx : 0} />
-                        <Bar stroke={"#231069"} fill={"#9BF316"} dataKey={(v) => v.tx ? v.tx : 0} />
-                        <Tooltip />
-                    </BarChart>
+                        <Area type={"basis"} stroke={"#231069"} fill={"#9BF316"} dataKey={(v) => v.tx ? v.tx : 0} stackId={"1"} />
+                        <Area type={"basis"} stroke={"#231069"} fill={"#04adef"} dataKey={(v) => v.rx ? v.rx : 0} stackId={"1"} />
+                    </AreaChart>
                 </ResponsiveContainer>
             </Col>
         </Row>

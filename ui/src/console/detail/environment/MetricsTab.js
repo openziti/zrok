@@ -21,7 +21,7 @@ const MetricsTab = (props) => {
 			.then(resp => {
 				setMetrics1(buildMetrics(resp.data));
 			});
-	}, []);
+	}, [props.selection.id]);
 
 	useEffect(() => {
 		let mounted = true;
@@ -45,7 +45,7 @@ const MetricsTab = (props) => {
 			mounted = false;
 			clearInterval(interval);
 		}
-	}, []);
+	}, [props.selection.id]);
 
 	return (
 		<MetricsView metrics30={metrics30} metrics7={metrics7} metrics1={metrics1} />

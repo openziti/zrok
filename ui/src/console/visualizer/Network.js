@@ -48,6 +48,8 @@ const Network = (props) => {
             case "account":
                 nodeIcon.addPath(accountIcon, xform);
                 break;
+            default:
+                break;
         }
 
         ctx.fill(nodeIcon);
