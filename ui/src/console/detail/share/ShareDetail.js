@@ -6,7 +6,7 @@ import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
 import ActionsTab from "./ActionsTab";
 import SecretToggle from "../../SecretToggle";
-import {Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis} from "recharts";
+import {Area, AreaChart, ResponsiveContainer} from "recharts";
 import MetricsTab from "./MetricsTab";
 
 const ShareDetail = (props) => {
@@ -40,10 +40,11 @@ const ShareDetail = (props) => {
     }, [props.selection]);
 
     const customProperties = {
-        metrics: row => (
+        sparkData: row => (
             <ResponsiveContainer width={"100%"} height={"100%"}>
                 <AreaChart data={row.value}>
-                    <Area type="basis" dataKey={(v) => v} stroke={"#777"} fillOpacity={0.5} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                    <Area type={"basis"} dataKey={(v) => v.rx ? v.rx : 0} stroke={"#231069"} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                    <Area type={"basis"} dataKey={(v) => v.tx ? v.tx * -1 : 0} stroke={"#231069"} fill={"#9BF316"} isAnimationActive={false} dot={false} />
                 </AreaChart>
             </ResponsiveContainer>
         ),

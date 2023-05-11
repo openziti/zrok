@@ -1281,14 +1281,14 @@ func init() {
         "frontendSelection": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/shareMetrics"
-        },
         "reserved": {
           "type": "boolean"
         },
         "shareMode": {
           "type": "string"
+        },
+        "sparkData": {
+          "$ref": "#/definitions/sparkData"
         },
         "token": {
           "type": "string"
@@ -1299,12 +1299,6 @@ func init() {
         "zId": {
           "type": "string"
         }
-      }
-    },
-    "shareMetrics": {
-      "type": "array",
-      "items": {
-        "type": "integer"
       }
     },
     "shareRequest": {
@@ -1370,6 +1364,23 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sparkData": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/sparkDataSample"
+      }
+    },
+    "sparkDataSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
       }
     },
     "unaccessRequest": {
@@ -2717,14 +2728,14 @@ func init() {
         "frontendSelection": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/shareMetrics"
-        },
         "reserved": {
           "type": "boolean"
         },
         "shareMode": {
           "type": "string"
+        },
+        "sparkData": {
+          "$ref": "#/definitions/sparkData"
         },
         "token": {
           "type": "string"
@@ -2735,12 +2746,6 @@ func init() {
         "zId": {
           "type": "string"
         }
-      }
-    },
-    "shareMetrics": {
-      "type": "array",
-      "items": {
-        "type": "integer"
       }
     },
     "shareRequest": {
@@ -2806,6 +2811,23 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sparkData": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/sparkDataSample"
+      }
+    },
+    "sparkDataSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
       }
     },
     "unaccessRequest": {

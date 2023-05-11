@@ -45,8 +45,9 @@ const SharesTab = (props) => {
             name: "Activity",
             cell: row => {
                 return <ResponsiveContainer width={"100%"} height={"100%"}>
-                    <AreaChart data={row.metrics}>
-                        <Area type="basis" dataKey={(v) => v} stroke={"#777"} fillOpacity={0.5} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                    <AreaChart data={row.sparkData}>
+                        <Area type={"linear"} dataKey={(v) => v.rx ? v.rx : 0} stroke={"#231069"} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                        <Area type={"linear"} dataKey={(v) => v.tx ? v.tx * -1 : 0} stroke={"#231069"} fill={"#9BF316"} isAnimationActive={false} dot={false} />
                     </AreaChart>
                 </ResponsiveContainer>
             }

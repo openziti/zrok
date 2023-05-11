@@ -33,14 +33,14 @@ type Share struct {
 	// frontend selection
 	FrontendSelection string `json:"frontendSelection,omitempty"`
 
-	// metrics
-	Metrics ShareMetrics `json:"metrics,omitempty"`
-
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
+
+	// spark data
+	SparkData SparkData `json:"sparkData,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`
@@ -56,7 +56,7 @@ type Share struct {
 func (m *Share) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateMetrics(formats); err != nil {
+	if err := m.validateSparkData(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,16 +66,16 @@ func (m *Share) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Share) validateMetrics(formats strfmt.Registry) error {
-	if swag.IsZero(m.Metrics) { // not required
+func (m *Share) validateSparkData(formats strfmt.Registry) error {
+	if swag.IsZero(m.SparkData) { // not required
 		return nil
 	}
 
-	if err := m.Metrics.Validate(formats); err != nil {
+	if err := m.SparkData.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("metrics")
+			return ve.ValidateName("sparkData")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("metrics")
+			return ce.ValidateName("sparkData")
 		}
 		return err
 	}
@@ -87,7 +87,7 @@ func (m *Share) validateMetrics(formats strfmt.Registry) error {
 func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateMetrics(ctx, formats); err != nil {
+	if err := m.contextValidateSparkData(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -97,13 +97,13 @@ func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	return nil
 }
 
-func (m *Share) contextValidateMetrics(ctx context.Context, formats strfmt.Registry) error {
+func (m *Share) contextValidateSparkData(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := m.Metrics.ContextValidate(ctx, formats); err != nil {
+	if err := m.SparkData.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("metrics")
+			return ve.ValidateName("sparkData")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("metrics")
+			return ce.ValidateName("sparkData")
 		}
 		return err
 	}

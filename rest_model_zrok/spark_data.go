@@ -14,13 +14,13 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ShareMetrics share metrics
+// SparkData spark data
 //
-// swagger:model shareMetrics
-type ShareMetrics []*ShareMetricsSample
+// swagger:model sparkData
+type SparkData []*SparkDataSample
 
-// Validate validates this share metrics
-func (m ShareMetrics) Validate(formats strfmt.Registry) error {
+// Validate validates this spark data
+func (m SparkData) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {
@@ -47,8 +47,8 @@ func (m ShareMetrics) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this share metrics based on the context it is used
-func (m ShareMetrics) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this spark data based on the context it is used
+func (m SparkData) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {

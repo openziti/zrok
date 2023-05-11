@@ -200,9 +200,17 @@
  * @property {string} frontendEndpoint 
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
- * @property {module:types.shareMetrics} metrics 
+ * @property {module:types.sparkData} sparkData 
  * @property {number} createdAt 
  * @property {number} updatedAt 
+ */
+
+/**
+ * @typedef sparkDataSample
+ * @memberof module:types
+ * 
+ * @property {number} rx 
+ * @property {number} tx 
  */
 
 /**

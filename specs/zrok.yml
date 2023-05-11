@@ -844,8 +844,8 @@ definitions:
         type: string
       reserved:
         type: boolean
-      metrics:
-        $ref: "#/definitions/shareMetrics"
+      sparkData:
+        $ref: "#/definitions/sparkData"
       createdAt:
         type: integer
       updatedAt:
@@ -856,10 +856,18 @@ definitions:
     items:
       $ref: "#/definitions/share"
 
-  shareMetrics:
+  sparkData:
     type: array
     items:
-      type: integer
+      $ref: "#/definitions/sparkDataSample"
+
+  sparkDataSample:
+    type: object
+    properties:
+      rx:
+        type: number
+      tx:
+        type: number
 
   shareRequest:
     type: object
