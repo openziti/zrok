@@ -7,9 +7,12 @@ package account
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ResetPasswordReader is a Reader for the ResetPassword structure.
@@ -28,6 +31,12 @@ func (o *ResetPasswordReader) ReadResponse(response runtime.ClientResponse, cons
 		return result, nil
 	case 404:
 		result := NewResetPasswordNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 422:
+		result := NewResetPasswordUnprocessableEntity()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -141,6 +150,67 @@ func (o *ResetPasswordNotFound) String() string {
 }
 
 func (o *ResetPasswordNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewResetPasswordUnprocessableEntity creates a ResetPasswordUnprocessableEntity with default headers values
+func NewResetPasswordUnprocessableEntity() *ResetPasswordUnprocessableEntity {
+	return &ResetPasswordUnprocessableEntity{}
+}
+
+/*
+ResetPasswordUnprocessableEntity describes a response with status code 422, with default header values.
+
+password validation failure
+*/
+type ResetPasswordUnprocessableEntity struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+// IsSuccess returns true when this reset password unprocessable entity response has a 2xx status code
+func (o *ResetPasswordUnprocessableEntity) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this reset password unprocessable entity response has a 3xx status code
+func (o *ResetPasswordUnprocessableEntity) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this reset password unprocessable entity response has a 4xx status code
+func (o *ResetPasswordUnprocessableEntity) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this reset password unprocessable entity response has a 5xx status code
+func (o *ResetPasswordUnprocessableEntity) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this reset password unprocessable entity response a status code equal to that given
+func (o *ResetPasswordUnprocessableEntity) IsCode(code int) bool {
+	return code == 422
+}
+
+func (o *ResetPasswordUnprocessableEntity) Error() string {
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+}
+
+func (o *ResetPasswordUnprocessableEntity) String() string {
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+}
+
+func (o *ResetPasswordUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *ResetPasswordUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

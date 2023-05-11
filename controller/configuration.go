@@ -28,5 +28,14 @@ func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middlewar
 		data.TouLink = cfg.Admin.TouLink
 		data.InviteTokenContact = cfg.Admin.InviteTokenContact
 	}
+	if cfg.PasswordRequirements != nil {
+		data.PasswordRequirements = &rest_model_zrok.PasswordRequirements{
+			Length:                 int64(cfg.PasswordRequirements.Length),
+			RequireCapital:         cfg.PasswordRequirements.RequireCapital,
+			RequireNumeric:         cfg.PasswordRequirements.RequireNumeric,
+			RequireSpecial:         cfg.PasswordRequirements.RequireSpecial,
+			ValidSpecialCharacters: cfg.PasswordRequirements.ValidSpecialCharacters,
+		}
+	}
 	return metadata.NewConfigurationOK().WithPayload(data)
 }

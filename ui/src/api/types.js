@@ -34,6 +34,7 @@
  * @property {boolean} invitesOpen 
  * @property {boolean} requiresInviteToken 
  * @property {string} inviteTokenContact 
+ * @property {module:types.passwordRequirements} passwordRequirements 
  */
 
 /**
@@ -164,6 +165,17 @@
  * 
  * @property {boolean} accountLimited 
  * @property {module:types.environmentAndResources[]} environments 
+ */
+
+/**
+ * @typedef passwordRequirements
+ * @memberof module:types
+ * 
+ * @property {number} length 
+ * @property {boolean} requireCapital 
+ * @property {boolean} requireNumeric 
+ * @property {boolean} requireSpecial 
+ * @property {string} validSpecialCharacters 
  */
 
 /**

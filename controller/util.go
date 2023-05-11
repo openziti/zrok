@@ -1,13 +1,16 @@
 package controller
 
 import (
+	"fmt"
+	"net/http"
+	"strings"
+	"unicode"
+
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
 )
 
 type zrokAuthenticator struct {
@@ -86,4 +89,44 @@ func realRemoteAddress(req *http.Request) string {
 
 func proxyUrl(shrToken, template string) string {
 	return strings.Replace(template, "{token}", shrToken, -1)
+}
+
+func validatePassword(cfg *config.Config, password string) error {
+	if cfg.PasswordRequirements.Length > len(password) {
+		return fmt.Errorf("password length: expected (%d), got (%d)", cfg.PasswordRequirements.Length, len(password))
+	}
+	if cfg.PasswordRequirements.RequireCapital {
+		if !hasCapital(password) {
+			return fmt.Errorf("password requires capital, found none")
+		}
+	}
+	if cfg.PasswordRequirements.RequireNumeric {
+		if !hasNumeric(password) {
+			return fmt.Errorf("password requires numeric, found none")
+		}
+	}
+	if cfg.PasswordRequirements.RequireSpecial {
+		if !strings.ContainsAny(password, cfg.PasswordRequirements.ValidSpecialCharacters) {
+			return fmt.Errorf("password requires special character, found none")
+		}
+	}
+	return nil
+}
+
+func hasCapital(check string) bool {
+	for _, c := range check {
+		if unicode.IsUpper(c) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasNumeric(check string) bool {
+	for _, c := range check {
+		if unicode.IsDigit(c) {
+			return true
+		}
+	}
+	return false
 }

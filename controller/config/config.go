@@ -1,12 +1,13 @@
 package config
 
 import (
+	"time"
+
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/store"
@@ -16,18 +17,19 @@ import (
 const ConfigVersion = 3
 
 type Config struct {
-	V             int
-	Admin         *AdminConfig
-	Bridge        *metrics.BridgeConfig
-	Endpoint      *EndpointConfig
-	Email         *emailUi.Config
-	Limits        *limits.Config
-	Maintenance   *MaintenanceConfig
-	Metrics       *metrics.Config
-	Registration  *RegistrationConfig
-	ResetPassword *ResetPasswordConfig
-	Store         *store.Config
-	Ziti          *zrokEdgeSdk.Config
+	V                    int
+	Admin                *AdminConfig
+	Bridge               *metrics.BridgeConfig
+	Endpoint             *EndpointConfig
+	Email                *emailUi.Config
+	Limits               *limits.Config
+	Maintenance          *MaintenanceConfig
+	Metrics              *metrics.Config
+	Registration         *RegistrationConfig
+	ResetPassword        *ResetPasswordConfig
+	Store                *store.Config
+	Ziti                 *zrokEdgeSdk.Config
+	PasswordRequirements *PaswordRequirementsConfig
 }
 
 type AdminConfig struct {
@@ -45,6 +47,14 @@ type EndpointConfig struct {
 
 type RegistrationConfig struct {
 	RegistrationUrlTemplate string
+}
+
+type PaswordRequirementsConfig struct {
+	Length                 int
+	RequireCapital         bool
+	RequireNumeric         bool
+	RequireSpecial         bool
+	ValidSpecialCharacters string
 }
 
 type ResetPasswordConfig struct {
@@ -71,6 +81,13 @@ type ResetPasswordMaintenanceConfig struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Limits: limits.DefaultConfig(),
+		PasswordRequirements: &PaswordRequirementsConfig{
+			Length:                 8,
+			RequireCapital:         true,
+			RequireNumeric:         true,
+			RequireSpecial:         true,
+			ValidSpecialCharacters: `!@$&*_-., "#%'()+/:;<=>?[\]^{|}~`,
+		},
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{
 				ExpirationTimeout: time.Minute * 15,
