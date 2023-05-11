@@ -37,12 +37,14 @@ const SharesTab = (props) => {
         },
         {
             name: "Backend",
+            grow: 0.5,
             selector: row => row.backendProxyEndpoint,
             sortable: true,
-            hide: "md"
+            hide: "lg"
         },
         {
             name: "Activity",
+            grow: 0.5,
             cell: row => {
                 return <ResponsiveContainer width={"100%"} height={"100%"}>
                     <AreaChart data={row.sparkData}>
