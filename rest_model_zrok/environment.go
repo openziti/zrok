@@ -8,6 +8,7 @@ package rest_model_zrok
 import (
 	"context"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -17,8 +18,8 @@ import (
 // swagger:model environment
 type Environment struct {
 
-	// active
-	Active bool `json:"active,omitempty"`
+	// activity
+	Activity SparkData `json:"activity,omitempty"`
 
 	// address
 	Address string `json:"address,omitempty"`
@@ -41,11 +42,60 @@ type Environment struct {
 
 // Validate validates this environment
 func (m *Environment) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateActivity(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this environment based on context it is used
+func (m *Environment) validateActivity(formats strfmt.Registry) error {
+	if swag.IsZero(m.Activity) { // not required
+		return nil
+	}
+
+	if err := m.Activity.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("activity")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("activity")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this environment based on the context it is used
 func (m *Environment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateActivity(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Environment) contextValidateActivity(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Activity.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("activity")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("activity")
+		}
+		return err
+	}
+
 	return nil
 }
 

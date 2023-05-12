@@ -90,6 +90,30 @@ func init() {
         }
       }
     },
+    "/detail/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountDetail",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environments"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -1065,8 +1089,8 @@ func init() {
     "environment": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
+        "activity": {
+          "$ref": "#/definitions/sparkData"
         },
         "address": {
           "type": "string"
@@ -1537,6 +1561,30 @@ func init() {
         }
       }
     },
+    "/detail/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountDetail",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environments"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -2512,8 +2560,8 @@ func init() {
     "environment": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
+        "activity": {
+          "$ref": "#/definitions/sparkData"
         },
         "address": {
           "type": "string"

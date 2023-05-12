@@ -87,7 +87,7 @@
  * @property {string} host 
  * @property {string} address 
  * @property {string} zId 
- * @property {boolean} active 
+ * @property {module:types.sparkData} activity 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */
@@ -206,14 +206,6 @@
  */
 
 /**
- * @typedef sparkDataSample
- * @memberof module:types
- * 
- * @property {number} rx 
- * @property {number} tx 
- */
-
-/**
  * @typedef shareRequest
  * @memberof module:types
  * 
@@ -233,6 +225,14 @@
  * 
  * @property {string[]} frontendProxyEndpoints 
  * @property {string} shrToken 
+ */
+
+/**
+ * @typedef sparkDataSample
+ * @memberof module:types
+ * 
+ * @property {number} rx 
+ * @property {number} tx 
  */
 
 /**

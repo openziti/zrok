@@ -9,6 +9,12 @@ export function configuration() {
 }
 
 /**
+ */
+export function getAccountDetail() {
+  return gateway.request(getAccountDetailOperation)
+}
+
+/**
  * @param {string} envZId 
  * @return {Promise<module:types.environmentShares>} ok
  */
@@ -102,6 +108,16 @@ export function version() {
 const configurationOperation = {
   path: '/configuration',
   method: 'get'
+}
+
+const getAccountDetailOperation = {
+  path: '/detail/account',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const getEnvironmentDetailOperation = {

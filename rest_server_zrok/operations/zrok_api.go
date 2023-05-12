@@ -70,6 +70,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+		MetadataGetAccountDetailHandler: metadata.GetAccountDetailHandlerFunc(func(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetAccountDetail has not yet been implemented")
+		}),
 		MetadataGetAccountMetricsHandler: metadata.GetAccountMetricsHandlerFunc(func(params metadata.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetAccountMetrics has not yet been implemented")
 		}),
@@ -194,6 +197,8 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
+	// MetadataGetAccountDetailHandler sets the operation handler for the get account detail operation
+	MetadataGetAccountDetailHandler metadata.GetAccountDetailHandler
 	// MetadataGetAccountMetricsHandler sets the operation handler for the get account metrics operation
 	MetadataGetAccountMetricsHandler metadata.GetAccountMetricsHandler
 	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
@@ -335,6 +340,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
+	}
+	if o.MetadataGetAccountDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetAccountDetailHandler")
 	}
 	if o.MetadataGetAccountMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetAccountMetricsHandler")
@@ -523,6 +531,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/account"] = metadata.NewGetAccountDetail(o.context, o.MetadataGetAccountDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

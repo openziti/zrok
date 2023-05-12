@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Configuration(params *ConfigurationParams, opts ...ClientOption) (*ConfigurationOK, error)
 
+	GetAccountDetail(params *GetAccountDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountDetailOK, error)
+
 	GetAccountMetrics(params *GetAccountMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountMetricsOK, error)
 
 	GetEnvironmentDetail(params *GetEnvironmentDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetEnvironmentDetailOK, error)
@@ -84,6 +86,45 @@ func (a *Client) Configuration(params *ConfigurationParams, opts ...ClientOption
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for configuration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetAccountDetail get account detail API
+*/
+func (a *Client) GetAccountDetail(params *GetAccountDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountDetailOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountDetailParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getAccountDetail",
+		Method:             "GET",
+		PathPattern:        "/detail/account",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountDetailReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetAccountDetailOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getAccountDetail: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
