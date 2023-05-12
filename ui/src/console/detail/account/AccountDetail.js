@@ -5,6 +5,7 @@ import {Tab, Tabs} from "react-bootstrap";
 import SecretToggle from "../../SecretToggle";
 import React from "react";
 import MetricsTab from "./MetricsTab";
+import EnvironmentsTab from "./EnvironmentsTab";
 
 const AccountDetail = (props) => {
     const customProperties = {
@@ -14,7 +15,10 @@ const AccountDetail = (props) => {
     return (
         <div>
             <h2><Icon path={mdiAccountBox} size={2} />{" "}{props.user.email}</h2>
-            <Tabs defaultActiveKey={"detail"}>
+            <Tabs defaultActiveKey={"environments"}>
+                <Tab eventKey={"environments"} title={"Environments"}>
+                    <EnvironmentsTab />
+                </Tab>
                 <Tab eventKey={"detail"} title={"Detail"}>
                     <PropertyTable object={props.user} custom={customProperties}/>
                 </Tab>

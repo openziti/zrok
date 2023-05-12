@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/sirupsen/logrus"
+	"strconv"
 )
 
 func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64, err error) {
@@ -26,6 +28,7 @@ func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64
 			"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
 			"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
 			envFilter +
+			"|> drop(columns: [\"share\", \"acctId\"])\n" +
 			"|> aggregateWindow(every: 10s, fn: sum, createEmpty: true)\n"
 
 		result, err := qapi.Query(context.Background(), query)
@@ -34,7 +37,12 @@ func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64
 		}
 
 		for result.Next() {
-			envId := result.Record().ValueByKey("envId").(int64)
+			envIdS := result.Record().ValueByKey("envId").(string)
+			envId, err := strconv.ParseInt(envIdS, 10, 32)
+			if err != nil {
+				logrus.Errorf("error parsing '%v': %v", envIdS, err)
+				continue
+			}
 			switch result.Record().Field() {
 			case "rx":
 				rxV := int64(0)

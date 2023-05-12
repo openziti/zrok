@@ -1,5 +1,4 @@
 export const buildMetrics = (m) => {
-    console.log("build", m);
     let metrics = {
         data: m.samples,
         rx: 0,

@@ -1,13 +1,13 @@
-import * as metadata from "../../../api/metadata";
 import React, {useEffect, useState} from "react";
-import DataTable from 'react-data-table-component';
+import * as metadata from "../../../api/metadata";
 import {Area, AreaChart, ResponsiveContainer} from "recharts";
+import DataTable from "react-data-table-component";
 
-const SharesTab = (props) => {
-    const [detail, setDetail] = useState({});
+const EnvironmentsTab = (props) => {
+    const [detail, setDetail] = useState([]);
 
     useEffect(() => {
-        metadata.getEnvironmentDetail(props.selection.id)
+        metadata.getAccountDetail()
             .then(resp => {
                 setDetail(resp.data);
             });
@@ -16,7 +16,7 @@ const SharesTab = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getEnvironmentDetail(props.selection.id)
+            metadata.getAccountDetail()
                 .then(resp => {
                     if(mounted) {
                         setDetail(resp.data);
@@ -31,16 +31,15 @@ const SharesTab = (props) => {
 
     const columns = [
         {
-            name: "Frontend",
-            selector: row => <a href={row.frontendEndpoint} target={"_"}>{row.frontendEndpoint}</a>,
-            sortable: true,
+            name: "Description",
+            selector: row => row.description,
+            sortable: true
         },
         {
-            name: "Backend",
+            name: "Address",
             grow: 0.5,
-            selector: row => row.backendProxyEndpoint,
-            sortable: true,
-            hide: "lg"
+            selector: row => row.address,
+            sortable: true
         },
         {
             name: "Activity",
@@ -56,20 +55,17 @@ const SharesTab = (props) => {
         }
     ];
 
-    if(detail.environment) {
-        return (
-            <div className={"zrok-datatable"}>
-                <DataTable
-                    className={"zrok-datatable"}
-                    data={detail.shares}
-                    columns={columns}
-                    defaultSortField={1}
-                    noDataComponent={<p>No shares in environment</p>}
-                />
-            </div>
-        );
-    }
-    return <></>;
+    return (
+        <div className={"zrok-datatable"}>
+            <DataTable
+                className={"zrok-datatable"}
+                data={detail}
+                columns={columns}
+                defaultSortField={1}
+                noDataComponent={<p>No environments in account</p>}
+            />
+        </div>
+    );
 }
 
-export default SharesTab;
+export default EnvironmentsTab;
