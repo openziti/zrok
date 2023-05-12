@@ -22,7 +22,7 @@ const Network = (props) => {
 
     const paintNode = (node, ctx) => {
         let nodeColor = node.selected ? "#9BF316" : "#04adef";
-        let textColor = node.selected ? "black" : "white";
+        let textColor = "black";
 
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
