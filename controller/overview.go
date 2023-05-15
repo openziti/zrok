@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
@@ -36,7 +37,19 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				ZID:         env.ZId,
 			},
 		}
-
+		var shrIds []int
+		for i := range shrs {
+			shrIds = append(shrIds, shrs[i].Id)
+		}
+		shrsLimited, err := str.FindSelectedLatestShareLimitjournal(shrIds, tx)
+		if err != nil {
+			logrus.Errorf("error finding limited shares for environment '%v': %v", env.ZId, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+		shrsLimitedMap := make(map[int]store.LimitJournalAction)
+		for i := range shrsLimited {
+			shrsLimitedMap[shrsLimited[i].ShareId] = shrsLimited[i].Action
+		}
 		for _, shr := range shrs {
 			feEndpoint := ""
 			if shr.FrontendEndpoint != nil {
@@ -50,7 +63,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			if shr.BackendProxyEndpoint != nil {
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
-			es.Shares = append(es.Shares, &rest_model_zrok.Share{
+			oshr := &rest_model_zrok.Share{
 				Token:                shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,
@@ -61,7 +74,13 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 				Reserved:             shr.Reserved,
 				CreatedAt:            shr.CreatedAt.UnixMilli(),
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
-			})
+			}
+			if action, found := shrsLimitedMap[shr.Id]; found {
+				if action == store.LimitAction {
+					oshr.Limited = true
+				}
+			}
+			es.Shares = append(es.Shares, oshr)
 		}
 		out = append(out, es)
 	}

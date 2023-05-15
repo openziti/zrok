@@ -9,7 +9,6 @@ const MetricsTab = (props) => {
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
     useEffect(() => {
-        console.log("token", props.share.token);
         metadata.getShareMetrics(props.share.token)
             .then(resp => {
                 setMetrics30(buildMetrics(resp.data));
@@ -27,7 +26,6 @@ const MetricsTab = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            console.log("token", props.share.token);
             metadata.getShareMetrics(props.share.token)
                 .then(resp => {
                     if(mounted) {

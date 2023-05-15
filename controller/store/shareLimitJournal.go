@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -39,6 +40,33 @@ func (str *Store) FindLatestShareLimitJournal(shrId int, trx *sqlx.Tx) (*ShareLi
 		return nil, errors.Wrap(err, "error finding share_limit_journal by share_id")
 	}
 	return j, nil
+}
+
+func (str *Store) FindSelectedLatestShareLimitjournal(shrIds []int, trx *sqlx.Tx) ([]*ShareLimitJournal, error) {
+	if len(shrIds) < 1 {
+		return nil, nil
+	}
+	in := "("
+	for i := range shrIds {
+		if i > 0 {
+			in += ", "
+		}
+		in += fmt.Sprintf("%d", shrIds[i])
+	}
+	in += ")"
+	rows, err := trx.Queryx("select id, share_id, rx_bytes, tx_bytes, action, created_at, updated_at from share_limit_journal where id in (select max(id) as id from share_limit_journal group by share_id) and share_id in " + in)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting all latest share_limit_journal")
+	}
+	var sljs []*ShareLimitJournal
+	for rows.Next() {
+		slj := &ShareLimitJournal{}
+		if err := rows.StructScan(slj); err != nil {
+			return nil, errors.Wrap(err, "error scanning share_limit_journal")
+		}
+		sljs = append(sljs, slj)
+	}
+	return sljs, nil
 }
 
 func (str *Store) FindAllLatestShareLimitJournal(trx *sqlx.Tx) ([]*ShareLimitJournal, error) {

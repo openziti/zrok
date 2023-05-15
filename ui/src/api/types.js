@@ -88,6 +88,7 @@
  * @property {string} address 
  * @property {string} zId 
  * @property {module:types.sparkData} activity 
+ * @property {boolean} limited 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */
@@ -201,6 +202,7 @@
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
  * @property {module:types.sparkData} activity 
+ * @property {boolean} limited 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */

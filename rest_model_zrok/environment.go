@@ -33,6 +33,9 @@ type Environment struct {
 	// host
 	Host string `json:"host,omitempty"`
 
+	// limited
+	Limited bool `json:"limited,omitempty"`
+
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
 

@@ -12,7 +12,7 @@ const sortNodes = (nodes) => {
 
 const nodesEqual = (a, b) => {
     if(a.length !== b.length) return false;
-    return a.every((e, i) => e.id === b[i].id);
+    return a.every((e, i) => e.id === b[i].id && e.limited === b[i].limited);
 }
 
 export const mergeGraph = (oldGraph, user, newOverview) => {
@@ -34,7 +34,8 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
             id: env.environment.zId,
             label: env.environment.description,
             type: "environment",
-            val: 50
+            val: 50,
+            limited: env.limited
         };
         newGraph.nodes.push(envNode);
         newGraph.links.push({
@@ -53,6 +54,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                     envZId: env.environment.zId,
                     label: shrLabel,
                     type: "share",
+                    limited: !!shr.limited,
                     val: 50
                 };
                 newGraph.nodes.push(shrNode);
@@ -75,11 +77,11 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
     // we're going to need to recompute a new graph... but we want to maintain the instances that already exist...
 
     // we want to preserve nodes that exist in the new graph, and remove those that don't.
-    let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id));
+    let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id && newNode.limited === oldNode.limited));
     let outputLinks = oldGraph.nodes.filter(oldLink => newGraph.links.find(newLink => newLink.target === oldLink.target && newLink.source === oldLink.source));
 
     // and then do the opposite; add any nodes that are in newGraph that are missing from oldGraph.
-    outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id)));
+    outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id && oldNode.limited === newNode.limited)));
     outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
 
     return {

@@ -706,6 +706,8 @@ definitions:
         type: string
       activity:
         $ref: "#/definitions/sparkData"
+      limited:
+        type: boolean
       createdAt:
         type: integer
       updatedAt:
@@ -861,6 +863,8 @@ definitions:
         type: boolean
       activity:
         $ref: "#/definitions/sparkData"
+      limited:
+        type: boolean
       createdAt:
         type: integer
       updatedAt:

@@ -36,6 +36,9 @@ type Share struct {
 	// frontend selection
 	FrontendSelection string `json:"frontendSelection,omitempty"`
 
+	// limited
+	Limited bool `json:"limited,omitempty"`
+
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 

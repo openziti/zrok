@@ -1104,6 +1104,9 @@ func init() {
         "host": {
           "type": "string"
         },
+        "limited": {
+          "type": "boolean"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -1307,6 +1310,9 @@ func init() {
         },
         "frontendSelection": {
           "type": "string"
+        },
+        "limited": {
+          "type": "boolean"
         },
         "reserved": {
           "type": "boolean"
@@ -2575,6 +2581,9 @@ func init() {
         "host": {
           "type": "string"
         },
+        "limited": {
+          "type": "boolean"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -2778,6 +2787,9 @@ func init() {
         },
         "frontendSelection": {
           "type": "string"
+        },
+        "limited": {
+          "type": "boolean"
         },
         "reserved": {
           "type": "boolean"
