@@ -36,6 +36,9 @@ const Network = (props) => {
 
         const nodeIcon = new Path2D();
         let xform = new DOMMatrix();
+        if(node.limited) {
+            ctx.fillStyle = "#f00";
+        }
         xform.translateSelf(node.x - (nodeWidth / 2) - 6, node.y - 13);
         xform.scaleSelf(0.5, 0.5);
         switch(node.type) {
@@ -51,7 +54,6 @@ const Network = (props) => {
             default:
                 break;
         }
-
         ctx.fill(nodeIcon);
         ctx.strokeStyle = "black";
         ctx.lineWidth = 0.5;
