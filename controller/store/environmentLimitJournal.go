@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -39,6 +40,33 @@ func (str *Store) FindLatestEnvironmentLimitJournal(envId int, trx *sqlx.Tx) (*E
 		return nil, errors.Wrap(err, "error finding environment_limit_journal by environment_id")
 	}
 	return j, nil
+}
+
+func (str *Store) FindSelectedLatestEnvironmentLimitJournal(envIds []int, trx *sqlx.Tx) ([]*EnvironmentLimitJournal, error) {
+	if len(envIds) < 1 {
+		return nil, nil
+	}
+	in := "("
+	for i := range envIds {
+		if i > 0 {
+			in += ", "
+		}
+		in += fmt.Sprintf("%d", envIds[i])
+	}
+	in += ")"
+	rows, err := trx.Queryx("select id, environment_id, rx_bytes, tx_bytes, action, created_at, updated_at from environment_limit_journal where id in (select max(id) as id from environment_limit_journal group by environment_id) and environment_id in " + in)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting all latest environment_limit_journal")
+	}
+	var eljs []*EnvironmentLimitJournal
+	for rows.Next() {
+		elj := &EnvironmentLimitJournal{}
+		if err := rows.StructScan(elj); err != nil {
+			return nil, errors.Wrap(err, "error scanning environment_limit_journal")
+		}
+		eljs = append(eljs, elj)
+	}
+	return eljs, nil
 }
 
 func (str *Store) FindAllLatestEnvironmentLimitJournal(trx *sqlx.Tx) ([]*EnvironmentLimitJournal, error) {

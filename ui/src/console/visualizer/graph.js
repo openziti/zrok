@@ -32,12 +32,13 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
 
     if(newOverview) {
         newOverview.forEach(env => {
+            let limited = !!env.limited;
             let envNode = {
                 id: env.environment.zId,
                 label: env.environment.description,
                 type: "environment",
-                val: 50,
-                limited: !!env.limited || accountNode.limited
+                limited: !!env.environment.limited || accountNode.limited,
+                val: 50
             };
             newGraph.nodes.push(envNode);
             newGraph.links.push({

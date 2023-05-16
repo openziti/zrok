@@ -55,7 +55,7 @@ func Run(inCfg *config.Config) error {
 	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
-	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
+	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareShareHandler = newShareHandler()

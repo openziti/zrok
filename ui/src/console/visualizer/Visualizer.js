@@ -10,7 +10,6 @@ const Visualizer = (props) => {
     const [networkGraph, setNetworkGraph] = useState({nodes: [], links: []});
 
     useEffect(() => {
-        console.log("visualizer overview", props.overview);
         setNetworkGraph(mergeGraph(networkGraph, props.user, props.overview.accountLimited, props.overview.environments));
 
         if(isSelectionGone(networkGraph, props.selection)) {

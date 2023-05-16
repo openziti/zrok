@@ -21,7 +21,6 @@ const Console = (props) => {
         let mounted = true;
         metadata.overview().then(resp => {
             if(mounted) {
-                console.log("init overview", resp.data);
                 setOverview(resp.data);
             }
         });
@@ -32,7 +31,6 @@ const Console = (props) => {
         let interval = setInterval(() => {
             metadata.overview().then(resp => {
                 if(mounted) {
-                    console.log("update overview", resp.data);
                     setOverview(resp.data);
                 }
             })
