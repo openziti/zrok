@@ -679,7 +679,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentSharesList"
+              "$ref": "#/definitions/overview"
             }
           },
           "500": {
@@ -1208,6 +1208,17 @@ func init() {
         },
         "tx": {
           "type": "number"
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "accountLimited": {
+          "type": "boolean"
+        },
+        "environments": {
+          "$ref": "#/definitions/environmentSharesList"
         }
       }
     },
@@ -2156,7 +2167,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentSharesList"
+              "$ref": "#/definitions/overview"
             }
           },
           "500": {
@@ -2685,6 +2696,17 @@ func init() {
         },
         "tx": {
           "type": "number"
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "accountLimited": {
+          "type": "boolean"
+        },
+        "environments": {
+          "$ref": "#/definitions/environmentSharesList"
         }
       }
     },

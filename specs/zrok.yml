@@ -403,7 +403,7 @@ paths:
         200:
           description: overview returned
           schema:
-            $ref: "#/definitions/environmentSharesList"
+            $ref: "#/definitions/overview"
         500:
           description: internal server error
           schema:
@@ -784,6 +784,14 @@ definitions:
         type: number
       timestamp:
         type: number
+
+  overview:
+    type: object
+    properties:
+      accountLimited:
+        type: boolean
+      environments:
+        $ref: "#/definitions/environmentSharesList"
 
   principal:
     type: object

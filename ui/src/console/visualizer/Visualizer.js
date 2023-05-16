@@ -10,7 +10,8 @@ const Visualizer = (props) => {
     const [networkGraph, setNetworkGraph] = useState({nodes: [], links: []});
 
     useEffect(() => {
-        setNetworkGraph(mergeGraph(networkGraph, props.user, props.overview));
+        console.log("visualizer overview", props.overview);
+        setNetworkGraph(mergeGraph(networkGraph, props.user, props.overview.environments));
 
         if(isSelectionGone(networkGraph, props.selection)) {
             // if the selection is no longer in the network graph...

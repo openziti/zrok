@@ -20,14 +20,14 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
-	var out rest_model_zrok.EnvironmentSharesList
+	var envShrsList rest_model_zrok.EnvironmentSharesList
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, tx)
 		if err != nil {
 			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
-		es := &rest_model_zrok.EnvironmentShares{
+		envShrs := &rest_model_zrok.EnvironmentShares{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
 				CreatedAt:   env.CreatedAt.UnixMilli(),
@@ -63,7 +63,7 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			if shr.BackendProxyEndpoint != nil {
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
-			oshr := &rest_model_zrok.Share{
+			envShr := &rest_model_zrok.Share{
 				Token:                shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,
@@ -77,12 +77,15 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 			}
 			if action, found := shrsLimitedMap[shr.Id]; found {
 				if action == store.LimitAction {
-					oshr.Limited = true
+					envShr.Limited = true
 				}
 			}
-			es.Shares = append(es.Shares, oshr)
+			envShrs.Shares = append(envShrs.Shares, envShr)
 		}
-		out = append(out, es)
+		envShrsList = append(envShrsList, envShrs)
 	}
-	return metadata.NewOverviewOK().WithPayload(out)
+	return metadata.NewOverviewOK().WithPayload(&rest_model_zrok.Overview{
+		AccountLimited: false,
+		Environments:   envShrsList,
+	})
 }

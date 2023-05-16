@@ -144,6 +144,14 @@
  */
 
 /**
+ * @typedef overview
+ * @memberof module:types
+ * 
+ * @property {boolean} accountLimited 
+ * @property {module:types.environmentSharesList} environments 
+ */
+
+/**
  * @typedef principal
  * @memberof module:types
  * 

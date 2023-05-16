@@ -29,43 +29,45 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
     }
     newGraph.nodes.push(accountNode);
 
-    newOverview.forEach(env => {
-        let envNode = {
-            id: env.environment.zId,
-            label: env.environment.description,
-            type: "environment",
-            val: 50,
-            limited: env.limited
-        };
-        newGraph.nodes.push(envNode);
-        newGraph.links.push({
-            target: accountNode.id,
-            source: envNode.id,
-            color: "#04adef"
-        });
-        if(env.shares) {
-            env.shares.forEach(shr => {
-                let shrLabel = shr.token;
-                if(shr.backendProxyEndpoint !== "") {
-                    shrLabel = shr.backendProxyEndpoint;
-                }
-                let shrNode = {
-                    id: shr.token,
-                    envZId: env.environment.zId,
-                    label: shrLabel,
-                    type: "share",
-                    limited: !!shr.limited,
-                    val: 50
-                };
-                newGraph.nodes.push(shrNode);
-                newGraph.links.push({
-                    target: envNode.id,
-                    source: shrNode.id,
-                    color: "#04adef"
-                });
+    if(newOverview) {
+        newOverview.forEach(env => {
+            let envNode = {
+                id: env.environment.zId,
+                label: env.environment.description,
+                type: "environment",
+                val: 50,
+                limited: env.limited
+            };
+            newGraph.nodes.push(envNode);
+            newGraph.links.push({
+                target: accountNode.id,
+                source: envNode.id,
+                color: "#04adef"
             });
-        }
-    });
+            if(env.shares) {
+                env.shares.forEach(shr => {
+                    let shrLabel = shr.token;
+                    if(shr.backendProxyEndpoint !== "") {
+                        shrLabel = shr.backendProxyEndpoint;
+                    }
+                    let shrNode = {
+                        id: shr.token,
+                        envZId: env.environment.zId,
+                        label: shrLabel,
+                        type: "share",
+                        limited: !!shr.limited,
+                        val: 50
+                    };
+                    newGraph.nodes.push(shrNode);
+                    newGraph.links.push({
+                        target: envNode.id,
+                        source: shrNode.id,
+                        color: "#04adef"
+                    });
+                });
+            }
+        });
+    }
     newGraph.nodes = sortNodes(newGraph.nodes);
 
     if(nodesEqual(oldGraph.nodes, newGraph.nodes)) {
