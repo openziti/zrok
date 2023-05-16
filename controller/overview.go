@@ -84,8 +84,20 @@ func overviewHandler(_ metadata.OverviewParams, principal *rest_model_zrok.Princ
 		}
 		envShrsList = append(envShrsList, envShrs)
 	}
+	var alj *store.AccountLimitJournal
+	aljEmpty, err := str.IsAccountLimitJournalEmpty(int(principal.ID), tx)
+	if err != nil {
+		logrus.Errorf("error checking account limit journal for '%v': %v", principal.Email, err)
+	}
+	if !aljEmpty {
+		alj, err = str.FindLatestAccountLimitJournal(int(principal.ID), tx)
+		if err != nil {
+			logrus.Errorf("error getting latest account limit journal entry for '%v': %v", principal.Email, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+	}
 	return metadata.NewOverviewOK().WithPayload(&rest_model_zrok.Overview{
-		AccountLimited: false,
+		AccountLimited: alj != nil && alj.Action == store.LimitAction,
 		Environments:   envShrsList,
 	})
 }

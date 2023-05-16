@@ -15,7 +15,7 @@ const nodesEqual = (a, b) => {
     return a.every((e, i) => e.id === b[i].id && e.limited === b[i].limited);
 }
 
-export const mergeGraph = (oldGraph, user, newOverview) => {
+export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
     let newGraph = {
         nodes: [],
         links: []
@@ -25,6 +25,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
         id: user.token,
         label: user.email,
         type: "account",
+        limited: !!accountLimited,
         val: 50
     }
     newGraph.nodes.push(accountNode);
@@ -36,7 +37,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                 label: env.environment.description,
                 type: "environment",
                 val: 50,
-                limited: env.limited
+                limited: !!env.limited || accountNode.limited
             };
             newGraph.nodes.push(envNode);
             newGraph.links.push({
@@ -55,7 +56,7 @@ export const mergeGraph = (oldGraph, user, newOverview) => {
                         envZId: env.environment.zId,
                         label: shrLabel,
                         type: "share",
-                        limited: !!shr.limited,
+                        limited: !!shr.limited || envNode.limited,
                         val: 50
                     };
                     newGraph.nodes.push(shrNode);
