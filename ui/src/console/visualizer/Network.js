@@ -3,10 +3,11 @@ import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
 import {roundRect} from "./draw";
-import {mdiShareVariant, mdiConsoleNetwork, mdiAccountBox} from "@mdi/js";
+import {mdiShareVariant, mdiConsoleNetwork, mdiAccountBox, mdiAlertCircle} from "@mdi/js";
 
 const accountIcon = new Path2D(mdiAccountBox);
 const environmentIcon = new Path2D(mdiConsoleNetwork);
+const limitIcon = new Path2D(mdiAlertCircle);
 const shareIcon = new Path2D(mdiShareVariant);
 
 const Network = (props) => {
@@ -21,7 +22,7 @@ const Network = (props) => {
     }, []);
 
     const paintNode = (node, ctx) => {
-        let nodeColor = node.selected ? "#9BF316" : node.limited ? "#f00": "#04adef";
+        let nodeColor = node.selected ? "#9BF316" : "#04adef";
         let textColor = "black";
 
         ctx.textBaseline = "middle";
@@ -36,9 +37,6 @@ const Network = (props) => {
 
         const nodeIcon = new Path2D();
         let xform = new DOMMatrix();
-        if(node.limited) {
-            ctx.fillStyle = "#f00";
-        }
         xform.translateSelf(node.x - (nodeWidth / 2) - 6, node.y - 13);
         xform.scaleSelf(0.5, 0.5);
         switch(node.type) {
@@ -58,6 +56,17 @@ const Network = (props) => {
         ctx.strokeStyle = "black";
         ctx.lineWidth = 0.5;
         ctx.stroke(nodeIcon);
+
+        if(node.limited) {
+            const nodeLimitIcon = new Path2D();
+            let limitXform = new DOMMatrix();
+            limitXform.translateSelf(node.x + (nodeWidth / 2) - 6, node.y - 13);
+            limitXform.scaleSelf(0.5, 0.5);
+            nodeLimitIcon.addPath(limitIcon, limitXform);
+            ctx.fillStyle = "red";
+            ctx.fill(nodeLimitIcon);
+            ctx.stroke(nodeLimitIcon);
+        }
 
         ctx.fillStyle = textColor;
         ctx.fillText(node.label, node.x, node.y);
