@@ -3,10 +3,10 @@ import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
 import {roundRect} from "./draw";
-import {mdiShareVariant, mdiConsoleNetwork, mdiAccountBox, mdiAlertOctagram} from "@mdi/js";
+import {mdiShareVariant, mdiConsole, mdiAccount, mdiAlertOctagram} from "@mdi/js";
 
-const accountIcon = new Path2D(mdiAccountBox);
-const environmentIcon = new Path2D(mdiConsoleNetwork);
+const accountIcon = new Path2D(mdiAccount);
+const environmentIcon = new Path2D(mdiConsole);
 const limitIcon = new Path2D(mdiAlertOctagram);
 const shareIcon = new Path2D(mdiShareVariant);
 
