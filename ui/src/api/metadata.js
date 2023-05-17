@@ -28,6 +28,19 @@ export function getEnvironmentDetail(envZId) {
 }
 
 /**
+ * @param {number} feId 
+ * @return {Promise<module:types.frontend>} ok
+ */
+export function getFrontendDetail(feId) {
+  const parameters = {
+    path: {
+      feId
+    }
+  }
+  return gateway.request(getFrontendDetailOperation, parameters)
+}
+
+/**
  * @param {string} shrToken 
  * @return {Promise<module:types.share>} ok
  */
@@ -122,6 +135,16 @@ const getAccountDetailOperation = {
 
 const getEnvironmentDetailOperation = {
   path: '/detail/environment/{envZId}',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const getFrontendDetailOperation = {
+  path: '/detail/frontend/{feId}',
   method: 'get',
   security: [
     {

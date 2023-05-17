@@ -54,6 +54,7 @@ func Run(inCfg *config.Config) error {
 		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
 	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
 	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)

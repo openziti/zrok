@@ -152,6 +152,44 @@ func init() {
         }
       }
     },
+    "/detail/frontend/{feId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getFrontendDetail",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "feId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/frontend"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/detail/share/{shrToken}": {
       "get": {
         "security": [
@@ -1652,6 +1690,44 @@ func init() {
             "description": "ok",
             "schema": {
               "$ref": "#/definitions/environmentAndResources"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/frontend/{feId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getFrontendDetail",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "feId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/frontend"
             }
           },
           "401": {

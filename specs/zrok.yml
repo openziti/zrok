@@ -368,6 +368,30 @@ paths:
         500:
           description: internal server error
 
+  /detail/frontend/{feId}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getFrontendDetail
+      parameters:
+        - name: feId
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/frontend"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /detail/share/{shrToken}:
     get:
       tags:

@@ -82,6 +82,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataGetEnvironmentMetricsHandler: metadata.GetEnvironmentMetricsHandlerFunc(func(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetEnvironmentMetrics has not yet been implemented")
 		}),
+		MetadataGetFrontendDetailHandler: metadata.GetFrontendDetailHandlerFunc(func(params metadata.GetFrontendDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetFrontendDetail has not yet been implemented")
+		}),
 		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
 		}),
@@ -205,6 +208,8 @@ type ZrokAPI struct {
 	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
 	// MetadataGetEnvironmentMetricsHandler sets the operation handler for the get environment metrics operation
 	MetadataGetEnvironmentMetricsHandler metadata.GetEnvironmentMetricsHandler
+	// MetadataGetFrontendDetailHandler sets the operation handler for the get frontend detail operation
+	MetadataGetFrontendDetailHandler metadata.GetFrontendDetailHandler
 	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
@@ -352,6 +357,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataGetEnvironmentMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetEnvironmentMetricsHandler")
+	}
+	if o.MetadataGetFrontendDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetFrontendDetailHandler")
 	}
 	if o.MetadataGetShareDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
@@ -547,6 +555,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/metrics/environment/{envId}"] = metadata.NewGetEnvironmentMetrics(o.context, o.MetadataGetEnvironmentMetricsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/frontend/{feId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
