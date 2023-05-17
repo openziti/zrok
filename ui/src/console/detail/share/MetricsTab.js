@@ -9,28 +9,10 @@ const MetricsTab = (props) => {
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
     useEffect(() => {
-        metadata.getShareMetrics(props.share.token)
-            .then(resp => {
-                setMetrics30(buildMetrics(resp.data));
-            });
-        metadata.getShareMetrics(props.share.token, {duration: "168h"})
-            .then(resp => {
-                setMetrics7(buildMetrics(resp.data));
-            });
-        metadata.getShareMetrics(props.share.token, {duration: "24h"})
-            .then(resp => {
-                setMetrics1(buildMetrics(resp.data));
-            });
-    }, [props.share]);
-
-    useEffect(() => {
-        let mounted = true;
-        let interval = setInterval(() => {
+        if(props.share.token) {
             metadata.getShareMetrics(props.share.token)
                 .then(resp => {
-                    if(mounted) {
-                        setMetrics30(buildMetrics(resp.data));
-                    }
+                    setMetrics30(buildMetrics(resp.data));
                 });
             metadata.getShareMetrics(props.share.token, {duration: "168h"})
                 .then(resp => {
@@ -40,6 +22,32 @@ const MetricsTab = (props) => {
                 .then(resp => {
                     setMetrics1(buildMetrics(resp.data));
                 });
+        }
+    }, [props.share]);
+
+    useEffect(() => {
+        let mounted = true;
+        let interval = setInterval(() => {
+            if(props.share.token) {
+                metadata.getShareMetrics(props.share.token)
+                    .then(resp => {
+                        if(mounted) {
+                            setMetrics30(buildMetrics(resp.data));
+                        }
+                    });
+                metadata.getShareMetrics(props.share.token, {duration: "168h"})
+                    .then(resp => {
+                        if(mounted) {
+                            setMetrics7(buildMetrics(resp.data));
+                        }
+                    });
+                metadata.getShareMetrics(props.share.token, {duration: "24h"})
+                    .then(resp => {
+                        if(mounted) {
+                            setMetrics1(buildMetrics(resp.data));
+                        }
+                    });
+            }
         }, 5000);
         return () => {
             mounted = false;
