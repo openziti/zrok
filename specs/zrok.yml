@@ -734,6 +734,8 @@ definitions:
   frontend:
     type: object
     properties:
+      id:
+        type: integer
       shrToken:
         type: string
       zId:

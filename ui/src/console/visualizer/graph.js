@@ -31,6 +31,8 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
     newGraph.nodes.push(accountNode);
 
     if(newOverview) {
+        let allShares = {};
+        let allFrontends = [];
         newOverview.forEach(env => {
             let limited = !!env.limited;
             let envNode = {
@@ -60,12 +62,42 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
                         limited: !!shr.limited || envNode.limited,
                         val: 50
                     };
+                    allShares[shr.token] = shrNode;
                     newGraph.nodes.push(shrNode);
                     newGraph.links.push({
                         target: envNode.id,
                         source: shrNode.id,
                         color: "#04adef"
                     });
+                });
+            }
+            if(env.frontends) {
+                env.frontends.forEach(fe => {
+                   let feNode = {
+                       id: fe.id,
+                       target: fe.shrToken,
+                       label: fe.shrToken,
+                       type: "frontend",
+                       val: 50
+                   }
+                   allFrontends.push(feNode);
+                   newGraph.nodes.push(feNode);
+                   newGraph.links.push({
+                       target: envNode.id,
+                       source: feNode.id,
+                       color: "#04adef"
+                   });
+                });
+            }
+        });
+        allFrontends.forEach(fe => {
+            let target = allShares[fe.target];
+            if(target) {
+                newGraph.links.push({
+                    target: target.id,
+                    source: fe.id,
+                    color: "#9BF316",
+                    type: "data",
                 });
             }
         });

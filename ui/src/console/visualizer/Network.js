@@ -3,10 +3,11 @@ import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
 import {roundRect} from "./draw";
-import {mdiShareVariant, mdiConsole, mdiAccount, mdiAlertOctagram} from "@mdi/js";
+import {mdiShareVariant, mdiConsole, mdiAccount, mdiAlertOctagram, mdiAccessPointNetwork} from "@mdi/js";
 
 const accountIcon = new Path2D(mdiAccount);
 const environmentIcon = new Path2D(mdiConsole);
+const frontendIcon = new Path2D(mdiAccessPointNetwork);
 const limitIcon = new Path2D(mdiAlertOctagram);
 const shareIcon = new Path2D(mdiShareVariant);
 
@@ -46,6 +47,9 @@ const Network = (props) => {
             case "environment":
                 nodeIcon.addPath(environmentIcon, xform);
                 break;
+            case "frontend":
+                nodeIcon.addPath(frontendIcon, xform);
+                break;
             case "account":
                 nodeIcon.addPath(accountIcon, xform);
                 break;
@@ -84,7 +88,8 @@ const Network = (props) => {
             height={800}
             onNodeClick={nodeClicked}
             linkOpacity={.75}
-            linkWidth={1.5}
+            linkWidth={(l) => l.type === "data" ? 3.0 : 1.5 }
+            linkLineDash={(l) => l.type === "data" ? [3, 3] : [] }
             nodeCanvasObject={paintNode}
             backgroundColor={"linear-gradient(180deg, #0E0238 0%, #231069 100%);"}
             cooldownTicks={300}

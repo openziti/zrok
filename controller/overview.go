@@ -38,16 +38,6 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 	}
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
-		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
-		if err != nil {
-			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
-			return metadata.NewOverviewInternalServerError()
-		}
-		slm, err := newSharesLimitedMap(shrs, trx)
-		if err != nil {
-			logrus.Errorf("error finding limited shares for environment '%v': %v", env.ZId, err)
-			return metadata.NewOverviewInternalServerError()
-		}
 		envRes := &rest_model_zrok.EnvironmentAndResources{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
@@ -58,6 +48,16 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				CreatedAt:   env.CreatedAt.UnixMilli(),
 				UpdatedAt:   env.UpdatedAt.UnixMilli(),
 			},
+		}
+		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
+		if err != nil {
+			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+		slm, err := newSharesLimitedMap(shrs, trx)
+		if err != nil {
+			logrus.Errorf("error finding limited shares for environment '%v': %v", env.ZId, err)
+			return metadata.NewOverviewInternalServerError()
 		}
 		for _, shr := range shrs {
 			feEndpoint := ""
@@ -86,6 +86,28 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			}
 			envRes.Shares = append(envRes.Shares, envShr)
+		}
+		fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
+		if err != nil {
+			logrus.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+		for _, fe := range fes {
+			envFe := &rest_model_zrok.Frontend{
+				ID:        int64(fe.Id),
+				ZID:       fe.ZId,
+				CreatedAt: fe.CreatedAt.UnixMilli(),
+				UpdatedAt: fe.UpdatedAt.UnixMilli(),
+			}
+			if fe.PrivateShareId != nil {
+				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
+				if err != nil {
+					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
+					return metadata.NewOverviewInternalServerError()
+				}
+				envFe.ShrToken = feShr.Token
+			}
+			envRes.Frontends = append(envRes.Frontends, envFe)
 		}
 		ovr.Environments = append(ovr.Environments, envRes)
 	}

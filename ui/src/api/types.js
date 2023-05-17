@@ -106,6 +106,7 @@
  * @typedef frontend
  * @memberof module:types
  * 
+ * @property {number} id 
  * @property {string} shrToken 
  * @property {string} zId 
  * @property {number} createdAt 

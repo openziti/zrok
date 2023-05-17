@@ -1144,6 +1144,9 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
+        "id": {
+          "type": "integer"
+        },
         "shrToken": {
           "type": "string"
         },
@@ -2653,6 +2656,9 @@ func init() {
       "type": "object",
       "properties": {
         "createdAt": {
+          "type": "integer"
+        },
+        "id": {
           "type": "integer"
         },
         "shrToken": {
