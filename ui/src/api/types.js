@@ -94,11 +94,22 @@
  */
 
 /**
- * @typedef environmentShares
+ * @typedef environmentAndResources
  * @memberof module:types
  * 
  * @property {module:types.environment} environment 
+ * @property {module:types.frontends} frontends 
  * @property {module:types.shares} shares 
+ */
+
+/**
+ * @typedef frontend
+ * @memberof module:types
+ * 
+ * @property {string} shrToken 
+ * @property {string} zId 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**
@@ -148,7 +159,7 @@
  * @memberof module:types
  * 
  * @property {boolean} accountLimited 
- * @property {module:types.environmentSharesList} environments 
+ * @property {module:types.environmentAndResources[]} environments 
  */
 
 /**

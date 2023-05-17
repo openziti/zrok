@@ -32,7 +32,11 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		logrus.Errorf("error finding limited environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
-	var envShrsList rest_model_zrok.EnvironmentSharesList
+	accountLimited, err := h.isAccountLimited(principal, trx)
+	if err != nil {
+		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
+	}
+	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
@@ -44,7 +48,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			logrus.Errorf("error finding limited shares for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
-		envShrs := &rest_model_zrok.EnvironmentShares{
+		envRes := &rest_model_zrok.EnvironmentAndResources{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
 				Description: env.Description,
@@ -81,18 +85,11 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				CreatedAt:            shr.CreatedAt.UnixMilli(),
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			}
-			envShrs.Shares = append(envShrs.Shares, envShr)
+			envRes.Shares = append(envRes.Shares, envShr)
 		}
-		envShrsList = append(envShrsList, envShrs)
+		ovr.Environments = append(ovr.Environments, envRes)
 	}
-	accountLimited, err := h.isAccountLimited(principal, trx)
-	if err != nil {
-		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
-	}
-	return metadata.NewOverviewOK().WithPayload(&rest_model_zrok.Overview{
-		AccountLimited: accountLimited,
-		Environments:   envShrsList,
-	})
+	return metadata.NewOverviewOK().WithPayload(ovr)
 }
 
 func (h *overviewHandler) isAccountLimited(principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {

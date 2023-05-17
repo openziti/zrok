@@ -26,7 +26,7 @@ type GetEnvironmentDetailOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.EnvironmentShares `json:"body,omitempty"`
+	Payload *rest_model_zrok.EnvironmentAndResources `json:"body,omitempty"`
 }
 
 // NewGetEnvironmentDetailOK creates GetEnvironmentDetailOK with default headers values
@@ -36,13 +36,13 @@ func NewGetEnvironmentDetailOK() *GetEnvironmentDetailOK {
 }
 
 // WithPayload adds the payload to the get environment detail o k response
-func (o *GetEnvironmentDetailOK) WithPayload(payload *rest_model_zrok.EnvironmentShares) *GetEnvironmentDetailOK {
+func (o *GetEnvironmentDetailOK) WithPayload(payload *rest_model_zrok.EnvironmentAndResources) *GetEnvironmentDetailOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get environment detail o k response
-func (o *GetEnvironmentDetailOK) SetPayload(payload *rest_model_zrok.EnvironmentShares) {
+func (o *GetEnvironmentDetailOK) SetPayload(payload *rest_model_zrok.EnvironmentAndResources) {
 	o.Payload = payload
 }
 

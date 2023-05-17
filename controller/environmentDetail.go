@@ -25,7 +25,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
 	}
-	es := &rest_model_zrok.EnvironmentShares{
+	es := &rest_model_zrok.EnvironmentAndResources{
 		Environment: &rest_model_zrok.Environment{
 			Address:     senv.Address,
 			CreatedAt:   senv.CreatedAt.UnixMilli(),

@@ -7,6 +7,7 @@ package rest_model_zrok
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -22,7 +23,7 @@ type Overview struct {
 	AccountLimited bool `json:"accountLimited,omitempty"`
 
 	// environments
-	Environments EnvironmentSharesList `json:"environments,omitempty"`
+	Environments []*EnvironmentAndResources `json:"environments"`
 }
 
 // Validate validates this overview
@@ -44,13 +45,22 @@ func (m *Overview) validateEnvironments(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := m.Environments.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("environments")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("environments")
+	for i := 0; i < len(m.Environments); i++ {
+		if swag.IsZero(m.Environments[i]) { // not required
+			continue
 		}
-		return err
+
+		if m.Environments[i] != nil {
+			if err := m.Environments[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("environments" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("environments" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -72,13 +82,19 @@ func (m *Overview) ContextValidate(ctx context.Context, formats strfmt.Registry)
 
 func (m *Overview) contextValidateEnvironments(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := m.Environments.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("environments")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("environments")
+	for i := 0; i < len(m.Environments); i++ {
+
+		if m.Environments[i] != nil {
+			if err := m.Environments[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("environments" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("environments" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
 		}
-		return err
+
 	}
 
 	return nil

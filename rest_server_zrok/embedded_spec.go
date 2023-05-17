@@ -137,7 +137,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentShares"
+              "$ref": "#/definitions/environmentAndResources"
             }
           },
           "401": {
@@ -1115,21 +1115,18 @@ func init() {
         }
       }
     },
-    "environmentShares": {
+    "environmentAndResources": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
+        "frontends": {
+          "$ref": "#/definitions/frontends"
+        },
         "shares": {
           "$ref": "#/definitions/shares"
         }
-      }
-    },
-    "environmentSharesList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -1140,6 +1137,29 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "frontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "shrToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "frontends": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/frontend"
+      }
     },
     "inviteRequest": {
       "type": "object",
@@ -1218,7 +1238,10 @@ func init() {
           "type": "boolean"
         },
         "environments": {
-          "$ref": "#/definitions/environmentSharesList"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentAndResources"
+          }
         }
       }
     },
@@ -1625,7 +1648,7 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentShares"
+              "$ref": "#/definitions/environmentAndResources"
             }
           },
           "401": {
@@ -2603,21 +2626,18 @@ func init() {
         }
       }
     },
-    "environmentShares": {
+    "environmentAndResources": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
+        "frontends": {
+          "$ref": "#/definitions/frontends"
+        },
         "shares": {
           "$ref": "#/definitions/shares"
         }
-      }
-    },
-    "environmentSharesList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -2628,6 +2648,29 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "frontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "shrToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "frontends": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/frontend"
+      }
     },
     "inviteRequest": {
       "type": "object",
@@ -2706,7 +2749,10 @@ func init() {
           "type": "boolean"
         },
         "environments": {
-          "$ref": "#/definitions/environmentSharesList"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentAndResources"
+          }
         }
       }
     },

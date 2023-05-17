@@ -16,7 +16,7 @@ export function getAccountDetail() {
 
 /**
  * @param {string} envZId 
- * @return {Promise<module:types.environmentShares>} ok
+ * @return {Promise<module:types.environmentAndResources>} ok
  */
 export function getEnvironmentDetail(envZId) {
   const parameters = {

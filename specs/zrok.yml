@@ -360,7 +360,7 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/environmentShares"
+            $ref: "#/definitions/environmentAndResources"
         401:
           description: unauthorized
         404:
@@ -718,21 +718,35 @@ definitions:
     items:
       $ref: "#/definitions/environment"
 
-  environmentSharesList:
-    type: array
-    items:
-      $ref: "#/definitions/environmentShares"
-
-  environmentShares:
+  environmentAndResources:
     type: object
     properties:
       environment:
         $ref: "#/definitions/environment"
+      frontends:
+        $ref: "#/definitions/frontends"
       shares:
         $ref: "#/definitions/shares"
 
   errorMessage:
     type: string
+
+  frontend:
+    type: object
+    properties:
+      shrToken:
+        type: string
+      zId:
+        type: string
+      createdAt:
+        type: integer
+      updatedAt:
+        type: integer
+
+  frontends:
+    type: array
+    items:
+      $ref: "#/definitions/frontend"
 
   inviteTokenGenerateRequest:
     type: object
@@ -791,7 +805,9 @@ definitions:
       accountLimited:
         type: boolean
       environments:
-        $ref: "#/definitions/environmentSharesList"
+        type: array
+        items:
+          $ref: "#/definitions/environmentAndResources"
 
   principal:
     type: object
