@@ -1,12 +1,13 @@
 package config
 
 import (
+	"time"
+
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/store"
@@ -28,6 +29,7 @@ type Config struct {
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
 	Ziti          *zrokEdgeSdk.Config
+	Tls           *TlsConfig
 }
 
 type AdminConfig struct {
@@ -64,6 +66,11 @@ type ResetPasswordMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
+}
+
+type TlsConfig struct {
+	CertPath string
+	KeyPath  string
 }
 
 func DefaultConfig() *Config {

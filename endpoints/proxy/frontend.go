@@ -3,6 +3,12 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/endpoints"
@@ -12,18 +18,19 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"time"
 )
 
 type FrontendConfig struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
+	Tls          *TlsConfig
 	RequestsChan chan *endpoints.Request
+}
+
+type TlsConfig struct {
+	CertPath string
+	KeyPath  string
 }
 
 func DefaultFrontendConfig(identityName string) *FrontendConfig {
@@ -70,6 +77,9 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 }
 
 func (h *Frontend) Run() error {
+	if h.cfg.Tls != nil {
+		return http.ListenAndServeTLS(h.cfg.Address, h.cfg.Tls.CertPath, h.cfg.Tls.KeyPath, h.handler)
+	}
 	return http.ListenAndServe(h.cfg.Address, h.handler)
 }
 

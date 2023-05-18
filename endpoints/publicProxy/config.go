@@ -9,6 +9,12 @@ type Config struct {
 	Identity  string
 	Address   string
 	HostMatch string
+	Tls       *TlsConfig
+}
+
+type TlsConfig struct {
+	CertPath string
+	KeyPath  string
 }
 
 func DefaultConfig() *Config {
