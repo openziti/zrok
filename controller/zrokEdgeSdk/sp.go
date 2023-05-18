@@ -78,16 +78,16 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteServicePolicyBind(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyBind), edge)
+func DeleteServicePoliciesBind(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyBind), edge)
 }
 
-func DeleteServicePolicyDial(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	return DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyDial), edge)
+func DeleteServicePoliciesDial(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyDial), edge)
 }
 
-func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	limit := int64(1)
+func DeleteServicePolicies(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	limit := int64(0)
 	offset := int64(0)
 	listReq := &service_policy.ListServicePoliciesParams{
 		Filter:  &filter,
@@ -100,8 +100,9 @@ func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client
 	if err != nil {
 		return err
 	}
-	if len(listResp.Payload.Data) == 1 {
-		spId := *(listResp.Payload.Data[0].ID)
+	logrus.Infof("found %d service policies to delete for '%v'", len(listResp.Payload.Data), filter)
+	for i := range listResp.Payload.Data {
+		spId := *(listResp.Payload.Data[i].ID)
 		req := &service_policy.DeleteServicePolicyParams{
 			ID:      spId,
 			Context: context.Background(),
@@ -112,8 +113,9 @@ func DeleteServicePolicy(envZId, filter string, edge *rest_management_api_client
 			return err
 		}
 		logrus.Infof("deleted service policy '%v' for environment '%v'", spId, envZId)
-	} else {
-		logrus.Infof("did not find a service policy")
+	}
+	if len(listResp.Payload.Data) < 1 {
+		logrus.Warnf("did not find any service policies to delete for '%v'", filter)
 	}
 	return nil
 }

@@ -68,7 +68,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessNotFound()
 	}
 
-	if err := zrokEdgeSdk.DeleteServicePolicy(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken), edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken), edge); err != nil {
 		logrus.Errorf("error removing access to '%v' for '%v': %v", shrToken, envZId, err)
 		return share.NewUnaccessInternalServerError()
 	}

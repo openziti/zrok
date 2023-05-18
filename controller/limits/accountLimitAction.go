@@ -33,7 +33,7 @@ func (a *accountLimitAction) HandleAccount(acct *store.Account, rxBytes, txBytes
 		}
 
 		for _, shr := range shrs {
-			if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, shr.Token, a.edge); err != nil {
+			if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, a.edge); err != nil {
 				return errors.Wrapf(err, "error deleting dial service policy for '%v'", shr.Token)
 			}
 			logrus.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)
