@@ -12,7 +12,7 @@ const EnvironmentDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        getEnvironmentDetail(props.selection.id)
+        getEnvironmentDetail(props.selection.envZId)
             .then(resp => {
                 setDetail(resp.data);
             });

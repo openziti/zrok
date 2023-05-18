@@ -13,7 +13,7 @@ const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getShareDetail(props.selection.id)
+        metadata.getShareDetail(props.selection.shrToken)
             .then(resp => {
                 let detail = resp.data;
                 detail.envZId = props.selection.envZId;
@@ -24,7 +24,7 @@ const ShareDetail = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getShareDetail(props.selection.id)
+            metadata.getShareDetail(props.selection.shrToken)
                 .then(resp => {
                     if(mounted) {
                         let detail = resp.data;

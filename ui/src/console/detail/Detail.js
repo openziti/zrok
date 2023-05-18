@@ -5,7 +5,6 @@ import AccessDetail from "./access/AccessDetail";
 
 const Detail = (props) => {
     let detailComponent = <h1>{props.selection.id} ({props.selection.type})</h1>;
-    console.log("selection type", props.selection.type);
 
     switch(props.selection.type) {
         case "frontend":

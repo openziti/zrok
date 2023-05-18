@@ -7,7 +7,7 @@ const SharesTab = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getEnvironmentDetail(props.selection.id)
+        metadata.getEnvironmentDetail(props.selection.envZId)
             .then(resp => {
                 setDetail(resp.data);
             });
@@ -16,7 +16,7 @@ const SharesTab = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getEnvironmentDetail(props.selection.id)
+            metadata.getEnvironmentDetail(props.selection.envZId)
                 .then(resp => {
                     if(mounted) {
                         setDetail(resp.data);

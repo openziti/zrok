@@ -9,15 +9,15 @@ const MetricsTab = (props) => {
 	const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
 	useEffect(() => {
-		metadata.getEnvironmentMetrics(props.selection.id)
+		metadata.getEnvironmentMetrics(props.selection.envZId)
 			.then(resp => {
 				setMetrics30(buildMetrics(resp.data));
 			});
-		metadata.getEnvironmentMetrics(props.selection.id, {duration: "168h"})
+		metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
 			.then(resp => {
 				setMetrics7(buildMetrics(resp.data));
 			});
-		metadata.getEnvironmentMetrics(props.selection.id, {duration: "24h"})
+		metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
 			.then(resp => {
 				setMetrics1(buildMetrics(resp.data));
 			});
@@ -26,17 +26,17 @@ const MetricsTab = (props) => {
 	useEffect(() => {
 		let mounted = true;
 		let interval = setInterval(() => {
-			metadata.getEnvironmentMetrics(props.selection.id)
+			metadata.getEnvironmentMetrics(props.selection.envZId)
 				.then(resp => {
 					if(mounted) {
 						setMetrics30(buildMetrics(resp.data));
 					}
 				});
-			metadata.getEnvironmentMetrics(props.selection.id, {duration: "168h"})
+			metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
 				.then(resp => {
 					setMetrics7(buildMetrics(resp.data));
 				});
-			metadata.getEnvironmentMetrics(props.selection.id, {duration: "24h"})
+			metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
 				.then(resp => {
 					setMetrics1(buildMetrics(resp.data));
 				});

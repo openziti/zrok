@@ -36,7 +36,8 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
         newOverview.forEach(env => {
             let limited = !!env.limited;
             let envNode = {
-                id: env.environment.zId,
+                id: 'env:' + env.environment.zId,
+                envZId: env.environment.zId,
                 label: env.environment.description,
                 type: "environment",
                 limited: !!env.environment.limited || accountNode.limited,
@@ -55,7 +56,8 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
                         shrLabel = shr.backendProxyEndpoint;
                     }
                     let shrNode = {
-                        id: shr.token,
+                        id: 'shr:' + shr.token,
+                        shrToken: shr.token,
                         envZId: env.environment.zId,
                         label: shrLabel,
                         type: "share",
@@ -74,7 +76,7 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
             if(env.frontends) {
                 env.frontends.forEach(fe => {
                    let feNode = {
-                       id: "fe:" + fe.id,
+                       id: 'ac:' + fe.id,
                        feId: fe.id,
                        target: fe.shrToken,
                        label: fe.shrToken,
