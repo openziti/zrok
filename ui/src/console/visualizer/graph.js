@@ -74,7 +74,8 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
             if(env.frontends) {
                 env.frontends.forEach(fe => {
                    let feNode = {
-                       id: fe.id,
+                       id: "fe:" + fe.id,
+                       feId: fe.id,
                        target: fe.shrToken,
                        label: fe.shrToken,
                        type: "frontend",

@@ -9,7 +9,7 @@ const AccessDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        getFrontendDetail(props.selection.id)
+        getFrontendDetail(props.selection.feId)
             .then(resp => {
                 setDetail(resp.data);
             });
