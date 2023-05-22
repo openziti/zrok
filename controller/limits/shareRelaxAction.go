@@ -72,7 +72,7 @@ func relaxPrivateShare(str *store.Store, edge *rest_management_api_client.ZitiEd
 				"zrokFrontendToken":  fe.Token,
 				"zrokShareToken":     shr.Token,
 			}
-			if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{env.ZId}, addlTags, edge); err != nil {
+			if err := zrokEdgeSdk.CreateServicePolicyDial(fe.Token+"-"+env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{env.ZId}, addlTags, edge); err != nil {
 				return errors.Wrapf(err, "unable to create dial policy for frontend '%v'", fe.Token)
 			}
 

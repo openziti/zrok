@@ -76,7 +76,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		"zrokFrontendToken":  feToken,
 		"zrokShareToken":     shrToken,
 	}
-	if err := zrokEdgeSdk.CreateServicePolicyDial(envZId+"-"+shr.ZId+"-dial", shr.ZId, []string{envZId}, addlTags, edge); err != nil {
+	if err := zrokEdgeSdk.CreateServicePolicyDial(feToken+"-"+envZId+"-"+shr.ZId+"-dial", shr.ZId, []string{envZId}, addlTags, edge); err != nil {
 		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}

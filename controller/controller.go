@@ -46,10 +46,17 @@ func Run(inCfg *config.Config) error {
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
+	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
+		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetEnvironmentMetricsHandler = newGetEnvironmentMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
+	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
-	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
+	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareShareHandler = newShareHandler()

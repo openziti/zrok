@@ -1,4 +1,4 @@
-import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Col, Container, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import Visualizer from "./visualizer/Visualizer";
 import Enable from "./modals/Enable";
@@ -15,7 +15,7 @@ const Console = (props) => {
     const openVersionModal = () => setShowVersionModal(true);
     const closeVersionModal = () => setShowVersionModal(false);
 
-    const [overview, setOverview] = useState([]);
+    const [overview, setOverview] = useState({});
 
     useEffect(() => {
         let mounted = true;
@@ -64,14 +64,22 @@ const Console = (props) => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Visualizer
-                user={props.user}
-                overview={overview}
-                defaultSelection={defaultSelection}
-                selection={selection}
-                setSelection={setSelection}
-            />
-            <Detail user={props.user} selection={selection} />
+            <Container fluid={"xl"}>
+                <Row id={"controls-row"}>
+                    <Col lg={6}>
+                        <Visualizer
+                            user={props.user}
+                            overview={overview}
+                            defaultSelection={defaultSelection}
+                            selection={selection}
+                            setSelection={setSelection}
+                        />
+                    </Col>
+                    <Col lg={6}>
+                        <Detail user={props.user} selection={selection} />
+                    </Col>
+                </Row>
+            </Container>
             <Enable show={showEnableModal} onHide={closeEnableModal} token={props.user.token} />
             <Version show={showVersionModal} onHide={closeVersionModal} />
         </Container>
