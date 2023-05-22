@@ -52,7 +52,7 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 		return nil, errors.Wrap(err, "error declaring queue")
 	}
 
-	msgs, err := ch.Consume(cfg.QueueName, "zrok", true, false, false, false, nil)
+	msgs, err := ch.Consume(cfg.QueueName, "zrok", false, false, false, false, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error consuming")
 	}
@@ -66,12 +66,15 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 	}, nil
 }
 
-func (s *amqpSource) Start(events chan ZitiEventJson) (join chan struct{}, err error) {
+func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	go func() {
 		logrus.Info("started")
 		defer logrus.Info("stopped")
 		for event := range s.msgs {
-			events <- ZitiEventJson(event.Body)
+			events <- &ZitiEventAMQP{
+				data: ZitiEventJson(event.Body),
+				msg:  &event,
+			}
 		}
 		close(s.join)
 	}()

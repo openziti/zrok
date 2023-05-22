@@ -2,12 +2,13 @@ package metrics
 
 import (
 	"encoding/binary"
+	"os"
+
 	"github.com/michaelquigley/cf"
 	"github.com/nxadm/tail"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func init() {
@@ -36,7 +37,7 @@ type fileSource struct {
 	t    *tail.Tail
 }
 
-func (s *fileSource) Start(events chan ZitiEventJson) (join chan struct{}, err error) {
+func (s *fileSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	f, err := os.Open(s.cfg.Path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening '%v'", s.cfg.Path)
@@ -69,7 +70,7 @@ func (s *fileSource) Stop() {
 	}
 }
 
-func (s *fileSource) tail(ptr int64, events chan ZitiEventJson) {
+func (s *fileSource) tail(ptr int64, events chan ZitiEventMsg) {
 	logrus.Info("started")
 	defer logrus.Info("stopped")
 
@@ -85,7 +86,9 @@ func (s *fileSource) tail(ptr int64, events chan ZitiEventJson) {
 	}
 
 	for event := range s.t.Lines {
-		events <- ZitiEventJson(event.Text)
+		events <- &ZitiEventJsonMsg{
+			data: ZitiEventJson(event.Text),
+		}
 
 		if err := s.writePtr(event.SeekInfo.Offset); err != nil {
 			logrus.Error(err)

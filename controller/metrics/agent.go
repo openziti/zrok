@@ -7,7 +7,7 @@ import (
 )
 
 type Agent struct {
-	events  chan ZitiEventJson
+	events  chan ZitiEventMsg
 	src     ZitiEventJsonSource
 	srcJoin chan struct{}
 	cache   *cache
@@ -31,7 +31,7 @@ func (a *Agent) AddUsageSink(snk UsageSink) {
 }
 
 func (a *Agent) Start() error {
-	a.events = make(chan ZitiEventJson)
+	a.events = make(chan ZitiEventMsg)
 	srcJoin, err := a.src.Start(a.events)
 	if err != nil {
 		return err
@@ -44,14 +44,21 @@ func (a *Agent) Start() error {
 		for {
 			select {
 			case event := <-a.events:
-				if usage, err := Ingest(event); err == nil {
+				if usage, err := Ingest(event.Data()); err == nil {
 					if err := a.cache.addZrokDetail(usage); err != nil {
 						logrus.Error(err)
 					}
+					shouldAck := true
 					for _, snk := range a.snks {
 						if err := snk.Handle(usage); err != nil {
 							logrus.Error(err)
+							if shouldAck {
+								shouldAck = false
+							}
 						}
+					}
+					if shouldAck {
+						event.Ack()
 					}
 				} else {
 					logrus.Error(err)

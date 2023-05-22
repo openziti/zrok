@@ -14,14 +14,14 @@ type Bridge struct {
 	src     ZitiEventJsonSource
 	srcJoin chan struct{}
 	snk     ZitiEventJsonSink
-	events  chan ZitiEventJson
+	events  chan ZitiEventMsg
 	close   chan struct{}
 	join    chan struct{}
 }
 
 func NewBridge(cfg *BridgeConfig) (*Bridge, error) {
 	b := &Bridge{
-		events: make(chan ZitiEventJson),
+		events: make(chan ZitiEventMsg),
 		join:   make(chan struct{}),
 		close:  make(chan struct{}),
 	}
@@ -53,11 +53,12 @@ func (b *Bridge) Start() (join chan struct{}, err error) {
 			select {
 			case eventJson := <-b.events:
 				logrus.Info(eventJson)
-				if err := b.snk.Handle(eventJson); err == nil {
-					logrus.Infof("-> %v", eventJson)
+				if err := b.snk.Handle(eventJson.Data()); err == nil {
+					logrus.Infof("-> %v", eventJson.Data())
 				} else {
 					logrus.Error(err)
 				}
+				eventJson.Ack()
 
 			case <-b.close:
 				logrus.Info("received close signal")
