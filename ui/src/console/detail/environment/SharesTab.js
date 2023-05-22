@@ -1,13 +1,13 @@
 import * as metadata from "../../../api/metadata";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
-import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
+import {Area, AreaChart, ResponsiveContainer} from "recharts";
 
 const SharesTab = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getEnvironmentDetail(props.selection.id)
+        metadata.getEnvironmentDetail(props.selection.envZId)
             .then(resp => {
                 setDetail(resp.data);
             });
@@ -16,13 +16,13 @@ const SharesTab = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getEnvironmentDetail(props.selection.id)
+            metadata.getEnvironmentDetail(props.selection.envZId)
                 .then(resp => {
                     if(mounted) {
                         setDetail(resp.data);
                     }
                 });
-        }, 1000);
+        }, 5000);
         return () => {
             mounted = false;
             clearInterval(interval);
@@ -34,28 +34,24 @@ const SharesTab = (props) => {
             name: "Frontend",
             selector: row => <a href={row.frontendEndpoint} target={"_"}>{row.frontendEndpoint}</a>,
             sortable: true,
-            hide: "md"
         },
         {
             name: "Backend",
+            grow: 0.5,
             selector: row => row.backendProxyEndpoint,
             sortable: true,
-        },
-        {
-            name: "Share Mode",
-            selector: row => row.shareMode,
-            hide: "md"
-        },
-        {
-            name: "Token",
-            selector: row => row.token,
-            sortable: true,
-            hide: "md"
+            hide: "lg"
         },
         {
             name: "Activity",
+            grow: 0.5,
             cell: row => {
-                return <Sparklines data={row.metrics} height={20} limit={60}><SparklinesLine color={"#3b2693"}/><SparklinesSpots/></Sparklines>;
+                return <ResponsiveContainer width={"100%"} height={"100%"}>
+                    <AreaChart data={row.activity}>
+                        <Area type={"basis"} dataKey={(v) => v.rx ? v.rx : 0} stroke={"#231069"} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                        <Area type={"basis"} dataKey={(v) => v.tx ? v.tx * -1 : 0} stroke={"#231069"} fill={"#9BF316"} isAnimationActive={false} dot={false} />
+                    </AreaChart>
+                </ResponsiveContainer>
             }
         }
     ];

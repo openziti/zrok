@@ -1,18 +1,19 @@
 import * as metadata from "../../../api/metadata";
-import {Sparklines, SparklinesLine, SparklinesSpots} from "react-sparklines";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
 import PropertyTable from "../../PropertyTable";
 import {Tab, Tabs} from "react-bootstrap";
 import ActionsTab from "./ActionsTab";
 import SecretToggle from "../../SecretToggle";
+import {Area, AreaChart, ResponsiveContainer} from "recharts";
+import MetricsTab from "./MetricsTab";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getShareDetail(props.selection.id)
+        metadata.getShareDetail(props.selection.shrToken)
             .then(resp => {
                 let detail = resp.data;
                 detail.envZId = props.selection.envZId;
@@ -23,7 +24,7 @@ const ShareDetail = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getShareDetail(props.selection.id)
+            metadata.getShareDetail(props.selection.shrToken)
                 .then(resp => {
                     if(mounted) {
                         let detail = resp.data;
@@ -39,11 +40,13 @@ const ShareDetail = (props) => {
     }, [props.selection]);
 
     const customProperties = {
-        metrics: row => (
-            <Sparklines data={row.value} limit={60} height={10}>
-                <SparklinesLine color={"#3b2693"}/>
-                <SparklinesSpots/>
-            </Sparklines>
+        activity: row => (
+            <ResponsiveContainer width={"100%"} height={"100%"}>
+                <AreaChart data={row.value}>
+                    <Area type={"basis"} dataKey={(v) => v.rx ? v.rx : 0} stroke={"#231069"} fill={"#04adef"} isAnimationActive={false} dot={false} />
+                    <Area type={"basis"} dataKey={(v) => v.tx ? v.tx * -1 : 0} stroke={"#231069"} fill={"#9BF316"} isAnimationActive={false} dot={false} />
+                </AreaChart>
+            </ResponsiveContainer>
         ),
         frontendEndpoint: row => (
             <a href={row.value} target="_">{row.value}</a>
@@ -64,6 +67,9 @@ const ShareDetail = (props) => {
                 <Tabs defaultActiveKey={"detail"}>
                     <Tab eventKey={"detail"} title={"Detail"}>
                         <PropertyTable object={detail} custom={customProperties} />
+                    </Tab>
+                    <Tab eventKey={"metrics"} title={"Metrics"}>
+                        <MetricsTab share={detail} />
                     </Tab>
                     <Tab eventKey={"actions"} title={"Actions"}>
                         <ActionsTab share={detail} />

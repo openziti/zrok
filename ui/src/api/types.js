@@ -87,17 +87,30 @@
  * @property {string} host 
  * @property {string} address 
  * @property {string} zId 
- * @property {boolean} active 
+ * @property {module:types.sparkData} activity 
+ * @property {boolean} limited 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */
 
 /**
- * @typedef environmentShares
+ * @typedef environmentAndResources
  * @memberof module:types
  * 
  * @property {module:types.environment} environment 
+ * @property {module:types.frontends} frontends 
  * @property {module:types.shares} shares 
+ */
+
+/**
+ * @typedef frontend
+ * @memberof module:types
+ * 
+ * @property {number} id 
+ * @property {string} shrToken 
+ * @property {string} zId 
+ * @property {number} createdAt 
+ * @property {number} updatedAt 
  */
 
 /**
@@ -121,6 +134,33 @@
  * 
  * @property {string} email 
  * @property {string} password 
+ */
+
+/**
+ * @typedef metrics
+ * @memberof module:types
+ * 
+ * @property {string} scope 
+ * @property {string} id 
+ * @property {number} period 
+ * @property {module:types.metricsSample[]} samples 
+ */
+
+/**
+ * @typedef metricsSample
+ * @memberof module:types
+ * 
+ * @property {number} rx 
+ * @property {number} tx 
+ * @property {number} timestamp 
+ */
+
+/**
+ * @typedef overview
+ * @memberof module:types
+ * 
+ * @property {boolean} accountLimited 
+ * @property {module:types.environmentAndResources[]} environments 
  */
 
 /**
@@ -181,7 +221,8 @@
  * @property {string} frontendEndpoint 
  * @property {string} backendProxyEndpoint 
  * @property {boolean} reserved 
- * @property {module:types.shareMetrics} metrics 
+ * @property {module:types.sparkData} activity 
+ * @property {boolean} limited 
  * @property {number} createdAt 
  * @property {number} updatedAt 
  */
@@ -206,6 +247,14 @@
  * 
  * @property {string[]} frontendProxyEndpoints 
  * @property {string} shrToken 
+ */
+
+/**
+ * @typedef sparkDataSample
+ * @memberof module:types
+ * 
+ * @property {number} rx 
+ * @property {number} tx 
  */
 
 /**

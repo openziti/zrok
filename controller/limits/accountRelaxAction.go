@@ -35,11 +35,11 @@ func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *B
 			switch shr.ShareMode {
 			case "public":
 				if err := relaxPublicShare(a.str, a.edge, shr, trx); err != nil {
-					return err
+					return errors.Wrap(err, "error relaxing public share")
 				}
 			case "private":
 				if err := relaxPrivateShare(a.str, a.edge, shr, trx); err != nil {
-					return err
+					return errors.Wrap(err, "error relaxing private share")
 				}
 			}
 		}

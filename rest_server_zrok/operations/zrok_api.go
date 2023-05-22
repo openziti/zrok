@@ -70,11 +70,26 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+		MetadataGetAccountDetailHandler: metadata.GetAccountDetailHandlerFunc(func(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetAccountDetail has not yet been implemented")
+		}),
+		MetadataGetAccountMetricsHandler: metadata.GetAccountMetricsHandlerFunc(func(params metadata.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetAccountMetrics has not yet been implemented")
+		}),
 		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
 		}),
+		MetadataGetEnvironmentMetricsHandler: metadata.GetEnvironmentMetricsHandlerFunc(func(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetEnvironmentMetrics has not yet been implemented")
+		}),
+		MetadataGetFrontendDetailHandler: metadata.GetFrontendDetailHandlerFunc(func(params metadata.GetFrontendDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetFrontendDetail has not yet been implemented")
+		}),
 		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
+		}),
+		MetadataGetShareMetricsHandler: metadata.GetShareMetricsHandlerFunc(func(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
@@ -185,10 +200,20 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
+	// MetadataGetAccountDetailHandler sets the operation handler for the get account detail operation
+	MetadataGetAccountDetailHandler metadata.GetAccountDetailHandler
+	// MetadataGetAccountMetricsHandler sets the operation handler for the get account metrics operation
+	MetadataGetAccountMetricsHandler metadata.GetAccountMetricsHandler
 	// MetadataGetEnvironmentDetailHandler sets the operation handler for the get environment detail operation
 	MetadataGetEnvironmentDetailHandler metadata.GetEnvironmentDetailHandler
+	// MetadataGetEnvironmentMetricsHandler sets the operation handler for the get environment metrics operation
+	MetadataGetEnvironmentMetricsHandler metadata.GetEnvironmentMetricsHandler
+	// MetadataGetFrontendDetailHandler sets the operation handler for the get frontend detail operation
+	MetadataGetFrontendDetailHandler metadata.GetFrontendDetailHandler
 	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
+	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
+	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -321,11 +346,26 @@ func (o *ZrokAPI) Validate() error {
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
 	}
+	if o.MetadataGetAccountDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetAccountDetailHandler")
+	}
+	if o.MetadataGetAccountMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetAccountMetricsHandler")
+	}
 	if o.MetadataGetEnvironmentDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetEnvironmentDetailHandler")
 	}
+	if o.MetadataGetEnvironmentMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetEnvironmentMetricsHandler")
+	}
+	if o.MetadataGetFrontendDetailHandler == nil {
+		unregistered = append(unregistered, "metadata.GetFrontendDetailHandler")
+	}
 	if o.MetadataGetShareDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
+	}
+	if o.MetadataGetShareMetricsHandler == nil {
+		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -502,11 +542,31 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/detail/account"] = metadata.NewGetAccountDetail(o.context, o.MetadataGetAccountDetailHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/metrics/account"] = metadata.NewGetAccountMetrics(o.context, o.MetadataGetAccountMetricsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/detail/environment/{envZId}"] = metadata.NewGetEnvironmentDetail(o.context, o.MetadataGetEnvironmentDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/metrics/environment/{envId}"] = metadata.NewGetEnvironmentMetrics(o.context, o.MetadataGetEnvironmentMetricsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/detail/frontend/{feId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/detail/share/{shrToken}"] = metadata.NewGetShareDetail(o.context, o.MetadataGetShareDetailHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/metrics/share/{shrToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

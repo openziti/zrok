@@ -25,7 +25,7 @@ func (a *shareLimitAction) HandleShare(shr *store.Share, _, _ int64, _ *Bandwidt
 		return err
 	}
 
-	if err := zrokEdgeSdk.DeleteServicePolicyDial(env.ZId, shr.Token, a.edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, a.edge); err != nil {
 		return err
 	}
 	logrus.Infof("removed dial service policy for '%v'", shr.Token)
