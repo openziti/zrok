@@ -62,7 +62,13 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	}
 
 	if md != nil {
-		cmd.tui.RequireToken(md.GetPayload().RegistrationRequiresToken)
+		if !md.GetPayload().InvitesOpen {
+			apiEndpoint, _ := zrd.ApiEndpoint()
+			tui.Error(fmt.Sprintf("'%v' is not currently accepting new users", apiEndpoint), nil)
+		}
+		cmd.tui.invitesOpen = md.GetPayload().InvitesOpen
+		cmd.tui.RequiresInviteToken(md.GetPayload().RequiresInviteToken)
+		cmd.tui.invitesContact = md.GetPayload().InviteTokenContact
 	}
 
 	if _, err := tea.NewProgram(&cmd.tui).Run(); err != nil {
@@ -97,14 +103,16 @@ func (cmd *inviteCommand) endpointError(apiEndpoint, _ string) {
 }
 
 type inviteTui struct {
-	focusIndex   int
-	msg          string
-	emailInputs  []textinput.Model
-	tokenInput   textinput.Model
-	cursorMode   textinput.CursorMode
-	done         bool
-	requireToken bool
-	maxIndex     int
+	focusIndex         int
+	msg                string
+	emailInputs        []textinput.Model
+	tokenInput         textinput.Model
+	cursorMode         textinput.CursorMode
+	done               bool
+	invitesOpen        bool
+	requireInviteToken bool
+	invitesContact     string
+	maxIndex           int
 
 	msgOk         string
 	msgMismatch   string
@@ -208,7 +216,7 @@ func (m *inviteTui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.emailInputs[i].PromptStyle = m.noStyle
 				m.emailInputs[i].TextStyle = m.noStyle
 			}
-			if m.requireToken {
+			if m.requireInviteToken {
 				if m.focusIndex == 2 {
 					cmds[2] = m.tokenInput.Focus()
 					m.tokenInput.PromptStyle = m.focusedStyle
@@ -234,7 +242,7 @@ func (m *inviteTui) updateInputs(msg tea.Msg) tea.Cmd {
 	for i := range m.emailInputs {
 		m.emailInputs[i], cmds[i] = m.emailInputs[i].Update(msg)
 	}
-	if m.requireToken {
+	if m.requireInviteToken {
 		m.tokenInput, cmds[2] = m.tokenInput.Update(msg)
 	}
 	return tea.Batch(cmds...)
@@ -242,14 +250,19 @@ func (m *inviteTui) updateInputs(msg tea.Msg) tea.Cmd {
 
 func (m inviteTui) View() string {
 	var b strings.Builder
+
 	b.WriteString(fmt.Sprintf("\n%v\n\n", m.msg))
+
+	if m.requireInviteToken && m.invitesContact != "" {
+		b.WriteString(fmt.Sprintf("If you don't already have one, request an invite token at: %v\n\n", m.invitesContact))
+	}
 
 	for i := 0; i < len(m.emailInputs); i++ {
 		b.WriteString(m.emailInputs[i].View())
 		b.WriteRune('\n')
 	}
 
-	if m.requireToken {
+	if m.requireInviteToken {
 		b.WriteString(m.tokenInput.View())
 		b.WriteRune('\n')
 	}
@@ -263,8 +276,8 @@ func (m inviteTui) View() string {
 	return b.String()
 }
 
-func (m *inviteTui) RequireToken(require bool) {
-	m.requireToken = require
+func (m *inviteTui) RequiresInviteToken(require bool) {
+	m.requireInviteToken = require
 	if require {
 		m.maxIndex = 3
 	} else {

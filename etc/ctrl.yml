@@ -19,9 +19,22 @@ admin:
   #
   secrets:
     -                             77623cad-1847-4d6d-8ffe-37defc33c909
-  # if `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
+  #
+  # If `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
   #
   tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
+  #
+  # To allow open invites to your `zrok` instance, set `invites_open` to `true`
+  #
+  invites_open:                   true
+  #
+  # Set `token_strategy` to `store` to require an invite token.
+  #
+  #token_strategy:                 store
+  #
+  # Set `invite_token_contact` to include an email address or a URL where an invite token can be requested
+  # 
+  invite_token_contact:           invites@zrok.io
 
 # The `bridge` section configures the `zrok controller metrics bridge`, specifying the source and sink where OpenZiti
 # `fabric.usage` events are consumed and then sent into `zrok`. For production environments, we recommend that you use
@@ -131,10 +144,6 @@ metrics:
 #
 registration:
   registration_url_template:      https://zrok.server.com/register
-  #
-  # Set `token_strategy` to `store` to require an invite token.
-  #
-  #token_strategy:                 store
 
 # Configure the generated URL for password resets. The reset token will be appended to this URL.
 #

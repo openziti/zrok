@@ -31,8 +31,11 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	Secrets []string `cf:"+secret"`
-	TouLink string
+	Secrets             []string `cf:"+secret"`
+	TouLink             string
+	InvitesOpen         bool
+	InviteTokenStrategy string
+	InviteTokenContact  string
 }
 
 type EndpointConfig struct {
@@ -42,7 +45,6 @@ type EndpointConfig struct {
 
 type RegistrationConfig struct {
 	RegistrationUrlTemplate string
-	TokenStrategy           string
 }
 
 type ResetPasswordConfig struct {

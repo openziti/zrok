@@ -17,8 +17,14 @@ import (
 // swagger:model configuration
 type Configuration struct {
 
-	// registration requires token
-	RegistrationRequiresToken bool `json:"registrationRequiresToken,omitempty"`
+	// invite token contact
+	InviteTokenContact string `json:"inviteTokenContact,omitempty"`
+
+	// invites open
+	InvitesOpen bool `json:"invitesOpen,omitempty"`
+
+	// requires invite token
+	RequiresInviteToken bool `json:"requiresInviteToken,omitempty"`
 
 	// tou link
 	TouLink string `json:"touLink,omitempty"`

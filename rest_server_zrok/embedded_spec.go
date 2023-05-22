@@ -1056,7 +1056,13 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
-        "registrationRequiresToken": {
+        "inviteTokenContact": {
+          "type": "string"
+        },
+        "invitesOpen": {
+          "type": "boolean"
+        },
+        "requiresInviteToken": {
           "type": "boolean"
         },
         "touLink": {
@@ -2611,7 +2617,13 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
-        "registrationRequiresToken": {
+        "inviteTokenContact": {
+          "type": "string"
+        },
+        "invitesOpen": {
+          "type": "boolean"
+        },
+        "requiresInviteToken": {
           "type": "boolean"
         },
         "touLink": {
