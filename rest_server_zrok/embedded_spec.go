@@ -1056,6 +1056,15 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
+        "inviteTokenContact": {
+          "type": "string"
+        },
+        "invitesOpen": {
+          "type": "boolean"
+        },
+        "requiresInviteToken": {
+          "type": "boolean"
+        },
         "touLink": {
           "type": "string"
         },
@@ -2608,6 +2617,15 @@ func init() {
     "configuration": {
       "type": "object",
       "properties": {
+        "inviteTokenContact": {
+          "type": "string"
+        },
+        "invitesOpen": {
+          "type": "boolean"
+        },
+        "requiresInviteToken": {
+          "type": "boolean"
+        },
         "touLink": {
           "type": "string"
         },

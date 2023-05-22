@@ -31,6 +31,9 @@
  * 
  * @property {string} version 
  * @property {string} touLink 
+ * @property {boolean} invitesOpen 
+ * @property {boolean} requiresInviteToken 
+ * @property {string} inviteTokenContact 
  */
 
 /**

@@ -38,7 +38,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if h.cfg.Registration != nil && h.cfg.Registration.TokenStrategy == "store" {
+	if h.cfg.Admin != nil && h.cfg.Admin.InviteTokenStrategy == "store" {
 		inviteToken, err := str.FindInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)

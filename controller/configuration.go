@@ -19,13 +19,14 @@ func newConfigurationHandler(cfg *config.Config) *configurationHandler {
 }
 
 func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middleware.Responder {
-	tou := ""
-	if cfg.Admin != nil {
-		tou = cfg.Admin.TouLink
-	}
 	data := &rest_model_zrok.Configuration{
-		Version: build.String(),
-		TouLink: tou,
+		Version:             build.String(),
+		InvitesOpen:         cfg.Admin != nil && cfg.Admin.InvitesOpen,
+		RequiresInviteToken: cfg.Registration != nil && cfg.Admin.InviteTokenStrategy == "store",
+	}
+	if cfg.Admin != nil {
+		data.TouLink = cfg.Admin.TouLink
+		data.InviteTokenContact = cfg.Admin.InviteTokenContact
 	}
 	return metadata.NewConfigurationOK().WithPayload(data)
 }

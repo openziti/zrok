@@ -8,6 +8,8 @@ FEATURE: New metrics infrastructure based on OpenZiti usage events (https://gith
 
 FEATURE: New limits implementation based on the new metrics infrastructure (https://github.com/openziti/zrok/issues/235). See the [v0.4 Limits Guide](docs/guides/metrics-and-limits/configuring-limits.md) for more information.
 
+FEATURE: The invite mechanism has been reworked to improve user experience. The configuration has been moved to the `admin` stanza of the controller configuration and now includes a boolean flag indicating whether or not the instance allows new invitations to be created, and also includes contact details for requesting a new invite. These values are used by the `zrok invite` command to provide a smoother end-user invite experience https://github.com/openziti/zrok/issues/229)
+
 CHANGE: The controller configuration version bumps from `v: 2` to `v: 3` to support all of the new `v0.4` functionality. See the [example ctrl.yml](etc/ctrl.yml) for details on the new configuration.
 
 CHANGE: The underlying database store now utilizes a `deleted` flag on all tables to implement "soft deletes". This was necessary for the new metrics infrastructure, where we need to account for metrics data that arrived after the lifetime of a share or environment; and also we're going to need this for limits, where we need to see historical information about activity in the past (https://github.com/openziti/zrok/issues/262)

@@ -672,6 +672,12 @@ definitions:
         type: string
       touLink:
         type: string
+      invitesOpen:
+        type: boolean
+      requiresInviteToken:
+        type: boolean
+      inviteTokenContact:
+        type: string
 
   createFrontendRequest:
     type: object
