@@ -15,20 +15,20 @@ const PasswordForm = (props) => {
         if (confirm === "" && password === "") {
             return
         }
-        if (confirm.length < props.passwordLength) {
+        if (password.length < props.passwordLength) {
             props.setMessage(passwordTooShortMessage)
             return;
         }
-        if (props.passwordRequireCapital && !/[A-Z]/.test(confirm)) {
+        if (props.passwordRequireCapital && !/[A-Z]/.test(password)) {
             props.setMessage(passwordRequiresCapitalMessage)
             return;
         }
-        if (props.passwordRequireNumeric && !/\d/.test(confirm)) {
+        if (props.passwordRequireNumeric && !/\d/.test(password)) {
             props.setMessage(passwordRequiresNumericMessage)
             return;
         }
         if (props.passwordRequireSpecial) {
-            if (!props.passwordValidSpecialCharacters.split("").some(v => confirm.includes(v))) {
+            if (!props.passwordValidSpecialCharacters.split("").some(v => password.includes(v))) {
                 props.setMessage(passwordRequiresSpecialMessage)
                 return;
             }
