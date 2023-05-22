@@ -1,18 +1,19 @@
 package zrokdir
 
 import (
+	"net/url"
+	"os"
+	"regexp"
+
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/pkg/errors"
-	"net/url"
-	"os"
-	"regexp"
 )
 
-func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
+func (zrd *ZrokXDG) Client() (*rest_client_zrok.Zrok, error) {
 	apiEndpoint, _ := zrd.ApiEndpoint()
 	apiUrl, err := url.Parse(apiEndpoint)
 	if err != nil {
@@ -30,14 +31,14 @@ func (zrd *ZrokDir) Client() (*rest_client_zrok.Zrok, error) {
 	// allow reported version string to be optionally prefixed with
 	// "refs/heads/" or "refs/tags/"
 	re := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
-	if ! re.MatchString(string(v.Payload)) {
+	if !re.MatchString(string(v.Payload)) {
 		return nil, errors.Errorf("expected a '%v' version, received: '%v'", build.Series, v.Payload)
 	}
 
 	return zrok, nil
 }
 
-func (zrd *ZrokDir) ApiEndpoint() (apiEndpoint string, from string) {
+func (zrd *ZrokXDG) ApiEndpoint() (apiEndpoint string, from string) {
 	apiEndpoint = "https://api.zrok.io"
 	from = "binary"
 

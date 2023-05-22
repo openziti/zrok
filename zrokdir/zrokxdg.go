@@ -1,48 +1,27 @@
 package zrokdir
 
-/*
 import (
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/adrg/xdg"
 	"github.com/pkg/errors"
 )
 
-type ZrokDir struct {
+type ZrokXDG struct {
 	Env        *Environment
 	Cfg        *Config
 	identities map[string]struct{}
 }
 
-func InitializeOld() (*ZrokDir, error) {
-	zrd, err := zrokDir()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting zrokdir path")
-	}
-	if err := os.MkdirAll(zrd, os.FileMode(0700)); err != nil {
-		return nil, errors.Wrapf(err, "error creating zrokdir root path '%v'", zrd)
-	}
-	if err := DeleteEnvironment(); err != nil {
-		return nil, errors.Wrap(err, "error deleting environment")
-	}
-	idd, err := identitiesDir()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting zrokdir identities path")
-	}
-	if err := os.MkdirAll(idd, os.FileMode(0700)); err != nil {
-		return nil, errors.Wrapf(err, "error creating zrokdir identities root path '%v'", idd)
-	}
-	return Load()
-}
-
-func Load() (*ZrokDir, error) {
+func Load() (*ZrokXDG, error) {
 	if err := checkMetadata(); err != nil {
 		return nil, err
 	}
 
-	zrd := &ZrokDir{}
+	zrd := &ZrokXDG{}
 
 	ids, err := listIdentities()
 	if err != nil {
@@ -77,7 +56,7 @@ func Load() (*ZrokDir, error) {
 	return zrd, nil
 }
 
-func (zrd *ZrokDir) Save() error {
+func (zrd *ZrokXDG) Save() error {
 	if err := writeMetadata(); err != nil {
 		return errors.Wrap(err, "error saving metadata")
 	}
@@ -95,11 +74,19 @@ func (zrd *ZrokDir) Save() error {
 }
 
 func Obliterate() error {
-	zrd, err := zrokDir()
+	cfgDir, err := configFile()
 	if err != nil {
 		return err
 	}
-	if err := os.RemoveAll(zrd); err != nil {
+	if err := os.RemoveAll(filepath.Dir(cfgDir)); err != nil {
+		return err
+	}
+
+	dataDir, err := environmentFile()
+	if err != nil {
+		return err
+	}
+	if err := os.RemoveAll(filepath.Dir(dataDir)); err != nil {
 		return err
 	}
 	return nil
@@ -133,50 +120,25 @@ func listIdentities() (map[string]struct{}, error) {
 }
 
 func configFile() (string, error) {
-	zrd, err := zrokDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(zrd, "config.json"), nil
+	return xdg.ConfigFile("zrok/config.json")
 }
 
 func environmentFile() (string, error) {
-	zrd, err := zrokDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(zrd, "environment.json"), nil
+	return xdg.DataFile("zrok/environment.json")
 }
 
 func identityFile(name string) (string, error) {
-	idd, err := identitiesDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(idd, fmt.Sprintf("%v.json", name)), nil
+	return xdg.DataFile(fmt.Sprintf("zrok/identities/%v.json", name))
 }
 
 func identitiesDir() (string, error) {
-	zrd, err := zrokDir()
+	dataDir, err := environmentFile()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(zrd, "identities"), nil
+	return filepath.Join(filepath.Dir(dataDir), "identities"), nil
 }
 
 func metadataFile() (string, error) {
-	zrd, err := zrokDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(zrd, "metadata.json"), nil
+	return xdg.DataFile("zrok/metadata.json")
 }
-
-func zrokDir() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(home, ".zrok"), nil
-}
-*/

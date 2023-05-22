@@ -2,20 +2,26 @@ package zrokdir
 
 import (
 	"encoding/json"
-	"github.com/openziti/zrok/tui"
-	"github.com/pkg/errors"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/openziti/zrok/tui"
+	"github.com/pkg/errors"
 )
 
 const V = "v0.3"
 
+var migratedToXDG = false
+
 type Metadata struct {
-	V string `json:"v"`
+	V   string `json:"v"`
+	Xdg bool   `json:"xdg"`
 }
 
 func checkMetadata() error {
 	mf, err := metadataFile()
+	fmt.Println("Checking metadata!")
 	if err != nil {
 		return err
 	}
@@ -31,6 +37,17 @@ func checkMetadata() error {
 	if m.V != V {
 		return errors.Errorf("invalid zrokdir metadata version '%v'", m.V)
 	}
+	migratedToXDG = m.Xdg
+	if !m.Xdg {
+		//Check if there was a previous install. Migrate if so and mark as xdg enabled.
+		fmt.Println("Should migrate to xdg...")
+		if err := migrate(); err != nil {
+			return errors.Wrap(err, "Unable to migrate to XDG config spec")
+		}
+		m.Xdg = true
+		migratedToXDG = true
+		//return errors.Errorf("Need to migrate to xdg")
+	}
 	return nil
 }
 
@@ -39,7 +56,7 @@ func writeMetadata() error {
 	if err != nil {
 		return err
 	}
-	data, err := json.Marshal(&Metadata{V: V})
+	data, err := json.Marshal(&Metadata{V: V, Xdg: migratedToXDG})
 	if err != nil {
 		return err
 	}
