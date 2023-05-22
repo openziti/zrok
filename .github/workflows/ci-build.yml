@@ -12,6 +12,7 @@ on:
 
 jobs:
   ubuntu-build:
+    name: Build Linux AMD64 CLI
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -39,3 +40,75 @@ jobs:
 
       - name: test
         run: go test -v ./...
+
+      - name: solve GOBIN
+        id: solve_go_bin
+        run: |
+          echo DEBUG: go_path="$(go env GOPATH)"
+          echo go_bin="$(go env GOPATH)/bin" >> $GITHUB_OUTPUT
+
+      - name: upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-amd64
+          path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
+          if-no-files-found: error
+  # build a release candidate container image for branches named "main" or like "v*"
+  rc-container-build:
+    needs: ubuntu-build
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v')
+    name: Build Release Candidate Container Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set a container image tag from the branch name
+        id: slug
+        run: |
+          echo branch_tag=$(sed 's/[^a-z0-9_-]/__/gi' <<< "${GITHUB_REF#refs/heads/}") >> $GITHUB_OUTPUT
+
+      - name: Checkout Workspace
+        uses: actions/checkout@v3
+
+      - name: Download Branch Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-amd64
+          path: ./dist/amd64/linux/
+
+      - name: Set Up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: amd64,arm64
+
+      - name: Set Up Docker BuildKit
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_API_USER }}
+          password: ${{ secrets.DOCKER_HUB_API_TOKEN }}
+
+      - name: Set Up Container Image Tags for zrok CLI Container
+        env:
+          ZROK_CONTAINER_IMAGE_REPO: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'openziti/zrok' }}
+          ZROK_CONTAINER_IMAGE_TAG: ${{ steps.slug.outputs.branch_tag }}
+        id: tagprep_cli
+        run: |
+          DOCKER_TAGS=""
+          DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}"
+          echo "DEBUG: DOCKER_TAGS=${DOCKER_TAGS}"
+          echo DOCKER_TAGS="${DOCKER_TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Build & Push Linux AMD64 CLI Container Image to Hub
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ${{ github.workspace }}/
+          file: ${{ github.workspace }}/docker/images/zrok/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ steps.tagprep_cli.outputs.DOCKER_TAGS }}
+          build-args: |
+            DOCKER_BUILD_DIR=./docker/images/zrok
+            ARTIFACTS_DIR=./dist
+          push: true

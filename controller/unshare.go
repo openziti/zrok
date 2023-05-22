@@ -124,10 +124,10 @@ func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, 
 	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyDial(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesDial(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyBind(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesBind(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
 	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {

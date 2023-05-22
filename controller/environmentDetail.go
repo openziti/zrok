@@ -25,7 +25,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
 	}
-	es := &rest_model_zrok.EnvironmentShares{
+	es := &rest_model_zrok.EnvironmentAndResources{
 		Environment: &rest_model_zrok.Environment{
 			Address:     senv.Address,
 			CreatedAt:   senv.CreatedAt.UnixMilli(),
@@ -40,12 +40,15 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		logrus.Errorf("error finding shares for environment '%v' for user '%v': %v", senv.ZId, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
-	var sparkData map[string][]int64
-	if cfg.Influx != nil {
-		sparkData, err = sparkDataForShares(shrs)
+	sparkRx := make(map[string][]int64)
+	sparkTx := make(map[string][]int64)
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
+		sparkRx, sparkTx, err = sparkDataForShares(shrs)
 		if err != nil {
 			logrus.Errorf("error querying spark data for shares for user '%v': %v", principal.Email, err)
 		}
+	} else {
+		logrus.Debug("skipping spark data for shares; no influx configuration")
 	}
 	for _, shr := range shrs {
 		feEndpoint := ""
@@ -60,6 +63,10 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		if shr.BackendProxyEndpoint != nil {
 			beProxyEndpoint = *shr.BackendProxyEndpoint
 		}
+		var sparkData []*rest_model_zrok.SparkDataSample
+		for i := 0; i < len(sparkRx[shr.Token]) && i < len(sparkTx[shr.Token]); i++ {
+			sparkData = append(sparkData, &rest_model_zrok.SparkDataSample{Rx: float64(sparkRx[shr.Token][i]), Tx: float64(sparkTx[shr.Token][i])})
+		}
 		es.Shares = append(es.Shares, &rest_model_zrok.Share{
 			Token:                shr.Token,
 			ZID:                  shr.ZId,
@@ -69,7 +76,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 			FrontendEndpoint:     feEndpoint,
 			BackendProxyEndpoint: beProxyEndpoint,
 			Reserved:             shr.Reserved,
-			Metrics:              sparkData[shr.Token],
+			Activity:             sparkData,
 			CreatedAt:            shr.CreatedAt.UnixMilli(),
 			UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 		})

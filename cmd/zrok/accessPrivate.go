@@ -5,7 +5,9 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/privateFrontend"
+	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -17,7 +19,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
+
+var accessPrivateCmd *accessPrivateCommand
 
 func init() {
 	accessCmd.AddCommand(newAccessPrivateCommand().cmd)
@@ -44,14 +49,6 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
-
-	endpointUrl, err := url.Parse("http://" + cmd.bindAddress)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("invalid endpoint address", err)
-		}
-		panic(err)
-	}
 
 	zrd, err := zrokdir.Load()
 	if err != nil {
@@ -85,10 +82,89 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
 
-	cfg := privateFrontend.DefaultConfig("backend")
-	cfg.ShrToken = shrToken
-	cfg.Address = cmd.bindAddress
-	cfg.RequestsChan = make(chan *endpoints.Request, 1024)
+	protocol := "http://"
+	switch accessResp.Payload.BackendMode {
+	case "tcpTunnel":
+		protocol = "tcp://"
+	case "udpTunnel":
+		protocol = "udp://"
+	}
+
+	endpointUrl, err := url.Parse(protocol + cmd.bindAddress)
+	if err != nil {
+		if !panicInstead {
+			tui.Error("invalid endpoint address", err)
+		}
+		panic(err)
+	}
+
+	requests := make(chan *endpoints.Request, 1024)
+	switch accessResp.Payload.BackendMode {
+	case "tcpTunnel":
+		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
+			BindAddress:  cmd.bindAddress,
+			IdentityName: "backend",
+			ShrToken:     args[0],
+			RequestsChan: requests,
+		})
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private frontend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("error starting frontend", err)
+				}
+				panic(err)
+			}
+		}()
+
+	case "udpTunnel":
+		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
+			BindAddress:  cmd.bindAddress,
+			IdentityName: "backend",
+			ShrToken:     args[0],
+			RequestsChan: requests,
+			IdleTime:     time.Minute,
+		})
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private frontend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("error starting frontend", err)
+				}
+				panic(err)
+			}
+		}()
+
+	default:
+		cfg := proxy.DefaultFrontendConfig("backend")
+		cfg.ShrToken = shrToken
+		cfg.Address = cmd.bindAddress
+		cfg.RequestsChan = requests
+		fe, err := proxy.NewFrontend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private frontend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("unable to run frontend", err)
+				}
+			}
+		}()
+	}
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -98,27 +174,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	frontend, err := privateFrontend.NewHTTP(cfg)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create private frontend", err)
-		}
-		panic(err)
-	}
-
-	go func() {
-		if err := frontend.Run(); err != nil {
-			if !panicInstead {
-				tui.Error("unable to run frontend", err)
-			}
-		}
-	}()
-
 	if cmd.headless {
 		logrus.Infof("access the zrok share at the followind endpoint: %v", endpointUrl.String())
 		for {
 			select {
-			case req := <-cfg.RequestsChan:
+			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
@@ -132,7 +192,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			for {
 				select {
-				case req := <-cfg.RequestsChan:
+				case req := <-requests:
 					if req != nil {
 						prg.Send(req)
 					}
@@ -144,17 +204,16 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("An error occurred", err)
 		}
 
-		close(cfg.RequestsChan)
+		close(requests)
 		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
-
 	}
 }
 
-func (cmd *accessPrivateCommand) destroy(frotendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Debugf("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendToken: frotendName,
+		FrontendToken: frontendName,
 		ShrToken:      shrToken,
 		EnvZID:        envZId,
 	}

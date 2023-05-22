@@ -6,13 +6,13 @@ import (
 	"github.com/openziti/edge/rest_util"
 )
 
-type ZitiConfig struct {
+type Config struct {
 	ApiEndpoint string
 	Username    string
 	Password    string `cf:"+secret"`
 }
 
-func Client(cfg *ZitiConfig) (*rest_management_api_client.ZitiEdgeManagement, error) {
+func Client(cfg *Config) (*rest_management_api_client.ZitiEdgeManagement, error) {
 	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.ApiEndpoint)
 	if err != nil {
 		return nil, err

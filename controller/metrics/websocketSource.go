@@ -1,10 +1,14 @@
 package metrics
 
 import (
-	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/gorilla/websocket"
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/channel/v2"
@@ -14,19 +18,20 @@ import (
 	"github.com/openziti/fabric/pb/mgmt_pb"
 	"github.com/openziti/identity"
 	"github.com/openziti/sdk-golang/ziti/constants"
+	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
-	"net/http"
-	"net/url"
-	"time"
 )
 
+func init() {
+	env.GetCfOptions().AddFlexibleSetter("websocketSource", loadWebsocketSourceConfig)
+}
+
 type WebsocketSourceConfig struct {
-	WebsocketEndpoint string
-	ApiEndpoint       string
+	WebsocketEndpoint string // wss://127.0.0.1:1280/fabric/v1/ws-api
+	ApiEndpoint       string // https://127.0.0.1:1280
 	Username          string
-	Password          string
+	Password          string `cf:"+secret"`
 }
 
 func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
@@ -37,17 +42,17 @@ func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error
 		}
 		return &websocketSource{cfg: cfg}, nil
 	}
-	return nil, errors.New("invalid config structure for 'websocket' source")
+	return nil, errors.New("invalid config structure for 'websocketSource'")
 }
 
 type websocketSource struct {
 	cfg    *WebsocketSourceConfig
 	ch     channel.Channel
-	events chan map[string]interface{}
+	events chan ZitiEventMsg
 	join   chan struct{}
 }
 
-func (s *websocketSource) Start(events chan map[string]interface{}) (chan struct{}, error) {
+func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	caCerts, err := rest_util.GetControllerWellKnownCas(s.cfg.ApiEndpoint)
 	if err != nil {
 		return nil, err
@@ -146,17 +151,7 @@ func (s *websocketSource) Stop() {
 }
 
 func (s *websocketSource) HandleReceive(msg *channel.Message, _ channel.Channel) {
-	decoder := json.NewDecoder(bytes.NewReader(msg.Body))
-	for {
-		ev := make(map[string]interface{})
-		err := decoder.Decode(&ev)
-		if err == io.EOF {
-			break
-		}
-		if err == nil {
-			s.events <- ev
-		} else {
-			logrus.Errorf("error parsing '%v': %v", string(msg.Body), err)
-		}
+	s.events <- &ZitiEventJsonMsg{
+		data: ZitiEventJson(msg.Body),
 	}
 }

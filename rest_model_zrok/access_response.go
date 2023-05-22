@@ -17,6 +17,9 @@ import (
 // swagger:model accessResponse
 type AccessResponse struct {
 
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 }

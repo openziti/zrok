@@ -18,6 +18,9 @@ import (
 // swagger:model share
 type Share struct {
 
+	// activity
+	Activity SparkData `json:"activity,omitempty"`
+
 	// backend mode
 	BackendMode string `json:"backendMode,omitempty"`
 
@@ -33,8 +36,8 @@ type Share struct {
 	// frontend selection
 	FrontendSelection string `json:"frontendSelection,omitempty"`
 
-	// metrics
-	Metrics ShareMetrics `json:"metrics,omitempty"`
+	// limited
+	Limited bool `json:"limited,omitempty"`
 
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
@@ -56,7 +59,7 @@ type Share struct {
 func (m *Share) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateMetrics(formats); err != nil {
+	if err := m.validateActivity(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,16 +69,16 @@ func (m *Share) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Share) validateMetrics(formats strfmt.Registry) error {
-	if swag.IsZero(m.Metrics) { // not required
+func (m *Share) validateActivity(formats strfmt.Registry) error {
+	if swag.IsZero(m.Activity) { // not required
 		return nil
 	}
 
-	if err := m.Metrics.Validate(formats); err != nil {
+	if err := m.Activity.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("metrics")
+			return ve.ValidateName("activity")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("metrics")
+			return ce.ValidateName("activity")
 		}
 		return err
 	}
@@ -87,7 +90,7 @@ func (m *Share) validateMetrics(formats strfmt.Registry) error {
 func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateMetrics(ctx, formats); err != nil {
+	if err := m.contextValidateActivity(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -97,13 +100,13 @@ func (m *Share) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	return nil
 }
 
-func (m *Share) contextValidateMetrics(ctx context.Context, formats strfmt.Registry) error {
+func (m *Share) contextValidateActivity(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := m.Metrics.ContextValidate(ctx, formats); err != nil {
+	if err := m.Activity.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("metrics")
+			return ve.ValidateName("activity")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("metrics")
+			return ce.ValidateName("activity")
 		}
 		return err
 	}

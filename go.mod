@@ -1,6 +1,6 @@
 module github.com/openziti/zrok
 
-go 1.19
+go 1.20
 
 require (
 	github.com/charmbracelet/bubbles v0.14.0
@@ -31,7 +31,9 @@ require (
 	github.com/openziti/fabric v0.22.59
 	github.com/openziti/identity v1.0.37
 	github.com/openziti/sdk-golang v0.18.61
+	github.com/openziti/transport/v2 v2.0.63
 	github.com/pkg/errors v0.9.1
+	github.com/rabbitmq/amqp091-go v1.7.0
 	github.com/rubenv/sql-migrate v1.1.2
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/sirupsen/logrus v1.9.0
@@ -41,7 +43,6 @@ require (
 	golang.org/x/crypto v0.6.0
 	golang.org/x/net v0.8.0
 	golang.org/x/time v0.3.0
-	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 	nhooyr.io/websocket v1.8.7
 )
 
@@ -91,7 +92,6 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/openziti/foundation/v2 v2.0.17 // indirect
 	github.com/openziti/metrics v1.2.10 // indirect
-	github.com/openziti/transport/v2 v2.0.63 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

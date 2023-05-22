@@ -3,6 +3,13 @@ import {useEffect, useRef} from "react";
 import {ForceGraph2D} from "react-force-graph";
 import * as d3 from "d3-force-3d";
 import {roundRect} from "./draw";
+import {mdiShareVariant, mdiConsole, mdiAccount, mdiAlertOctagram, mdiAccessPointNetwork} from "@mdi/js";
+
+const accountIcon = new Path2D(mdiAccount);
+const environmentIcon = new Path2D(mdiConsole);
+const frontendIcon = new Path2D(mdiAccessPointNetwork);
+const limitIcon = new Path2D(mdiAlertOctagram);
+const shareIcon = new Path2D(mdiShareVariant);
 
 const Network = (props) => {
     const targetRef = useRef();
@@ -16,20 +23,8 @@ const Network = (props) => {
     }, []);
 
     const paintNode = (node, ctx) => {
-        let nodeColor = "#636363";
-        let textColor = "#ccc";
-        switch(node.type) {
-            case "environment":
-                nodeColor = "#444";
-                break;
-
-            case "share": // share
-                nodeColor = "#291A66";
-                break;
-
-            default:
-                //
-        }
+        let nodeColor = node.selected ? "#9BF316" : "#04adef";
+        let textColor = "black";
 
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
@@ -41,14 +36,40 @@ const Network = (props) => {
         roundRect(ctx, node.x - (nodeWidth / 2), node.y - 7, nodeWidth, 14, 1.25);
         ctx.fill();
 
-        if(node.selected) {
-            ctx.strokeStyle = "#c4bdde";
-            ctx.stroke();
-        } else {
-            if(node.type === "share") {
-                ctx.strokeStyle = "#433482";
-                ctx.stroke();
-            }
+        const nodeIcon = new Path2D();
+        let xform = new DOMMatrix();
+        xform.translateSelf(node.x - (nodeWidth / 2) - 6, node.y - 13);
+        xform.scaleSelf(0.5, 0.5);
+        switch(node.type) {
+            case "share":
+                nodeIcon.addPath(shareIcon, xform);
+                break;
+            case "environment":
+                nodeIcon.addPath(environmentIcon, xform);
+                break;
+            case "frontend":
+                nodeIcon.addPath(frontendIcon, xform);
+                break;
+            case "account":
+                nodeIcon.addPath(accountIcon, xform);
+                break;
+            default:
+                break;
+        }
+        ctx.fill(nodeIcon);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 0.5;
+        ctx.stroke(nodeIcon);
+
+        if(node.limited) {
+            const nodeLimitIcon = new Path2D();
+            let limitXform = new DOMMatrix();
+            limitXform.translateSelf(node.x + (nodeWidth / 2) - 6, node.y - 13);
+            limitXform.scaleSelf(0.5, 0.5);
+            nodeLimitIcon.addPath(limitIcon, limitXform);
+            ctx.fillStyle = "red";
+            ctx.fill(nodeLimitIcon);
+            ctx.stroke(nodeLimitIcon);
         }
 
         ctx.fillStyle = textColor;
@@ -64,12 +85,13 @@ const Network = (props) => {
             ref={targetRef}
             graphData={props.networkGraph}
             width={props.size.width}
-            height={500}
+            height={800}
             onNodeClick={nodeClicked}
             linkOpacity={.75}
-            linkWidth={1.5}
+            linkWidth={(l) => l.type === "data" ? 3.0 : 1.5 }
+            linkLineDash={(l) => l.type === "data" ? [3, 3] : [] }
             nodeCanvasObject={paintNode}
-            backgroundColor={"#3b2693"}
+            backgroundColor={"linear-gradient(180deg, #0E0238 0%, #231069 100%);"}
             cooldownTicks={300}
         />
     )

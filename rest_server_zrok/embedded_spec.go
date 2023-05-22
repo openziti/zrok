@@ -90,6 +90,30 @@ func init() {
         }
       }
     },
+    "/detail/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountDetail",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environments"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -113,7 +137,45 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentShares"
+              "$ref": "#/definitions/environmentAndResources"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/frontend/{feId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getFrontendDetail",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "feId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/frontend"
             }
           },
           "401": {
@@ -520,6 +582,126 @@ func init() {
         }
       }
     },
+    "/metrics/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "account metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/metrics/environment/{envId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/metrics/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getShareMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -535,7 +717,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentSharesList"
+              "$ref": "#/definitions/overview"
             }
           },
           "500": {
@@ -852,6 +1034,9 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "frontendToken": {
           "type": "string"
         }
@@ -945,8 +1130,8 @@ func init() {
     "environment": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
+        "activity": {
+          "$ref": "#/definitions/sparkData"
         },
         "address": {
           "type": "string"
@@ -960,6 +1145,9 @@ func init() {
         "host": {
           "type": "string"
         },
+        "limited": {
+          "type": "boolean"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -968,21 +1156,18 @@ func init() {
         }
       }
     },
-    "environmentShares": {
+    "environmentAndResources": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
+        "frontends": {
+          "$ref": "#/definitions/frontends"
+        },
         "shares": {
           "$ref": "#/definitions/shares"
         }
-      }
-    },
-    "environmentSharesList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -993,6 +1178,32 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "frontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "shrToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "frontends": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/frontend"
+      }
     },
     "inviteRequest": {
       "type": "object",
@@ -1029,6 +1240,54 @@ func init() {
     },
     "loginResponse": {
       "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "period": {
+          "type": "number"
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metricsSample"
+          }
+        },
+        "scope": {
+          "type": "string"
+        }
+      }
+    },
+    "metricsSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "accountLimited": {
+          "type": "boolean"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentAndResources"
+          }
+        }
+      }
     },
     "principal": {
       "type": "object",
@@ -1112,6 +1371,9 @@ func init() {
     "share": {
       "type": "object",
       "properties": {
+        "activity": {
+          "$ref": "#/definitions/sparkData"
+        },
         "backendMode": {
           "type": "string"
         },
@@ -1127,8 +1389,8 @@ func init() {
         "frontendSelection": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/shareMetrics"
+        "limited": {
+          "type": "boolean"
         },
         "reserved": {
           "type": "boolean"
@@ -1145,12 +1407,6 @@ func init() {
         "zId": {
           "type": "string"
         }
-      }
-    },
-    "shareMetrics": {
-      "type": "array",
-      "items": {
-        "type": "integer"
       }
     },
     "shareRequest": {
@@ -1170,7 +1426,8 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tcpTunnel",
+            "udpTunnel"
           ]
         },
         "backendProxyEndpoint": {
@@ -1215,6 +1472,23 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sparkData": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/sparkDataSample"
+      }
+    },
+    "sparkDataSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
       }
     },
     "unaccessRequest": {
@@ -1371,6 +1645,30 @@ func init() {
         }
       }
     },
+    "/detail/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountDetail",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/environments"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/detail/environment/{envZId}": {
       "get": {
         "security": [
@@ -1394,7 +1692,45 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/environmentShares"
+              "$ref": "#/definitions/environmentAndResources"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/detail/frontend/{feId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getFrontendDetail",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "feId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/frontend"
             }
           },
           "401": {
@@ -1801,6 +2137,126 @@ func init() {
         }
       }
     },
+    "/metrics/account": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getAccountMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "account metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/metrics/environment/{envId}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getEnvironmentMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "envId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "environment metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/metrics/share/{shrToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getShareMetrics",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "shrToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share metrics",
+            "schema": {
+              "$ref": "#/definitions/metrics"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -1816,7 +2272,7 @@ func init() {
           "200": {
             "description": "overview returned",
             "schema": {
-              "$ref": "#/definitions/environmentSharesList"
+              "$ref": "#/definitions/overview"
             }
           },
           "500": {
@@ -2133,6 +2589,9 @@ func init() {
     "accessResponse": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
         "frontendToken": {
           "type": "string"
         }
@@ -2226,8 +2685,8 @@ func init() {
     "environment": {
       "type": "object",
       "properties": {
-        "active": {
-          "type": "boolean"
+        "activity": {
+          "$ref": "#/definitions/sparkData"
         },
         "address": {
           "type": "string"
@@ -2241,6 +2700,9 @@ func init() {
         "host": {
           "type": "string"
         },
+        "limited": {
+          "type": "boolean"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -2249,21 +2711,18 @@ func init() {
         }
       }
     },
-    "environmentShares": {
+    "environmentAndResources": {
       "type": "object",
       "properties": {
         "environment": {
           "$ref": "#/definitions/environment"
         },
+        "frontends": {
+          "$ref": "#/definitions/frontends"
+        },
         "shares": {
           "$ref": "#/definitions/shares"
         }
-      }
-    },
-    "environmentSharesList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/environmentShares"
       }
     },
     "environments": {
@@ -2274,6 +2733,32 @@ func init() {
     },
     "errorMessage": {
       "type": "string"
+    },
+    "frontend": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "shrToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "frontends": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/frontend"
+      }
     },
     "inviteRequest": {
       "type": "object",
@@ -2310,6 +2795,54 @@ func init() {
     },
     "loginResponse": {
       "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "period": {
+          "type": "number"
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metricsSample"
+          }
+        },
+        "scope": {
+          "type": "string"
+        }
+      }
+    },
+    "metricsSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "properties": {
+        "accountLimited": {
+          "type": "boolean"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentAndResources"
+          }
+        }
+      }
     },
     "principal": {
       "type": "object",
@@ -2393,6 +2926,9 @@ func init() {
     "share": {
       "type": "object",
       "properties": {
+        "activity": {
+          "$ref": "#/definitions/sparkData"
+        },
         "backendMode": {
           "type": "string"
         },
@@ -2408,8 +2944,8 @@ func init() {
         "frontendSelection": {
           "type": "string"
         },
-        "metrics": {
-          "$ref": "#/definitions/shareMetrics"
+        "limited": {
+          "type": "boolean"
         },
         "reserved": {
           "type": "boolean"
@@ -2426,12 +2962,6 @@ func init() {
         "zId": {
           "type": "string"
         }
-      }
-    },
-    "shareMetrics": {
-      "type": "array",
-      "items": {
-        "type": "integer"
       }
     },
     "shareRequest": {
@@ -2451,7 +2981,8 @@ func init() {
           "enum": [
             "proxy",
             "web",
-            "dav"
+            "tcpTunnel",
+            "udpTunnel"
           ]
         },
         "backendProxyEndpoint": {
@@ -2496,6 +3027,23 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sparkData": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/sparkDataSample"
+      }
+    },
+    "sparkDataSample": {
+      "type": "object",
+      "properties": {
+        "rx": {
+          "type": "number"
+        },
+        "tx": {
+          "type": "number"
+        }
       }
     },
     "unaccessRequest": {

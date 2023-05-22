@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/openziti/zrok/controller/config"
 	"strings"
 	"time"
 
@@ -11,11 +12,11 @@ import (
 )
 
 type maintenanceRegistrationAgent struct {
-	cfg *RegistrationMaintenanceConfig
+	cfg *config.RegistrationMaintenanceConfig
 	ctx context.Context
 }
 
-func newRegistrationMaintenanceAgent(ctx context.Context, cfg *RegistrationMaintenanceConfig) *maintenanceRegistrationAgent {
+func newRegistrationMaintenanceAgent(ctx context.Context, cfg *config.RegistrationMaintenanceConfig) *maintenanceRegistrationAgent {
 	return &maintenanceRegistrationAgent{
 		cfg: cfg,
 		ctx: ctx,
@@ -78,11 +79,11 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 }
 
 type maintenanceResetPasswordAgent struct {
-	cfg *ResetPasswordMaintenanceConfig
+	cfg *config.ResetPasswordMaintenanceConfig
 	ctx context.Context
 }
 
-func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *ResetPasswordMaintenanceConfig) *maintenanceResetPasswordAgent {
+func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *config.ResetPasswordMaintenanceConfig) *maintenanceResetPasswordAgent {
 	return &maintenanceResetPasswordAgent{
 		cfg: cfg,
 		ctx: ctx,
