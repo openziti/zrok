@@ -58,7 +58,9 @@ func (a *Agent) Start() error {
 						}
 					}
 					if shouldAck {
-						event.Ack()
+						if err := event.Ack(); err != nil {
+							logrus.Error("unable to Ack message", err)
+						}
 					}
 				} else {
 					logrus.Error(err)

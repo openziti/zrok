@@ -73,7 +73,7 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 		for event := range s.msgs {
 			events <- &ZitiEventAMQP{
 				data: ZitiEventJson(event.Body),
-				msg:  &event,
+				msg:  event,
 			}
 		}
 		close(s.join)

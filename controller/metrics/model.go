@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/openziti/zrok/util"
-	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -58,7 +57,7 @@ func (e *ZitiEventJsonMsg) Ack() error {
 
 type ZitiEventAMQP struct {
 	data ZitiEventJson
-	msg  *amqp.Delivery
+	msg  amqp.Delivery
 }
 
 func (e *ZitiEventAMQP) Data() ZitiEventJson {
@@ -66,9 +65,6 @@ func (e *ZitiEventAMQP) Data() ZitiEventJson {
 }
 
 func (e *ZitiEventAMQP) Ack() error {
-	if e.msg != nil {
-		return errors.New("Nil delivery message")
-	}
 	return e.msg.Ack(false)
 }
 
