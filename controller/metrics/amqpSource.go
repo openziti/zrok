@@ -71,7 +71,6 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 		logrus.Info("started")
 		defer logrus.Info("stopped")
 		for event := range s.msgs {
-			logrus.Info("Got event message")
 			events <- &ZitiEventAMQP{
 				data: ZitiEventJson(event.Body),
 				msg:  &event,
