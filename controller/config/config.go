@@ -1,12 +1,13 @@
 package config
 
 import (
+	"time"
+
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/store"
@@ -24,6 +25,7 @@ type Config struct {
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
 	Metrics       *metrics.Config
+	Passwords     *PasswordsConfig
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
@@ -31,16 +33,29 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	Secrets             []string `cf:"+secret"`
-	TouLink             string
 	InvitesOpen         bool
 	InviteTokenStrategy string
 	InviteTokenContact  string
+	Secrets             []string `cf:"+secret"`
+	TouLink             string
 }
 
 type EndpointConfig struct {
 	Host string
 	Port int
+}
+
+type MaintenanceConfig struct {
+	ResetPassword *ResetPasswordMaintenanceConfig
+	Registration  *RegistrationMaintenanceConfig
+}
+
+type PasswordsConfig struct {
+	Length                 int
+	RequireCapital         bool
+	RequireNumeric         bool
+	RequireSpecial         bool
+	ValidSpecialCharacters string
 }
 
 type RegistrationConfig struct {
@@ -49,11 +64,6 @@ type RegistrationConfig struct {
 
 type ResetPasswordConfig struct {
 	ResetUrlTemplate string
-}
-
-type MaintenanceConfig struct {
-	ResetPassword *ResetPasswordMaintenanceConfig
-	Registration  *RegistrationMaintenanceConfig
 }
 
 type RegistrationMaintenanceConfig struct {
@@ -82,6 +92,13 @@ func DefaultConfig() *Config {
 				CheckFrequency:    time.Hour,
 				BatchLimit:        500,
 			},
+		},
+		Passwords: &PasswordsConfig{
+			Length:                 8,
+			RequireCapital:         true,
+			RequireNumeric:         true,
+			RequireSpecial:         true,
+			ValidSpecialCharacters: `!@$&*_-., "#%'()+/:;<=>?[\]^{|}~`,
 		},
 	}
 }

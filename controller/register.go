@@ -2,16 +2,21 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
 
-type registerHandler struct{}
+type registerHandler struct {
+	cfg *config.Config
+}
 
-func newRegisterHandler() *registerHandler {
-	return &registerHandler{}
+func newRegisterHandler(cfg *config.Config) *registerHandler {
+	return &registerHandler{
+		cfg: cfg,
+	}
 }
 func (h *registerHandler) Handle(params account.RegisterParams) middleware.Responder {
 	if params.Body == nil || params.Body.Token == "" || params.Body.Password == "" {
@@ -38,6 +43,12 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		logrus.Errorf("error creating token for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
+
+	if err := validatePassword(h.cfg, params.Body.Password); err != nil {
+		logrus.Errorf("password not valid for request '%v', (%v): %v", params.Body.Token, ar.Email, err)
+		return account.NewRegisterUnprocessableEntity().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+
 	hpwd, err := hashPassword(params.Body.Password)
 	if err != nil {
 		logrus.Errorf("error hashing password for request '%v' (%v): %v", params.Body.Token, ar.Email, err)

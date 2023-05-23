@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ResetPasswordOKCode is the HTTP code returned for type ResetPasswordOK
@@ -59,6 +61,49 @@ func (o *ResetPasswordNotFound) WriteResponse(rw http.ResponseWriter, producer r
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
+}
+
+// ResetPasswordUnprocessableEntityCode is the HTTP code returned for type ResetPasswordUnprocessableEntity
+const ResetPasswordUnprocessableEntityCode int = 422
+
+/*
+ResetPasswordUnprocessableEntity password validation failure
+
+swagger:response resetPasswordUnprocessableEntity
+*/
+type ResetPasswordUnprocessableEntity struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewResetPasswordUnprocessableEntity creates ResetPasswordUnprocessableEntity with default headers values
+func NewResetPasswordUnprocessableEntity() *ResetPasswordUnprocessableEntity {
+
+	return &ResetPasswordUnprocessableEntity{}
+}
+
+// WithPayload adds the payload to the reset password unprocessable entity response
+func (o *ResetPasswordUnprocessableEntity) WithPayload(payload rest_model_zrok.ErrorMessage) *ResetPasswordUnprocessableEntity {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the reset password unprocessable entity response
+func (o *ResetPasswordUnprocessableEntity) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *ResetPasswordUnprocessableEntity) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(422)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // ResetPasswordInternalServerErrorCode is the HTTP code returned for type ResetPasswordInternalServerError

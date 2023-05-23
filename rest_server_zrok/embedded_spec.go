@@ -754,6 +754,12 @@ func init() {
           "404": {
             "description": "request not found"
           },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -781,6 +787,12 @@ func init() {
           },
           "404": {
             "description": "request not found"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"
@@ -1062,6 +1074,9 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
+        "passwordRequirements": {
+          "$ref": "#/definitions/passwordRequirements"
+        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -1292,6 +1307,26 @@ func init() {
           "items": {
             "$ref": "#/definitions/environmentAndResources"
           }
+        }
+      }
+    },
+    "passwordRequirements": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "integer"
+        },
+        "requireCapital": {
+          "type": "boolean"
+        },
+        "requireNumeric": {
+          "type": "boolean"
+        },
+        "requireSpecial": {
+          "type": "boolean"
+        },
+        "validSpecialCharacters": {
+          "type": "string"
         }
       }
     },
@@ -2315,6 +2350,12 @@ func init() {
           "404": {
             "description": "request not found"
           },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -2342,6 +2383,12 @@ func init() {
           },
           "404": {
             "description": "request not found"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"
@@ -2623,6 +2670,9 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
+        "passwordRequirements": {
+          "$ref": "#/definitions/passwordRequirements"
+        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -2853,6 +2903,26 @@ func init() {
           "items": {
             "$ref": "#/definitions/environmentAndResources"
           }
+        }
+      }
+    },
+    "passwordRequirements": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "integer"
+        },
+        "requireCapital": {
+          "type": "boolean"
+        },
+        "requireNumeric": {
+          "type": "boolean"
+        },
+        "requireSpecial": {
+          "type": "boolean"
+        },
+        "validSpecialCharacters": {
+          "type": "string"
         }
       }
     },

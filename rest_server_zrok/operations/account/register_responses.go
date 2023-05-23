@@ -83,6 +83,49 @@ func (o *RegisterNotFound) WriteResponse(rw http.ResponseWriter, producer runtim
 	rw.WriteHeader(404)
 }
 
+// RegisterUnprocessableEntityCode is the HTTP code returned for type RegisterUnprocessableEntity
+const RegisterUnprocessableEntityCode int = 422
+
+/*
+RegisterUnprocessableEntity password validation failure
+
+swagger:response registerUnprocessableEntity
+*/
+type RegisterUnprocessableEntity struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewRegisterUnprocessableEntity creates RegisterUnprocessableEntity with default headers values
+func NewRegisterUnprocessableEntity() *RegisterUnprocessableEntity {
+
+	return &RegisterUnprocessableEntity{}
+}
+
+// WithPayload adds the payload to the register unprocessable entity response
+func (o *RegisterUnprocessableEntity) WithPayload(payload rest_model_zrok.ErrorMessage) *RegisterUnprocessableEntity {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the register unprocessable entity response
+func (o *RegisterUnprocessableEntity) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *RegisterUnprocessableEntity) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(422)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // RegisterInternalServerErrorCode is the HTTP code returned for type RegisterInternalServerError
 const RegisterInternalServerErrorCode int = 500
 

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
@@ -34,8 +35,8 @@ func Run(inCfg *config.Config) error {
 	api.KeyAuth = newZrokAuthenticator(cfg).authenticate
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
-	api.AccountRegisterHandler = newRegisterHandler()
-	api.AccountResetPasswordHandler = newResetPasswordHandler()
+	api.AccountRegisterHandler = newRegisterHandler(cfg)
+	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
