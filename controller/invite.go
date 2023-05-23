@@ -21,7 +21,7 @@ func newInviteHandler(cfg *config.Config) *inviteHandler {
 
 func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
 	if h.cfg.Invites == nil || !h.cfg.Invites.InvitesOpen {
-		logrus.Warn("not accepting invites; attempt from '%v'", params.Body.Email)
+		logrus.Warnf("not accepting invites; attempt from '%v'", params.Body.Email)
 		return account.NewInviteBadRequest()
 	}
 	if params.Body == nil || params.Body.Email == "" {
