@@ -20,6 +20,10 @@ func newInviteHandler(cfg *config.Config) *inviteHandler {
 }
 
 func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
+	if h.cfg.Invites == nil || !h.cfg.Invites.InvitesOpen {
+		logrus.Warn("not accepting invites; attempt from '%v'", params.Body.Email)
+		return account.NewInviteBadRequest()
+	}
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return account.NewInviteBadRequest()
@@ -38,7 +42,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if h.cfg.Admin != nil && h.cfg.Admin.InviteTokenStrategy == "store" {
+	if h.cfg.Invites != nil && h.cfg.Invites.TokenStrategy == "store" {
 		inviteToken, err := str.FindInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
