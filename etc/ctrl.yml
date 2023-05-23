@@ -140,20 +140,20 @@ metrics:
     org:            zrok
     token:          "<INFLUX TOKEN>"
 
+# Configure password requirements for user accounts.
+#
+#passwords:
+#  length:           8
+#  require_capital:  true
+#  require_numeric:  true
+#  require_special:  true
+#  # Denote which characters satisfy the `require_special` requirement. Note the need to escape specific characters.
+#  valid_special_characters: "\"\\`'~!@#$%^&*()[],./"
+
 # Configure the generated URL for the registration email. The registration token will be appended to this URL.
 #
 registration:
   registration_url_template:      https://zrok.server.com/register
-
-# Configure password requirements for user accounts.
-#
-password_requirements:
-  length: 8
-  require_capital: true
-  require_numeric: true
-  require_special: true
-  # Denote which characters satisfy the `require_special` requirement. Note the need to escape specific characters.
-  valid_special_characters: "\"\\`'~!@#$%^&*()[],./"
 
 # Configure the generated URL for password resets. The reset token will be appended to this URL.
 #
