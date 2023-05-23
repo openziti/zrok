@@ -22,6 +22,7 @@ type Config struct {
 	Bridge        *metrics.BridgeConfig
 	Endpoint      *EndpointConfig
 	Email         *emailUi.Config
+	Invites       *InvitesConfig
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
 	Metrics       *metrics.Config
@@ -33,16 +34,19 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	InvitesOpen         bool
-	InviteTokenStrategy string
-	InviteTokenContact  string
-	Secrets             []string `cf:"+secret"`
-	TouLink             string
+	Secrets []string `cf:"+secret"`
+	TouLink string
 }
 
 type EndpointConfig struct {
 	Host string
 	Port int
+}
+
+type InvitesConfig struct {
+	InvitesOpen   bool
+	TokenStrategy string
+	TokenContact  string
 }
 
 type MaintenanceConfig struct {
