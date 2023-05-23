@@ -33,7 +33,7 @@ const PasswordForm = (props) => {
                 return;
             }
         }
-        if (confirm != password) {
+        if (confirm !== password) {
             props.setMessage(passwordMismatchMessage)
             return;
         }

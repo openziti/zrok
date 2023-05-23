@@ -92,21 +92,21 @@ func proxyUrl(shrToken, template string) string {
 }
 
 func validatePassword(cfg *config.Config, password string) error {
-	if cfg.PasswordRequirements.Length > len(password) {
-		return fmt.Errorf("password length: expected (%d), got (%d)", cfg.PasswordRequirements.Length, len(password))
+	if cfg.Passwords.Length > len(password) {
+		return fmt.Errorf("password length: expected (%d), got (%d)", cfg.Passwords.Length, len(password))
 	}
-	if cfg.PasswordRequirements.RequireCapital {
+	if cfg.Passwords.RequireCapital {
 		if !hasCapital(password) {
 			return fmt.Errorf("password requires capital, found none")
 		}
 	}
-	if cfg.PasswordRequirements.RequireNumeric {
+	if cfg.Passwords.RequireNumeric {
 		if !hasNumeric(password) {
 			return fmt.Errorf("password requires numeric, found none")
 		}
 	}
-	if cfg.PasswordRequirements.RequireSpecial {
-		if !strings.ContainsAny(password, cfg.PasswordRequirements.ValidSpecialCharacters) {
+	if cfg.Passwords.RequireSpecial {
+		if !strings.ContainsAny(password, cfg.Passwords.ValidSpecialCharacters) {
 			return fmt.Errorf("password requires special character, found none")
 		}
 	}

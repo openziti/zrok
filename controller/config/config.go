@@ -17,27 +17,27 @@ import (
 const ConfigVersion = 3
 
 type Config struct {
-	V                    int
-	Admin                *AdminConfig
-	Bridge               *metrics.BridgeConfig
-	Endpoint             *EndpointConfig
-	Email                *emailUi.Config
-	Limits               *limits.Config
-	Maintenance          *MaintenanceConfig
-	Metrics              *metrics.Config
-	Registration         *RegistrationConfig
-	ResetPassword        *ResetPasswordConfig
-	Store                *store.Config
-	Ziti                 *zrokEdgeSdk.Config
-	PasswordRequirements *PaswordRequirementsConfig
+	V             int
+	Admin         *AdminConfig
+	Bridge        *metrics.BridgeConfig
+	Endpoint      *EndpointConfig
+	Email         *emailUi.Config
+	Limits        *limits.Config
+	Maintenance   *MaintenanceConfig
+	Metrics       *metrics.Config
+	Passwords     *PasswordsConfig
+	Registration  *RegistrationConfig
+	ResetPassword *ResetPasswordConfig
+	Store         *store.Config
+	Ziti          *zrokEdgeSdk.Config
 }
 
 type AdminConfig struct {
-	Secrets             []string `cf:"+secret"`
-	TouLink             string
 	InvitesOpen         bool
 	InviteTokenStrategy string
 	InviteTokenContact  string
+	Secrets             []string `cf:"+secret"`
+	TouLink             string
 }
 
 type EndpointConfig struct {
@@ -45,11 +45,12 @@ type EndpointConfig struct {
 	Port int
 }
 
-type RegistrationConfig struct {
-	RegistrationUrlTemplate string
+type MaintenanceConfig struct {
+	ResetPassword *ResetPasswordMaintenanceConfig
+	Registration  *RegistrationMaintenanceConfig
 }
 
-type PaswordRequirementsConfig struct {
+type PasswordsConfig struct {
 	Length                 int
 	RequireCapital         bool
 	RequireNumeric         bool
@@ -57,13 +58,12 @@ type PaswordRequirementsConfig struct {
 	ValidSpecialCharacters string
 }
 
-type ResetPasswordConfig struct {
-	ResetUrlTemplate string
+type RegistrationConfig struct {
+	RegistrationUrlTemplate string
 }
 
-type MaintenanceConfig struct {
-	ResetPassword *ResetPasswordMaintenanceConfig
-	Registration  *RegistrationMaintenanceConfig
+type ResetPasswordConfig struct {
+	ResetUrlTemplate string
 }
 
 type RegistrationMaintenanceConfig struct {
@@ -81,13 +81,6 @@ type ResetPasswordMaintenanceConfig struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Limits: limits.DefaultConfig(),
-		PasswordRequirements: &PaswordRequirementsConfig{
-			Length:                 8,
-			RequireCapital:         true,
-			RequireNumeric:         true,
-			RequireSpecial:         true,
-			ValidSpecialCharacters: `!@$&*_-., "#%'()+/:;<=>?[\]^{|}~`,
-		},
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{
 				ExpirationTimeout: time.Minute * 15,
@@ -99,6 +92,13 @@ func DefaultConfig() *Config {
 				CheckFrequency:    time.Hour,
 				BatchLimit:        500,
 			},
+		},
+		Passwords: &PasswordsConfig{
+			Length:                 8,
+			RequireCapital:         true,
+			RequireNumeric:         true,
+			RequireSpecial:         true,
+			ValidSpecialCharacters: `!@$&*_-., "#%'()+/:;<=>?[\]^{|}~`,
 		},
 	}
 }

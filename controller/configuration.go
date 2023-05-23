@@ -27,14 +27,14 @@ func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middlewar
 	if cfg.Admin != nil {
 		data.TouLink = cfg.Admin.TouLink
 		data.InviteTokenContact = cfg.Admin.InviteTokenContact
-	}
-	if cfg.PasswordRequirements != nil {
-		data.PasswordRequirements = &rest_model_zrok.PasswordRequirements{
-			Length:                 int64(cfg.PasswordRequirements.Length),
-			RequireCapital:         cfg.PasswordRequirements.RequireCapital,
-			RequireNumeric:         cfg.PasswordRequirements.RequireNumeric,
-			RequireSpecial:         cfg.PasswordRequirements.RequireSpecial,
-			ValidSpecialCharacters: cfg.PasswordRequirements.ValidSpecialCharacters,
+		if cfg.Passwords != nil {
+			data.PasswordRequirements = &rest_model_zrok.PasswordRequirements{
+				Length:                 int64(cfg.Passwords.Length),
+				RequireCapital:         cfg.Passwords.RequireCapital,
+				RequireNumeric:         cfg.Passwords.RequireNumeric,
+				RequireSpecial:         cfg.Passwords.RequireSpecial,
+				ValidSpecialCharacters: cfg.Passwords.ValidSpecialCharacters,
+			}
 		}
 	}
 	return metadata.NewConfigurationOK().WithPayload(data)
