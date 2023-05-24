@@ -22,7 +22,7 @@ const SetPasswordForm = (props) => {
     useEffect(() => {
         metadata.configuration().then(resp => {
             if(!resp.error) {
-                if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
+                if (resp.data.touLink !== undefined && resp.data.touLink.trim() !== "") {
                     setTou(resp.data.touLink)
                 }
                 setPasswordLength(resp.data.passwordRequirements.length)
