@@ -1,12 +1,11 @@
 package endpoints
 
 import (
-	"net/url"
-	"strings"
-
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/sirupsen/logrus"
+	"net/url"
+	"strings"
 )
 
 func GetRefreshedService(name string, ctx ziti.Context) (*rest_model.ServiceDetail, bool) {

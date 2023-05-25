@@ -3,12 +3,6 @@ package publicProxy
 import (
 	"context"
 	"fmt"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
@@ -18,6 +12,11 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
 )
 
 type httpFrontend struct {

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge-api/rest_management_api_client"

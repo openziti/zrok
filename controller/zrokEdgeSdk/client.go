@@ -2,7 +2,6 @@ package zrokEdgeSdk
 
 import (
 	"crypto/x509"
-
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_util"
 )

@@ -3,9 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
-
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_management_api_client/service"
@@ -16,6 +13,8 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"strings"
+	"time"
 )
 
 func GC(inCfg *zrok_config.Config) error {

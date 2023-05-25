@@ -3,7 +3,6 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-
 	"github.com/go-openapi/runtime/middleware"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"

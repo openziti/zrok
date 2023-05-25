@@ -3,13 +3,12 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/model"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {

@@ -3,17 +3,16 @@ package proxy
 import (
 	"crypto/tls"
 	"fmt"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"time"
-
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
 )
 
 type BackendConfig struct {

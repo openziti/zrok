@@ -2,13 +2,12 @@ package proxy
 
 import (
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
+	"net/http"
+	"time"
 )
 
 type WebBackendConfig struct {

@@ -3,13 +3,12 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func CreateShareServiceEdgeRouterPolicy(envZId, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {

@@ -1,14 +1,13 @@
 package tcpTunnel
 
 import (
-	"net"
-	"time"
-
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"net"
+	"time"
 )
 
 type BackendConfig struct {
