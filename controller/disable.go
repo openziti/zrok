@@ -2,9 +2,10 @@ package controller
 
 import (
 	"fmt"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"

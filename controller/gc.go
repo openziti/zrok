@@ -3,18 +3,19 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/config"
-	"github.com/openziti/edge/rest_management_api_client/service"
-	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
-	"github.com/openziti/edge/rest_management_api_client/service_policy"
+	"strings"
+	"time"
+
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
+	"github.com/openziti/edge-api/rest_management_api_client/service"
+	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
+	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"strings"
-	"time"
 )
 
 func GC(inCfg *zrok_config.Config) error {

@@ -3,13 +3,14 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/config"
+	"time"
+
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 var zrokProxyConfigId string

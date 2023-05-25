@@ -3,16 +3,17 @@ package controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/edge/rest_management_api_client"
-	edge_service "github.com/openziti/edge/rest_management_api_client/service"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type unshareHandler struct{}

@@ -3,8 +3,13 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/model"
@@ -12,11 +17,6 @@ import (
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"time"
 )
 
 type FrontendConfig struct {
@@ -45,12 +45,15 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.IdentityName)
 	}
-	zCfg, err := config.NewFromFile(zCfgPath)
+	zCfg, err := ziti.NewConfigFromFile(zCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
-	zCtx := ziti.NewContextWithConfig(zCfg)
+	zCtx, err := ziti.NewContext(zCfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error loading ziti context")
+	}
 	zDialCtx := zitiDialContext{ctx: zCtx, shrToken: cfg.ShrToken}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
@@ -115,7 +118,7 @@ func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.Reverse
 	director := func(req *http.Request) {
 		targetShrToken := cfg.ShrToken
 		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
-			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+			if cfg, found := svc.Config[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
 			} else {
 				logrus.Warn("no config!")
@@ -147,7 +150,7 @@ func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.Reverse
 func authHandler(shrToken string, handler http.Handler, realm string, cfg *FrontendConfig, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
-			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+			if cfg, found := svc.Config[model.ZrokProxyConfig]; found {
 				if scheme, found := cfg["auth_scheme"]; found {
 					switch scheme {
 					case string(model.None):
