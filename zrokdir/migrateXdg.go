@@ -1,6 +1,7 @@
 package zrokdir
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -38,6 +39,34 @@ func migrate() error {
 		return err
 	}
 
+	if err := updateMetadata(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func updateMetadata() error {
+	mf, err := metadataFile()
+	if err != nil {
+		return err
+	}
+	data, err := os.ReadFile(mf)
+	if err != nil {
+		return errors.Wrapf(err, "error reading metadata file '%v'", mf)
+	}
+	m := &Metadata{}
+	if err := json.Unmarshal(data, m); err != nil {
+		return errors.Wrapf(err, "error unmarshaling metadata file '%v'", mf)
+	}
+	m.Xdg = true
+	newData, err := json.Marshal(&m)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(mf, newData, os.FileMode(0600)); err != nil {
+		return errors.Wrapf(err, "error writing metadata file '%v'", mf)
+	}
 	return nil
 }
 
@@ -71,11 +100,11 @@ func moveIdentities() error {
 func moveFileHelper(old, new func() (string, error), name string) error {
 	of, err := old()
 	if err != nil {
-		return fmt.Errorf("unable to load old %f file: %v", name, err)
+		return fmt.Errorf("unable to load old %s file: %v", name, err)
 	}
 	nf, err := new()
 	if err != nil {
-		return fmt.Errorf("unable to load new %f file: %v", name, err)
+		return fmt.Errorf("unable to load new %s file: %v", name, err)
 	}
 	if err := moveFile(of, nf); err != nil {
 		return fmt.Errorf("unable to move %s file: %v", name, err)
@@ -89,7 +118,7 @@ func moveFile(source, dest string) error {
 		return fmt.Errorf("unable to open source file: %v", err)
 	}
 	defer sourceFile.Close()
-	destFile, err := os.Open(dest)
+	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("unable to open destination file: %v", err)
 	}
