@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"nhooyr.io/websocket"
@@ -64,14 +63,17 @@ func (cmd *testWebsocketCommand) run(_ *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 
-		cfg := &config.Config{}
+		cfg := &ziti.Config{}
 		err = json.Unmarshal(identityJsonBytes, cfg)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to load ziti configuration JSON: %v", err)
 			os.Exit(1)
 		}
-		zitiContext := ziti.NewContextWithConfig(cfg)
-
+		zitiContext, err := ziti.NewContext(cfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to load ziti context: %v", err)
+			os.Exit(1)
+		}
 		dial := func(_ context.Context, _, addr string) (net.Conn, error) {
 			service := strings.Split(addr, ":")[0]
 			return zitiContext.Dial(service)

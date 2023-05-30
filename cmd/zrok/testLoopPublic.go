@@ -7,7 +7,6 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
@@ -144,7 +143,7 @@ func (l *looper) run() {
 }
 
 func (l *looper) serviceListener() {
-	zcfg, err := config.NewFromFile(l.zif)
+	zcfg, err := ziti.NewConfigFromFile(l.zif)
 	if err != nil {
 		logrus.Errorf("error opening ziti config '%v': %v", l.zif, err)
 		return
@@ -153,7 +152,12 @@ func (l *looper) serviceListener() {
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 10,
 	}
-	if l.listener, err = ziti.NewContextWithConfig(zcfg).ListenWithOptions(l.shrToken, &opts); err == nil {
+	zctx, err := ziti.NewContext(zcfg)
+	if err != nil {
+		logrus.Errorf("error loading ziti context: %v", err)
+		return
+	}
+	if l.listener, err = zctx.ListenWithOptions(l.shrToken, &opts); err == nil {
 		if err := http.Serve(l.listener, l); err != nil {
 			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}

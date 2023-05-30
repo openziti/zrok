@@ -13,15 +13,16 @@ import (
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/channel/v2"
 	"github.com/openziti/channel/v2/websockets"
-	"github.com/openziti/edge/rest_util"
+	"github.com/openziti/edge-api/rest_util"
 	"github.com/openziti/fabric/event"
 	"github.com/openziti/fabric/pb/mgmt_pb"
 	"github.com/openziti/identity"
-	"github.com/openziti/sdk-golang/ziti/constants"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+const ZitiSession = "zt-session"
 
 func init() {
 	env.GetCfOptions().AddFlexibleSetter("websocketSource", loadWebsocketSourceConfig)
@@ -81,7 +82,7 @@ func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, e
 		HandshakeTimeout: 5 * time.Second,
 	}
 
-	conn, resp, err := dialer.Dial(s.cfg.WebsocketEndpoint, http.Header{constants.ZitiSession: []string{*apiSession.Token}})
+	conn, resp, err := dialer.Dial(s.cfg.WebsocketEndpoint, http.Header{ZitiSession: []string{*apiSession.Token}})
 	if err != nil {
 		if resp != nil {
 			if body, rerr := io.ReadAll(resp.Body); rerr == nil {

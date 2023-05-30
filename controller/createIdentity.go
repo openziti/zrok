@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/go-openapi/runtime/middleware"
-	rest_model_edge "github.com/openziti/edge/rest_model"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"

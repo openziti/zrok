@@ -1,14 +1,14 @@
 package endpoints
 
 import (
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/sirupsen/logrus"
 	"net/url"
 	"strings"
 )
 
-func GetRefreshedService(name string, ctx ziti.Context) (*edge.Service, bool) {
+func GetRefreshedService(name string, ctx ziti.Context) (*rest_model.ServiceDetail, bool) {
 	svc, found := ctx.GetService(name)
 	if !found {
 		if err := ctx.RefreshServices(); err != nil {

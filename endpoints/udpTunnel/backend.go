@@ -2,7 +2,6 @@ package udpTunnel
 
 import (
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
@@ -28,11 +27,15 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		ConnectTimeout: 5 * time.Minute,
 		MaxConnections: 64,
 	}
-	zcfg, err := config.NewFromFile(cfg.IdentityPath)
+	zcfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
-	listener, err := ziti.NewContextWithConfig(zcfg).ListenWithOptions(cfg.ShrToken, &options)
+	zctx, err := ziti.NewContext(zcfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error loading ziti context")
+	}
+	listener, err := zctx.ListenWithOptions(cfg.ShrToken, &options)
 	if err != nil {
 		return nil, errors.Wrap(err, "error listening")
 	}

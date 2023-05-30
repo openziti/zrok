@@ -5,14 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/config"
-	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
-	"github.com/openziti/edge/rest_management_api_client/identity"
-	"github.com/openziti/edge/rest_model"
-	rest_model_edge "github.com/openziti/edge/rest_model"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
+	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
+	"github.com/openziti/edge-api/rest_management_api_client/identity"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	ziti_config "github.com/openziti/sdk-golang/ziti/config"
 	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
@@ -118,7 +116,7 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 	}
 	if len(listResp.Payload.Data) < 1 {
 		name := model.ZrokProxyConfig
-		ct := &rest_model.ConfigTypeCreate{Name: &name}
+		ct := &rest_model_edge.ConfigTypeCreate{Name: &name}
 		createReq := &config.CreateConfigTypeParams{ConfigType: ct}
 		createReq.SetTimeout(30 * time.Second)
 		createResp, err := edge.Config.CreateConfigType(createReq, nil)
@@ -139,16 +137,22 @@ func getIdentityId(identityName string) (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir", identityName)
 	}
-	zcfg, err := ziti_config.NewFromFile(zif)
+	zcfg, err := ziti.NewConfigFromFile(zif)
 	if err != nil {
 		return "", errors.Wrapf(err, "error loading ziti config from file '%v'", zif)
 	}
-	zctx := ziti.NewContextWithConfig(zcfg)
+	zctx, err := ziti.NewContext(zcfg)
+	if err != nil {
+		return "", errors.Wrap(err, "error loading ziti context")
+	}
 	id, err := zctx.GetCurrentIdentity()
 	if err != nil {
 		return "", errors.Wrapf(err, "error getting current identity from '%v'", zif)
 	}
-	return id.Id, nil
+	if id.ID != nil {
+		return *id.ID, nil
+	}
+	return "", nil
 }
 
 func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {

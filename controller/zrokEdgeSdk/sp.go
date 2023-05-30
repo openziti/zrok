@@ -3,9 +3,9 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/service_policy"
-	"github.com/openziti/edge/rest_model"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"

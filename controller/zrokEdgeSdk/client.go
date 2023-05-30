@@ -2,8 +2,8 @@ package zrokEdgeSdk
 
 import (
 	"crypto/x509"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_util"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_util"
 )
 
 type Config struct {

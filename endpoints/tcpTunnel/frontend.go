@@ -2,7 +2,6 @@ package tcpTunnel
 
 import (
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/zrokdir"
@@ -34,12 +33,15 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.IdentityName)
 	}
-	zCfg, err := config.NewFromFile(zCfgPath)
+	zCfg, err := ziti.NewConfigFromFile(zCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
-	zCtx := ziti.NewContextWithConfig(zCfg)
+	zCtx, err := ziti.NewContext(zCfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error loading ziti context")
+	}
 	return &Frontend{
 		cfg:   cfg,
 		zCtx:  zCtx,

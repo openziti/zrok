@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
@@ -31,12 +30,15 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.Identity)
 	}
-	zCfg, err := config.NewFromFile(zCfgPath)
+	zCfg, err := ziti.NewConfigFromFile(zCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
-	zCtx := ziti.NewContextWithConfig(zCfg)
+	zCtx, err := ziti.NewContext(zCfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error loading ziti context")
+	}
 	zDialCtx := zitiDialContext{ctx: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
@@ -93,7 +95,7 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	director := func(req *http.Request) {
 		targetShrToken := resolveService(cfg.HostMatch, req.Host)
 		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
-			if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+			if cfg, found := svc.Config[model.ZrokProxyConfig]; found {
 				logrus.Debugf("auth model: %v", cfg)
 			} else {
 				logrus.Warn("no config!")
@@ -127,7 +129,7 @@ func authHandler(handler http.Handler, realm string, cfg *Config, ctx ziti.Conte
 		shrToken := resolveService(cfg.HostMatch, r.Host)
 		if shrToken != "" {
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
-				if cfg, found := svc.Configs[model.ZrokProxyConfig]; found {
+				if cfg, found := svc.Config[model.ZrokProxyConfig]; found {
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
 						case string(model.None):

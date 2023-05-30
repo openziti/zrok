@@ -2,7 +2,7 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/util"

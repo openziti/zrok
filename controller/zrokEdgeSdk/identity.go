@@ -3,10 +3,10 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/identity"
-	rest_model_edge "github.com/openziti/edge/rest_model"
-	"github.com/openziti/sdk-golang/ziti/config"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/identity"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -60,7 +60,7 @@ func GetIdentityByZId(zId string, edge *rest_management_api_client.ZitiEdgeManag
 	return resp, nil
 }
 
-func EnrollIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) (*config.Config, error) {
+func EnrollIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) (*ziti.Config, error) {
 	p := &identity.DetailIdentityParams{
 		Context: context.Background(),
 		ID:      zId,
