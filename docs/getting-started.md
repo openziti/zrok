@@ -3,17 +3,18 @@ sidebar_position: 0
 ---
 # Getting Started with zrok
 
-`zrok` is an open source, Apache v2 licensed sharing platform, built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), 
-a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_. You can choose to self-host `zrok`
-or leverage the free, managed offering provided by NetFoundry: https://zrok.io
+`zrok` is a next-generation sharing platform, designed to make sharing network and file resources simple and secure. `zrok` is a _Ziti Native Application_, built on top of the [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) programmable zero trust network overlay. `zrok` is open source, licensed under the Apache v2 license. You can choose to self-host `zrok` or leverage the free, managed offering provided by NetFoundry at https://zrok.io.
 
-As of version `v0.3.0`, `zrok` provides the ability to:
+As of version `v0.4.0`, `zrok` provides the ability to:
 
-* share resources [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies.
-* share [privately](./core-features/sharing-private.md). It does this by leveraging
-  [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) to support zero trust, peer to peer connections without
-  the need for any open ports on the internet.
-* use `web` sharing; easily share files with others using a single `zrok` command
+* share resources [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies; this allows you to easily expose your private HTTP/S resources to the public internet without changing your network security
+* share resources [privately](./core-features/sharing-private.md); private sharing uses peer-to-peer connectivity between two parties by leveraging the OpenZiti overlay. We believe the private sharing offered by `zrok` provides a unique level of security and privacy for this type of sharing.
+
+As of version `v0.4.0`, `zrok` allows sharing these kinds of resources:
+
+* HTTP/S resources; `zrok` provides reverse proxy capabilities for your HTTP/S endpoints, both publicly and privately
+* file resources; `zrok` provides built in `web` capabilities, allowing you to share your files with other users, both publicly and privately
+* TCP and UDP tunnels; `zrok` provides built-in `tunnel` capabilities, allowing you to share your TCP and UDP endpoints directly with other users privately (`zrok` does not currently offer public sharing of these kinds of resources)
 
 Let's take a look at how to get started with `zrok`.
 
