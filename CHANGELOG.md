@@ -16,6 +16,8 @@ CHANGE: The controller configuration version bumps from `v: 2` to `v: 3` to supp
 
 CHANGE: The underlying database store now utilizes a `deleted` flag on all tables to implement "soft deletes". This was necessary for the new metrics infrastructure, where we need to account for metrics data that arrived after the lifetime of a share or environment; and also we're going to need this for limits, where we need to see historical information about activity in the past (https://github.com/openziti/zrok/issues/262)
 
+CHANGE: Updated to latest `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/335)
+
 # v0.3.7
 
 FIX: Improved TUI word-wrapping (https://github.com/openziti/zrok/issues/180)
