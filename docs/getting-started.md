@@ -39,7 +39,7 @@ Move the downloaded `zrok` distribution into a directory on your system. In my c
 
 ```
 $ ls -lF zrok*
--rwxr-xr-x 1 michael michael 12724747 Jan 17 12:57 zrok_0.3.0-rc1_linux_amd64.tar.gz*
+-rwxr-xr-x 1 michael michael 14459159 May 31 13:46 zrok_0.4.0-rc1_linux_amd64.tar.gz*
 ```
 
 Create a directory where the extracted distribution will sit:
@@ -52,7 +52,7 @@ $ cd zrok/
 Extract the `zrok` distribution:
 
 ```
-$ tar zxvf ../zrok_0.3.0-rc1_linux_amd64.tar.gz
+$ tar zxvf ../zrok_0.4.0-rc1_linux_amd64.tar.gz
 CHANGELOG.md
 README.md
 zrok
@@ -83,14 +83,14 @@ $env:path += ";"+$pwd.Path
 With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
 
 ```
-$ zrok version
+$ ./zrok version
                _    
  _____ __ ___ | | __
 |_  / '__/ _ \| |/ /
  / /| | | (_) |   < 
 /___|_|  \___/|_|\_\
 
-v0.3.0-rc1 [0d43b55]
+v0.4.0-rc1 [c889005]
 ```
 
 ## Configure Your zrok Service Instance
