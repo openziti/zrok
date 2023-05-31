@@ -145,7 +145,7 @@ In order to create an account with the `zrok` service instance, you will need to
 Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
 :::
 
-We generate an invitation with the `zrok invite` command:
+We generate an invitation with the `zrok invite` command. A service instance that allows open registration will provide an input form like this:
 
 ```
 $ zrok invite
@@ -158,6 +158,23 @@ enter and confirm your email address...
 [ Submit ]
 
 invitation sent to 'user@domain.com'!
+```
+
+A service instance that requires token-based invitation authentication will present a form that looks like this:
+
+```
+$ zrok invite
+
+enter and confirm your email address...
+
+If you don't already have one, request an invite token at: michael@quigley.com
+
+> Email Address
+> Confirm Email
+> Token
+
+
+[ Submit ]
 ```
 
 The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
