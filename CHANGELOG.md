@@ -8,7 +8,7 @@ FEATURE: New metrics infrastructure based on OpenZiti usage events (https://gith
 
 FEATURE: New limits implementation based on the new metrics infrastructure (https://github.com/openziti/zrok/issues/235). See the [v0.4 Limits Guide](docs/guides/metrics-and-limits/configuring-limits.md) for more information.
 
-FEATURE: The invite mechanism has been reworked to improve user experience. The configuration has been moved to the `admin` stanza of the controller configuration and now includes a boolean flag indicating whether or not the instance allows new invitations to be created, and also includes contact details for requesting a new invite. These values are used by the `zrok invite` command to provide a smoother end-user invite experience https://github.com/openziti/zrok/issues/229)
+FEATURE: The invite mechanism has been reworked to improve user experience. The configuration has been updated to include a new `invite` stanza, and now includes a boolean flag indicating whether or not the instance allows new invitations to be created, and also includes contact details for requesting a new invite. These values are used by the `zrok invite` command to provide a smoother end-user invite experience https://github.com/openziti/zrok/issues/229)
 
 FEATURE: New password strength checking rules and configuration. See the example configuration file (`etc/ctrl.yml`) for details about how to configure the strength checking rules (https://github.com/openziti/zrok/issues/167)
 
