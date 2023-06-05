@@ -2,19 +2,19 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type accountRelaxAction struct {
 	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
+	zCfg *zrokEdgeSdk.Config
 }
 
-func newAccountRelaxAction(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *accountRelaxAction {
-	return &accountRelaxAction{str, edge}
+func newAccountRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *accountRelaxAction {
+	return &accountRelaxAction{str, zCfg}
 }
 
 func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
@@ -23,6 +23,11 @@ func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *B
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
+	}
+
+	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	if err != nil {
+		return err
 	}
 
 	for _, env := range envs {
@@ -34,11 +39,11 @@ func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *B
 		for _, shr := range shrs {
 			switch shr.ShareMode {
 			case "public":
-				if err := relaxPublicShare(a.str, a.edge, shr, trx); err != nil {
+				if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
 					return errors.Wrap(err, "error relaxing public share")
 				}
 			case "private":
-				if err := relaxPrivateShare(a.str, a.edge, shr, trx); err != nil {
+				if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
 					return errors.Wrap(err, "error relaxing private share")
 				}
 			}

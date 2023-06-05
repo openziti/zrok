@@ -2,7 +2,6 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/util"
@@ -11,16 +10,15 @@ import (
 )
 
 type accountWarningAction struct {
-	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
-	cfg  *emailUi.Config
+	str *store.Store
+	cfg *emailUi.Config
 }
 
-func newAccountWarningAction(cfg *emailUi.Config, str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *accountWarningAction {
-	return &accountWarningAction{str, edge, cfg}
+func newAccountWarningAction(cfg *emailUi.Config, str *store.Store) *accountWarningAction {
+	return &accountWarningAction{str, cfg}
 }
 
-func (a *accountWarningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *accountWarningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, _ *sqlx.Tx) error {
 	logrus.Infof("warning '%v'", acct.Email)
 
 	if a.cfg != nil {

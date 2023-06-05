@@ -2,7 +2,6 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/util"
@@ -11,13 +10,12 @@ import (
 )
 
 type shareWarningAction struct {
-	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
-	cfg  *emailUi.Config
+	str *store.Store
+	cfg *emailUi.Config
 }
 
-func newShareWarningAction(cfg *emailUi.Config, str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *shareWarningAction {
-	return &shareWarningAction{str, edge, cfg}
+func newShareWarningAction(cfg *emailUi.Config, str *store.Store) *shareWarningAction {
+	return &shareWarningAction{str, cfg}
 }
 
 func (a *shareWarningAction) HandleShare(shr *store.Share, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
