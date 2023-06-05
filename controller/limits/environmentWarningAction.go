@@ -2,7 +2,6 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/util"
@@ -11,13 +10,12 @@ import (
 )
 
 type environmentWarningAction struct {
-	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
-	cfg  *emailUi.Config
+	str *store.Store
+	cfg *emailUi.Config
 }
 
-func newEnvironmentWarningAction(cfg *emailUi.Config, str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *environmentWarningAction {
-	return &environmentWarningAction{str, edge, cfg}
+func newEnvironmentWarningAction(cfg *emailUi.Config, str *store.Store) *environmentWarningAction {
+	return &environmentWarningAction{str, cfg}
 }
 
 func (a *environmentWarningAction) HandleEnvironment(env *store.Environment, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {

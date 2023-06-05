@@ -11,24 +11,29 @@ import (
 
 type shareRelaxAction struct {
 	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
+	zCfg *zrokEdgeSdk.Config
 }
 
-func newShareRelaxAction(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *shareRelaxAction {
-	return &shareRelaxAction{str, edge}
+func newShareRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *shareRelaxAction {
+	return &shareRelaxAction{str, zCfg}
 }
 
 func (a *shareRelaxAction) HandleShare(shr *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("relaxing '%v'", shr.Token)
 
 	if !shr.Deleted {
+		edge, err := zrokEdgeSdk.Client(a.zCfg)
+		if err != nil {
+			return err
+		}
+
 		switch shr.ShareMode {
 		case "public":
-			if err := relaxPublicShare(a.str, a.edge, shr, trx); err != nil {
+			if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
 				return err
 			}
 		case "private":
-			if err := relaxPrivateShare(a.str, a.edge, shr, trx); err != nil {
+			if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
 				return err
 			}
 		}

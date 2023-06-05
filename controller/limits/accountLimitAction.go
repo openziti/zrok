@@ -2,7 +2,6 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
@@ -11,19 +10,24 @@ import (
 
 type accountLimitAction struct {
 	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
+	zCfg *zrokEdgeSdk.Config
 }
 
-func newAccountLimitAction(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *accountLimitAction {
-	return &accountLimitAction{str, edge}
+func newAccountLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *accountLimitAction {
+	return &accountLimitAction{str, zCfg}
 }
 
-func (a *accountLimitAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *accountLimitAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("limiting '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
+	}
+
+	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	if err != nil {
+		return err
 	}
 
 	for _, env := range envs {
@@ -33,7 +37,7 @@ func (a *accountLimitAction) HandleAccount(acct *store.Account, rxBytes, txBytes
 		}
 
 		for _, shr := range shrs {
-			if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, a.edge); err != nil {
+			if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, edge); err != nil {
 				return errors.Wrapf(err, "error deleting dial service policy for '%v'", shr.Token)
 			}
 			logrus.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)

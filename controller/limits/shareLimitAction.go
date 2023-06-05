@@ -2,7 +2,6 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/sirupsen/logrus"
@@ -10,11 +9,11 @@ import (
 
 type shareLimitAction struct {
 	str  *store.Store
-	edge *rest_management_api_client.ZitiEdgeManagement
+	zCfg *zrokEdgeSdk.Config
 }
 
-func newShareLimitAction(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement) *shareLimitAction {
-	return &shareLimitAction{str, edge}
+func newShareLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *shareLimitAction {
+	return &shareLimitAction{str, zCfg}
 }
 
 func (a *shareLimitAction) HandleShare(shr *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
@@ -25,7 +24,12 @@ func (a *shareLimitAction) HandleShare(shr *store.Share, _, _ int64, _ *Bandwidt
 		return err
 	}
 
-	if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, a.edge); err != nil {
+	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	if err != nil {
+		return err
+	}
+
+	if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shr.Token, edge); err != nil {
 		return err
 	}
 	logrus.Infof("removed dial service policy for '%v'", shr.Token)

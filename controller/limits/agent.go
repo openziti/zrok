@@ -34,25 +34,21 @@ type Agent struct {
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
-	edge, err := zrokEdgeSdk.Client(zCfg)
-	if err != nil {
-		return nil, err
-	}
 	a := &Agent{
 		cfg:                cfg,
 		ifx:                newInfluxReader(ifxCfg),
 		zCfg:               zCfg,
 		str:                str,
 		queue:              make(chan *metrics.Usage, 1024),
-		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str, edge)},
-		acctLimitActions:   []AccountAction{newAccountLimitAction(str, edge)},
-		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, edge)},
-		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(emailCfg, str, edge)},
-		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, edge)},
-		envRelaxActions:    []EnvironmentAction{newEnvironmentRelaxAction(str, edge)},
-		shrWarningActions:  []ShareAction{newShareWarningAction(emailCfg, str, edge)},
-		shrLimitActions:    []ShareAction{newShareLimitAction(str, edge)},
-		shrRelaxActions:    []ShareAction{newShareRelaxAction(str, edge)},
+		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
+		acctLimitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
+		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
+		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(emailCfg, str)},
+		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, zCfg)},
+		envRelaxActions:    []EnvironmentAction{newEnvironmentRelaxAction(str, zCfg)},
+		shrWarningActions:  []ShareAction{newShareWarningAction(emailCfg, str)},
+		shrLimitActions:    []ShareAction{newShareLimitAction(str, zCfg)},
+		shrRelaxActions:    []ShareAction{newShareRelaxAction(str, zCfg)},
 		close:              make(chan struct{}),
 		join:               make(chan struct{}),
 	}
