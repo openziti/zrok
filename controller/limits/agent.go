@@ -41,6 +41,7 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Confi
 		str:                str,
 		queue:              make(chan *metrics.Usage, 1024),
 		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
+		acctLimitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
 		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
 		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(emailCfg, str)},
 		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, zCfg)},
