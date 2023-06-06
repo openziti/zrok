@@ -139,6 +139,10 @@ func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 	return true, nil
 }
 
+func (a *Agent) CanAccessShare(shrToken string, trx *sqlx.Tx) (bool, error) {
+	return true, nil
+}
+
 func (a *Agent) Handle(u *metrics.Usage) error {
 	logrus.Debugf("handling: %v", u)
 	a.queue <- u
