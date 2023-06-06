@@ -57,7 +57,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessNotFound()
 	}
 
-	if err := h.checkLimits(shrToken, trx); err != nil {
+	if err := h.checkLimits(shr, trx); err != nil {
 		logrus.Errorf("cannot access limited share for '%v': %v", principal.Email, err)
 		return share.NewAccessNotFound()
 	}
@@ -99,14 +99,14 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	})
 }
 
-func (h *accessHandler) checkLimits(shrToken string, trx *sqlx.Tx) error {
+func (h *accessHandler) checkLimits(shr *store.Share, trx *sqlx.Tx) error {
 	if limitsAgent != nil {
-		ok, err := limitsAgent.CanAccessShare(shrToken, trx)
+		ok, err := limitsAgent.CanAccessShare(shr.Id, trx)
 		if err != nil {
-			return errors.Wrapf(err, "error checking share limits for '%v'", shrToken)
+			return errors.Wrapf(err, "error checking share limits for '%v'", shr.Token)
 		}
 		if !ok {
-			return errors.Errorf("share limit check failed for '%v'", shrToken)
+			return errors.Errorf("share limit check failed for '%v'", shr.Token)
 		}
 	}
 	return nil

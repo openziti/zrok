@@ -139,7 +139,58 @@ func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 	return true, nil
 }
 
-func (a *Agent) CanAccessShare(shrToken string, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing {
+		shr, err := a.str.GetShare(shrId, trx)
+		if err != nil {
+			return false, err
+		}
+		if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
+			slj, err := a.str.FindLatestShareLimitJournal(shr.Id, trx)
+			if err != nil {
+				return false, err
+			}
+			if slj.Action == store.LimitAction {
+				return false, nil
+			}
+		} else if err != nil {
+			return false, err
+		}
+
+		env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
+		if err != nil {
+			return false, err
+		}
+		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(env.Id, trx); err == nil && !empty {
+			elj, err := a.str.FindLatestEnvironmentLimitJournal(env.Id, trx)
+			if err != nil {
+				return false, err
+			}
+			if elj.Action == store.LimitAction {
+				return false, nil
+			}
+		} else if err != nil {
+			return false, err
+		}
+
+		if env.AccountId != nil {
+			acct, err := a.str.GetAccount(*env.AccountId, trx)
+			if err != nil {
+				return false, err
+			}
+			if empty, err := a.str.IsAccountLimitJournalEmpty(acct.Id, trx); err == nil && !empty {
+				alj, err := a.str.FindLatestAccountLimitJournal(acct.Id, trx)
+				if err != nil {
+					return false, err
+				}
+				if alj.Action == store.LimitAction {
+					return false, nil
+				}
+			} else if err != nil {
+				return false, err
+			}
+		}
+	}
 	return true, nil
 }
 
