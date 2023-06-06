@@ -2,10 +2,12 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,16 +18,16 @@ func newAccessHandler() *accessHandler {
 }
 
 func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	envZId := params.Body.EnvZID
 	envId := 0
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
+	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx); err == nil {
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
@@ -45,7 +47,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	}
 
 	shrToken := params.Body.ShrToken
-	shr, err := str.FindShareWithToken(shrToken, tx)
+	shr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding share")
 		return share.NewAccessNotFound()
@@ -55,13 +57,18 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessNotFound()
 	}
 
+	if err := h.checkLimits(shr, trx); err != nil {
+		logrus.Errorf("cannot access limited share for '%v': %v", principal.Email, err)
+		return share.NewAccessNotFound()
+	}
+
 	feToken, err := createToken()
 	if err != nil {
 		logrus.Error(err)
 		return share.NewAccessInternalServerError()
 	}
 
-	if _, err := str.CreateFrontend(envId, &store.Frontend{PrivateShareId: &shr.Id, Token: feToken, ZId: envZId}, tx); err != nil {
+	if _, err := str.CreateFrontend(envId, &store.Frontend{PrivateShareId: &shr.Id, Token: feToken, ZId: envZId}, trx); err != nil {
 		logrus.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
@@ -81,7 +88,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing frontend record: %v", err)
 		return share.NewAccessInternalServerError()
 	}
@@ -90,4 +97,17 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		FrontendToken: feToken,
 		BackendMode:   shr.BackendMode,
 	})
+}
+
+func (h *accessHandler) checkLimits(shr *store.Share, trx *sqlx.Tx) error {
+	if limitsAgent != nil {
+		ok, err := limitsAgent.CanAccessShare(shr.Id, trx)
+		if err != nil {
+			return errors.Wrapf(err, "error checking share limits for '%v'", shr.Token)
+		}
+		if !ok {
+			return errors.Errorf("share limit check failed for '%v'", shr.Token)
+		}
+	}
+	return nil
 }
