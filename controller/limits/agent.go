@@ -239,6 +239,14 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 	}
 	defer func() { _ = trx.Rollback() }()
 
+	acct, err := a.str.GetAccount(int(u.AccountId), trx)
+	if err != nil {
+		return err
+	}
+	if acct.Limitless {
+		return nil
+	}
+
 	if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(u.AccountId); err == nil {
 		if enforce {
 			enforced := false
