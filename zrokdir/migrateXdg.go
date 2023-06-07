@@ -43,6 +43,8 @@ func migrate() error {
 		return err
 	}
 
+	obliterateOldZrokDir()
+
 	return nil
 }
 
@@ -85,8 +87,6 @@ func moveIdentities() error {
 			return identityFile(name)
 		}
 	}
-
-	fmt.Println(oi)
 
 	for id := range oi {
 		if err := moveFileHelper(ifo(id), ifn(id), fmt.Sprintf("identity/%s", id)); err != nil {
@@ -204,4 +204,15 @@ func zrokDirOld() (string, error) {
 		return "", err
 	}
 	return filepath.Join(home, ".zrok"), nil
+}
+
+func obliterateOldZrokDir() error {
+	zrd, err := zrokDirOld()
+	if err != nil {
+		return err
+	}
+	if err := os.RemoveAll(zrd); err != nil {
+		return err
+	}
+	return nil
 }

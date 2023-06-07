@@ -11,8 +11,6 @@ import (
 
 const V = "v0.3"
 
-var migratedToXDG = false
-
 type Metadata struct {
 	V   string `json:"v"`
 	Xdg bool   `json:"xdg"`
@@ -42,13 +40,11 @@ func checkMetadata() error {
 	if m.V != V {
 		return errors.Errorf("invalid zrokdir metadata version '%v'", m.V)
 	}
-	migratedToXDG = m.Xdg
 	if !m.Xdg {
 		if err := migrate(); err != nil {
 			return errors.Wrap(err, "Unable to migrate to XDG config spec")
 		}
 		m.Xdg = true
-		migratedToXDG = true
 	}
 	return nil
 }
@@ -58,7 +54,7 @@ func writeMetadata() error {
 	if err != nil {
 		return err
 	}
-	data, err := json.Marshal(&Metadata{V: V, Xdg: migratedToXDG})
+	data, err := json.Marshal(&Metadata{V: V, Xdg: true})
 	if err != nil {
 		return err
 	}
