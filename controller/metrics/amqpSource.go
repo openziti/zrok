@@ -81,8 +81,10 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 }
 
 func (s *amqpSource) Stop() {
-	if err := s.ch.Close(); err != nil {
-		logrus.Error(err)
+	if s.ch != nil {
+		if err := s.ch.Close(); err != nil {
+			logrus.Error(err)
+		}
 	}
 	close(s.join)
 }
