@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func init() {
@@ -29,61 +30,105 @@ func loadAmqpSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
 }
 
 type amqpSource struct {
+	cfg   *AmqpSourceConfig
 	conn  *amqp.Connection
 	ch    *amqp.Channel
 	queue amqp.Queue
 	msgs  <-chan amqp.Delivery
+	errs  chan *amqp.Error
 	join  chan struct{}
 }
 
 func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
-	conn, err := amqp.Dial(cfg.Url)
-	if err != nil {
-		return nil, errors.Wrap(err, "error dialing amqp broker")
+	as := &amqpSource{cfg: cfg, join: make(chan struct{})}
+	if err := as.connect(); err != nil {
+		return nil, err
 	}
-
-	ch, err := conn.Channel()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting amqp channel")
-	}
-
-	queue, err := ch.QueueDeclare(cfg.QueueName, true, false, false, false, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "error declaring queue")
-	}
-
-	msgs, err := ch.Consume(cfg.QueueName, "zrok", false, false, false, false, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "error consuming")
-	}
-
-	return &amqpSource{
-		conn,
-		ch,
-		queue,
-		msgs,
-		make(chan struct{}),
-	}, nil
+	return as, nil
 }
 
 func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	go func() {
 		logrus.Info("started")
 		defer logrus.Info("stopped")
-		for event := range s.msgs {
-			events <- &ZitiEventAMQP{
-				data: ZitiEventJson(event.Body),
-				msg:  event,
+
+		reconnect := false
+		for {
+			if reconnect {
+				if err := s.reconnect(); err != nil {
+					logrus.Errorf("error reconnecting: %v", err)
+					continue
+				}
+				reconnect = false
+			}
+			select {
+			case event := <-s.msgs:
+				if event.Body != nil {
+					events <- &ZitiEventAMQP{
+						data: ZitiEventJson(event.Body),
+						msg:  event,
+					}
+				}
+			case err := <-s.errs:
+				if err != nil {
+					logrus.Error(err)
+					reconnect = true
+				}
 			}
 		}
-		close(s.join)
 	}()
 	return s.join, nil
 }
 
 func (s *amqpSource) Stop() {
-	if err := s.ch.Close(); err != nil {
-		logrus.Error(err)
+	if s.ch != nil {
+		if err := s.ch.Close(); err != nil {
+			logrus.Error(err)
+		}
 	}
-	<-s.join
+	close(s.join)
+}
+
+func (s *amqpSource) connect() error {
+	conn, err := amqp.Dial(s.cfg.Url)
+	if err != nil {
+		return errors.Wrap(err, "error dialing amqp broker")
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		return errors.Wrap(err, "error getting amqp channel")
+	}
+
+	queue, err := ch.QueueDeclare(s.cfg.QueueName, true, false, false, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "error declaring queue")
+	}
+
+	msgs, err := ch.Consume(s.cfg.QueueName, "zrok", false, false, false, false, nil)
+	if err != nil {
+		return errors.Wrap(err, "error consuming")
+	}
+
+	s.errs = make(chan *amqp.Error)
+	conn.NotifyClose(s.errs)
+	s.conn = conn
+	s.ch = ch
+	s.queue = queue
+	s.msgs = msgs
+
+	logrus.Infof("connected to '%v'", s.cfg.Url)
+
+	return nil
+}
+
+func (s *amqpSource) reconnect() error {
+	s.conn = nil
+	s.ch = nil
+	s.msgs = nil
+	s.errs = nil
+
+	logrus.Infof("reconnecting; delay for reconnect")
+	time.Sleep(10 * time.Second)
+	return s.connect()
 }
