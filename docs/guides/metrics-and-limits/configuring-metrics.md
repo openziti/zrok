@@ -41,7 +41,6 @@ network:
 And you'll want to add this stanza to the tail-end of the router configuration for every router on your OpenZiti network:
 
 ```yaml
-# this must be the last router configuration stanza
 metrics:
   reportInterval: 5s
   intervalAgeThreshold: 5s
