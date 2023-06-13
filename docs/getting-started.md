@@ -90,7 +90,7 @@ $ ./zrok version
  / /| | | (_) |   < 
 /___|_|  \___/|_|\_\
 
-v0.4.0-rc1 [c889005]
+v0.4.0-rc6 [c889005]
 ```
 
 ## Configure Your zrok Service Instance
@@ -230,14 +230,14 @@ $ zrok status
 
 Config:
 
- CONFIG       VALUE                SOURCE 
- apiEndpoint  https://api.zrok.io  env    
+ CONFIG       VALUE                        SOURCE
+ apiEndpoint  https://api.staging.zrok.io  env
 
 Environment:
 
- PROPERTY       VALUE        
- Secret Token   klFEoIi0QAg7 
- Ziti Identity  FTpvelYD6h   
+ PROPERTY       VALUE
+ Secret Token   <<SET>>
+ Ziti Identity  <<SET>>
 ```
 
 Excellent... our environment is now fully enabled.
