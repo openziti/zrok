@@ -53,18 +53,21 @@ admin:
   # generate these admin tokens from a source of randomness, e.g. 
   #  LC_ALL=C tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c32
   secrets:
-    -               Q8V0LqnNb5wNX9kE1fgQ0H6VlcvJybB1
+    -               Q8V0LqnNb5wNX9kE1fgQ0H6VlcvJybB1  # be sure to change this!
 
 endpoint:
   host:             0.0.0.0
   port:             18080
+
+invites:
+  invites_open:    true
 
 store:
   path:             zrok.db
   type:             sqlite3
 
 ziti:
-  api_endpoint:     "https://127.0.0.1:1280"
+  api_endpoint:     "https://127.0.0.1:8441"
   username:         admin
   password:         "XO0xHp75uuyeireO2xmmVlK91T7B9fpD"
 
@@ -72,7 +75,7 @@ ziti:
 
 The `admin` section defines privileged administrative credentials and must be set in the `ZROK_ADMIN_TOKEN` environment variable in shells where you want to run `zrok admin`.
 
-The `endpoint` section defines where your `zrok` controller will listen. 
+The `endpoint` section defines where your `zrok` controller will listen.
 
 The `store` section defines the local `sqlite3` database used by the controller.
 
@@ -87,7 +90,7 @@ To work with a self-hosted `zrok` deployment, you'll need to set the `ZROK_API_E
 In my case, I've set:
 
 ```bash
-export ZROK_API_ENDPOINT=http://localhost:18080
+export ZROK_API_ENDPOINT=http://127.0.0.1:18080
 ```
 
 ## Bootstrap OpenZiti for zrok
