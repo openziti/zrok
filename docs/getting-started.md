@@ -39,7 +39,7 @@ Move the downloaded `zrok` distribution into a directory on your system. In my c
 
 ```
 $ ls -lF zrok*
--rwxr-xr-x 1 michael michael 14459159 May 31 13:46 zrok_0.4.0-rc1_linux_amd64.tar.gz*
+-rwxr-xr-x 1 michael michael 14459159 May 31 13:46 zrok_0.4.0-rc6_linux_amd64.tar.gz*
 ```
 
 Create a directory where the extracted distribution will sit:
@@ -284,9 +284,9 @@ A frontend is an HTTPS listener exposed to the internet, that lets any user with
 
 For example, I might create a public share using the `zrok share public` command, which results in my `zrok` service instance exposing the following URL to access my resources:
 
-https://h0fz2ts9c84t.share.zrok.io
+https://2ptgbr8tlfvk.share.zrok.io
 
-In this case my share was given the "share token" of `h0fz2ts9c84t`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
+In this case my share was given the "share token" of `2ptgbr8tlfvk`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
 
 :::note
 Here is the `--help` output from `zrok share public`:
