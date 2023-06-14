@@ -18,6 +18,8 @@ CHANGE: The underlying database store now utilizes a `deleted` flag on all table
 
 CHANGE: Updated to latest `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/335)
 
+FIX: `zrok share reserved --override-endpoint` now works correctly; `--override-endpoint` was being incorrectly ignore previously (https://github.com/openziti/zrok/pull/348)
+
 # v0.3.7
 
 FIX: Improved TUI word-wrapping (https://github.com/openziti/zrok/issues/180)
