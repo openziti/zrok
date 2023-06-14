@@ -54,7 +54,7 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 
 		reconnect := false
 		for {
-			if reconnect {
+			if reconnect || s.errs == nil {
 				if err := s.reconnect(); err != nil {
 					logrus.Errorf("error reconnecting: %v", err)
 					continue
@@ -69,8 +69,8 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 						msg:  event,
 					}
 				}
-			case err := <-s.errs:
-				if err != nil {
+			case err, ok := <-s.errs:
+				if err != nil || !ok {
 					logrus.Error(err)
 					reconnect = true
 				}
