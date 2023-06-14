@@ -73,6 +73,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
+	target = cmd.overrideEndpoint
 	if target == "" {
 		target = resp.Payload.BackendProxyEndpoint
 	}
