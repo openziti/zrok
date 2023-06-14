@@ -12,7 +12,7 @@ const sortNodes = (nodes) => {
 
 const nodesEqual = (a, b) => {
     if(a.length !== b.length) return false;
-    return a.every((e, i) => e.id === b[i].id && e.limited === b[i].limited);
+    return a.every((e, i) => e.id === b[i].id && e.limited === b[i].limited && e.label === b[i].label);
 }
 
 export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
@@ -116,11 +116,11 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
     // we're going to need to recompute a new graph... but we want to maintain the instances that already exist...
 
     // we want to preserve nodes that exist in the new graph, and remove those that don't.
-    let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id && newNode.limited === oldNode.limited));
+    let outputNodes = oldGraph.nodes.filter(oldNode => newGraph.nodes.find(newNode => newNode.id === oldNode.id && newNode.limited === oldNode.limited && newNode.label === oldNode.label));
     let outputLinks = oldGraph.nodes.filter(oldLink => newGraph.links.find(newLink => newLink.target === oldLink.target && newLink.source === oldLink.source));
 
     // and then do the opposite; add any nodes that are in newGraph that are missing from oldGraph.
-    outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id && oldNode.limited === newNode.limited)));
+    outputNodes.push(...newGraph.nodes.filter(newNode => !outputNodes.find(oldNode => oldNode.id === newNode.id && oldNode.limited === newNode.limited && oldNode.label === newNode.label)));
     outputLinks.push(...newGraph.links.filter(newLink => !outputLinks.find(oldLink => oldLink.target === newLink.target && oldLink.source === newLink.source)));
 
     return {
