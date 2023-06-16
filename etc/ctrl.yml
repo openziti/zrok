@@ -23,6 +23,10 @@ admin:
   # If `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
   #
   tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
+  #
+  # If `profile_endpoint` is present, the controller will start a `net/http/pprof` endpoint at the specified host:port
+  #
+  #profile_endpoint:               localhost:6060
 
 # The `bridge` section configures the `zrok controller metrics bridge`, specifying the source and sink where OpenZiti
 # `fabric.usage` events are consumed and then sent into `zrok`. For production environments, we recommend that you use
