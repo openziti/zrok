@@ -94,7 +94,7 @@ mainLoop:
 
 			case event, ok := <-s.msgs:
 				if !ok {
-					logrus.Warn("selecting on msg !ok")
+					logrus.Debug("selecting on msg !ok")
 					break msgLoop
 				}
 				if event.Body != nil {
@@ -103,7 +103,7 @@ mainLoop:
 						msg:  event,
 					}
 				} else {
-					logrus.Warn("event body was nil!")
+					logrus.Debug("event body was nil!")
 					break msgLoop
 				}
 			}
