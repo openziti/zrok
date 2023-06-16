@@ -45,8 +45,12 @@ func (a *Agent) Start() error {
 			select {
 			case event := <-a.events:
 				if usage, err := Ingest(event.Data()); err == nil {
-					if err := a.cache.addZrokDetail(usage); err != nil {
-						logrus.Errorf("unable to add zrok detail for: %v: %v", usage.String(), err)
+					if usage.AccountId != 0 || usage.EnvironmentId != 0 {
+						if err := a.cache.addZrokDetail(usage); err != nil {
+							logrus.Errorf("unable to add zrok detail for: %v: %v", usage.String(), err)
+						}
+					} else {
+						logrus.Debugf("skipping zrok detail for: %v", usage.String())
 					}
 					shouldAck := true
 					for _, snk := range a.snks {
@@ -64,9 +68,6 @@ func (a *Agent) Start() error {
 					}
 				} else {
 					logrus.Errorf("unable to ingest '%v': %v", event.Data(), err)
-					if err := event.Ack(); err != nil {
-						logrus.Errorf("unable to ack unparseable message: %v", err)
-					}
 				}
 			}
 		}
