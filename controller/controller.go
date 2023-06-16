@@ -2,11 +2,13 @@ package controller
 
 import (
 	"context"
-
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -25,6 +27,12 @@ var limitsAgent *limits.Agent
 
 func Run(inCfg *config.Config) error {
 	cfg = inCfg
+
+	if cfg.Admin != nil && cfg.Admin.ProfileEndpoint != "" {
+		go func() {
+			log.Println(http.ListenAndServe(cfg.Admin.ProfileEndpoint, nil))
+		}()
+	}
 
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {

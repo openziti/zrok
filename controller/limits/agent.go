@@ -209,14 +209,18 @@ mainLoop:
 	for {
 		select {
 		case usage := <-a.queue:
-			if err := a.enforce(usage); err != nil {
-				logrus.Errorf("error running enforcement: %v", err)
-			}
-			if time.Since(lastCycle) > a.cfg.Cycle {
-				if err := a.relax(); err != nil {
-					logrus.Errorf("error running relax cycle: %v", err)
+			if usage.ShareToken != "" {
+				if err := a.enforce(usage); err != nil {
+					logrus.Errorf("error running enforcement: %v", err)
 				}
-				lastCycle = time.Now()
+				if time.Since(lastCycle) > a.cfg.Cycle {
+					if err := a.relax(); err != nil {
+						logrus.Errorf("error running relax cycle: %v", err)
+					}
+					lastCycle = time.Now()
+				}
+			} else {
+				logrus.Warnf("not enforcing for usage with no share token: %v", usage.String())
 			}
 
 		case <-time.After(a.cfg.Cycle):
