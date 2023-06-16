@@ -47,9 +47,6 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 		close: make(chan struct{}),
 		join:  make(chan struct{}),
 	}
-	if err := as.connect(); err != nil {
-		return nil, err
-	}
 	return as, nil
 }
 
