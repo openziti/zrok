@@ -83,14 +83,6 @@ mainLoop:
 	msgLoop:
 		for {
 			select {
-			case event := <-s.msgs:
-				if event.Body != nil {
-					s.events <- &ZitiEventAMQP{
-						data: ZitiEventJson(event.Body),
-						msg:  event,
-					}
-				}
-
 			case err, ok := <-s.errs:
 				if err != nil || !ok {
 					logrus.Error(err)
@@ -99,6 +91,21 @@ mainLoop:
 
 			case <-s.close:
 				break mainLoop
+
+			case event, ok := <-s.msgs:
+				if !ok {
+					logrus.Warn("selecting on msg !ok")
+					break msgLoop
+				}
+				if event.Body != nil {
+					s.events <- &ZitiEventAMQP{
+						data: ZitiEventJson(event.Body),
+						msg:  event,
+					}
+				} else {
+					logrus.Warn("event body was nil!")
+					break msgLoop
+				}
 			}
 		}
 	}
