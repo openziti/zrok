@@ -32,6 +32,13 @@ First, let's create the private share.
     ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
     ```
 
+1. If you are self-hosting zrok then it's important to set your API endpoint URL too. If you're using the hosted zrok service then you can skip this step.
+
+    ```bash
+    # file name ".env"
+    ZROK_API_ENDPOINT="https://zrok.example.com"
+    ```
+
 1. Run your Compose project to start sharing the built-in demo web server:
 
     ```bash
