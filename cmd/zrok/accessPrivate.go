@@ -22,8 +22,6 @@ import (
 	"time"
 )
 
-var accessPrivateCmd *accessPrivateCommand
-
 func init() {
 	accessCmd.AddCommand(newAccessPrivateCommand().cmd)
 }

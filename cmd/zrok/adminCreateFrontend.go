@@ -21,10 +21,9 @@ type adminCreateFrontendCommand struct {
 
 func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 	cmd := &cobra.Command{
-		Use:     "frontend <zitiId> <publicName> <urlTemplate>",
-		Aliases: []string{"fe"},
-		Short:   "Create a global public frontend",
-		Args:    cobra.ExactArgs(3),
+		Use:   "frontend <zitiId> <publicName> <urlTemplate>",
+		Short: "Create a global public frontend",
+		Args:  cobra.ExactArgs(3),
 	}
 	command := &adminCreateFrontendCommand{cmd: cmd}
 	cmd.Run = command.run

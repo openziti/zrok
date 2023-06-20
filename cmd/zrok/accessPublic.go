@@ -22,10 +22,9 @@ type accessPublicCommand struct {
 
 func newAccessPublicCommand() *accessPublicCommand {
 	cmd := &cobra.Command{
-		Use:     "public [<configPath>]",
-		Aliases: []string{"fe"},
-		Short:   "Create a public access HTTP frontend",
-		Args:    cobra.RangeArgs(0, 1),
+		Use:   "public [<configPath>]",
+		Short: "Create a public access HTTP frontend",
+		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &accessPublicCommand{cmd: cmd}
 	cmd.Run = command.run
