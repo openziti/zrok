@@ -39,9 +39,7 @@ type amqpSink struct {
 }
 
 func newAmqpSink(cfg *AmqpSinkConfig) (*amqpSink, error) {
-	as := &amqpSink{
-		cfg: cfg,
-	}
+	as := &amqpSink{cfg: cfg}
 	return as, nil
 }
 
