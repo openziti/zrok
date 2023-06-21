@@ -67,15 +67,15 @@ func (s *amqpSink) Handle(event ZitiEventJson) error {
 func (s *amqpSink) connect() (err error) {
 	s.conn, err = amqp.Dial(s.cfg.Url)
 	if err != nil {
-		return errors.Wrap(err, "error dialing amqp broker")
+		return errors.Wrapf(err, "error dialing '%v'", s.cfg.Url)
 	}
 	s.ch, err = s.conn.Channel()
 	if err != nil {
-		return errors.Wrap(err, "error getting amqp channel")
+		return errors.Wrapf(err, "error getting amqp channel from '%v'", s.cfg.Url)
 	}
 	s.queue, err = s.ch.QueueDeclare(s.cfg.QueueName, true, false, false, false, nil)
 	if err != nil {
-		return errors.Wrap(err, "error declaring queue")
+		return errors.Wrapf(err, "error declaring queue '%v' with '%v'", s.cfg.QueueName, s.cfg.Url)
 	}
 	return nil
 }
