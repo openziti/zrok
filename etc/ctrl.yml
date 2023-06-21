@@ -36,7 +36,7 @@ admin:
 bridge:
   source:
     type:           fileSource
-    path:           /tmp/fabric-usage.log
+    path:           /tmp/fabric-usage.json
   sink:
     type:           amqpSink
     url:            amqp://guest:guest@localhost:5672
