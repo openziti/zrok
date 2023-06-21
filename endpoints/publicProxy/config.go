@@ -2,6 +2,7 @@ package publicProxy
 
 import (
 	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 )
 
@@ -9,12 +10,7 @@ type Config struct {
 	Identity  string
 	Address   string
 	HostMatch string
-	Tls       *TlsConfig
-}
-
-type TlsConfig struct {
-	CertPath string
-	KeyPath  string
+	Tls       *endpoints.TlsConfig
 }
 
 func DefaultConfig() *Config {

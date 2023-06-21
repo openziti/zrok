@@ -24,13 +24,8 @@ type FrontendConfig struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
-	Tls          *TlsConfig
+	Tls          *endpoints.TlsConfig
 	RequestsChan chan *endpoints.Request
-}
-
-type TlsConfig struct {
-	CertPath string
-	KeyPath  string
 }
 
 func DefaultFrontendConfig(identityName string) *FrontendConfig {
