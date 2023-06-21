@@ -31,38 +31,39 @@ func loadAmqpSinkConfig(v interface{}, _ *cf.Options) (interface{}, error) {
 }
 
 type amqpSink struct {
-	cfg   *AmqpSinkConfig
-	conn  *amqp.Connection
-	ch    *amqp.Channel
-	queue amqp.Queue
-	join  chan struct{}
+	cfg       *AmqpSinkConfig
+	conn      *amqp.Connection
+	ch        *amqp.Channel
+	queue     amqp.Queue
+	connected bool
 }
 
 func newAmqpSink(cfg *AmqpSinkConfig) (*amqpSink, error) {
-	return &amqpSink{
-		cfg:  cfg,
-		join: make(chan struct{}),
-	}, nil
-}
-
-func (s *amqpSink) Start() (join chan struct{}, err error) {
-	logrus.Info("started")
-	return s.join, nil
+	as := &amqpSink{
+		cfg: cfg,
+	}
+	return as, nil
 }
 
 func (s *amqpSink) Handle(event ZitiEventJson) error {
+	if !s.connected {
+		if err := s.connect(); err != nil {
+			return err
+		}
+		logrus.Infof("connected to '%v'", s.cfg.Url)
+		s.connected = true
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	logrus.Infof("pushing '%v'", event)
-	return s.ch.PublishWithContext(ctx, "", s.queue.Name, false, false, amqp.Publishing{
+	err := s.ch.PublishWithContext(ctx, "", s.queue.Name, false, false, amqp.Publishing{
 		ContentType: "application/json",
 		Body:        []byte(event),
 	})
-}
-
-func (s *amqpSink) Stop() {
-	close(s.join)
-	logrus.Info("stopped")
+	if err != nil {
+		s.connected = false
+	}
+	return err
 }
 
 func (s *amqpSink) connect() (err error) {
@@ -70,18 +71,13 @@ func (s *amqpSink) connect() (err error) {
 	if err != nil {
 		return errors.Wrap(err, "error dialing amqp broker")
 	}
-
 	s.ch, err = s.conn.Channel()
 	if err != nil {
 		return errors.Wrap(err, "error getting amqp channel")
 	}
-
 	s.queue, err = s.ch.QueueDeclare(s.cfg.QueueName, true, false, false, false, nil)
 	if err != nil {
 		return errors.Wrap(err, "error declaring queue")
 	}
-
-	logrus.Infof("connected to amqp broker at '%v'", s.cfg.Url)
-
 	return nil
 }

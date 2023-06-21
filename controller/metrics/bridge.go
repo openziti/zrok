@@ -14,7 +14,6 @@ type Bridge struct {
 	src     ZitiEventJsonSource
 	srcJoin chan struct{}
 	snk     ZitiEventJsonSink
-	snkJoin chan struct{}
 	events  chan ZitiEventMsg
 	close   chan struct{}
 	join    chan struct{}
@@ -40,9 +39,6 @@ func NewBridge(cfg *BridgeConfig) (*Bridge, error) {
 }
 
 func (b *Bridge) Start() (join chan struct{}, err error) {
-	if b.snkJoin, err = b.snk.Start(); err != nil {
-		return nil, err
-	}
 	if b.srcJoin, err = b.src.Start(b.events); err != nil {
 		return nil, err
 	}
@@ -76,9 +72,7 @@ func (b *Bridge) Start() (join chan struct{}, err error) {
 
 func (b *Bridge) Stop() {
 	b.src.Stop()
-	b.snk.Stop()
 	close(b.close)
 	<-b.srcJoin
-	<-b.snkJoin
 	<-b.join
 }
