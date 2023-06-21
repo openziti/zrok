@@ -79,5 +79,7 @@ type ZitiEventJsonSource interface {
 }
 
 type ZitiEventJsonSink interface {
+	Start() (join chan struct{}, err error)
 	Handle(event ZitiEventJson) error
+	Stop()
 }
