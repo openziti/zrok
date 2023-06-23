@@ -3,8 +3,8 @@ sidebar_position: 0
 ---
 # Shares - Private
 
-`zrok` was built to share and access digital resources. A `private` share allows a resource to be 
-shared through a __privately__ available endpoint. Privately shared resources can only be accessed by another `zrok` user who has the details of your unique share. 
+`zrok` was designed to securely share and access digital resources. A `private` share allows a resource to be 
+shared through a privately available endpoint local to the user accessing the resource. Privately shared resources can only be accessed by another `zrok` user who has the details of your unique share. You are in control of who can access your `private` shares by sharing the the share token.
 
 Peer-to-peer private resource sharing is one of the things that makes `zrok` unique.
 
