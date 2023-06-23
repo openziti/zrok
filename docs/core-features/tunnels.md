@@ -109,3 +109,5 @@ And both the `share` client and the `access` client show the traffic:
 ```
 
 Exit the `access` client to remove the local access to the shared TCP port. Exit the `share` client to disable further accesses to the shared resource.
+
+For UDP network resources just use the `zrok share private --backend-mode udpTunnel` instead of `tcpTunnel`.
