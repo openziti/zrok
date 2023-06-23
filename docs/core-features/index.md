@@ -4,10 +4,9 @@ sidebar_position: 25
 ---
 # Core Features
 
-`zrok` was built for sharing resources. This doc is meant to explain the core features of `zrok` sharing
-as well as other important features.
+`zrok` was designed to make sharing local resources both secure and easy. In this section of the `zrok` documentation, we'll tour through all of the most important features.
 
 Sharing with `zrok` can be either [`public`](./sharing-public.md) or [`private`](./sharing-private.md).
-Naturally, regular web-based resources can be shared but `zrok` also includes a [file sharing](./files.md) feature.
+Naturally, regular web-based resources can be shared but `zrok` also includes support for sharing raw [TCP](./tunnels.md) and [UDP](./tunnels.md) network connections, and also includes a [website and file sharing](./files.md) feature.
 
-Learn about `zrok` [hosting here](./hosting.md). 
+Learn about `zrok` [hosting here](./hosting.md), including instructions on how to [install your own `zrok` instance](../guides/self-hosting/self_hosting_guide.md). 
