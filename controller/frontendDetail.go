@@ -45,16 +45,19 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 		logrus.Errorf("environment not matched for frontend '%d' for account '%v'", fe.Id, principal.Email)
 		return metadata.NewGetFrontendDetailNotFound()
 	}
-	shr, err := str.GetShare(fe.Id, trx)
-	if err != nil {
-		logrus.Errorf("error getting share for frontend '%d': %v", fe.Id, err)
-		return metadata.NewGetFrontendDetailInternalServerError()
-	}
-	return metadata.NewGetFrontendDetailOK().WithPayload(&rest_model_zrok.Frontend{
+	payload := &rest_model_zrok.Frontend{
 		ID:        int64(fe.Id),
-		ShrToken:  shr.Token,
 		ZID:       fe.ZId,
 		CreatedAt: fe.CreatedAt.UnixMilli(),
 		UpdatedAt: fe.UpdatedAt.UnixMilli(),
-	})
+	}
+	if fe.PrivateShareId != nil {
+		shr, err := str.GetShare(*fe.PrivateShareId, trx)
+		if err != nil {
+			logrus.Errorf("error getting share for frontend '%d': %v", fe.Id, err)
+			return metadata.NewGetFrontendDetailInternalServerError()
+		}
+		payload.ShrToken = shr.Token
+	}
+	return metadata.NewGetFrontendDetailOK().WithPayload(payload)
 }
