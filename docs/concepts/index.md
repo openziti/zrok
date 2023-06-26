@@ -2,7 +2,7 @@
 sidebar_title: Core Features
 sidebar_position: 25
 ---
-# Core Features
+# Concepts
 
 `zrok` was designed to make sharing local resources both secure and easy. In this section of the `zrok` documentation, we'll tour through all of the most important features.
 
