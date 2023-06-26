@@ -81,6 +81,14 @@ The `store` section defines the local `sqlite3` database used by the controller.
 
 The `ziti` section defines how the `zrok` controller should communicate with your OpenZiti installation. When using the OpenZiti quickstart, an administrative password will be generated; the `password` in the `ziti` stanza should reflect this password.
 
+:::note
+
+Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
+
+See the separate guides on [configuring metrics](../metrics-and-limits/configuring-metrics.md) and [configuring limits](../metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
+
+:::
+
 ## Environment Variables
 
 The `zrok` binaries are configured to work with the global `zrok.io` service, and default to using `api.zrok.io` as the endpoint for communicating with the service.

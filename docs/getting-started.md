@@ -7,8 +7,8 @@ sidebar_position: 0
 
 As of version `v0.4.0`, `zrok` provides the ability to:
 
-* share resources [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies; this allows you to easily expose your private HTTP/S resources to the public internet without changing your network security
-* share resources [privately](./core-features/sharing-private.md); private sharing uses peer-to-peer connectivity between two parties by leveraging the OpenZiti overlay. We believe the private sharing offered by `zrok` provides a unique level of security and privacy for this type of sharing.
+* share resources [publicly](./concepts/sharing-public.md), similar to other distributed reverse proxies; this allows you to easily expose your private HTTP/S resources to the public internet without changing your network security
+* share resources [privately](./concepts/sharing-private.md); private sharing uses peer-to-peer connectivity between two parties by leveraging the OpenZiti overlay. We believe the private sharing offered by `zrok` provides a unique level of security and privacy for this type of sharing.
 
 As of version `v0.4.0`, `zrok` allows sharing these kinds of resources:
 
