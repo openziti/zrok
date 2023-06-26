@@ -11,4 +11,4 @@ To use a `reserved` share, you will first run the `zrok reserve` command to crea
 
 This pattern works for both `public` and `private` shares, and for all resource types supported by `zrok`.
 
-To delete your `reserved` share use the `zrok release` command.
+To delete your `reserved` share use the `zrok release` command or click the delete button in the share's _Actions_ tab in the web console.
