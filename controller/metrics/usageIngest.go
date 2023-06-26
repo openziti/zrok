@@ -57,14 +57,14 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 					}
 					if v, found := usage["egress.tx"]; found {
 						if vFloat64, ok := v.(float64); ok {
-							u.BackendTx = int64(vFloat64)
+							u.BackendRx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/egress.tx': %v", event)
 						}
 					}
 					if v, found := usage["egress.rx"]; found {
 						if vFloat64, ok := v.(float64); ok {
-							u.BackendRx = int64(vFloat64)
+							u.BackendTx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/egress.rx': %v", event)
 						}
