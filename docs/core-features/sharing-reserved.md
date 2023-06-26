@@ -1,7 +1,7 @@
 ---
 sidebar_position: 10
 ---
-# Shares - Reserved
+# Reserved Shares
 
 By default a `public` or `private` share is allocated a _share token_ when you run the `zrok share` command. The `zrok share` command is the bridge between your local environment and the users you are sharing with. When you terminate the `zrok share`, the bridge is eliminated and the _share token_ is deleted. If you run `zrok share` again, you will be allocated a brand new _share token_.
 

@@ -1,7 +1,7 @@
 ---
 sidebar_position: 10
 ---
-# Shares - Public
+# Public Shares
 
 `zrok` supports `public` sharing for web-based (HTTP and HTTPS) resources. These resources are easily shared with the general internet through public access points.
 
