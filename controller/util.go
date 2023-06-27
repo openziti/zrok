@@ -1,22 +1,23 @@
 package controller
 
 import (
-	"crypto/x509"
-	errors2 "github.com/go-openapi/errors"
-	"github.com/jaevor/go-nanoid"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_util"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"net/http"
 	"strings"
+	"unicode"
+
+	errors2 "github.com/go-openapi/errors"
+	"github.com/jaevor/go-nanoid"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/sirupsen/logrus"
 )
 
 type zrokAuthenticator struct {
-	cfg *Config
+	cfg *config.Config
 }
 
-func newZrokAuthenticator(cfg *Config) *zrokAuthenticator {
+func newZrokAuthenticator(cfg *config.Config) *zrokAuthenticator {
 	return &zrokAuthenticator{cfg}
 }
 
@@ -56,18 +57,6 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 	}
 }
 
-func edgeClient() (*rest_management_api_client.ZitiEdgeManagement, error) {
-	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.Ziti.ApiEndpoint)
-	if err != nil {
-		return nil, err
-	}
-	caPool := x509.NewCertPool()
-	for _, ca := range caCerts {
-		caPool.AddCert(ca)
-	}
-	return rest_util.NewEdgeManagementClientWithUpdb(cfg.Ziti.Username, cfg.Ziti.Password, cfg.Ziti.ApiEndpoint, caPool)
-}
-
 func createShareToken() (string, error) {
 	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyz0123456789", 12)
 	if err != nil {
@@ -100,4 +89,44 @@ func realRemoteAddress(req *http.Request) string {
 
 func proxyUrl(shrToken, template string) string {
 	return strings.Replace(template, "{token}", shrToken, -1)
+}
+
+func validatePassword(cfg *config.Config, password string) error {
+	if cfg.Passwords.Length > len(password) {
+		return fmt.Errorf("password length: expected (%d), got (%d)", cfg.Passwords.Length, len(password))
+	}
+	if cfg.Passwords.RequireCapital {
+		if !hasCapital(password) {
+			return fmt.Errorf("password requires capital, found none")
+		}
+	}
+	if cfg.Passwords.RequireNumeric {
+		if !hasNumeric(password) {
+			return fmt.Errorf("password requires numeric, found none")
+		}
+	}
+	if cfg.Passwords.RequireSpecial {
+		if !strings.ContainsAny(password, cfg.Passwords.ValidSpecialCharacters) {
+			return fmt.Errorf("password requires special character, found none")
+		}
+	}
+	return nil
+}
+
+func hasCapital(check string) bool {
+	for _, c := range check {
+		if unicode.IsUpper(c) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasNumeric(check string) bool {
+	for _, c := range check {
+		if unicode.IsDigit(c) {
+			return true
+		}
+	}
+	return false
 }

@@ -3,17 +3,18 @@ sidebar_position: 0
 ---
 # Getting Started with zrok
 
-`zrok` is an open source, Apache v2 licensed sharing platform, built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), 
-a programmable zero trust network overlay. `zrok` is an _OpenZiti Native Application_. You can choose to self-host `zrok`
-or leverage the free, managed offering provided by NetFoundry: https://zrok.io
+`zrok` is a next-generation sharing platform, designed to make sharing network and file resources simple and secure. `zrok` is a _Ziti Native Application_, built on top of the [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) programmable zero trust network overlay. `zrok` is open source, licensed under the Apache v2 license. You can choose to self-host `zrok` or leverage the free, managed offering provided by NetFoundry at https://zrok.io.
 
-As of version `v0.3.0`, `zrok` provides the ability to:
+As of version `v0.4.0`, `zrok` provides the ability to:
 
-* share resources [publicly](./core-features/sharing-public.md), similar to other distributed reverse proxies.
-* share [privately](./core-features/sharing-private.md). It does this by leveraging
-  [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) to support zero trust, peer to peer connections without
-  the need for any open ports on the internet.
-* use `web` sharing; easily share files with others using a single `zrok` command
+* share resources [publicly](./concepts/sharing-public.md), similar to other distributed reverse proxies; this allows you to easily expose your private HTTP/S resources to the public internet without changing your network security
+* share resources [privately](./concepts/sharing-private.md); private sharing uses peer-to-peer connectivity between two parties by leveraging the OpenZiti overlay. We believe the private sharing offered by `zrok` provides a unique level of security and privacy for this type of sharing.
+
+As of version `v0.4.0`, `zrok` allows sharing these kinds of resources:
+
+* HTTP/S resources; `zrok` provides reverse proxy capabilities for your HTTP/S endpoints, both publicly and privately
+* file resources; `zrok` provides built in `web` capabilities, allowing you to share your files with other users, both publicly and privately
+* TCP and UDP tunnels; `zrok` provides built-in `tunnel` capabilities, allowing you to share your TCP and UDP endpoints directly with other users privately (`zrok` does not currently offer public sharing of these kinds of resources)
 
 Let's take a look at how to get started with `zrok`.
 
@@ -38,7 +39,7 @@ Move the downloaded `zrok` distribution into a directory on your system. In my c
 
 ```
 $ ls -lF zrok*
--rwxr-xr-x 1 michael michael 12724747 Jan 17 12:57 zrok_0.3.0-rc1_linux_amd64.tar.gz*
+-rwxr-xr-x 1 michael michael 14459159 May 31 13:46 zrok_0.4.0-rc6_linux_amd64.tar.gz*
 ```
 
 Create a directory where the extracted distribution will sit:
@@ -51,7 +52,7 @@ $ cd zrok/
 Extract the `zrok` distribution:
 
 ```
-$ tar zxvf ../zrok_0.3.0-rc1_linux_amd64.tar.gz
+$ tar zxvf ../zrok_0.4.0-rc1_linux_amd64.tar.gz
 CHANGELOG.md
 README.md
 zrok
@@ -82,14 +83,14 @@ $env:path += ";"+$pwd.Path
 With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
 
 ```
-$ zrok version
+$ ./zrok version
                _    
  _____ __ ___ | | __
 |_  / '__/ _ \| |/ /
  / /| | | (_) |   < 
 /___|_|  \___/|_|\_\
 
-v0.3.0-rc1 [0d43b55]
+v0.4.0-rc6 [c889005]
 ```
 
 ## Configure Your zrok Service Instance
@@ -144,7 +145,7 @@ In order to create an account with the `zrok` service instance, you will need to
 Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
 :::
 
-We generate an invitation with the `zrok invite` command:
+We generate an invitation with the `zrok invite` command. A service instance that allows open registration will provide an input form like this:
 
 ```
 $ zrok invite
@@ -157,6 +158,23 @@ enter and confirm your email address...
 [ Submit ]
 
 invitation sent to 'user@domain.com'!
+```
+
+A service instance that requires token-based invitation authentication will present a form that looks like this:
+
+```
+$ zrok invite
+
+enter and confirm your email address...
+
+If you don't already have one, request an invite token at: michael@quigley.com
+
+> Email Address
+> Confirm Email
+> Token
+
+
+[ Submit ]
 ```
 
 The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
@@ -212,14 +230,14 @@ $ zrok status
 
 Config:
 
- CONFIG       VALUE                SOURCE 
- apiEndpoint  https://api.zrok.io  env    
+ CONFIG       VALUE                        SOURCE
+ apiEndpoint  https://api.staging.zrok.io  env
 
 Environment:
 
- PROPERTY       VALUE        
- Secret Token   klFEoIi0QAg7 
- Ziti Identity  FTpvelYD6h   
+ PROPERTY       VALUE
+ Secret Token   <<SET>>
+ Ziti Identity  <<SET>>
 ```
 
 Excellent... our environment is now fully enabled.
@@ -266,9 +284,9 @@ A frontend is an HTTPS listener exposed to the internet, that lets any user with
 
 For example, I might create a public share using the `zrok share public` command, which results in my `zrok` service instance exposing the following URL to access my resources:
 
-https://h0fz2ts9c84t.share.zrok.io
+https://2ptgbr8tlfvk.share.zrok.io
 
-In this case my share was given the "share token" of `h0fz2ts9c84t`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
+In this case my share was given the "share token" of `2ptgbr8tlfvk`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
 
 :::note
 Here is the `--help` output from `zrok share public`:
@@ -430,7 +448,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting a Service Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](./guides/self-hosting/v0.3_self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](./guides/self-hosting/self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/docs/learn/introduction/	"OpenZiti"
-[ zrok-download]: https://zrok.io "Zrok Download"
+[ zrok-download]: https://zrok.io "zrok Download"

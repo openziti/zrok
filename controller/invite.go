@@ -2,24 +2,28 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 
 type inviteHandler struct {
-	cfg *Config
+	cfg *config.Config
 }
 
-func newInviteHandler(cfg *Config) *inviteHandler {
+func newInviteHandler(cfg *config.Config) *inviteHandler {
 	return &inviteHandler{
 		cfg: cfg,
 	}
 }
 
-func (self *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
+func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder {
+	if h.cfg.Invites == nil || !h.cfg.Invites.InvitesOpen {
+		logrus.Warnf("not accepting invites; attempt from '%v'", params.Body.Email)
+		return account.NewInviteBadRequest()
+	}
 	if params.Body == nil || params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return account.NewInviteBadRequest()
@@ -38,11 +42,11 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if self.cfg.Registration != nil && self.cfg.Registration.TokenStrategy == "store" {
-		inviteToken, err := str.GetInviteTokenByToken(params.Body.Token, tx)
+	if h.cfg.Invites != nil && h.cfg.Invites.TokenStrategy == "store" {
+		inviteToken, err := str.FindInviteTokenByToken(params.Body.Token, tx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
-			return account.NewInviteBadRequest().WithPayload(rest_model_zrok.ErrorMessage("Missing invite token"))
+			return account.NewInviteBadRequest().WithPayload("missing invite token")
 		}
 		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
 			logrus.Error(err)
@@ -62,9 +66,10 @@ func (self *inviteHandler) Handle(params account.InviteParams) middleware.Respon
 		SourceAddress: params.HTTPRequest.RemoteAddr,
 	}
 
-	if _, err := str.FindAccountWithEmail(params.Body.Email, tx); err == nil {
+	// deleted accounts still exist as far as invites are concerned (ignore deleted flag)
+	if _, err := str.FindAccountWithEmailAndDeleted(params.Body.Email, tx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
-		return account.NewInviteBadRequest().WithPayload(rest_model_zrok.ErrorMessage("Duplicate email found"))
+		return account.NewInviteBadRequest().WithPayload("duplicate email found")
 	} else {
 		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
 	}

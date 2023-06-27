@@ -2,14 +2,20 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
 
-type resetPasswordHandler struct{}
+type resetPasswordHandler struct {
+	cfg *config.Config
+}
 
-func newResetPasswordHandler() *resetPasswordHandler {
-	return &resetPasswordHandler{}
+func newResetPasswordHandler(cfg *config.Config) *resetPasswordHandler {
+	return &resetPasswordHandler{
+		cfg: cfg,
+	}
 }
 
 func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) middleware.Responder {
@@ -37,6 +43,16 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 		logrus.Errorf("error finding account for '%v': %v", params.Body.Token, err)
 		return account.NewResetPasswordNotFound()
 	}
+	if a.Deleted {
+		logrus.Errorf("account '%v' for '%v' deleted", a.Email, a.Token)
+		return account.NewResetPasswordNotFound()
+	}
+
+	if err := validatePassword(handler.cfg, params.Body.Password); err != nil {
+		logrus.Errorf("password not valid for request '%v', (%v): %v", params.Body.Token, a.Email, err)
+		return account.NewResetPasswordUnprocessableEntity().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	}
+
 	hpwd, err := hashPassword(params.Body.Password)
 	if err != nil {
 		logrus.Errorf("error hashing password for '%v' (%v): %v", params.Body.Token, a.Email, err)

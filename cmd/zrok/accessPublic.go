@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/endpoints/publicFrontend"
+	"github.com/openziti/zrok/endpoints/publicProxy"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -22,10 +22,9 @@ type accessPublicCommand struct {
 
 func newAccessPublicCommand() *accessPublicCommand {
 	cmd := &cobra.Command{
-		Use:     "public [<configPath>]",
-		Aliases: []string{"fe"},
-		Short:   "Create a public access HTTP frontend",
-		Args:    cobra.RangeArgs(0, 1),
+		Use:   "public [<configPath>]",
+		Short: "Create a public access HTTP frontend",
+		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &accessPublicCommand{cmd: cmd}
 	cmd.Run = command.run
@@ -33,7 +32,7 @@ func newAccessPublicCommand() *accessPublicCommand {
 }
 
 func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
-	cfg := publicFrontend.DefaultConfig()
+	cfg := publicProxy.DefaultConfig()
 	if len(args) == 1 {
 		if err := cfg.Load(args[0]); err != nil {
 			if !panicInstead {
@@ -43,7 +42,7 @@ func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
-	frontend, err := publicFrontend.NewHTTP(cfg)
+	frontend, err := publicProxy.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create http frontend", err)

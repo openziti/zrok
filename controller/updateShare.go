@@ -38,7 +38,7 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 
 	envFound := false
 	for _, senv := range senvs {
-		if senv.Id == sshr.Id {
+		if senv.Id == sshr.EnvironmentId {
 			envFound = true
 			break
 		}

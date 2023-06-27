@@ -72,6 +72,10 @@ paths:
             $ref: "#/definitions/registerResponse"
         404:
           description: request not found
+        422:
+          description: password validation failure
+          schema:
+            $ref: '#/definitions/errorMessage'
         500:
           description: internal server error
 
@@ -90,6 +94,10 @@ paths:
           description: password reset
         404:
           description: request not found
+        422:
+          description: password validation failure
+          schema:
+            $ref: '#/definitions/errorMessage'
         500:
           description: internal server error
 
@@ -329,6 +337,21 @@ paths:
           schema:
             $ref: "#/definitions/configuration"
 
+  /detail/account:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getAccountDetail
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/environments"
+        500:
+          description: internal server error
+
   /detail/environment/{envZId}:
     get:
       tags:
@@ -345,7 +368,31 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/environmentShares"
+            $ref: "#/definitions/environmentAndResources"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /detail/frontend/{feId}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getFrontendDetail
+      parameters:
+        - name: feId
+          in: path
+          type: integer
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/frontend"
         401:
           description: unauthorized
         404:
@@ -388,11 +435,88 @@ paths:
         200:
           description: overview returned
           schema:
-            $ref: "#/definitions/environmentSharesList"
+            $ref: "#/definitions/overview"
         500:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
+  /metrics/account:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getAccountMetrics
+      parameters:
+        - name: duration
+          in: query
+          type: string
+      responses:
+        200:
+          description: account metrics
+          schema:
+            $ref: "#/definitions/metrics"
+        400:
+          description: bad request
+        500:
+          description: internal server error
+
+  /metrics/environment/{envId}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getEnvironmentMetrics
+      parameters:
+        - name: envId
+          in: path
+          type: string
+          required: true
+        - name: duration
+          in: query
+          type: string
+      responses:
+        200:
+          description: environment metrics
+          schema:
+            $ref: "#/definitions/metrics"
+        400:
+          description: bad request
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+
+  /metrics/share/{shrToken}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getShareMetrics
+      parameters:
+        - name: shrToken
+          in: path
+          type: string
+          required: true
+        - name: duration
+          in: query
+          type: string
+      responses:
+        200:
+          description: share metrics
+          schema:
+            $ref: "#/definitions/metrics"
+        400:
+          description: bad request
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
 
   /version:
     get:
@@ -404,6 +528,7 @@ paths:
           description: current server version
           schema:
             $ref: "#/definitions/version"
+
   #
   # share
   #
@@ -537,6 +662,8 @@ definitions:
     properties:
       frontendToken:
         type: string
+      backendMode:
+        type: string
 
   authUser:
     type: object
@@ -553,6 +680,14 @@ definitions:
         type: string
       touLink:
         type: string
+      invitesOpen:
+        type: boolean
+      requiresInviteToken:
+        type: boolean
+      inviteTokenContact:
+        type: string
+      passwordRequirements:
+        $ref: "#/definitions/passwordRequirements"
 
   createFrontendRequest:
     type: object
@@ -609,7 +744,9 @@ definitions:
         type: string
       zId:
         type: string
-      active:
+      activity:
+        $ref: "#/definitions/sparkData"
+      limited:
         type: boolean
       createdAt:
         type: integer
@@ -621,21 +758,37 @@ definitions:
     items:
       $ref: "#/definitions/environment"
 
-  environmentSharesList:
-    type: array
-    items:
-      $ref: "#/definitions/environmentShares"
-
-  environmentShares:
+  environmentAndResources:
     type: object
     properties:
       environment:
         $ref: "#/definitions/environment"
+      frontends:
+        $ref: "#/definitions/frontends"
       shares:
         $ref: "#/definitions/shares"
 
   errorMessage:
     type: string
+
+  frontend:
+    type: object
+    properties:
+      id:
+        type: integer
+      shrToken:
+        type: string
+      zId:
+        type: string
+      createdAt:
+        type: integer
+      updatedAt:
+        type: integer
+
+  frontends:
+    type: array
+    items:
+      $ref: "#/definitions/frontend"
 
   inviteTokenGenerateRequest:
     type: object
@@ -663,6 +816,54 @@ definitions:
 
   loginResponse:
     type: string
+
+  metrics:
+    type: object
+    properties:
+      scope:
+        type: string
+      id:
+        type: string
+      period:
+        type: number
+      samples:
+        type: array
+        items:
+          $ref: "#/definitions/metricsSample"
+
+  metricsSample:
+    type: object
+    properties:
+      rx:
+        type: number
+      tx:
+        type: number
+      timestamp:
+        type: number
+
+  overview:
+    type: object
+    properties:
+      accountLimited:
+        type: boolean
+      environments:
+        type: array
+        items:
+          $ref: "#/definitions/environmentAndResources"
+          
+  passwordRequirements:
+    type: object
+    properties:
+      length:
+        type: integer
+      requireCapital:
+        type: boolean
+      requireNumeric:
+        type: boolean
+      requireSpecial:
+        type: boolean
+      validSpecialCharacters:
+        type: string
 
   principal:
     type: object
@@ -740,8 +941,10 @@ definitions:
         type: string
       reserved:
         type: boolean
-      metrics:
-        $ref: "#/definitions/shareMetrics"
+      activity:
+        $ref: "#/definitions/sparkData"
+      limited:
+        type: boolean
       createdAt:
         type: integer
       updatedAt:
@@ -751,11 +954,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/share"
-
-  shareMetrics:
-    type: array
-    items:
-      type: integer
 
   shareRequest:
     type: object
@@ -771,7 +969,7 @@ definitions:
           type: string
       backendMode:
         type: string
-        enum: ["proxy", "web", "dav"]
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel"]
       backendProxyEndpoint:
         type: string
       authScheme:
@@ -792,6 +990,19 @@ definitions:
           type: string
       shrToken:
         type: string
+
+  sparkData:
+    type: array
+    items:
+      $ref: "#/definitions/sparkDataSample"
+
+  sparkDataSample:
+    type: object
+    properties:
+      rx:
+        type: number
+      tx:
+        type: number
 
   unaccessRequest:
     type: object

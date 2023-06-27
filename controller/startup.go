@@ -3,8 +3,9 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/config"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -23,7 +24,7 @@ func controllerStartup() error {
 func inspectZiti() error {
 	logrus.Infof("inspecting ziti controller configuration")
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error getting ziti edge client")
 	}

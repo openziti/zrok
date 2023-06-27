@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/edge/rest_management_api_client"
-	edge_service "github.com/openziti/edge/rest_management_api_client/service"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -29,7 +29,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
@@ -124,10 +124,10 @@ func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, 
 	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyDial(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesDial(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
-	if err := zrokEdgeSdk.DeleteServicePolicyBind(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesBind(senv.ZId, shrToken, edge); err != nil {
 		return err
 	}
 	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {

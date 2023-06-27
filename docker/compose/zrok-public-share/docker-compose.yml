@@ -41,11 +41,6 @@ services:
     environment:
       HOME: /mnt
       PFXLOG_NO_JSON: "true"
-    volumes:
-      - zrok_env:/mnt/.zrok
-    environment:
-      HOME: /mnt
-      PFXLOG_NO_JSON: "true"
 
   # demo servers you can share with zrok
   zrok-test:

@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti/transport/v2"
+	"github.com/openziti/transport/v2/tcp"
+	"github.com/openziti/transport/v2/udp"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -24,6 +27,8 @@ func init() {
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
+	transport.AddAddressParser(tcp.AddressParser{})
+	transport.AddAddressParser(udp.AddressParser{})
 }
 
 var rootCmd = &cobra.Command{

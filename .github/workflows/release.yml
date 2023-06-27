@@ -13,6 +13,7 @@ jobs:
   build-linux-amd64:
     runs-on: ubuntu-20.04
     steps:
+      - run: sudo apt update
       - run: sudo apt-get install gcc-multilib g++-multilib
 
       - uses: actions/checkout@v3
@@ -54,6 +55,7 @@ jobs:
   build-linux-arm64:
     runs-on: ubuntu-20.04
     steps:
+      - run: sudo apt update
       - run: sudo apt-get install gcc-aarch64-linux-gnu
 
       - uses: actions/checkout@v3
@@ -95,6 +97,7 @@ jobs:
   build-linux-arm:
     runs-on: ubuntu-20.04
     steps:
+      - run: sudo apt update
       - run: sudo apt-get install gcc-arm-linux-gnueabi
 
       - uses: actions/checkout@v3
@@ -187,6 +190,7 @@ jobs:
   build-windows:
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt update
       - run: sudo apt-get install gcc-mingw-w64-x86-64
 
       - uses: actions/checkout@v3

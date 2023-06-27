@@ -5,17 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/openziti/edge/rest_management_api_client"
-	"github.com/openziti/edge/rest_management_api_client/config"
-	"github.com/openziti/edge/rest_management_api_client/edge_router_policy"
-	"github.com/openziti/edge/rest_management_api_client/identity"
-	"github.com/openziti/edge/rest_management_api_client/service"
-	"github.com/openziti/edge/rest_management_api_client/service_edge_router_policy"
-	"github.com/openziti/edge/rest_management_api_client/service_policy"
-	"github.com/openziti/edge/rest_model"
-	rest_model_edge "github.com/openziti/edge/rest_model"
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
+	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
+	"github.com/openziti/edge-api/rest_management_api_client/identity"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	config2 "github.com/openziti/sdk-golang/ziti/config"
+	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/model"
@@ -25,7 +21,7 @@ import (
 	"time"
 )
 
-func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
+func Bootstrap(skipCtrl, skipFrontend bool, inCfg *zrok_config.Config) error {
 	cfg = inCfg
 
 	if v, err := store.Open(cfg.Store); err == nil {
@@ -35,7 +31,7 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 	}
 
 	logrus.Info("connecting to the ziti edge management api")
-	edge, err := edgeClient()
+	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}
@@ -100,27 +96,6 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *Config) error {
 		return err
 	}
 
-	var metricsSvcZId string
-	if metricsSvcZId, err = assertMetricsService(cfg, edge); err != nil {
-		return err
-	}
-
-	if err := assertMetricsSerp(metricsSvcZId, cfg, edge); err != nil {
-		return err
-	}
-
-	if !skipCtrl {
-		if err := assertCtrlMetricsBind(ctrlZId, metricsSvcZId, edge); err != nil {
-			return err
-		}
-	}
-
-	if !skipFrontend {
-		if err := assertFrontendMetricsDial(frontendZId, metricsSvcZId, edge); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -141,7 +116,7 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 	}
 	if len(listResp.Payload.Data) < 1 {
 		name := model.ZrokProxyConfig
-		ct := &rest_model.ConfigTypeCreate{Name: &name}
+		ct := &rest_model_edge.ConfigTypeCreate{Name: &name}
 		createReq := &config.CreateConfigTypeParams{ConfigType: ct}
 		createReq.SetTimeout(30 * time.Second)
 		createResp, err := edge.Config.CreateConfigType(createReq, nil)
@@ -162,16 +137,22 @@ func getIdentityId(identityName string) (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir", identityName)
 	}
-	zcfg, err := config2.NewFromFile(zif)
+	zcfg, err := ziti.NewConfigFromFile(zif)
 	if err != nil {
 		return "", errors.Wrapf(err, "error loading ziti config from file '%v'", zif)
 	}
-	zctx := ziti.NewContextWithConfig(zcfg)
+	zctx, err := ziti.NewContext(zcfg)
+	if err != nil {
+		return "", errors.Wrap(err, "error loading ziti context")
+	}
 	id, err := zctx.GetCurrentIdentity()
 	if err != nil {
 		return "", errors.Wrapf(err, "error getting current identity from '%v'", zif)
 	}
-	return id.Id, nil
+	if id.ID != nil {
+		return *id.ID, nil
+	}
+	return "", nil
 }
 
 func assertIdentity(zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
@@ -241,107 +222,5 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 		}
 	}
 	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
-	return nil
-}
-
-func assertMetricsService(cfg *Config, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	filter := fmt.Sprintf("name=\"%v\" and tags.zrok != null", cfg.Metrics.ServiceName)
-	limit := int64(0)
-	offset := int64(0)
-	listReq := &service.ListServicesParams{
-		Filter: &filter,
-		Limit:  &limit,
-		Offset: &offset,
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.Service.ListServices(listReq, nil)
-	if err != nil {
-		return "", errors.Wrapf(err, "error listing '%v' service", cfg.Metrics.ServiceName)
-	}
-	var svcZId string
-	if len(listResp.Payload.Data) != 1 {
-		logrus.Infof("creating '%v' service", cfg.Metrics.ServiceName)
-		svcZId, err = zrokEdgeSdk.CreateService("metrics", nil, nil, edge)
-		if err != nil {
-			return "", errors.Wrapf(err, "error creating '%v' service", cfg.Metrics.ServiceName)
-		}
-	} else {
-		svcZId = *listResp.Payload.Data[0].ID
-	}
-
-	logrus.Infof("asserted '%v' service (%v)", cfg.Metrics.ServiceName, svcZId)
-	return svcZId, nil
-}
-
-func assertMetricsSerp(metricsSvcZId string, cfg *Config, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(edgeRouterRoles) = \"#all\" and tags.zrok != null", metricsSvcZId)
-	limit := int64(0)
-	offset := int64(0)
-	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
-		Filter: &filter,
-		Limit:  &limit,
-		Offset: &offset,
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(listReq, nil)
-	if err != nil {
-		return errors.Wrapf(err, "error listing '%v' serps", cfg.Metrics.ServiceName)
-	}
-	if len(listResp.Payload.Data) != 1 {
-		logrus.Infof("creating '%v' serp", cfg.Metrics.ServiceName)
-		_, err := zrokEdgeSdk.CreateServiceEdgeRouterPolicy(cfg.Metrics.ServiceName, metricsSvcZId, nil, edge)
-		if err != nil {
-			return errors.Wrapf(err, "error creating '%v' serp", cfg.Metrics.ServiceName)
-		}
-	}
-	logrus.Infof("asserted '%v' serp", cfg.Metrics.ServiceName)
-	return nil
-}
-
-func assertCtrlMetricsBind(ctrlZId, metricsSvcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(identityRoles) = \"@%v\" and type = 2 and tags.zrok != null", metricsSvcZId, ctrlZId)
-	limit := int64(0)
-	offset := int64(0)
-	listReq := &service_policy.ListServicePoliciesParams{
-		Filter: &filter,
-		Limit:  &limit,
-		Offset: &offset,
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
-	if err != nil {
-		return errors.Wrapf(err, "error listing 'ctrl-metrics-bind' service policy")
-	}
-	if len(listResp.Payload.Data) != 1 {
-		logrus.Info("creating 'ctrl-metrics-bind' service policy")
-		if err = zrokEdgeSdk.CreateServicePolicyBind("ctrl-metrics-bind", metricsSvcZId, ctrlZId, nil, edge); err != nil {
-			return errors.Wrap(err, "error creating 'ctrl-metrics-bind' service policy")
-		}
-	}
-	logrus.Infof("asserted 'ctrl-metrics-bind' service policy")
-	return nil
-}
-
-func assertFrontendMetricsDial(frontendZId, metricsSvcZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("allOf(serviceRoles) = \"@%v\" and allOf(identityRoles) = \"@%v\" and type = 1 and tags.zrok != null", metricsSvcZId, frontendZId)
-	limit := int64(0)
-	offset := int64(0)
-	listReq := &service_policy.ListServicePoliciesParams{
-		Filter: &filter,
-		Limit:  &limit,
-		Offset: &offset,
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
-	if err != nil {
-		return errors.Wrapf(err, "error listing 'frontend-metrics-dial' service policy")
-	}
-	if len(listResp.Payload.Data) != 1 {
-		logrus.Info("creating 'frontend-metrics-dial' service policy")
-		if err = zrokEdgeSdk.CreateServicePolicyDial("frontend-metrics-dial", metricsSvcZId, []string{frontendZId}, nil, edge); err != nil {
-			return errors.Wrap(err, "error creating 'frontend-metrics-dial' service policy")
-		}
-	}
-	logrus.Infof("asserted 'frontend-metrics-dial' service policy")
 	return nil
 }

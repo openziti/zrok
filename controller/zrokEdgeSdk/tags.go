@@ -1,7 +1,7 @@
 package zrokEdgeSdk
 
 import (
-	"github.com/openziti/edge/rest_model"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/build"
 )
 

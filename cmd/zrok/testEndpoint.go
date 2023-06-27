@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
 	"github.com/openziti/zrok/cmd/zrok/endpointUi"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
@@ -79,13 +78,17 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 			flag.Usage()
 			os.Exit(1)
 		}
-		config := config.Config{}
+		config := ziti.Config{}
 		err = json.Unmarshal(identityJsonBytes, &config)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to load ziti configuration JSON: %v", err)
 			os.Exit(1)
 		}
-		zitiContext := ziti.NewContextWithConfig(&config)
+		zitiContext, err := ziti.NewContext(&config)
+		if err != nil {
+			fmt.Printf("error loading ziti context: %v", err)
+			os.Exit(1)
+		}
 		if err := zitiContext.Authenticate(); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: Unable to authenticate ziti: %v\n\n", err)
 			os.Exit(1)

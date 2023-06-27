@@ -12,9 +12,10 @@ type Environment struct {
 	Host        string
 	Address     string
 	ZId         string
+	Deleted     bool
 }
 
-func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx) (int, error) {
+func (str *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into environments (account_id, description, host, address, z_id) values ($1, $2, $3, $4, $5) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing environments insert statement")
@@ -26,7 +27,7 @@ func (self *Store) CreateEnvironment(accountId int, i *Environment, tx *sqlx.Tx)
 	return id, nil
 }
 
-func (self *Store) CreateEphemeralEnvironment(i *Environment, tx *sqlx.Tx) (int, error) {
+func (str *Store) CreateEphemeralEnvironment(i *Environment, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into environments (description, host, address, z_id) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing environments (ephemeral) insert statement")
@@ -38,7 +39,7 @@ func (self *Store) CreateEphemeralEnvironment(i *Environment, tx *sqlx.Tx) (int,
 	return id, nil
 }
 
-func (self *Store) GetEnvironment(id int, tx *sqlx.Tx) (*Environment, error) {
+func (str *Store) GetEnvironment(id int, tx *sqlx.Tx) (*Environment, error) {
 	i := &Environment{}
 	if err := tx.QueryRowx("select * from environments where id = $1", id).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting environment by id")
@@ -46,8 +47,8 @@ func (self *Store) GetEnvironment(id int, tx *sqlx.Tx) (*Environment, error) {
 	return i, nil
 }
 
-func (self *Store) FindEnvironmentsForAccount(accountId int, tx *sqlx.Tx) ([]*Environment, error) {
-	rows, err := tx.Queryx("select environments.* from environments where account_id = $1", accountId)
+func (str *Store) FindEnvironmentsForAccount(accountId int, tx *sqlx.Tx) ([]*Environment, error) {
+	rows, err := tx.Queryx("select environments.* from environments where account_id = $1 and not deleted", accountId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting environments by account id")
 	}
@@ -62,16 +63,16 @@ func (self *Store) FindEnvironmentsForAccount(accountId int, tx *sqlx.Tx) ([]*En
 	return is, nil
 }
 
-func (self *Store) FindEnvironmentForAccount(envZId string, accountId int, tx *sqlx.Tx) (*Environment, error) {
+func (str *Store) FindEnvironmentForAccount(envZId string, accountId int, tx *sqlx.Tx) (*Environment, error) {
 	env := &Environment{}
-	if err := tx.QueryRowx("select environments.* from environments where z_id = $1 and account_id = $2", envZId, accountId).StructScan(env); err != nil {
+	if err := tx.QueryRowx("select environments.* from environments where z_id = $1 and account_id = $2 and not deleted", envZId, accountId).StructScan(env); err != nil {
 		return nil, errors.Wrap(err, "error finding environment by z_id and account_id")
 	}
 	return env, nil
 }
 
-func (self *Store) DeleteEnvironment(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from environments where id = $1")
+func (str *Store) DeleteEnvironment(id int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("update environments set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing environments delete statement")
 	}

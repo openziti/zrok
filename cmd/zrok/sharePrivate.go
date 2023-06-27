@@ -6,8 +6,9 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyBackend"
-	"github.com/openziti/zrok/endpoints/webBackend"
+	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -43,7 +44,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -67,8 +68,14 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	case "web":
 		target = args[0]
 
+	case "tcpTunnel":
+		target = args[0]
+
+	case "udpTunnel":
+		target = args[0]
+
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel}", cmd.backendMode), nil)
 	}
 
 	zrd, err := zrokdir.Load()
@@ -139,7 +146,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	requestsChan := make(chan *endpoints.Request, 1024)
 	switch cmd.backendMode {
 	case "proxy":
-		cfg := &proxyBackend.Config{
+		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
@@ -155,7 +162,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "web":
-		cfg := &webBackend.Config{
+		cfg := &proxy.WebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
@@ -168,6 +175,46 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 			panic(err)
 		}
+
+	case "tcpTunnel":
+		cfg := &tcpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
+		}
+		be, err := tcpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create tcpTunnel backend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running tcpTunnel backend: %v", err)
+			}
+		}()
+
+	case "udpTunnel":
+		cfg := &udpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        resp.Payload.ShrToken,
+			RequestsChan:    requestsChan,
+		}
+		be, err := udpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create udpTunnel backend", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running udpTunnel backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
@@ -207,8 +254,8 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 }
 
-func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := proxyBackend.NewBackend(cfg)
+func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http proxy backend")
 	}
@@ -222,8 +269,8 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxyBackend.Config) (endp
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *webBackend.Config) (endpoints.RequestHandler, error) {
-	be, err := webBackend.NewBackend(cfg)
+func (cmd *sharePrivateCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewWebBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
 	}

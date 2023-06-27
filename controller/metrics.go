@@ -1,181 +1,261 @@
 package controller
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"github.com/go-openapi/runtime/middleware"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
-	"github.com/influxdata/influxdb-client-go/v2/api/write"
-	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/config"
-	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/model"
-	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/zrokdir"
-	"github.com/pkg/errors"
+	"github.com/openziti/zrok/controller/metrics"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/mgo.v2/bson"
-	"net"
 	"time"
 )
 
-type metricsAgent struct {
-	writeApi     api.WriteAPIBlocking
-	metricsQueue chan *model.Metrics
-	envCache     map[string]*envCacheEntry
-	zCtx         ziti.Context
-	zListener    edge.Listener
-	shutdown     chan struct{}
-	joined       chan struct{}
+type getAccountMetricsHandler struct {
+	cfg      *metrics.InfluxConfig
+	idb      influxdb2.Client
+	queryApi api.QueryAPI
 }
 
-type envCacheEntry struct {
-	env        string
-	lastAccess time.Time
-}
-
-func newMetricsAgent() *metricsAgent {
-	ma := &metricsAgent{
-		metricsQueue: make(chan *model.Metrics, 1024),
-		envCache:     make(map[string]*envCacheEntry),
-		shutdown:     make(chan struct{}),
-		joined:       make(chan struct{}),
-	}
-	if idb != nil {
-		ma.writeApi = idb.WriteAPIBlocking(cfg.Influx.Org, cfg.Influx.Bucket)
-	}
-	return ma
-}
-
-func (ma *metricsAgent) run() {
-	logrus.Info("starting")
-	defer logrus.Info("exiting")
-	defer close(ma.joined)
-
-	if err := ma.bindService(); err != nil {
-		logrus.Errorf("error binding metrics service: %v", err)
-		return
-	}
-
-work:
-	for {
-		select {
-		case <-ma.shutdown:
-			break work
-
-		case m := <-ma.metricsQueue:
-			if err := ma.processMetrics(m); err != nil {
-				logrus.Errorf("error processing metrics: %v", err)
-			}
-		}
-	}
-
-	if err := ma.zListener.Close(); err != nil {
-		logrus.Errorf("error closing metrics service listener: %v", err)
+func newGetAccountMetricsHandler(cfg *metrics.InfluxConfig) *getAccountMetricsHandler {
+	idb := influxdb2.NewClient(cfg.Url, cfg.Token)
+	queryApi := idb.QueryAPI(cfg.Org)
+	return &getAccountMetricsHandler{
+		cfg:      cfg,
+		idb:      idb,
+		queryApi: queryApi,
 	}
 }
 
-func (ma *metricsAgent) bindService() error {
-	zif, err := zrokdir.ZitiIdentityFile("ctrl")
-	if err != nil {
-		return errors.Wrap(err, "error getting 'ctrl' identity")
-	}
-	zCfg, err := config.NewFromFile(zif)
-	if err != nil {
-		return errors.Wrap(err, "error loading 'ctrl' identity")
-	}
-	ma.zCtx = ziti.NewContextWithConfig(zCfg)
-	opts := &ziti.ListenOptions{
-		ConnectTimeout: 5 * time.Minute,
-		MaxConnections: 1024,
-	}
-	ma.zListener, err = ma.zCtx.ListenWithOptions(cfg.Metrics.ServiceName, opts)
-	if err != nil {
-		return errors.Wrapf(err, "error listening for metrics on '%v'", cfg.Metrics.ServiceName)
-	}
-	go ma.listen()
-	return nil
-}
-
-func (ma *metricsAgent) listen() {
-	logrus.Info("started")
-	defer logrus.Info("exited")
-	for {
-		conn, err := ma.zListener.Accept()
+func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	duration := 30 * 24 * time.Hour
+	if params.Duration != nil {
+		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("error accepting: %v", err)
-			return
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			return metadata.NewGetAccountMetricsBadRequest()
 		}
-		logrus.Debugf("accepted metrics connetion from '%v'", conn.RemoteAddr())
-		go newMetricsHandler(conn, ma.metricsQueue).run()
+		duration = v
+	}
+	slice := sliceSize(duration)
+
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"acctId\"] == \"%d\")\n", principal.ID) +
+		"|> drop(columns: [\"share\", \"envId\"])\n" +
+		fmt.Sprintf("|> aggregateWindow(every: %v, fn: sum, createEmpty: true)", slice)
+
+	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
+	if err != nil {
+		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		return metadata.NewGetAccountMetricsInternalServerError()
+	}
+
+	response := &rest_model_zrok.Metrics{
+		Scope:  "account",
+		ID:     fmt.Sprintf("%d", principal.ID),
+		Period: duration.Seconds(),
+	}
+	for i := 0; i < len(rx) && i < len(tx) && i < len(timestamps); i++ {
+		response.Samples = append(response.Samples, &rest_model_zrok.MetricsSample{
+			Rx:        rx[i],
+			Tx:        tx[i],
+			Timestamp: timestamps[i],
+		})
+	}
+	return metadata.NewGetAccountMetricsOK().WithPayload(response)
+}
+
+type getEnvironmentMetricsHandler struct {
+	cfg      *metrics.InfluxConfig
+	idb      influxdb2.Client
+	queryApi api.QueryAPI
+}
+
+func newGetEnvironmentMetricsHandler(cfg *metrics.InfluxConfig) *getEnvironmentMetricsHandler {
+	idb := influxdb2.NewClient(cfg.Url, cfg.Token)
+	queryApi := idb.QueryAPI(cfg.Org)
+	return &getEnvironmentMetricsHandler{
+		cfg:      cfg,
+		idb:      idb,
+		queryApi: queryApi,
 	}
 }
 
-func (ma *metricsAgent) processMetrics(m *model.Metrics) error {
-	var pts []*write.Point
-	if len(m.Sessions) > 0 {
-		out := "metrics = {\n"
-		for k, v := range m.Sessions {
-			if ma.writeApi != nil {
-				pt := influxdb2.NewPoint("xfer",
-					map[string]string{"namespace": m.Namespace, "share": k},
-					map[string]interface{}{"bytesRead": v.BytesRead, "bytesWritten": v.BytesWritten},
-					time.UnixMilli(v.LastUpdate))
-				pts = append(pts, pt)
-			}
-			out += fmt.Sprintf("\t[%v.%v]: %v/%v (%v)\n", m.Namespace, k, util.BytesToSize(v.BytesRead), util.BytesToSize(v.BytesWritten), time.Since(time.UnixMilli(v.LastUpdate)))
-		}
-		out += "}"
-		logrus.Info(out)
+func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	trx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return metadata.NewGetEnvironmentMetricsInternalServerError()
+	}
+	defer func() { _ = trx.Rollback() }()
+	env, err := str.FindEnvironmentForAccount(params.EnvID, int(principal.ID), trx)
+	if err != nil {
+		logrus.Errorf("error finding environment '%s' for '%s': %v", params.EnvID, principal.Email, err)
+		return metadata.NewGetEnvironmentMetricsUnauthorized()
 	}
 
-	if len(pts) > 0 {
-		if err := ma.writeApi.WritePoint(context.Background(), pts...); err == nil {
-			logrus.Debugf("wrote metrics to influx")
-		} else {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (ma *metricsAgent) stop() {
-	close(ma.shutdown)
-}
-
-func (ma *metricsAgent) join() {
-	<-ma.joined
-}
-
-type metricsHandler struct {
-	conn         net.Conn
-	metricsQueue chan *model.Metrics
-}
-
-func newMetricsHandler(conn net.Conn, metricsQueue chan *model.Metrics) *metricsHandler {
-	return &metricsHandler{conn, metricsQueue}
-}
-
-func (mh *metricsHandler) run() {
-	logrus.Debugf("handling metrics connection: %v", mh.conn.RemoteAddr())
-	var mtrBuf bytes.Buffer
-	buf := make([]byte, 4096)
-	for {
-		n, err := mh.conn.Read(buf)
+	duration := 30 * 24 * time.Hour
+	if params.Duration != nil {
+		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			break
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			return metadata.NewGetAccountMetricsBadRequest()
 		}
-		mtrBuf.Write(buf[:n])
+		duration = v
 	}
-	if err := mh.conn.Close(); err != nil {
-		logrus.Errorf("error closing metrics connection")
+	slice := sliceSize(duration)
+
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"envId\"] == \"%d\")\n", int64(env.Id)) +
+		"|> drop(columns: [\"share\", \"acctId\"])\n" +
+		fmt.Sprintf("|> aggregateWindow(every: %v, fn: sum, createEmpty: true)", slice)
+
+	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
+	if err != nil {
+		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		return metadata.NewGetAccountMetricsInternalServerError()
 	}
-	m := &model.Metrics{}
-	if err := bson.Unmarshal(mtrBuf.Bytes(), &m); err == nil {
-		mh.metricsQueue <- m
-	} else {
-		logrus.Errorf("error unmarshaling metrics: %v", err)
+
+	response := &rest_model_zrok.Metrics{
+		Scope:  "account",
+		ID:     fmt.Sprintf("%d", principal.ID),
+		Period: duration.Seconds(),
+	}
+	for i := 0; i < len(rx) && i < len(tx) && i < len(timestamps); i++ {
+		response.Samples = append(response.Samples, &rest_model_zrok.MetricsSample{
+			Rx:        rx[i],
+			Tx:        tx[i],
+			Timestamp: timestamps[i],
+		})
+	}
+
+	return metadata.NewGetEnvironmentMetricsOK().WithPayload(response)
+}
+
+type getShareMetricsHandler struct {
+	cfg      *metrics.InfluxConfig
+	idb      influxdb2.Client
+	queryApi api.QueryAPI
+}
+
+func newGetShareMetricsHandler(cfg *metrics.InfluxConfig) *getShareMetricsHandler {
+	idb := influxdb2.NewClient(cfg.Url, cfg.Token)
+	queryApi := idb.QueryAPI(cfg.Org)
+	return &getShareMetricsHandler{
+		cfg:      cfg,
+		idb:      idb,
+		queryApi: queryApi,
+	}
+}
+
+func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	trx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return metadata.NewGetEnvironmentMetricsInternalServerError()
+	}
+	defer func() { _ = trx.Rollback() }()
+	shr, err := str.FindShareWithToken(params.ShrToken, trx)
+	if err != nil {
+		logrus.Errorf("error finding share '%v' for '%v': %v", params.ShrToken, principal.Email, err)
+		return metadata.NewGetShareMetricsUnauthorized()
+	}
+	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
+	if err != nil {
+		logrus.Errorf("error finding environment '%d' for '%v': %v", shr.EnvironmentId, principal.Email, err)
+		return metadata.NewGetShareMetricsUnauthorized()
+	}
+	if env.AccountId != nil && int64(*env.AccountId) != principal.ID {
+		logrus.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShrToken)
+		return metadata.NewGetShareMetricsUnauthorized()
+	}
+
+	duration := 30 * 24 * time.Hour
+	if params.Duration != nil {
+		v, err := time.ParseDuration(*params.Duration)
+		if err != nil {
+			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			return metadata.NewGetAccountMetricsBadRequest()
+		}
+		duration = v
+	}
+	slice := sliceSize(duration)
+
+	query := fmt.Sprintf("from(bucket: \"%v\")\n", h.cfg.Bucket) +
+		fmt.Sprintf("|> range(start: -%v)\n", duration) +
+		"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
+		"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
+		"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
+		fmt.Sprintf("|> filter(fn: (r) => r[\"share\"] == \"%v\")\n", shr.Token) +
+		fmt.Sprintf("|> aggregateWindow(every: %v, fn: sum, createEmpty: true)", slice)
+
+	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
+	if err != nil {
+		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		return metadata.NewGetAccountMetricsInternalServerError()
+	}
+
+	response := &rest_model_zrok.Metrics{
+		Scope:  "account",
+		ID:     fmt.Sprintf("%d", principal.ID),
+		Period: duration.Seconds(),
+	}
+	for i := 0; i < len(rx) && i < len(tx) && i < len(timestamps); i++ {
+		response.Samples = append(response.Samples, &rest_model_zrok.MetricsSample{
+			Rx:        rx[i],
+			Tx:        tx[i],
+			Timestamp: timestamps[i],
+		})
+	}
+
+	return metadata.NewGetShareMetricsOK().WithPayload(response)
+}
+
+func runFluxForRxTxArray(query string, queryApi api.QueryAPI) (rx, tx, timestamps []float64, err error) {
+	result, err := queryApi.Query(context.Background(), query)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	for result.Next() {
+		switch result.Record().Field() {
+		case "rx":
+			rxV := int64(0)
+			if v, ok := result.Record().Value().(int64); ok {
+				rxV = v
+			}
+			rx = append(rx, float64(rxV))
+			timestamps = append(timestamps, float64(result.Record().Time().UnixMilli()))
+
+		case "tx":
+			txV := int64(0)
+			if v, ok := result.Record().Value().(int64); ok {
+				txV = v
+			}
+			tx = append(tx, float64(txV))
+		}
+	}
+	return rx, tx, timestamps, nil
+}
+
+func sliceSize(duration time.Duration) time.Duration {
+	switch duration {
+	case 30 * 24 * time.Hour:
+		return 24 * time.Hour
+	case 7 * 24 * time.Hour:
+		return 4 * time.Hour
+	case 24 * time.Hour:
+		return 30 * time.Minute
+	default:
+		return duration
 	}
 }

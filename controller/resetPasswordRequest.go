@@ -42,7 +42,7 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 
 	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
 	if err != nil {
-		logrus.Infof("no account found for '%v': %v", params.Body.EmailAddress, err)
+		logrus.Errorf("no account found for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 

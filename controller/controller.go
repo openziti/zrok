@@ -2,6 +2,13 @@ package controller
 
 import (
 	"context"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/limits"
+	"github.com/openziti/zrok/controller/metrics"
+	"github.com/sirupsen/logrus"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -13,13 +20,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-var cfg *Config
+var cfg *config.Config
 var str *store.Store
-var mtr *metricsAgent
 var idb influxdb2.Client
+var limitsAgent *limits.Agent
 
-func Run(inCfg *Config) error {
+func Run(inCfg *config.Config) error {
 	cfg = inCfg
+
+	if cfg.Admin != nil && cfg.Admin.ProfileEndpoint != "" {
+		go func() {
+			log.Println(http.ListenAndServe(cfg.Admin.ProfileEndpoint, nil))
+		}()
+	}
 
 	swaggerSpec, err := loads.Embedded(rest_server_zrok.SwaggerJSON, rest_server_zrok.FlatSwaggerJSON)
 	if err != nil {
@@ -30,8 +43,8 @@ func Run(inCfg *Config) error {
 	api.KeyAuth = newZrokAuthenticator(cfg).authenticate
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
-	api.AccountRegisterHandler = newRegisterHandler()
-	api.AccountResetPasswordHandler = newResetPasswordHandler()
+	api.AccountRegisterHandler = newRegisterHandler(cfg)
+	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
@@ -40,15 +53,22 @@ func Run(inCfg *Config) error {
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()
 	api.AdminListFrontendsHandler = newListFrontendsHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
-	api.EnvironmentEnableHandler = newEnableHandler(cfg.Limits)
+	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
+	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
+		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetEnvironmentMetricsHandler = newGetEnvironmentMetricsHandler(cfg.Metrics.Influx)
+		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
+	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
-	api.MetadataOverviewHandler = metadata.OverviewHandlerFunc(overviewHandler)
+	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
-	api.ShareShareHandler = newShareHandler(cfg.Limits)
+	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
@@ -63,17 +83,31 @@ func Run(inCfg *Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
-	if cfg.Influx != nil {
-		idb = influxdb2.NewClient(cfg.Influx.Url, cfg.Influx.Token)
+	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
+		idb = influxdb2.NewClient(cfg.Metrics.Influx.Url, cfg.Metrics.Influx.Token)
+	} else {
+		logrus.Warn("skipping influx client; no configuration")
 	}
 
-	if cfg.Metrics != nil {
-		mtr = newMetricsAgent()
-		go mtr.run()
-		defer func() {
-			mtr.stop()
-			mtr.join()
-		}()
+	if cfg.Metrics != nil && cfg.Metrics.Agent != nil && cfg.Metrics.Influx != nil {
+		ma, err := metrics.NewAgent(cfg.Metrics.Agent, str, cfg.Metrics.Influx)
+		if err != nil {
+			return errors.Wrap(err, "error creating metrics agent")
+		}
+		if err := ma.Start(); err != nil {
+			return errors.Wrap(err, "error starting metrics agent")
+		}
+		defer func() { ma.Stop() }()
+
+		if cfg.Limits != nil && cfg.Limits.Enforcing {
+			limitsAgent, err = limits.NewAgent(cfg.Limits, cfg.Metrics.Influx, cfg.Ziti, cfg.Email, str)
+			if err != nil {
+				return errors.Wrap(err, "error creating limits agent")
+			}
+			ma.AddUsageSink(limitsAgent)
+			limitsAgent.Start()
+			defer func() { limitsAgent.Stop() }()
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
