@@ -258,6 +258,7 @@ jobs:
         run: |
           printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
       - uses: mislav/bump-homebrew-formula-action@v2
+        if: "!contains(github.ref, '-')"
         with:
           formula-name: zrok
         env:
