@@ -50,8 +50,8 @@ const MetricsGraph = (props) => {
                         <CartesianGrid strokeDasharay={"3 3"} />
                         <XAxis dataKey={(v) => v.timestamp} scale={"time"} tickFormatter={(v) => moment(v).format("MMM DD") } style={{ fontSize: '75%'}}/>
                         <YAxis tickFormatter={(v) => bytesToSize(v)} style={{ fontSize: '75%' }}/>
-                        <Area type={"basis"} stroke={"#231069"} fill={"#9BF316"} dataKey={(v) => v.tx ? v.tx : 0} stackId={"1"} />
-                        <Area type={"basis"} stroke={"#231069"} fill={"#04adef"} dataKey={(v) => v.rx ? v.rx : 0} stackId={"1"} />
+                        <Area type={"basis"} stroke={"#231069"} fill={"#04adef"} dataKey={(v) => v.tx ? v.tx : 0} stackId={"1"} />
+                        <Area type={"basis"} stroke={"#231069"} fill={"#9BF316"} dataKey={(v) => v.rx ? v.rx : 0} stackId={"1"} />
                     </AreaChart>
                 </ResponsiveContainer>
             </Col>
