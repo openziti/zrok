@@ -37,7 +37,7 @@ jobs:
       - run: npm run build
         working-directory: ui
         env:
-          CI: ""
+          CI: "true"
 
       - uses: goreleaser/goreleaser-action@v2
         with:
@@ -79,7 +79,7 @@ jobs:
       - run: npm run build
         working-directory: ui
         env:
-          CI: ""
+          CI: "true"
 
       - uses: goreleaser/goreleaser-action@v2
         with:
@@ -121,7 +121,7 @@ jobs:
       - run: npm run build
         working-directory: ui
         env:
-          CI: ""
+          CI: "true"
 
       - uses: goreleaser/goreleaser-action@v2
         with:
@@ -170,7 +170,7 @@ jobs:
       - run: npm run build
         working-directory: ui
         env:
-          CI: ""
+          CI: "true"
 
       - uses: goreleaser/goreleaser-action@v2
         with:
@@ -214,7 +214,7 @@ jobs:
       - run: npm run build
         working-directory: ui
         env:
-          CI: ""
+          CI: "true"
 
       - uses: goreleaser/goreleaser-action@v2
         with:
