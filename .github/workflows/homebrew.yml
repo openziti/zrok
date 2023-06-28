@@ -1,0 +1,20 @@
+name: Homebrew Bump
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  update-brew:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract Version
+        id: extract-version
+        run: |
+          printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
+      - uses: mislav/bump-homebrew-formula-action@v2
+        if: "!contains(github.ref, '-')"
+        with:
+          formula-name: zrok
+        env:
+          COMMITTER_TOKEN: ${{ secrets.BREW_COMMITTER_TOKEN }}
