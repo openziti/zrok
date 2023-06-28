@@ -34,6 +34,7 @@ jobs:
         working-directory: ui
         env:
           CI: "true"
+          
       - name: go install
         run: go install -ldflags "-X github.com/openziti/zrok/build.Version=${{ github.ref }} -X github.com/openziti/zrok/build.Hash=${{ github.sha }}" ./...
 
