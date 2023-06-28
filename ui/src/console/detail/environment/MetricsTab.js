@@ -21,6 +21,7 @@ const MetricsTab = (props) => {
 			.then(resp => {
 				setMetrics1(buildMetrics(resp.data));
 			});
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [props.selection.id]);
 
 	useEffect(() => {
@@ -45,6 +46,7 @@ const MetricsTab = (props) => {
 			mounted = false;
 			clearInterval(interval);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [props.selection.id]);
 
 	return (

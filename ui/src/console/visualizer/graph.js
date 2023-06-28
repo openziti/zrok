@@ -34,7 +34,6 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
         let allShares = {};
         let allFrontends = [];
         newOverview.forEach(env => {
-            let limited = !!env.limited;
             let envNode = {
                 id: 'env:' + env.environment.zId,
                 envZId: env.environment.zId,
