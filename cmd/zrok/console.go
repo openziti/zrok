@@ -5,7 +5,6 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
-	"os/exec"
 )
 
 func init() {
@@ -34,7 +33,7 @@ func (cmd *consoleCommand) run(_ *cobra.Command, _ []string) {
 	}
 
 	apiEndpoint, _ := zrd.ApiEndpoint()
-	if err := exec.Command("open", apiEndpoint).Run(); err != nil {
+	if err := openBrowser(apiEndpoint); err != nil {
 		tui.Error(fmt.Sprintf("unable to open '%v'", apiEndpoint), err)
 	}
 }
