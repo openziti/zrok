@@ -1,5 +1,5 @@
 import React, {useEffect, useState, Fragment} from "react";
-import {Button, Container, Form, Row} from "react-bootstrap";
+import {Container, Form, Row} from "react-bootstrap";
 
 const PasswordForm = (props) => {
     const [password, setPassword] = useState('');
@@ -38,6 +38,7 @@ const PasswordForm = (props) => {
             return;
         }
         props.setParentPassword(password)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [password, confirm])
 
     return (
