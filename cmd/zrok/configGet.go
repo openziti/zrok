@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/zrokdir"
+	"github.com/openziti/zrok/environment"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ func newConfigGetCommand() *configGetCommand {
 func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		panic(err)
 	}

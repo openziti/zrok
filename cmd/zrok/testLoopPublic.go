@@ -14,7 +14,7 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/zrokdir"
+	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
@@ -105,7 +105,7 @@ func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 type looper struct {
 	id            int
 	cmd           *testLoopPublicCommand
-	env           *zrokdir.Environment
+	env           *environment.Environment
 	done          chan struct{}
 	listener      edge.Listener
 	zif           string
@@ -175,7 +175,7 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l *looper) startup() {
 	logrus.Infof("starting #%d", l.id)
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		panic(err)
 	}
@@ -185,7 +185,7 @@ func (l *looper) startup() {
 	}
 	l.env = zrd.Env
 
-	l.zif, err = zrokdir.ZitiIdentityFile("backend")
+	l.zif, err = environment.ZitiIdentityFile("backend")
 	if err != nil {
 		panic(err)
 	}

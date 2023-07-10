@@ -14,8 +14,8 @@ import (
 	zrok_config "github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/model"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -133,9 +133,9 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 }
 
 func getIdentityId(identityName string) (string, error) {
-	zif, err := zrokdir.ZitiIdentityFile(identityName)
+	zif, err := environment.ZitiIdentityFile(identityName)
 	if err != nil {
-		return "", errors.Wrapf(err, "error opening identity '%v' from zrokdir", identityName)
+		return "", errors.Wrapf(err, "error opening identity '%v' from environment", identityName)
 	}
 	zcfg, err := ziti.NewConfigFromFile(zif)
 	if err != nil {
@@ -195,7 +195,7 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 	if err != nil {
 		return "", errors.Wrapf(err, "error encoding identity config '%v'", name)
 	}
-	if err := zrokdir.SaveZitiIdentity(name, out.String()); err != nil {
+	if err := environment.SaveZitiIdentity(name, out.String()); err != nil {
 		return "", errors.Wrapf(err, "error saving identity config '%v'", name)
 	}
 	return zId, nil

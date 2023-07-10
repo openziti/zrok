@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/jaevor/go-nanoid"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -43,9 +43,9 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
-		logrus.Error("error loading zrokdir", err)
+		logrus.Error("error loading environment", err)
 	}
 
 	zrok, err := zrd.Client()

@@ -1,8 +1,8 @@
 package sdk
 
 import (
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 )
 
@@ -29,14 +29,14 @@ func newPublicShare(request *ShareRequest) (*Share, error) {
 	return nil, nil
 }
 
-func loadEnvironment(request *ShareRequest) (*zrokdir.ZrokDir, error) {
-	zrd, err := zrokdir.Load()
+func loadEnvironment(request *ShareRequest) (*environment.Root, error) {
+	env, err := environment.Load()
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading zrokdir")
+		return nil, errors.Wrap(err, "error loading environment")
 	}
-	return zrd, nil
+	return env, nil
 }
 
-func createShare(zrd *zrokdir.ZrokDir, req *rest_model_zrok.ShareRequest) (*Share, error) {
+func createShare(zrd *environment.Root, req *rest_model_zrok.ShareRequest) (*Share, error) {
 	return nil, nil
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 )
 
@@ -27,12 +27,12 @@ func newConsoleCommand() *consoleCommand {
 }
 
 func (cmd *consoleCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := zrokdir.Load()
+	env, err := environment.Load()
 	if err != nil {
-		tui.Error("unable to load zrokdir", err)
+		tui.Error("unable to load environment", err)
 	}
 
-	apiEndpoint, _ := zrd.ApiEndpoint()
+	apiEndpoint, _ := env.ApiEndpoint()
 	if err := openBrowser(apiEndpoint); err != nil {
 		tui.Error(fmt.Sprintf("unable to open '%v'", apiEndpoint), err)
 	}

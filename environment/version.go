@@ -1,4 +1,4 @@
-package zrokdir
+package environment
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ func checkMetadata() error {
 	}
 	data, err := os.ReadFile(mf)
 	if err != nil {
-		tui.Warning("unable to open zrokdir metadata; ignoring\n")
+		tui.Warning("unable to open environment metadata; ignoring\n")
 		return nil
 	}
 	m := &Metadata{}
@@ -29,7 +29,7 @@ func checkMetadata() error {
 		return errors.Wrapf(err, "error unmarshaling metadata file '%v'", mf)
 	}
 	if m.V != V {
-		return errors.Errorf("invalid zrokdir metadata version '%v'", m.V)
+		return errors.Errorf("invalid environment metadata version '%v'", m.V)
 	}
 	return nil
 }

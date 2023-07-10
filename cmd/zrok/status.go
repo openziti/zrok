@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -34,9 +34,9 @@ func newStatusCommand() *statusCommand {
 func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
-		tui.Error("unable to load zrokdir", err)
+		tui.Error("error loading environment", err)
 	}
 
 	_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Config")+":\n\n")

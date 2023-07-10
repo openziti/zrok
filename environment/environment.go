@@ -1,4 +1,4 @@
-package zrokdir
+package environment
 
 import (
 	"encoding/json"
@@ -54,7 +54,7 @@ func saveEnvironment(env *Environment) error {
 		return errors.Wrap(err, "error getting environment file")
 	}
 	if err := os.MkdirAll(filepath.Dir(ef), os.FileMode(0700)); err != nil {
-		return errors.Wrapf(err, "error creating zrokdir path '%v'", filepath.Dir(ef))
+		return errors.Wrapf(err, "error creating environment path '%v'", filepath.Dir(ef))
 	}
 	if err := os.WriteFile(ef, data, os.FileMode(0600)); err != nil {
 		return errors.Wrap(err, "error saving environment file")

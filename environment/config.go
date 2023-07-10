@@ -1,4 +1,4 @@
-package zrokdir
+package environment
 
 import (
 	"encoding/json"
@@ -52,7 +52,7 @@ func saveConfig(cfg *Config) error {
 		return errors.Wrap(err, "error getting config file path")
 	}
 	if err := os.MkdirAll(filepath.Dir(cf), os.FileMode(0700)); err != nil {
-		return errors.Wrapf(err, "error creating zrokdir path '%v'", filepath.Dir(cf))
+		return errors.Wrapf(err, "error creating environment path '%v'", filepath.Dir(cf))
 	}
 	if err := os.WriteFile(cf, data, os.FileMode(0600)); err != nil {
 		return errors.Wrap(err, "error saving config file")

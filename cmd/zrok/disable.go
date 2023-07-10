@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/rest_client_zrok/environment"
+	httpTransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
+	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,10 +31,10 @@ func newDisableCommand() *disableCommand {
 }
 
 func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", err)
+			tui.Error("unable to load environment", err)
 		}
 		panic(err)
 	}
@@ -50,8 +50,8 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
-	req := environment.NewDisableParams()
+	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	req := restEnvironment.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
 		Identity: zrd.Env.ZId,
 	}
@@ -59,13 +59,13 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
-	if err := zrokdir.DeleteEnvironment(); err != nil {
+	if err := environment.DeleteEnvironment(); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok environment", err)
 		}
 		panic(err)
 	}
-	if err := zrokdir.DeleteZitiIdentity("backend"); err != nil {
+	if err := environment.DeleteZitiIdentity("backend"); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok backend identity", err)
 		}

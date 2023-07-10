@@ -2,11 +2,11 @@ package main
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,10 +60,10 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		target = args[1]
 	}
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error loading zrokdir", err)
+			tui.Error("error loading environment", err)
 		}
 		panic(err)
 	}

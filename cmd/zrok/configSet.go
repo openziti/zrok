@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
 	value := args[1]
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	switch configName {
 	case "apiEndpoint":
 		if zrd.Cfg == nil {
-			zrd.Cfg = &zrokdir.Config{}
+			zrd.Cfg = &environment.Config{}
 		}
 		ok, err := isFullyValidUrl(value)
 		if err != nil {

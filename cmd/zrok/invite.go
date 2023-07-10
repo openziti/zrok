@@ -8,12 +8,12 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/account"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 )
 
@@ -42,9 +42,9 @@ func newInviteCommand() *inviteCommand {
 }
 
 func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
-		tui.Error("error loading zrokdir", err)
+		tui.Error("error loading environment", err)
 	}
 
 	zrok, err := zrd.Client()

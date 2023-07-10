@@ -1,4 +1,4 @@
-package zrokdir
+package environment
 
 import (
 	"github.com/pkg/errors"
@@ -16,7 +16,7 @@ func SaveZitiIdentity(name, data string) error {
 		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(zif), os.FileMode(0700)); err != nil {
-		return errors.Wrapf(err, "error creating zrokdir path '%v'", filepath.Dir(zif))
+		return errors.Wrapf(err, "error creating environment path '%v'", filepath.Dir(zif))
 	}
 	if err := os.WriteFile(zif, []byte(data), os.FileMode(0600)); err != nil {
 		return errors.Wrapf(err, "error writing ziti identity file '%v'", zif)

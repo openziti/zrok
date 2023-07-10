@@ -2,10 +2,10 @@ package main
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,10 +31,10 @@ func newReleaseCommand() *releaseCommand {
 
 func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", err)
+			tui.Error("unable to load environment", err)
 		}
 		panic(err)
 	}

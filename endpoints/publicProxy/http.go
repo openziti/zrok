@@ -7,9 +7,9 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -26,9 +26,9 @@ type httpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*httpFrontend, error) {
-	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.Identity)
+	zCfgPath, err := environment.ZitiIdentityFile(cfg.Identity)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.Identity)
+		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.Identity)
 	}
 	zCfg, err := ziti.NewConfigFromFile(zCfgPath)
 	if err != nil {

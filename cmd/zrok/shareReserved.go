@@ -6,11 +6,11 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -44,10 +44,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 	var target string
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error loading zrokdir", err)
+			tui.Error("error loading environment", err)
 		}
 		panic(err)
 	}
@@ -78,7 +78,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		target = resp.Payload.BackendProxyEndpoint
 	}
 
-	zif, err := zrokdir.ZitiIdentityFile("backend")
+	zif, err := environment.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)

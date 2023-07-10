@@ -8,11 +8,11 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
@@ -48,9 +48,9 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 
-	zrd, err := zrokdir.Load()
+	zrd, err := environment.Load()
 	if err != nil {
-		tui.Error("unable to load zrokdir", err)
+		tui.Error("error loading environment", err)
 	}
 
 	if zrd.Env == nil {
