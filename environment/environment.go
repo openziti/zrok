@@ -13,7 +13,7 @@ type Environment struct {
 	ApiEndpoint string `json:"api_endpoint"`
 }
 
-func hasEnvironment() (bool, error) {
+func IsEnabled() (bool, error) {
 	ef, err := environmentFile()
 	if err != nil {
 		return false, errors.Wrap(err, "error getting environment file path")

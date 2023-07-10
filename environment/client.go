@@ -12,11 +12,11 @@ import (
 	"regexp"
 )
 
-func (zrd *Root) Client() (*rest_client_zrok.Zrok, error) {
-	apiEndpoint, _ := zrd.ApiEndpoint()
+func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
+	apiEndpoint, _ := r.ApiEndpoint()
 	apiUrl, err := url.Parse(apiEndpoint)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", zrd)
+		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", r)
 	}
 	transport := httptransport.New(apiUrl.Host, "/api/v1", []string{apiUrl.Scheme})
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
@@ -37,12 +37,12 @@ func (zrd *Root) Client() (*rest_client_zrok.Zrok, error) {
 	return zrok, nil
 }
 
-func (zrd *Root) ApiEndpoint() (apiEndpoint string, from string) {
+func (r *Root) ApiEndpoint() (apiEndpoint string, from string) {
 	apiEndpoint = "https://api.zrok.io"
 	from = "binary"
 
-	if zrd.Cfg != nil && zrd.Cfg.ApiEndpoint != "" {
-		apiEndpoint = zrd.Cfg.ApiEndpoint
+	if r.Cfg != nil && r.Cfg.ApiEndpoint != "" {
+		apiEndpoint = r.Cfg.ApiEndpoint
 		from = "config"
 	}
 
@@ -52,8 +52,8 @@ func (zrd *Root) ApiEndpoint() (apiEndpoint string, from string) {
 		from = "ZROK_API_ENDPOINT"
 	}
 
-	if zrd.Env != nil && zrd.Env.ApiEndpoint != "" {
-		apiEndpoint = zrd.Env.ApiEndpoint
+	if r.Env != nil && r.Env.ApiEndpoint != "" {
+		apiEndpoint = r.Env.ApiEndpoint
 		from = "env"
 	}
 

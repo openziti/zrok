@@ -48,19 +48,19 @@ func Load() (*Root, error) {
 	}
 	zrd.identities = ids
 
-	hasCfg, err := hasConfig()
+	hasCfg, err := HasConfig()
 	if err != nil {
 		return nil, err
 	}
 	if hasCfg {
-		cfg, err := loadConfig()
+		cfg, err := LoadConfig()
 		if err != nil {
 			return nil, err
 		}
 		zrd.Cfg = cfg
 	}
 
-	hasEnv, err := hasEnvironment()
+	hasEnv, err := IsEnabled()
 	if err != nil {
 		return nil, err
 	}
@@ -75,17 +75,17 @@ func Load() (*Root, error) {
 	return zrd, nil
 }
 
-func (zrd *Root) Save() error {
+func (r *Root) Save() error {
 	if err := writeMetadata(); err != nil {
 		return errors.Wrap(err, "error saving metadata")
 	}
-	if zrd.Env != nil {
-		if err := saveEnvironment(zrd.Env); err != nil {
+	if r.Env != nil {
+		if err := saveEnvironment(r.Env); err != nil {
 			return errors.Wrap(err, "error saving environment")
 		}
 	}
-	if zrd.Cfg != nil {
-		if err := saveConfig(zrd.Cfg); err != nil {
+	if r.Cfg != nil {
+		if err := SaveConfig(r.Cfg); err != nil {
 			return errors.Wrap(err, "error saving config")
 		}
 	}
