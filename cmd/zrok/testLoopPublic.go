@@ -8,7 +8,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -105,7 +105,7 @@ func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 type looper struct {
 	id            int
 	cmd           *testLoopPublicCommand
-	env           *environment.Environment
+	env           *env_v0_3.Environment
 	done          chan struct{}
 	listener      edge.Listener
 	zif           string
@@ -175,7 +175,7 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l *looper) startup() {
 	logrus.Infof("starting #%d", l.id)
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}
@@ -185,7 +185,7 @@ func (l *looper) startup() {
 	}
 	l.env = zrd.Env
 
-	l.zif, err = environment.ZitiIdentityFile("backend")
+	l.zif, err = env_v0_3.ZitiIdentityFile("backend")
 	if err != nil {
 		panic(err)
 	}

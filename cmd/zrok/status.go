@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 	"os"
@@ -34,7 +34,7 @@ func newStatusCommand() *statusCommand {
 func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		tui.Error("error loading environment", err)
 	}

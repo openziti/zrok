@@ -9,7 +9,7 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -78,7 +78,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel}", cmd.backendMode), nil)
 	}
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -90,7 +90,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zif, err := environment.ZitiIdentityFile("backend")
+	zif, err := env_v0_3.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)

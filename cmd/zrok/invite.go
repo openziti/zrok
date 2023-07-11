@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/account"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -42,7 +42,7 @@ func newInviteCommand() *inviteCommand {
 }
 
 func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		tui.Error("error loading environment", err)
 	}

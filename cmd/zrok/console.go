@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +27,7 @@ func newConsoleCommand() *consoleCommand {
 }
 
 func (cmd *consoleCommand) run(_ *cobra.Command, _ []string) {
-	env, err := environment.Load()
+	env, err := env_v0_3.Load()
 	if err != nil {
 		tui.Error("unable to load environment", err)
 	}

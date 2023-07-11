@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,7 @@ func newAdminDeleteFrontendCommand() *adminDeleteFrontendCommand {
 func (cmd *adminDeleteFrontendCommand) run(_ *cobra.Command, args []string) {
 	feToken := args[0]
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}

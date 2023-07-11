@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	httpTransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
@@ -31,7 +31,7 @@ func newDisableCommand() *disableCommand {
 }
 
 func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -59,13 +59,13 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
-	if err := environment.DeleteEnvironment(); err != nil {
+	if err := env_v0_3.DeleteEnvironment(); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok environment", err)
 		}
 		panic(err)
 	}
-	if err := environment.DeleteZitiIdentity("backend"); err != nil {
+	if err := env_v0_3.DeleteZitiIdentity("backend"); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok backend identity", err)
 		}

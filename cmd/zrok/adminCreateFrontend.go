@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"os"
 
-	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
@@ -35,7 +35,7 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	publicName := args[1]
 	urlTemplate := args[2]
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/sirupsen/logrus"
 	"os"
 	user2 "os/user"
@@ -10,7 +11,6 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/environment"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
@@ -42,7 +42,7 @@ func newEnableCommand() *enableCommand {
 }
 
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}
@@ -117,7 +117,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		prg.Send("writing the environment details...")
 	}
 	apiEndpoint, _ := zrd.ApiEndpoint()
-	zrd.Env = &environment.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
+	zrd.Env = &env_v0_3.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
 	if err := zrd.Save(); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
@@ -131,7 +131,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		os.Exit(1)
 	}
-	if err := environment.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
+	if err := env_v0_3.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
 			prg.Quit()

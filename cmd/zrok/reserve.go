@@ -2,7 +2,7 @@ package main
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -60,7 +60,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		target = args[1]
 	}
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("error loading environment", err)

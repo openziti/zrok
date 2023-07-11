@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
@@ -43,7 +43,7 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		logrus.Error("error loading environment", err)
 	}

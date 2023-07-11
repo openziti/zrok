@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/environment"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -30,7 +30,7 @@ func newConfigUnsetCommand() *configUnsetCommand {
 func (cmd *configUnsetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}

@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"net/url"
 	"os"
 
-	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +33,7 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
 	value := args[1]
 
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 	switch configName {
 	case "apiEndpoint":
 		if zrd.Cfg == nil {
-			zrd.Cfg = &environment.Config{}
+			zrd.Cfg = &env_v0_3.Config{}
 		}
 		ok, err := isFullyValidUrl(value)
 		if err != nil {

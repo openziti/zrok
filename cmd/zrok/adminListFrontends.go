@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/environment"
 	"github.com/spf13/cobra"
 	"os"
 	"time"
@@ -31,7 +31,7 @@ func newAdminListFrontendsCommand() *adminListFrontendsCommand {
 }
 
 func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := environment.Load()
+	zrd, err := env_v0_3.Load()
 	if err != nil {
 		panic(err)
 	}

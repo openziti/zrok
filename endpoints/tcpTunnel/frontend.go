@@ -3,7 +3,7 @@ package tcpTunnel
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error resolving tcp address '%v'", cfg.BindAddress)
 	}
-	zCfgPath, err := environment.ZitiIdentityFile(cfg.IdentityName)
+	zCfgPath, err := env_v0_3.ZitiIdentityFile(cfg.IdentityName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.IdentityName)
 	}
