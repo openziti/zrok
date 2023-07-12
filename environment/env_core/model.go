@@ -9,3 +9,8 @@ type Environment struct {
 type Config struct {
 	ApiEndpoint string
 }
+
+type Metadata struct {
+	V        string
+	RootPath string
+}

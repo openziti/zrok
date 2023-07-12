@@ -1,36 +1,39 @@
 package environment
 
 import (
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/rest_client_zrok"
 )
 
 type Root interface {
+	Metadata() *env_core.Metadata
+	IsLatest() bool
+	HasConfig() (bool, error)
+	Config() *env_core.Config
+	SetConfig(cfg *env_core.Config) error
+	Client() (*rest_client_zrok.Zrok, error)
+	ApiEndpoint() (string, string)
+	Environment() *env_core.Environment
+	DeleteEnvironment() error
+	IsEnabled() (bool, error)
+	ZitiIdentityFile(name string) (string, error)
+	SaveZitiIdentity(name, data string) error
+	DeleteZitiIdentity(name string) error
+	Obliterate() error
 }
 
-func Load() (Root, error) {
+func ListRoots() ([]*env_core.Metadata, error) {
 	return nil, nil
 }
 
-func IsEnabled() (bool, error) {
-	return env_v0_3.IsEnabled()
+func LoadRoot() (Root, error) {
+	return nil, nil
 }
 
-func DeleteEnvironment() error {
-	return env_v0_3.DeleteEnvironment()
+func LoadRootVersion(m *env_core.Metadata) (Root, error) {
+	return nil, nil
 }
 
-func HasConfig() (bool, error) {
-	return env_v0_3.HasConfig()
-}
-
-func ZitiIdentityFile(name string) (string, error) {
-	return env_v0_3.ZitiIdentityFile(name)
-}
-
-func SaveZitiIdentity(name, data string) error {
-	return env_v0_3.SaveZitiIdentity(name, data)
-}
-
-func DeleteZitiIdentity(name string) error {
-	return env_v0_3.DeleteZitiIdentity(name)
+func UpdateRoot(r Root) (Root, error) {
+	return nil, nil
 }
