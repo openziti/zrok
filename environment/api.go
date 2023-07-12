@@ -2,12 +2,13 @@ package environment
 
 import (
 	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/environment/env_v0_3x"
 	"github.com/openziti/zrok/rest_client_zrok"
+	"github.com/pkg/errors"
 )
 
 type Root interface {
 	Metadata() *env_core.Metadata
-	IsLatest() bool
 	HasConfig() (bool, error)
 	Config() *env_core.Config
 	SetConfig(cfg *env_core.Config) error
@@ -27,11 +28,24 @@ func ListRoots() ([]*env_core.Metadata, error) {
 }
 
 func LoadRoot() (Root, error) {
-	return nil, nil
+	return env_v0_3x.Load()
 }
 
 func LoadRootVersion(m *env_core.Metadata) (Root, error) {
-	return nil, nil
+	if m == nil {
+		return nil, errors.Errorf("specify metadata version")
+	}
+	switch m.V {
+	case env_v0_3x.V:
+		return env_v0_3x.Load()
+
+	default:
+		return nil, errors.Errorf("unknown metadata version '%v'", m.V)
+	}
+}
+
+func NeedsUpdate(r Root) bool {
+	return r.Metadata().V != env_v0_3x.V
 }
 
 func UpdateRoot(r Root) (Root, error) {
