@@ -6,7 +6,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -44,7 +44,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 	var target string
 
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("error loading environment", err)
@@ -52,18 +52,18 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
@@ -78,7 +78,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		target = resp.Payload.BackendProxyEndpoint
 	}
 
-	zif, err := env_v0_3.ZitiIdentityFile("backend")
+	zif, err := env.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)

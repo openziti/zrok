@@ -1,179 +1,234 @@
 package env_v0_3
 
 import (
-	"fmt"
+	"encoding/json"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-type Root struct {
-	Env        *Environment
-	Cfg        *Config
-	identities map[string]struct{}
-}
+const V = "v0.3"
 
-func Initialize() (*Root, error) {
-	zrd, err := rootDir()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting environment path")
-	}
-	if err := os.MkdirAll(zrd, os.FileMode(0700)); err != nil {
-		return nil, errors.Wrapf(err, "error creating environment root path '%v'", zrd)
-	}
-	if err := DeleteEnvironment(); err != nil {
-		return nil, errors.Wrap(err, "error deleting environment")
-	}
-	idd, err := identitiesDir()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting environment identities path")
-	}
-	if err := os.MkdirAll(idd, os.FileMode(0700)); err != nil {
-		return nil, errors.Wrapf(err, "error creating environment identities root path '%v'", idd)
-	}
-	return Load()
+type Root struct {
+	meta *env_core.Metadata
+	cfg  *env_core.Config
+	env  *env_core.Environment
 }
 
 func Load() (*Root, error) {
-	if err := checkMetadata(); err != nil {
-		return nil, err
-	}
-
-	zrd := &Root{}
-
-	ids, err := listIdentities()
+	r := &Root{}
+	exists, err := rootExists()
 	if err != nil {
 		return nil, err
 	}
-	zrd.identities = ids
+	if exists {
+		if meta, err := loadMetadata(); err == nil {
+			r.meta = meta
+		} else {
+			return nil, err
+		}
 
-	hasCfg, err := HasConfig()
-	if err != nil {
-		return nil, err
-	}
-	if hasCfg {
-		cfg, err := LoadConfig()
+		if cfg, err := loadConfig(); err == nil {
+			r.cfg = cfg
+		}
+
+		if env, err := loadEnvironment(); err == nil {
+			r.env = env
+		}
+
+	} else {
+		root, err := rootDir()
 		if err != nil {
 			return nil, err
 		}
-		zrd.Cfg = cfg
-	}
-
-	hasEnv, err := IsEnabled()
-	if err != nil {
-		return nil, err
-	}
-	if hasEnv {
-		env, err := loadEnvironment()
-		if err != nil {
-			return nil, err
-		}
-		zrd.Env = env
-	}
-
-	return zrd, nil
-}
-
-func (r *Root) Save() error {
-	if err := writeMetadata(); err != nil {
-		return errors.Wrap(err, "error saving metadata")
-	}
-	if r.Env != nil {
-		if err := saveEnvironment(r.Env); err != nil {
-			return errors.Wrap(err, "error saving environment")
+		r.meta = &env_core.Metadata{
+			V:        V,
+			RootPath: root,
 		}
 	}
-	if r.Cfg != nil {
-		if err := SaveConfig(r.Cfg); err != nil {
-			return errors.Wrap(err, "error saving config")
-		}
-	}
-	return nil
+	return r, nil
 }
 
-func Obliterate() error {
-	zrd, err := rootDir()
+func rootExists() (bool, error) {
+	mf, err := metadataFile()
 	if err != nil {
-		return err
+		return false, err
 	}
-	if err := os.RemoveAll(zrd); err != nil {
-		return err
-	}
-	return nil
-}
-
-func listIdentities() (map[string]struct{}, error) {
-	ids := make(map[string]struct{})
-
-	idd, err := identitiesDir()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting environment identities path")
-	}
-	_, err = os.Stat(idd)
+	_, err = os.Stat(mf)
 	if os.IsNotExist(err) {
-		return ids, nil
+		return false, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error stat-ing environment identities root '%v'", idd)
+		return false, err
 	}
-	des, err := os.ReadDir(idd)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error listing environment identities from '%v'", idd)
-	}
-	for _, de := range des {
-		if strings.HasSuffix(de.Name(), ".json") && !de.IsDir() {
-			name := strings.TrimSuffix(de.Name(), ".json")
-			ids[name] = struct{}{}
-		}
-	}
-	return ids, nil
+	return true, err
 }
 
-func configFile() (string, error) {
-	zrd, err := rootDir()
+func loadMetadata() (*env_core.Metadata, error) {
+	mf, err := metadataFile()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return filepath.Join(zrd, "config.json"), nil
+	data, err := os.ReadFile(mf)
+	if err != nil {
+		return nil, err
+	}
+	m := &metadata{}
+	if err := json.Unmarshal(data, m); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling metadata file '%v'", mf)
+	}
+	if m.V != V {
+		return nil, errors.Errorf("got metadata version '%v', expected '%v'", m.V, V)
+	}
+	rf, err := rootDir()
+	if err != nil {
+		return nil, err
+	}
+	out := &env_core.Metadata{
+		V:        m.V,
+		RootPath: rf,
+	}
+	return out, nil
 }
 
-func environmentFile() (string, error) {
-	zrd, err := rootDir()
+func writeMetadata() error {
+	mf, err := metadataFile()
 	if err != nil {
-		return "", err
+		return err
 	}
-	return filepath.Join(zrd, "environment.json"), nil
+	data, err := json.Marshal(&metadata{V: V})
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(mf), os.FileMode(0700)); err != nil {
+		return err
+	}
+	if err := os.WriteFile(mf, data, os.FileMode(0600)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func identityFile(name string) (string, error) {
-	idd, err := identitiesDir()
+func loadConfig() (*env_core.Config, error) {
+	cf, err := configFile()
 	if err != nil {
-		return "", err
+		return nil, errors.Wrap(err, "error getting config file path")
 	}
-	return filepath.Join(idd, fmt.Sprintf("%v.json", name)), nil
+	data, err := os.ReadFile(cf)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error reading config file '%v'", cf)
+	}
+	cfg := &config{}
+	if err := json.Unmarshal(data, cfg); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
+	}
+	out := &env_core.Config{
+		ApiEndpoint: cfg.ApiEndpoint,
+	}
+	return out, nil
 }
 
-func identitiesDir() (string, error) {
-	zrd, err := rootDir()
+func saveConfig(cfg *env_core.Config) error {
+	in := &config{ApiEndpoint: cfg.ApiEndpoint}
+	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
-		return "", err
+		return errors.Wrap(err, "error marshaling config")
 	}
-	return filepath.Join(zrd, "identities"), nil
+	cf, err := configFile()
+	if err != nil {
+		return errors.Wrap(err, "error getting config file path")
+	}
+	if err := os.MkdirAll(filepath.Dir(cf), os.FileMode(0700)); err != nil {
+		return errors.Wrapf(err, "error creating environment path '%v'", filepath.Dir(cf))
+	}
+	if err := os.WriteFile(cf, data, os.FileMode(0600)); err != nil {
+		return errors.Wrap(err, "error saving config file")
+	}
+	return nil
 }
 
-func metadataFile() (string, error) {
-	zrd, err := rootDir()
+func isEnabled() (bool, error) {
+	ef, err := environmentFile()
 	if err != nil {
-		return "", err
+		return false, errors.Wrap(err, "error getting environment file path")
 	}
-	return filepath.Join(zrd, "metadata.json"), nil
+	_, err = os.Stat(ef)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, errors.Wrapf(err, "error stat-ing environment file '%v'", ef)
+	}
+	return true, nil
 }
 
-func rootDir() (string, error) {
-	home, err := os.UserHomeDir()
+func loadEnvironment() (*env_core.Environment, error) {
+	ef, err := environmentFile()
 	if err != nil {
-		return "", err
+		return nil, errors.Wrap(err, "error getting environment file")
 	}
-	return filepath.Join(home, ".zrok"), nil
+	data, err := os.ReadFile(ef)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error reading environment file '%v'", ef)
+	}
+	env := &environment{}
+	if err := json.Unmarshal(data, env); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling environment file '%v'", ef)
+	}
+	out := &env_core.Environment{
+		Token:        env.Token,
+		ZitiIdentity: env.ZId,
+		ApiEndpoint:  env.ApiEndpoint,
+	}
+	return out, nil
+}
+
+func saveEnvironment(env *env_core.Environment) error {
+	in := &environment{
+		Token:       env.Token,
+		ZId:         env.ZitiIdentity,
+		ApiEndpoint: env.ApiEndpoint,
+	}
+	data, err := json.MarshalIndent(in, "", "  ")
+	if err != nil {
+		return errors.Wrap(err, "error marshaling environment")
+	}
+	ef, err := environmentFile()
+	if err != nil {
+		return errors.Wrap(err, "error getting environment file")
+	}
+	if err := os.MkdirAll(filepath.Dir(ef), os.FileMode(0700)); err != nil {
+		return errors.Wrapf(err, "error creating environment path '%v'", filepath.Dir(ef))
+	}
+	if err := os.WriteFile(ef, data, os.FileMode(0600)); err != nil {
+		return errors.Wrap(err, "error saving environment file")
+	}
+	return nil
+}
+
+func deleteEnvironment() error {
+	ef, err := environmentFile()
+	if err != nil {
+		return errors.Wrap(err, "error getting environment file")
+	}
+	if err := os.Remove(ef); err != nil {
+		return errors.Wrap(err, "error removing environment file")
+	}
+
+	return nil
+}
+
+type metadata struct {
+	V string `json:"v"`
+}
+
+type config struct {
+	ApiEndpoint string `json:"api_endpoint"`
+}
+
+type environment struct {
+	Token       string `json:"zrok_token"`
+	ZId         string `json:"ziti_identity"`
+	ApiEndpoint string `json:"api_endpoint"`
 }

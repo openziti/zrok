@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	httpTransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
@@ -31,7 +31,7 @@ func newDisableCommand() *disableCommand {
 }
 
 func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -39,33 +39,33 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("no environment found; nothing to disable!", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("could not create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := restEnvironment.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
-		Identity: zrd.Env.ZId,
+		Identity: env.Environment().ZitiIdentity,
 	}
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
 		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
-	if err := env_v0_3.DeleteEnvironment(); err != nil {
+	if err := env.DeleteEnvironment(); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok environment", err)
 		}
 		panic(err)
 	}
-	if err := env_v0_3.DeleteZitiIdentity("backend"); err != nil {
+	if err := env.DeleteZitiIdentity("backend"); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok backend identity", err)
 		}

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment"
 	"github.com/spf13/cobra"
 )
 
@@ -28,15 +28,15 @@ func newConfigGetCommand() *configGetCommand {
 func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 	configName := args[0]
 
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 
 	switch configName {
 	case "apiEndpoint":
-		if zrd.Cfg != nil && zrd.Cfg.ApiEndpoint != "" {
-			fmt.Printf("apiEndpoint = %v\n", zrd.Cfg.ApiEndpoint)
+		if env.Config() != nil && env.Config().ApiEndpoint != "" {
+			fmt.Printf("apiEndpoint = %v\n", env.Config().ApiEndpoint)
 		} else {
 			fmt.Println("apiEndpoint = <unset>")
 		}

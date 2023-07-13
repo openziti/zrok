@@ -2,20 +2,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment/env_v0_3"
-	"github.com/sirupsen/logrus"
-	"os"
-	user2 "os/user"
-	"time"
-
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	user2 "os/user"
+	"time"
 )
 
 func init() {
@@ -42,13 +42,13 @@ func newEnableCommand() *enableCommand {
 }
 
 func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 	token := args[0]
 
-	if zrd.Env != nil {
+	if env.IsEnabled() {
 		tui.Error(fmt.Sprintf("you already have an enabled environment, %v first before you %v", tui.Code.Render("zrok disable"), tui.Code.Render("zrok enable")), nil)
 	}
 
@@ -64,9 +64,9 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if cmd.description == "<user>@<hostname>" {
 		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
 	}
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
-		cmd.endpointError(zrd.ApiEndpoint())
+		cmd.endpointError(env.ApiEndpoint())
 		tui.Error("error creating service client", err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
@@ -110,15 +110,14 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		case <-done:
 		case <-time.After(1 * time.Second):
 		}
-		cmd.endpointError(zrd.ApiEndpoint())
+		cmd.endpointError(env.ApiEndpoint())
 		os.Exit(1)
 	}
 	if err != nil {
 		prg.Send("writing the environment details...")
 	}
-	apiEndpoint, _ := zrd.ApiEndpoint()
-	zrd.Env = &env_v0_3.Environment{Token: token, ZId: resp.Payload.Identity, ApiEndpoint: apiEndpoint}
-	if err := zrd.Save(); err != nil {
+	apiEndpoint, _ := env.ApiEndpoint()
+	if err := env.SetEnvironment(&env_core.Environment{Token: token, ZitiIdentity: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
 			prg.Quit()
@@ -131,7 +130,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		os.Exit(1)
 	}
-	if err := env_v0_3.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
+	if err := env.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
 			prg.Quit()

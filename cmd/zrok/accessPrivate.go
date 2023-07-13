@@ -8,7 +8,7 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -48,16 +48,16 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("error loading environment", err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -65,11 +65,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
 		ShrToken: shrToken,
-		EnvZID:   zrd.Env.ZId,
+		EnvZID:   env.Environment().ZitiIdentity,
 	}
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
@@ -168,7 +168,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -203,7 +203,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
 	}
 }
 

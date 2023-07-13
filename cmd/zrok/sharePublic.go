@@ -7,7 +7,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -72,7 +72,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -80,11 +80,11 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zif, err := env_v0_3.ZitiIdentityFile("backend")
+	zif, err := env.ZitiIdentityFile("backend")
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)
@@ -92,7 +92,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -100,10 +100,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               zrd.Env.ZId,
+		EnvZID:               env.Environment().ZitiIdentity,
 		ShareMode:            "public",
 		FrontendSelection:    cmd.frontendSelection,
 		BackendMode:          cmd.backendMode,
@@ -134,7 +134,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -204,7 +204,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requestsChan)
-		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
 	}
 }
 

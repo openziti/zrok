@@ -2,19 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment/env_v0_3"
-	"os"
-	"strings"
-
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/account"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/spf13/cobra"
+	"os"
+	"strings"
 )
 
 func init() {
@@ -42,15 +41,15 @@ func newInviteCommand() *inviteCommand {
 }
 
 func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("error loading environment", err)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
-			cmd.endpointError(zrd.ApiEndpoint())
+			cmd.endpointError(env.ApiEndpoint())
 			tui.Error("error creating zrok api client", err)
 		}
 		panic(err)
@@ -63,7 +62,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 
 	if md != nil {
 		if !md.GetPayload().InvitesOpen {
-			apiEndpoint, _ := zrd.ApiEndpoint()
+			apiEndpoint, _ := env.ApiEndpoint()
 			tui.Error(fmt.Sprintf("'%v' is not currently accepting new users", apiEndpoint), nil)
 		}
 		cmd.tui.invitesOpen = md.GetPayload().InvitesOpen
@@ -86,7 +85,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		}
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
-			cmd.endpointError(zrd.ApiEndpoint())
+			cmd.endpointError(env.ApiEndpoint())
 			tui.Error("error creating invitation", err)
 		}
 

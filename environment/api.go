@@ -2,7 +2,6 @@ package environment
 
 import (
 	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/environment/env_v0_3x"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/pkg/errors"
 )
@@ -15,20 +14,21 @@ type Root interface {
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
 	Environment() *env_core.Environment
+	SetEnvironment(env *env_core.Environment) error
 	DeleteEnvironment() error
-	IsEnabled() (bool, error)
+	IsEnabled() bool
 	ZitiIdentityFile(name string) (string, error)
 	SaveZitiIdentity(name, data string) error
 	DeleteZitiIdentity(name string) error
 	Obliterate() error
 }
 
-func ListRoots() ([]*env_core.Metadata, error) {
-	return nil, nil
+func LoadRoot() (Root, error) {
+	return env_v0_3.Load()
 }
 
-func LoadRoot() (Root, error) {
-	return env_v0_3x.Load()
+func ListRoots() ([]*env_core.Metadata, error) {
+	return nil, nil
 }
 
 func LoadRootVersion(m *env_core.Metadata) (Root, error) {
@@ -36,8 +36,8 @@ func LoadRootVersion(m *env_core.Metadata) (Root, error) {
 		return nil, errors.Errorf("specify metadata version")
 	}
 	switch m.V {
-	case env_v0_3x.V:
-		return env_v0_3x.Load()
+	case env_v0_3.V:
+		return env_v0_3.Load()
 
 	default:
 		return nil, errors.Errorf("unknown metadata version '%v'", m.V)
@@ -45,7 +45,7 @@ func LoadRootVersion(m *env_core.Metadata) (Root, error) {
 }
 
 func NeedsUpdate(r Root) bool {
-	return r.Metadata().V != env_v0_3x.V
+	return r.Metadata().V != env_v0_3.V
 }
 
 func UpdateRoot(r Root) (Root, error) {

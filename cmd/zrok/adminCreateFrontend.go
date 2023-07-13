@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/openziti/zrok/environment/env_v0_3"
-	"os"
-
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -35,12 +34,12 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	publicName := args[1]
 	urlTemplate := args[2]
 
-	zrd, err := env_v0_3.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		panic(err)
 	}
