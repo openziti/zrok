@@ -27,6 +27,9 @@ func (r *Root) Config() *env_core.Config {
 }
 
 func (r *Root) SetConfig(cfg *env_core.Config) error {
+	if err := assertMetadata(); err != nil {
+		return err
+	}
 	if err := saveConfig(cfg); err != nil {
 		return err
 	}
@@ -87,6 +90,9 @@ func (r *Root) Environment() *env_core.Environment {
 }
 
 func (r *Root) SetEnvironment(env *env_core.Environment) error {
+	if err := assertMetadata(); err != nil {
+		return err
+	}
 	if err := saveEnvironment(env); err != nil {
 		return err
 	}
@@ -115,6 +121,9 @@ func (r *Root) ZitiIdentityFile(name string) (string, error) {
 }
 
 func (r *Root) SaveZitiIdentity(name, data string) error {
+	if err := assertMetadata(); err != nil {
+		return err
+	}
 	zif, err := r.ZitiIdentityFile(name)
 	if err != nil {
 		return err

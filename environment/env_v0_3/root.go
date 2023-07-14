@@ -65,6 +65,19 @@ func rootExists() (bool, error) {
 	return true, err
 }
 
+func assertMetadata() error {
+	exists, err := rootExists()
+	if err != nil {
+		return err
+	}
+	if !exists {
+		if err := writeMetadata(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func loadMetadata() (*env_core.Metadata, error) {
 	mf, err := metadataFile()
 	if err != nil {
