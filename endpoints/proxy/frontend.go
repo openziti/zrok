@@ -44,7 +44,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading environment root")
 	}
-	zCfgPath, err := env.ZitiIdentityFile(cfg.IdentityName)
+	zCfgPath, err := env.ZitiIdentityNamed(cfg.IdentityName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.IdentityName)
 	}

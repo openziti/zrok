@@ -101,20 +101,20 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
+			IdentityName: env.ShareIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create private frontend", err)
+				tui.Error("unable to create private access", err)
 			}
 			panic(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
 				if !panicInstead {
-					tui.Error("error starting frontend", err)
+					tui.Error("error starting access", err)
 				}
 				panic(err)
 			}
@@ -123,7 +123,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "udpTunnel":
 		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
+			IdentityName: env.ShareIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 			IdleTime:     time.Minute,
@@ -144,7 +144,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}()
 
 	default:
-		cfg := proxy.DefaultFrontendConfig("backend")
+		cfg := proxy.DefaultFrontendConfig(env.ShareIdentityName())
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress
 		cfg.RequestsChan = requests

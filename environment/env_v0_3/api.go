@@ -116,15 +116,23 @@ func (r *Root) IsEnabled() bool {
 	return r.env != nil
 }
 
-func (r *Root) ZitiIdentityFile(name string) (string, error) {
+func (r *Root) AccessIdentityName() string {
+	return "frontend"
+}
+
+func (r *Root) ShareIdentityName() string {
+	return "backend"
+}
+
+func (r *Root) ZitiIdentityNamed(name string) (string, error) {
 	return identityFile(name)
 }
 
-func (r *Root) SaveZitiIdentity(name, data string) error {
+func (r *Root) SaveZitiIdentityNamed(name, data string) error {
 	if err := assertMetadata(); err != nil {
 		return err
 	}
-	zif, err := r.ZitiIdentityFile(name)
+	zif, err := r.ZitiIdentityNamed(name)
 	if err != nil {
 		return err
 	}
@@ -137,8 +145,8 @@ func (r *Root) SaveZitiIdentity(name, data string) error {
 	return nil
 }
 
-func (r *Root) DeleteZitiIdentity(name string) error {
-	zif, err := r.ZitiIdentityFile(name)
+func (r *Root) DeleteZitiIdentityNamed(name string) error {
+	zif, err := r.ZitiIdentityNamed(name)
 	if err != nil {
 		return errors.Wrapf(err, "error getting ziti identity file path for '%v'", name)
 	}

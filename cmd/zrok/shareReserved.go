@@ -78,7 +78,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		target = resp.Payload.BackendProxyEndpoint
 	}
 
-	zif, err := env.ZitiIdentityFile("backend")
+	zif, err := env.ZitiIdentityNamed(env.ShareIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)

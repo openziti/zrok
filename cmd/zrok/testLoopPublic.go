@@ -186,7 +186,7 @@ func (l *looper) startup() {
 	}
 	l.env = env.Environment()
 
-	l.zif, err = env.ZitiIdentityFile("backend")
+	l.zif, err = env.ZitiIdentityNamed(env.ShareIdentityName())
 	if err != nil {
 		panic(err)
 	}

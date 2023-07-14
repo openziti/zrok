@@ -130,7 +130,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		}
 		os.Exit(1)
 	}
-	if err := env.SaveZitiIdentity("backend", resp.Payload.Cfg); err != nil {
+	if err := env.SaveZitiIdentityNamed(env.ShareIdentityName(), resp.Payload.Cfg); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
 			prg.Quit()

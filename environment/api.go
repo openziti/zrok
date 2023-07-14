@@ -24,9 +24,12 @@ type Root interface {
 	SetEnvironment(env *env_core.Environment) error
 	DeleteEnvironment() error
 
-	ZitiIdentityFile(name string) (string, error)
-	SaveZitiIdentity(name, data string) error
-	DeleteZitiIdentity(name string) error
+	AccessIdentityName() string
+	ShareIdentityName() string
+
+	ZitiIdentityNamed(name string) (string, error)
+	SaveZitiIdentityNamed(name, data string) error
+	DeleteZitiIdentityNamed(name string) error
 }
 
 func LoadRoot() (Root, error) {

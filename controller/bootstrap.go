@@ -36,14 +36,19 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}
 
+	env, err := environment.LoadRoot()
+	if err != nil {
+		return err
+	}
+
 	var frontendZId string
 	if !skipFrontend {
 		logrus.Info("creating identity for frontend ziti access")
 
-		if frontendZId, err = getIdentityId("frontend"); err == nil {
+		if frontendZId, err = getIdentityId(env.AccessIdentityName()); err == nil {
 			logrus.Infof("frontend identity: %v", frontendZId)
 		} else {
-			frontendZId, err = bootstrapIdentity("frontend", edge)
+			frontendZId, err = bootstrapIdentity(env.AccessIdentityName(), edge)
 			if err != nil {
 				panic(err)
 			}
@@ -51,7 +56,7 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		if err := assertIdentity(frontendZId, edge); err != nil {
 			panic(err)
 		}
-		if err := assertErpForIdentity("frontend", frontendZId, edge); err != nil {
+		if err := assertErpForIdentity(env.AccessIdentityName(), frontendZId, edge); err != nil {
 			panic(err)
 		}
 
@@ -117,7 +122,7 @@ func getIdentityId(identityName string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "error opening environment root")
 	}
-	zif, err := env.ZitiIdentityFile(identityName)
+	zif, err := env.ZitiIdentityNamed(identityName)
 	if err != nil {
 		return "", errors.Wrapf(err, "error opening identity '%v' from environment", identityName)
 	}
@@ -184,7 +189,7 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 	if err != nil {
 		return "", errors.Wrapf(err, "error encoding identity config '%v'", name)
 	}
-	if err := env.SaveZitiIdentity(name, out.String()); err != nil {
+	if err := env.SaveZitiIdentityNamed(name, out.String()); err != nil {
 		return "", errors.Wrapf(err, "error saving identity config '%v'", name)
 	}
 	return zId, nil

@@ -36,7 +36,7 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	zif, err := env.ZitiIdentityFile(name)
+	zif, err := env.ZitiIdentityNamed(name)
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if err := env.SaveZitiIdentity(name, resp.Payload.Cfg); err != nil {
+	if err := env.SaveZitiIdentityNamed(name, resp.Payload.Cfg); err != nil {
 		panic(err)
 	}
 

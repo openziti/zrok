@@ -30,7 +30,7 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading environment root")
 	}
-	zCfgPath, err := env.ZitiIdentityFile(cfg.Identity)
+	zCfgPath, err := env.ZitiIdentityNamed(cfg.Identity)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.Identity)
 	}
