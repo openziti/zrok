@@ -2,25 +2,31 @@ package environment
 
 import (
 	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/pkg/errors"
 )
 
+// Root is the primary interface encapsulating the on-disk environment data.
 type Root interface {
 	Metadata() *env_core.Metadata
+	Obliterate() error
+
 	HasConfig() (bool, error)
 	Config() *env_core.Config
 	SetConfig(cfg *env_core.Config) error
+
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
+
+	IsEnabled() bool
 	Environment() *env_core.Environment
 	SetEnvironment(env *env_core.Environment) error
 	DeleteEnvironment() error
-	IsEnabled() bool
+
 	ZitiIdentityFile(name string) (string, error)
 	SaveZitiIdentity(name, data string) error
 	DeleteZitiIdentity(name string) error
-	Obliterate() error
 }
 
 func LoadRoot() (Root, error) {

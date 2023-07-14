@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/openziti/edge-api/rest_management_api_client"
-	"github.com/openziti/edge-api/rest_management_api_client/config"
+	restMgmtEdgeConfig "github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/identity"
-	rest_model_edge "github.com/openziti/edge-api/rest_model"
+	restModelEdge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	zrok_config "github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/environment"
@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-func Bootstrap(skipCtrl, skipFrontend bool, inCfg *zrok_config.Config) error {
+func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 	cfg = inCfg
 
 	if v, err := store.Open(cfg.Store); err == nil {
@@ -34,26 +34,6 @@ func Bootstrap(skipCtrl, skipFrontend bool, inCfg *zrok_config.Config) error {
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
-	}
-
-	var ctrlZId string
-	if !skipCtrl {
-		logrus.Info("creating identity for controller ziti access")
-
-		if ctrlZId, err = getIdentityId("ctrl"); err == nil {
-			logrus.Infof("controller identity: %v", ctrlZId)
-		} else {
-			ctrlZId, err = bootstrapIdentity("ctrl", edge)
-			if err != nil {
-				panic(err)
-			}
-		}
-		if err := assertIdentity(ctrlZId, edge); err != nil {
-			panic(err)
-		}
-		if err := assertErpForIdentity("ctrl", ctrlZId, edge); err != nil {
-			panic(err)
-		}
 	}
 
 	var frontendZId string
@@ -103,7 +83,7 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 	filter := fmt.Sprintf("name=\"%v\"", model.ZrokProxyConfig)
 	limit := int64(100)
 	offset := int64(0)
-	listReq := &config.ListConfigTypesParams{
+	listReq := &restMgmtEdgeConfig.ListConfigTypesParams{
 		Filter:  &filter,
 		Limit:   &limit,
 		Offset:  &offset,
@@ -116,8 +96,8 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 	}
 	if len(listResp.Payload.Data) < 1 {
 		name := model.ZrokProxyConfig
-		ct := &rest_model_edge.ConfigTypeCreate{Name: &name}
-		createReq := &config.CreateConfigTypeParams{ConfigType: ct}
+		ct := &restModelEdge.ConfigTypeCreate{Name: &name}
+		createReq := &restMgmtEdgeConfig.CreateConfigTypeParams{ConfigType: ct}
 		createReq.SetTimeout(30 * time.Second)
 		createResp, err := edge.Config.CreateConfigType(createReq, nil)
 		if err != nil {
@@ -186,7 +166,7 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 		return "", errors.Wrap(err, "error loading environment root")
 	}
 
-	idc, err := zrokEdgeSdk.CreateIdentity(name, rest_model_edge.IdentityTypeDevice, nil, edge)
+	idc, err := zrokEdgeSdk.CreateIdentity(name, restModelEdge.IdentityTypeDevice, nil, edge)
 	if err != nil {
 		return "", errors.Wrapf(err, "error creating '%v' identity", name)
 	}
