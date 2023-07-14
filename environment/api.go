@@ -33,7 +33,11 @@ type Root interface {
 }
 
 func LoadRoot() (Root, error) {
-	return env_v0_3.Load()
+	if assert, err := env_v0_3.Assert(); assert && err == nil {
+		return env_v0_3.Load()
+	} else {
+		return nil, err
+	}
 }
 
 func ListRoots() ([]*env_core.Metadata, error) {

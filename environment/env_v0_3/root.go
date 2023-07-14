@@ -16,6 +16,21 @@ type Root struct {
 	env  *env_core.Environment
 }
 
+func Assert() (bool, error) {
+	exists, err := rootExists()
+	if err != nil {
+		return true, err
+	}
+	if exists {
+		meta, err := loadMetadata()
+		if err != nil {
+			return true, err
+		}
+		return meta.V == V, nil
+	}
+	return false, nil
+}
+
 func Load() (*Root, error) {
 	r := &Root{}
 	exists, err := rootExists()
@@ -62,7 +77,7 @@ func rootExists() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return true, err
+	return true, nil
 }
 
 func assertMetadata() error {
