@@ -109,6 +109,8 @@ func Update(r env_core.Root) (env_core.Root, error) {
 			return nil, err
 		}
 		fmt.Printf("renamed '%v' -> '%v'\n", oldShareF, newShareF)
+	} else if !os.IsNotExist(err) {
+		return nil, err
 	}
 
 	if err := writeMetadata(); err != nil {
