@@ -39,6 +39,10 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error loading environment", err)
 	}
 
+	if !environment.IsLatest(env) {
+		tui.Warning(fmt.Sprintf("Your environment is out of date ('%v'), use '%v' to update (make a backup before updating!)\n", env.Metadata().V, tui.Code.Render("zrok update")))
+	}
+
 	_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Config")+":\n\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
