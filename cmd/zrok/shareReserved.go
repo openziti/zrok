@@ -10,6 +10,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -144,10 +145,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	if cmd.headless {
 		switch resp.Payload.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
 
-		case "private":
+		case string(sdk.PrivateShareMode):
 			logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
 		}
 		for {
@@ -159,13 +160,13 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	} else {
 		var shareDescription string
 		switch resp.Payload.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			shareDescription = resp.Payload.FrontendEndpoint
-		case "private":
+		case string(sdk.PrivateShareMode):
 			shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 		}
 
-		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)
+		mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg

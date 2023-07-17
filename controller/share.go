@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -68,7 +69,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	var shrZId string
 	var frontendEndpoints []string
 	switch params.Body.ShareMode {
-	case "public":
+	case string(sdk.PublicShareMode):
 		if len(params.Body.FrontendSelection) < 1 {
 			logrus.Info("no frontend selection provided")
 			return share.NewShareNotFound()
@@ -94,7 +95,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			return share.NewShareInternalServerError()
 		}
 
-	case "private":
+	case string(sdk.PrivateShareMode):
 		logrus.Info("doing private")
 		shrZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
 		if err != nil {
@@ -123,7 +124,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 	if len(frontendEndpoints) > 0 {
 		sshr.FrontendEndpoint = &frontendEndpoints[0]
-	} else if sshr.ShareMode == "private" {
+	} else if sshr.ShareMode == string(sdk.PrivateShareMode) {
 		sshr.FrontendEndpoint = &sshr.ShareMode
 	}
 

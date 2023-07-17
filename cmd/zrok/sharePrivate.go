@@ -14,6 +14,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -110,7 +111,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.Environment().ZitiIdentity,
-		ShareMode:            "private",
+		ShareMode:            string(sdk.PrivateShareMode),
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
@@ -231,7 +232,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	} else {
 		shareDescription := fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", resp.Payload.ShrToken)))
-		mdl := newShareModel(resp.Payload.ShrToken, []string{shareDescription}, "private", cmd.backendMode)
+		mdl := newShareModel(resp.Payload.ShrToken, []string{shareDescription}, sdk.PrivateShareMode, sdk.BackendMode(cmd.backendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg

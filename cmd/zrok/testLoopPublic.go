@@ -14,6 +14,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
@@ -198,9 +199,9 @@ func (l *looper) startup() {
 	tunnelReq := share.NewShareParams()
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               l.env.ZitiIdentity,
-		ShareMode:            "public",
+		ShareMode:            string(sdk.PublicShareMode),
 		FrontendSelection:    l.cmd.frontendSelection,
-		BackendMode:          "proxy",
+		BackendMode:          string(sdk.ProxyBackendMode),
 		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
 		AuthScheme:           string(model.None),
 	}

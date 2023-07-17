@@ -6,6 +6,7 @@ import (
 	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -39,8 +40,8 @@ func newReserveCommand() *reserveCommand {
 }
 
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
-	shareMode := args[0]
-	if shareMode != "public" && shareMode != "private" {
+	shareMode := sdk.ShareMode(args[0])
+	if shareMode != sdk.PublicShareMode && shareMode != sdk.PrivateShareMode {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
@@ -83,13 +84,13 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.Environment().ZitiIdentity,
-		ShareMode:            shareMode,
+		ShareMode:            string(shareMode),
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
 		AuthScheme:           string(model.None),
 		Reserved:             true,
 	}
-	if shareMode == "public" {
+	if shareMode == sdk.PublicShareMode {
 		req.Body.FrontendSelection = cmd.frontendSelection
 	}
 	if len(cmd.basicAuth) > 0 {

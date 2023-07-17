@@ -12,6 +12,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -104,7 +105,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               env.Environment().ZitiIdentity,
-		ShareMode:            "public",
+		ShareMode:            string(sdk.PublicShareMode),
 		FrontendSelection:    cmd.frontendSelection,
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
@@ -185,7 +186,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	} else {
-		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
+		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
