@@ -45,28 +45,28 @@ const PasswordForm = (props) => {
         <Fragment>
             {
                 (props.passwordLength > 0 || props.passwordRequireCapital || props.passwordRequireNumeric || props.passwordRequireSpecial) &&
-                <h2>Password Requirements</h2>
+                <h2 style={{justifyContent: "center"}}>Password Requirements</h2>
             }
             {
                 props.passwordLength > 0 &&
-                <Row>Minimum Length of {props.passwordLength} </Row>
+                <Row style={{justifyContent: "center"}}>Minimum Length of {props.passwordLength} </Row>
             }
             {
                 props.passwordRequireCapital &&
-                <Row>Requires at least 1 Capital Letter</Row>
+                <Row style={{justifyContent: "center"}}>Requires at least 1 Capital Letter</Row>
             }
             {
                 props.passwordRequireNumeric &&
-                <Row>Requires at least 1 Digit</Row>
+                <Row style={{justifyContent: "center"}}>Requires at least 1 Digit</Row>
             }
             {
                 props.passwordRequireSpecial &&
                 <Fragment>
-                    <Row>Requires at least 1 Special Character</Row>
-                    <Row>{props.passwordValidSpecialCharacters.split("").join(" ")}</Row>
+                    <Row style={{justifyContent: "center"}}>Requires at least 1 Special Character</Row>
+                    <Row style={{justifyContent: "center"}}>{props.passwordValidSpecialCharacters.split("").join(" ")}</Row>
                 </Fragment>
             }
-            <Container className={"fullscreen-body"}>
+            <Container>
                 <Form.Group controlId={"password"}>
                     <Form.Control
                         type={"password"}

@@ -15,6 +15,30 @@ paths:
   #
   # account
   #
+  /changePassword:
+    post:
+      tags:
+        - account
+      operationId: changePassword
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/changePasswordRequest'
+      responses:
+        200:
+          description: changed password
+        400:
+          description: password not changed
+        401:
+          description: unauthorized
+        422:
+          description: password validation failure
+          schema:
+            $ref: '#/definitions/errorMessage'
+        500:
+          description: internal server error
+
   /invite:
     post:
       tags:
@@ -671,6 +695,16 @@ definitions:
       username:
         type: string
       password:
+        type: string
+
+  changePasswordRequest:
+    type: object
+    properties:
+      email:
+        type: string
+      oldPassword:
+        type: string
+      newPassword:
         type: string
 
   configuration:

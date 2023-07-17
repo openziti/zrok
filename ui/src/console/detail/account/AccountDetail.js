@@ -6,6 +6,7 @@ import SecretToggle from "../../SecretToggle";
 import React from "react";
 import MetricsTab from "./MetricsTab";
 import EnvironmentsTab from "./EnvironmentsTab";
+import ActionsTab from "./ActionsTab";
 
 const AccountDetail = (props) => {
     const customProperties = {
@@ -24,6 +25,9 @@ const AccountDetail = (props) => {
                 </Tab>
                 <Tab eventKey={"metrics"} title={"Metrics"}>
                     <MetricsTab />
+                </Tab>
+                <Tab eventKey={"actions"} title={"Actions"}>
+                    <ActionsTab user={props.user}/>
                 </Tab>
             </Tabs>
         </div>
