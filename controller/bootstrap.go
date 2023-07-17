@@ -15,7 +15,7 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -85,7 +85,7 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 }
 
 func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name=\"%v\"", model.ZrokProxyConfig)
+	filter := fmt.Sprintf("name=\"%v\"", sdk.ZrokProxyConfig)
 	limit := int64(100)
 	offset := int64(0)
 	listReq := &restMgmtEdgeConfig.ListConfigTypesParams{
@@ -100,7 +100,7 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 		return err
 	}
 	if len(listResp.Payload.Data) < 1 {
-		name := model.ZrokProxyConfig
+		name := sdk.ZrokProxyConfig
 		ct := &restModelEdge.ConfigTypeCreate{Name: &name}
 		createReq := &restMgmtEdgeConfig.CreateConfigTypeParams{ConfigType: ct}
 		createReq.SetTimeout(30 * time.Second)
@@ -108,11 +108,11 @@ func assertZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManageme
 		if err != nil {
 			return err
 		}
-		logrus.Infof("created '%v' config type with id '%v'", model.ZrokProxyConfig, createResp.Payload.Data.ID)
+		logrus.Infof("created '%v' config type with id '%v'", sdk.ZrokProxyConfig, createResp.Payload.Data.ID)
 	} else if len(listResp.Payload.Data) > 1 {
-		return errors.Errorf("found %d '%v' config types; expected 0 or 1", len(listResp.Payload.Data), model.ZrokProxyConfig)
+		return errors.Errorf("found %d '%v' config types; expected 0 or 1", len(listResp.Payload.Data), sdk.ZrokProxyConfig)
 	} else {
-		logrus.Infof("found '%v' config type with id '%v'", model.ZrokProxyConfig, *(listResp.Payload.Data[0].ID))
+		logrus.Infof("found '%v' config type with id '%v'", sdk.ZrokProxyConfig, *(listResp.Payload.Data[0].ID))
 	}
 	return nil
 }

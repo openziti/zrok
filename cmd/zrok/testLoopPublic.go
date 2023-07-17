@@ -10,7 +10,6 @@ import (
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -203,7 +202,7 @@ func (l *looper) startup() {
 		FrontendSelection:    l.cmd.frontendSelection,
 		BackendMode:          string(sdk.ProxyBackendMode),
 		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
-		AuthScheme:           string(model.None),
+		AuthScheme:           string(sdk.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
 	tunnelResp, err := l.zrok.Share.Share(tunnelReq, l.auth)

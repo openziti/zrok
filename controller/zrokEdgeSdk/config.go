@@ -6,23 +6,23 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/sdk"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
-func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*model.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
-	authScheme, err := model.ParseAuthScheme(authSchemeStr)
+func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*sdk.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
+	authScheme, err := sdk.ParseAuthScheme(authSchemeStr)
 	if err != nil {
 		return "", err
 	}
-	cfg := &model.ProxyConfig{
+	cfg := &sdk.ProxyConfig{
 		AuthScheme: authScheme,
 	}
-	if cfg.AuthScheme == model.Basic {
-		cfg.BasicAuth = &model.BasicAuth{}
+	if cfg.AuthScheme == sdk.Basic {
+		cfg.BasicAuth = &sdk.BasicAuth{}
 		for _, authUser := range authUsers {
-			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &model.AuthUser{Username: authUser.Username, Password: authUser.Password})
+			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUser{Username: authUser.Username, Password: authUser.Password})
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{

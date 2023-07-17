@@ -10,7 +10,6 @@ import (
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -114,11 +113,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		ShareMode:            string(sdk.PrivateShareMode),
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
-		AuthScheme:           string(model.None),
+		AuthScheme:           string(sdk.None),
 	}
 	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(model.Basic)
+		req.Body.AuthScheme = string(sdk.Basic)
 		for _, pair := range cmd.basicAuth {
 			tokens := strings.Split(pair, ":")
 			if len(tokens) == 2 {

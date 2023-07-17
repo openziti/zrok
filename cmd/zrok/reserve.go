@@ -3,7 +3,6 @@ package main
 import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk"
@@ -87,7 +86,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		ShareMode:            string(shareMode),
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
-		AuthScheme:           string(model.None),
+		AuthScheme:           string(sdk.None),
 		Reserved:             true,
 	}
 	if shareMode == sdk.PublicShareMode {
@@ -95,7 +94,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(model.Basic)
+		req.Body.AuthScheme = string(sdk.Basic)
 		for _, pair := range cmd.basicAuth {
 			tokens := strings.Split(pair, ":")
 			if len(tokens) == 2 {

@@ -19,5 +19,25 @@ const (
 type ShareRequest struct {
 	BackendMode BackendMode
 	ShareMode   ShareMode
+	Frontends   []string
+	Auth        []string
 	Target      string
 }
+
+type Metrics struct {
+	Namespace string
+	Sessions  map[string]SessionMetrics
+}
+
+type SessionMetrics struct {
+	BytesRead    int64
+	BytesWritten int64
+	LastUpdate   int64
+}
+
+type AuthScheme string
+
+const (
+	None  AuthScheme = "none"
+	Basic AuthScheme = "basic"
+)
