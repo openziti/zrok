@@ -43,12 +43,12 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 
 	var frontendZId string
 	if !skipFrontend {
-		logrus.Info("creating identity for frontend ziti access")
+		logrus.Info("creating identity for public frontend access")
 
-		if frontendZId, err = getIdentityId(env.AccessIdentityName()); err == nil {
+		if frontendZId, err = getIdentityId(env.PublicIdentityName()); err == nil {
 			logrus.Infof("frontend identity: %v", frontendZId)
 		} else {
-			frontendZId, err = bootstrapIdentity(env.AccessIdentityName(), edge)
+			frontendZId, err = bootstrapIdentity(env.PublicIdentityName(), edge)
 			if err != nil {
 				panic(err)
 			}
@@ -56,7 +56,7 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		if err := assertIdentity(frontendZId, edge); err != nil {
 			panic(err)
 		}
-		if err := assertErpForIdentity(env.AccessIdentityName(), frontendZId, edge); err != nil {
+		if err := assertErpForIdentity(env.PublicIdentityName(), frontendZId, edge); err != nil {
 			panic(err)
 		}
 

@@ -77,13 +77,13 @@ func Update(r env_core.Root) (env_core.Root, error) {
 
 	newR := &Root{meta: r.Metadata(), cfg: r.Config(), env: r.Environment()}
 
-	oldAccessF, err := r.ZitiIdentityNamed(r.AccessIdentityName())
+	oldAccessF, err := r.ZitiIdentityNamed(r.PublicIdentityName())
 	if err != nil {
 		return nil, err
 	}
 	_, err = os.Stat(oldAccessF)
 	if err == nil {
-		newAccessF, err := newR.ZitiIdentityNamed(newR.AccessIdentityName())
+		newAccessF, err := newR.ZitiIdentityNamed(newR.PublicIdentityName())
 		if err != nil {
 			return nil, err
 		}
@@ -95,13 +95,13 @@ func Update(r env_core.Root) (env_core.Root, error) {
 		return nil, err
 	}
 
-	oldShareF, err := r.ZitiIdentityNamed(r.ShareIdentityName())
+	oldShareF, err := r.ZitiIdentityNamed(r.EnvironmentIdentityName())
 	if err != nil {
 		return nil, err
 	}
 	_, err = os.Stat(oldShareF)
 	if err == nil {
-		newShareF, err := newR.ZitiIdentityNamed(newR.ShareIdentityName())
+		newShareF, err := newR.ZitiIdentityNamed(newR.EnvironmentIdentityName())
 		if err != nil {
 			return nil, err
 		}

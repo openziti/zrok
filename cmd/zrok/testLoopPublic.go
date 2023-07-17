@@ -186,7 +186,7 @@ func (l *looper) startup() {
 	}
 	l.env = env.Environment()
 
-	l.zif, err = env.ZitiIdentityNamed(env.ShareIdentityName())
+	l.zif, err = env.ZitiIdentityNamed(env.EnvironmentIdentityName())
 	if err != nil {
 		panic(err)
 	}

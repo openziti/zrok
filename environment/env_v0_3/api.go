@@ -116,11 +116,11 @@ func (r *Root) IsEnabled() bool {
 	return r.env != nil
 }
 
-func (r *Root) AccessIdentityName() string {
+func (r *Root) PublicIdentityName() string {
 	return "frontend"
 }
 
-func (r *Root) ShareIdentityName() string {
+func (r *Root) EnvironmentIdentityName() string {
 	return "backend"
 }
 

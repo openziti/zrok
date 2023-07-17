@@ -101,7 +101,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: env.ShareIdentityName(),
+			IdentityName: env.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
@@ -123,7 +123,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "udpTunnel":
 		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: env.ShareIdentityName(),
+			IdentityName: env.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 			IdleTime:     time.Minute,
@@ -144,7 +144,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}()
 
 	default:
-		cfg := proxy.DefaultFrontendConfig(env.ShareIdentityName())
+		cfg := proxy.DefaultFrontendConfig(env.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress
 		cfg.RequestsChan = requests

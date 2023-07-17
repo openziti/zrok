@@ -19,8 +19,8 @@ type Root interface {
 	SetEnvironment(env *Environment) error
 	DeleteEnvironment() error
 
-	AccessIdentityName() string
-	ShareIdentityName() string
+	PublicIdentityName() string
+	EnvironmentIdentityName() string
 
 	ZitiIdentityNamed(name string) (string, error)
 	SaveZitiIdentityNamed(name, data string) error

@@ -116,12 +116,12 @@ func (r *Root) IsEnabled() bool {
 	return r.env != nil
 }
 
-func (r *Root) AccessIdentityName() string {
-	return "access"
+func (r *Root) PublicIdentityName() string {
+	return "public"
 }
 
-func (r *Root) ShareIdentityName() string {
-	return "share"
+func (r *Root) EnvironmentIdentityName() string {
+	return "environment"
 }
 
 func (r *Root) ZitiIdentityNamed(name string) (string, error) {

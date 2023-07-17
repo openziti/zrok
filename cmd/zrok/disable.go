@@ -65,7 +65,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	if err := env.DeleteZitiIdentityNamed(env.ShareIdentityName()); err != nil {
+	if err := env.DeleteZitiIdentityNamed(env.EnvironmentIdentityName()); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok backend identity", err)
 		}
