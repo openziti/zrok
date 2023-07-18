@@ -35,3 +35,28 @@ func (o *OauthAuthenticateOK) WriteResponse(rw http.ResponseWriter, producer run
 
 	rw.WriteHeader(200)
 }
+
+// OauthAuthenticateInternalServerErrorCode is the HTTP code returned for type OauthAuthenticateInternalServerError
+const OauthAuthenticateInternalServerErrorCode int = 500
+
+/*
+OauthAuthenticateInternalServerError internal server error
+
+swagger:response oauthAuthenticateInternalServerError
+*/
+type OauthAuthenticateInternalServerError struct {
+}
+
+// NewOauthAuthenticateInternalServerError creates OauthAuthenticateInternalServerError with default headers values
+func NewOauthAuthenticateInternalServerError() *OauthAuthenticateInternalServerError {
+
+	return &OauthAuthenticateInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *OauthAuthenticateInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
+}

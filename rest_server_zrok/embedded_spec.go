@@ -725,6 +725,9 @@ func init() {
         "responses": {
           "200": {
             "description": "testing"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -2363,6 +2366,9 @@ func init() {
         "responses": {
           "200": {
             "description": "testing"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

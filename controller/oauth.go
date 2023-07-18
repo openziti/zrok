@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/openziti/zrok/controller/oauth"
+
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/go-openapi/runtime/middleware"
@@ -24,6 +26,8 @@ func newOauthHandler() *oauthHandler {
 }
 
 func (h *oauthHandler) Handle(params share.OauthAuthenticateParams) middleware.Responder {
+	ghandle := oauth.NewGoogleOauthHandler()
+	return ghandle.Handle(params)
 	awsUrl := "https:///oauth2/token" // COGNITO URL OR WHATEVER OAUTH PROVIDER URL
 	clientId := ""                    // PROVIDER CLIENT ID
 	secret := ""                      // PROVIDER CLIENT SECRET

@@ -21,9 +21,8 @@ import (
 )
 
 var (
-	cfg         *Config
+	cfg         *config.Config
 	str         *store.Store
-	mtr         *metricsAgent
 	idb         influxdb2.Client
 	limitsAgent *limits.Agent
 )
@@ -72,7 +71,7 @@ func Run(inCfg *config.Config) error {
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareOauthAuthenticateHandler = newOauthHandler()
-	api.ShareShareHandler = newShareHandler(cfg.Limits)
+	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()

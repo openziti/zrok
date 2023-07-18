@@ -26,6 +26,12 @@ func (o *OauthAuthenticateReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return result, nil
+	case 500:
+		result := NewOauthAuthenticateInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -78,6 +84,57 @@ func (o *OauthAuthenticateOK) String() string {
 }
 
 func (o *OauthAuthenticateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewOauthAuthenticateInternalServerError creates a OauthAuthenticateInternalServerError with default headers values
+func NewOauthAuthenticateInternalServerError() *OauthAuthenticateInternalServerError {
+	return &OauthAuthenticateInternalServerError{}
+}
+
+/*
+OauthAuthenticateInternalServerError describes a response with status code 500, with default header values.
+
+internal server error
+*/
+type OauthAuthenticateInternalServerError struct {
+}
+
+// IsSuccess returns true when this oauth authenticate internal server error response has a 2xx status code
+func (o *OauthAuthenticateInternalServerError) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this oauth authenticate internal server error response has a 3xx status code
+func (o *OauthAuthenticateInternalServerError) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this oauth authenticate internal server error response has a 4xx status code
+func (o *OauthAuthenticateInternalServerError) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this oauth authenticate internal server error response has a 5xx status code
+func (o *OauthAuthenticateInternalServerError) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this oauth authenticate internal server error response a status code equal to that given
+func (o *OauthAuthenticateInternalServerError) IsCode(code int) bool {
+	return code == 500
+}
+
+func (o *OauthAuthenticateInternalServerError) Error() string {
+	return fmt.Sprintf("[GET /oauth/authorize][%d] oauthAuthenticateInternalServerError ", 500)
+}
+
+func (o *OauthAuthenticateInternalServerError) String() string {
+	return fmt.Sprintf("[GET /oauth/authorize][%d] oauthAuthenticateInternalServerError ", 500)
+}
+
+func (o *OauthAuthenticateInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

@@ -573,6 +573,8 @@ paths:
       responses:
         200:
           description: testing
+        500:
+          description: internal server error
 
 
   /share:
@@ -1001,7 +1003,7 @@ definitions:
           $ref: "#/definitions/authUser"
       oauthProvider:
         type: string
-        enum: [amazon]
+        enum: [amazon,google]
       oauthEmailDomains:
         type: array
         items:
