@@ -24,6 +24,20 @@ type ShareRequest struct {
 	Target      string
 }
 
+type Share struct {
+	Token string
+}
+
+type AccessRequest struct {
+	ShareToken string
+}
+
+type Access struct {
+	Token       string
+	ShareToken  string
+	BackendMode BackendMode
+}
+
 type Metrics struct {
 	Namespace string
 	Sessions  map[string]SessionMetrics

@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-type Share struct {
-	Token string
-}
-
 func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	var err error
 	var out *share.ShareParams
@@ -77,11 +73,11 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 	return req
 }
 
-func DeleteShare(root env_core.Root, shrToken string) error {
+func DeleteShare(root env_core.Root, shr *Share) error {
 	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
 		EnvZID:   root.Environment().ZitiIdentity,
-		ShrToken: shrToken,
+		ShrToken: shr.Token,
 	}
 
 	zrok, err := root.Client()
@@ -94,5 +90,6 @@ func DeleteShare(root env_core.Root, shrToken string) error {
 	if err != nil {
 		return errors.Wrap(err, "error deleting share")
 	}
+
 	return nil
 }
