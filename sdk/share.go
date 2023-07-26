@@ -10,6 +10,10 @@ import (
 )
 
 func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
+	if !root.IsEnabled() {
+		return nil, errors.New("environment is not enabled; enable with 'zrok enable' first!")
+	}
+
 	var err error
 	var out *share.ShareParams
 
