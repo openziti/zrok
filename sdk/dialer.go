@@ -1,0 +1,32 @@
+package sdk
+
+import (
+	"github.com/openziti/sdk-golang/ziti"
+	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/pkg/errors"
+)
+
+func NewDialer(shrToken string, root env_core.Root) (edge.Conn, error) {
+	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting ziti identity path")
+	}
+
+	zcfg, err := ziti.NewConfigFromFile(zif)
+	if err != nil {
+		return nil, errors.Wrap(err, "error loading ziti identity")
+	}
+
+	zctx, err := ziti.NewContext(zcfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting ziti context")
+	}
+
+	conn, err := zctx.Dial(shrToken)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error dialing '%v'", shrToken)
+	}
+
+	return conn, nil
+}
