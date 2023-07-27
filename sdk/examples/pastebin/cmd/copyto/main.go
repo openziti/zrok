@@ -4,13 +4,24 @@ import (
 	"fmt"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk"
+	"io"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
+const MAX_PASTE_SIZE = 64 * 1024
+
+var data []byte
+
 func main() {
+	var err error
+	data, err = io.ReadAll(os.Stdin)
+	if err != nil {
+		panic(err)
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
@@ -53,7 +64,7 @@ func main() {
 }
 
 func handle(conn net.Conn) {
-	_, err := conn.Write([]byte("hello from pastebin"))
+	_, err := conn.Write(data)
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 	}

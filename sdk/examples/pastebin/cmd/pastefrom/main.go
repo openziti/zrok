@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+const MAX_PASTE_SIZE = 64 * 1024
+
 func main() {
 	if len(os.Args) < 2 {
 		panic("usage: pastefrom <shrToken>")
@@ -36,7 +38,7 @@ func main() {
 		_ = conn.Close()
 	}()
 
-	buf := make([]byte, 10240)
+	buf := make([]byte, MAX_PASTE_SIZE)
 	n, err := conn.Read(buf)
 	if err != nil {
 		panic(err)
