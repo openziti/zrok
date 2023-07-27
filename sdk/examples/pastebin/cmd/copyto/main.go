@@ -16,10 +16,15 @@ const MAX_PASTE_SIZE = 64 * 1024
 var data []byte
 
 func main() {
-	var err error
-	data, err = io.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
+	stat, _ := os.Stdin.Stat()
+	if stat.Mode()&os.ModeCharDevice == 0 {
+		var err error
+		data, err = io.ReadAll(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		panic("usage: 'copyto' is requires input from stdin; pipe your paste buffer into it")
 	}
 
 	root, err := environment.LoadRoot()
