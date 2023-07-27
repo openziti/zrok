@@ -30,6 +30,21 @@ const config = {
   },
   
   plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/docs/guides/self-hosting/metrics-and-limits/configuring-limits',
+            from: ['/docs/guides/metrics-and-limits/configuring-limits'],
+          },
+          {
+            to: '/docs/guides/self-hosting/metrics-and-limits/configuring-metrics',
+            from: ['/docs/guides/metrics-and-limits/configuring-metrics'],
+          }
+        ]
+      }
+    ]
   ],
   
   presets: [
