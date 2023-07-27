@@ -1,3 +1,7 @@
+---
+sidebar_position: 40
+---
+
 # Configuring Limits
 
 > If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.

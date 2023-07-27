@@ -85,7 +85,7 @@ The `ziti` section defines how the `zrok` controller should communicate with you
 
 Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
 
-See the separate guides on [configuring metrics](../metrics-and-limits/configuring-metrics.md) and [configuring limits](../metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
+See the separate guides on [configuring metrics](./metrics-and-limits/configuring-metrics.md) and [configuring limits](./metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
 
 :::
 
