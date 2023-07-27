@@ -1,3 +1,7 @@
+---
+sidebar_position: 20
+---
+
 # Configuring Metrics
 
 A fully configured, production-scale `zrok` service instance looks like this:
