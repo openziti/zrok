@@ -18,6 +18,19 @@ type Root struct {
 	env  *env_core.Environment
 }
 
+func Default() (*Root, error) {
+	r := &Root{}
+	root, err := rootDir()
+	if err != nil {
+		return nil, err
+	}
+	r.meta = &env_core.Metadata{
+		V:        V,
+		RootPath: root,
+	}
+	return r, nil
+}
+
 func Assert() (bool, error) {
 	exists, err := rootExists()
 	if err != nil {
@@ -55,14 +68,11 @@ func Load() (*Root, error) {
 		}
 
 	} else {
-		root, err := rootDir()
+		root, err := Default()
 		if err != nil {
 			return nil, err
 		}
-		r.meta = &env_core.Metadata{
-			V:        V,
-			RootPath: root,
-		}
+		r = root
 	}
 	return r, nil
 }

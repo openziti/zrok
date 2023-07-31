@@ -13,7 +13,7 @@ func LoadRoot() (env_core.Root, error) {
 	} else if assert, err := env_v0_3.Assert(); assert && err == nil {
 		return env_v0_3.Load()
 	} else {
-		return nil, err
+		return env_v0_4.Default()
 	}
 }
 
