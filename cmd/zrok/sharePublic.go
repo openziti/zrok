@@ -7,12 +7,12 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
-	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -72,19 +72,19 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", err)
+			tui.Error("unable to load environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zif, err := zrokdir.ZitiIdentityFile("backend")
+	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)
@@ -92,7 +92,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -100,19 +100,19 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               zrd.Env.ZId,
-		ShareMode:            "public",
+		EnvZID:               env.Environment().ZitiIdentity,
+		ShareMode:            string(sdk.PublicShareMode),
 		FrontendSelection:    cmd.frontendSelection,
 		BackendMode:          cmd.backendMode,
 		BackendProxyEndpoint: target,
-		AuthScheme:           string(model.None),
+		AuthScheme:           string(sdk.None),
 	}
 	if len(cmd.basicAuth) > 0 {
 		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(model.Basic)
+		req.Body.AuthScheme = string(sdk.Basic)
 		for _, pair := range cmd.basicAuth {
 			tokens := strings.Split(pair, ":")
 			if len(tokens) == 2 {
@@ -134,7 +134,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -185,7 +185,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	} else {
-		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, "public", cmd.backendMode)
+		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
@@ -204,7 +204,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requestsChan)
-		cmd.destroy(zrd.Env.ZId, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
 	}
 }
 

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -30,12 +30,12 @@ func newAdminDeleteFrontendCommand() *adminDeleteFrontendCommand {
 func (cmd *adminDeleteFrontendCommand) run(_ *cobra.Command, args []string) {
 	feToken := args[0]
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		panic(err)
 	}

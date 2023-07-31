@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"io"
 	"net/http"
@@ -29,7 +29,7 @@ func newOverviewCommand() *overviewCommand {
 }
 
 func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := zrokdir.Load()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("error loading zrokdir", err)
@@ -37,12 +37,12 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	client := &http.Client{}
-	apiEndpoint, _ := zrd.ApiEndpoint()
+	apiEndpoint, _ := root.ApiEndpoint()
 	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v1/overview", apiEndpoint), nil)
 	if err != nil {
 		if !panicInstead {
@@ -50,7 +50,7 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	req.Header.Add("X-TOKEN", zrd.Env.Token)
+	req.Header.Add("X-TOKEN", root.Environment().Token)
 	resp, err := client.Do(req)
 	if err != nil {
 		if !panicInstead {

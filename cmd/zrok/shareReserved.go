@@ -6,11 +6,12 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -44,26 +45,26 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 	var target string
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error loading zrokdir", err)
+			tui.Error("error loading environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
@@ -78,7 +79,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		target = resp.Payload.BackendProxyEndpoint
 	}
 
-	zif, err := zrokdir.ZitiIdentityFile("backend")
+	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)
@@ -144,10 +145,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	if cmd.headless {
 		switch resp.Payload.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
 
-		case "private":
+		case string(sdk.PrivateShareMode):
 			logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
 		}
 		for {
@@ -159,13 +160,13 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	} else {
 		var shareDescription string
 		switch resp.Payload.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			shareDescription = resp.Payload.FrontendEndpoint
-		case "private":
+		case string(sdk.PrivateShareMode):
 			shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 		}
 
-		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)
+		mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg

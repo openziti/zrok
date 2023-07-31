@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -32,7 +32,11 @@ func newAdminCreateIdentity() *adminCreateIdentity {
 func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 	name := args[0]
 
-	zif, err := zrokdir.ZitiIdentityFile(name)
+	env, err := environment.LoadRoot()
+	if err != nil {
+		panic(err)
+	}
+	zif, err := env.ZitiIdentityNamed(name)
 	if err != nil {
 		panic(err)
 	}
@@ -41,12 +45,7 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	zrd, err := zrokdir.Load()
-	if err != nil {
-		panic(err)
-	}
-
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +58,7 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if err := zrokdir.SaveZitiIdentity(name, resp.Payload.Cfg); err != nil {
+	if err := env.SaveZitiIdentityNamed(name, resp.Payload.Cfg); err != nil {
 		panic(err)
 	}
 

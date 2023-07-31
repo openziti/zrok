@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/sdk"
 	"strings"
 	"time"
 
@@ -19,8 +20,8 @@ var wordwrapBreakpoints = map[rune]bool{' ': true, '-': true}
 type shareModel struct {
 	shrToken             string
 	frontendDescriptions []string
-	shareMode            string
-	backendMode          string
+	shareMode            sdk.ShareMode
+	backendMode          sdk.BackendMode
 	requests             []*endpoints.Request
 	log                  []string
 	showLog              bool
@@ -32,7 +33,7 @@ type shareModel struct {
 
 type shareLogLine string
 
-func newShareModel(shrToken string, frontendEndpoints []string, shareMode, backendMode string) *shareModel {
+func newShareModel(shrToken string, frontendEndpoints []string, shareMode sdk.ShareMode, backendMode sdk.BackendMode) *shareModel {
 	return &shareModel{
 		shrToken:             shrToken,
 		frontendDescriptions: frontendEndpoints,
@@ -116,15 +117,15 @@ func (m *shareModel) adjustPaneHeights() {
 func (m *shareModel) renderConfig() string {
 	out := "["
 	if m.shareMode == "public" {
-		out += shareModePublicStyle.Render(strings.ToUpper(m.shareMode))
+		out += shareModePublicStyle.Render(strings.ToUpper(string(m.shareMode)))
 	} else {
-		out += shareModePrivateStyle.Render(strings.ToUpper(m.shareMode))
+		out += shareModePrivateStyle.Render(strings.ToUpper(string(m.shareMode)))
 	}
 	out += "] ["
 	if m.backendMode == "proxy" {
-		out += backendModeProxyStyle.Render(strings.ToUpper(m.backendMode))
+		out += backendModeProxyStyle.Render(strings.ToUpper(string(m.backendMode)))
 	} else {
-		out += backendModeWebStyle.Render(strings.ToUpper(m.backendMode))
+		out += backendModeWebStyle.Render(strings.ToUpper(string(m.backendMode)))
 	}
 	out += "]"
 	return out
