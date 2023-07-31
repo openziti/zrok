@@ -2,6 +2,8 @@
 
 FEATURE: New `zrok overview` command, which returns all of the account details as a single JSON structure. See the OpenAPI spec at `specs/zrok.yml` for more details of the `/api/v1/overview` endpoint (https://github.com/openziti/zrok/issues/374)
 
+FEATURE: New `zrok` SDK; `zrok` SDK used internally by `zrok share` and `zrok access` commands (https://github.com/openziti/zrok/issues/34); `pastebin` example illustrates basic SDK usage (see `sdk/examples/pastebin/README.md` for details)
+
 # v0.4.2
 
 Some days are just like this. `v0.4.2` is a re-do of `v0.4.1`. Trying to get Homebrew working and had a bad release. Hopefully this is the one.
