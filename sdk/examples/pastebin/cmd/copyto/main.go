@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net"
 	"os"
@@ -11,20 +14,14 @@ import (
 	"syscall"
 )
 
-const MAX_PASTE_SIZE = 64 * 1024
-
-var data []byte
+func init() {
+	pfxlog.GlobalInit(logrus.WarnLevel, pfxlog.DefaultOptions())
+}
 
 func main() {
-	stat, _ := os.Stdin.Stat()
-	if stat.Mode()&os.ModeCharDevice == 0 {
-		var err error
-		data, err = io.ReadAll(os.Stdin)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		panic("usage: 'copyto' is requires input from stdin; pipe your paste buffer into it")
+	data, err := loadData()
+	if err != nil {
+		panic(err)
 	}
 
 	root, err := environment.LoadRoot()
@@ -41,7 +38,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("access your pastebin with: 'pastefrom %v'\n", shr.Token)
+	fmt.Printf("access your pastebin using 'pastefrom %v'\n", shr.Token)
 
 	listener, err := sdk.NewListener(shr.Token, root)
 	if err != nil {
@@ -61,14 +58,27 @@ func main() {
 
 	for {
 		if conn, err := listener.Accept(); err == nil {
-			go handle(conn)
+			go handle(conn, data)
 		} else {
 			panic(err)
 		}
 	}
 }
 
-func handle(conn net.Conn) {
+func loadData() ([]byte, error) {
+	stat, _ := os.Stdin.Stat()
+	if stat.Mode()&os.ModeCharDevice == 0 {
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, err
+		}
+		return data, nil
+	} else {
+		return nil, errors.New("'copyto' requires input from stdin; direct your paste buffer into stdin")
+	}
+}
+
+func handle(conn net.Conn, data []byte) {
 	_, err := conn.Write(data)
 	if err != nil {
 		fmt.Printf("error: %v\n", err)

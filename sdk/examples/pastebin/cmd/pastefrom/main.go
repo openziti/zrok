@@ -44,5 +44,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(string(buf[:n]))
+	fmt.Printf(string(buf[:n]))
 }
