@@ -12,7 +12,7 @@ Some days are just like this. `v0.4.2` is a re-do of `v0.4.1`. Trying to get Hom
 
 FEATURE: New `zrok console` command to open the currently configured web console in the local web browser (https://github.com/openziti/zrok/issues/170)
 
-CHANGES: Further tweaks to the release process to automatically get the latest release into Homebrew (https://github.com/openziti/zrok/issues/264)
+CHANGE: Further tweaks to the release process to automatically get the latest release into Homebrew (https://github.com/openziti/zrok/issues/264)
 
 # v0.4.0
 
