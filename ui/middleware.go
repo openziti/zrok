@@ -9,12 +9,16 @@ import (
 	"strings"
 )
 
-func StaticBuilder(handler http.Handler) http.Handler {
+func Middleware(handler http.Handler, healthCheck func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	logrus.Infof("building")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/api/v1") {
 			logrus.Debugf("directing '%v' to api handler", r.URL.Path)
 			handler.ServeHTTP(w, r)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, "/health") {
+			healthCheck(w, r)
 			return
 		}
 
