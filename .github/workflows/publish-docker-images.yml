@@ -9,7 +9,8 @@ on:
         required: true
   release:
     types:
-      - published
+      - released  # excludes "prereleased" which is included in "published" to
+                  # avoid prematurely releasing semver tagged container images
 
 jobs:
   publish-docker-images:
