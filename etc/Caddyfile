@@ -1,6 +1,7 @@
-:2015 {
+servers :2015 {
 	route / {
 		visitor_ip "stderr"
 	}
 	respond "hello, world!"
+	protocols h1 h2c
 }
