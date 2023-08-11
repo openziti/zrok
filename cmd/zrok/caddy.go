@@ -27,6 +27,7 @@ func newCaddyCommand() *caddyCommand {
 
 func (cmd *caddyCommand) run(_ *cobra.Command, _ []string) {
 	caddy.Run(&caddy.Config{})
-	time.Sleep(30 * time.Second)
-	caddy.Stop()
+	for {
+		time.Sleep(30 * time.Minute)
+	}
 }

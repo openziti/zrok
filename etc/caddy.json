@@ -1,0 +1,6 @@
+:2015 {
+	route / {
+		visitor_ip "stderr"
+	}
+	respond "hello, world!"
+}
