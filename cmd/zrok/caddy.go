@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
+	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/spf13/cobra"
 	"os"
 	"time"
@@ -38,6 +39,7 @@ func (cmd *caddyCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	var adapter caddyfile.Adapter
+	adapter.ServerType = httpcaddyfile.ServerType{}
 	cfg, warn, err := adapter.Adapt(data, map[string]interface{}{"filename": args[0]})
 	if err != nil {
 		panic(err)
@@ -45,7 +47,7 @@ func (cmd *caddyCommand) run(_ *cobra.Command, args []string) {
 	for _, w := range warn {
 		fmt.Println(w.Message)
 	}
-	fmt.Printf("cfg: %v\n", cfg)
+	fmt.Printf("cfg: %v\n", string(cfg))
 	if err := caddy.Load(cfg, true); err != nil {
 		panic(err)
 	}
