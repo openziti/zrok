@@ -1,6 +1,6 @@
-:2015 {
-	route / {
-		visitor_ip "stderr"
+http:// {
+	bind zrok/nhtlakfk3pui
+	reverse_proxy 127.0.0.1:3000 {
+		header_up Host http://localhost:3000
 	}
-	respond "hello, world!"
 }

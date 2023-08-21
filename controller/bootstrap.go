@@ -10,6 +10,7 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/identity"
 	restModelEdge "github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/edge-api/rest_util"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
@@ -173,13 +174,13 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 
 	idc, err := zrokEdgeSdk.CreateIdentity(name, restModelEdge.IdentityTypeDevice, nil, edge)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating '%v' identity", name)
+		return "", errors.Wrapf(rest_util.WrapErr(err), "error creating '%v' identity", name)
 	}
 
 	zId := idc.Payload.Data.ID
 	cfg, err := zrokEdgeSdk.EnrollIdentity(zId, edge)
 	if err != nil {
-		return "", errors.Wrapf(err, "error enrolling '%v' identity", name)
+		return "", errors.Wrapf(rest_util.WrapErr(err), "error enrolling '%v' identity", name)
 	}
 
 	var out bytes.Buffer
