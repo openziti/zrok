@@ -106,6 +106,19 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
+	var shareDescription string
+	switch resp.Payload.ShareMode {
+	case string(sdk.PublicShareMode):
+		shareDescription = resp.Payload.FrontendEndpoint
+	case string(sdk.PrivateShareMode):
+		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
+	}
+
+	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
+	if !cmd.headless {
+		proxy.SetCaddyLoggingWriter(mdl)
+	}
+
 	requestsChan := make(chan *endpoints.Request, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
@@ -158,15 +171,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
-		var shareDescription string
-		switch resp.Payload.ShareMode {
-		case string(sdk.PublicShareMode):
-			shareDescription = resp.Payload.FrontendEndpoint
-		case string(sdk.PrivateShareMode):
-			shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
-		}
-
-		mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg

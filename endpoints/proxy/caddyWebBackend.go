@@ -68,6 +68,11 @@ func NewCaddyWebBackend(cfg *CaddyWebBackendConfig) (*CaddyWebBackend, error) {
 			},
 		},
 	}
+	if loggingRequests != nil {
+		caddyLog := caddyCfg.Logging.Logs["default"]
+		caddyLog.WriterRaw = caddyconfig.JSONModuleObject(&CaddyLogWriter{}, "output", "zrok_tui", nil)
+		caddyCfg.Logging.Logs["default"] = caddyLog
+	}
 
 	return &CaddyWebBackend{cfg: cfg, caddyCfg: caddyCfg}, nil
 }

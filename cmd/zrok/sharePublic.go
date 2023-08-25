@@ -130,6 +130,11 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
+	if !cmd.headless {
+		proxy.SetCaddyLoggingWriter(mdl)
+	}
+
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -185,7 +190,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	} else {
-		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg

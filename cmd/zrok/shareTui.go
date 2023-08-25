@@ -218,6 +218,10 @@ func (m *shareModel) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
+func (shareModel) Close() error {
+	return nil
+}
+
 func wrap(lines []string, width int) []string {
 	ret := make([]string, 0)
 	for _, line := range lines {
