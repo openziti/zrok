@@ -1,4 +1,4 @@
-package main
+package endpoints
 
 import (
 	"context"
@@ -14,38 +14,38 @@ import (
 )
 
 func init() {
-	caddy.RegisterNetwork("zrok", newZrokListener)
+	caddy.RegisterNetwork("zrok", NewZrokListener)
 }
 
-type zrokListener struct {
+type ZrokListener struct {
 	zctx  ziti.Context
 	share string
 	l     edge.Listener
 }
 
-func (l *zrokListener) String() string {
+func (l *ZrokListener) String() string {
 	return fmt.Sprintf("zrok/%s", l.share)
 }
 
-func (l *zrokListener) Network() string {
+func (l *ZrokListener) Network() string {
 	return "zrok"
 }
 
-func (l *zrokListener) Accept() (net.Conn, error) {
+func (l *ZrokListener) Accept() (net.Conn, error) {
 	return l.l.Accept()
 }
 
-func (l *zrokListener) Close() error {
+func (l *ZrokListener) Close() error {
 	_ = l.l.Close()
 	l.zctx.Close()
 	return nil
 }
 
-func (l *zrokListener) Addr() net.Addr {
+func (l *ZrokListener) Addr() net.Addr {
 	return l
 }
 
-func newZrokListener(ctx context.Context, _ string, addr string, cfg net.ListenConfig) (any, error) {
+func NewZrokListener(_ context.Context, _ string, addr string, _ net.ListenConfig) (any, error) {
 	shrToken := strings.Split(addr, ":")[0]
 	env, err := environment.LoadRoot()
 	if err != nil {
@@ -66,7 +66,7 @@ func newZrokListener(ctx context.Context, _ string, addr string, cfg net.ListenC
 	if err != nil {
 		return nil, err
 	}
-	l := &zrokListener{
+	l := &ZrokListener{
 		zctx:  zctx,
 		share: shrToken,
 		l:     conn,
@@ -75,6 +75,6 @@ func newZrokListener(ctx context.Context, _ string, addr string, cfg net.ListenC
 }
 
 var (
-	_ net.Addr     = (*zrokListener)(nil)
-	_ net.Listener = (*zrokListener)(nil)
+	_ net.Addr     = (*ZrokListener)(nil)
+	_ net.Listener = (*ZrokListener)(nil)
 )
