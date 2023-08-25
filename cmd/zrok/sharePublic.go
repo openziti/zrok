@@ -138,7 +138,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		os.Exit(0)
 	}()
 
-	requestsChan := make(chan *endpoints.Request, 1024)
+	requests := make(chan *endpoints.Request, 1024)
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
@@ -146,7 +146,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			EndpointAddress: target,
 			ShrToken:        resp.Payload.ShrToken,
 			Insecure:        cmd.insecure,
-			RequestsChan:    requestsChan,
+			RequestsChan:    requests,
 		}
 		_, err = cmd.proxyBackendMode(cfg)
 		if err != nil {
@@ -161,7 +161,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
-			Requests:     requestsChan,
+			Requests:     requests,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -179,7 +179,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(resp.Payload.FrontendProxyEndpoints, "\n"))
 		for {
 			select {
-			case req := <-requestsChan:
+			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
@@ -193,7 +193,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			for {
 				select {
-				case req := <-requestsChan:
+				case req := <-requests:
 					prg.Send(req)
 				}
 			}
@@ -203,7 +203,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("An error occurred", err)
 		}
 
-		close(requestsChan)
+		close(requests)
 		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
 	}
 }

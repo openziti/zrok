@@ -8,6 +8,7 @@ import (
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp/fileserver"
 	"github.com/openziti/zrok/endpoints"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -28,6 +29,8 @@ func NewCaddyWebBackend(cfg *CaddyWebBackendConfig) (*CaddyWebBackend, error) {
 	handler.Browse = new(fileserver.Browse)
 
 	var handlers []json.RawMessage
+	middlewareRequests = cfg.Requests
+	handlers = append(handlers, caddyconfig.JSONModuleObject(&ZrokRequestsMiddleware{}, "handler", "zrok_requests", nil))
 	handlers = append(handlers, caddyconfig.JSONModuleObject(handler, "handler", "file_server", nil))
 
 	route := caddyhttp.Route{HandlersRaw: handlers}
@@ -54,6 +57,15 @@ func NewCaddyWebBackend(cfg *CaddyWebBackendConfig) (*CaddyWebBackend, error) {
 		},
 		AppsRaw: caddy.ModuleMap{
 			"http": caddyconfig.JSON(httpApp, nil),
+		},
+		Logging: &caddy.Logging{
+			Logs: map[string]*caddy.CustomLog{
+				"default": {
+					BaseLog: caddy.BaseLog{
+						Level: zap.ErrorLevel.CapitalString(),
+					},
+				},
+			},
 		},
 	}
 
