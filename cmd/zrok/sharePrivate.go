@@ -162,11 +162,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "web":
-		cfg := &proxy.WebBackendConfig{
+		cfg := &proxy.CaddyWebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     resp.Payload.ShrToken,
-			RequestsChan: requestsChan,
+			Requests:     requestsChan,
 		}
 		_, err = cmd.webBackendMode(cfg)
 		if err != nil {
@@ -269,8 +269,8 @@ func (cmd *sharePrivateCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endp
 	return be, nil
 }
 
-func (cmd *sharePrivateCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewWebBackend(cfg)
+func (cmd *sharePrivateCommand) webBackendMode(cfg *proxy.CaddyWebBackendConfig) (endpoints.RequestHandler, error) {
+	be, err := proxy.NewCaddyWebBackend(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating http web backend")
 	}
