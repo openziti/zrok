@@ -9,7 +9,6 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -106,7 +105,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env, shr)
+		cmd.shutdown(env, shr)
 		os.Exit(0)
 	}()
 
@@ -121,13 +120,20 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			Insecure:        cmd.insecure,
 			RequestsChan:    requests,
 		}
-		_, err = cmd.proxyBackendMode(cfg)
+
+		be, err := proxy.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create proxy backend handler", err)
+				tui.Error("error creating proxy backend", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http proxy backend: %v", err)
+			}
+		}()
 
 	case "web":
 		cfg := &proxy.CaddyWebBackendConfig{
@@ -136,13 +142,20 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			ShrToken:     shr.Token,
 			Requests:     requests,
 		}
-		_, err = cmd.webBackendMode(cfg)
+
+		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create web backend handler", err)
+				tui.Error("unable to create web backend", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http web backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
@@ -176,41 +189,11 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.destroy(env, shr)
+		cmd.shutdown(env, shr)
 	}
 }
 
-func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http proxy backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http proxy backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *sharePublicCommand) webBackendMode(cfg *proxy.CaddyWebBackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewCaddyWebBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http web backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http web backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *sharePublicCommand) destroy(root env_core.Root, shr *sdk.Share) {
+func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
 	logrus.Debugf("shutting down '%v'", shr.Token)
 	if err := sdk.DeleteShare(root, shr); err != nil {
 		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
