@@ -25,7 +25,8 @@ type ShareRequest struct {
 }
 
 type Share struct {
-	Token string
+	Token             string
+	FrontendEndpoints []string
 }
 
 type AccessRequest struct {

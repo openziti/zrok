@@ -3,14 +3,10 @@ package main
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/go-openapi/runtime"
-	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/rest_client_zrok"
-	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
@@ -87,50 +83,21 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load ziti identity configuration", err)
+			tui.Error("unable to access ziti identity file", err)
 		}
 		panic(err)
 	}
 
-	zrok, err := env.Client()
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create zrok client", err)
-		}
-		panic(err)
+	req := &sdk.ShareRequest{
+		BackendMode: sdk.BackendMode(cmd.backendMode),
+		ShareMode:   sdk.PublicShareMode,
+		Frontends:   cmd.frontendSelection,
+		Auth:        cmd.basicAuth,
+		Target:      target,
 	}
+	shr, err := sdk.CreateShare(env, req)
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
-	req := share.NewShareParams()
-	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.Environment().ZitiIdentity,
-		ShareMode:            string(sdk.PublicShareMode),
-		FrontendSelection:    cmd.frontendSelection,
-		BackendMode:          cmd.backendMode,
-		BackendProxyEndpoint: target,
-		AuthScheme:           string(sdk.None),
-	}
-	if len(cmd.basicAuth) > 0 {
-		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(sdk.Basic)
-		for _, pair := range cmd.basicAuth {
-			tokens := strings.Split(pair, ":")
-			if len(tokens) == 2 {
-				req.Body.AuthUsers = append(req.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
-			} else {
-				panic(errors.Errorf("invalid username:password pair '%v'", pair))
-			}
-		}
-	}
-	resp, err := zrok.Share.Share(req, auth)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create share", err)
-		}
-		panic(err)
-	}
-
-	mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
+	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 	if !cmd.headless {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
@@ -139,17 +106,18 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env, shr)
 		os.Exit(0)
 	}()
 
 	requests := make(chan *endpoints.Request, 1024)
+
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			ShrToken:        resp.Payload.ShrToken,
+			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
 			RequestsChan:    requests,
 		}
@@ -165,7 +133,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		cfg := &proxy.CaddyWebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
-			ShrToken:     resp.Payload.ShrToken,
+			ShrToken:     shr.Token,
 			Requests:     requests,
 		}
 		_, err = cmd.webBackendMode(cfg)
@@ -181,7 +149,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if cmd.headless {
-		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(resp.Payload.FrontendProxyEndpoints, "\n"))
+		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
 		for {
 			select {
 			case req := <-requests:
@@ -208,7 +176,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
+		cmd.destroy(env, shr)
 	}
 }
 
@@ -242,16 +210,10 @@ func (cmd *sharePublicCommand) webBackendMode(cfg *proxy.CaddyWebBackendConfig) 
 	return be, nil
 }
 
-func (cmd *sharePublicCommand) destroy(id string, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", shrToken)
-	req := share.NewUnshareParams()
-	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   id,
-		ShrToken: shrToken,
+func (cmd *sharePublicCommand) destroy(root env_core.Root, shr *sdk.Share) {
+	logrus.Debugf("shutting down '%v'", shr.Token)
+	if err := sdk.DeleteShare(root, shr); err != nil {
+		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
-	if _, err := zrok.Share.Unshare(req, auth); err == nil {
-		logrus.Debugf("shutdown complete")
-	} else {
-		logrus.Errorf("error shutting down: %v", err)
-	}
+	logrus.Debugf("shutdown complete")
 }
