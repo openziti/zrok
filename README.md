@@ -60,6 +60,8 @@ acc, err := sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: shrToken})
 conn, err := sdk.NewDialer(shrToken, root)
 ```
 
+This [blog post](https://blog.openziti.io/the-zrok-sdk) provides more details for [getting started](https://blog.openziti.io/the-zrok-sdk) with the `zrok` SDK.
+
 ## Self-Hosting
 
 `zrok` is designed to scale up to support extremely large service instances. `zrok.io` is a public service instance operated by NetFoundry using the same code base that is available to self-hosted environments.
@@ -68,7 +70,7 @@ conn, err := sdk.NewDialer(shrToken, root)
 
 The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add an OpenZiti network and you're up and running.
 
-See the [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/) for details on getting your own `zrok` service instance running. This builds on top of the [OpenZiti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have a running `zrok` service instance in minutes.
+See the [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/) for details on getting your own `zrok` service instance running.
 
 ## Building
 
