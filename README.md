@@ -4,9 +4,9 @@
 
 `zrok` facilitates sharing resources both publicly and privately. Public sharing allows you to share `zrok` resources with non-`zrok` users over the public internet. Private sharing allows you to directly share your resources peer-to-peer with other `zrok` users without changing your security or firewall settings.
 
-Like other offerings in this space, `zrok` allows users to share tunnels for HTTP, TCP and UDP network resources. `zrok` also allows users to easily and rapidly share files, web content, and custom resources in a peer-to-peer manner.
+Like other offerings in this space, `zrok` allows users to share tunnels for HTTP, TCP and UDP network resources. `zrok` additionally allows users to easily and rapidly share files, web content, and custom resources in a peer-to-peer manner.
 
-`zrok` is an extensible platform for sharing.
+`zrok` is an extensible platform for sharing. Initially we're targeting technical users. Super-simple sharing for end users is planned an in the backlog.
 
 ![zrok Web Console](docs/images/zrok_web_console.png)
 
