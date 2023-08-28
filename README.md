@@ -24,7 +24,7 @@ You can be up and sharing using the `zrok.io` service in minutes. Here is a syno
 
 * `zrok share` to share resources immediately, simply and securely
 
-See the [Concepts and Getting Started Guide](docs/getting-started.md) for a full overview.
+See the [Concepts and Getting Started Guide](https://docs.zrok.io/docs/getting-started) for a full overview.
 
 ## The `zrok` SDK
 
@@ -68,7 +68,7 @@ conn, err := sdk.NewDialer(shrToken, root)
 
 The single `zrok` binary contains everything you need to operate `zrok` environments and also host your own service instances. Just add an OpenZiti network and you're up and running.
 
-See the [Self-Hosting Guide](docs/guides/self-hosting/self_hosting_guide.md) for details on getting your own `zrok` service instance running. This builds on top of the [OpenZiti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have a running `zrok` service instance in minutes.
+See the [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/) for details on getting your own `zrok` service instance running. This builds on top of the [OpenZiti Quick Start](https://docs.openziti.io/docs/learn/quickstarts/network/) to have a running `zrok` service instance in minutes.
 
 ## Building
 
