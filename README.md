@@ -6,7 +6,7 @@
 
 Like other offerings in this space, `zrok` allows users to share tunnels for HTTP, TCP and UDP network resources. 
 
-![zrok Web Console](/home/michael/Repos/nf/zrok/docs/images/zrok_web_console.png)
+![zrok Web Console](docs/images/zrok_web_console.png)
 
 ## Extensible
 
