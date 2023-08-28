@@ -16,7 +16,7 @@ You can be up and sharing using the `zrok.io` service in minutes. Here is a syno
 
 ### First-time Setup
 
-* Download the binary for your platform [here](https://github.com/openziti/zrok/releases)
+* Download the binary for your platform [here](https://github.com/openziti/zrok/releases/latest)
 * `zrok invite` to create an account with the service
 * `zrok enable` to enable your shell environment for sharing with the service
 
