@@ -1,10 +1,10 @@
-![zrok](docs/images/zrok.png)
+![zrok](docs/images/zrok_cover.png)
 
-`zrok` is a next-generation sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
+`zrok` is a next-generation, peer-to-peer sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
 
-`zrok` facilitates sharing resources both publicly and privately, exposing them to an audience you can easily control.
+`zrok` facilitates sharing resources both publicly and privately, exposing them to an audience you can easily control. Public sharing allows you to share `zrok` resources with non-`zrok` users over the public internet. Private sharing allows you to directly share peer-to-peer with other `zrok` users without changing your security or firewall settings.
 
-Like other offerings in this space, `zrok` allows users to create ephemeral reverse proxies ("tunnels") for `http` resources. Additionally:
+Like other offerings in this space, `zrok` allows users to create ephemeral reverse proxies ("tunnels") for HTTP, TCP and UDP resources. Additionally:
 
 * `zrok` allows users to _privately_ share resources with other `zrok` users; in _private_ usage scenarios, your private resources are not exposed to any public endpoints; all communication is securely and privately transported between `zrok` environments
 * `zrok` allows sharing other types of resources; rather than just proxying `http` endpoints, `zrok` allows users to easily and rapidly share files and web content
