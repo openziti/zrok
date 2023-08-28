@@ -4,7 +4,6 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/caddyf"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
@@ -169,13 +168,13 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}()
 
 	case "caddy":
-		cfg := &caddyf.BackendConfig{
+		cfg := &proxy.CaddyfileBackendConfig{
 			CaddyfilePath: target,
 			Shr:           shr,
 			Requests:      requests,
 		}
 
-		be, err := caddyf.NewBackend(cfg)
+		be, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
 			if !panicInstead {
 				tui.Error("unable to create caddy backend", err)
