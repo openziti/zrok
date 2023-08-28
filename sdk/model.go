@@ -7,6 +7,7 @@ const (
 	WebBackendMode       BackendMode = "web"
 	TcpTunnelBackendMode BackendMode = "tcpTunnel"
 	UdpTunnelBackendMode BackendMode = "udpTunnel"
+	CaddyBackendMode     BackendMode = "caddy"
 )
 
 type ShareMode string

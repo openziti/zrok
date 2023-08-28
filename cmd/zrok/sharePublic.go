@@ -4,6 +4,7 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/caddyf"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
@@ -39,7 +40,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, caddy}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -62,6 +63,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	case "web":
 		target = args[0]
+
+	case "caddy":
+		target = args[0]
+		cmd.headless = true
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
@@ -95,6 +100,12 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		Target:      target,
 	}
 	shr, err := sdk.CreateShare(env, req)
+	if err != nil {
+		if !panicInstead {
+			tui.Error("unable to create share", err)
+		}
+		panic(err)
+	}
 
 	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 	if !cmd.headless {
@@ -154,6 +165,27 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running http web backend: %v", err)
+			}
+		}()
+
+	case "caddy":
+		cfg := &caddyf.BackendConfig{
+			CaddyfilePath: target,
+			Shr:           shr,
+			Requests:      requests,
+		}
+
+		be, err := caddyf.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create caddy backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running caddy backend: %v", err)
 			}
 		}()
 
