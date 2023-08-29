@@ -3,7 +3,7 @@ module github.com/openziti/zrok
 go 1.20
 
 require (
-	github.com/caddyserver/caddy/v2 v2.7.3
+	github.com/caddyserver/caddy/v2 v2.7.5-0.20230829153420-ed8bb13c5df7
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
@@ -41,6 +41,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/wneessen/go-mail v0.2.7
+	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/net v0.14.0
 	golang.org/x/time v0.3.0
@@ -65,7 +66,7 @@ require (
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/biogo/store v0.0.0-20200525035639-8c94ae1e7c9c // indirect
-	github.com/caddyserver/certmagic v0.19.1 // indirect
+	github.com/caddyserver/certmagic v0.19.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -165,8 +166,8 @@ require (
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
-	github.com/quic-go/qtls-go1-20 v0.3.1 // indirect
-	github.com/quic-go/quic-go v0.37.4 // indirect
+	github.com/quic-go/qtls-go1-20 v0.3.2 // indirect
+	github.com/quic-go/quic-go v0.38.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
@@ -213,7 +214,6 @@ require (
 	go.step.sm/crypto v0.33.0 // indirect
 	go.step.sm/linkedca v0.20.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.25.0 // indirect
 	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect

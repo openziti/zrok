@@ -1,10 +1,12 @@
 package proxy
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
+	"github.com/caddyserver/caddy/v2/modules/caddyhttp/fileserver"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/sdk"
 	"github.com/sirupsen/logrus"
@@ -12,6 +14,13 @@ import (
 	"strings"
 	"text/template"
 )
+
+//go:embed browse.html
+var browseHtml string
+
+func init() {
+	fileserver.BrowseTemplate = browseHtml
+}
 
 type CaddyfileBackendConfig struct {
 	CaddyfilePath string
