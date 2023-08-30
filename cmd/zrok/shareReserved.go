@@ -127,7 +127,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			Insecure:        cmd.insecure,
-			RequestsChan:    requestsChan,
+			Requests:        requestsChan,
 		}
 		_, err := cmd.proxyBackendMode(cfg)
 		if err != nil {

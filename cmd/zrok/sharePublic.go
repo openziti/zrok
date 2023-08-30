@@ -71,7 +71,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	env, err := environment.LoadRoot()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -79,11 +79,11 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if !env.IsEnabled() {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
+	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to access ziti identity file", err)
@@ -98,7 +98,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		Auth:        cmd.basicAuth,
 		Target:      target,
 	}
-	shr, err := sdk.CreateShare(env, req)
+	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create share", err)
@@ -115,7 +115,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.shutdown(env, shr)
+		cmd.shutdown(root, shr)
 		os.Exit(0)
 	}()
 
@@ -128,7 +128,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			EndpointAddress: target,
 			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
-			RequestsChan:    requests,
+			Requests:        requests,
 		}
 
 		be, err := proxy.NewBackend(cfg)
@@ -220,7 +220,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.shutdown(env, shr)
+		cmd.shutdown(root, shr)
 	}
 }
 

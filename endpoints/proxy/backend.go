@@ -20,7 +20,7 @@ type BackendConfig struct {
 	EndpointAddress string
 	ShrToken        string
 	Insecure        bool
-	RequestsChan    chan *endpoints.Request
+	Requests        chan *endpoints.Request
 }
 
 type Backend struct {
@@ -88,8 +88,8 @@ func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
 	proxy.Transport = tpt
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
-		if cfg.RequestsChan != nil {
-			cfg.RequestsChan <- &endpoints.Request{
+		if cfg.Requests != nil {
+			cfg.Requests <- &endpoints.Request{
 				Stamp:      time.Now(),
 				RemoteAddr: fmt.Sprintf("%v", req.Header["X-Real-Ip"]),
 				Method:     req.Method,
