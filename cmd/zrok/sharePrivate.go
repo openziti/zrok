@@ -70,9 +70,10 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	case "caddy":
 		target = args[0]
+		cmd.headless = true
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy}", cmd.backendMode), nil)
 	}
 
 	root, err := environment.LoadRoot()
@@ -160,7 +161,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create web backend handler", err)
+				tui.Error("error creating web backend", err)
 			}
 			panic(err)
 		}
@@ -182,7 +183,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := tcpTunnel.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create tcpTunnel backend", err)
+				tui.Error("error creating tcpTunnel backend", err)
 			}
 			panic(err)
 		}
@@ -204,7 +205,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := udpTunnel.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create udpTunnel backend", err)
+				tui.Error("error creating udpTunnel backend", err)
 			}
 			panic(err)
 		}
@@ -225,7 +226,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		be, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create caddy backend", err)
+				tui.Error("error creating caddy backend", err)
 			}
 			panic(err)
 		}

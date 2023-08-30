@@ -6,13 +6,14 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -45,7 +46,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 	var target string
 
-	env, err := environment.LoadRoot()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("error loading environment", err)
@@ -53,18 +54,18 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if !env.IsEnabled() {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := env.Client()
+	zrok, err := root.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
@@ -78,8 +79,11 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	if target == "" {
 		target = resp.Payload.BackendProxyEndpoint
 	}
+	if sdk.BackendMode(resp.Payload.BackendMode) == sdk.CaddyBackendMode {
+		cmd.headless = true
+	}
 
-	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
+	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)
@@ -129,13 +133,20 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			Insecure:        cmd.insecure,
 			Requests:        requestsChan,
 		}
-		_, err := cmd.proxyBackendMode(cfg)
+
+		be, err := proxy.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
 				tui.Error("unable to create proxy backend handler", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http proxy backend: %v", err)
+			}
+		}()
 
 	case "web":
 		cfg := &proxy.CaddyWebBackendConfig{
@@ -144,13 +155,85 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			ShrToken:     shrToken,
 			Requests:     requestsChan,
 		}
-		_, err := cmd.webBackendMode(cfg)
+
+		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create web backend handler", err)
+				tui.Error("error creating web backend", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http web backend: %v", err)
+			}
+		}()
+
+	case "tcpTunnel":
+		cfg := &tcpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        shrToken,
+			RequestsChan:    requestsChan,
+		}
+
+		be, err := tcpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating tcpTunnel backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running tcpTunnel backend: %v", err)
+			}
+		}()
+
+	case "udpTunnel":
+		cfg := &udpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        shrToken,
+			RequestsChan:    requestsChan,
+		}
+
+		be, err := udpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating udpTunnel backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running udpTunnel backend: %v", err)
+			}
+		}()
+
+	case "caddy":
+		cfg := &proxy.CaddyfileBackendConfig{
+			CaddyfilePath: target,
+			Shr:           &sdk.Share{Token: shrToken, FrontendEndpoints: []string{resp.Payload.FrontendEndpoint}},
+			Requests:      requestsChan,
+		}
+
+		be, err := proxy.NewCaddyfileBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating caddy backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
@@ -190,34 +273,4 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 		close(requestsChan)
 	}
-}
-
-func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http proxy backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http proxy backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *shareReservedCommand) webBackendMode(cfg *proxy.CaddyWebBackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewCaddyWebBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http web backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http web backend: %v", err)
-		}
-	}()
-
-	return be, nil
 }
