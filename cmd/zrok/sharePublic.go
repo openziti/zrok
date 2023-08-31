@@ -176,6 +176,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 		be, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
+			cmd.shutdown(root, shr)
 			if !panicInstead {
 				tui.Error("unable to create caddy backend", err)
 			}
