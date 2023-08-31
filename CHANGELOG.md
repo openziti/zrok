@@ -8,6 +8,8 @@ CHANGE: Updated the golang version for release builds to `1.21.0` and the node v
 
 CHANGE: Added `FrontendEndponts` to `sdk.Share`, returning selected frontend URLs to callers of `sdk.CreateShare`
 
+CHANGE: Added a short alias `-b` for `--backend-mode` to improve CLI ergonomics (https://github.com/openziti/zrok/issues/397)
+
 # v0.4.5
 
 FEATURE: New health check endpoint (`/health`), which verifies that the underlying SQL store and metrics repository (InfluxDB, if configured) are operating correctly (https://github.com/openziti/zrok/issues/372)
