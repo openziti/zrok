@@ -1,6 +1,20 @@
+# v0.4.6
+
+FEATURE: New `--backend-mode caddy`, which pre-processes a `Caddyfile` allowing a `bind` statement to work like this: `bind {{ .ZrokBindAddress }}`. Allows development of complicated API gateways and multi-backend shares, while maintaining the simple, ephemeral sharing model provided by `zrok` (https://github.com/openziti/zrok/issues/391)
+
+CHANGE: `--backend-mode web` has been refactored to utilize Caddy as the integrated web server. This provides for a much nicer web-based file browsing experience, while maintaining the existing web server facilities (https://github.com/openziti/zrok/issues/392)
+
+CHANGE: Updated the golang version for release builds to `1.21.0` and the node version to `18.x`
+
+CHANGE: Added `FrontendEndponts` to `sdk.Share`, returning selected frontend URLs to callers of `sdk.CreateShare`
+
+CHANGE: Added a short alias `-b` for `--backend-mode` to improve CLI ergonomics (https://github.com/openziti/zrok/issues/397)
+
 # v0.4.5
 
 FEATURE: New health check endpoint (`/health`), which verifies that the underlying SQL store and metrics repository (InfluxDB, if configured) are operating correctly (https://github.com/openziti/zrok/issues/372)
+
+CHANGE: Updated to golang v1.21.0 and node v18.x
 
 FIX: `zrok admin bootstrap` and `zrok enable` both broken with latest OpenZiti releases (tested with `v0.30.0`); updated to latest OpenZiti golang SDK (https://github.com/openziti/zrok/issues/389)
 

@@ -7,6 +7,7 @@ const (
 	WebBackendMode       BackendMode = "web"
 	TcpTunnelBackendMode BackendMode = "tcpTunnel"
 	UdpTunnelBackendMode BackendMode = "udpTunnel"
+	CaddyBackendMode     BackendMode = "caddy"
 )
 
 type ShareMode string
@@ -25,7 +26,8 @@ type ShareRequest struct {
 }
 
 type Share struct {
-	Token string
+	Token             string
+	FrontendEndpoints []string
 }
 
 type AccessRequest struct {

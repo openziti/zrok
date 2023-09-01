@@ -3,17 +3,12 @@ package main
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/go-openapi/runtime"
-	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/rest_client_zrok"
-	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -44,7 +39,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -68,11 +63,15 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	case "web":
 		target = args[0]
 
+	case "caddy":
+		target = args[0]
+		cmd.headless = true
+
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
 	}
 
-	env, err := environment.LoadRoot()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load environment", err)
@@ -80,49 +79,26 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if !env.IsEnabled() {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zif, err := env.ZitiIdentityNamed(env.EnvironmentIdentityName())
+	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load ziti identity configuration", err)
+			tui.Error("unable to access ziti identity file", err)
 		}
 		panic(err)
 	}
 
-	zrok, err := env.Client()
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create zrok client", err)
-		}
-		panic(err)
+	req := &sdk.ShareRequest{
+		BackendMode: sdk.BackendMode(cmd.backendMode),
+		ShareMode:   sdk.PublicShareMode,
+		Frontends:   cmd.frontendSelection,
+		Auth:        cmd.basicAuth,
+		Target:      target,
 	}
-
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
-	req := share.NewShareParams()
-	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               env.Environment().ZitiIdentity,
-		ShareMode:            string(sdk.PublicShareMode),
-		FrontendSelection:    cmd.frontendSelection,
-		BackendMode:          cmd.backendMode,
-		BackendProxyEndpoint: target,
-		AuthScheme:           string(sdk.None),
-	}
-	if len(cmd.basicAuth) > 0 {
-		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(sdk.Basic)
-		for _, pair := range cmd.basicAuth {
-			tokens := strings.Split(pair, ":")
-			if len(tokens) == 2 {
-				req.Body.AuthUsers = append(req.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
-			} else {
-				panic(errors.Errorf("invalid username:password pair '%v'", pair))
-			}
-		}
-	}
-	resp, err := zrok.Share.Share(req, auth)
+	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create share", err)
@@ -130,62 +106,103 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
+	if !cmd.headless {
+		proxy.SetCaddyLoggingWriter(mdl)
+	}
+
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
+		cmd.shutdown(root, shr)
 		os.Exit(0)
 	}()
 
-	requestsChan := make(chan *endpoints.Request, 1024)
+	requests := make(chan *endpoints.Request, 1024)
+
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			ShrToken:        resp.Payload.ShrToken,
+			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
-			RequestsChan:    requestsChan,
+			Requests:        requests,
 		}
-		_, err = cmd.proxyBackendMode(cfg)
+
+		be, err := proxy.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create proxy backend handler", err)
+				tui.Error("error creating proxy backend", err)
 			}
 			panic(err)
 		}
 
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http proxy backend: %v", err)
+			}
+		}()
+
 	case "web":
-		cfg := &proxy.WebBackendConfig{
+		cfg := &proxy.CaddyWebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
-			ShrToken:     resp.Payload.ShrToken,
-			RequestsChan: requestsChan,
+			ShrToken:     shr.Token,
+			Requests:     requests,
 		}
-		_, err = cmd.webBackendMode(cfg)
+
+		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create web backend handler", err)
+				tui.Error("unable to create web backend", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http web backend: %v", err)
+			}
+		}()
+
+	case "caddy":
+		cfg := &proxy.CaddyfileBackendConfig{
+			CaddyfilePath: target,
+			Shr:           shr,
+			Requests:      requests,
+		}
+
+		be, err := proxy.NewCaddyfileBackend(cfg)
+		if err != nil {
+			cmd.shutdown(root, shr)
+			if !panicInstead {
+				tui.Error("unable to create caddy backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
 	}
 
 	if cmd.headless {
-		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(resp.Payload.FrontendProxyEndpoints, "\n"))
+		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
 		for {
 			select {
-			case req := <-requestsChan:
+			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
 
 	} else {
-		mdl := newShareModel(resp.Payload.ShrToken, resp.Payload.FrontendProxyEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
@@ -193,7 +210,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			for {
 				select {
-				case req := <-requestsChan:
+				case req := <-requests:
 					prg.Send(req)
 				}
 			}
@@ -203,51 +220,15 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("An error occurred", err)
 		}
 
-		close(requestsChan)
-		cmd.destroy(env.Environment().ZitiIdentity, resp.Payload.ShrToken, zrok, auth)
+		close(requests)
+		cmd.shutdown(root, shr)
 	}
 }
 
-func (cmd *sharePublicCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http proxy backend")
+func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
+	logrus.Debugf("shutting down '%v'", shr.Token)
+	if err := sdk.DeleteShare(root, shr); err != nil {
+		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http proxy backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *sharePublicCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewWebBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http web backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http web backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *sharePublicCommand) destroy(id string, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", shrToken)
-	req := share.NewUnshareParams()
-	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   id,
-		ShrToken: shrToken,
-	}
-	if _, err := zrok.Share.Unshare(req, auth); err == nil {
-		logrus.Debugf("shutdown complete")
-	} else {
-		logrus.Errorf("error shutting down: %v", err)
-	}
+	logrus.Debugf("shutdown complete")
 }

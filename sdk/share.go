@@ -49,7 +49,10 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 		return nil, errors.Wrap(err, "unable to create share")
 	}
 
-	return &Share{Token: in.Payload.ShrToken}, nil
+	return &Share{
+		Token:             in.Payload.ShrToken,
+		FrontendEndpoints: in.Payload.FrontendProxyEndpoints,
+	}, nil
 }
 
 func newPrivateShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
