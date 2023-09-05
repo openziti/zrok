@@ -3,8 +3,8 @@ package controller
 import (
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/model"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/sdk"
 )
 
 type publicResourceAllocator struct{}
@@ -14,9 +14,9 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 }
 
 func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
-	var authUsers []*model.AuthUser
+	var authUsers []*sdk.AuthUser
 	for _, authUser := range params.Body.AuthUsers {
-		authUsers = append(authUsers, &model.AuthUser{authUser.Username, authUser.Password})
+		authUsers = append(authUsers, &sdk.AuthUser{authUser.Username, authUser.Password})
 	}
 	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, params.Body.OauthProvider, params.Body.OauthEmailDomains, edge)
 	if err != nil {

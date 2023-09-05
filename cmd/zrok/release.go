@@ -2,10 +2,10 @@ package main
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,19 +31,19 @@ func newReleaseCommand() *releaseCommand {
 
 func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", err)
+			tui.Error("unable to load environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -51,10 +51,10 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewUnshareParams()
 	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   zrd.Env.ZId,
+		EnvZID:   env.Environment().ZitiIdentity,
 		ShrToken: shrToken,
 		Reserved: true,
 	}

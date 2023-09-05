@@ -3,8 +3,8 @@ package udpTunnel
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/model"
-	"github.com/openziti/zrok/zrokdir"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net"
@@ -99,15 +99,19 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error resolving udp address '%v'", cfg.BindAddress)
 	}
-	zCfgPath, err := zrokdir.ZitiIdentityFile(cfg.IdentityName)
+	env, err := environment.LoadRoot()
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from zrokdir", cfg.IdentityName)
+		return nil, errors.Wrap(err, "error loading environment root")
+	}
+	zCfgPath, err := env.ZitiIdentityNamed(cfg.IdentityName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.IdentityName)
 	}
 	zCfg, err := ziti.NewConfigFromFile(zCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
 	}
-	zCfg.ConfigTypes = []string{model.ZrokProxyConfig}
+	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")

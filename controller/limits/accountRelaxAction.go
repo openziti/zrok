@@ -4,6 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -38,11 +39,11 @@ func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *B
 
 		for _, shr := range shrs {
 			switch shr.ShareMode {
-			case "public":
+			case string(sdk.PublicShareMode):
 				if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
 					return errors.Wrap(err, "error relaxing public share")
 				}
-			case "private":
+			case string(sdk.PrivateShareMode):
 				if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
 					return errors.Wrap(err, "error relaxing private share")
 				}

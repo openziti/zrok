@@ -1,3 +1,33 @@
+# v0.4.6
+
+FEATURE: New `--backend-mode caddy`, which pre-processes a `Caddyfile` allowing a `bind` statement to work like this: `bind {{ .ZrokBindAddress }}`. Allows development of complicated API gateways and multi-backend shares, while maintaining the simple, ephemeral sharing model provided by `zrok` (https://github.com/openziti/zrok/issues/391)
+
+CHANGE: `--backend-mode web` has been refactored to utilize Caddy as the integrated web server. This provides for a much nicer web-based file browsing experience, while maintaining the existing web server facilities (https://github.com/openziti/zrok/issues/392)
+
+CHANGE: Updated the golang version for release builds to `1.21.0` and the node version to `18.x`
+
+CHANGE: Added `FrontendEndponts` to `sdk.Share`, returning selected frontend URLs to callers of `sdk.CreateShare`
+
+CHANGE: Added a short alias `-b` for `--backend-mode` to improve CLI ergonomics (https://github.com/openziti/zrok/issues/397)
+
+# v0.4.5
+
+FEATURE: New health check endpoint (`/health`), which verifies that the underlying SQL store and metrics repository (InfluxDB, if configured) are operating correctly (https://github.com/openziti/zrok/issues/372)
+
+CHANGE: Updated to golang v1.21.0 and node v18.x
+
+FIX: `zrok admin bootstrap` and `zrok enable` both broken with latest OpenZiti releases (tested with `v0.30.0`); updated to latest OpenZiti golang SDK (https://github.com/openziti/zrok/issues/389)
+
+# v0.4.4
+
+FIX: `zrok status`, `zrok enable`, `zrok config`, etc. were all causing a panic when used on systems that had no previous `~/.zrok` directory (https://github.com/openziti/zrok/issues/383)
+
+# v0.4.3
+
+FEATURE: New `zrok overview` command, which returns all of the account details as a single JSON structure. See the OpenAPI spec at `specs/zrok.yml` for more details of the `/api/v1/overview` endpoint (https://github.com/openziti/zrok/issues/374)
+
+FEATURE: New `zrok` SDK (https://github.com/openziti/zrok/issues/34). `pastebin` example illustrates basic SDK usage (see `sdk/examples/pastebin/README.md` for details) ((https://github.com/openziti/zrok/issues/379)
+
 # v0.4.2
 
 Some days are just like this. `v0.4.2` is a re-do of `v0.4.1`. Trying to get Homebrew working and had a bad release. Hopefully this is the one.
@@ -6,7 +36,7 @@ Some days are just like this. `v0.4.2` is a re-do of `v0.4.1`. Trying to get Hom
 
 FEATURE: New `zrok console` command to open the currently configured web console in the local web browser (https://github.com/openziti/zrok/issues/170)
 
-CHANGES: Further tweaks to the release process to automatically get the latest release into Homebrew (https://github.com/openziti/zrok/issues/264)
+CHANGE: Further tweaks to the release process to automatically get the latest release into Homebrew (https://github.com/openziti/zrok/issues/264)
 
 # v0.4.0
 

@@ -56,15 +56,15 @@ When the user runs `zrok enable` from their shell, here's what happens:
 2. The `zrok` controller creates a new OpenZiti identity for the environment and enrolls it.
 3. The `zrok` controller creates an edge router policy associating the new OpenZiti identity with `#all` edge routers.
 4. The `zrok` controller returns the entire SDK configuration back to the `zrok enable` client.
-5. The `zrok enable` client then stores the OpenZiti identity along with a few other housekeeping details in the user's `~/.zrok` folder (we refer to this as `zrokdir`, conceptually in the code).
-6. With the OpenZiti identity and configuration details stored in the user's `zrokdir`, the user is then able to create any number of binding endpoints using the `zrok http` command.
+5. The `zrok enable` client then stores the OpenZiti identity along with a few other housekeeping details in the user's `~/.zrok` folder.
+6. With the OpenZiti identity and configuration details stored in the user's `environment`, the user is then able to create any number of binding endpoints using the `zrok http` command.
 
 
 ### The `zrok http` Flow
 
 When a `zrok` user issues a `zrok http` command for an endpoint, here's what happens:
 
-1. The `zrok http` client gathers the necessary identity details from the `zrokdir` (this was all staged during `zrok enable`).
+1. The `zrok http` client gathers the necessary identity details from the `environment` (this was all staged during `zrok enable`).
 2. The `zrok http` client reaches out to the `zrok` controller with an authenticated `tunnel` request, asking to have a new endpoint binding created.
 3. The `zrok` controller allocates a new "service name" for the binding.
 4. The `zrok` controller creates a `zrok.proxy.v1` configuration describing the user's requested authentication details (currently: `none` or `basic`).

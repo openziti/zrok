@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -34,9 +34,13 @@ func newStatusCommand() *statusCommand {
 func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
-		tui.Error("unable to load zrokdir", err)
+		tui.Error("error loading environment", err)
+	}
+
+	if !environment.IsLatest(env) {
+		tui.Warning(fmt.Sprintf("Your environment is out of date ('%v'), use '%v' to update (make a backup before updating!)\n", env.Metadata().V, tui.Code.Render("zrok update")))
 	}
 
 	_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Config")+":\n\n")
@@ -44,13 +48,12 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
 	t.AppendHeader(table.Row{"Config", "Value", "Source"})
-	apiEndpoint, from := zrd.ApiEndpoint()
+	apiEndpoint, from := env.ApiEndpoint()
 	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, from})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
-	if zrd.Env == nil {
-		tui.Warning("Unable to load your local environment!\n")
+	if !env.IsEnabled() {
 		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.Code.Render("zrok enable"))
 	} else {
 		_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Environment")+":\n\n")
@@ -60,17 +63,17 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		t.SetStyle(table.StyleColoredDark)
 		t.AppendHeader(table.Row{"Property", "Value"})
 		if cmd.secrets {
-			t.AppendRow(table.Row{"Secret Token", zrd.Env.Token})
-			t.AppendRow(table.Row{"Ziti Identity", zrd.Env.ZId})
+			t.AppendRow(table.Row{"Secret Token", env.Environment().Token})
+			t.AppendRow(table.Row{"Ziti Identity", env.Environment().ZitiIdentity})
 		} else {
 			secretToken := "<<SET>>"
-			if zrd.Env.Token == "" {
+			if env.Environment().Token == "" {
 				secretToken = "<<UNSET>>"
 			}
 			t.AppendRow(table.Row{"Secret Token", secretToken})
 
 			zId := "<<SET>>"
-			if zrd.Env.ZId == "" {
+			if env.Environment().ZitiIdentity == "" {
 				zId = "<<UNSET>>"
 			}
 			t.AppendRow(table.Row{"Ziti Identity", zId})

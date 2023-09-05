@@ -2,8 +2,7 @@
 
 ## zrok
 
-At this time, building `zrok` is pretty straightforward. You will require `node` v16+ to be installed in order to complete
-the build as well as `go`.
+At this time, building `zrok` is pretty straightforward. You will require `node` v16+ to be installed in order to complete the build as well as `go`. Because `zrok` uses CGO, you will also need to have a working C compiler toolchain. [TDM-GCC](https://jmeubank.github.io/tdm-gcc/download/) works great on Windows (just make sure it's in your PATH).
 
 To build, follow these steps:
 * clone the repository

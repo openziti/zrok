@@ -20,12 +20,7 @@ Let's take a look at how to get started with `zrok`.
 
 :::note `zrok` moves fast!
 
-`zrok` is currently in a closed-beta phase and requires an invitation token. If you would like to try `zrok` and provide
-feedback, please send an email to invite@zrok.io. `zrok` is an open source project and is in its early development
-phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details
-about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in
-[Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach
-out directly.
+`zrok` is an open source project and is in its early development phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in [Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach out directly.
 
 :::
 
@@ -107,13 +102,13 @@ The `zrok` executable defaults to using the `zrok` service instance at `api.zrok
 
 ```
 $ zrok config set apiEndpoint https://zrok.mydomain.com
-[WARNING]: unable to open zrokdir metadata; ignoring
+[WARNING]: unable to open environment metadata; ignoring
 
 zrok configuration updated
 ```
 
 :::note
-The `WARNING` about `zrokdir metadata` is ignorable. Running the `zrok config set` command writes a small piece of metadata into a `.zrok` folder inside your home directory. This allows `zrok` to identify the version of its settings, providing a mechanism to upgrade your installation as new versions are released. This `WARNING` is letting you know that your current environment has not been initialized by `zrok`.
+The `WARNING` about `environment metadata` is ignorable. Running the `zrok config set` command writes a small piece of metadata into a `.zrok` folder inside your home directory. This allows `zrok` to identify the version of its settings, providing a mechanism to upgrade your installation as new versions are released. This `WARNING` is letting you know that your current environment has not been initialized by `zrok`.
 :::
 
 You can use the `zrok status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as as an _environment_.

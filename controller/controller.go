@@ -130,10 +130,15 @@ func Run(inCfg *config.Config) error {
 	defer func() { _ = server.Shutdown() }()
 	server.Host = cfg.Endpoint.Host
 	server.Port = cfg.Endpoint.Port
+	rest_server_zrok.HealthCheck = HealthCheckHTTP
 	server.ConfigureAPI()
 	if err := server.Serve(); err != nil {
 		return errors.Wrap(err, "api server error")
 	}
 
 	return nil
+}
+
+func Store() *store.Store {
+	return str
 }

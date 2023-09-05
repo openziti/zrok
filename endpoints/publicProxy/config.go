@@ -36,7 +36,7 @@ type OauthProviderSecrets struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Identity: "frontend",
+		Identity: "public",
 		Address:  "0.0.0.0:8080",
 	}
 }

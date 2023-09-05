@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/rest_client_zrok/environment"
+	httpTransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/environment"
+	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,41 +31,41 @@ func newDisableCommand() *disableCommand {
 }
 
 func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to load zrokdir", err)
+			tui.Error("unable to load environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("no environment found; nothing to disable!", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("could not create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
-	req := environment.NewDisableParams()
+	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	req := restEnvironment.NewDisableParams()
 	req.Body = &rest_model_zrok.DisableRequest{
-		Identity: zrd.Env.ZId,
+		Identity: env.Environment().ZitiIdentity,
 	}
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
 		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
-	if err := zrokdir.DeleteEnvironment(); err != nil {
+	if err := env.DeleteEnvironment(); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok environment", err)
 		}
 		panic(err)
 	}
-	if err := zrokdir.DeleteZitiIdentity("backend"); err != nil {
+	if err := env.DeleteZitiIdentityNamed(env.EnvironmentIdentityName()); err != nil {
 		if !panicInstead {
 			tui.Error("error removing zrok backend identity", err)
 		}

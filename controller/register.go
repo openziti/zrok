@@ -75,7 +75,7 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		return account.NewRegisterInternalServerError()
 	}
 
-	logrus.Infof("created account '%v' with token '%v'", a.Email, a.Token)
+	logrus.Infof("created account '%v'", a.Email)
 
 	return account.NewRegisterOK().WithPayload(&rest_model_zrok.RegisterResponse{Token: a.Token})
 }

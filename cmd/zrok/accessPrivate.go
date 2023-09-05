@@ -8,11 +8,11 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
@@ -48,16 +48,16 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
-		tui.Error("unable to load zrokdir", err)
+		tui.Error("error loading environment", err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -65,11 +65,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
 		ShrToken: shrToken,
-		EnvZID:   zrd.Env.ZId,
+		EnvZID:   env.Environment().ZitiIdentity,
 	}
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
@@ -101,20 +101,20 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
+			IdentityName: env.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create private frontend", err)
+				tui.Error("unable to create private access", err)
 			}
 			panic(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
 				if !panicInstead {
-					tui.Error("error starting frontend", err)
+					tui.Error("error starting access", err)
 				}
 				panic(err)
 			}
@@ -123,7 +123,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "udpTunnel":
 		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: "backend",
+			IdentityName: env.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 			IdleTime:     time.Minute,
@@ -144,7 +144,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}()
 
 	default:
-		cfg := proxy.DefaultFrontendConfig("backend")
+		cfg := proxy.DefaultFrontendConfig(env.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress
 		cfg.RequestsChan = requests
@@ -168,7 +168,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -203,7 +203,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.destroy(accessResp.Payload.FrontendToken, zrd.Env.ZId, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
 	}
 }
 

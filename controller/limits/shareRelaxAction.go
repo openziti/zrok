@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -28,11 +29,11 @@ func (a *shareRelaxAction) HandleShare(shr *store.Share, _, _ int64, _ *Bandwidt
 		}
 
 		switch shr.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
 				return err
 			}
-		case "private":
+		case string(sdk.PrivateShareMode):
 			if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
 				return err
 			}

@@ -6,12 +6,14 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/tcpTunnel"
+	"github.com/openziti/zrok/endpoints/udpTunnel"
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -44,26 +46,26 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	shrToken := args[0]
 	var target string
 
-	zrd, err := zrokdir.Load()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error loading zrokdir", err)
+			tui.Error("error loading environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	zrok, err := root.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
@@ -77,8 +79,11 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	if target == "" {
 		target = resp.Payload.BackendProxyEndpoint
 	}
+	if sdk.BackendMode(resp.Payload.BackendMode) == sdk.CaddyBackendMode {
+		cmd.headless = true
+	}
 
-	zif, err := zrokdir.ZitiIdentityFile("backend")
+	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to load ziti identity configuration", err)
@@ -105,6 +110,19 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
+	var shareDescription string
+	switch resp.Payload.ShareMode {
+	case string(sdk.PublicShareMode):
+		shareDescription = resp.Payload.FrontendEndpoint
+	case string(sdk.PrivateShareMode):
+		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
+	}
+
+	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
+	if !cmd.headless {
+		proxy.SetCaddyLoggingWriter(mdl)
+	}
+
 	requestsChan := make(chan *endpoints.Request, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
@@ -113,9 +131,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			Insecure:        cmd.insecure,
-			RequestsChan:    requestsChan,
+			Requests:        requestsChan,
 		}
-		_, err := cmd.proxyBackendMode(cfg)
+
+		be, err := proxy.NewBackend(cfg)
 		if err != nil {
 			if !panicInstead {
 				tui.Error("unable to create proxy backend handler", err)
@@ -123,20 +142,98 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http proxy backend: %v", err)
+			}
+		}()
+
 	case "web":
-		cfg := &proxy.WebBackendConfig{
+		cfg := &proxy.CaddyWebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     shrToken,
-			RequestsChan: requestsChan,
+			Requests:     requestsChan,
 		}
-		_, err := cmd.webBackendMode(cfg)
+
+		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
 			if !panicInstead {
-				tui.Error("unable to create web backend handler", err)
+				tui.Error("error creating web backend", err)
 			}
 			panic(err)
 		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running http web backend: %v", err)
+			}
+		}()
+
+	case "tcpTunnel":
+		cfg := &tcpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        shrToken,
+			RequestsChan:    requestsChan,
+		}
+
+		be, err := tcpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating tcpTunnel backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running tcpTunnel backend: %v", err)
+			}
+		}()
+
+	case "udpTunnel":
+		cfg := &udpTunnel.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        shrToken,
+			RequestsChan:    requestsChan,
+		}
+
+		be, err := udpTunnel.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating udpTunnel backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running udpTunnel backend: %v", err)
+			}
+		}()
+
+	case "caddy":
+		cfg := &proxy.CaddyfileBackendConfig{
+			CaddyfilePath: target,
+			Shr:           &sdk.Share{Token: shrToken, FrontendEndpoints: []string{resp.Payload.FrontendEndpoint}},
+			Requests:      requestsChan,
+		}
+
+		be, err := proxy.NewCaddyfileBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating caddy backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
 
 	default:
 		tui.Error("invalid backend mode", nil)
@@ -144,10 +241,10 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 	if cmd.headless {
 		switch resp.Payload.ShareMode {
-		case "public":
+		case string(sdk.PublicShareMode):
 			logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
 
-		case "private":
+		case string(sdk.PrivateShareMode):
 			logrus.Infof("use this command to access your zrok share: 'zrok access private %v'", shrToken)
 		}
 		for {
@@ -157,15 +254,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 	} else {
-		var shareDescription string
-		switch resp.Payload.ShareMode {
-		case "public":
-			shareDescription = resp.Payload.FrontendEndpoint
-		case "private":
-			shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
-		}
-
-		mdl := newShareModel(shrToken, []string{shareDescription}, resp.Payload.ShareMode, resp.Payload.BackendMode)
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
@@ -185,34 +273,4 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 		close(requestsChan)
 	}
-}
-
-func (cmd *shareReservedCommand) proxyBackendMode(cfg *proxy.BackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http proxy backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http proxy backend: %v", err)
-		}
-	}()
-
-	return be, nil
-}
-
-func (cmd *shareReservedCommand) webBackendMode(cfg *proxy.WebBackendConfig) (endpoints.RequestHandler, error) {
-	be, err := proxy.NewWebBackend(cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating http web backend")
-	}
-
-	go func() {
-		if err := be.Run(); err != nil {
-			logrus.Errorf("error running http web backend: %v", err)
-		}
-	}()
-
-	return be, nil
 }

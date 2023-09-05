@@ -1,16 +1,12 @@
 package main
 
 import (
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/model"
-	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
+	"fmt"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/zrokdir"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func init() {
@@ -33,14 +29,14 @@ func newReserveCommand() *reserveCommand {
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVar(&command.backendMode, "backend-mode", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy}")
 	cmd.Run = command.run
 	return command
 }
 
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
-	shareMode := args[0]
-	if shareMode != "public" && shareMode != "private" {
+	shareMode := sdk.ShareMode(args[0])
+	if shareMode != sdk.PublicShareMode && shareMode != sdk.PrivateShareMode {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	}
 
@@ -58,63 +54,51 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 
 	case "web":
 		target = args[1]
+
+	case "tcpTunnel":
+		target = args[1]
+
+	case "udpTunnel":
+		target = args[1]
+
+	case "caddy":
+		target = args[1]
+
+	default:
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy}", cmd.backendMode), nil)
 	}
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error loading zrokdir", err)
+			tui.Error("error loading environment", err)
 		}
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := zrd.Client()
+	req := &sdk.ShareRequest{
+		BackendMode: sdk.BackendMode(cmd.backendMode),
+		ShareMode:   shareMode,
+		Auth:        cmd.basicAuth,
+		Target:      target,
+	}
+	if shareMode == sdk.PublicShareMode {
+		req.Frontends = cmd.frontendSelection
+	}
+	shr, err := sdk.CreateShare(env, req)
 	if err != nil {
 		if !panicInstead {
-			tui.Error("unable to create zrok client", err)
-		}
-		panic(err)
-	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", zrd.Env.Token)
-	req := share.NewShareParams()
-	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               zrd.Env.ZId,
-		ShareMode:            shareMode,
-		BackendMode:          cmd.backendMode,
-		BackendProxyEndpoint: target,
-		AuthScheme:           string(model.None),
-		Reserved:             true,
-	}
-	if shareMode == "public" {
-		req.Body.FrontendSelection = cmd.frontendSelection
-	}
-	if len(cmd.basicAuth) > 0 {
-		logrus.Infof("configuring basic auth")
-		req.Body.AuthScheme = string(model.Basic)
-		for _, pair := range cmd.basicAuth {
-			tokens := strings.Split(pair, ":")
-			if len(tokens) == 2 {
-				req.Body.AuthUsers = append(req.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
-			} else {
-				panic(errors.Errorf("invalid username:password pair '%v'", pair))
-			}
-		}
-	}
-
-	resp, err := zrok.Share.Share(req, auth)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create tunnel", err)
+			tui.Error("unable to create share", err)
 		}
 		panic(err)
 	}
 
-	logrus.Infof("your reserved share token is '%v'", resp.Payload.ShrToken)
-	for _, fpe := range resp.Payload.FrontendProxyEndpoints {
+	logrus.Infof("your reserved share token is '%v'", shr.Token)
+	for _, fpe := range shr.FrontendEndpoints {
 		logrus.Infof("reserved frontend endpoint: %v", fpe)
 	}
 }

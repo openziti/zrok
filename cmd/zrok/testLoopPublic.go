@@ -8,13 +8,14 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/model"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/zrokdir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
@@ -105,7 +106,7 @@ func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
 type looper struct {
 	id            int
 	cmd           *testLoopPublicCommand
-	env           *zrokdir.Environment
+	env           *env_core.Environment
 	done          chan struct{}
 	listener      edge.Listener
 	zif           string
@@ -175,33 +176,33 @@ func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (l *looper) startup() {
 	logrus.Infof("starting #%d", l.id)
 
-	zrd, err := zrokdir.Load()
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 
-	if zrd.Env == nil {
+	if !env.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
-	l.env = zrd.Env
+	l.env = env.Environment()
 
-	l.zif, err = zrokdir.ZitiIdentityFile("backend")
+	l.zif, err = env.ZitiIdentityNamed(env.EnvironmentIdentityName())
 	if err != nil {
 		panic(err)
 	}
-	l.zrok, err = zrd.Client()
+	l.zrok, err = env.Client()
 	if err != nil {
 		panic(err)
 	}
 	l.auth = httptransport.APIKeyAuth("x-token", "header", l.env.Token)
 	tunnelReq := share.NewShareParams()
 	tunnelReq.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               l.env.ZId,
-		ShareMode:            "public",
+		EnvZID:               l.env.ZitiIdentity,
+		ShareMode:            string(sdk.PublicShareMode),
 		FrontendSelection:    l.cmd.frontendSelection,
-		BackendMode:          "proxy",
+		BackendMode:          string(sdk.ProxyBackendMode),
 		BackendProxyEndpoint: fmt.Sprintf("looper#%d", l.id),
-		AuthScheme:           string(model.None),
+		AuthScheme:           string(sdk.None),
 	}
 	tunnelReq.SetTimeout(60 * time.Second)
 	tunnelResp, err := l.zrok.Share.Share(tunnelReq, l.auth)
@@ -272,7 +273,7 @@ func (l *looper) shutdown() {
 
 	untunnelReq := share.NewUnshareParams()
 	untunnelReq.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   l.env.ZId,
+		EnvZID:   l.env.ZitiIdentity,
 		ShrToken: l.shrToken,
 	}
 	if _, err := l.zrok.Share.Unshare(untunnelReq, l.auth); err != nil {
