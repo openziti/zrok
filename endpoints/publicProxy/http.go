@@ -3,32 +3,24 @@ package publicProxy
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
-	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
-	"github.com/openziti/zrok/util"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
 )
 
 type httpFrontend struct {
@@ -202,29 +194,6 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 						case string(sdk.Oauth):
 							if oauthCfg, found := cfg["oauth"]; found {
 								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
-									cookie, err := r.Cookie("zrok-access")
-									if err != nil {
-										logrus.Errorf("Unable to get access cookie: %v", err)
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken), http.StatusFound)
-										return
-									}
-									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-										if pcfg.Oauth == nil {
-											return nil, fmt.Errorf("Missing oauth configuration for access point. Unable to parse jwt")
-										}
-										return pcfg.Oauth.HashKeyRaw, nil
-									})
-									if err != nil {
-										logrus.Errorf("Unable to parse JWT: %v", err)
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken), http.StatusFound)
-										return
-									}
-									claims := tkn.Claims.(*ZrokClaims)
-									if claims.Provider != provider {
-										logrus.Error("Provider mismatch. Redoing auth flow")
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken), http.StatusFound)
-										return
-									}
 									var authCheckInterval time.Duration
 									if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
 										logrus.Errorf("Missing authorization check interval in share config. Defaulting to 3 hours")
@@ -238,9 +207,33 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 											authCheckInterval = i
 										}
 									}
+
+									cookie, err := r.Cookie("zrok-access")
+									if err != nil {
+										logrus.Errorf("Unable to get access cookie: %v", err)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										return
+									}
+									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+										if pcfg.Oauth == nil {
+											return nil, fmt.Errorf("missing oauth configuration for access point. Unable to parse jwt")
+										}
+										return []byte(pcfg.Oauth.HashKeyRaw), nil
+									})
+									if err != nil {
+										logrus.Errorf("Unable to parse JWT: %v", err)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										return
+									}
+									claims := tkn.Claims.(*ZrokClaims)
+									if claims.Provider != provider {
+										logrus.Error("Provider mismatch. Redoing auth flow")
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										return
+									}
 									if claims.AuthorizationCheckInterval != authCheckInterval {
 										logrus.Error("Authorization check interval mismatch. Redoing auth flow")
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken), http.StatusFound)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:28080/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
 										return
 									}
 									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
@@ -337,7 +330,7 @@ func SetZrokCookie(w http.ResponseWriter, email, accessToken, provider string, c
 	http.SetCookie(w, &http.Cookie{
 		Name:    "zrok-access",
 		Value:   sTkn,
-		MaxAge:  3000,
+		MaxAge:  int(checkInterval.Seconds()),
 		Domain:  "localzrok.io",
 		Path:    "/",
 		Expires: time.Now().Add(checkInterval),

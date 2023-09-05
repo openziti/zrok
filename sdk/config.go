@@ -20,8 +20,9 @@ type AuthUser struct {
 }
 
 type OauthAuth struct {
-	Provider     string   `json:"provider"`
-	EmailDomains []string `json:"email_domains"`
+	Provider                   string   `json:"provider"`
+	EmailDomains               []string `json:"email_domains"`
+	AuthorizationCheckInterval string   `json:"authorization_check_interval"`
 }
 
 func ParseAuthScheme(authScheme string) (AuthScheme, error) {

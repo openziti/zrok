@@ -38,6 +38,10 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 		}
 	}
 
+	if request.OauthProvider != "" {
+		out.Body.AuthScheme = string(Oauth)
+	}
+
 	zrok, err := root.Client()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting zrok client")
@@ -70,12 +74,15 @@ func newPrivateShare(root env_core.Root, request *ShareRequest) *share.SharePara
 func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:               root.Environment().ZitiIdentity,
-		ShareMode:            string(request.ShareMode),
-		FrontendSelection:    request.Frontends,
-		BackendMode:          string(request.BackendMode),
-		BackendProxyEndpoint: request.Target,
-		AuthScheme:           string(None),
+		EnvZID:                          root.Environment().ZitiIdentity,
+		ShareMode:                       string(request.ShareMode),
+		FrontendSelection:               request.Frontends,
+		BackendMode:                     string(request.BackendMode),
+		BackendProxyEndpoint:            request.Target,
+		AuthScheme:                      string(None),
+		OauthEmailDomains:               request.OauthEmailDomains,
+		OauthProvider:                   request.OauthProvider,
+		OauthAuthorizationCheckInterval: request.OauthAuthorizationCheckInterval.String(),
 	}
 	return req
 }

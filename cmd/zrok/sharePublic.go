@@ -111,7 +111,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if cmd.oauthProvider != "" {
-		req.Auth = []string{}
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailDomains = cmd.oauthEmailDomains
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval

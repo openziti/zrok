@@ -11,7 +11,13 @@ import (
 	"time"
 )
 
-func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*sdk.AuthUser, oauthProvider string, oauthEmailDomains []string, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
+type OauthOptions struct {
+	Provider                   string
+	EmailDomains               []string
+	AuthorizationCheckInterval string
+}
+
+func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*sdk.AuthUser, oauthOptions *OauthOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	authScheme, err := sdk.ParseAuthScheme(authSchemeStr)
 	if err != nil {
 		return "", err
@@ -25,10 +31,11 @@ func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, aut
 			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUser{Username: authUser.Username, Password: authUser.Password})
 		}
 	}
-	if cfg.AuthScheme == model.Oauth {
-		cfg.OauthAuth = &model.OauthAuth{
-			Provider:     oauthProvider,
-			EmailDomains: oauthEmailDomains,
+	if cfg.AuthScheme == sdk.Oauth && oauthOptions != nil {
+		cfg.OauthAuth = &sdk.OauthAuth{
+			Provider:                   oauthOptions.Provider,
+			EmailDomains:               oauthOptions.EmailDomains,
+			AuthorizationCheckInterval: oauthOptions.AuthorizationCheckInterval,
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{

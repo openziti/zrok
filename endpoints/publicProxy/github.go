@@ -57,8 +57,9 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 	}
 
 	type IntermediateJWT struct {
-		State string `json:"state"`
-		Share string `json:"share"`
+		State                      string `json:"state"`
+		Share                      string `json:"share"`
+		AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
 		jwt.RegisteredClaims
 	}
 
@@ -76,6 +77,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 					id,
 					r.URL.Query().Get("share"),
+					r.URL.Query().Get("checkInterval"),
 					jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -134,8 +136,6 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 			}
 		}
 
-		SetZrokCookie(w, primaryEmail, tokens.AccessToken, "github", 3*time.Hour, key)
-
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
 			return key, nil
 		})
@@ -143,6 +143,16 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 			http.Error(w, fmt.Sprintf("After intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
 			return
 		}
+
+		authCheckInterval := 3 * time.Hour
+		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).AuthorizationCheckInterval)
+		if err != nil {
+			logrus.Errorf("unable to parse authorization check interval: %v. Defaulting to 3 hours", err)
+		} else {
+			authCheckInterval = i
+		}
+
+		SetZrokCookie(w, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s.%s:8080", scheme, token.Claims.(*IntermediateJWT).Share, cfg.RedirectUrl), http.StatusFound)
 	}
 
