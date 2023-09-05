@@ -40,11 +40,14 @@ type ShareRequest struct {
 	// frontend selection
 	FrontendSelection []string `json:"frontendSelection"`
 
+	// oauth authorization check interval
+	OauthAuthorizationCheckInterval string `json:"oauthAuthorizationCheckInterval,omitempty"`
+
 	// oauth email domains
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
 
 	// oauth provider
-	// Enum: [amazon]
+	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
 	// reserved
@@ -159,7 +162,7 @@ var shareRequestTypeOauthProviderPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["amazon"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["github","google"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -169,8 +172,11 @@ func init() {
 
 const (
 
-	// ShareRequestOauthProviderAmazon captures enum value "amazon"
-	ShareRequestOauthProviderAmazon string = "amazon"
+	// ShareRequestOauthProviderGithub captures enum value "github"
+	ShareRequestOauthProviderGithub string = "github"
+
+	// ShareRequestOauthProviderGoogle captures enum value "google"
+	ShareRequestOauthProviderGoogle string = "google"
 )
 
 // prop value enum

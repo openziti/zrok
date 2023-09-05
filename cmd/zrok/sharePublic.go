@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
@@ -28,14 +29,15 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth         []string
-	frontendSelection []string
-	backendMode       string
-	headless          bool
-	insecure          bool
-	oauthProvider     string
-	oauthEmailDomains []string
-	cmd               *cobra.Command
+	basicAuth          []string
+	frontendSelection  []string
+	backendMode        string
+	headless           bool
+	insecure           bool
+	oauthProvider      string
+	oauthEmailDomains  []string
+	oauthCheckInterval time.Duration
+	cmd                *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -53,6 +55,8 @@ func newSharePublicCommand() *sharePublicCommand {
 
 	cmd.Flags().StringVar(&command.oauthProvider, "provider", "", "Provider to authenticate against with oauth")
 	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-domains", []string{}, "Valid email domains for oauth authentication")
+	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Max lifetime for oauth validation. Will force a recheck once time elapses for session")
+
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "provider")
 	cmd.Run = command.run
 	return command
@@ -132,9 +136,8 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	if cmd.oauthProvider != "" {
 		req.Body.AuthScheme = string(model.Oauth)
 		req.Body.OauthProvider = cmd.oauthProvider
-	}
-	if len(cmd.oauthEmailDomains) > 0 {
 		req.Body.OauthEmailDomains = cmd.oauthEmailDomains
+		req.Body.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval.String()
 	}
 	resp, err := zrok.Share.Share(req, auth)
 	if err != nil {

@@ -36,6 +36,53 @@ func (o *OauthAuthenticateOK) WriteResponse(rw http.ResponseWriter, producer run
 	rw.WriteHeader(200)
 }
 
+// OauthAuthenticateFoundCode is the HTTP code returned for type OauthAuthenticateFound
+const OauthAuthenticateFoundCode int = 302
+
+/*
+OauthAuthenticateFound redirect back to share
+
+swagger:response oauthAuthenticateFound
+*/
+type OauthAuthenticateFound struct {
+	/*Redirect URL
+
+	 */
+	Location string `json:"location"`
+}
+
+// NewOauthAuthenticateFound creates OauthAuthenticateFound with default headers values
+func NewOauthAuthenticateFound() *OauthAuthenticateFound {
+
+	return &OauthAuthenticateFound{}
+}
+
+// WithLocation adds the location to the oauth authenticate found response
+func (o *OauthAuthenticateFound) WithLocation(location string) *OauthAuthenticateFound {
+	o.Location = location
+	return o
+}
+
+// SetLocation sets the location to the oauth authenticate found response
+func (o *OauthAuthenticateFound) SetLocation(location string) {
+	o.Location = location
+}
+
+// WriteResponse to the client
+func (o *OauthAuthenticateFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	// response header location
+
+	location := o.Location
+	if location != "" {
+		rw.Header().Set("location", location)
+	}
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(302)
+}
+
 // OauthAuthenticateInternalServerErrorCode is the HTTP code returned for type OauthAuthenticateInternalServerError
 const OauthAuthenticateInternalServerErrorCode int = 500
 

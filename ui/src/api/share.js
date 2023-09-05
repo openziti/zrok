@@ -18,14 +18,16 @@ export function access(options) {
 }
 
 /**
- * @param {string} state 
  * @param {string} code 
+ * @param {object} options Optional options
+ * @param {string} [options.state] 
  * @return {Promise<object>} testing
  */
-export function oauthAuthenticate(state, code) {
+export function oauthAuthenticate(code, options) {
+  if (!options) options = {}
   const parameters = {
     query: {
-      state,
+      state: options.state,
       code
     }
   }

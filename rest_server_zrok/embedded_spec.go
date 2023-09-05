@@ -712,8 +712,7 @@ func init() {
           {
             "type": "string",
             "name": "state",
-            "in": "query",
-            "required": true
+            "in": "query"
           },
           {
             "type": "string",
@@ -725,6 +724,15 @@ func init() {
         "responses": {
           "200": {
             "description": "testing"
+          },
+          "302": {
+            "description": "redirect back to share",
+            "headers": {
+              "location": {
+                "type": "string",
+                "description": "Redirect URL"
+              }
+            }
           },
           "500": {
             "description": "internal server error"
@@ -1516,6 +1524,9 @@ func init() {
             "type": "string"
           }
         },
+        "oauthAuthorizationCheckInterval": {
+          "type": "string"
+        },
         "oauthEmailDomains": {
           "type": "array",
           "items": {
@@ -1525,7 +1536,8 @@ func init() {
         "oauthProvider": {
           "type": "string",
           "enum": [
-            "amazon"
+            "github",
+            "google"
           ]
         },
         "reserved": {
@@ -2353,8 +2365,7 @@ func init() {
           {
             "type": "string",
             "name": "state",
-            "in": "query",
-            "required": true
+            "in": "query"
           },
           {
             "type": "string",
@@ -2366,6 +2377,15 @@ func init() {
         "responses": {
           "200": {
             "description": "testing"
+          },
+          "302": {
+            "description": "redirect back to share",
+            "headers": {
+              "location": {
+                "type": "string",
+                "description": "Redirect URL"
+              }
+            }
           },
           "500": {
             "description": "internal server error"
@@ -3157,6 +3177,9 @@ func init() {
             "type": "string"
           }
         },
+        "oauthAuthorizationCheckInterval": {
+          "type": "string"
+        },
         "oauthEmailDomains": {
           "type": "array",
           "items": {
@@ -3166,7 +3189,8 @@ func init() {
         "oauthProvider": {
           "type": "string",
           "enum": [
-            "amazon"
+            "github",
+            "google"
           ]
         },
         "reserved": {

@@ -65,7 +65,7 @@ type OauthAuthenticateParams struct {
 	Code string
 
 	// State.
-	State string
+	State *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -132,13 +132,13 @@ func (o *OauthAuthenticateParams) SetCode(code string) {
 }
 
 // WithState adds the state to the oauth authenticate params
-func (o *OauthAuthenticateParams) WithState(state string) *OauthAuthenticateParams {
+func (o *OauthAuthenticateParams) WithState(state *string) *OauthAuthenticateParams {
 	o.SetState(state)
 	return o
 }
 
 // SetState adds the state to the oauth authenticate params
-func (o *OauthAuthenticateParams) SetState(state string) {
+func (o *OauthAuthenticateParams) SetState(state *string) {
 	o.State = state
 }
 
@@ -160,13 +160,20 @@ func (o *OauthAuthenticateParams) WriteToRequest(r runtime.ClientRequest, reg st
 		}
 	}
 
-	// query param state
-	qrState := o.State
-	qState := qrState
-	if qState != "" {
+	if o.State != nil {
 
-		if err := r.SetQueryParam("state", qState); err != nil {
-			return err
+		// query param state
+		var qrState string
+
+		if o.State != nil {
+			qrState = *o.State
+		}
+		qState := qrState
+		if qState != "" {
+
+			if err := r.SetQueryParam("state", qState); err != nil {
+				return err
+			}
 		}
 	}
 

@@ -70,7 +70,6 @@ func Run(inCfg *config.Config) error {
 	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.ShareAccessHandler = newAccessHandler()
-	api.ShareOauthAuthenticateHandler = newOauthHandler()
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()

@@ -14,7 +14,7 @@ import (
 // OauthAuthenticateURL generates an URL for the oauth authenticate operation
 type OauthAuthenticateURL struct {
 	Code  string
-	State string
+	State *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -55,7 +55,10 @@ func (o *OauthAuthenticateURL) Build() (*url.URL, error) {
 		qs.Set("code", codeQ)
 	}
 
-	stateQ := o.State
+	var stateQ string
+	if o.State != nil {
+		stateQ = *o.State
+	}
 	if stateQ != "" {
 		qs.Set("state", stateQ)
 	}

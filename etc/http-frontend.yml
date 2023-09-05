@@ -3,3 +3,19 @@
 # purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
 #
 host_match: zrok.io
+
+#tls:
+#  cert_path: "/Path/To/Cert/zrok.crt"
+#  key_path:  "/Path/To/Cert/zrok.key"
+
+#oauth:
+#  port: 28080
+#  redirect_url: zrok.io
+#  hash_key_raw: "test1234test1234"
+#  providers:
+#    - name: google
+#      client_id: <client-id>
+#      client_secret: <client-secret>
+#    - name: github
+#      client_id: <client-id>
+#      client_secret: <client-secret>

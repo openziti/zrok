@@ -38,10 +38,9 @@ type OauthAuthenticateParams struct {
 	*/
 	Code string
 	/*
-	  Required: true
 	  In: query
 	*/
-	State string
+	State *string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -93,21 +92,18 @@ func (o *OauthAuthenticateParams) bindCode(rawData []string, hasKey bool, format
 
 // bindState binds and validates parameter State from query.
 func (o *OauthAuthenticateParams) bindState(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("state", "query", rawData)
-	}
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
 
-	// Required: true
+	// Required: false
 	// AllowEmptyValue: false
 
-	if err := validate.RequiredString("state", "query", raw); err != nil {
-		return err
+	if raw == "" { // empty values pass all other validations
+		return nil
 	}
-	o.State = raw
+	o.State = &raw
 
 	return nil
 }

@@ -556,27 +556,6 @@ paths:
         500:
           description: internal server error
 
-  /oauth/authorize:
-    get:
-      tags:
-        - share
-      operationId: oauthAuthenticate
-      parameters:
-        - name: state
-          in: query
-          type: string
-          required: true
-        - name: code
-          in: query
-          type: string
-          required: true
-      responses:
-        200:
-          description: testing
-        500:
-          description: internal server error
-
-
   /share:
     post:
       tags:
@@ -1003,11 +982,14 @@ definitions:
           $ref: "#/definitions/authUser"
       oauthProvider:
         type: string
-        enum: [amazon,google]
+        enum: [github,google]
       oauthEmailDomains:
         type: array
         items:
           type: string
+      oauthAuthorizationCheckInterval:
+        type: string
+
       reserved:
         type: boolean
 

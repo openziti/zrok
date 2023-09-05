@@ -26,6 +26,12 @@ func (o *OauthAuthenticateReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return result, nil
+	case 302:
+		result := NewOauthAuthenticateFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewOauthAuthenticateInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -84,6 +90,68 @@ func (o *OauthAuthenticateOK) String() string {
 }
 
 func (o *OauthAuthenticateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewOauthAuthenticateFound creates a OauthAuthenticateFound with default headers values
+func NewOauthAuthenticateFound() *OauthAuthenticateFound {
+	return &OauthAuthenticateFound{}
+}
+
+/*
+OauthAuthenticateFound describes a response with status code 302, with default header values.
+
+redirect back to share
+*/
+type OauthAuthenticateFound struct {
+
+	/* Redirect URL
+	 */
+	Location string
+}
+
+// IsSuccess returns true when this oauth authenticate found response has a 2xx status code
+func (o *OauthAuthenticateFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this oauth authenticate found response has a 3xx status code
+func (o *OauthAuthenticateFound) IsRedirect() bool {
+	return true
+}
+
+// IsClientError returns true when this oauth authenticate found response has a 4xx status code
+func (o *OauthAuthenticateFound) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this oauth authenticate found response has a 5xx status code
+func (o *OauthAuthenticateFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this oauth authenticate found response a status code equal to that given
+func (o *OauthAuthenticateFound) IsCode(code int) bool {
+	return code == 302
+}
+
+func (o *OauthAuthenticateFound) Error() string {
+	return fmt.Sprintf("[GET /oauth/authorize][%d] oauthAuthenticateFound ", 302)
+}
+
+func (o *OauthAuthenticateFound) String() string {
+	return fmt.Sprintf("[GET /oauth/authorize][%d] oauthAuthenticateFound ", 302)
+}
+
+func (o *OauthAuthenticateFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header location
+	hdrLocation := response.GetHeader("location")
+
+	if hdrLocation != "" {
+		o.Location = hdrLocation
+	}
 
 	return nil
 }
