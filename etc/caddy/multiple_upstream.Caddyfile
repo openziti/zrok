@@ -1,6 +1,10 @@
 http:// {
 	bind {{ .ZrokBindAddress }}
-	reverse_proxy /zrok/* https://zrok.io
+	handle_path /zrok/* {
+	    reverse_proxy https://zrok.io {
+	        header_up Host zrok.io
+	    }
+	}
 	reverse_proxy /* 127.0.0.1:3000 {
 		header_up Host localhost:3000
 	}
