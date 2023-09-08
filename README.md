@@ -6,7 +6,7 @@
 
 Like other offerings in this space, `zrok` allows users to share tunnels for HTTP, TCP and UDP network resources. `zrok` additionally allows users to easily and rapidly share files, web content, and custom resources in a peer-to-peer manner.
 
-`zrok` is an extensible platform for sharing. Initially we're targeting technical users. Super-simple sharing for end users is planned an in the backlog.
+`zrok` is an extensible platform for sharing. Initially we're targeting technical users. Super-simple sharing for end users is planned and in the backlog.
 
 ![zrok Web Console](docs/images/zrok_web_console.png)
 
