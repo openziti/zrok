@@ -16,6 +16,28 @@ Currently we support the following Oauth providers:
 - google
 - github
 
+In your oauth provider of choice's setup you would be prompted to create a client for accessing their services. This is where you will find the client_id and client_secret.
+
+The port you choose is entirely up to the deployment. Just make sure it is open to receive callbacks from your configured oauth providers.
+
+redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access point against. 
+
+We then secure the response data within a zrok-access cookie. This is secured with the hash_key_raw. This can be any raw string.
+
+An example config would look something like:
+```yaml
+oauth:
+  port: 28080
+  redirect_url: zrok.io
+  hash_key_raw: "test1234test1234"
+  providers:
+    - name: google
+      client_id: ohfwerouyr972t3riugdf89032r8y230ry.apps.googleusercontent.com
+      client_secret: SDAFOHWER-qafsfgghrWERFfeqo13g 
+```
+
+Note that the client id and secret are jumbled text and do not correlate to actual secrets.
+
 We spin up a zitadel oidc server on the specified port that handled all of the oauth handshaking. With the response we create a cookie with the name `zrok-access`.
 
 ## Enabling Oath on Share
