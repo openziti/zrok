@@ -2,12 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
-	"time"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -17,6 +11,11 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+	"time"
 )
 
 func init() {
