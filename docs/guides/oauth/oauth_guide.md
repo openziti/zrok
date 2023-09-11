@@ -24,6 +24,12 @@ redirect_url is what we will tell the oauth providers to callback with the autho
 
 We then secure the response data within a zrok-access cookie. This is secured with the hash_key_raw. This can be any raw string.
 
+### Required Scopes:
+- google
+- - Need access to a user's email: ./auth/userinfo.email 
+
+### Example
+
 An example config would look something like:
 ```yaml
 oauth:
