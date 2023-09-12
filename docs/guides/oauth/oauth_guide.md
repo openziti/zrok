@@ -16,11 +16,11 @@ Currently we support the following Oauth providers:
 - google
 - github
 
-In your oauth provider of choice's setup you would be prompted to create a client for accessing their services. This is where you will find the client_id and client_secret.
+In your oauth provider of choice's setup you would be prompted to create a client for accessing their services. It will ask for a redirect url. The format is: `<scheme>://<redirect_url>:<port>/<provider>/oauth` and as an example: `http://zrok.io:28080/google/oauth` This is also where you will find the client_id and client_secret.
 
 The port you choose is entirely up to the deployment. Just make sure it is open to receive callbacks from your configured oauth providers.
 
-redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access server against. This will get combined with the above port.
+redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access server against without the scheme or port. This will get combined with the above port.
 
 We then secure the response data within a zrok-access cookie. This is secured with the hash_key_raw. This can be any raw string.
 
