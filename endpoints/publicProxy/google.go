@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -44,7 +45,15 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 
 	key := []byte(cfg.HashKeyRaw)
 
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.RedirectUrl))
+	u, err := url.Parse(redirectUrl)
+	if err != nil {
+		logrus.Errorf("unable to parse redirect url: %v", err)
+		return err
+	}
+	parts := strings.Split(u.Hostname(), ".")
+	domain := parts[len(parts)-2] + "." + parts[len(parts)-1]
+
+	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(domain))
 
 	options := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
