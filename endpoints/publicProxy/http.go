@@ -302,7 +302,7 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 	if err := configureGithubOauth(cfg.Oauth, tls); err != nil {
 		return err
 	}
-	zhttp.StartServer(ctx, "0.0.0.0:28080")
+	zhttp.StartServer(ctx, fmt.Sprintf("%s:%d", strings.Split(cfg.Address, ":")[0], cfg.Oauth.Port))
 	return nil
 }
 

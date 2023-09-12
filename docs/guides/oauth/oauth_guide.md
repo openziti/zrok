@@ -20,7 +20,7 @@ In your oauth provider of choice's setup you would be prompted to create a clien
 
 The port you choose is entirely up to the deployment. Just make sure it is open to receive callbacks from your configured oauth providers.
 
-redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access point against. 
+redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access server against. This will get combined with the above port.
 
 We then secure the response data within a zrok-access cookie. This is secured with the hash_key_raw. This can be any raw string.
 
