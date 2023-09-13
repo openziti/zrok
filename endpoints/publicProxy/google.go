@@ -122,6 +122,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		logrus.Infof("Response from google userinfo endpoint: %s", string(response))
 		rDat := googleOauthEmailResp{}
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
