@@ -208,10 +208,12 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 										}
 									}
 
+									target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
+
 									cookie, err := r.Cookie("zrok-access")
 									if err != nil {
 										logrus.Errorf("Unable to get access cookie: %v", err)
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 										return
 									}
 									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
@@ -222,18 +224,18 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 									})
 									if err != nil {
 										logrus.Errorf("Unable to parse JWT: %v", err)
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 										return
 									}
 									claims := tkn.Claims.(*ZrokClaims)
 									if claims.Provider != provider {
 										logrus.Error("Provider mismatch. Redoing auth flow")
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 										return
 									}
 									if claims.AuthorizationCheckInterval != authCheckInterval {
 										logrus.Error("Authorization check interval mismatch. Redoing auth flow")
-										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?share=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), shrToken, authCheckInterval.String()), http.StatusFound)
+										http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider.(string), url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 										return
 									}
 									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {

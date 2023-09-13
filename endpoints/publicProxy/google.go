@@ -68,7 +68,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 
 	type IntermediateJWT struct {
 		State                      string `json:"state"`
-		Share                      string `json:"share"`
+		Host                       string `json:"host"`
 		AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
 		jwt.RegisteredClaims
 	}
@@ -79,11 +79,15 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 
 	authHandlerWithQueryState := func(party rp.RelyingParty) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			host, err := url.QueryUnescape(r.URL.Query().Get("targethost"))
+			if err != nil {
+				logrus.Errorf("Unable to unescape target host: %v", err)
+			}
 			rp.AuthURLHandler(func() string {
 				id := uuid.New().String()
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 					id,
-					r.URL.Query().Get("share"),
+					host,
 					r.URL.Query().Get("checkInterval"),
 					jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -107,19 +111,21 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + url.QueryEscape(tokens.AccessToken))
 		if err != nil {
-			logrus.Error("Get: " + err.Error() + "\n")
+			logrus.Error("Error getting user info from google: " + err.Error() + "\n")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		defer resp.Body.Close()
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
+			logrus.Errorf("Error reading response body: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		rDat := googleOauthEmailResp{}
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
+			logrus.Errorf("Error unmarshalling google oauth response: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -141,7 +147,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 		}
 
 		SetZrokCookie(w, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key)
-		http.Redirect(w, r, fmt.Sprintf("%s://%s.%s:8080", scheme, token.Claims.(*IntermediateJWT).Share, cfg.RedirectUrl), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 
 	http.Handle(callbackPath, rp.CodeExchangeHandler(getEmail, relyingParty))
