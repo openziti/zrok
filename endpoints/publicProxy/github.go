@@ -167,7 +167,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 			authCheckInterval = i
 		}
 
-		SetZrokCookie(w, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
+		SetZrokCookie(w, domain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 

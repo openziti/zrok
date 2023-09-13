@@ -147,7 +147,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 			authCheckInterval = i
 		}
 
-		SetZrokCookie(w, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key)
+		SetZrokCookie(w, domain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 

@@ -316,7 +316,7 @@ type ZrokClaims struct {
 	jwt.RegisteredClaims
 }
 
-func SetZrokCookie(w http.ResponseWriter, email, accessToken, provider string, checkInterval time.Duration, key []byte) {
+func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider string, checkInterval time.Duration, key []byte) {
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, ZrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
@@ -333,7 +333,7 @@ func SetZrokCookie(w http.ResponseWriter, email, accessToken, provider string, c
 		Name:    "zrok-access",
 		Value:   sTkn,
 		MaxAge:  int(checkInterval.Seconds()),
-		Domain:  "localzrok.io",
+		Domain:  domain,
 		Path:    "/",
 		Expires: time.Now().Add(checkInterval),
 		//Secure:  true, //When tls gets added have this be configured on if tls
