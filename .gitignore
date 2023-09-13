@@ -4,7 +4,7 @@
 *.db
 automated-release-build
 etc/dev.yml
-etc/dev-metrics.yml
+etc/dev-frontend.yml
 
 # Dependencies
 /node_modules/
