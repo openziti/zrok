@@ -112,7 +112,7 @@ func (o *ShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.P
 const ShareUnprocessableEntityCode int = 422
 
 /*
-ShareUnprocessableEntity Unprocessable entity. Incorrect enum?
+ShareUnprocessableEntity unprocessable
 
 swagger:response shareUnprocessableEntity
 */

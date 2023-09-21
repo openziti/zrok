@@ -702,44 +702,6 @@ func init() {
         }
       }
     },
-    "/oauth/authorize": {
-      "get": {
-        "tags": [
-          "share"
-        ],
-        "operationId": "oauthAuthenticate",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "state",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "code",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "testing"
-          },
-          "302": {
-            "description": "redirect back to share",
-            "headers": {
-              "location": {
-                "type": "string",
-                "description": "Redirect URL"
-              }
-            }
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/overview": {
       "get": {
         "security": [
@@ -904,7 +866,7 @@ func init() {
             "description": "not found"
           },
           "422": {
-            "description": "Unprocessable entity. Incorrect enum?"
+            "description": "unprocessable"
           },
           "500": {
             "description": "internal server error",
@@ -2356,44 +2318,6 @@ func init() {
         }
       }
     },
-    "/oauth/authorize": {
-      "get": {
-        "tags": [
-          "share"
-        ],
-        "operationId": "oauthAuthenticate",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "state",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "name": "code",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "testing"
-          },
-          "302": {
-            "description": "redirect back to share",
-            "headers": {
-              "location": {
-                "type": "string",
-                "description": "Redirect URL"
-              }
-            }
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/overview": {
       "get": {
         "security": [
@@ -2558,7 +2482,7 @@ func init() {
             "description": "not found"
           },
           "422": {
-            "description": "Unprocessable entity. Incorrect enum?"
+            "description": "unprocessable"
           },
           "500": {
             "description": "internal server error",

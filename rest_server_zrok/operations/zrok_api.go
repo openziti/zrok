@@ -103,9 +103,6 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
-		ShareOauthAuthenticateHandler: share.OauthAuthenticateHandlerFunc(func(params share.OauthAuthenticateParams) middleware.Responder {
-			return middleware.NotImplemented("operation share.OauthAuthenticate has not yet been implemented")
-		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
@@ -225,8 +222,6 @@ type ZrokAPI struct {
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
-	// ShareOauthAuthenticateHandler sets the operation handler for the oauth authenticate operation
-	ShareOauthAuthenticateHandler share.OauthAuthenticateHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
@@ -383,9 +378,6 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
-	}
-	if o.ShareOauthAuthenticateHandler == nil {
-		unregistered = append(unregistered, "share.OauthAuthenticateHandler")
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
@@ -591,10 +583,6 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/oauth/authorize"] = share.NewOauthAuthenticate(o.context, o.ShareOauthAuthenticateHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

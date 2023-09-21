@@ -578,7 +578,7 @@ paths:
         404:
           description: not found
         422:
-          description: Unprocessable entity. Incorrect enum?
+          description: unprocessable
         500:
           description: internal server error
           schema:
@@ -982,14 +982,13 @@ definitions:
           $ref: "#/definitions/authUser"
       oauthProvider:
         type: string
-        enum: [github,google]
+        enum: ["github", "google"]
       oauthEmailDomains:
         type: array
         items:
           type: string
       oauthAuthorizationCheckInterval:
         type: string
-
       reserved:
         type: boolean
 

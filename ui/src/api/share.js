@@ -18,23 +18,6 @@ export function access(options) {
 }
 
 /**
- * @param {string} code 
- * @param {object} options Optional options
- * @param {string} [options.state] 
- * @return {Promise<object>} testing
- */
-export function oauthAuthenticate(code, options) {
-  if (!options) options = {}
-  const parameters = {
-    query: {
-      state: options.state,
-      code
-    }
-  }
-  return gateway.request(oauthAuthenticateOperation, parameters)
-}
-
-/**
  * @param {object} options Optional options
  * @param {module:types.shareRequest} [options.body] 
  * @return {Promise<module:types.shareResponse>} share created
@@ -103,11 +86,6 @@ const accessOperation = {
       id: 'key'
     }
   ]
-}
-
-const oauthAuthenticateOperation = {
-  path: '/oauth/authorize',
-  method: 'get'
 }
 
 const shareOperation = {

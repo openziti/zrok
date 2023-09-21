@@ -231,7 +231,7 @@ func NewShareUnprocessableEntity() *ShareUnprocessableEntity {
 /*
 ShareUnprocessableEntity describes a response with status code 422, with default header values.
 
-Unprocessable entity. Incorrect enum?
+unprocessable
 */
 type ShareUnprocessableEntity struct {
 }
