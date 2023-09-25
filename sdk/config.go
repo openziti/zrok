@@ -4,22 +4,22 @@ import "github.com/pkg/errors"
 
 const ZrokProxyConfig = "zrok.proxy.v1"
 
-type ProxyConfig struct {
-	AuthScheme AuthScheme `json:"auth_scheme"`
-	BasicAuth  *BasicAuth `json:"basic_auth"`
-	OauthAuth  *OauthAuth `json:"oauth"`
+type FrontendConfig struct {
+	AuthScheme AuthScheme       `json:"auth_scheme"`
+	BasicAuth  *BasicAuthConfig `json:"basic_auth"`
+	OAuthAuth  *OAuthConfig     `json:"oauth"`
 }
 
-type BasicAuth struct {
-	Users []*AuthUser `json:"users"`
+type BasicAuthConfig struct {
+	Users []*AuthUserConfig `json:"users"`
 }
 
-type AuthUser struct {
+type AuthUserConfig struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type OauthAuth struct {
+type OAuthConfig struct {
 	Provider                   string   `json:"provider"`
 	EmailDomains               []string `json:"email_domains"`
 	AuthorizationCheckInterval string   `json:"authorization_check_interval"`

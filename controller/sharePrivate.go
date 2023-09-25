@@ -14,15 +14,20 @@ func newPrivateResourceAllocator() *privateResourceAllocator {
 }
 
 func (a *privateResourceAllocator) allocate(envZId, shrToken string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
-	var authUsers []*sdk.AuthUser
+	var authUsers []*sdk.AuthUserConfig
 	for _, authUser := range params.Body.AuthUsers {
-		authUsers = append(authUsers, &sdk.AuthUser{authUser.Username, authUser.Password})
+		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 	}
-	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, &zrokEdgeSdk.OauthOptions{
-		Provider:                   params.Body.OauthProvider,
-		EmailDomains:               params.Body.OauthEmailDomains,
-		AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
-	}, edge)
+	options := &zrokEdgeSdk.FrontendOptions{
+		AuthScheme: params.Body.AuthScheme,
+		AuthUsers:  authUsers,
+		OAuth: &sdk.OAuthConfig{
+			Provider:                   params.Body.OauthProvider,
+			EmailDomains:               params.Body.OauthEmailDomains,
+			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
+		},
+	}
+	cfgZId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, options, edge)
 	if err != nil {
 		return "", nil, err
 	}
