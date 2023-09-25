@@ -18,9 +18,13 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 	}
+	authScheme, err := sdk.ParseAuthScheme(params.Body.AuthScheme)
+	if err != nil {
+		return "", nil, err
+	}
 	options := &zrokEdgeSdk.FrontendOptions{
-		AuthScheme: params.Body.AuthScheme,
-		AuthUsers:  authUsers,
+		AuthScheme:     authScheme,
+		BasicAuthUsers: authUsers,
 		Oauth: &sdk.OauthConfig{
 			Provider:                   params.Body.OauthProvider,
 			EmailDomains:               params.Body.OauthEmailDomains,

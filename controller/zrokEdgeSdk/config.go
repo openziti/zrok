@@ -12,22 +12,18 @@ import (
 )
 
 type FrontendOptions struct {
-	AuthScheme string
-	AuthUsers  []*sdk.AuthUserConfig
-	Oauth      *sdk.OauthConfig
+	AuthScheme     sdk.AuthScheme
+	BasicAuthUsers []*sdk.AuthUserConfig
+	Oauth          *sdk.OauthConfig
 }
 
 func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
-	authScheme, err := sdk.ParseAuthScheme(options.AuthScheme)
-	if err != nil {
-		return "", err
-	}
 	cfg := &sdk.FrontendConfig{
-		AuthScheme: authScheme,
+		AuthScheme: options.AuthScheme,
 	}
 	if cfg.AuthScheme == sdk.Basic {
 		cfg.BasicAuth = &sdk.BasicAuthConfig{}
-		for _, authUser := range options.AuthUsers {
+		for _, authUser := range options.BasicAuthUsers {
 			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 		}
 	}
