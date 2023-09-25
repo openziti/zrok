@@ -7,7 +7,7 @@ const ZrokProxyConfig = "zrok.proxy.v1"
 type FrontendConfig struct {
 	AuthScheme AuthScheme       `json:"auth_scheme"`
 	BasicAuth  *BasicAuthConfig `json:"basic_auth"`
-	OAuthAuth  *OAuthConfig     `json:"oauth"`
+	OauthAuth  *OauthConfig     `json:"oauth"`
 }
 
 type BasicAuthConfig struct {
@@ -19,7 +19,7 @@ type AuthUserConfig struct {
 	Password string `json:"password"`
 }
 
-type OAuthConfig struct {
+type OauthConfig struct {
 	Provider                   string   `json:"provider"`
 	EmailDomains               []string `json:"email_domains"`
 	AuthorizationCheckInterval string   `json:"authorization_check_interval"`

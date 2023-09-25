@@ -21,7 +21,7 @@ func (a *privateResourceAllocator) allocate(envZId, shrToken string, params shar
 	options := &zrokEdgeSdk.FrontendOptions{
 		AuthScheme: params.Body.AuthScheme,
 		AuthUsers:  authUsers,
-		OAuth: &sdk.OAuthConfig{
+		Oauth: &sdk.OauthConfig{
 			Provider:                   params.Body.OauthProvider,
 			EmailDomains:               params.Body.OauthEmailDomains,
 			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,

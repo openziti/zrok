@@ -14,7 +14,7 @@ import (
 type FrontendOptions struct {
 	AuthScheme string
 	AuthUsers  []*sdk.AuthUserConfig
-	OAuth      *sdk.OAuthConfig
+	Oauth      *sdk.OauthConfig
 }
 
 func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
@@ -31,11 +31,11 @@ func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions,
 			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 		}
 	}
-	if cfg.AuthScheme == sdk.Oauth && options.OAuth != nil {
-		cfg.OAuthAuth = &sdk.OAuthConfig{
-			Provider:                   options.OAuth.Provider,
-			EmailDomains:               options.OAuth.EmailDomains,
-			AuthorizationCheckInterval: options.OAuth.AuthorizationCheckInterval,
+	if cfg.AuthScheme == sdk.Oauth && options.Oauth != nil {
+		cfg.OauthAuth = &sdk.OauthConfig{
+			Provider:                   options.Oauth.Provider,
+			EmailDomains:               options.Oauth.EmailDomains,
+			AuthorizationCheckInterval: options.Oauth.AuthorizationCheckInterval,
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{
