@@ -23,18 +23,18 @@ import (
 	"time"
 )
 
-type httpFrontend struct {
+type HttpFrontend struct {
 	cfg     *Config
 	zCtx    ziti.Context
 	handler http.Handler
 }
 
-func NewHTTP(cfg *Config) (*httpFrontend, error) {
-	env, err := environment.LoadRoot()
+func NewHTTP(cfg *Config) (*HttpFrontend, error) {
+	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading environment root")
 	}
-	zCfgPath, err := env.ZitiIdentityNamed(cfg.Identity)
+	zCfgPath, err := root.ZitiIdentityNamed(cfg.Identity)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting ziti identity '%v' from environment", cfg.Identity)
 	}
@@ -59,15 +59,15 @@ func NewHTTP(cfg *Config) (*httpFrontend, error) {
 	if err := configureOauthHandlers(context.Background(), cfg, false); err != nil {
 		return nil, err
 	}
-	handler := authHandler(util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
-	return &httpFrontend{
+	handler := authHandler(util.NewProxyHandler(proxy), cfg, zCtx)
+	return &HttpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
 		handler: handler,
 	}, nil
 }
 
-func (self *httpFrontend) Run() error {
+func (self *HttpFrontend) Run() error {
 	return http.ListenAndServe(self.cfg.Address, self.handler)
 }
 
@@ -134,7 +134,7 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Context) http.HandlerFunc {
+func authHandler(handler http.Handler, pcfg *Config, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		shrToken := resolveService(pcfg.HostMatch, r.Host)
 		if shrToken != "" {
@@ -151,7 +151,7 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 							logrus.Debugf("auth scheme basic '%v", shrToken)
 							inUser, inPass, ok := r.BasicAuth()
 							if !ok {
-								writeUnauthorizedResponse(w, realm)
+								basicAuthRequired(w, shrToken)
 								return
 							}
 							authed := false
@@ -185,7 +185,7 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 							}
 
 							if !authed {
-								writeUnauthorizedResponse(w, realm)
+								basicAuthRequired(w, shrToken)
 								return
 							}
 
@@ -271,7 +271,7 @@ func authHandler(handler http.Handler, realm string, pcfg *Config, ctx ziti.Cont
 							}
 						default:
 							logrus.Infof("invalid auth scheme '%v'", scheme)
-							writeUnauthorizedResponse(w, realm)
+							basicAuthRequired(w, shrToken)
 							return
 						}
 					} else {
@@ -340,7 +340,7 @@ func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider s
 	})
 }
 
-func writeUnauthorizedResponse(w http.ResponseWriter, realm string) {
+func basicAuthRequired(w http.ResponseWriter, realm string) {
 	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
 	w.WriteHeader(401)
 	w.Write([]byte("No Authorization\n"))
