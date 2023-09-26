@@ -36,7 +36,7 @@ func (oc *OauthConfig) GetProvider(name string) *OauthProviderConfig {
 type OauthProviderConfig struct {
 	Name         string
 	ClientId     string
-	ClientSecret string
+	ClientSecret string `cf:"+secret"`
 }
 
 func DefaultConfig() *Config {
