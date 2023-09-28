@@ -18,6 +18,7 @@ type Config struct {
 }
 
 type OauthConfig struct {
+	Host        string
 	Port        int
 	RedirectUrl string
 	HashKeyRaw  string

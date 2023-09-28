@@ -334,11 +334,10 @@ func basicAuthRequired(w http.ResponseWriter, realm string) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, shrToken string, pcfg *Config, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.HostMatch, pcfg.Oauth.Port, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.Oauth.Host, pcfg.Oauth.Port, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {
-	logrus.Debugf("host = '%v'", host)
 	if hostMatch == "" || strings.Contains(host, hostMatch) {
 		tokens := strings.Split(host, ".")
 		if len(tokens) > 0 {
