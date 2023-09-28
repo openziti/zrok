@@ -26,14 +26,14 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 		return nil, errors.Errorf("unknown share mode '%v'", request.ShareMode)
 	}
 
-	if len(request.Auth) > 0 {
+	if len(request.BasicAuth) > 0 {
 		out.Body.AuthScheme = string(Basic)
-		for _, pair := range request.Auth {
-			tokens := strings.Split(pair, ":")
+		for _, basicAuthUser := range request.BasicAuth {
+			tokens := strings.Split(basicAuthUser, ":")
 			if len(tokens) == 2 {
 				out.Body.AuthUsers = append(out.Body.AuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
 			} else {
-				return nil, errors.Errorf("invalid username:password pair '%v'", pair)
+				return nil, errors.Errorf("invalid username:password '%v'", basicAuthUser)
 			}
 		}
 	}

@@ -22,9 +22,9 @@ const (
 type ShareRequest struct {
 	BackendMode                     BackendMode
 	ShareMode                       ShareMode
-	Frontends                       []string
-	Auth                            []string
 	Target                          string
+	Frontends                       []string
+	BasicAuth                       []string
 	OauthProvider                   string
 	OauthEmailDomains               []string
 	OauthAuthorizationCheckInterval time.Duration

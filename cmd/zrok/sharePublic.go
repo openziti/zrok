@@ -105,10 +105,9 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   sdk.PublicShareMode,
 		Frontends:   cmd.frontendSelection,
-		Auth:        cmd.basicAuth,
+		BasicAuth:   cmd.basicAuth,
 		Target:      target,
 	}
-
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailDomains = cmd.oauthEmailDomains

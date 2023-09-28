@@ -99,7 +99,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	req := &sdk.ShareRequest{
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   sdk.PrivateShareMode,
-		Auth:        cmd.basicAuth,
+		BasicAuth:   cmd.basicAuth,
 		Target:      target,
 	}
 	shr, err := sdk.CreateShare(root, req)
