@@ -2,6 +2,7 @@ package publicProxy
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
@@ -29,6 +30,19 @@ type HttpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
+	var key []byte
+	if cfg.Oauth != nil {
+		hash := md5.New()
+		n, err := hash.Write([]byte(cfg.Oauth.HashKeyRaw))
+		if err != nil {
+			return nil, err
+		}
+		if n != len(cfg.Oauth.HashKeyRaw) {
+			return nil, errors.New("short hash")
+		}
+		key = hash.Sum(nil)
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading environment root")
@@ -58,7 +72,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	if err := configureOauthHandlers(context.Background(), cfg, false); err != nil {
 		return nil, err
 	}
-	handler := authHandler(util.NewProxyHandler(proxy), cfg, zCtx)
+	handler := authHandler(util.NewProxyHandler(proxy), cfg, key, zCtx)
 	return &HttpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -133,7 +147,7 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func authHandler(handler http.Handler, pcfg *Config, ctx ziti.Context) http.HandlerFunc {
+func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		shrToken := resolveService(pcfg.HostMatch, r.Host)
 		if shrToken != "" {
@@ -191,7 +205,7 @@ func authHandler(handler http.Handler, pcfg *Config, ctx ziti.Context) http.Hand
 							handler.ServeHTTP(w, r)
 
 						case string(sdk.Oauth):
-							logrus.Debugf("auth scheme oauth '%v", shrToken)
+							logrus.Debugf("auth scheme oauth '%v'", shrToken)
 
 							if oauthCfg, found := cfg["oauth"]; found {
 								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
@@ -221,7 +235,7 @@ func authHandler(handler http.Handler, pcfg *Config, ctx ziti.Context) http.Hand
 										if pcfg.Oauth == nil {
 											return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
 										}
-										return []byte(pcfg.Oauth.HashKeyRaw), nil
+										return key, nil
 									})
 									if err != nil {
 										logrus.Errorf("unable to parse jwt: %v", err)

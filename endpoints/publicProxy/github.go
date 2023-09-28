@@ -1,7 +1,9 @@
 package publicProxy
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,7 +29,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 
 	providerCfg := cfg.GetProvider("github")
 	if providerCfg == nil {
-		logrus.Info("unable to find provider config for github. Skipping.")
+		logrus.Info("unable to find provider config for github; skipping")
 		return nil
 	}
 	clientID := providerCfg.ClientId
@@ -42,7 +44,15 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		Endpoint:     githubOAuth.Endpoint,
 	}
 
-	key := []byte(cfg.HashKeyRaw)
+	hash := md5.New()
+	n, err := hash.Write([]byte(cfg.HashKeyRaw))
+	if err != nil {
+		return err
+	}
+	if n != len(cfg.HashKeyRaw) {
+		return errors.New("short hash")
+	}
+	key := hash.Sum(nil)
 
 	u, err := url.Parse(redirectUrl)
 	if err != nil {

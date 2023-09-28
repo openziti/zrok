@@ -1,7 +1,9 @@
 package publicProxy
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,7 +45,15 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 		Endpoint:     googleOauth.Endpoint,
 	}
 
-	key := []byte(cfg.HashKeyRaw)
+	hash := md5.New()
+	n, err := hash.Write([]byte(cfg.HashKeyRaw))
+	if err != nil {
+		return err
+	}
+	if n != len(cfg.HashKeyRaw) {
+		return errors.New("short hash")
+	}
+	key := hash.Sum(nil)
 
 	u, err := url.Parse(redirectUrl)
 	if err != nil {

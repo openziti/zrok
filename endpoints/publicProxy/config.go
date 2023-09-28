@@ -21,7 +21,7 @@ type OauthConfig struct {
 	Host        string
 	Port        int
 	RedirectUrl string
-	HashKeyRaw  string
+	HashKeyRaw  string `cf:"+secret"`
 	Providers   []*OauthProviderConfig
 }
 
