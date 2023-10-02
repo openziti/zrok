@@ -2,11 +2,7 @@
 # configured string. This will allow you to let a load balancer access the frontend by IP address for health check
 # purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
 #
-host_match: zrok.io
-
-#tls:
-#  cert_path: "/Path/To/Cert/zrok.crt"
-#  key_path:  "/Path/To/Cert/zrok.key"
+#host_match: zrok.io
 
 #oauth:
 #  port: 28080
