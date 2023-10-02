@@ -1,5 +1,7 @@
 # v0.4.7
 
+FEATURE: OAuth authentication with the ability to restrict authenticated users to specified domains for `zrok share public`. Supports both Google and GitHub authentication in this version. More authentication providers, and extensibility to come in future `zrok` releases (https://github.com/openziti/zrok/issues/45, https://github.com/openziti/zrok/issues/404)
+
 CHANGE: `--basic-auth` realm now presented as the share token rather than as `zrok` in `publicProxy` frontend implementation
 
 # v0.4.6
