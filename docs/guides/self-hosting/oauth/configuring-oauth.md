@@ -1,3 +1,27 @@
+# OAuth Configuration
+
+As of `v0.4.7`, `zrok` includes OAuth integration for both Google and GitHub for `zrok access public` public frontends. 
+
+This integration allows you to create public shares and request that the public frontend authenticate your users against either the Google or GitHub OAuth endpoints (using the user's Google or GitHub accounts). Additionally, you can restrict the email address domain associated with the count to a list of domains that you provide when you create the share.
+
+This is a first step towards a more comprehensive portfolio of user authentication strategies in future `zrok` releases.
+
+## Planning for the OAuth Frontend
+
+The current implementation of the public frontend OAuth integration uses a separate listening address and port from the public frontend itself.
+
+After this frontend is configured, we'll use the OAuth frontend address when creating the OAuth clients for Google and GitHub.
+
+## Configuring a Google OAuth Client
+
+### OAuth Content Screen
+
+Configure the application in the OAuth Content Screen.
+
+### Create the OAuth 2.0 Client ID
+
+
+
 ## Enabling Oauth on Access Point
 
 There is a new stanza in the access point configuration. 
