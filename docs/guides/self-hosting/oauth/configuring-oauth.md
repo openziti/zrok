@@ -12,15 +12,37 @@ The current implementation of the public frontend OAuth integration uses a separ
 
 After this frontend is configured, we'll use the OAuth frontend address when creating the OAuth clients for Google and GitHub.
 
-## Configuring a Google OAuth Client
+## Configuring a Google OAuth Client ID
 
 ### OAuth Content Screen
 
+`APIs & Services > Credentials > OAuth content screen`
+
 Configure the application in the OAuth Content Screen.
+
+Add a non-sensitive scope for `../auth/userinfo.email`.
 
 ### Create the OAuth 2.0 Client ID
 
+`APIs & Services > Credentials > + Create Credentials`
 
+Select `OAuth client ID`
+
+Application type is `Web Application`
+
+Name it whatever you'd like
+
+Authorized redirect URIs:
+
+Use the address of the OAuth frontend you configured above, but you're going to add `/google/oauth` to the end of the URL.
+
+Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
+
+## Configuring a GitHub Client ID
+
+`Settings > Developer Settings > OAuth Apps > Register a new application`
+
+Authorization Callback URL: Use the address of the OAuth frontend you configured above, but add `/github/oauth` to the end of the URL.
 
 ## Enabling Oauth on Access Point
 
