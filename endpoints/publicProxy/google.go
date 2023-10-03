@@ -35,12 +35,11 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 
 	clientID := providerCfg.ClientId
 	callbackPath := "/google/oauth"
-	port := cfg.Port
-	redirectUrl := fmt.Sprintf("%s://%s", scheme, cfg.RedirectUrl)
+	redirectUrl := fmt.Sprintf("%s://%s", scheme, cfg.RedirectHost)
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v:%v%v", redirectUrl, port, callbackPath),
+		RedirectURL:  fmt.Sprintf("%v:%v%v", redirectUrl, cfg.RedirectPort, callbackPath),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}

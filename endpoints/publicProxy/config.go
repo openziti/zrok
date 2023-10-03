@@ -18,11 +18,10 @@ type Config struct {
 }
 
 type OauthConfig struct {
-	Host        string
-	Port        int
-	RedirectUrl string
-	HashKeyRaw  string `cf:"+secret"`
-	Providers   []*OauthProviderConfig
+	RedirectHost string
+	RedirectPort int
+	HashKeyRaw   string `cf:"+secret"`
+	Providers    []*OauthProviderConfig
 }
 
 func (oc *OauthConfig) GetProvider(name string) *OauthProviderConfig {
@@ -65,6 +64,6 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 	if err := configureGithubOauth(cfg.Oauth, tls); err != nil {
 		return err
 	}
-	zhttp.StartServer(ctx, fmt.Sprintf("%s:%d", strings.Split(cfg.Address, ":")[0], cfg.Oauth.Port))
+	zhttp.StartServer(ctx, fmt.Sprintf("%s:%d", strings.Split(cfg.Address, ":")[0], cfg.Oauth.RedirectPort))
 	return nil
 }

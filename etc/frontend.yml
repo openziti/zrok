@@ -5,8 +5,8 @@
 #host_match: zrok.io
 
 #oauth:
-#  port: 28080
-#  redirect_url: zrok.io
+#  redirect_host: zrok.io
+#  redirect_port: 28080
 #  hash_key_raw: "test1234test1234"
 #  providers:
 #    - name: google
