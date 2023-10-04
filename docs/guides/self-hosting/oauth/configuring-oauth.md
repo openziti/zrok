@@ -18,37 +18,37 @@ After this frontend is configured, we'll use the OAuth frontend address when cre
 
 `APIs & Services > Credentials > OAuth content screen`
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_oauth_content_screen_2.png)
+![](images/google_oauth_content_screen_2.png)
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_oauth_content_screen_3.png)
+![](images/google_oauth_content_screen_3.png)
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_oauth_content_screen_4.png)
+![](images/google_oauth_content_screen_4.png)
 
 Add a non-sensitive scope for `../auth/userinfo.email`.
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_oauth_content_screen_5.png)
+![](images/google_oauth_content_screen_5.png)
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_oauth_content_screen_6.png)
+![](images/google_oauth_content_screen_6.png)
 
 ### Create the OAuth 2.0 Client ID
 
 `APIs & Services > Credentials > + Create Credentials`
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_create_credentials_1.png)
+![](images/google_create_credentials_1.png)
 
 Select `OAuth client ID`
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_create_credentials_2.png)
+![](images/google_create_credentials_2.png)
 
 Application type is `Web Application`
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_create_credentials_3.png)
+![](images/google_create_credentials_3.png)
 
 Authorized redirect URIs:
 
 Use the address of the OAuth frontend you configured above, but you're going to add `/google/oauth` to the end of the URL.
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/google_create_credentials_4.png)
+![](images/google_create_credentials_4.png)
 
 Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
 
@@ -56,15 +56,15 @@ Save the client ID and the client secret. You'll configure these into your `fron
 
 `Settings > Developer Settings > OAuth Apps > Register a new application`
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/github_create_oauth_application_1.png)
+![](images/github_create_oauth_application_1.png)
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/github_create_oauth_application_2.png)
+![](images/github_create_oauth_application_2.png)
 
 Authorization Callback URL: Use the address of the OAuth frontend you configured above, but add `/github/oauth` to the end of the URL.
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/github_create_oauth_application_3.png)
+![](images/github_create_oauth_application_3.png)
 
-![](/home/michael/Repos/nf/zrok/docs/guides/self-hosting/oauth/images/github_create_oauth_application_4.png)
+![](images/github_create_oauth_application_4.png)
 
 Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
 
