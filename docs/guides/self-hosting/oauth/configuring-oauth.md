@@ -8,9 +8,11 @@ This is a first step towards a more comprehensive portfolio of user authenticati
 
 ## Planning for the OAuth Frontend
 
-The current implementation of the public frontend OAuth integration uses a separate listening address and port from the public frontend itself.
+The current implementation of the OAuth public frontend uses a HTTP listener to handle redirects from OAuth providers. You'll need to configure a DNS name and a port for this listener that is accessible by your end users. We'll refer to this listener as the "OAuth frontend" in this guide.
 
-After this frontend is configured, we'll use the OAuth frontend address when creating the OAuth clients for Google and GitHub.
+We'll use the public DNS address of the OAuth frontend when creating the Google and GitHub OAuth clients below. This address is typically configured into these clients as the "redirect URL" where these clients will send the authenticated users after authentication.
+
+The `zrok` OAuth frontend will capture the successful authentication and forward the user back to their original destination.
 
 ## Configuring a Google OAuth Client ID
 
