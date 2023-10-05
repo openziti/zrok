@@ -18,41 +18,51 @@ The `zrok` OAuth frontend will capture the successful authentication and forward
 
 ### OAuth Content Screen
 
-`APIs & Services > Credentials > OAuth content screen`
+Before you can configure an OAuth Client ID in Google Cloud, you have to configure the "OAuth content screen". 
+
+In the Google Cloud console, navigate to: `APIs & Services > Credentials > OAuth content screen`
 
 ![](images/google_oauth_content_screen_2.png)
 
+Here you can give your `zrok` public frontend an identity and branding to match your deployment.
+
 ![](images/google_oauth_content_screen_3.png)
+
+Describe what domains are authorized to access your public frontend and establish contact information.
 
 ![](images/google_oauth_content_screen_4.png)
 
-Add a non-sensitive scope for `../auth/userinfo.email`.
+Add a non-sensitive scope for `../auth/userinfo.email`. This is important as it allows the `zrok` OAuth frontend to receive the email address of the authenticated user.
 
 ![](images/google_oauth_content_screen_5.png)
 
 ![](images/google_oauth_content_screen_6.png)
 
+Now your OAuth content screen is configured.
+
 ### Create the OAuth 2.0 Client ID
 
-`APIs & Services > Credentials > + Create Credentials`
+Next we create the OAuth Client ID for your public frontend.
+
+In the Google Cloud Console, navigate to: `APIs & Services > Credentials > + Create Credentials`
 
 ![](images/google_create_credentials_1.png)
 
-Select `OAuth client ID`
+Select `OAuth client ID` from the `+ Create Credentials` dropdown.
 
 ![](images/google_create_credentials_2.png)
 
-Application type is `Web Application`
+Application type is `Web Application`.
 
 ![](images/google_create_credentials_3.png)
 
-Authorized redirect URIs:
-
-Use the address of the OAuth frontend you configured above, but you're going to add `/google/oauth` to the end of the URL.
+The most important bit here is the "Authorized redirect URIs". You're going to want to put a URL here that matches the `zrok` OAuth frontend address that you configured at the start of this guide, but at the end of the URL you're going to append `/google/oauth` to the URL.
 
 ![](images/google_create_credentials_4.png)
 
 Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
+
+With this your Google OAuth client should be configured and ready.
 
 ## Configuring a GitHub Client ID
 
