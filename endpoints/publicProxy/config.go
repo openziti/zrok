@@ -18,10 +18,11 @@ type Config struct {
 }
 
 type OauthConfig struct {
-	RedirectHost string
-	RedirectPort int
-	HashKeyRaw   string `cf:"+secret"`
-	Providers    []*OauthProviderConfig
+	RedirectHost     string
+	RedirectPort     int
+	RedirectHttpOnly bool
+	HashKey          string `cf:"+secret"`
+	Providers        []*OauthProviderConfig
 }
 
 func (oc *OauthConfig) GetProvider(name string) *OauthProviderConfig {

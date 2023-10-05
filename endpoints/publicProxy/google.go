@@ -5,12 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -19,6 +13,11 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 	googleOauth "golang.org/x/oauth2/google"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 )
 
 func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
@@ -45,11 +44,11 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 	}
 
 	hash := md5.New()
-	n, err := hash.Write([]byte(cfg.HashKeyRaw))
+	n, err := hash.Write([]byte(cfg.HashKey))
 	if err != nil {
 		return err
 	}
-	if n != len(cfg.HashKeyRaw) {
+	if n != len(cfg.HashKey) {
 		return errors.New("short hash")
 	}
 	key := hash.Sum(nil)
@@ -124,7 +123,9 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer resp.Body.Close()
+		defer func() {
+			_ = resp.Body.Close()
+		}()
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
 			logrus.Errorf("Error reading response body: %v", err)

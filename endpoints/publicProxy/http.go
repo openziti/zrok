@@ -33,11 +33,11 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	var key []byte
 	if cfg.Oauth != nil {
 		hash := md5.New()
-		n, err := hash.Write([]byte(cfg.Oauth.HashKeyRaw))
+		n, err := hash.Write([]byte(cfg.Oauth.HashKey))
 		if err != nil {
 			return nil, err
 		}
-		if n != len(cfg.Oauth.HashKeyRaw) {
+		if n != len(cfg.Oauth.HashKey) {
 			return nil, errors.New("short hash")
 		}
 		key = hash.Sum(nil)
@@ -80,17 +80,17 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	}, nil
 }
 
-func (self *HttpFrontend) Run() error {
-	return http.ListenAndServe(self.cfg.Address, self.handler)
+func (f *HttpFrontend) Run() error {
+	return http.ListenAndServe(f.cfg.Address, f.handler)
 }
 
 type zitiDialContext struct {
 	ctx ziti.Context
 }
 
-func (self *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
+func (c *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
 	shrToken := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	conn, err := self.ctx.Dial(shrToken)
+	conn, err := c.ctx.Dial(shrToken)
 	if err != nil {
 		return conn, err
 	}
@@ -344,11 +344,15 @@ func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider s
 func basicAuthRequired(w http.ResponseWriter, realm string) {
 	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
 	w.WriteHeader(401)
-	w.Write([]byte("No Authorization\n"))
+	_, _ = w.Write([]byte("No Authorization\n"))
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, shrToken string, pcfg *Config, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("http://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", shrToken, pcfg.Oauth.RedirectHost, pcfg.Oauth.RedirectPort, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	scheme := "https"
+	if pcfg.Oauth != nil && pcfg.Oauth.RedirectHttpOnly {
+		scheme = "http"
+	}
+	http.Redirect(w, r, fmt.Sprintf("%s://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", scheme, shrToken, pcfg.Oauth.RedirectHost, pcfg.Oauth.RedirectPort, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {

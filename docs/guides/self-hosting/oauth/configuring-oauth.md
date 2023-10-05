@@ -66,75 +66,89 @@ With this your Google OAuth client should be configured and ready.
 
 ## Configuring a GitHub Client ID
 
-`Settings > Developer Settings > OAuth Apps > Register a new application`
+Register a new OAuth application through the GitHub settings for the account that owns the application.
+
+Navigate to:`Settings > Developer Settings > OAuth Apps > Register a new application`
 
 ![](images/github_create_oauth_application_1.png)
 
 ![](images/github_create_oauth_application_2.png)
 
-Authorization Callback URL: Use the address of the OAuth frontend you configured above, but add `/github/oauth` to the end of the URL.
+The "Authorized callback URL" should be configured to match the OAuth frontend address you configured at the start of this guide, with `/github/oauth` appended to the end.
 
 ![](images/github_create_oauth_application_3.png)
+
+Create a new client secret.
 
 ![](images/github_create_oauth_application_4.png)
 
 Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
 
-## Enabling Oauth on Access Point
+## Configuring your Public Frontend
 
-There is a new stanza in the access point configuration. 
+The public frontend configuration includes a new `oauth` section:
 
 ```yaml
 oauth:
-  port: <host-port> #port to listen on oauth callbacks from
-  redirect_url: <host-url> #redirect url to feed into oauth flow
-  hash_key_raw: "<your-key>" #key we will use to sign our access token
-  providers: #which providers we configure to use.
-    - name: <provider-name>
-      client_id: <client-id> #the client id you get from your oauth provider
-      client_secret: <client-secret> #the client secret you get from your oauth provider
-```
-Currently we support the following Oauth providers:
-- google
-- github
-
-In your oauth provider of choice's setup you would be prompted to create a client for accessing their services. It will ask for a redirect url. The format is: `<scheme>://<redirect_url>:<port>/<provider>/oauth` and as an example: `http://zrok.io:28080/google/oauth` This is also where you will find the client_id and client_secret.
-
-The port you choose is entirely up to the deployment. Just make sure it is open to receive callbacks from your configured oauth providers.
-
-redirect_url is what we will tell the oauth providers to callback with the authorization result. This will be whatever domain you've chosen to host the access server against without the scheme or port. This will get combined with the above port.
-
-We then secure the response data within a zrok-access cookie. This is secured with the hash_key_raw. This can be any raw string.
-
-### Required Scopes:
-- google
-- - Need access to a user's email: ./auth/userinfo.email 
-
-### Example
-
-An example config would look something like:
-```yaml
-oauth:
-  port: 28080
-  redirect_url: zrok.io
-  hash_key_raw: "test1234test1234"
+  redirect_host: oauth.zrok.io
+  redirect_port: 28080
+  redirect_http_only: false
+  hash_key: "<yourRandomHashKey>"
   providers:
     - name: google
-      client_id: ohfwerouyr972t3riugdf89032r8y230ry.apps.googleusercontent.com
-      client_secret: SDAFOHWER-qafsfgghrWERFfeqo13g 
+      client_id: <client-id>
+      client_secret: <client-secret>
+    - name: github
+      client_id: <client-id>
+      client_secret: <client-secret>
+      
 ```
 
-Note that the client id and secret are jumbled text and do not correlate to actual secrets.
+The `redirect_host` and `redirect_port` value should correspond with the DNS hostname and port configured as your OAuth frontend.
 
-We spin up a zitadel oidc server on the specified port that handled all of the oauth handshaking. With the response we create a cookie with the name `zrok-access`.
+The `redirect_http_only` is useful in development environments where your OAuth frontend is not running behind an HTTPS reverse proxy. Should not be enabled in production environments!
 
-## Enabling Oath on Share
+`hash_key` is a unique string for your installation that is used to secure the authentication payloads for your public frontend.
 
-To utilize the oauth integration on the access point we need to add a few more flags to our share command. There are three new flags:
-- `provider` : This is the provider to authenticate against. Options are the same as above dependant on what the acess point is configured for
-- `oauth-domains` : A list of valid email domains that are allowed to access the service. for example `gmail.com`
-- `oauth-check-interval` : How long a `zrok-access` token is valid for before reinitializing the oauth flow. This is defaultly 3 hours.
+`providers` is a list of configured providers for this public frontend. The current implementation supports `google` and `github` as options.
 
-That's all it takes!
+Both the `google` and `github` providers accept a `client_id` and `client_secret` parameter. These values are provided when you configure the OAuth clients at Google or GitHub.
 
-Now when a user connects to your share they will be prompted with the chosen oauth provider and allowed based on your allowed domains. Simply restarting the service won't force a reauth for users either. Changing the `provider` or `oauth-check-interval` will, however. 
+## Enabling OAuth on a Public Share
+
+With your public frontend configured to support OAuth, you can test this by creating a public share. There are new command line options to support this:
+
+```
+$ zrok share public
+Error: accepts 1 arg(s), received 0
+Usage:
+  zrok share public <target> [flags]
+
+Flags:
+  -b, --backend-mode string               The backend mode {proxy, web, caddy} (default "proxy")
+      --basic-auth stringArray            Basic authentication users (<username:password>,...)
+      --frontends stringArray             Selected frontends to use for the share (default [public])
+      --headless                          Disable TUI and run headless
+  -h, --help                              help for public
+      --insecure                          Enable insecure TLS certificate validation for <target>
+      --oauth-check-interval duration     Maximum lifetime for OAuth authentication; reauthenticate after expiry (default 3h0m0s)
+      --oauth-email-domains stringArray   Allow only these email domains to authenticate via OAuth
+      --oauth-provider string             Enable OAuth provider [google, github]
+
+Global Flags:
+  -p, --panic     Panic instead of showing pretty errors
+  -v, --verbose   Enable verbose logging
+```
+
+The `--oauth-provider` flag enables OAuth for the share using the specified provider.
+
+The `--oauth-email-domains` flag accepts a comma-separated list of authenticated email address domains that are allowed to access the share.
+
+The `--oauth-check-interval` flag specifies how frequently the authentication must be checked.
+
+An example public share:
+
+```
+$ zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
+```
+

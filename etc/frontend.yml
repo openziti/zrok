@@ -4,10 +4,13 @@
 #
 #host_match: zrok.io
 
+# The OAuth configuration is used when enabling OAuth authentication with your public frontend.
+#
 #oauth:
-#  redirect_host: zrok.io
+#  redirect_host: oauth.zrok.io
 #  redirect_port: 28080
-#  hash_key_raw: "test1234test1234"
+#  redirect_http_only: false
+#  hash_key: "<yourRandomHashKey>"
 #  providers:
 #    - name: google
 #      client_id: <client-id>
