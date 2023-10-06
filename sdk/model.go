@@ -1,5 +1,7 @@
 package sdk
 
+import "time"
+
 type BackendMode string
 
 const (
@@ -18,11 +20,14 @@ const (
 )
 
 type ShareRequest struct {
-	BackendMode BackendMode
-	ShareMode   ShareMode
-	Frontends   []string
-	Auth        []string
-	Target      string
+	BackendMode                     BackendMode
+	ShareMode                       ShareMode
+	Target                          string
+	Frontends                       []string
+	BasicAuth                       []string
+	OauthProvider                   string
+	OauthEmailDomains               []string
+	OauthAuthorizationCheckInterval time.Duration
 }
 
 type Share struct {
@@ -56,4 +61,5 @@ type AuthScheme string
 const (
 	None  AuthScheme = "none"
 	Basic AuthScheme = "basic"
+	Oauth AuthScheme = "oauth"
 )

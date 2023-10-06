@@ -1,3 +1,9 @@
+# v0.4.7
+
+FEATURE: OAuth authentication with the ability to restrict authenticated users to specified domains for `zrok share public`. Supports both Google and GitHub authentication in this version. More authentication providers, and extensibility to come in future `zrok` releases. See the OAuth configuration guide at `docs/guides/self-hosting/oauth/configuring-oauth.md` for details (https://github.com/openziti/zrok/issues/45, https://github.com/openziti/zrok/issues/404)
+
+CHANGE: `--basic-auth` realm now presented as the share token rather than as `zrok` in `publicProxy` frontend implementation
+
 # v0.4.6
 
 FEATURE: New `--backend-mode caddy`, which pre-processes a `Caddyfile` allowing a `bind` statement to work like this: `bind {{ .ZrokBindAddress }}`. Allows development of complicated API gateways and multi-backend shares, while maintaining the simple, ephemeral sharing model provided by `zrok` (https://github.com/openziti/zrok/issues/391)

@@ -40,6 +40,16 @@ type ShareRequest struct {
 	// frontend selection
 	FrontendSelection []string `json:"frontendSelection"`
 
+	// oauth authorization check interval
+	OauthAuthorizationCheckInterval string `json:"oauthAuthorizationCheckInterval,omitempty"`
+
+	// oauth email domains
+	OauthEmailDomains []string `json:"oauthEmailDomains"`
+
+	// oauth provider
+	// Enum: [github google]
+	OauthProvider string `json:"oauthProvider,omitempty"`
+
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
@@ -57,6 +67,10 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateBackendMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOauthProvider(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -141,6 +155,48 @@ func (m *ShareRequest) validateBackendMode(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateBackendModeEnum("backendMode", "body", m.BackendMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var shareRequestTypeOauthProviderPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["github","google"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypeOauthProviderPropEnum = append(shareRequestTypeOauthProviderPropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestOauthProviderGithub captures enum value "github"
+	ShareRequestOauthProviderGithub string = "github"
+
+	// ShareRequestOauthProviderGoogle captures enum value "google"
+	ShareRequestOauthProviderGoogle string = "google"
+)
+
+// prop value enum
+func (m *ShareRequest) validateOauthProviderEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeOauthProviderPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validateOauthProvider(formats strfmt.Registry) error {
+	if swag.IsZero(m.OauthProvider) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateOauthProviderEnum("oauthProvider", "body", m.OauthProvider); err != nil {
 		return err
 	}
 

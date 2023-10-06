@@ -14,11 +14,24 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 }
 
 func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
-	var authUsers []*sdk.AuthUser
+	var authUsers []*sdk.AuthUserConfig
 	for _, authUser := range params.Body.AuthUsers {
-		authUsers = append(authUsers, &sdk.AuthUser{authUser.Username, authUser.Password})
+		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 	}
-	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, params.Body.AuthScheme, authUsers, edge)
+	authScheme, err := sdk.ParseAuthScheme(params.Body.AuthScheme)
+	if err != nil {
+		return "", nil, err
+	}
+	options := &zrokEdgeSdk.FrontendOptions{
+		AuthScheme:     authScheme,
+		BasicAuthUsers: authUsers,
+		Oauth: &sdk.OauthConfig{
+			Provider:                   params.Body.OauthProvider,
+			EmailDomains:               params.Body.OauthEmailDomains,
+			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
+		},
+	}
+	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, options, edge)
 	if err != nil {
 		return "", nil, err
 	}

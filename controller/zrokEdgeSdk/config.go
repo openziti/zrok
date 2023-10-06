@@ -11,18 +11,27 @@ import (
 	"time"
 )
 
-func CreateConfig(cfgTypeZId, envZId, shrToken string, authSchemeStr string, authUsers []*sdk.AuthUser, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
-	authScheme, err := sdk.ParseAuthScheme(authSchemeStr)
-	if err != nil {
-		return "", err
-	}
-	cfg := &sdk.ProxyConfig{
-		AuthScheme: authScheme,
+type FrontendOptions struct {
+	AuthScheme     sdk.AuthScheme
+	BasicAuthUsers []*sdk.AuthUserConfig
+	Oauth          *sdk.OauthConfig
+}
+
+func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
+	cfg := &sdk.FrontendConfig{
+		AuthScheme: options.AuthScheme,
 	}
 	if cfg.AuthScheme == sdk.Basic {
-		cfg.BasicAuth = &sdk.BasicAuth{}
-		for _, authUser := range authUsers {
-			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUser{Username: authUser.Username, Password: authUser.Password})
+		cfg.BasicAuth = &sdk.BasicAuthConfig{}
+		for _, authUser := range options.BasicAuthUsers {
+			cfg.BasicAuth.Users = append(cfg.BasicAuth.Users, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
+		}
+	}
+	if cfg.AuthScheme == sdk.Oauth && options.Oauth != nil {
+		cfg.OauthAuth = &sdk.OauthConfig{
+			Provider:                   options.Oauth.Provider,
+			EmailDomains:               options.Oauth.EmailDomains,
+			AuthorizationCheckInterval: options.Oauth.AuthorizationCheckInterval,
 		}
 	}
 	cfgCrt := &rest_model.ConfigCreate{

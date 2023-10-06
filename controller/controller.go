@@ -20,10 +20,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-var cfg *config.Config
-var str *store.Store
-var idb influxdb2.Client
-var limitsAgent *limits.Agent
+var (
+	cfg         *config.Config
+	str         *store.Store
+	idb         influxdb2.Client
+	limitsAgent *limits.Agent
+)
 
 func Run(inCfg *config.Config) error {
 	cfg = inCfg

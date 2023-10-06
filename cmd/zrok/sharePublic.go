@@ -15,6 +15,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 )
 
 func init() {
@@ -22,12 +23,15 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth         []string
-	frontendSelection []string
-	backendMode       string
-	headless          bool
-	insecure          bool
-	cmd               *cobra.Command
+	basicAuth          []string
+	frontendSelection  []string
+	backendMode        string
+	headless           bool
+	insecure           bool
+	oauthProvider      string
+	oauthEmailDomains  []string
+	oauthCheckInterval time.Duration
+	cmd                *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -37,11 +41,17 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
+
+	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
+	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
+	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domains to authenticate via OAuth")
+	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
+
 	cmd.Run = command.run
 	return command
 }
@@ -95,8 +105,13 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   sdk.PublicShareMode,
 		Frontends:   cmd.frontendSelection,
-		Auth:        cmd.basicAuth,
+		BasicAuth:   cmd.basicAuth,
 		Target:      target,
+	}
+	if cmd.oauthProvider != "" {
+		req.OauthProvider = cmd.oauthProvider
+		req.OauthEmailDomains = cmd.oauthEmailDomains
+		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
 	}
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {

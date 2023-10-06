@@ -865,6 +865,9 @@ func init() {
           "404": {
             "description": "not found"
           },
+          "422": {
+            "description": "unprocessable"
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -1483,6 +1486,22 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "oauthAuthorizationCheckInterval": {
+          "type": "string"
+        },
+        "oauthEmailDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "oauthProvider": {
+          "type": "string",
+          "enum": [
+            "github",
+            "google"
+          ]
         },
         "reserved": {
           "type": "boolean"
@@ -2462,6 +2481,9 @@ func init() {
           "404": {
             "description": "not found"
           },
+          "422": {
+            "description": "unprocessable"
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -3080,6 +3102,22 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "oauthAuthorizationCheckInterval": {
+          "type": "string"
+        },
+        "oauthEmailDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "oauthProvider": {
+          "type": "string",
+          "enum": [
+            "github",
+            "google"
+          ]
         },
         "reserved": {
           "type": "boolean"
