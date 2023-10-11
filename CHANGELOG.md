@@ -2,6 +2,8 @@
 
 CHANGE: The title color of the header was changed from white to flourescent green, to better match the overall branding
 
+CHANGE: Tweaks to build and release process for logging and deprecations. Pin golang version at 1.21.3+ and node version at 18.x across all platforms
+
 # v0.4.7
 
 FEATURE: OAuth authentication with the ability to restrict authenticated users to specified domains for `zrok share public`. Supports both Google and GitHub authentication in this version. More authentication providers, and extensibility to come in future `zrok` releases. See the OAuth configuration guide at `docs/guides/self-hosting/oauth/configuring-oauth.md` for details (https://github.com/openziti/zrok/issues/45, https://github.com/openziti/zrok/issues/404)

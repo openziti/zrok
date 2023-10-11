@@ -10,7 +10,7 @@ builds:
     goarch:
       - amd64
     hooks:
-      post: gon build/gon-amd64.hcl
+      post: gon -log-level=info build/gon-amd64.hcl
 
   - id: zrok-arm64
     main: ./cmd/zrok
@@ -23,4 +23,4 @@ builds:
     goarch:
       - arm64
     hooks:
-      post: gon build/gon-arm64.hcl
+      post: gon -log-level=info build/gon-arm64.hcl
