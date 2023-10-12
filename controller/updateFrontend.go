@@ -57,7 +57,7 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 		}
 
 		if err := tx.Commit(); err != nil {
-			logrus.Errorf("error commiting frontend update: %v", err)
+			logrus.Errorf("error committing frontend update: %v", err)
 			return admin.NewUpdateFrontendInternalServerError()
 		}
 	}

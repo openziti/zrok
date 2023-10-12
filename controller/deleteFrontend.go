@@ -40,7 +40,7 @@ func (h *deleteFrontendHandler) Handle(params admin.DeleteFrontendParams, princi
 	}
 
 	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error commiting frontend '%v' deletion: %v", feToken, err)
+		logrus.Errorf("error committing frontend '%v' deletion: %v", feToken, err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
 
