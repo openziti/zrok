@@ -68,9 +68,10 @@ const config = {
         // googleAnalytics: {
         //
         // },
-        // gtag: {
-        //
-        // },
+        gtag: {
+          trackingID: 'G-V2KMEXWJ10',
+          anonymizeIP: true,
+        },
         sitemap: {
 
         }
