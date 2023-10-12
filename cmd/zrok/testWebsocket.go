@@ -102,7 +102,7 @@ func (cmd *testWebsocketCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer c.Close(websocket.StatusInternalError, "the sky is falling")
 
-	logrus.Info("Writting to server...")
+	logrus.Info("Writing to server...")
 	err = wsjson.Write(ctx, c, "hi")
 	if err != nil {
 		logrus.Error(err)

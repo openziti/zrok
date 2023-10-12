@@ -211,7 +211,7 @@ $ zrok enable klFEoIi0QAg7
 ⣻  contacting the zrok service...
 ```
 
-After a few seconds, the message will change and indicate that the enable operation suceeded:
+After a few seconds, the message will change and indicate that the enable operation succeeded:
 
 ```
 $ zrok enable klFEoIi0QAg7 
