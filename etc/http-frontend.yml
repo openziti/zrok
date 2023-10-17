@@ -1,0 +1,21 @@
+# Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
+# configured string. This will allow you to let a load balancer access the frontend by IP address for health check
+# purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
+#
+host_match: localzrok.io
+
+#tls:
+#  cert_path: "/Path/To/Cert/zrok.crt"
+#  key_path:  "/Path/To/Cert/zrok.key"
+
+oauth:
+  port: 28081
+  redirect_url: oauth.localzrok.io
+  hash_key_raw: "test1234test1234"
+  providers:
+    - name: google
+      client_id: 97755533483-3ft4fssabpnl9hcjvh5g61fsuq2rhlj7.apps.googleusercontent.com
+      client_secret: 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
+    - name: github
+      client_id: 0d785a002f6459967c76
+      client_secret: c65c7f24f21d92554ffadc54d5bbf95f37829062

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"os"
 )
 

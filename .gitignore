@@ -16,6 +16,8 @@ etc/dev-frontend.yml
 .docusaurus
 .cache-loader
 
+sdk/python/sdk/build/
+
 # Misc
 .DS_Store
 .env.local
@@ -24,6 +26,7 @@ etc/dev-frontend.yml
 .env.production.local
 go.work
 go.work.sum
+/zrok-venv
 
 npm-debug.log*
 yarn-debug.log*

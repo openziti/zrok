@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"strings"
 	"time"
 
