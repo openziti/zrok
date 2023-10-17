@@ -2,6 +2,8 @@
 
 FEATURE: The `sdk` package now includes a `sdk.Overview` function, which returns a complete description of the account attached to the enabled environment. Useful for inventorying the deployed shares and environments (https://github.com/openziti/zrok/issues/407)
 
+CHANGE: The `zrok access public` frontend configuration format has changed and now requires that the configuration document include a `v: 2` declaration. This frontend configuration format is now versioned and when the code updates the configuration structure, you will receive an error message at startup, provoking you to look into updating your configuration (https://github.com/openziti/zrok/issues/406)
+
 CHANGE: The title color of the header was changed from white to flourescent green, to better match the overall branding
 
 CHANGE: Tweaks to build and release process for logging and deprecations. Pin golang version at 1.21.3+ and node version at 18.x across all platforms

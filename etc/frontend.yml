@@ -1,3 +1,9 @@
+# The `v` field determines the configuration version. When software is released that changes the structure of the
+# configuration, the software will expect this field to be incremented. This protects you against invalid configuration
+# versions and will refer to you to the documentation when the configuration structure changes.
+#
+v: 2
+
 # Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
 # configured string. This will allow you to let a load balancer access the frontend by IP address for health check
 # purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
