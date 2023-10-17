@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
-	"io"
-	"net/http"
 )
 
 func init() {
@@ -41,32 +40,13 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	client := &http.Client{}
-	apiEndpoint, _ := root.ApiEndpoint()
-	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v1/overview", apiEndpoint), nil)
+	json, err := sdk.Overview(root)
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error accessing overview", err)
-		}
-		panic(err)
-	}
-	req.Header.Add("X-TOKEN", root.Environment().Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("error requesting overview", err)
+			tui.Error("error loading zrokdir", err)
 		}
 		panic(err)
 	}
 
-	json, err := io.ReadAll(resp.Body)
-	if err != nil {
-		if !panicInstead {
-			tui.Error("error reading body", err)
-		}
-		panic(err)
-	}
-	_ = resp.Body.Close()
-
-	fmt.Println(string(json))
+	fmt.Println(json)
 }
