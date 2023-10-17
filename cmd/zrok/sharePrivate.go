@@ -4,6 +4,7 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
@@ -72,8 +73,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = args[0]
 		cmd.headless = true
 
+	case "drive":
+		target = args[0]
+
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
 	}
 
 	root, err := environment.LoadRoot()
@@ -235,6 +239,28 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
+
+	case "drive":
+		cfg := &drive.BackendConfig{
+			IdentityPath: zif,
+			DriveRoot:    target,
+			ShrToken:     shr.Token,
+			Requests:     requests,
+		}
+
+		be, err := drive.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating drive backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running drive backend: %v", err)
 			}
 		}()
 

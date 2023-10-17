@@ -25,7 +25,6 @@ type BackendConfig struct {
 
 type Backend struct {
 	cfg      *BackendConfig
-	requests func() int32
 	listener edge.Listener
 	handler  http.Handler
 }
@@ -56,7 +55,6 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	handler := util.NewProxyHandler(proxy)
 	return &Backend{
 		cfg:      cfg,
-		requests: handler.Requests,
 		listener: listener,
 		handler:  handler,
 	}, nil
@@ -67,10 +65,6 @@ func (b *Backend) Run() error {
 		return err
 	}
 	return nil
-}
-
-func (b *Backend) Requests() func() int32 {
-	return b.requests
 }
 
 func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
