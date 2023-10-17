@@ -7,7 +7,7 @@
 
 # The `v` field determines the configuration version. When software is released that changes the structure of the
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
-# versions.
+# versions and will refer to you to the documentation when the configuration structure changes.
 #
 v: 3
 
