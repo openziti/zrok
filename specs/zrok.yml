@@ -971,7 +971,7 @@ definitions:
           type: string
       backendMode:
         type: string
-        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy"]
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive"]
       backendProxyEndpoint:
         type: string
       authScheme:
