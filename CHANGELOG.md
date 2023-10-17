@@ -1,3 +1,7 @@
+# v0.4.9
+
+FIX: Remove extraneous share token prepended to OAuth frontend redirect.
+
 # v0.4.8
 
 FEATURE: The `sdk` package now includes a `sdk.Overview` function, which returns a complete description of the account attached to the enabled environment. Useful for inventorying the deployed shares and environments (https://github.com/openziti/zrok/issues/407)
