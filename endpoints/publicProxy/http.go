@@ -352,7 +352,7 @@ func oauthLoginRequired(w http.ResponseWriter, r *http.Request, shrToken string,
 	if pcfg.Oauth != nil && pcfg.Oauth.RedirectHttpOnly {
 		scheme = "http"
 	}
-	http.Redirect(w, r, fmt.Sprintf("%s://%s.%s:%d/%s/login?targethost=%s&checkInterval=%s", scheme, shrToken, pcfg.Oauth.RedirectHost, pcfg.Oauth.RedirectPort, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s://%s:%d/%s/login?targethost=%s&checkInterval=%s", scheme, pcfg.Oauth.RedirectHost, pcfg.Oauth.RedirectPort, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {
