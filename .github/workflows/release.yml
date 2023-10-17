@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.21.0'
+          go-version: '>=1.21.3'
           cache: true
 
       - uses: actions/setup-node@v3
@@ -43,7 +43,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --config .goreleaser-linux.yml
+          args: release --skip=publish --config .goreleaser-linux.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -66,12 +66,12 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.21.0'
+          go-version: '>=1.21.3'
           cache: true
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - run: npm install
         working-directory: ui
@@ -85,7 +85,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --config .goreleaser-linux-arm64.yml
+          args: release --skip=publish --config .goreleaser-linux-arm64.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -108,12 +108,12 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.21.0'
+          go-version: '>=1.21.3'
           cache: true
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - run: npm install
         working-directory: ui
@@ -127,7 +127,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --config .goreleaser-linux-armhf.yml
+          args: release --skip=publish --config .goreleaser-linux-armhf.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -157,12 +157,12 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.21.0'
+          go-version: '>=1.21.3'
           cache: true
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - run: npm install
         working-directory: ui
@@ -176,7 +176,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --config .goreleaser-darwin.yml
+          args: release --skip=publish --config .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
@@ -201,12 +201,12 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '>=1.21.0'
+          go-version: '>=1.21.3'
           cache: true
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - run: npm install
         working-directory: ui
@@ -220,7 +220,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --config .goreleaser-windows.yml
+          args: release --skip=publish --config .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

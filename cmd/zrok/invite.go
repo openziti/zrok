@@ -89,7 +89,8 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 			tui.Error("error creating invitation", err)
 		}
 
-		fmt.Printf("invitation sent to '%v'!\n", email)
+		fmt.Printf("invitation sent to '%v'!\n\n", email)
+		fmt.Printf(fmt.Sprintf("%v\n\n", tui.Attention.Render("*** be sure to check your SPAM folder if you do not receive the invitation email!")))
 	}
 }
 

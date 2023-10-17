@@ -10,7 +10,10 @@ import (
 	"strings"
 )
 
+const V = 2
+
 type Config struct {
+	V         int
 	Identity  string
 	Address   string
 	HostMatch string
@@ -50,6 +53,9 @@ func DefaultConfig() *Config {
 func (c *Config) Load(path string) error {
 	if err := cf.BindYaml(c, path, cf.DefaultOptions()); err != nil {
 		return errors.Wrapf(err, "error loading frontend config '%v'", path)
+	}
+	if c.V != V {
+		return errors.Errorf("invalid configuration version '%d'; expected '%d'", c.V, V)
 	}
 	return nil
 }

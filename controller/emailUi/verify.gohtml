@@ -7,37 +7,29 @@
     <title>Welcome to zrok!</title>
     <meta name="description" content="Please click to create your zrok account.">
     <meta name="viewport" content="width=device-width">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            padding: 25;
+            padding: 25px;
             font-family: 'JetBrains Mono', 'Courier New', monospace;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             color: #ffffff;
             background-color: #3b2693;
-
         }
 
         a:link {
-            color: #00d7e4;
+            color: white;
         }
 
         a:visited {
-            color: #00d7e4;
+            color: white;
         }
 
         a:hover,
         a:active {
             color: #ff0100;
-        }
-
-        .claim {
-            font-size: 2em;
-            margin: 0.5em 0 1em 0;
         }
 
         .container {
@@ -46,8 +38,6 @@
             max-width: 100%;
             text-align: center;
         }
-
-
 
         .btn {
             display: inline-block;
@@ -132,23 +122,23 @@
 
 <div class="container">
     <div class="banner" style="margin: auto;">
-        <img src="https://zrok.io/wp-content/uploads/2023/01/welcome.jpg" width="363px" height="500px" style="padding-bottom: 10px;"/>
+        <img src="https://zrok.io/wp-content/uploads/2023/01/welcome.jpg" width="363px" height="500px" style="padding-bottom: 10px;" alt="welcome to zrok"/>
     </div>
     <div class="cta" style="text-align: center;">
-        <p style="text-align: center;">Please click the button below to create your zrok account for {{ .EmailAddress }}.</p>
+        <p style="text-align: center; color: white;">Please click the button below to create your zrok account for {{ .EmailAddress }}.</p>
         <a class="btn btn-primary" href="{{ .VerifyUrl }}" style="color: #ffffff;">Create Account</a>
         <a class="btn btn-secondary" href="https://docs.zrok.io/" style="color: #ffffff">Documentation</a>
     </div>
 
     <table border="0" cellpadding="0" cellspacing="0" align="center" class="about">
         <tr>
-            <td><a href="https://github.com/openziti/zrok" target="_blank">github.com/openziti/zrok</a></td>
+            <td><a href="https://github.com/openziti/zrok" target="_blank" style="color: white;">github.com/openziti/zrok</a></td>
         </tr>
         <tr>
             <td>{{ .Version }}</td>
         </tr>
     </table>
-    <p style="text-align: center;"></a>Copyright © 2023 <a href="http://www.netfoundry.io" target="_blank" style="color: #00d7e4;">NetFoundry, Inc.</a></p>
+    <p style="text-align: center;">Copyright © 2023 <a href="http://www.netfoundry.io" target="_blank" style="color: white;">NetFoundry, Inc.</a></p>
 </div>
 </body>
 

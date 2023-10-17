@@ -1,3 +1,9 @@
+# The `v` field determines the configuration version. When software is released that changes the structure of the
+# configuration, the software will expect this field to be incremented. This protects you against invalid configuration
+# versions and will refer to you to the documentation when the configuration structure changes.
+#
+v: 2
+
 # Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
 # configured string. This will allow you to let a load balancer access the frontend by IP address for health check
 # purposes, and will allow `Host` headers that match the configured DNS name to be routed through `zrok`.
@@ -7,10 +13,25 @@
 # The OAuth configuration is used when enabling OAuth authentication with your public frontend.
 #
 #oauth:
+#  # `redirect_host` and `redirect_port` should correspond with the DNS hostname and URL representing
+#  # the OAuth frontend you'll use with your installation.
+#  #
 #  redirect_host: oauth.zrok.io
 #  redirect_port: 28080
+#
+#  # `redirect_http_only` will generate an HTTP URI for your OAuth frontend, rather than HTTPS. This
+#  # should only be set to `true` in development environments.
+#  #
 #  redirect_http_only: false
+#
+#  # `hash_key` is a unique key for your installation that is used to secure authentication payloads
+#  # with OAuth providers.
+#  #
 #  hash_key: "<yourRandomHashKey>"
+#
+#  # `providers` contains an array of provider details enabled in your installation. Currently only
+#  # `google` and `github` are supported. Your configuration can include `google`, `github`, or both.
+#  #
 #  providers:
 #    - name: google
 #      client_id: <client-id>
