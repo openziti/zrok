@@ -2,7 +2,7 @@
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
 # versions and will refer to you to the documentation when the configuration structure changes.
 #
-v: 2
+v: 3
 
 # Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
 # configured string. This will allow you to let a load balancer access the frontend by IP address for health check
@@ -13,16 +13,19 @@ v: 2
 # The OAuth configuration is used when enabling OAuth authentication with your public frontend.
 #
 #oauth:
-#  # `redirect_host` and `redirect_port` should correspond with the DNS hostname and URL representing
-#  # the OAuth frontend you'll use with your installation.
+#  # `bind_address` is the <address:port> of the interface where the OAuth frontend listener should
+#  # bind
 #  #
-#  redirect_host: oauth.zrok.io
-#  redirect_port: 28080
+#  bind_address: 127.0.0.1:8181
 #
-#  # `redirect_http_only` will generate an HTTP URI for your OAuth frontend, rather than HTTPS. This
-#  # should only be set to `true` in development environments.
+#  # `redirect_url` is the <scheme://address[:port]> of the URL where OAuth requests should be directed.
 #  #
-#  redirect_http_only: false
+#  redirect_url: https://oauth.zrok.io
+#
+#  # `cookie_domain` is the domain where the authentication cookies should be applied. Should likely match
+#  # the `host_match` specified above.
+#  #
+#  cookie_domain: zrok.io
 #
 #  # `hash_key` is a unique key for your installation that is used to secure authentication payloads
 #  # with OAuth providers.
