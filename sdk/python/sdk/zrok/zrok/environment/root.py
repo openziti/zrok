@@ -72,7 +72,7 @@ class Root:
             apiEndpoint = self.env.ApiEndpoint
             frm = "env"
 
-        return ApiEndpoint(apiEndpoint, frm)
+        return ApiEndpoint(apiEndpoint.rstrip("/"), frm)
     
     def IsEnabled(self) -> bool:
         return self.env != Environment()
