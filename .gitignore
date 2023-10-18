@@ -33,3 +33,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .obsidian
+sdk/examples/pastebin/cmd/copyto/copyto
+sdk/examples/pastebin/cmd/copyto/payload
+sdk/examples/pastebin/cmd/pastefrom/pastefrom
