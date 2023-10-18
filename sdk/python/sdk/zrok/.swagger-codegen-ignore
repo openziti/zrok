@@ -28,3 +28,4 @@ tox.ini
 test-requirements.txt
 test/
 docs/
+README.md
