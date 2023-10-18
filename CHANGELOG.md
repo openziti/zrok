@@ -1,3 +1,11 @@
+# v0.4.10
+
+CHANGE: The public frontend configuration has been bumped from `v: 2` to `v: 3`. The `redirect_host`, `redirect_port` and `redirect_http_only` parameters have been removed. These three configuration options have been replaced with `bind_address`, `redirect_url` and `cookie_domain`. See the OAuth configuration guide at `docs/guides/self-hosting/oauth/configuring-oauth.md` for more details (https://github.com/openziti/zrok/issues/411)
+
+# v0.4.9
+
+FIX: Remove extraneous share token prepended to OAuth frontend redirect.
+
 # v0.4.8
 
 FEATURE: The `sdk` package now includes a `sdk.Overview` function, which returns a complete description of the account attached to the enabled environment. Useful for inventorying the deployed shares and environments (https://github.com/openziti/zrok/issues/407)

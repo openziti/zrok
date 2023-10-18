@@ -16,7 +16,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -32,12 +31,10 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		return nil
 	}
 	clientID := providerCfg.ClientId
-	callbackPath := "/github/oauth"
-	redirectUrl := fmt.Sprintf("%s://%s", scheme, cfg.RedirectHost)
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v:%v%v", redirectUrl, cfg.RedirectPort, callbackPath),
+		RedirectURL:  fmt.Sprintf("%v/github/oauth", cfg.RedirectUrl),
 		Scopes:       []string{"user:email"},
 		Endpoint:     githubOAuth.Endpoint,
 	}
@@ -52,15 +49,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 	}
 	key := hash.Sum(nil)
 
-	u, err := url.Parse(redirectUrl)
-	if err != nil {
-		logrus.Errorf("unable to parse redirect url: %v", err)
-		return err
-	}
-	parts := strings.Split(u.Hostname(), ".")
-	domain := parts[len(parts)-2] + "." + parts[len(parts)-1]
-
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(domain))
+	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
 
 	options := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
@@ -177,10 +166,10 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 			authCheckInterval = i
 		}
 
-		SetZrokCookie(w, domain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
+		SetZrokCookie(w, cfg.CookieDomain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 
-	http.Handle(callbackPath, rp.CodeExchangeHandler(getEmail, relyingParty))
+	http.Handle("/github/oauth", rp.CodeExchangeHandler(getEmail, relyingParty))
 	return nil
 }
