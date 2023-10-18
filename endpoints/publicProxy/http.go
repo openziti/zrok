@@ -228,7 +228,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 									cookie, err := r.Cookie("zrok-access")
 									if err != nil {
 										logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
-										oauthLoginRequired(w, r, shrToken, pcfg, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
@@ -239,18 +239,18 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 									})
 									if err != nil {
 										logrus.Errorf("unable to parse jwt: %v", err)
-										oauthLoginRequired(w, r, shrToken, pcfg, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									claims := tkn.Claims.(*ZrokClaims)
 									if claims.Provider != provider {
 										logrus.Error("provider mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, shrToken, pcfg, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									if claims.AuthorizationCheckInterval != authCheckInterval {
 										logrus.Error("authorization check interval mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, shrToken, pcfg, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
@@ -347,12 +347,8 @@ func basicAuthRequired(w http.ResponseWriter, realm string) {
 	_, _ = w.Write([]byte("No Authorization\n"))
 }
 
-func oauthLoginRequired(w http.ResponseWriter, r *http.Request, shrToken string, pcfg *Config, provider, target string, authCheckInterval time.Duration) {
-	scheme := "https"
-	if pcfg.Oauth != nil && pcfg.Oauth.RedirectHttpOnly {
-		scheme = "http"
-	}
-	http.Redirect(w, r, fmt.Sprintf("%s://%s:%d/%s/login?targethost=%s&checkInterval=%s", scheme, pcfg.Oauth.RedirectHost, pcfg.Oauth.RedirectPort, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
+	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targethost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {

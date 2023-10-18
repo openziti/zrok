@@ -16,7 +16,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -33,12 +32,10 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 	}
 
 	clientID := providerCfg.ClientId
-	callbackPath := "/google/oauth"
-	redirectUrl := fmt.Sprintf("%s://%s", scheme, cfg.RedirectHost)
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v:%v%v", redirectUrl, cfg.RedirectPort, callbackPath),
+		RedirectURL:  fmt.Sprintf("%v/google/oauth", cfg.RedirectUrl),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}
@@ -53,15 +50,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 	}
 	key := hash.Sum(nil)
 
-	u, err := url.Parse(redirectUrl)
-	if err != nil {
-		logrus.Errorf("unable to parse redirect url: %v", err)
-		return err
-	}
-	parts := strings.Split(u.Hostname(), ".")
-	domain := parts[len(parts)-2] + "." + parts[len(parts)-1]
-
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(domain))
+	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
 
 	options := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
@@ -157,10 +146,10 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 			authCheckInterval = i
 		}
 
-		SetZrokCookie(w, domain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key)
+		SetZrokCookie(w, cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 
-	http.Handle(callbackPath, rp.CodeExchangeHandler(getEmail, relyingParty))
+	http.Handle("/google/oauth", rp.CodeExchangeHandler(getEmail, relyingParty))
 	return nil
 }

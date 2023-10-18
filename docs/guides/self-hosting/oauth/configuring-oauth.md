@@ -90,23 +90,25 @@ The public frontend configuration includes a new `oauth` section:
 
 ```yaml
 oauth:
-  redirect_host: oauth.zrok.io
-  redirect_port: 28080
-  redirect_http_only: false
-  hash_key: "<yourRandomHashKey>"
+  bind_address:                   0.0.0.0:8181
+  redirect_url:                   https://oauth.zrok.io
+  cookie_domain:                  zrok.io
+  hash_key:                       "the quick brown fox jumped over the lazy dog"
   providers:
-    - name: google
-      client_id: <client-id>
-      client_secret: <client-secret>
-    - name: github
-      client_id: <client-id>
-      client_secret: <client-secret>
+    - name:                       google
+      client_id:                  "<client id from google>"
+      client_secret:              "<client secret from google>"
+    - name:                       github
+      client_id:                  "<client id from github>"
+      client_secret:              "<client secret from github>"
       
 ```
 
-The `redirect_host` and `redirect_port` value should correspond with the DNS hostname and port configured as your OAuth frontend.
+The `bind_address` parameter determines where the OAuth frontend will bind. Should be in `ip:port` format.
 
-The `redirect_http_only` is useful in development environments where your OAuth frontend is not running behind an HTTPS reverse proxy. Should not be enabled in production environments!
+The `redirect_url` parameter determines the base URL where OAuth frontend requests will be redirected.
+
+`cookie_domain` is the domain where authentication cookies should be stored.
 
 `hash_key` is a unique string for your installation that is used to secure the authentication payloads for your public frontend.
 
