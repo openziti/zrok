@@ -29,6 +29,7 @@ setup(
     description="zrok",
     author_email="",
     url="",
+    python_requires='>=3.10',
     keywords=["Swagger", "zrok"],
     install_requires=REQUIRES,
     packages=find_packages(),
