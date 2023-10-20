@@ -4,6 +4,7 @@ import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
+	drive "github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
@@ -42,7 +43,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	}
 	command := &sharePublicCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 
@@ -76,6 +77,9 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	case "caddy":
 		target = args[0]
 		cmd.headless = true
+
+	case "drive":
+		target = args[0]
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
@@ -201,6 +205,28 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
+
+	case "drive":
+		cfg := &drive.BackendConfig{
+			IdentityPath: zif,
+			DriveRoot:    target,
+			ShrToken:     shr.Token,
+			Requests:     requests,
+		}
+
+		be, err := drive.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating drive backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running drive backend: %v", err)
 			}
 		}()
 
