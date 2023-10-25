@@ -1,6 +1,20 @@
-# v0.4.11
+# v0.4.14
 
 FEATURE: `zrok` Drives "Phase 1" (`p1`) functionality included in this release. This includes new `--backend-mode drive`, which accepts a folder path as a target. A `drive` share can be mounted as a network drive on Windows, macOS, and Linux, allowing full read/write access from all applications on those systems (https://github.com/openziti/zrok/issues/218) Subsequent releases will address CLI use cases and provide further refinements to the overall approach.
+
+# v0.4.13
+
+FIX: Update to Homebrew automation to properly integrate with the latest version of the Homebrew release process.
+
+# v0.4.12
+
+FIX: The `zrok reserve` command was not properly recording the reserved share status of the shares that it created, preventing the `zrok release` command from properly releasing them (https://github.com/openziti/zrok/issues/427) If a user encounters reserved shares that cannot be released with the `zrok release` command, they can be deleted through the web console. 
+
+# v0.4.11
+
+FEATURE: The `zrok reserve` command now incorporates the `--json-output|-j` flag, which outputs the reservation details as JSON, rather than as human-consumable log messages. Other commands will produce similar output in the future (https://github.com/openziti/zrok/issues/422)
+
+FIX: Include `--oauth-provider` and associated flags for the `zrok reserve` command, allowing reserved shares to specify OAuth authentication (https://github.com/openziti/zrok/issues/421)
 
 # v0.4.10
 

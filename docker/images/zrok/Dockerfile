@@ -1,7 +1,8 @@
 # this builds docker.io/openziti/zrok
-FROM docker.io/openziti/ziti-cli:0.27.9
-# This build stage grabs artifacts that are copied into the final image.
-# It uses the same base as the final image to maximize docker cache hits.
+ARG ZITI_CLI_TAG="0.30.5"
+ARG ZITI_CLI_IMAGE="docker.io/openziti/ziti-cli"
+# this builds docker.io/openziti/ziti-controller
+FROM ${ZITI_CLI_IMAGE}:${ZITI_CLI_TAG}
 
 ARG ARTIFACTS_DIR=./dist
 ARG DOCKER_BUILD_DIR=.
@@ -18,6 +19,11 @@ LABEL name="openziti/zrok" \
       description="Run the zrok CLI"
 
 USER root
+
+### install packages (jq introduced in source image in next release 0.30.6)
+RUN   INSTALL_PKGS="jq" && \
+      microdnf -y update --setopt=install_weak_deps=0 --setopt=tsflags=nodocs && \
+      microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs ${INSTALL_PKGS}
 
 ### add licenses to this directory
 RUN mkdir -p -m0755 /licenses
