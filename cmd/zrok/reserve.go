@@ -87,6 +87,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := &sdk.ShareRequest{
+		Reserved:    true,
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   shareMode,
 		BasicAuth:   cmd.basicAuth,
