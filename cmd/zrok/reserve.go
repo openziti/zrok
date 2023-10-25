@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk"
@@ -18,6 +19,7 @@ type reserveCommand struct {
 	basicAuth          []string
 	frontendSelection  []string
 	backendMode        string
+	jsonOutput         bool
 	oauthProvider      string
 	oauthEmailDomains  []string
 	oauthCheckInterval time.Duration
@@ -33,7 +35,7 @@ func newReserveCommand() *reserveCommand {
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy}")
-
+	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
 	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domains to authenticate via OAuth")
@@ -55,10 +57,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	case "proxy":
 		v, err := parseUrl(args[1])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			tui.Error("invalid target endpoint URL", err)
 		}
 		target = v
 
@@ -80,10 +79,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 
 	env, err := environment.LoadRoot()
 	if err != nil {
-		if !panicInstead {
-			tui.Error("error loading environment", err)
-		}
-		panic(err)
+		tui.Error("error loading environment", err)
 	}
 
 	if !env.IsEnabled() {
@@ -109,14 +105,19 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 	shr, err := sdk.CreateShare(env, req)
 	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create share", err)
-		}
-		panic(err)
+		tui.Error("unable to create share", err)
 	}
 
-	logrus.Infof("your reserved share token is '%v'", shr.Token)
-	for _, fpe := range shr.FrontendEndpoints {
-		logrus.Infof("reserved frontend endpoint: %v", fpe)
+	if !cmd.jsonOutput {
+		logrus.Infof("your reserved share token is '%v'", shr.Token)
+		for _, fpe := range shr.FrontendEndpoints {
+			logrus.Infof("reserved frontend endpoint: %v", fpe)
+		}
+	} else {
+		out, err := json.Marshal(shr)
+		if err != nil {
+			tui.Error("error emitting JSON", err)
+		}
+		fmt.Println(string(out))
 	}
 }
