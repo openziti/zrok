@@ -20,6 +20,7 @@ const (
 )
 
 type ShareRequest struct {
+	Reserved                        bool
 	BackendMode                     BackendMode
 	ShareMode                       ShareMode
 	Target                          string

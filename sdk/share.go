@@ -25,6 +25,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	default:
 		return nil, errors.Errorf("unknown share mode '%v'", request.ShareMode)
 	}
+	out.Body.Reserved = request.Reserved
 
 	if len(request.BasicAuth) > 0 {
 		out.Body.AuthScheme = string(Basic)
