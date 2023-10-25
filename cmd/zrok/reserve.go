@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 func init() {
@@ -14,10 +15,13 @@ func init() {
 }
 
 type reserveCommand struct {
-	basicAuth         []string
-	frontendSelection []string
-	backendMode       string
-	cmd               *cobra.Command
+	basicAuth          []string
+	frontendSelection  []string
+	backendMode        string
+	oauthProvider      string
+	oauthEmailDomains  []string
+	oauthCheckInterval time.Duration
+	cmd                *cobra.Command
 }
 
 func newReserveCommand() *reserveCommand {
@@ -27,9 +31,15 @@ func newReserveCommand() *reserveCommand {
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}
-	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy}")
+
+	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
+	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
+	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domains to authenticate via OAuth")
+	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
+
 	cmd.Run = command.run
 	return command
 }
@@ -88,6 +98,11 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 	if shareMode == sdk.PublicShareMode {
 		req.Frontends = cmd.frontendSelection
+	}
+	if cmd.oauthProvider != "" {
+		req.OauthProvider = cmd.oauthProvider
+		req.OauthEmailDomains = cmd.oauthEmailDomains
+		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
 	}
 	shr, err := sdk.CreateShare(env, req)
 	if err != nil {
