@@ -16,6 +16,6 @@ jobs:
         if: "!contains(github.ref, '-')"
         with:
           formula-name: zrok
-          download-url: https://github.com/openziti/zrok/archive/${{ steps.extract-version.outputs.tag-name }}.tar.gz
+          download-url: https://github.com/openziti/zrok/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
         env:
           COMMITTER_TOKEN: ${{ secrets.BREW_COMMITTER_TOKEN }}
