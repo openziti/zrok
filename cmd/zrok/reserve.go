@@ -100,6 +100,9 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		req.Frontends = cmd.frontendSelection
 	}
 	if cmd.oauthProvider != "" {
+		if shareMode != sdk.PublicShareMode {
+			tui.Error("--oauth-provider only supported for public shares", nil)
+		}
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailDomains = cmd.oauthEmailDomains
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
