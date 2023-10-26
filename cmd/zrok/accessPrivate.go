@@ -173,7 +173,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}()
 
 	if cmd.headless {
-		logrus.Infof("access the zrok share at the followind endpoint: %v", endpointUrl.String())
+		logrus.Infof("access the zrok share at the following endpoint: %v", endpointUrl.String())
 		for {
 			select {
 			case req := <-requests:
