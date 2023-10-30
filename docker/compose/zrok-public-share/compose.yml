@@ -1,0 +1,69 @@
+services:
+
+  # set file ownership
+  zrok-init:
+    image: busybox
+    # matches uid:gid of "nobody" in zrok container image
+    command: chown -Rc 65534:65534 /mnt/.zrok
+    user: root
+    volumes:
+      - zrok_env:/mnt/.zrok
+
+  # enable zrok environment
+  zrok-enable:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    depends_on:
+      zrok-init:
+        condition: service_completed_successfully
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        if [[ -n "$(jq '.ziti_identity' ~/.zrok/environment.json 2>/dev/null)" ]]; then
+          echo "INFO: zrok environment is already enabled"
+          exit 0
+        else
+          zrok config set apiEndpoint ${ZROK_API_ENDPOINT:-https://api.zrok.io}
+          echo "INFO: running: zrok $$(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
+          exec zrok "$${@}"
+        fi
+    command: -- enable --headless --description "${ZROK_ENVIRONMENT_NAME:-docker temp public share}" ${ZROK_ENABLE_TOKEN}
+    volumes:
+      - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+
+  # start share on temporary public frontend url
+  zrok-share:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        set -o pipefail
+        ZROK_CMD="share public --headless"
+        if [[ -n "${ZROK_SHARE_OPTS:-}" ]]; then
+          ZROK_CMD+=" ${ZROK_SHARE_OPTS}"
+        fi
+        if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
+          ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
+        fi
+        ZROK_CMD+=" --backend-mode proxy ${ZROK_BACKEND:-http://zrok-test:9090/}"
+        echo "INFO: running: zrok $${ZROK_CMD}"
+        exec zrok $${ZROK_CMD}
+    depends_on:
+      zrok-enable:
+        condition: service_completed_successfully
+    volumes:
+      - zrok_env:/mnt/.zrok
+    environment:
+      HOME: /mnt
+      PFXLOG_NO_JSON: "true"
+
+  # demo servers you can share with zrok
+  zrok-test:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    command: test endpoint --address 0.0.0.0  # 9090
+
+volumes:
+  zrok_env:

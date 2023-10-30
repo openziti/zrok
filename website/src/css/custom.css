@@ -178,3 +178,8 @@ a code {
   color: var(--ifm-navbar-link-color);
   font-weight: var(--ifm-font-weight-semibold);
 }
+
+/* hide the clipboard copy button on code blocks of type "buttonless" */
+.language-buttonless div > button {
+  display: none;
+}

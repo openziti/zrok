@@ -5,7 +5,7 @@ FROM debian:bullseye-slim
 #
 
 ARG TARGETARCH
-ARG golang_version=1.19.5
+ARG golang_version=1.20
 ARG go_distribution_file=go${golang_version}.linux-${TARGETARCH}.tar.gz
 ARG go_path=/usr/share/go
 ARG go_root=/usr/local/go
