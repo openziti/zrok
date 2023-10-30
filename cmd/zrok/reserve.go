@@ -34,7 +34,7 @@ func newReserveCommand() *reserveCommand {
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy, drive}")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
@@ -73,8 +73,11 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	case "caddy":
 		target = args[1]
 
+	case "drive":
+		target = args[1]
+
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
 	}
 
 	env, err := environment.LoadRoot()

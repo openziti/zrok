@@ -1,6 +1,8 @@
-# Changelog
+# CHANGELOG
 
 ## v0.4.14
+
+FEATURE: `zrok` Drives "Phase 1" (`p1`) functionality included in this release. This includes new `--backend-mode drive`, which accepts a folder path as a target. A `drive` share can be mounted as a network drive on Windows, macOS, and Linux, allowing full read/write access from all applications on those systems (https://github.com/openziti/zrok/issues/218) Subsequent releases will address CLI use cases and provide further refinements to the overall approach.
 
 FEATURE: Docker Compose project for a reserved public share in docker/compose/zrok-public-share-reserved/compose.yml is described in the [public share guide](https://docs.zrok.io/docs/guides/docker-share/docker_public_share_guide/).
 
@@ -138,7 +140,7 @@ CHANGE: `zrok test loop` has been moved to `zrok test loop public`, making way f
 
 ## v0.3.2
 
-FEATURE: New docker infrastructure, including `compose.yml` examples (and documentation) illustrating how to deploy `zrok` in `docker`-based environments
+FEATURE: New docker infrastructure, including `docker-compose.yml` examples (and documentation) illustrating how to deploy `zrok` in `docker`-based environments
 
 CHANGE: Include missing `--headless` flag for `zrok enable` and `zrok access private` (https://github.com/openziti/zrok/issues/246)
 
@@ -146,8 +148,7 @@ CHANGE: Fix for `zrok enable` error path handling (https://github.com/openziti/z
 
 FEATURE: `zrok controller validate` and `zrok access public validate` will both perform a quick syntax validation on controller and public frontend configuration documents (https://github.com/openziti/zrok/issues/238)
 
-	$ zrok controller validate etc/dev.yml
-
+	$ zrok controller validate etc/dev.yml 
 	[ERROR]: controller config validation failed (error loading controller config 'etc/dev.yml': field 'maintenance': field 'registration': field 'expiration_timeout': got [bool], expected [time.Duration])
 
 CHANGE: `zrok status` no longer shows secrets (secret token, ziti identity) unless the `--secrets` flag is passed (https://github.com/openziti/zrok/issues/243)
