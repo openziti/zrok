@@ -1,0 +1,173 @@
+services:
+  # create Caddyfile
+  zrok-caddyfile:
+    image: busybox
+    # create Caddyfile
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        ZROK_UPSTREAM_URL="${ZROK_BACKEND:-http://zrok-test:9090}"
+        ZROK_UPSTREAM_HOST="$(echo $${ZROK_UPSTREAM_URL}|sed -E 's#^https?://([^/:]+).*#\1#')"
+        mkdir -p /mnt/.zrok
+        cat <<CADDYFILE >| /mnt/.zrok/Caddyfile
+        {
+          # GET /config/ and POST /load on this API to reload Caddy config
+          admin 0.0.0.0:2019
+        }
+        http:// {
+          bind {{ .ZrokBindAddress }}
+          handle_path /zrok-test/* {
+              reverse_proxy http://zrok-test:9090 {
+                  header_up Host zrok-test
+              }
+          }
+          handle_path /zrok-static/* {
+            root * /mnt/.zrok/html
+            file_server browse
+          }
+          reverse_proxy /* $${ZROK_UPSTREAM_URL} {
+              header_up Host $${ZROK_UPSTREAM_HOST}
+          }
+        }
+        CADDYFILE
+    user: root
+    volumes:
+      - zrok_env:/mnt
+
+  # set file ownership
+  zrok-init:
+    image: busybox
+    depends_on:
+      zrok-caddyfile:
+        condition: service_completed_successfully
+    # matches uid:gid of "nobody" in zrok container image
+    command: chown -Rc 65534:65534 /mnt/
+    user: root
+    volumes:
+      - zrok_env:/mnt
+
+  # enable zrok environment
+  zrok-enable:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    depends_on:
+      zrok-init:
+        condition: service_completed_successfully
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        if [[ -s ~/.zrok/environment.json ]]; then
+          ZITI_ID="$(jq '.ziti_identity' ~/.zrok/environment.json 2>/dev/null)"
+          if [[ -z "$${ZITI_ID}" || "$${ZITI_ID}" == null ]]; then
+            echo "ERROR: invalid environment; consider a reset with 'docker compose down --volumes'" >&2
+            exit 1
+          else
+            echo "INFO: zrok environment is already enabled"
+            exit 0
+          fi
+        else
+          if [[ -z "${ZROK_ENABLE_TOKEN}" ]]; then
+            echo "ERROR: ZROK_ENABLE_TOKEN is not defined" >&2
+            exit 1
+          else
+            zrok config set apiEndpoint ${ZROK_API_ENDPOINT:-https://api.zrok.io}
+            echo "INFO: running: zrok $(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
+            exec zrok "$${@}"
+          fi
+        fi
+    command: -- enable --headless --description "${ZROK_ENVIRONMENT_NAME:-docker reserved public share}" ${ZROK_ENABLE_TOKEN}
+    volumes:
+      - zrok_env:/mnt
+    environment:
+      HOME: /mnt
+
+  # reserve zrok frontend url for the zrok backend config
+  zrok-reserve:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        if [[ -s ~/.zrok/reserved.json ]]; then
+          ZROK_RESERVE_TOKEN="$(jq '.token' ~/.zrok/reserved.json 2>/dev/null)"  
+          if [[ -z "$${ZROK_RESERVE_TOKEN}" || "$${ZROK_RESERVE_TOKEN}" == null ]]; then
+            echo "ERROR: invalid reserved.json: $(jq -c . ~/.zrok/reserved.json)" >&2
+            exit 1
+          else 
+            echo "INFO: zrok backend is already reserved: $${ZROK_RESERVE_TOKEN}"
+            exit 0
+          fi
+        else
+          set -o pipefail
+          ZROK_CMD="reserve public --json-output"
+          if [[ -n "${ZROK_SHARE_OPTS:-}" ]]; then
+            ZROK_CMD+=" ${ZROK_SHARE_OPTS}"
+          fi
+          if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
+            ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
+          fi
+          if [[ -n "${ZROK_BACKEND_MODE:-}" && "${ZROK_BACKEND_MODE}" != caddy ]]; then
+            ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_BACKEND:-http://zrok-test:9090}"
+          else
+            ZROK_CMD+=" --backend-mode caddy /mnt/.zrok/Caddyfile"
+          fi
+          echo "INFO: running: zrok $${ZROK_CMD}"
+          zrok $${ZROK_CMD} | jq -rc | tee ~/.zrok/reserved.json
+        fi
+    depends_on:
+      zrok-enable:
+        condition: service_completed_successfully
+    volumes:
+      - zrok_env:/mnt
+    environment:
+      HOME: /mnt
+
+  # start share on reserved public frontend url
+  zrok-share:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        if ! [[ -s ~/.zrok/reserved.json ]]; then
+          echo "ERROR: empty or missing reserved.json" >&2
+          exit 1
+        else
+          ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' ~/.zrok/reserved.json 2>/dev/null)
+          if [[ -z "$${ZROK_PUBLIC_URLS}" || "$${ZROK_PUBLIC_URLS}" == null ]]; then
+            echo "ERROR: frontend endpoints not defined" >&2
+            exit 1
+          else 
+            echo "INFO: zrok public URLs: $${ZROK_PUBLIC_URLS}"
+          fi
+          ZROK_RESERVE_TOKEN=$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)
+          if [[ -z "$${ZROK_RESERVE_TOKEN}" && "$${ZROK_RESERVE_TOKEN}" == null ]]; then
+            echo "ERROR: zrok reservation token not defined" >&2
+            exit 1
+          else 
+            echo "INFO: zrok reservation token: $${ZROK_RESERVE_TOKEN}"
+          fi
+
+          echo "INFO: running: zrok $${@} $${ZROK_RESERVE_TOKEN}"
+          exec zrok "$${@}" $${ZROK_RESERVE_TOKEN}
+        fi
+    command: -- share reserved --headless 
+    depends_on:
+      zrok-reserve:
+        condition: service_completed_successfully
+    volumes:
+      - zrok_env:/mnt
+    ports:
+      - 127.0.0.1:2019:2019
+    environment:
+      HOME: /mnt
+      PFXLOG_NO_JSON: "true"
+
+  # demo server
+  zrok-test:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    command: test endpoint --address 0.0.0.0  # 9090
+
+volumes:
+  zrok_env:
