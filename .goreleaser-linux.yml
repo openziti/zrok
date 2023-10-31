@@ -1,5 +1,6 @@
 builds:
-- main: ./cmd/zrok
+- id: zrok-amd64
+  main: ./cmd/zrok
   binary: zrok
   ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
   env:
@@ -8,3 +9,47 @@ builds:
     - linux
   goarch:
     - amd64
+
+nfpms:
+  - package_name: zrok
+    id: zrok-cli
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |-
+      zrok is a next-generation sharing platform, designed to make sharing network and file resources simple and
+      secure.
+    license: Apache 2.0
+
+    # Build IDs for the builds you want to create NFPM packages for.
+    builds:
+      - zrok-amd64
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+
+    # {{ .ConventionalFileName }} satisfies the RPM name convention.
+    file_name_template: "{{ .ConventionalFileName }}"
+
+    # Umask to be used on files without explicit mode set. (overridable)
+    umask: 0o002
+
+    # Package version within this release version.
+    release: 1
+
+    # Section.
+    section: default
+
+    # Priority.
+    priority: optional
+
+    # GoReleaser will automatically add the binaries here
+    bindir: /opt/openziti/bin
+
+    # Contents to add to the package.
+    contents:
+      - src: /opt/openziti/bin/zrok
+        dst: /usr/bin/zrok
+        type: "symlink"
