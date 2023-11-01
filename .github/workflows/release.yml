@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload DEB to Artifactory release repo
         shell: bash
-        run: >
+        run: |
           for DEB in ./dist/*.deb; do
             echo "INFO: Uploading $DEB"
             jf rt upload --recursive=false --flat=true \
@@ -146,7 +146,7 @@ jobs:
 
       - name: Upload DEB to Artifactory release repo
         shell: bash
-        run: >
+        run: |
           for DEB in ./dist/*.deb; do
             echo "INFO: Uploading $DEB"
             jf rt upload --recursive=false --flat=true \
@@ -216,7 +216,7 @@ jobs:
 
       - name: Upload DEB to Artifactory release repo
         shell: bash
-        run: >
+        run: |
           for DEB in ./dist/*.deb; do
             echo "INFO: Uploading $DEB"
             jf rt upload --recursive=false --flat=true \
