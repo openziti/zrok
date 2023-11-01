@@ -321,9 +321,15 @@ jobs:
           path: ./dist/*.gz
 
   publish-release:
-    # run even when a needed job was skipped, e.g. while Ken is testing in a fork where Windows and macOS
-    # are skipped
-    if: ${{ !cancelled() }}
+    # allow skipped but not failed
+    if: ${{
+          !cancelled()
+          && (needs.build-linux-amd64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
+          && (needs.build-linux-arm.result   == 'success' || needs.build-linux-amd.result   == 'skipped')
+          && (needs.build-linux-arm64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
+          && (needs.build-darwin.result      == 'success' || needs.build-darwin.result      == 'skipped')
+          && (needs.build-windows.result     == 'success' || needs.build-windows.result     == 'skipped')
+      }}
     needs: [build-linux-amd64, build-linux-arm, build-linux-arm64, build-darwin, build-windows]
     runs-on: ubuntu-latest
     steps:
