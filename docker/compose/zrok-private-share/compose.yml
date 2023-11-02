@@ -32,7 +32,7 @@ services:
 
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
-    command: share private --headless --backend-mode proxy ${ZROK_BACKEND:-http://zrok-test:9090/} 
+    command: share private --headless --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/} 
     depends_on:
       zrok-enable:
         condition: service_completed_successfully

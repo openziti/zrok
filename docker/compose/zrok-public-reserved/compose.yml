@@ -7,7 +7,7 @@ services:
       - sh
       - -euc
       - |
-        ZROK_UPSTREAM_URL="${ZROK_BACKEND:-http://zrok-test:9090}"
+        ZROK_UPSTREAM_URL="${ZROK_TARGET:-http://zrok-test:9090}"
         ZROK_UPSTREAM_HOST="$(echo $${ZROK_UPSTREAM_URL}|sed -E 's#^https?://([^/:]+).*#\1#')"
         mkdir -p /mnt/.zrok
         cat <<CADDYFILE >| /mnt/.zrok/Caddyfile
@@ -90,12 +90,12 @@ services:
       - -euc
       - |
         if [[ -s ~/.zrok/reserved.json ]]; then
-          ZROK_RESERVE_TOKEN="$(jq '.token' ~/.zrok/reserved.json 2>/dev/null)"  
-          if [[ -z "$${ZROK_RESERVE_TOKEN}" || "$${ZROK_RESERVE_TOKEN}" == null ]]; then
+          ZROK_RESERVED_TOKEN="$(jq '.token' ~/.zrok/reserved.json 2>/dev/null)"
+          if [[ -z "$${ZROK_RESERVED_TOKEN}" || "$${ZROK_RESERVED_TOKEN}" == null ]]; then
             echo "ERROR: invalid reserved.json: $(jq -c . ~/.zrok/reserved.json)" >&2
             exit 1
-          else 
-            echo "INFO: zrok backend is already reserved: $${ZROK_RESERVE_TOKEN}"
+          else
+            echo "INFO: zrok backend is already reserved: $${ZROK_RESERVED_TOKEN}"
             exit 0
           fi
         else
@@ -108,7 +108,7 @@ services:
             ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
           fi
           if [[ -n "${ZROK_BACKEND_MODE:-}" && "${ZROK_BACKEND_MODE}" != caddy ]]; then
-            ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_BACKEND:-http://zrok-test:9090}"
+            ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_TARGET:-http://zrok-test:9090}"
           else
             ZROK_CMD+=" --backend-mode caddy /mnt/.zrok/Caddyfile"
           fi
@@ -138,21 +138,21 @@ services:
           if [[ -z "$${ZROK_PUBLIC_URLS}" || "$${ZROK_PUBLIC_URLS}" == null ]]; then
             echo "ERROR: frontend endpoints not defined" >&2
             exit 1
-          else 
+          else
             echo "INFO: zrok public URLs: $${ZROK_PUBLIC_URLS}"
           fi
-          ZROK_RESERVE_TOKEN=$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)
-          if [[ -z "$${ZROK_RESERVE_TOKEN}" && "$${ZROK_RESERVE_TOKEN}" == null ]]; then
+          ZROK_RESERVED_TOKEN=$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)
+          if [[ -z "$${ZROK_RESERVED_TOKEN}" && "$${ZROK_RESERVED_TOKEN}" == null ]]; then
             echo "ERROR: zrok reservation token not defined" >&2
             exit 1
-          else 
-            echo "INFO: zrok reservation token: $${ZROK_RESERVE_TOKEN}"
+          else
+            echo "INFO: zrok reservation token: $${ZROK_RESERVED_TOKEN}"
           fi
 
-          echo "INFO: running: zrok $${@} $${ZROK_RESERVE_TOKEN}"
-          exec zrok "$${@}" $${ZROK_RESERVE_TOKEN}
+          echo "INFO: running: zrok $${@} $${ZROK_RESERVED_TOKEN}"
+          exec zrok "$${@}" $${ZROK_RESERVED_TOKEN}
         fi
-    command: -- share reserved --headless 
+    command: -- share reserved --headless
     depends_on:
       zrok-reserve:
         condition: service_completed_successfully
