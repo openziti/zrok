@@ -1,0 +1,17 @@
+[Unit]
+Description=zrok share
+After=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=zrok-share
+UMask=0007
+Environment=PFXLOG_NO_JSON=true
+ExecStartPre=/opt/openziti/bin/zrok-enable.bash /opt/openziti/etc/zrok/zrok-share.env
+ExecStart=/opt/openziti/bin/zrok-share.bash /opt/openziti/etc/zrok/zrok-share.env
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

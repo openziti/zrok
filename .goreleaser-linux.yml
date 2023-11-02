@@ -53,3 +53,71 @@ nfpms:
       - src: /opt/openziti/bin/zrok
         dst: /usr/bin/zrok
         type: "symlink"
+
+  - package_name: zrok-share
+    id: zrok-share
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |-
+      This package provides zrok-share.service. To enable, edit the "/opt/openziti/etc/zrok/zrok-share.env" file with the
+      desired sharing configuration, and run "systemctl enable zrok-share.service && systemctl restart zrok-share.service".
+    license: Apache 2.0
+
+    # do not bundle the built binaries, only supporting files
+    meta: true
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+
+    # {{ .ConventionalFileName }} satisfies the RPM name convention.
+    file_name_template: "{{ .ConventionalFileName }}"
+
+    # Umask to be used on files without explicit mode set. (overridable)
+    umask: 0o002
+
+    # Package version within this release version.
+    release: 1
+
+    # Section.
+    section: default
+
+    # Priority.
+    priority: optional
+
+    # GoReleaser will automatically add the binaries here
+    dependencies:
+      - zrok
+
+    recommends:
+      - jq
+
+    # Contents to add to the package.
+    contents:
+      - dst: /lib/systemd/system/
+        src: ./nfpm/zrok-share.service
+
+      - dst: /opt/openziti/etc/zrok
+        type: dir
+        file_info:
+          mode: 0755
+
+      - dst: /opt/openziti/bin/
+        src: ./nfpm/zrok-share.bash
+        file_info:
+          mode: 0755
+
+      - dst: /opt/openziti/bin/
+        src: ./nfpm/zrok-enable.bash
+        file_info:
+          mode: 0755
+
+      - dst: /opt/openziti/etc/zrok/
+        src: ./nfpm/zrok-share.env
+        type: config|noreplace
+
+      - dst: /opt/openziti/etc/zrok/
+        src: ./etc/caddy/multiple_upstream.Caddyfile
+        type: config|noreplace
