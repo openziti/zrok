@@ -120,14 +120,14 @@ Both the `google` and `github` providers accept a `client_id` and `client_secret
 
 With your public frontend configured to support OAuth, you can test this by creating a public share. There are new command line options to support this:
 
-```
+```text
 $ zrok share public
 Error: accepts 1 arg(s), received 0
 Usage:
   zrok share public <target> [flags]
 
 Flags:
-  -b, --backend-mode string               The backend mode {proxy, web, caddy} (default "proxy")
+  -b, --backend-mode string               The backend mode {proxy, web, caddy, drive} (default "proxy")
       --basic-auth stringArray            Basic authentication users (<username:password>,...)
       --frontends stringArray             Selected frontends to use for the share (default [public])
       --headless                          Disable TUI and run headless
@@ -150,7 +150,6 @@ The `--oauth-check-interval` flag specifies how frequently the authentication mu
 
 An example public share:
 
+```text
+zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
 ```
-$ zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
-```
-

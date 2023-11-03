@@ -82,7 +82,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		target = args[0]
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, caddy, drive}", cmd.backendMode), nil)
 	}
 
 	root, err := environment.LoadRoot()
