@@ -33,8 +33,9 @@ type ShareRequest struct {
 }
 
 type Share struct {
-	Token             string   `json:"token"`
-	FrontendEndpoints []string `json:"frontend_endpoints"`
+	Token             string        `json:"token"`
+	FrontendEndpoints []string      `json:"frontend_endpoints"`
+	Request           *ShareRequest `json:"request"`
 }
 
 type AccessRequest struct {

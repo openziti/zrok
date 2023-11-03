@@ -57,6 +57,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	return &Share{
 		Token:             in.Payload.ShrToken,
 		FrontendEndpoints: in.Payload.FrontendProxyEndpoints,
+		Request:           request,
 	}, nil
 }
 
