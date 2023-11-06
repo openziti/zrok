@@ -53,7 +53,7 @@ repo_gpgcheck=1"
         echo "$REPOSRC" >| $REPOFILE 
     fi
 
-    $PACKAGER update
+    $PACKAGER update --assumeyes
     $PACKAGER install --assumeyes zrok-share
     zrok version
     $PACKAGER info zrok-share
@@ -115,7 +115,7 @@ installDebian(){
     apt-get update
     apt-get install --yes zrok-share
     zrok version
-    apt show zrok-share
+    apt-cache show zrok-share=$(dpkg-query -W -f='${Version}' zrok-share)
 }
 
 main(){
