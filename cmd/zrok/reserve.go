@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"time"
+	"slices"
 )
 
 func init() {
@@ -34,7 +35,7 @@ func newReserveCommand() *reserveCommand {
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, <tcpTunnel, udpTunnel>, caddy, drive}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
@@ -48,8 +49,11 @@ func newReserveCommand() *reserveCommand {
 
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	shareMode := sdk.ShareMode(args[0])
+	privateOnlyModes := []string{"tcpTunnel", "udpTunnel"}
 	if shareMode != sdk.PublicShareMode && shareMode != sdk.PrivateShareMode {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
+	} else if shareMode == sdk.PublicShareMode && slices.Contains(privateOnlyModes, cmd.backendMode) {
+		tui.Error(fmt.Sprintf("invalid sharing mode for a %s share: %s", sdk.PublicShareMode, cmd.backendMode), nil)
 	}
 
 	var target string

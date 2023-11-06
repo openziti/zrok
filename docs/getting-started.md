@@ -293,7 +293,7 @@ Usage:
   zrok share public <target> [flags]
 
 Flags:
-      --backend-mode string      The backend mode {proxy, web} (default "proxy")
+      --backend-mode string      The backend mode {proxy, web, caddy, drive} (default "proxy")
       --basic-auth stringArray   Basic authentication users (<username:password>,...)
       --frontends stringArray    Selected frontends to use for the share (default [public])
       --headless                 Disable TUI and run headless
