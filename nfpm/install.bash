@@ -47,16 +47,19 @@ repo_gpgcheck=1"
         REPOSUM=$(checkSum <<< "$REPOSRC")
         if [ "$EXISTINGSUM" != "$REPOSUM" ]; then
             mv -v $REPOFILE{,".$(date -Iseconds)"}
-            echo "$REPOSRC" > $REPOFILE 
+            echo "$REPOSRC" > $REPOFILE
+
         fi
     else
-        echo "$REPOSRC" >| $REPOFILE 
+        echo "$REPOSRC" >| $REPOFILE
+
     fi
 
     $PACKAGER update --assumeyes
-    $PACKAGER install --assumeyes zrok-share
-    zrok version
-    $PACKAGER info zrok-share
+    $PACKAGER install --assumeyes "$@"
+    for PKG in "$@"; do
+        $PACKAGER info "$PKG"
+    done
 }
 
 installDebian(){
@@ -106,24 +109,31 @@ installDebian(){
         REPOSUM=$(checkSum <<< "$REPOSRC")
         if [ "$EXISTINGSUM" != "$REPOSUM" ]; then
             mv -v $REPOFILE{,".$(date -Iseconds)"}
-            echo "$REPOSRC" > $REPOFILE 
+            echo "$REPOSRC" > $REPOFILE
+
         fi
     else
-        echo "$REPOSRC" >| $REPOFILE 
+        echo "$REPOSRC" >| $REPOFILE
+
     fi
 
     apt-get update
-    apt-get install --yes zrok-share
-    zrok version
-    apt-cache show zrok-share=$(dpkg-query -W -f='${Version}' zrok-share)
+    apt-get install --yes "$@"
+    for PKG in "$@"; do
+        apt-cache show "$PKG=$(dpkg-query -W -f='${Version}' $PKG)"
+    done
 }
 
 main(){
+    if ! (( $# )); then
+        echo "ERROR: No arguments provided. Please provide a space-separated list of packages to install from the OpenZiti repo." >&2
+        exit 1
+    fi
     # Detect the system's distribution family
     if [ -f /etc/redhat-release ]; then
-        installRedHat
+        installRedHat "$@"
     elif [ -f /etc/debian_version ]; then
-        installDebian
+        installDebian "$@"
     else
         echo "ERROR: Unsupported Linux distribution family. The zrok-share package is availabe as a Debian or Red Hat package." >&2
         exit 1
@@ -131,4 +141,4 @@ main(){
 }
 
 # ensure the script is not executed before it is fully downloaded if curl'd to bash
-main
+main "$@"
