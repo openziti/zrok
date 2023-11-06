@@ -49,6 +49,12 @@ server {
 
 }
 
+map $http_upgrade $connection_upgrade {
+    default      keep-alive;
+    'websocket'  upgrade;
+    ''           close;
+}
+
 server {
     listen              443 ssl;
     server_name         *.zrok.quigley.com;
@@ -65,8 +71,10 @@ server {
       proxy_buffers    4 512k;
       proxy_buffer_size   256k;
 
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
     }
-
 }
 ```
 
