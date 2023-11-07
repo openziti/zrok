@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+# allow GITHUB_TOKEN to be used by the peaceiris/actions-gh-pages action to push to gh-pages branch
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
