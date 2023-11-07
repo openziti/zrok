@@ -145,10 +145,6 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
 
-      - run: |
-          brew tap mitchellh/gon
-          brew install mitchellh/gon/gon        
-
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
