@@ -20,7 +20,37 @@ You can be up and sharing using the `zrok.io` service in minutes. Here is a syno
 
 ### And then... sharing...
 
-* `zrok share` to share resources immediately, simply and securely
+Easily share private network resources with public internet users, securely, without having to alter any of your local network configuration:
+
+```
+$ zrok share public localhost:8080
+```
+
+![zrok share public](docs/images/zrok_share_public.png)
+
+```
+$ curl -s https://dslno640nct4.share.zrok.io | head
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#000000"/>
+    <meta name="description" content="zrok ui"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+```
+
+Share "network drives" with public and private users running on Windows, macOS, or Linux systems:
+
+```
+$ zrok share public --backend-mode drive ~/Repos/zrok
+```
+
+![zrok share public -b drive](docs/images/zrok_share_public_drive.png)
+
+Mounting and working with shared drives is simple, and works with any applications on the end users' systems:
+
+![mounted zrok drive](docs/images/zrok_share_public_drive_explorer.png)
 
 See the [Concepts and Getting Started Guide](https://docs.zrok.io/docs/getting-started) for a full overview.
 
@@ -70,7 +100,7 @@ The single `zrok` binary contains everything you need to operate `zrok` environm
 
 See the [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/) for details on getting your own `zrok` service instance running.
 
-# zrok Office Hours
+## zrok Office Hours
 
 We maintain a growing playlist of videos focusing on various aspects of `zrok`. This includes the "office hours" series, which are longer-format videos digging into the implementation of `zrok` and showcasing some of the latest features and capabilities:
 
