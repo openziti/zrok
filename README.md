@@ -70,6 +70,14 @@ The single `zrok` binary contains everything you need to operate `zrok` environm
 
 See the [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/) for details on getting your own `zrok` service instance running.
 
+# zrok Office Hours
+
+We maintain a growing playlist of videos focusing on various aspects of `zrok`. This includes the "office hours" series, which are longer-format videos digging into the implementation of `zrok` and showcasing some of the latest features and capabilities:
+
+[![zrok Office Hours](https://img.youtube.com/vi/Edqv7yRmXb0/0.jpg)](https://www.youtube.com/watch?v=Edqv7yRmXb0&list=PLMUj_5fklasLuM6XiCNqwAFBuZD1t2lO2)
+
+
+
 ## Building
 
 If you are interested in building `zrok` for yourself instead of using a released package, please refer to [BUILD.md](./BUILD.md)
