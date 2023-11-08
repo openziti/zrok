@@ -26,6 +26,7 @@ func init() {
 	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(copyCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
 	transport.AddAddressParser(tcp.AddressParser{})
@@ -77,6 +78,11 @@ var adminUpdateCmd = &cobra.Command{
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure your zrok environment",
+}
+
+var copyCmd = &cobra.Command{
+	Use:   "copy",
+	Short: "Copy files to/from zrok drives",
 }
 
 var loopCmd = &cobra.Command{
