@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/io-developer/go-davsync/pkg/client/webdav"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/studio-b12/gowebdav"
+	"path/filepath"
 )
 
 func init() {
@@ -25,5 +27,34 @@ func newCopyFromCommand() *copyFromCommand {
 }
 
 func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
-	_ = &webdav.Options{}
+	c := gowebdav.NewClient(args[0], "", "")
+	if err := c.Connect(); err != nil {
+		panic(err)
+	}
+	if err := cmd.recurseTree(c, ""); err != nil {
+		panic(err)
+	}
+}
+
+func (cmd *copyFromCommand) recurseTree(c *gowebdav.Client, path string) error {
+	files, err := c.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		sub := filepath.ToSlash(filepath.Join(path, f.Name()))
+		if f.IsDir() {
+			logrus.Infof("-> %v", sub)
+			if err := cmd.recurseTree(c, sub); err != nil {
+				return err
+			}
+		} else {
+			fi, err := c.Stat(sub)
+			if err != nil {
+				return err
+			}
+			logrus.Infof("++ %v (%v)", sub, fi.Sys())
+		}
+	}
+	return nil
 }
