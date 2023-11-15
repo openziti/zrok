@@ -2,18 +2,24 @@
 #
 http:// {
     # Bind to the zrok share
-	bind {{ .ZrokBindAddress }}
+    bind {{ .ZrokBindAddress }}
 
     # Handle paths starting with `/zrok/*`
     # This will also strip the `/zrok/` from the path before sending to the backend
-	handle_path /zrok/* {
-	    reverse_proxy https://zrok.io {
-	        header_up Host zrok.io
-	    }
-	}
+    handle_path /zrok/* {
+        reverse_proxy https://zrok.io {
+            header_up Host zrok.io
+        }
+    }
 
-	# All other traffic goes to localhost:3000
-	reverse_proxy /* 127.0.0.1:3000 {
-		header_up Host localhost:3000
-	}
+    # serve index.html if it exists, else a file index
+    handle_path /zrok-static/* {
+        root * /var/www/html
+        file_server browse
+    }
+
+    # All other traffic goes to localhost:3000
+    reverse_proxy /* 127.0.0.1:3000 {
+        header_up Host localhost:3000
+    }
 }
