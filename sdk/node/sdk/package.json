@@ -1,0 +1,40 @@
+{
+  "name": "zrok",
+  "version": "1.0.0",
+  "description": "SDK to enable programmatic usee of the zrok sharing methods",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openziti/zrok.git"
+  },
+  "keywords": [
+    "security",
+    "network",
+    "peer-to-peer",
+    "reverse-proxy",
+    "zero-trust"
+  ],
+  "author": "NetFoundry",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/openziti/zrok/issues"
+  },
+  "homepage": "https://github.com/openziti/zrok#readme",
+  "dependencies": {
+    "@openziti/ziti-sdk-nodejs": "^0.14.0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./zrok": "./zrok",
+    "./zrok/share": "./zrok/share",
+    "./environment": "./environment",
+    "./environment/root": "./environment/root.js",
+    "./environment/dirs": "./environment/dirs"
+  },
+  "imports": {
+    "./environment/dirs": "./environment/dirs.js"
+  }
+}

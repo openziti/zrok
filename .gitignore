@@ -7,7 +7,7 @@ etc/dev.yml
 etc/dev-frontend.yml
 
 # Dependencies
-/node_modules/
+node_modules/
 
 # Artifacts
 /dist/

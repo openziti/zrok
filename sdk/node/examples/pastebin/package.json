@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "commander": "^11.1.0",
+    "path": "^0.12.7",
+    "zrok": "../../sdk_ts/dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "npx tsc"
+  }
+}
