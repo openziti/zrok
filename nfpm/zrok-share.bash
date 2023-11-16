@@ -92,15 +92,16 @@ else
   if [[ -n "${ZROK_SHARE_OPTS:-}" ]]; then
     ZROK_CMD+=" ${ZROK_SHARE_OPTS}"
   fi
-  if [[ -n "${ZROK_BASIC_AUTH:-}" ]]; then
-    ZROK_CMD+=" --basic-auth ${ZROK_BASIC_AUTH}"
-  elif [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
+  if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
     ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
     if [[ -n "${ZROK_OAUTH_EMAILS:-}" ]]; then
       for EMAIL in ${ZROK_OAUTH_EMAILS}; do
         ZROK_CMD+=" --oauth-email-domains ${EMAIL}"
       done
     fi
+  elif [[ -n "${ZROK_BASIC_AUTH:-}" ]]; then
+    ZROK_CMD+=" --basic-auth ${ZROK_BASIC_AUTH}"
+  fi
   echo "INFO: running: zrok ${ZROK_CMD}"
   zrok ${ZROK_CMD} | jq -rc | tee ~/.zrok/reserved.json
 fi
