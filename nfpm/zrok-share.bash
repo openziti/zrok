@@ -94,14 +94,13 @@ else
   fi
   if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
     ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
-  fi
-  if [[ -n "${ZROK_OAUTH_EMAILS:-}" ]]; then
-    for EMAIL in ${ZROK_OAUTH_EMAILS}; do
-      if ! [[ ${EMAIL} =~ @ ]]; then
-        echo "WARNING: '${EMAIL}' does not contain '@' so it may match more than one email domain!" >&2
-      fi
-      ZROK_CMD+=" --oauth-email-domains ${EMAIL}"
-    done
+    if [[ -n "${ZROK_OAUTH_EMAILS:-}" ]]; then
+      for EMAIL in ${ZROK_OAUTH_EMAILS}; do
+        ZROK_CMD+=" --oauth-email-domains ${EMAIL}"
+      done
+    fi
+  elif [[ -n "${ZROK_BASIC_AUTH:-}" ]]; then
+    ZROK_CMD+=" --basic-auth ${ZROK_BASIC_AUTH}"
   fi
   echo "INFO: running: zrok ${ZROK_CMD}"
   zrok ${ZROK_CMD} | jq -rc | tee ~/.zrok/reserved.json
