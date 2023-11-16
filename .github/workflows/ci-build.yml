@@ -10,6 +10,10 @@ on:
       - 'docs/**'
       - 'website/**'
 
+# cancel older, redundant builds that haven't started yet
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   ubuntu-build:
     name: Build Linux AMD64 CLI
@@ -27,22 +31,29 @@ jobs:
         with:
           node-version: 18.x
 
-      - run: npm install
+      - name: install ui node modules
+        shell: bash
+        run: npm install
         working-directory: ui
 
-      - run: npm run build
+      - name: build node ui
+        shell: bash
+        run: npm run build
         working-directory: ui
         env:
           CI: "true"
           
       - name: go install
+        shell: bash
         run: go install -ldflags "-X github.com/openziti/zrok/build.Version=${{ github.ref }} -X github.com/openziti/zrok/build.Hash=${{ github.sha }}" ./...
 
-      - name: test
+      - name: go test
+        shell: bash
         run: go test -v ./...
 
       - name: solve GOBIN
         id: solve_go_bin
+        shell: bash
         run: |
           echo DEBUG: go_path="$(go env GOPATH)"
           echo go_bin="$(go env GOPATH)/bin" >> $GITHUB_OUTPUT
@@ -53,6 +64,7 @@ jobs:
           name: linux-amd64
           path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
           if-no-files-found: error
+
   # build a release candidate container image for branches named "main" or like "v*"
   rc-container-build:
     needs: ubuntu-build
@@ -62,6 +74,7 @@ jobs:
     steps:
       - name: Set a container image tag from the branch name
         id: slug
+        shell: bash
         run: |
           echo branch_tag=$(sed 's/[^a-z0-9_-]/__/gi' <<< "${GITHUB_REF#refs/heads/}") >> $GITHUB_OUTPUT
 
@@ -86,7 +99,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_HUB_API_USER }}
+          username: ${{ vars.DOCKER_HUB_API_USER || secrets.DOCKER_HUB_API_USER }}
           password: ${{ secrets.DOCKER_HUB_API_TOKEN }}
 
       - name: Set Up Container Image Tags for zrok CLI Container
@@ -94,11 +107,10 @@ jobs:
           ZROK_CONTAINER_IMAGE_REPO: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'openziti/zrok' }}
           ZROK_CONTAINER_IMAGE_TAG: ${{ steps.slug.outputs.branch_tag }}
         id: tagprep_cli
+        shell: bash
         run: |
-          DOCKER_TAGS=""
-          DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}"
-          echo "DEBUG: DOCKER_TAGS=${DOCKER_TAGS}"
-          echo DOCKER_TAGS="${DOCKER_TAGS}" >> $GITHUB_OUTPUT
+          echo DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}" \
+          | tee -a $GITHUB_OUTPUT
 
       - name: Build & Push Linux AMD64 CLI Container Image to Hub
         uses: docker/build-push-action@v3

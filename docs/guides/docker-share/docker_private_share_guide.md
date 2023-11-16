@@ -24,7 +24,7 @@ First, let's create the private share.
 
 1. Make a folder on your computer to use as a Docker Compose project for your zrok private share.
 1. In your terminal, change directory to your newly-created project folder.
-1. Download [the zrok-private-share Docker Compose project file](pathname:///zrok-private-share/docker-compose.yml) into your new project folder and make sure it's named `docker-compose.yml`.
+1. Download [the zrok-private-share Docker Compose project file](pathname:///zrok-private-share/compose.yml) into your new project folder and make sure it's named `compose.yml`.
 1. Copy your zrok environment token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
 
     ```bash
@@ -59,7 +59,7 @@ Now that we have a private share we can access it with zrok running in Docker. N
 
 1. Make a folder on your computer to use as a Docker Compose project for your zrok private access.
 1. In your terminal, change directory to your newly-created project folder.
-1. Download [the zrok-private-access Docker Compose project file](pathname:///zrok-private-access/docker-compose.yml) into your new project folder and make sure it's named `docker-compose.yml`.
+1. Download [the zrok-private-access Docker Compose project file](pathname:///zrok-private-access/compose.yml) into your new project folder and make sure it's named `compose.yml`.
 1. Copy your zrok environment token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
 
     ```bash

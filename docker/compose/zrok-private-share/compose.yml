@@ -1,38 +1,38 @@
-version: '3'
 services:
-  zrok-enable-init:
+  zrok-init:
     image: busybox
     # matches uid:gid of "nobody" in zrok container image
     command: chown -Rc 65534:65534 /mnt/.zrok
     user: root
     volumes:
       - zrok_env:/mnt/.zrok
+
   zrok-enable:
-    image: docker.io/openziti/zrok
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
     depends_on:
-      zrok-enable-init:
+      zrok-init:
         condition: service_completed_successfully
     entrypoint:
       - bash
-      - -c
+      - -euc
       - |
-        if [[ -s /mnt/.zrok/environment.json ]]; then
-          echo "INFO: noop: zrok environment is already enabled"
+        if [[ -n "$(jq '.ziti_identity' ~/.zrok/environment.json 2>/dev/null)" ]]; then
+          echo "INFO: zrok environment is already enabled"
           exit 0
         else
+          zrok config set apiEndpoint ${ZROK_API_ENDPOINT:-https://api.zrok.io}
           echo "INFO: running: zrok $$(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
-          exec zrok $${@}
+          exec zrok "$${@}"
         fi
-    command: -- enable --headless ${ZROK_ENABLE_TOKEN}
+    command: -- enable --headless --description "${ZROK_ENVIRONMENT_NAME:-docker private share}" ${ZROK_ENABLE_TOKEN}
     volumes:
       - zrok_env:/mnt/.zrok
     environment:
       HOME: /mnt
-      ZROK_ENABLE_TOKEN:
-      ZROK_API_ENDPOINT: ${ZROK_API_ENDPOINT:-https://api.zrok.io/}
-  zrok-public-share:
-    image: docker.io/openziti/zrok
-    command: share public --headless http://zrok-test:9090
+
+  zrok-share:
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    command: share private --headless --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/} 
     depends_on:
       zrok-enable:
         condition: service_completed_successfully
@@ -44,10 +44,8 @@ services:
 
   # demo servers you can share with zrok
   zrok-test:
-    image: docker.io/openziti/zrok
+    image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
     command: test endpoint --address 0.0.0.0  # 9090
-  httpbin-test:
-    image: mccutchen/go-httpbin  # 8080/tcp
 
 volumes:
   zrok_env:

@@ -90,23 +90,25 @@ The public frontend configuration includes a new `oauth` section:
 
 ```yaml
 oauth:
-  redirect_host: oauth.zrok.io
-  redirect_port: 28080
-  redirect_http_only: false
-  hash_key: "<yourRandomHashKey>"
+  bind_address:                   0.0.0.0:8181
+  redirect_url:                   https://oauth.zrok.io
+  cookie_domain:                  zrok.io
+  hash_key:                       "the quick brown fox jumped over the lazy dog"
   providers:
-    - name: google
-      client_id: <client-id>
-      client_secret: <client-secret>
-    - name: github
-      client_id: <client-id>
-      client_secret: <client-secret>
+    - name:                       google
+      client_id:                  "<client id from google>"
+      client_secret:              "<client secret from google>"
+    - name:                       github
+      client_id:                  "<client id from github>"
+      client_secret:              "<client secret from github>"
       
 ```
 
-The `redirect_host` and `redirect_port` value should correspond with the DNS hostname and port configured as your OAuth frontend.
+The `bind_address` parameter determines where the OAuth frontend will bind. Should be in `ip:port` format.
 
-The `redirect_http_only` is useful in development environments where your OAuth frontend is not running behind an HTTPS reverse proxy. Should not be enabled in production environments!
+The `redirect_url` parameter determines the base URL where OAuth frontend requests will be redirected.
+
+`cookie_domain` is the domain where authentication cookies should be stored.
 
 `hash_key` is a unique string for your installation that is used to secure the authentication payloads for your public frontend.
 
@@ -118,14 +120,14 @@ Both the `google` and `github` providers accept a `client_id` and `client_secret
 
 With your public frontend configured to support OAuth, you can test this by creating a public share. There are new command line options to support this:
 
-```
+```text
 $ zrok share public
 Error: accepts 1 arg(s), received 0
 Usage:
   zrok share public <target> [flags]
 
 Flags:
-  -b, --backend-mode string               The backend mode {proxy, web, caddy} (default "proxy")
+  -b, --backend-mode string               The backend mode {proxy, web, caddy, drive} (default "proxy")
       --basic-auth stringArray            Basic authentication users (<username:password>,...)
       --frontends stringArray             Selected frontends to use for the share (default [public])
       --headless                          Disable TUI and run headless
@@ -148,7 +150,6 @@ The `--oauth-check-interval` flag specifies how frequently the authentication mu
 
 An example public share:
 
+```text
+zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
 ```
-$ zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
-```
-

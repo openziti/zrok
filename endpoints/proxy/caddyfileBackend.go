@@ -56,10 +56,6 @@ func (b *CaddyfileBackend) Run() error {
 	return nil
 }
 
-func (b *CaddyfileBackend) Requests() func() int32 {
-	return nil
-}
-
 func preprocessCaddyfile(inF string, shr *sdk.Share) (string, error) {
 	input, err := os.ReadFile(inF)
 	if err != nil {

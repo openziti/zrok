@@ -19,8 +19,6 @@ func newShareHandler() *shareHandler {
 }
 
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Info("handling")
-
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)

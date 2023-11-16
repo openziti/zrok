@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write
 
+env:
+  ZITI_DEB_PROD_REPO: ${{ vars.ZITI_DEB_PROD_REPO || 'zitipax-openziti-deb-stable' }}
+  ZITI_RPM_PROD_REPO: ${{ vars.ZITI_RPM_PROD_REPO || 'zitipax-openziti-rpm-stable' }}
+  JFROG_CLI_VERSION: ${{ vars.JFROG_CLI_VERSION || '2.50.4' }}
+
 jobs:
   build-linux-amd64:
     runs-on: ubuntu-20.04
@@ -39,7 +44,7 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest
@@ -51,6 +56,34 @@ jobs:
         with:
           name: release-builds
           path: ./dist/*.gz
+
+      - name: Configure jFrog CLI
+        uses: jfrog/setup-jfrog-cli@v3
+        with:
+          version: ${{ env.JFROG_CLI_VERSION }}
+        env:
+          JF_ENV_1: ${{ secrets.ZITI_ARTIFACTORY_CLI_CONFIG_PACKAGE_UPLOAD }}
+
+      - name: Upload RPM to Artifactory release repo
+        shell: bash
+        run: |
+          for RPM in ./dist/*.rpm; do
+            echo "INFO: Uploading $RPM"
+            jf rt upload --recursive=false --flat=true \
+              "$RPM" \
+              ${{ env.ZITI_RPM_PROD_REPO }}/redhat/x86_64/
+          done
+
+      - name: Upload DEB to Artifactory release repo
+        shell: bash
+        run: |
+          for DEB in ./dist/*.deb; do
+            echo "INFO: Uploading $DEB"
+            jf rt upload --recursive=false --flat=true \
+            --deb=debian/main/amd64 \
+            "$DEB" \
+            ${{ env.ZITI_DEB_PROD_REPO }}/pool/zrok/amd64/
+          done
 
   build-linux-arm64:
     runs-on: ubuntu-20.04
@@ -94,6 +127,34 @@ jobs:
           name: release-builds
           path: ./dist/*.gz
 
+      - name: Configure jFrog CLI
+        uses: jfrog/setup-jfrog-cli@v3
+        with:
+          version: ${{ env.JFROG_CLI_VERSION }}
+        env:
+          JF_ENV_1: ${{ secrets.ZITI_ARTIFACTORY_CLI_CONFIG_PACKAGE_UPLOAD }}
+
+      - name: Upload RPM to Artifactory release repo
+        shell: bash
+        run: |
+          for RPM in ./dist/*.rpm; do
+            echo "INFO: Uploading $RPM"
+            jf rt upload --recursive=false --flat=true \
+              "$RPM" \
+              ${{ env.ZITI_RPM_PROD_REPO }}/redhat/aarch64/
+          done
+
+      - name: Upload DEB to Artifactory release repo
+        shell: bash
+        run: |
+          for DEB in ./dist/*.deb; do
+            echo "INFO: Uploading $DEB"
+            jf rt upload --recursive=false --flat=true \
+            --deb=debian/main/arm64 \
+            "$DEB" \
+            ${{ env.ZITI_DEB_PROD_REPO }}/pool/zrok/arm64/
+          done
+
   build-linux-arm:
     runs-on: ubuntu-20.04
     steps:
@@ -136,7 +197,36 @@ jobs:
           name: release-builds
           path: ./dist/*.gz
 
+      - name: Configure jFrog CLI
+        uses: jfrog/setup-jfrog-cli@v3
+        with:
+          version: ${{ env.JFROG_CLI_VERSION }}
+        env:
+          JF_ENV_1: ${{ secrets.ZITI_ARTIFACTORY_CLI_CONFIG_PACKAGE_UPLOAD }}
+
+      - name: Upload RPM to Artifactory release repo
+        shell: bash
+        run: |
+          for RPM in ./dist/*.rpm; do
+            echo "INFO: Uploading $RPM"
+            jf rt upload --recursive=false --flat=true \
+              "$RPM" \
+              ${{ env.ZITI_RPM_PROD_REPO }}/redhat/armv7/
+          done
+
+      - name: Upload DEB to Artifactory release repo
+        shell: bash
+        run: |
+          for DEB in ./dist/*.deb; do
+            echo "INFO: Uploading $DEB"
+            jf rt upload --recursive=false --flat=true \
+            --deb=debian/main/armv7 \
+            "$DEB" \
+            ${{ env.ZITI_DEB_PROD_REPO }}/pool/zrok/armv7/
+          done
+
   build-darwin:
+    if: github.repository_owner == 'openziti' || vars.ZROK_SKIP_MACOS_BUILD == 'false'
     runs-on: macos-latest
     steps:
       - name: import distribution cert
@@ -144,10 +234,6 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
-
-      - run: |
-          brew tap mitchellh/gon
-          brew install mitchellh/gon/gon        
 
       - uses: actions/checkout@v3
         with:
@@ -188,6 +274,7 @@ jobs:
           path: ./dist/*.gz
 
   build-windows:
+    if: github.repository_owner == 'openziti' || vars.ZROK_SKIP_WINDOWS_BUILD == 'false'
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt update
@@ -230,6 +317,15 @@ jobs:
           path: ./dist/*.gz
 
   publish-release:
+    # allow skipped but not failed
+    if: ${{
+          !cancelled()
+          && (needs.build-linux-amd64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
+          && (needs.build-linux-arm.result   == 'success' || needs.build-linux-amd.result   == 'skipped')
+          && (needs.build-linux-arm64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
+          && (needs.build-darwin.result      == 'success' || needs.build-darwin.result      == 'skipped')
+          && (needs.build-windows.result     == 'success' || needs.build-windows.result     == 'skipped')
+      }}
     needs: [build-linux-amd64, build-linux-arm, build-linux-arm64, build-darwin, build-windows]
     runs-on: ubuntu-latest
     steps:

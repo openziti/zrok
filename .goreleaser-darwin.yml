@@ -10,7 +10,12 @@ builds:
     goarch:
       - amd64
     hooks:
-      post: gon -log-level=info build/gon-amd64.hcl
+      post:
+        - cmd: 'codesign -s "Developer ID Application: NetFoundry Inc" -v dist/zrok-amd64_darwin_amd64_v1/zrok --options=runtime'
+          output: true
+        - cmd: zip "dist/zrok-amd64_darwin_amd64_v1/zrok.zip" dist/zrok-amd64_darwin_amd64_v1/zrok
+        - cmd: xcrun notarytool submit "dist/zrok-amd64_darwin_amd64_v1/zrok.zip" --apple-id {{ .Env.AC_USERNAME }} --password {{ .Env.AC_PASSWORD }} --team-id MN5S649TXM --wait
+          output: true
 
   - id: zrok-arm64
     main: ./cmd/zrok
@@ -23,4 +28,9 @@ builds:
     goarch:
       - arm64
     hooks:
-      post: gon -log-level=info build/gon-arm64.hcl
+      post:
+        - cmd: 'codesign -s "Developer ID Application: NetFoundry Inc" -v dist/zrok-arm64_darwin_arm64/zrok --options=runtime'
+          output: true
+        - cmd: zip "dist/zrok-arm64_darwin_arm64/zrok.zip" dist/zrok-arm64_darwin_arm64/zrok
+        - cmd: xcrun notarytool submit "dist/zrok-arm64_darwin_arm64/zrok.zip" --apple-id {{ .Env.AC_USERNAME }} --password {{ .Env.AC_PASSWORD }} --team-id MN5S649TXM --wait
+          output: true

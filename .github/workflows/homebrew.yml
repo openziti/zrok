@@ -6,16 +6,18 @@ on:
 
 jobs:
   update-brew:
+    if: github.repository_owner == 'openziti'
     runs-on: ubuntu-latest
     steps:
       - name: Extract Version
         id: extract-version
         run: |
-          printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
-      - uses: mislav/bump-homebrew-formula-action@v2
-        if: "!contains(github.ref, '-')"
+          echo "tag-name=${GITHUB_REF#refs/tags/}" | tee -a ${GITHUB_OUTPUT}
+
+      - uses: mislav/bump-homebrew-formula-action@v3.1
+        if: ${{ !contains(github.ref, '-') }}
         with:
           formula-name: zrok
-          download-url: https://github.com/openziti/zrok/archive/${{ steps.extract-version.outputs.tag-name }}.tar.gz
+          download-url: https://github.com/openziti/zrok/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
         env:
           COMMITTER_TOKEN: ${{ secrets.BREW_COMMITTER_TOKEN }}

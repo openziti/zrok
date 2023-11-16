@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
@@ -123,7 +124,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
-	requestsChan := make(chan *endpoints.Request, 1024)
+	requests := make(chan *endpoints.Request, 1024)
 	switch resp.Payload.BackendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
@@ -131,7 +132,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			Insecure:        cmd.insecure,
-			Requests:        requestsChan,
+			Requests:        requests,
 		}
 
 		be, err := proxy.NewBackend(cfg)
@@ -153,7 +154,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath: zif,
 			WebRoot:      target,
 			ShrToken:     shrToken,
-			Requests:     requestsChan,
+			Requests:     requests,
 		}
 
 		be, err := proxy.NewCaddyWebBackend(cfg)
@@ -175,7 +176,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        shrToken,
-			RequestsChan:    requestsChan,
+			RequestsChan:    requests,
 		}
 
 		be, err := tcpTunnel.NewBackend(cfg)
@@ -197,7 +198,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			IdentityPath:    zif,
 			EndpointAddress: target,
 			ShrToken:        shrToken,
-			RequestsChan:    requestsChan,
+			RequestsChan:    requests,
 		}
 
 		be, err := udpTunnel.NewBackend(cfg)
@@ -218,7 +219,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		cfg := &proxy.CaddyfileBackendConfig{
 			CaddyfilePath: target,
 			Shr:           &sdk.Share{Token: shrToken, FrontendEndpoints: []string{resp.Payload.FrontendEndpoint}},
-			Requests:      requestsChan,
+			Requests:      requests,
 		}
 
 		be, err := proxy.NewCaddyfileBackend(cfg)
@@ -232,6 +233,28 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running caddy backend: %v", err)
+			}
+		}()
+
+	case "drive":
+		cfg := &drive.BackendConfig{
+			IdentityPath: zif,
+			DriveRoot:    target,
+			ShrToken:     shrToken,
+			Requests:     requests,
+		}
+
+		be, err := drive.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating drive backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running drive backend: %v", err)
 			}
 		}()
 
@@ -249,7 +272,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		}
 		for {
 			select {
-			case req := <-requestsChan:
+			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
@@ -261,7 +284,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			for {
 				select {
-				case req := <-requestsChan:
+				case req := <-requests:
 					prg.Send(req)
 				}
 			}
@@ -271,6 +294,6 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("An error occurred", err)
 		}
 
-		close(requestsChan)
+		close(requests)
 	}
 }
