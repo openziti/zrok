@@ -25,7 +25,7 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
                 raise Exception("invalid username:password pair: " + pair) 
 
     if request.OauthProvider != "":
-        out.OauthProvider = model.AUTH_SCHEME_OAUTH
+        out.auth_scheme = model.AUTH_SCHEME_OAUTH
 
     try:
         zrok = root.Client()
