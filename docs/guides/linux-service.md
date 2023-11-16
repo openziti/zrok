@@ -70,7 +70,7 @@ ZROK_BACKEND_MODE="proxy"
 
 ### Serve Static Files
 
-Run zrok's embedded web server to serve the files in a directory. If there's an `index.html` file in the directory then visitors will see that web page in their browser, otherwise they'll see a generated index of the directory. The directory must be readable by 'other' users, i.e. `chmod o+rX /var/www/html`.
+Run zrok's embedded web server to serve the files in a directory. If there's an `index.html` file in the directory then visitors will see that web page in their browser, otherwise they'll see a generated index of the files. The directory must be readable by 'other', e.g. `chmod -R o+rX /var/www/html`.
 
 ```bash title="/opt/openziti/etc/zrok/zrok-share.env"
 ZROK_TARGET="/var/www/html"
@@ -79,7 +79,7 @@ ZROK_BACKEND_MODE="web"
 
 ### WebDAV Server
 
-This uses zrok's `drive` backend mode to serve a directory of static files as a WebDAV resource. The directory must be readable by 'other' users, i.e. `chmod o+rX /usr/share/doc`.
+This uses zrok's `drive` backend mode to serve a directory of static files as a WebDAV resource. The directory must be readable by 'other', e.g. `chmod -R o+rX /usr/share/doc`.
 
 ```bash title="/opt/openziti/etc/zrok/zrok-share.env"
 ZROK_TARGET="/usr/share/doc"
@@ -88,7 +88,7 @@ ZROK_BACKEND_MODE="drive"
 
 ### Caddy Server
 
-Use zrok's built-in Caddy server to serve static files or as a reverse proxy to multiple web servers with various HTTP routes or as a load-balanced set. A sample Caddyfile template is provided. Set these in the configuration file.
+Use zrok's built-in Caddy server to serve static files or as a reverse proxy to multiple web servers with various HTTP routes or as a load-balanced set. A sample Caddyfile is available in the path shown.
 
 ```bash title="/opt/openziti/etc/zrok/zrok-share.env"
 ZROK_TARGET="/opt/openziti/etc/zrok/multiple_upstream.Caddyfile"
@@ -97,7 +97,7 @@ ZROK_BACKEND_MODE="caddy"
 
 ## Authentication
 
-You can require a password or OAuth email address suffix.
+You can limit access to certain email addresses with OAuth or require a password.
 
 ### OAuth
 
