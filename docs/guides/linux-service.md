@@ -9,7 +9,7 @@ Proxy a reserved public subdomain to a backend target with a Linux service.
 
 ## Requirements
 
-The Linux distribution must have a package manager that understands the `.deb` or `.rpm` format and be running systemd v232 or newer. This includes Ubuntu 20+, 
+The Linux distribution must have a package manager that understands the `.deb` or `.rpm` format and be running systemd v232 or newer. The service was tested with Ubuntu 20-22, Debian 11-12, Rocky 8-9, and Fedora 37-38.
 
 ## How it Works
 
@@ -55,9 +55,9 @@ ZROK_ENABLE_TOKEN="14cbfca9772f"
 
 ## Use Cases
 
-You can change the share target by modifying the configuration file and restarting the service. Changing the target does not require reserving a new subdomain.
+You may change the target for the current backend mode, e.g. `proxy`, by editing the configuration file and restarting the service. The reserved subdomain will remain the same.
 
-You may switch between backend modes or change authentication options by deleting the `/var/lib/zrok-share/.zrok/reserved.json` file and restarting the service. A new subdomain will be reserved.
+You may switch between backend modes or change authentication options by deleting `/var/lib/zrok-share/.zrok/reserved.json` and restarting the service. A new subdomain will be reserved.
 
 ### Proxy a Web Server
 
@@ -120,16 +120,18 @@ ZROK_BASIC_AUTH="user:passwd"
 
 Start the service, and check the zrok console or the service log for the reserved subdomain.
 
-```bash
-# run now and at startup
+```bash title="run now and at startup"
 sudo systemctl enable --now zrok-share.service
+```
 
-# or
-
-# run now
+```bash title="run now"
 sudo systemctl restart zrok-share.service
 ```
 
 ```bash
 journalctl -u zrok-share.service
 ```
+
+## Package Contents
+
+The files included in the `zrok-share` package are sourced [here in GitHub](https://github.com/openziti/zrok/tree/main/nfpm).
