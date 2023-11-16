@@ -7,10 +7,6 @@ sidebar_position: 40
 
 Proxy a reserved public subdomain to a backend target with a Linux service.
 
-## Requirements
-
-The Linux distribution must have a package manager that understands the `.deb` or `.rpm` format and be running systemd v232 or newer. The service was tested with Ubuntu 20-22, Debian 11-12, Rocky 8-9, and Fedora 37-38.
-
 ## How it Works
 
 The `zrok-share` package creates a `zrok-share.service` unit in systemd. The administrator edits the service's configuration file to specify the:
@@ -131,6 +127,15 @@ sudo systemctl restart zrok-share.service
 ```bash
 journalctl -u zrok-share.service
 ```
+
+## Compatibility
+
+The Linux distribution must have a package manager that understands the `.deb` or `.rpm` format and be running systemd v232 or newer. The service was tested with:
+
+* Ubuntu 20.04, 22.04, 23.04
+* Debian 11 12
+* Rocky 8, 9
+* Fedora 37, 38
 
 ## Package Contents
 
