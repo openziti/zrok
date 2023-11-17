@@ -48,7 +48,7 @@ services:
         if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
           ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
         fi
-        ZROK_CMD+=" --backend-mode proxy ${ZROK_BACKEND:-http://zrok-test:9090/}"
+        ZROK_CMD+=" --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/}"
         echo "INFO: running: zrok $${ZROK_CMD}"
         exec zrok $${ZROK_CMD}
     depends_on:
