@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.16
+
+FEATURE: Publish Linux packages for `zrok` CLI and a systemd service for running a reserved public share (`zrok-share`).
+
 ## v0.4.15
 
 CHANGE: Updated the code signing and notarization process for macos binaries. The previous release process used the `gon` utility to handle both code signing and notarization. Apple changed the requirements and the `gon` utility no longer properly functions as of 2023-11-01. The `goreleaser` process has been adjusted to use the `notarytool` utility that ships with XCode to sign and notarize the binary (https://github.com/openziti/zrok/issues/435)
