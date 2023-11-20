@@ -1,5 +1,6 @@
 ---
-title: Linux Service
+title: zrok Front Door
+sidebar_label: Front Door
 sidebar_position: 40
 ---
 
@@ -23,22 +24,15 @@ When the service starts it will:
 
 ## Installation
 
-1. Download the OpenZiti install script.
+1. Install `zrok` by following the package repo setup instructions in [the Linux install guide](/guides/install/linux.mdx).
+1. Install the `zrok-share` package.
 
-    ```bash
-    curl -sSo ./openziti-install.bash https://get.openziti.io/install.bash
+    ```bash title="Ubuntu, Debian"
+    sudo sudo apt install zrok-share
     ```
 
-1. Inspect the script to ensure it is suitable to run as root on your system.
-
-    ```bash
-    less ./openziti-install.bash
-    ```
-
-1. Run the script as root to install the `zrok-share` package.
-
-    ```bash
-    sudo bash ./openziti-install.bash zrok-share
+    ```bash title="Fedora, Rocky"
+    sudo dnf install zrok-share
     ```
 
 ## Enable
@@ -73,15 +67,6 @@ ZROK_TARGET="/var/www/html"
 ZROK_BACKEND_MODE="web"
 ```
 
-### WebDAV Server
-
-This uses zrok's `drive` backend mode to serve a directory of static files as a WebDAV resource. The directory must be readable by 'other', e.g. `chmod -R o+rX /usr/share/doc`.
-
-```bash title="/opt/openziti/etc/zrok/zrok-share.env"
-ZROK_TARGET="/usr/share/doc"
-ZROK_BACKEND_MODE="drive"
-```
-
 ### Caddy Server
 
 Use zrok's built-in Caddy server to serve static files or as a reverse proxy to multiple web servers with various HTTP routes or as a load-balanced set. A sample Caddyfile is available in the path shown.
@@ -90,6 +75,17 @@ Use zrok's built-in Caddy server to serve static files or as a reverse proxy to 
 ZROK_TARGET="/opt/openziti/etc/zrok/multiple_upstream.Caddyfile"
 ZROK_BACKEND_MODE="caddy"
 ```
+
+### Network Drive
+
+This uses zrok's `drive` backend mode to serve a directory of static files as a virtual network drive. The directory must be readable by 'other', e.g. `chmod -R o+rX /usr/share/doc`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_TARGET="/usr/share/doc"
+ZROK_BACKEND_MODE="drive"
+```
+
+[Learn more about this feature in this blog post](https://blog.openziti.io/zrok-drives-an-early-preview).
 
 ## Authentication
 

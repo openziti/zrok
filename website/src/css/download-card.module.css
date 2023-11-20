@@ -1,0 +1,72 @@
+:root {
+  --cardfooter-background: #c4b7f5
+}
+
+[data-theme="dark"] {
+  --cardfooter-background: #4b359f
+}
+
+.downloadContainer {
+  width: 100%; /* Adjust this value to fit your design */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 9px; /* Adjust the space between cards */
+  padding: 20px; /* Space inside the container */
+}
+
+.downloadCard {
+  width: 30%; /* Adjust the width as needed */
+  box-sizing: border-box; /* Include padding and border in the width */
+  background-color: var(--sidebar-selected);
+  border-radius: 18px;
+  text-align: center;
+  display: flex;
+  flex-grow: 1; /* Allows the content area to grow and take up available space */
+  flex-direction: column; /* Stack footer vertically */
+
+}
+
+.downloadCard img {
+  width: auto; /* This will make the image take the full width of the card */
+  max-height: 200px; /* This will maintain the aspect ratio of the image */
+  margin: 0 auto; /* Center the image if the card is wider than the image */
+  display: block; /* Change display from inline to block for better control */
+  padding: 10px;;
+}
+
+.cardFooter {
+  background-color: var(--cardfooter-background);
+  border-top: 1px solid #e0e0e0; /* Light gray border on top */
+  padding: 10px;
+  margin-top: auto; /* Push the footer to the bottom */
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+
+.downloadCard ul {
+  list-style: none; /* Remove the default list style */
+  padding: 0; /* Remove the default padding */
+  margin: 0; /* Remove the default margin */
+  margin-bottom: 20px; /* Add some space between the list and the footer */
+}
+
+.downloadCard .imgContainer {
+  background-color: #e0e0e0; /* Light gray background for light mode */
+  display: inline-block; /* Or 'block' depending on layout */
+  padding: 10px; /* Adjust padding as needed */
+  border-radius: 8px; /* Optional: for rounded corners */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .downloadContainer {
+    flex-direction: column;
+  }
+
+  .downloadCard {
+    width: auto; /* Take full width on small screens */
+    max-width: none; /* Allow the card to take full width */
+  }
+}
