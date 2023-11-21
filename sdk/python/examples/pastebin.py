@@ -3,21 +3,17 @@ import argparse
 import sys
 import os
 import zrok
+import zrok.listener
+import zrok.dialer
 from zrok.model import AccessRequest, ShareRequest
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import urllib3
+import signal
+import threading
 
-class MyServer(BaseHTTPRequestHandler):
-    def __init__(self, data, *args, **kwargs):
-        self.data = data
-        super(MyServer, self).__init__(*args, **kwargs)
+exit_signal = threading.Event()
 
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/plain")
-        self.send_header("Content-length", len(self.data))
-        self.end_headers()
-        self.wfile.write(bytes(self.data, "utf-8"))
+def signal_handler(signum, frame):
+    print("\nCtrl-C detected. Next connection will close server")
+    exit_signal.set()
 
 class copyto:
     def handle(self, *args, **kwargs):
@@ -34,18 +30,18 @@ class copyto:
             sys.exit(1)
 
         data = self.loadData()
-        def handler(*args):
-            MyServer(data, *args)
-        zrok.monkeypatch(bindHost="127.0.0.1", bindPort=8082, root=root, shrToken=shr.Token)
-        webServer = HTTPServer(("127.0.0.1", 8082), handler)
         print("access your pastebin using 'pastebin.py pastefrom " + shr.Token + "'")
 
         try:
-            webServer.serve_forever(poll_interval=600)
+            with zrok.listener.Listener(shr.Token, root) as server:
+                while not exit_signal.is_set():
+                    conn, peer = server.accept()
+                    with conn:
+                        conn.sendall(data.encode('utf-8'))
+
         except KeyboardInterrupt:
             pass
 
-        webServer.server_close()
         zrok.share.DeleteShare(root, shr)
         print("Server stopped.")
         
@@ -67,16 +63,9 @@ def pastefrom(options):
         print("unable to create access", e)
         sys.exit(1)
 
-    zrok.monkeypatch(bindHost="127.0.0.1", bindPort=8082, root=root, shrToken=options.shrToken)
-
-    http = urllib3.PoolManager()
-    try:
-        r = http.request('GET', "http://" + options.shrToken)
-    except Exception as e:
-        print("Error on request: ", e)
-        zrok.access.DeleteAccess(root, acc)
-        return
-    print(r.data.decode('utf-8'))
+    client = zrok.dialer.Dialer(options.shrToken, root)
+    data = client.recv(1024)
+    print(data.decode('utf-8'))
     try:
         zrok.access.DeleteAccess(root, acc)
     except Exception as e:
@@ -97,4 +86,9 @@ if __name__ == "__main__":
     parser_pastefrom.add_argument("shrToken")
 
     options = parser.parse_args()
-    options.func(options)
+    signal.signal(signal.SIGINT, signal_handler)
+    # Create a separate thread to run the server so we can respond to ctrl-c when in 'accept'
+    server_thread = threading.Thread(target=options.func, args=[options])
+    server_thread.start()
+
+    server_thread.join()

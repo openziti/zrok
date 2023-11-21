@@ -2,9 +2,9 @@ from setuptools import setup, find_packages  # noqa: H301
 import os
 
 NAME = "zrok_sdk"
-VERSION = "dev"
+VERSION = "0.0.0.dev"
 try:
-    VERSION += '.dev' + os.environ['ZROK_VERSION']
+    VERSION = os.environ['ZROK_VERSION']
 except KeyError: 
     pass
 # To install the library, run the following
