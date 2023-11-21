@@ -10,7 +10,7 @@ etc/dev-frontend.yml
 node_modules/
 
 # Artifacts
-/dist/
+dist/
 
 # Generated files
 .docusaurus

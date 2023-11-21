@@ -1,0 +1,68 @@
+name: Build/Relesae Node SDK
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+
+  build:
+    name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
+
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    
+    strategy:
+      matrix:
+        config:
+          - { os: windows-latest, target: "windows", arch: "x64" }
+          - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
+          - { os: ubuntu-20.04,   target: "linux", arch: "arm64" }
+          - { os: macos-latest,   target: "macos", arch: "x64" }
+          - { os: macos-latest,   target: "macos", arch: "arm64" }
+        node_ver: [ 16, 18, 19, 20, 21]
+      fail-fast: false
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: 'recursive'
+
+    - name: Get crossbuild tools
+      if: matrix.config.target == 'linux' && matrix.config.arch != 'x64'
+      run: |
+        sudo apt update -y
+        sudo apt install -y crossbuild-essential-${{ matrix.config.arch }}
+
+    - name: Node Version
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node_ver }}
+
+    - name: Get current date
+      id: date
+      run: echo "date=$(date)" >> $GITHUB_OUTPUT
+
+
+    - name: Build NodeJS-SDK
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}
+        npm install
+        npm run build:package -- --target_arch=${{ matrix.config.arch }}
+      env:
+        PRESET: ci-${{ matrix.config.target }}-${{ matrix.config.arch }}
+        TARGET_ARCH: ${{ matrix.config.arch }}
+        BUILD_DATE: ${{ steps.date.outputs.date }}
+
+    - name: NPM Publish
+      uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
+        access: public
+      if: |
+        matrix.config.os == 'ubuntu-20.04' && matrix.node_ver == '20' && matrix.config.arch == 'x64' && startsWith(github.ref, 'refs/tags/')
