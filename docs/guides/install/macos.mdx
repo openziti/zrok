@@ -7,7 +7,7 @@ import { AssetsProvider } from '@site/src/components/assets-context';
 import DownloadCard from '@site/src/components/download-card';
 import styles from '@site/src/css/download-card.module.css';
 
-## Extract Binary Distribution
+## Darwin Binary
 
 <AssetsProvider>
   <div className={styles.downloadContainer}>
@@ -35,7 +35,7 @@ Download the binary distribution for your macOS architecture. For Intel Macs use
 1. Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
 
     ```text
-    export PATH=~/bin:$PATH
+    PATH=~/bin:$PATH
     ```
 
 1. With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:

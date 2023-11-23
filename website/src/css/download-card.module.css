@@ -1,9 +1,11 @@
 :root {
-  --cardfooter-background: #c4b7f5
+  --contrasting-background: #c4b7f5;
+  --container-border: 1px solid #adadad; /* Light gray border */
 }
 
 [data-theme="dark"] {
-  --cardfooter-background: #4b359f
+  --contrasting-background: #4b359f;
+  --container-border: 1px solid #6d6d6d; /* Light gray border */
 }
 
 .downloadContainer {
@@ -37,8 +39,8 @@
 }
 
 .cardFooter {
-  background-color: var(--cardfooter-background);
-  border-top: 1px solid #e0e0e0; /* Light gray border on top */
+  background-color: var(--contrasting-background);
+  border-top: var(--container-border);
   padding: 10px;
   margin-top: auto; /* Push the footer to the bottom */
   border-bottom-left-radius: 18px;
@@ -52,11 +54,19 @@
   margin-bottom: 20px; /* Add some space between the list and the footer */
 }
 
+.downloadCard h3 {
+  margin-top: 10px;
+}
+
 .downloadCard .imgContainer {
-  background-color: #e0e0e0; /* Light gray background for light mode */
+  background-color: var(--contrasting-background);
   display: inline-block; /* Or 'block' depending on layout */
   padding: 10px; /* Adjust padding as needed */
-  border-radius: 8px; /* Optional: for rounded corners */
+  border-top-left-radius: 18px; /* Optional: for rounded corners */
+  border-top-right-radius: 18px; /* Optional: for rounded corners */
+  border-bottom: var(--container-border);
+  padding: 10px;
+  margin-bottom: auto; /* Push the footer to the bottom */
 }
 
 /* Responsive design for smaller screens */

@@ -6,7 +6,7 @@ sidebar_position: 40
 
 ## Goal
 
-Proxy a reserved public subdomain to a backend target with a Linux service.
+Proxy a reserved public subdomain to a backend target with a Linux system service.
 
 ## How it Works
 
@@ -24,8 +24,14 @@ When the service starts it will:
 
 ## Installation
 
-1. Install `zrok` by following the package repo setup instructions in [the Linux install guide](/guides/install/linux.mdx).
-1. Install the `zrok-share` package.
+1. Set up `zrok`'s Linux package repository by following [the Linux install guide](/guides/install/linux.mdx#install-zrok-from-the-repository). This will complete the installation in one step if you prefer that convenience.
+
+    ```bash
+    curl -sSLf https://get.openziti.io/install.bash \
+    | sudo bash -s zrok-share
+    ```
+
+1. If you set up the repository by following the guide, then also install the `zrok-share` package. This provides the systemd service.
 
     ```bash title="Ubuntu, Debian"
     sudo sudo apt install zrok-share

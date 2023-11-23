@@ -28,7 +28,7 @@ const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
     return (
         // <div className={colorMode === 'dark' ? styles.downloadCardDark : styles.downloadCardLight}>
         <div className={styles.downloadCard}>
-            <div className="imgContainer">
+            <div className={styles.imgContainer}>
                 <img src={osLogo} alt={`${osName} logo`} />
             </div>
             <h3>{osName}</h3>
