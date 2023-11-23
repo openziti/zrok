@@ -20,36 +20,36 @@ import styles from '@site/src/css/download-card.module.css';
 
 Download the binary distribution for your macOS architecture. For Intel Macs use the `amd64` distribution. For Apple Silicon Macs use the `arm64` distribution.
 
-Unarchive the distribution in a temporary directory:
+1. Unarchive the distribution in a temporary directory.
 
-```text
-mkdir /tmp/zrok && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok
-```
+    ```text
+    mkdir /tmp/zrok && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok
+    ```
 
-Install the `zrok` executable.
+1. Install the `zrok` executable.
 
-```text
-mkdir -p ~/bin && install /tmp/zrok/zrok ~/bin/
-```
+    ```text
+    mkdir -p ~/bin && install /tmp/zrok/zrok ~/bin/
+    ```
 
-Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
+1. Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
 
-```text
-export PATH=~/bin:$PATH
-```
+    ```text
+    export PATH=~/bin:$PATH
+    ```
 
-With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
+1. With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
 
-```text
-zrok version
-```
+    ```text
+    zrok version
+    ```
 
-```buttonless title="Output"
-               _    
- _____ __ ___ | | __
-|_  / '__/ _ \| |/ /
- / /| | | (_) |   < 
-/___|_|  \___/|_|\_\
-
-v0.4.0 [c889005]
-```
+    ```buttonless title="Output"
+                   _    
+     _____ __ ___ | | __
+    |_  / '__/ _ \| |/ /
+     / /| | | (_) |   < 
+    /___|_|  \___/|_|\_\
+    
+    v0.4.0 [c889005]
+    ```

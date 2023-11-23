@@ -18,35 +18,35 @@ import styles from '@site/src/css/download-card.module.css';
   </div>
 </AssetsProvider>
 
-Unarchive the distribution in a temporary directory:
+1. Unarchive the distribution in a temporary directory:
 
-```text
-New-Item -Path "$env:TEMP\zrok" -ItemType Directory -ErrorAction Stop
-tar -xf .\zrok*windows*.tar.gz -C "$env:TEMP\zrok"
-```
+    ```text
+    New-Item -Path "$env:TEMP\zrok" -ItemType Directory -ErrorAction Stop
+    tar -xf .\zrok*windows*.tar.gz -C "$env:TEMP\zrok"
+    ```
 
-Install the `zrok` executable and include HOME\bin in the search PATH.
+1. Install the `zrok` executable and include HOME\bin in the search PATH.
 
-```text
-$source = Join-Path -Path $env:TEMP -ChildPath "zrok\zrok.exe"
-$destination = Join-Path -Path $env:HOME -ChildPath "bin\zrok.exe"
-New-Item -Path $destination -ItemType Directory -ErrorAction SilentlyContinue
-Copy-Item -Path $source -Destination $destination
-$env:path += ";"+$destination
-```
+    ```text
+    $source = Join-Path -Path $env:TEMP -ChildPath "zrok\zrok.exe"
+    $destination = Join-Path -Path $env:HOME -ChildPath "bin\zrok.exe"
+    New-Item -Path $destination -ItemType Directory -ErrorAction SilentlyContinue
+    Copy-Item -Path $source -Destination $destination
+    $env:path += ";"+$destination
+    ```
 
-With the `zrok` executable in your path, you can then execute the `zrok` directly.
+1. With the `zrok` executable in your path, you can then execute the `zrok` directly.
 
-```text
-zrok version
-```
+    ```text
+    zrok version
+    ```
 
-```buttonless title="Output"
-               _    
- _____ __ ___ | | __
-|_  / '__/ _ \| |/ /
- / /| | | (_) |   < 
-/___|_|  \___/|_|\_\
+    ```buttonless title="Output"
 
-v0.4.0 [c889005]
-```
+     _____ __ ___ | | __
+    |_  / '__/ _ \| |/ /
+     / /| | | (_) |   <
+    /___|_|  \___/|_|\_\
+
+    v0.4.0 [c889005]
+    ```
