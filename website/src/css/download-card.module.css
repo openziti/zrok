@@ -56,22 +56,24 @@
   margin-bottom: 20px; /* Add some space between the list and the footer */
 }
 
-.downloadCard li {
+.downloadButtons {
     display: inline-block; /* Allows width and height to be set */
     margin: 5px; /* Spacing between buttons */
     padding: 10px 15px; /* Size of the button */
     text-align: center; /* Centers text within the button */
-    text-decoration: none; /* Removes the underline from links */
     background-color: var(--contrasting-background); /* Background color - Bootstrap primary button color */
     border: 1px var(--container-border); /* Border color - same as background for a solid button */
     border-radius: 18px; /* Rounded corners */
     transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
-.downloadCard li:hover, .downloadCard li:focus {
+.downloadButtons:hover, .downloadButtons:focus {
     background-color: var(--button-background-hover);
-    text-decoration: none; /* Ensures the text remains with no underline on hover/focus */
     outline: none; /* Removes the outline on focus for a clean look */
+}
+
+.downloadLinks, .downloadLinks:hover, .downloadLinks:focus {
+    text-decoration: none; /* Removes the underline from links */
 }
 
 .downloadCard h3 {

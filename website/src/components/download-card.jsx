@@ -35,8 +35,8 @@ const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
             {filteredLinks.length > 0 && (
                 <ul>
                     {filteredLinks.map((link, index) => (
-                        <li key={index}>
-                            <a href={link.url}>
+                        <li key={index} className={styles.downloadButtons}>
+                            <a href={link.url} className={styles.downloadLinks}>
                                 {link.arch}
                             </a>
                         </li>
