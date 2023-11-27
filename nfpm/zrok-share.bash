@@ -30,8 +30,7 @@ else
   #   echo "ERROR: need /opt/openziti/etc/zrok.env or filename argument to read share configuration" >&2
   #   exit 1
   # fi
-  echo "ERROR: need filename argument to read share configuration" >&2
-  exit 1
+  echo "WARNING: no environment filename argument, trying to read share configuration from env vars" >&2
 fi
 
 if [[ -s ~/.zrok/reserved.json ]]; then

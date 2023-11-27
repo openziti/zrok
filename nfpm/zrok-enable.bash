@@ -8,7 +8,7 @@ set -o nounset
 set -o pipefail
 
 BASENAME=$(basename "$0")
-DEFAULT_ZROK_ENVIRONMENT_NAME="zrok-share.service on $(hostname -s)"
+DEFAULT_ZROK_ENVIRONMENT_NAME="zrok-share service on $(hostname -s 2>/dev/null || echo localhost)"
 
 if (( $# )); then
   case $1 in
@@ -44,8 +44,7 @@ if (( $# )); then
     exit 1
   fi
 else
-  echo "ERROR: need filename argument to read environment configuration" >&2
-  exit 1
+  echo "WARNING: no env filename argument, trying to read configuration from environment variables" >&2
 fi
 
 if [[ -z "${ZROK_ENABLE_TOKEN}" ]]; then
