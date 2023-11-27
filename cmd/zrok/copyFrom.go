@@ -1,10 +1,9 @@
 package main
 
 import (
+	"github.com/openziti/zrok/util/sync"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/studio-b12/gowebdav"
-	"path/filepath"
 )
 
 func init() {
@@ -27,34 +26,19 @@ func newCopyFromCommand() *copyFromCommand {
 }
 
 func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
-	c := gowebdav.NewClient(args[0], "", "")
-	if err := c.Connect(); err != nil {
-		panic(err)
-	}
-	if err := cmd.recurseTree(c, ""); err != nil {
-		panic(err)
-	}
-}
-
-func (cmd *copyFromCommand) recurseTree(c *gowebdav.Client, path string) error {
-	files, err := c.ReadDir(path)
+	t, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{
+		URL:      args[0],
+		Username: "",
+		Password: "",
+	})
 	if err != nil {
-		return err
+		panic(err)
 	}
-	for _, f := range files {
-		sub := filepath.ToSlash(filepath.Join(path, f.Name()))
-		if f.IsDir() {
-			logrus.Infof("-> %v", sub)
-			if err := cmd.recurseTree(c, sub); err != nil {
-				return err
-			}
-		} else {
-			etag := "<etag>"
-			if v, ok := f.(gowebdav.File); ok {
-				etag = v.ETag()
-			}
-			logrus.Infof("++ %v (%v)", sub, etag)
-		}
+	tree, err := t.Inventory()
+	if err != nil {
+		panic(err)
 	}
-	return nil
+	for _, f := range tree {
+		logrus.Infof("-> %v [%v, %v, %v]", f.Path, f.Size, f.Modified, f.ETag)
+	}
 }
