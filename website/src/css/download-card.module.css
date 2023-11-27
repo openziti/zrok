@@ -34,7 +34,7 @@
 
 .downloadCard img {
   width: auto; /* This will make the image take the full width of the card */
-  max-height: 150px; /* This will maintain the aspect ratio of the image */
+  max-height: 100px; /* This will maintain the aspect ratio of the image */
   margin: 0 auto; /* Center the image if the card is wider than the image */
   display: block; /* Change display from inline to block for better control */
   padding: 10px;;

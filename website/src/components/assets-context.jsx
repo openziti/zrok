@@ -18,7 +18,7 @@ export const AssetsProvider = ({ children }) => {
         const filteredAssets = data.assets.map(asset => ({
           name: asset.name,
           url: asset.browser_download_url,
-          arch: asset.name.replace('\.tar\.gz','').toUpperCase().split('_')[3]
+          arch: asset.name.replace('\.tar\.gz','').split('_')[3]
         }));
         console.log("Fetched assets:", filteredAssets); // Log fetched assets
         setAssets(filteredAssets);

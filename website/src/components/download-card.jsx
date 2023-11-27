@@ -17,6 +17,19 @@ const getFilenamePattern = (osName) => {
     }
 };
 
+const getArchitecturePattern = (arch) => {
+    switch (arch) {
+        case 'amd64':
+            return 'x86_64';
+        case 'arm64':
+            return 'ARM64';
+        case 'armv7':
+            return 'ARM';
+        default:
+            return arch.toUpperCase();
+    }
+}
+
 const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
     const { colorMode } = useColorMode();
     const assets = useAssets();
@@ -37,7 +50,7 @@ const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
                     {filteredLinks.map((link, index) => (
                         <li key={index} className={styles.downloadButtons}>
                             <a href={link.url} className={styles.downloadLinks}>
-                                {link.arch}
+                                {getArchitecturePattern(link.arch)}
                             </a>
                         </li>
                     ))}

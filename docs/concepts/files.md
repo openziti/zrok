@@ -1,7 +1,7 @@
 ---
+title: Sharing Websites and Files
 sidebar_position: 30
 ---
-# Sharing Websites and Files
 
 With `zrok` it is possible to share files quickly and easily as well. To share files using `zrok` use
 the `--backend-mode web`, for example: `zrok share private . --backend-mode web`.
@@ -10,6 +10,7 @@ Running with this mode will make it trivially easy to share files from the direc
 was run from.
 
 For example if you have a directory with a structure like this:
+
 ```shell
 -rw-r--r--+ 1 Michael None     7090 Apr 17 12:53 CHANGELOG.md
 -rw-r--r--+ 1 Michael None    11346 Apr 17 12:53 LICENSE
@@ -17,7 +18,8 @@ For example if you have a directory with a structure like this:
 -rwxr-xr-x+ 1 Michael None 44250624 Apr 17 13:00 zrok.exe*
 ```
 
-The files can be shared using a command such as: 
+The files can be shared using a command such as:
+
 ```shell
 zrok share public --backend-mode web .
 ```
