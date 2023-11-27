@@ -49,11 +49,11 @@ func (cmd *copyFromCommand) recurseTree(c *gowebdav.Client, path string) error {
 				return err
 			}
 		} else {
-			fi, err := c.Stat(sub)
-			if err != nil {
-				return err
+			etag := "<etag>"
+			if v, ok := f.(gowebdav.File); ok {
+				etag = v.ETag()
 			}
-			logrus.Infof("++ %v (%v)", sub, fi.Sys())
+			logrus.Infof("++ %v (%v)", sub, etag)
 		}
 	}
 	return nil
