@@ -2,6 +2,7 @@
   "label": "Install",
   "position": 10,
   "link": {
-    "type": "generated-index"
+    "type": "doc",
+    "id": "guides/install/index"
   }
 }
