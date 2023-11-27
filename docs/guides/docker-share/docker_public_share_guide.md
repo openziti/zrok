@@ -54,10 +54,10 @@ This concludes sharing the demo web server. Read on to learn how to pivot to sha
 
 ## Proxy Any Web Server
 
-The simplest way to share your web server is to set `ZROK_BACKEND` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that upstream server URL. This applies to both temporary and reserved public shares.
+The simplest way to share your web server is to set `ZROK_TARGET` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that upstream server URL. This applies to both temporary and reserved public shares.
 
 ```bash title=".env"
-ZROK_BACKEND="http://example.com:8080"
+ZROK_TARGET="http://example.com:8080"
 ```
 
 ## Require Authentication
