@@ -57,13 +57,24 @@ docker compose down && docker compose up
 
 You can require a password or an OAuth login with certain email addresses.
 
-## OAuth Email
+### OAuth Email
 
-You can allow specific email addresses or an email domain by setting `ZROK_OAUTH_PROVIDER` to `github` or `google` and `ZROK_SHARE_OPTS` to specify additional command-line options to `zrok reserve public`. Read more about the OAuth features in [this blog post](https://blog.openziti.io/the-zrok-oauth-public-frontend).
+You can allow specific email addresses or an email domain by setting `ZROK_OAUTH_PROVIDER` to `github` or `google` and
+`ZROK_SHARE_OPTS` to specify additional command-line options to `zrok reserve public`. Read more about the OAuth
+features in [this blog post](https://blog.openziti.io/the-zrok-oauth-public-frontend).
 
 ```bash title=".env"
 ZROK_OAUTH_PROVIDER="github"
 ZROK_SHARE_OPTS="--oauth-email-domains @example.com"
+```
+
+### Password
+
+You can require a password by setting `ZROK_SHARE_OPTS` to specify additional command-line options to `zrok reserve
+public`.
+
+```bash title=".env"
+ZROK_SHARE_OPTS="--basic-auth 'admin:passwd'"
 ```
 
 ## Share Something Different
