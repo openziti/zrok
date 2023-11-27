@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/openziti/zrok/util/sync"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -31,18 +30,10 @@ func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
 		target = args[1]
 	}
 
-	t := sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{
+	dst := sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{
 		Root: target,
 	})
-	destTree, err := t.Inventory()
-	if err != nil {
-		panic(err)
-	}
-	for _, f := range destTree {
-		logrus.Infof("<- %v [%v, %v, %v]", f.Path, f.Size, f.Modified, f.ETag)
-	}
-
-	s, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{
+	src, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{
 		URL:      args[0],
 		Username: "",
 		Password: "",
@@ -50,11 +41,8 @@ func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	srcTree, err := s.Inventory()
-	if err != nil {
+
+	if err := sync.Synchronize(src, dst); err != nil {
 		panic(err)
-	}
-	for _, f := range srcTree {
-		logrus.Infof("-> %v [%v, %v, %v]", f.Path, f.Size, f.Modified, f.ETag)
 	}
 }
