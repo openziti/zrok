@@ -1,6 +1,6 @@
 ---
-title: zrok Front Door
-sidebar_label: Front Door
+title: zrok frontdoor
+sidebar_label: frontdoor
 sidebar_position: 40
 ---
 
