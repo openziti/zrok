@@ -3,6 +3,8 @@ package sync
 import (
 	"github.com/pkg/errors"
 	"github.com/studio-b12/gowebdav"
+	"io"
+	"os"
 	"path/filepath"
 )
 
@@ -56,4 +58,12 @@ func (t *WebDAVTarget) recurse(path string, tree []*Object) ([]*Object, error) {
 		}
 	}
 	return tree, nil
+}
+
+func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
+	return t.c.ReadStream(path)
+}
+
+func (t *WebDAVTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
+	return t.c.WriteStream(path, stream, mode)
 }

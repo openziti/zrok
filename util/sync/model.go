@@ -1,6 +1,10 @@
 package sync
 
-import "time"
+import (
+	"io"
+	"os"
+	"time"
+)
 
 type Object struct {
 	Path     string
@@ -11,4 +15,6 @@ type Object struct {
 
 type Target interface {
 	Inventory() ([]*Object, error)
+	ReadStream(path string) (io.ReadCloser, error)
+	WriteStream(path string, stream io.Reader, mode os.FileMode) error
 }

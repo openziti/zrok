@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"golang.org/x/net/webdav"
+	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 )
 
 type FilesystemTargetConfig struct {
@@ -13,16 +15,20 @@ type FilesystemTargetConfig struct {
 }
 
 type FilesystemTarget struct {
+	cfg  *FilesystemTargetConfig
 	root fs.FS
 	tree []*Object
 }
 
 func NewFilesystemTarget(cfg *FilesystemTargetConfig) *FilesystemTarget {
 	root := os.DirFS(cfg.Root)
-	return &FilesystemTarget{root: root}
+	return &FilesystemTarget{cfg: cfg, root: root}
 }
 
 func (t *FilesystemTarget) Inventory() ([]*Object, error) {
+	if _, err := os.Stat(t.cfg.Root); os.IsNotExist(err) {
+		return nil, nil
+	}
 	t.tree = nil
 	if err := fs.WalkDir(t.root, ".", t.recurse); err != nil {
 		return nil, err
@@ -49,6 +55,27 @@ func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error 
 			etag = fmt.Sprintf(`"%x%x"`, fi.ModTime().UnixNano(), fi.Size())
 		}
 		t.tree = append(t.tree, &Object{path, fi.Size(), fi.ModTime(), etag})
+	}
+	return nil
+}
+
+func (t *FilesystemTarget) ReadStream(path string) (io.ReadCloser, error) {
+	return os.Open(path)
+}
+
+func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
+	targetPath := filepath.Join(t.cfg.Root, path)
+
+	if err := os.MkdirAll(filepath.Dir(targetPath), mode); err != nil {
+		return err
+	}
+	f, err := os.Create(targetPath)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(f, stream)
+	if err != nil {
+		return err
 	}
 	return nil
 }

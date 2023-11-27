@@ -3,6 +3,7 @@ package sync
 import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 func Synchronize(src, dst Target) error {
@@ -32,9 +33,16 @@ func Synchronize(src, dst Target) error {
 		}
 	}
 
-	logrus.Infof("files to copy:")
-	for _, copy := range copyList {
-		logrus.Infof("-> %v", copy.Path)
+	for _, target := range copyList {
+		logrus.Infof("+> %v", target.Path)
+		ss, err := src.ReadStream(target.Path)
+		if err != nil {
+			return err
+		}
+		if err := dst.WriteStream(target.Path, ss, os.ModePerm); err != nil {
+			return err
+		}
+		logrus.Infof("=> %v", target.Path)
 	}
 
 	return nil
