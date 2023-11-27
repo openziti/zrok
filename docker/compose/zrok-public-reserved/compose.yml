@@ -126,6 +126,7 @@ services:
   # start share on reserved public frontend url
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    restart: unless-stopped
     entrypoint:
       - bash
       - -euc
