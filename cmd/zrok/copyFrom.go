@@ -26,7 +26,23 @@ func newCopyFromCommand() *copyFromCommand {
 }
 
 func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
-	t, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{
+	target := "."
+	if len(args) == 2 {
+		target = args[1]
+	}
+
+	t := sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{
+		Root: target,
+	})
+	destTree, err := t.Inventory()
+	if err != nil {
+		panic(err)
+	}
+	for _, f := range destTree {
+		logrus.Infof("<- %v [%v, %v, %v]", f.Path, f.Size, f.Modified, f.ETag)
+	}
+
+	s, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{
 		URL:      args[0],
 		Username: "",
 		Password: "",
@@ -34,11 +50,11 @@ func (cmd *copyFromCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	tree, err := t.Inventory()
+	srcTree, err := s.Inventory()
 	if err != nil {
 		panic(err)
 	}
-	for _, f := range tree {
+	for _, f := range srcTree {
 		logrus.Infof("-> %v [%v, %v, %v]", f.Path, f.Size, f.Modified, f.ETag)
 	}
 }
