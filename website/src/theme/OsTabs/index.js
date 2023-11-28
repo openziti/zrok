@@ -7,11 +7,11 @@ function OsTabs(props) {
 
   useEffect(() => {
     // Based on the OS or any other client-side condition, set the default value
-    const tabs = ['iOS', 'Android', 'Mac OS', 'Windows', 'Linux']
+    const tabs = ['Mac OS', 'Windows', 'Linux']
     if (tabs.includes(osName)) {
       setDefaultValue(osName);
     } else {
-      setDefaultValue('Windows');
+      setDefaultValue('Linux');
     }
   }, []); // The empty dependency array ensures this runs once after component mount
 
