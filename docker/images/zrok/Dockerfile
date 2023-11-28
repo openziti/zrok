@@ -1,5 +1,5 @@
 # this builds docker.io/openziti/zrok
-ARG ZITI_CLI_TAG="0.30.5"
+ARG ZITI_CLI_TAG="0.31.0"
 ARG ZITI_CLI_IMAGE="docker.io/openziti/ziti-cli"
 # this builds docker.io/openziti/ziti-controller
 FROM ${ZITI_CLI_IMAGE}:${ZITI_CLI_TAG}
@@ -30,8 +30,14 @@ RUN mkdir -p -m0755 /licenses
 COPY ./LICENSE /licenses/apache.txt
 
 RUN mkdir -p /usr/local/bin
-COPY ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok /usr/local/bin/
-RUN chmod 0755 /usr/local/bin/zrok
+COPY ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok \
+      ./nfpm/zrok-enable.bash \
+      ./nfpm/zrok-share.bash \
+      /usr/local/bin/
+RUN chmod 0755 \
+      /usr/local/bin/zrok \
+      /usr/local/bin/zrok-enable.bash \
+      /usr/local/bin/zrok-share.bash
 
 USER nobody
 ENTRYPOINT [ "zrok" ]

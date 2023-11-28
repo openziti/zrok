@@ -1,6 +1,6 @@
 ## Goal
 
-Proxy a reserved public subdomain to a backend target with Docker.
+Proxy a reserved public subdomain to a backend target with an always-on Docker Compose service.
 
 ## How it Works
 
@@ -11,7 +11,7 @@ When the project runs it will:
 
 1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
 1. reserve a public subdomain for the service unless `/mnt/.zrok/reserved.json` exists
-1. start sharing the target specified in the `.env` configuration file
+1. start sharing the target specified in the `ZROK_TARGET` environment variable
 
 ## Create the Docker Project
 
@@ -23,7 +23,7 @@ When the project runs it will:
   ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
   ```
 
-1. Run the Compose project to start sharing the built-in demo web server.
+1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
 
   ```bash
   docker compose up --detach
@@ -68,18 +68,13 @@ ZROK_OAUTH_PROVIDER="github"
 ZROK_SHARE_OPTS="--oauth-email-domains @example.com"
 ```
 
-### Password
+## Caddy is Powerful
 
-You can require a password by setting `ZROK_SHARE_OPTS` to specify additional command-line options to `zrok reserve
-public`.
+The reserved public share project uses zrok's default backend mode, `proxy`. Another backend mode, `caddy`, accepts a path to [a Caddyfile](https://caddyserver.com/docs/caddyfile) as the value of `ZROK_TARGET` ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)). 
 
-```bash title=".env"
-ZROK_SHARE_OPTS="--basic-auth 'admin:passwd'"
-```
+Caddy is the most powerful and flexible backend mode in zrok. You must reserve a new public subdomain whenever you switch the backend mode, so using `caddy` reduces the risk that you'll have to share a new frontend URL with your users. 
 
-## Share Something Different
-
-The reserved public share project uses zrok's `caddy` mode. Caddy accepts configuration as a Caddyfile that is mounted into the container ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)).
+With Caddy, you can balance the workload for websites or web services or share static sites and files or all of the above at the same time. You can update the Caddyfile and restart the Docker Compose project to start sharing the new configuration with the same reserved public subdomain.
 
 1. Create a Caddyfile. This example demonstrates proxying two HTTP servers with a weighted round-robin load balancer.
 
@@ -94,7 +89,7 @@ The reserved public share project uses zrok's `caddy` mode. Caddy accepts config
   }
   ```
 
-1. Create a file `compose.override.yml`. This example adds two `httpbin` containers for Caddy load balance, and masks the default Caddyfile with our custom one.
+1. Create a file `compose.override.yml`. This example adds two `httpbin` containers for load balancing, and mounts the Caddyfile into the container.
 
   ```yaml title="compose.override.yml"
   services:
@@ -107,13 +102,21 @@ The reserved public share project uses zrok's `caddy` mode. Caddy accepts config
         - ./Caddyfile:/mnt/.zrok/Caddyfile
   ```
 
-1. Re-run the project to load the new configuration.
+1. Start a new Docker Compose project or delete the existing state volume. 
 
   ```bash
-  docker compose up --force-recreate --detach
+  docker compose down --volumes
   ```
 
-1. Recall the reserved share URL from the log.
+  If you prefer to keep using the same zrok environment with the new share then delete `/mnt/.zrok/reserved.json` instead of the entire volume.
+
+1. Run the project to load the new configuration.
+
+  ```bash
+  docker compose up --detach
+  ```
+
+1. Note the new reserved share URL from the log.
 
   ```bash
   docker compose logs zrok-share

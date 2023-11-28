@@ -7,42 +7,41 @@ services:
     volumes:
       - zrok_env:/mnt/.zrok
 
+  # enable zrok environment
   zrok-enable:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
     depends_on:
       zrok-init:
         condition: service_completed_successfully
-    entrypoint:
-      - bash
-      - -euc
-      - |
-        if [[ -n "$(jq '.ziti_identity' ~/.zrok/environment.json 2>/dev/null)" ]]; then
-          echo "INFO: zrok environment is already enabled"
-          exit 0
-        else
-          zrok config set apiEndpoint ${ZROK_API_ENDPOINT:-https://api.zrok.io}
-          echo "INFO: running: zrok $$(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
-          exec zrok "$${@}"
-        fi
-    command: -- enable --headless --description "${ZROK_ENVIRONMENT_NAME:-docker private share}" ${ZROK_ENABLE_TOKEN}
+    entrypoint: zrok-enable.bash
     volumes:
-      - zrok_env:/mnt/.zrok
+      - zrok_env:/mnt
     environment:
-      HOME: /mnt
+      STATE_DIRECTORY: /mnt
+      ZROK_ENABLE_TOKEN:
+      ZROK_API_ENDPOINT:
+      ZROK_ENVIRONMENT_NAME: docker-private-share
 
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
-    command: share private --headless --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/} 
+    entrypoint:
+    - bash
+    - -euxc
+    - |
+      echo "DEBUG: HOME=$${HOME}"
+      ls -lA /mnt/.zrok/
+      exec zrok $${@}
+    command: -- share private --headless --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/} 
     depends_on:
       zrok-enable:
         condition: service_completed_successfully
     volumes:
-      - zrok_env:/mnt/.zrok
+      - zrok_env:/mnt
     environment:
       HOME: /mnt
       PFXLOG_NO_JSON: "true"
 
-  # demo servers you can share with zrok
+  # demo server you can share with zrok
   zrok-test:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
     command: test endpoint --address 0.0.0.0  # 9090
