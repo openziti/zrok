@@ -1,3 +1,5 @@
+import AnsibleRepoSetup from './install/_ansible_repo_setup.yaml'
+import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
 
 ## Goal
 
@@ -19,14 +21,14 @@ When the service starts it will:
 
 ## Installation
 
-1. Set up `zrok`'s Linux package repository by following [the Linux install guide](/guides/install/linux.mdx#install-zrok-from-the-repository). This will complete the installation in one step if you prefer that convenience.
+1. Set up `zrok`'s Linux package repository by following [the Linux install guide](/guides/install/linux.mdx#install-zrok-from-the-repository), or run this one-liner to complete the repo setup and install packages.
 
     ```bash
     curl -sSLf https://get.openziti.io/install.bash \
     | sudo bash -s zrok-share
     ```
 
-1. If you set up the repository by following the guide, then also install the `zrok-share` package. This provides the systemd service.
+1. If you set up the repository by following the guide, then also install the `zrok-share` package. This package provides the systemd service.
 
     ```bash title="Ubuntu, Debian"
     sudo sudo apt install zrok-share
@@ -35,6 +37,49 @@ When the service starts it will:
     ```bash title="Fedora, Rocky"
     sudo dnf install zrok-share
     ```
+
+<Details>
+<summary>Ansible Playbook</summary>
+
+<ConcatenateYamlSnippets
+  title="Set up package repository and install zrok-share"
+>
+{AnsibleRepoSetup}
+{`
+- name: Install zrok-share package
+  gather_facts: false
+  hosts: all 
+  become: true
+  tasks:
+  - name: Install zrok-share
+    ansible.builtin.package:
+      name: zrok-share
+      state: present
+
+  - name: Copy env config from Ansible controller to target
+    copy:
+      dest: /opt/openziti/etc/zrok/zrok-share.env
+      src: /opt/openziti/etc/zrok/zrok-share.env
+
+  - name: Enable and restart service
+    systemd:
+      name: zrok-share
+      enabled: yes
+      state: restarted
+      daemon_reload: yes
+
+  - name: Wait for service
+    systemd:
+      name: zrok-share
+      state: started
+    register: service_status
+    until: service_status.status.ActiveState == 'active'
+    retries: 30
+    delay: 1
+`}
+</ConcatenateYamlSnippets>
+
+</Details>
 
 ## Enable
 
@@ -57,6 +102,12 @@ Proxy a reserved subdomain to an existing web server. The web server could be on
 ```bash title="/opt/openziti/etc/zrok/zrok-share.env"
 ZROK_TARGET="http://127.0.0.1:3000"
 ZROK_BACKEND_MODE="proxy"
+```
+
+If your HTTPS server has an unverifiable TLS server certificate then you must set `--insecure`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_INSECURE="--insecure"
 ```
 
 ### Serve Static Files
