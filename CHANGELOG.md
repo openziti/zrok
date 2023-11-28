@@ -4,13 +4,7 @@
 
 CHANGE: Replaced most in-line shell scripts in Docker Compose projects with installed scripts that are shared between the Docker and Linux service. This normalizes the operational configuration of both Docker shares and Linux service, i.e., to use the same env vars.
 
-CHANGE: documentation: Replaced Downloads page with downloads cards and Install guides offering latest release
-
-CHANGE: documentation: Add a guide for running zrok as a production service
-
-CHANGE: documentation: Organize the instance configuration section of getting started as a separate guide
-
-CHANGE: documentation: upgrade to Docusaurus v3
+CHANGE: Upgrade to Docusaurus v3 for documentation.
 
 FIX: Some Docker shares had broken env mountpoints
 
