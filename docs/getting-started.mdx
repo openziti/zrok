@@ -1,150 +1,77 @@
 ---
-sidebar_position: 0
+title: Getting Started with zrok
+sidebar_label: Getting Started
+sidebar_position: 10
 ---
-# Getting Started with zrok
 
-`zrok` is a next-generation sharing platform, designed to make sharing network and file resources simple and secure. `zrok` is a _Ziti Native Application_, built on top of the [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) programmable zero trust network overlay. `zrok` is open source, licensed under the Apache v2 license. You can choose to self-host `zrok` or leverage the free, managed offering provided by NetFoundry at https://zrok.io.
+import { AssetsProvider } from '@site/src/components/assets-context';
+import DownloadCard from '@site/src/components/download-card';
+import styles from '@site/src/css/download-card.module.css';
 
-As of version `v0.4.0`, `zrok` provides the ability to:
+## What's a zrok?
 
-* share resources [publicly](./concepts/sharing-public.md), similar to other distributed reverse proxies; this allows you to easily expose your private HTTP/S resources to the public internet without changing your network security
-* share resources [privately](./concepts/sharing-private.md); private sharing uses peer-to-peer connectivity between two parties by leveraging the OpenZiti overlay. We believe the private sharing offered by `zrok` provides a unique level of security and privacy for this type of sharing.
+`zrok` */ziːɹɒk/ ("zee-rock")* is a secure, open-source, self-hostable sharing platform that simplifies shielding and sharing network services or files. There's a hardened zrok-as-a-service offering available at [zrok.io](https://zrok.io) with a generous free tier.
 
-As of version `v0.4.0`, `zrok` allows sharing these kinds of resources:
+## Open Source
 
-* HTTP/S resources; `zrok` provides reverse proxy capabilities for your HTTP/S endpoints, both publicly and privately
-* file resources; `zrok` provides built in `web` capabilities, allowing you to share your files with other users, both publicly and privately
-* TCP and UDP tunnels; `zrok` provides built-in `tunnel` capabilities, allowing you to share your TCP and UDP endpoints directly with other users privately (`zrok` does not currently offer public sharing of these kinds of resources)
+`zrok` is licensed under Apache 2.0.
 
-Let's take a look at how to get started with `zrok`.
+Check [the roadmap](https://github.com/orgs/openziti/projects/16) if you're thinking about the future. We would love to hear your ideas for `zrok`!
 
-:::note `zrok` moves fast!
+The best ways to engage are [Discourse](https://openziti.discourse.group/) for questions and [GitHub Issues](https://github.com/openziti/zrok/issues) for documenting problems.
 
-`zrok` is an open source project and is in its early development phases. We're doing our development publicly. See the [roadmap](https://github.com/orgs/openziti/projects/16) for details about the project. We are highly interested in feedback as we continue to iterate quickly. Please provide feedback in [Discourse](https://openziti.discourse.group/), raise [GitHub Issues](https://github.com/openziti/zrok/issues), or reach out directly.
+[Read more about zrok open source](/concepts/opensource.md).
 
-:::
+### Ziti native
 
-## Downloading zrok
+`zrok` is a _Ziti Native Application_, built on the [OpenZiti](https://openziti.io) platform, and supported by the OpenZiti community and NetFoundry team.
 
-Releases are also available from the `zrok` project repository on GitHub at https://github.com/openziti/zrok/releases/latest. If you're a Linux user and you're not sure which download to use then check out the hints on [the Downloads page](./downloads.md).
+## What's it for?
 
-### Extract zrok Distribution
+Use `zrok` to share a running service, like a web server or a network socket, or to share a directory of static files.
 
-Move the downloaded `zrok` distribution into a directory on your system. In my case, I've placed it in my home directory:
+If [sharing publicly](./concepts/sharing-public.md), you can reserve a subdomain, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
 
-```
-$ ls -lF zrok*
--rwxr-xr-x 1 michael michael 14459159 May 31 13:46 zrok_0.4.0-rc6_linux_amd64.tar.gz*
-```
+If [sharing privately](./concepts/sharing-private.md), only users with the share token can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
 
-Create a directory where the extracted distribution will sit:
+## Installing the zrok Command
 
-```
-$ mkdir zrok
-$ cd zrok/
-```
-
-Extract the `zrok` distribution:
-
-```
-$ tar zxvf ../zrok_0.4.0-rc1_linux_amd64.tar.gz
-CHANGELOG.md
-README.md
-zrok
-```
-
-> NOTE: On Windows platforms the distribution is shipped as a `zip` archive. Windows Explorer includes support for extracting `zip` archives natively.
-
-Add `zrok` to your shell's environment.
-
-For Linux or macos:
-
-```
-$ export PATH=`pwd`:$PATH
-```
-
-For Windows (using Command Prompt):
-
-```
-> set PATH=%CD%;%PATH%
-```
-
-For Windows (using PowerShell):
-
-```
-$env:path += ";"+$pwd.Path
-```
-
-With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
-
-```
-$ ./zrok version
-               _    
- _____ __ ___ | | __
-|_  / '__/ _ \| |/ /
- / /| | | (_) |   < 
-/___|_|  \___/|_|\_\
-
-v0.4.0-rc6 [c889005]
-```
-
-## Configure Your zrok Service Instance
-
-:::note
-Most users can safely skip this section and proceed to "Generating an Invitation" below.
-
-This section is relevant if you want to use the `zrok` CLI with an alternate service instance (in the case of self-hosting, etc.).
-:::
-
-`zrok` is both an installable utility that you interact with from your local computer, and also a _service_ that exists on the network. NetFoundry operates the public _service instance_ that is available at `api.zrok.io`, but because `zrok` is open source and self-hostable, you're free to create your own `zrok` service instance.
-
-The `zrok` executable defaults to using the `zrok` service instance at `api.zrok.io`. Should you need to change the endpoint to use a different service instance, you can do that with the following command:
-
-```
-$ zrok config set apiEndpoint https://zrok.mydomain.com
-[WARNING]: unable to open environment metadata; ignoring
-
-zrok configuration updated
-```
-
-:::note
-The `WARNING` about `environment metadata` is ignorable. Running the `zrok config set` command writes a small piece of metadata into a `.zrok` folder inside your home directory. This allows `zrok` to identify the version of its settings, providing a mechanism to upgrade your installation as new versions are released. This `WARNING` is letting you know that your current environment has not been initialized by `zrok`.
-:::
-
-You can use the `zrok status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as as an _environment_.
-
-```
-$ zrok status
-
-Config:
-
- CONFIG       VALUE                      SOURCE 
- apiEndpoint  https://zrok.mydomain.com  config 
-
-[WARNING]: Unable to load your local environment!
-
-To create a local environment use the zrok enable command.
-```
-
-:::note
-The `WARNING` about being `unable to load your local environment` will go away once you've successfully enabled (`zrok enable`) for your shell (we'll get to that below). For now, this warning is ignorable.
-:::
-
-The `zrok status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
+<AssetsProvider>
+  <div className={styles.downloadContainer}>
+    <DownloadCard
+      osName="Windows"
+      osLogo="/img/logo-windows.svg"
+      infoText="Binary executable"
+      guideLink="/docs/guides/install/windows"
+    />
+    <DownloadCard
+      osName="macOS"
+      osLogo="/img/logo-apple.svg"
+      infoText="Binary executable"
+      guideLink="/docs/guides/install/macos"
+    />
+    <DownloadCard
+      osName="Linux"
+      osLogo="/img/logo-linux.svg"
+      infoText="DEB, RPM packages"
+      guideLink="/docs/guides/install/linux"
+    />
+  </div>
+</AssetsProvider>
 
 ## Generating an Invitation
 
-In order to create an account with the `zrok` service instance, you will need to create an invitation. 
-
 :::note
-Some environments take advantage of _invitation tokens_, which limit who is able to request an invitation on the service instance. If your service uses invitation tokens, the administrator of your instance will include details about how to use your token to generate your invitation.
+If not using `zrok.io` (zrok-as-a-service), you must configure the `zrok` command to use your instance. See the [instance configuration guide](/guides/self-hosting/instance-configuration.mdx) in the self-hosting section for details.
 :::
 
-We generate an invitation with the `zrok invite` command. A service instance that allows open registration will provide an input form like this:
+Invite yourself to `zrok` by running the `zrok invite` command:
 
+```text
+zrok invite
 ```
-$ zrok invite
 
+```buttonless title="Output"
 enter and confirm your email address...
 
 > user@domain.com
@@ -155,30 +82,13 @@ enter and confirm your email address...
 invitation sent to 'user@domain.com'!
 ```
 
-A service instance that requires token-based invitation authentication will present a form that looks like this:
-
-```
-$ zrok invite
-
-enter and confirm your email address...
-
-If you don't already have one, request an invite token at: michael@quigley.com
-
-> Email Address
-> Confirm Email
-> Token
-
-
-[ Submit ]
-```
-
 The `zrok invite` command presents a small form that allows you to enter (and then confirm) your email address. Tabbing to the `[ Submit ]` button will send the request to your configured `zrok` service.
 
 Next, check the email where you sent the invite. You should receive a message asking you to click a link to create your `zrok` account. When you click that link, you will be brought to a web page that will allow you to set a password for your new account:
 
 ![Enter a Password](images/zrok_verify.png)
 
-Enter a password and it's confirmation, and click the `Register Account` button. You'll see the following:
+Enter a password and its confirmation, and click the `Register Account` button. You'll see the following:
 
 ![Successful Registration](images/zrok_registration_success.png)
 
@@ -206,23 +116,25 @@ This dialog box shows you the `zrok enable` command that you can use to enable a
 
 Let's copy that command and paste it into your shell:
 
-```
+```buttonless title="Example"
 $ zrok enable klFEoIi0QAg7 
 ⣻  contacting the zrok service...
 ```
 
 After a few seconds, the message will change and indicate that the enable operation succeeded:
 
-```
+```buttonless title="Example"
 $ zrok enable klFEoIi0QAg7 
 ⣻  the zrok environment was successfully enabled...
 ```
 
 Now, if we run a `zrok status` command, you will see the details of your environment:
 
+```txt
+zrok status
 ```
-$ zrok status
 
+```buttonless title="Output"
 Config:
 
  CONFIG       VALUE                        SOURCE
@@ -273,21 +185,22 @@ Shared resources are _ephemeral_ by default; as soon as you terminate the `zrok 
 
 ### Public Shares and Frontends
 
-Resources that are shared _publicly_ are exposed to any users on the internet who have access to the `zrok` service instance's "frontend".
+Resources that are shared _publicly_ are exposed to any users on the internet who have access to the `zrok` instance's "frontend".
 
 A frontend is an HTTPS listener exposed to the internet, that lets any user with your ephemeral share token access your publicly shared resources.
 
-For example, I might create a public share using the `zrok share public` command, which results in my `zrok` service instance exposing the following URL to access my resources:
+For example, I might create a public share using the `zrok share public` command, which results in my `zrok` instance exposing a URL like `https://2ptgbr8tlfvk.share.zrok.io` to access my resources.
 
-https://2ptgbr8tlfvk.share.zrok.io
-
-In this case my share was given the "share token" of `2ptgbr8tlfvk`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
+In this case, my share was given the "share token" of `2ptgbr8tlfvk`. That URL can be given to any user, allowing them to immediately access the shared resources directly from my local environment, all without exposing any access to my private, secure environment. The physical network location of my environment is not exposed to anonymous consumers of my resources.
 
 :::note
 Here is the `--help` output from `zrok share public`:
 
+```text
+zrok share public
 ```
-$ zrok share public
+
+```buttonless title="Output"
 Error: accepts 1 arg(s), received 0
 Usage:
   zrok share public <target> [flags]
@@ -338,13 +251,13 @@ If we try to reload the frontend endpoint in our web browser, we'll see:
 
 `zrok` also provides a powerful _private_ sharing model. If I execute the following command:
 
-```
+```buttonless title="Example"
 $ zrok share private http://localhost:8080
 ```
 
 The `zrok` service will respond with the following:
 
-```
+```buttonless title="Output"
 access your share with: zrok access private wvszln4dyz9q
 ```
 
@@ -370,7 +283,7 @@ A reserved share can be re-used multiple times; it will survive termination of t
 
 The first step is to create the reserved share:
 
-```
+```txt title="Example"
 $ zrok reserve public --backend-mode web v0.3_getting_started
 [   0.275]    INFO main.(*reserveCommand).run: your reserved share token is 'mltwsinym1s2'
 [   0.275]    INFO main.(*reserveCommand).run: reserved frontend endpoint: https://mltwsinym1s2.share.zrok.io
@@ -388,7 +301,7 @@ This is the `404` error message returned by the `zrok` frontend. We're getting t
 
 This command:
 
-```
+```txt title="Example"
 $ zrok share reserved mltwsinym1s2
 ```
 
@@ -398,13 +311,13 @@ $ zrok share reserved mltwsinym1s2
 
 And now if we refresh the frontend endpoint URL in the web browser, we'll see an index of the `docs` directory:
 
-![zrok docs share](images/zrok_docs_share.png)
+![zrok docs share](images/zrok_web_console_share_frontend.png)
 
 With the reserved share, we're free to stop and restart the `zrok share reserved` command as many times as we want, without losing the token for our share.
 
 When we're done with the reserved share, we can _release_ it using this command:
 
-```
+```txt title="Example"
 $ zrok release mltwsinym1s2
 [   0.230]    INFO main.(*releaseCommand).run: reserved share 'mltwsinym1s2' released
 ```
@@ -415,11 +328,11 @@ In summary, `zrok` lets you easily and securely share resources with both genera
 
 Here's a quick review of the `zrok` mental model and the vocabulary.
 
-### Service Instance and Account
+### Instance and Account
 
-You create an _account_ with a `zrok` _service instance_. Your account is identified by a username and a password, which you use to log into the _web console_. Your account also has a _secret token_, which you will use to authenticate from the `zrok` command-line to interact with the _service instance_.
+You create an _account_ with a `zrok` _instance_. Your account is identified by a username and a password, which you use to log into the _web console_. Your account also has a _secret token_, which you will use to authenticate from the `zrok` command-line to interact with the _instance_.
 
-You create a new _account_ with a `zrok` _service instance_ through the `zrok invite` command.
+You create a new _account_ with a `zrok` _instance_ through the `zrok invite` command.
 
 ### Environment
 
@@ -431,7 +344,7 @@ You create a new _environment_ by using the `zrok enable` command.
 
 Once you've enabled an _environment_, you then create one or more _shares_. Shares have either a _public_ or _private_ _sharing mode_. _Shares_ share a specific type of resource using a _backend mode_. As of this writing `zrok` supports a `proxy` _backend mode_ to share local HTTP resources as a _reverse proxy_. `zrok` also supports a `web` _backend mode_ to share local file and HTML resources by enabling a basic HTTP server.
 
-Every _share_ is identified by a _share token_. _Public shares_ can be accessed through either a _frontend_ instance offered through the `zrok` _service instance_, or through the `zrok access` command. _Private shares_ can only be accessed through the `zrok access` command.
+Every _share_ is identified by a _share token_. _Public shares_ can be accessed through either a _frontend_ instance offered through the `zrok` _instance_, or through the `zrok access` command. _Private shares_ can only be accessed through the `zrok access` command.
 
 You use the `zrok share` command to create and enable _ephemeral shares_.
 
@@ -441,9 +354,9 @@ You use the `zrok share` command to create and enable _ephemeral shares_.
 
 You use the `zrok reserve` command to create _reserved shares_. Reserved shares last until you use the `zrok release` command to delete them.
 
-## Self-Hosting a Service Instance
+## Self-Hosting an Instance
 
-Interested in self-hosting your own `zrok` service instance? See the [self-hosting guide](./guides/self-hosting/self_hosting_guide.md) for details.
+Interested in self-hosting your own `zrok` instance? See the [self-hosting guide](./guides/self-hosting/self_hosting_guide.md) for details.
 
 [openziti]: https://docs.openziti.io/docs/learn/introduction/	"OpenZiti"
 [ zrok-download]: https://zrok.io "zrok Download"

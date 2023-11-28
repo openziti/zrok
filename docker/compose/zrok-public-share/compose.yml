@@ -15,52 +15,46 @@ services:
     depends_on:
       zrok-init:
         condition: service_completed_successfully
-    entrypoint:
-      - bash
-      - -euc
-      - |
-        if [[ -n "$(jq '.ziti_identity' ~/.zrok/environment.json 2>/dev/null)" ]]; then
-          echo "INFO: zrok environment is already enabled"
-          exit 0
-        else
-          zrok config set apiEndpoint ${ZROK_API_ENDPOINT:-https://api.zrok.io}
-          echo "INFO: running: zrok $$(sed -E "s/${ZROK_ENABLE_TOKEN}/************/" <<< $${@})"
-          exec zrok "$${@}"
-        fi
-    command: -- enable --headless --description "${ZROK_ENVIRONMENT_NAME:-docker temp public share}" ${ZROK_ENABLE_TOKEN}
+    entrypoint: zrok-enable.bash
     volumes:
-      - zrok_env:/mnt/.zrok
+      - zrok_env:/mnt
     environment:
-      HOME: /mnt
+      STATE_DIRECTORY: /mnt
+      ZROK_ENABLE_TOKEN:
+      ZROK_API_ENDPOINT:
+      ZROK_ENVIRONMENT_NAME: docker-public-share
 
-  # start share on temporary public frontend url
+  # provision a temporary zrok frontend subdomain and start sharing the backend target
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
-    entrypoint:
-      - bash
-      - -euc
-      - |
-        set -o pipefail
-        ZROK_CMD="share public --headless"
-        if [[ -n "${ZROK_SHARE_OPTS:-}" ]]; then
-          ZROK_CMD+=" ${ZROK_SHARE_OPTS}"
-        fi
-        if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
-          ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
-        fi
-        ZROK_CMD+=" --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/}"
-        echo "INFO: running: zrok $${ZROK_CMD}"
-        exec zrok $${ZROK_CMD}
+    entrypoint: zrok-share.bash
     depends_on:
       zrok-enable:
         condition: service_completed_successfully
     volumes:
-      - zrok_env:/mnt/.zrok
+      - zrok_env:/mnt
+    ports: []
+      # - 127.0.0.1:2019:2019  # Caddy admin API
     environment:
-      HOME: /mnt
-      PFXLOG_NO_JSON: "true"
+      # internal configuration
+      STATE_DIRECTORY: /mnt  # zrok homedir in container
+      ZROK_FRONTEND_MODE: temp-public  # tells zrok-share.bash to create a temporary subdomain and share until exit
 
-  # demo servers you can share with zrok
+      # most relevant options
+      ZROK_BACKEND_MODE: proxy  # web, caddy, drive, proxy
+      ZROK_TARGET: http://zrok-test:9090  # backend target, is a path in container filesystem unless proxy mode
+      ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate
+      ZROK_OAUTH_PROVIDER:  # google, github
+      ZROK_OATH_EMAILS:     # space-separated list of OAuth email addresses or @domain.tld to allow
+      ZROK_BASIC_AUTH:      # username:password, mutually-exclusive with ZROK_OAUTH_PROVIDER
+
+      # least relevant options
+      ZROK_VERBOSE:           # "--verbose"
+      ZROK_SHARE_OPTS:        # additional arguments to "zrok share public" command
+      ZROK_FRONTENDS:         # "public"
+      PFXLOG_NO_JSON: "true"  # suppress JSON logging format
+
+  # demo server you can share with zrok
   zrok-test:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
     command: test endpoint --address 0.0.0.0  # 9090
