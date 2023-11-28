@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type FilesystemTargetConfig struct {
@@ -52,7 +53,7 @@ func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error 
 				return err
 			}
 		} else {
-			etag = fmt.Sprintf(`"%x%x"`, fi.ModTime().UnixNano(), fi.Size())
+			etag = fmt.Sprintf(`"%x%x"`, fi.ModTime().UTC().UnixNano(), fi.Size())
 		}
 		t.tree = append(t.tree, &Object{path, fi.Size(), fi.ModTime(), etag})
 	}
@@ -75,6 +76,14 @@ func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.Fi
 	}
 	_, err = io.Copy(f, stream)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *FilesystemTarget) SetModificationTime(path string, mtime time.Time) error {
+	targetPath := filepath.Join(t.cfg.Root, path)
+	if err := os.Chtimes(targetPath, time.Now(), mtime); err != nil {
 		return err
 	}
 	return nil

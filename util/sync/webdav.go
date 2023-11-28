@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type WebDAVTargetConfig struct {
@@ -66,4 +67,8 @@ func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
 
 func (t *WebDAVTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
 	return t.c.WriteStream(path, stream, mode)
+}
+
+func (t *WebDAVTarget) SetModificationTime(path string, mtime time.Time) error {
+	return nil
 }

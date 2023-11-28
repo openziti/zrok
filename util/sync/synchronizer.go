@@ -25,7 +25,7 @@ func Synchronize(src, dst Target) error {
 	var copyList []*Object
 	for _, srcF := range srcTree {
 		if dstF, found := dstIndex[srcF.Path]; found {
-			if dstF.ETag != srcF.ETag {
+			if dstF.Size != srcF.Size || dstF.Modified.UTC() != srcF.Modified.UTC() {
 				copyList = append(copyList, srcF)
 			}
 		} else {
@@ -34,12 +34,14 @@ func Synchronize(src, dst Target) error {
 	}
 
 	for _, target := range copyList {
-		logrus.Infof("+> %v", target.Path)
 		ss, err := src.ReadStream(target.Path)
 		if err != nil {
 			return err
 		}
 		if err := dst.WriteStream(target.Path, ss, os.ModePerm); err != nil {
+			return err
+		}
+		if err := dst.SetModificationTime(target.Path, target.Modified); err != nil {
 			return err
 		}
 		logrus.Infof("=> %v", target.Path)
