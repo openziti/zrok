@@ -38,13 +38,14 @@ fi
 
 if (( $# )); then
   if [[ -s "$1" ]]; then
+    echo "INFO: reading enable parameters from $1"
     source "$1"
   else
     echo "ERROR: \$1="$1" is empty or not a readable file" >&2
     exit 1
   fi
 else
-  echo "WARNING: no env filename argument, trying to read configuration from environment variables" >&2
+  echo "INFO: reading enable parameters from environment variables"
 fi
 
 if [[ -z "${ZROK_ENABLE_TOKEN}" ]]; then
