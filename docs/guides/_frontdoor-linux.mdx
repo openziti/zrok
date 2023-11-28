@@ -1,7 +1,7 @@
 
 ## Goal
 
-Proxy a reserved public subdomain to a backend target with a Linux system service.
+Proxy a reserved public subdomain to a backend target with an always-on Linux system service.
 
 ## How it Works
 
@@ -15,7 +15,7 @@ When the service starts it will:
 
 1. enable the zrok environment unless `/var/lib/zrok-share/.zrok/environment.json` exists
 1. reserve a public subdomain for the service unless `/var/lib/zrok-share/.zrok/reserved.json` exists
-1. start sharing the target specified in the configuration file
+1. start sharing the target specified as `ZROK_TARGET` in the environment file
 
 ## Installation
 
