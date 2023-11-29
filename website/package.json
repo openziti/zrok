@@ -26,7 +26,8 @@
     "remark-math": "^5.1.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.0.0"
+    "@docusaurus/module-type-aliases": "^3.0.0",
+    "yaml-loader": "^0.8.0"
   },
   "browserslist": {
     "production": [

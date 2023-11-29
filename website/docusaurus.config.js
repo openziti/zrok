@@ -44,7 +44,24 @@ const config = {
           }
         ]
       }
-    ]
+    ],
+    function myPlugin(context, options) {
+      return {
+        name: 'custom-webpack-plugin',
+        configureWebpack(config, isServer, utils) {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.yaml$/,
+                  use: 'yaml-loader',
+                },
+              ],
+            },
+          };
+        },
+      };
+    },
   ],
   
   presets: [

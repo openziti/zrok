@@ -6,6 +6,8 @@ sidebar_label: Linux
 import { AssetsProvider } from '@site/src/components/assets-context';
 import DownloadCard from '@site/src/components/download-card';
 import styles from '@site/src/css/download-card.module.css';
+import AnsibleRepoSetup from './_ansible_repo_setup.yaml'
+import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
 
 ## Linux Binary
 
@@ -60,7 +62,7 @@ Download the binary distribution for your Linux distribution's architecture or r
 </Details>
 
 <Details>
-<summary>Auto install binary in `/usr/local/bin/zrok`</summary>
+<summary>Script to install binary in `/usr/local/bin/zrok`</summary>
 
 This script auto-selects the correct architecture, and may be helpful for Raspberry Pi users.
 
@@ -149,7 +151,7 @@ zrok version;
 </Details>
 
 <Details>
-<summary>Auto set up DEB or RPM repository</summary>
+<summary>Script to set up DEB or RPM repository</summary>
 
 1. Download the zrok install script.
 
@@ -168,5 +170,26 @@ zrok version;
     ```text
     sudo bash ./zrok-install.bash zrok
     ```
+
+</Details>
+
+<Details>
+<summary>Ansible Playbook</summary>
+
+<ConcatenateYamlSnippets
+  title="Set up package repository and install zrok">
+{AnsibleRepoSetup}
+{`
+- name: Install zrok package
+  gather_facts: false
+  hosts: all 
+  become: true
+  tasks:
+  - name: Install zrok
+    ansible.builtin.package:
+      name: zrok
+      state: present
+`}
+</ConcatenateYamlSnippets>
 
 </Details>
