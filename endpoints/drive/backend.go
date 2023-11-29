@@ -5,8 +5,8 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/drive/webdav"
 	"github.com/pkg/errors"
-	"golang.org/x/net/webdav"
 	"net/http"
 	"time"
 )
