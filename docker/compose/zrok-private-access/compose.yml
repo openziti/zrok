@@ -24,6 +24,7 @@ services:
 
   zrok-access:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    restart: unless-stopped
     command: access private --headless --bind 0.0.0.0:9191 ${ZROK_ACCESS_TOKEN}
     depends_on:
       zrok-enable:
