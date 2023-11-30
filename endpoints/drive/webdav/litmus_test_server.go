@@ -21,7 +21,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"golang.org/x/net/webdav"
+	"github.com/openziti/zrok/endpoints/drive/webdav"
 	"log"
 	"net/http"
 	"net/url"

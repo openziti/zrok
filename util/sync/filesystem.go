@@ -3,7 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
-	"golang.org/x/net/webdav"
+	"github.com/openziti/zrok/endpoints/drive/webdav"
 	"io"
 	"io/fs"
 	"os"
