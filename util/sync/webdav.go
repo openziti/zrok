@@ -1,8 +1,8 @@
 package sync
 
 import (
+	"github.com/openziti/zrok/util/sync/webdavClient"
 	"github.com/pkg/errors"
-	"github.com/studio-b12/gowebdav"
 	"io"
 	"os"
 	"path/filepath"
@@ -16,11 +16,11 @@ type WebDAVTargetConfig struct {
 }
 
 type WebDAVTarget struct {
-	c *gowebdav.Client
+	c *webdavClient.Client
 }
 
 func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
-	c := gowebdav.NewClient(cfg.URL, cfg.Username, cfg.Password)
+	c := webdavClient.NewClient(cfg.URL, cfg.Username, cfg.Password)
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "error connecting to webdav target")
 	}
@@ -48,7 +48,7 @@ func (t *WebDAVTarget) recurse(path string, tree []*Object) ([]*Object, error) {
 				return nil, err
 			}
 		} else {
-			if v, ok := f.(gowebdav.File); ok {
+			if v, ok := f.(webdavClient.File); ok {
 				tree = append(tree, &Object{
 					Path:     filepath.ToSlash(filepath.Join(path, f.Name())),
 					Size:     v.Size(),
