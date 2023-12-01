@@ -6,13 +6,18 @@ package webdav
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/xml"
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -55,6 +60,63 @@ type File interface {
 	io.Writer
 }
 
+type webdavFile struct {
+	File
+	name string
+}
+
+func (f *webdavFile) DeadProps() (map[xml.Name]Property, error) {
+	logrus.Infof("DeadProps(%v)", f.name)
+	var (
+		xmlName       xml.Name
+		property      Property
+		properties    = make(map[xml.Name]Property)
+		checksum, err = f.md5()
+	)
+	if err == nil {
+		xmlName.Space = "http://owncloud.org/ns"
+		xmlName.Local = "checksums"
+		property.XMLName = xmlName
+		property.InnerXML = append(property.InnerXML, "<checksum xmlns=\"http://owncloud.org/ns\">"...)
+		property.InnerXML = append(property.InnerXML, checksum...)
+		property.InnerXML = append(property.InnerXML, "</checksum>"...)
+		properties[xmlName] = property
+	}
+
+	var stat fs.FileInfo
+	stat, err = f.Stat()
+	if err == nil {
+		xmlName.Space = "DAV:"
+		xmlName.Local = "lastmodified"
+		property.XMLName = xmlName
+		property.InnerXML = strconv.AppendInt(nil, stat.ModTime().Unix(), 10)
+		properties[xmlName] = property
+	}
+
+	return properties, nil
+}
+
+func (f *webdavFile) Patch(proppatches []Proppatch) ([]Propstat, error) {
+	var stat Propstat
+	stat.Status = http.StatusOK
+	return []Propstat{stat}, nil
+}
+
+func (f *webdavFile) md5() (string, error) {
+	file, err := os.Open(f.name)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+	xhash := fmt.Sprintf("%x", hash.Sum(nil))
+	logrus.Infof("hashed %v = %v", f.name, xhash)
+	return xhash, nil
+}
+
 // A Dir implements FileSystem using the native file system restricted to a
 // specific directory tree.
 //
@@ -93,7 +155,7 @@ func (d Dir) OpenFile(ctx context.Context, name string, flag int, perm os.FileMo
 	if err != nil {
 		return nil, err
 	}
-	return f, nil
+	return &webdavFile{f, name}, nil
 }
 
 func (d Dir) RemoveAll(ctx context.Context, name string) error {
