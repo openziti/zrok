@@ -99,12 +99,12 @@ type props struct {
 	Modified    string   `xml:"DAV: prop>getlastmodified,omitempty"`
 }
 
-type response struct {
+type Response struct {
 	Href  string  `xml:"DAV: href"`
 	Props []props `xml:"DAV: propstat"`
 }
 
-func getProps(r *response, status string) *props {
+func getProps(r *Response, status string) *props {
 	for _, prop := range r.Props {
 		if strings.Contains(prop.Status, status) {
 			return &prop
@@ -119,7 +119,7 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 	files := make([]os.FileInfo, 0)
 	skipSelf := true
 	parse := func(resp interface{}) error {
-		r := resp.(*response)
+		r := resp.(*Response)
 
 		if skipSelf {
 			skipSelf = false
@@ -169,7 +169,7 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 				<d:getlastmodified/>
 			</d:prop>
 		</d:propfind>`,
-		&response{},
+		&Response{},
 		parse)
 
 	if err != nil {
@@ -184,7 +184,7 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 func (c *Client) Stat(path string) (os.FileInfo, error) {
 	var f *File
 	parse := func(resp interface{}) error {
-		r := resp.(*response)
+		r := resp.(*Response)
 		if p := getProps(r, "200"); p != nil && f == nil {
 			f = new(File)
 			f.name = p.Name
@@ -221,7 +221,7 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 				<d:getlastmodified/>
 			</d:prop>
 		</d:propfind>`,
-		&response{},
+		&Response{},
 		parse)
 
 	if err != nil {

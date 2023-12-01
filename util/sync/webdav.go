@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/openziti/zrok/util/sync/webdavClient"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path/filepath"
@@ -72,5 +73,14 @@ func (t *WebDAVTarget) WriteStream(path string, stream io.Reader, mode os.FileMo
 }
 
 func (t *WebDAVTarget) SetModificationTime(path string, mtime time.Time) error {
+	modtimeUnix := mtime.Unix()
+	body := "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" +
+		"<propertyupdate xmlns=\"DAV:\" xmlns:z=\"zrok:\"><set><prop><z:lastmodified>" +
+		fmt.Sprintf("%d", modtimeUnix) +
+		"</z:lastmodified></prop></set></propertyupdate>"
+	logrus.Infof("sending '%v'", body)
+	if err := t.c.Proppatch(path, body, nil, nil); err != nil {
+		return err
+	}
 	return nil
 }

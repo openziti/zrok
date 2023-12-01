@@ -105,6 +105,26 @@ func (c *Client) propfind(path string, self bool, body string, resp interface{},
 	return parseXML(rs.Body, resp, parse)
 }
 
+func (c *Client) Proppatch(path string, body string, resp interface{}, parse func(resp interface{}) error) error {
+	rs, err := c.req("PROPPATCH", path, strings.NewReader(body), func(rq *http.Request) {
+		rq.Header.Add("Content-Type", "application/xml;charset=UTF-8")
+		rq.Header.Add("Accept", "application/xml,text/xml")
+		rq.Header.Add("Accept-Charset", "utf-8")
+		// TODO add support for 'gzip,deflate;q=0.8,q=0.7'
+		rq.Header.Add("Accept-Encoding", "")
+	})
+	if err != nil {
+		return err
+	}
+	defer rs.Body.Close()
+
+	if rs.StatusCode != 207 {
+		return NewPathError("PROPPATCH", path, rs.StatusCode)
+	}
+
+	return parseXML(rs.Body, resp, parse)
+}
+
 func (c *Client) doCopyMove(
 	method string,
 	oldpath string,
