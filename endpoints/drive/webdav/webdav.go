@@ -8,7 +8,6 @@ package webdav // import "golang.org/x/net/webdav"
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/url"
@@ -288,10 +287,6 @@ func (h *Handler) handlePut(w http.ResponseWriter, r *http.Request) (status int,
 		return http.StatusInternalServerError, err
 	}
 	w.Header().Set("ETag", etag)
-	ts := r.Header.Get("zrok-timestamp")
-	if ts != "" {
-		logrus.Infof("zrok-timestamp = %v", ts)
-	}
 	return http.StatusCreated, nil
 }
 
