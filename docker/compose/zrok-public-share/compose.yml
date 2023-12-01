@@ -27,6 +27,7 @@ services:
   # provision a temporary zrok frontend subdomain and start sharing the backend target
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    restart: no
     entrypoint: zrok-share.bash
     depends_on:
       zrok-enable:

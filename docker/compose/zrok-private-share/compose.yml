@@ -24,6 +24,7 @@ services:
 
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    restart: no
     entrypoint:
     - bash
     - -euxc
