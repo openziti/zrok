@@ -47,7 +47,7 @@ func NewAuthClient(uri string, auth Authorizer) *Client {
 
 // SetHeader lets us set arbitrary headers for a given client
 func (c *Client) SetHeader(key, value string) {
-	c.headers.Add(key, value)
+	c.headers.Set(key, value)
 }
 
 // SetInterceptor lets us set an arbitrary interceptor for a given client
@@ -417,7 +417,6 @@ func (c *Client) Write(path string, data []byte, _ os.FileMode) (err error) {
 
 // WriteStream writes a stream
 func (c *Client) WriteStream(path string, stream io.Reader, _ os.FileMode) (err error) {
-
 	err = c.createParentCollection(path)
 	if err != nil {
 		return err

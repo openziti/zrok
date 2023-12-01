@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"fmt"
 	"github.com/openziti/zrok/util/sync/webdavClient"
 	"github.com/pkg/errors"
 	"io"
@@ -66,6 +67,7 @@ func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
 }
 
 func (t *WebDAVTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
+	t.c.SetHeader("zrok-timestamp", fmt.Sprintf("%d", time.Now().UnixNano()))
 	return t.c.WriteStream(path, stream, mode)
 }
 

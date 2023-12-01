@@ -61,7 +61,7 @@ func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error 
 }
 
 func (t *FilesystemTarget) ReadStream(path string) (io.ReadCloser, error) {
-	return os.Open(path)
+	return os.Open(filepath.Join(t.cfg.Root, path))
 }
 
 func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
