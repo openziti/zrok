@@ -92,9 +92,22 @@ func (f *webdavFile) DeadProps() (map[xml.Name]Property, error) {
 	return properties, nil
 }
 
-func (f *webdavFile) Patch(proppatches []Proppatch) ([]Propstat, error) {
+func (f *webdavFile) Patch(patches []Proppatch) ([]Propstat, error) {
 	var stat Propstat
 	stat.Status = http.StatusOK
+	for _, patch := range patches {
+		for _, prop := range patch.Props {
+			if prop.XMLName.Space == "zrok:" && prop.XMLName.Local == "lastmodified" {
+				modtimeUnix, err := strconv.ParseInt(string(prop.InnerXML), 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				if err := f.updateModtime(f.name, time.Unix(modtimeUnix, 0)); err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
 	return []Propstat{stat}, nil
 }
 
@@ -109,6 +122,13 @@ func (f *webdavFile) checksum() (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+func (f *webdavFile) updateModtime(path string, modtime time.Time) error {
+	if err := os.Chtimes(f.name, time.Now(), modtime); err != nil {
+		return err
+	}
+	return nil
 }
 
 // A Dir implements FileSystem using the native file system restricted to a
