@@ -4,7 +4,7 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
 type privateResourceAllocator struct{}

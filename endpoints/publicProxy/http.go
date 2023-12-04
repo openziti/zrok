@@ -11,7 +11,7 @@ import (
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
