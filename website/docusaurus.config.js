@@ -44,7 +44,24 @@ const config = {
           }
         ]
       }
-    ]
+    ],
+    function myPlugin(context, options) {
+      return {
+        name: 'custom-webpack-plugin',
+        configureWebpack(config, isServer, utils) {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.yaml$/,
+                  use: 'yaml-loader',
+                },
+              ],
+            },
+          };
+        },
+      };
+    },
   ],
   
   presets: [
@@ -95,24 +112,12 @@ const config = {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
-            label: 'What is zrok?',
+            label: 'Docs',
           },
           {
             href: 'https://github.com/orgs/openziti/projects/16',
             label: 'Roadmap',
             position: 'right',
-          },
-          {
-            type: 'doc',
-            docId: 'getting-started',
-            position: 'right',
-            label: 'Docs',
-          },
-          {
-            type: 'doc',
-            docId: 'downloads',
-            position: 'right',
-            label: 'Downloads',
           },
           {
             href: 'https://github.com/openziti/zrok',

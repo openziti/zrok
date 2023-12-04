@@ -8,8 +8,8 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"time"
 	"slices"
+	"time"
 )
 
 func init() {

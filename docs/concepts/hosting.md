@@ -1,6 +1,7 @@
 ---
 sidebar_position: 200
 ---
+
 # Hosting
 
 ## Self-Hosted
