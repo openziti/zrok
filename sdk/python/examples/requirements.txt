@@ -1,0 +1,3 @@
+openziti==0.8.1
+requests==2.31.0
+zrok-sdk
