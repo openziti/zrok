@@ -26,7 +26,7 @@ sdk/python/sdk/build/
 .env.production.local
 go.work
 go.work.sum
-/zrok-venv
+zrok-venv
 
 npm-debug.log*
 yarn-debug.log*
