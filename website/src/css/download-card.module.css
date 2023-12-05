@@ -1,0 +1,104 @@
+:root {
+  --contrasting-background: #c4b7f5;
+  --container-border: 1px solid #adadad; /* Light gray border */
+  --button-background-hover: #9c84f9;
+}
+
+[data-theme="dark"] {
+  --contrasting-background: #4b359f;
+  --container-border: 1px solid #6d6d6d; /* Light gray border */
+  --button-background-hover: #251463;
+}
+
+.downloadContainer {
+  width: 100%; /* Adjust this value to fit your design */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 9px; /* Adjust the space between cards */
+  padding: 20px; /* Space inside the container */
+}
+
+.downloadCard {
+  width: 30%; /* Adjust the width as needed */
+  box-sizing: border-box; /* Include padding and border in the width */
+  background-color: var(--sidebar-selected);
+  border-radius: 18px;
+  text-align: center;
+  display: flex;
+  flex-grow: 1; /* Allows the content area to grow and take up available space */
+  flex-direction: column; /* Stack footer vertically */
+
+}
+
+.downloadCard img {
+  width: auto; /* This will make the image take the full width of the card */
+  max-height: 100px; /* This will maintain the aspect ratio of the image */
+  margin: 0 auto; /* Center the image if the card is wider than the image */
+  display: block; /* Change display from inline to block for better control */
+  padding: 10px;;
+}
+
+.cardFooter {
+  background-color: var(--contrasting-background);
+  border-top: var(--container-border);
+  padding: 10px;
+  margin-top: auto; /* Push the footer to the bottom */
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+
+.downloadCard ul {
+  list-style: none; /* Remove the default list style */
+  padding: 0; /* Remove the default padding */
+  margin: 0; /* Remove the default margin */
+  margin-bottom: 20px; /* Add some space between the list and the footer */
+}
+
+.downloadButtons {
+    display: inline-block; /* Allows width and height to be set */
+    margin: 5px; /* Spacing between buttons */
+    padding: 10px 15px; /* Size of the button */
+    text-align: center; /* Centers text within the button */
+    background-color: var(--contrasting-background); /* Background color - Bootstrap primary button color */
+    border: 1px var(--container-border); /* Border color - same as background for a solid button */
+    border-radius: 18px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.downloadButtons:hover, .downloadButtons:focus {
+    background-color: var(--button-background-hover);
+    outline: none; /* Removes the outline on focus for a clean look */
+}
+
+.downloadLinks, .downloadLinks:hover, .downloadLinks:focus {
+    text-decoration: none; /* Removes the underline from links */
+}
+
+.downloadCard h3 {
+  margin-top: 10px;
+}
+
+.downloadCard .imgContainer {
+  background-color: var(--contrasting-background);
+  display: inline-block; /* Or 'block' depending on layout */
+  padding: 10px; /* Adjust padding as needed */
+  border-top-left-radius: 18px; /* Optional: for rounded corners */
+  border-top-right-radius: 18px; /* Optional: for rounded corners */
+  border-bottom: var(--container-border);
+  padding: 10px;
+  margin-bottom: auto; /* Push the footer to the bottom */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .downloadContainer {
+    flex-direction: column;
+  }
+
+  .downloadCard {
+    width: auto; /* Take full width on small screens */
+    max-width: none; /* Allow the card to take full width */
+  }
+}

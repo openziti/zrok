@@ -1,0 +1,56 @@
+---
+title: zrok frontdoor
+sidebar_label: frontdoor
+sidebar_position: 20
+hide_table_of_contents: true
+---
+
+import OsTabs from '@theme/OsTabs';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+// import Details from '@theme/MDXComponents/Details';
+import LinuxService from './_frontdoor-linux.mdx';
+import ReservedDocker from './_frontdoor-docker.mdx';
+
+**zrok frontdoor** provides a shielded entry point for your production website or service. This is useful if you want to expose it to the public internet, but not directly.
+
+<OsTabs
+  queryString="os"
+  values={[
+    { label: 'Linux', value: 'Linux', },
+    { label: 'macOS', value: 'Mac OS', },
+    { label: 'Windows', value: 'Windows', },
+  ]}
+>
+
+  <TabItem value="Linux">
+
+On Linux, zrok frontdoor is implemented natively as a system service provided by the `zrok-share` DEB or RPM package.
+
+If you'd prefer to run zrok in Docker instead of installing the package then you can follow the Docker instructions. With Docker, the steps are the same for Linux, [macOS](./?os=Mac+OS), and [Windows](./?os=Windows).
+
+    <LinuxService/>
+
+  </TabItem>
+
+  <TabItem value="Mac OS">
+
+On macOS, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service.
+
+    <ReservedDocker/>
+
+  </TabItem>
+
+  <TabItem value="Windows">
+
+On Windows, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service.
+
+    <ReservedDocker/>
+
+  </TabItem>
+
+</OsTabs>
+
+## Concepts
+
+Overview of [zrok reserved shares](/concepts/sharing-reserved.md)

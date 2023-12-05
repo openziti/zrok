@@ -13,7 +13,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"

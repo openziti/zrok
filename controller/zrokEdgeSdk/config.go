@@ -6,7 +6,7 @@ import (
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
 	"time"
 )

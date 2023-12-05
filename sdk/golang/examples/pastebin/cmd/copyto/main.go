@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net"

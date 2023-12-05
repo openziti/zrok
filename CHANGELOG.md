@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.4.18
+
+CHANGE: Moved the golang zrok sdk into `sdk/golang/sdk` to normalize location for future sdk's. 
+
+## v0.4.17
+
+CHANGE: Replaced most in-line shell scripts in Docker Compose projects with installed scripts that are shared between the Docker and Linux service. This normalizes the operational configuration of both Docker shares and Linux service, i.e., to use the same env vars.
+
+CHANGE: Upgrade to Docusaurus v3 for documentation.
+
+FIX: Some Docker shares had broken env mountpoints
+
 ## v0.4.16
 
 FEATURE: Publish Linux packages for `zrok` CLI and a systemd service for running a reserved public share (`zrok-share`).
