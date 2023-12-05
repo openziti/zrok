@@ -6,6 +6,8 @@ FEATURE: Python sdk added. Can be found on [pypi](https://test.pypi.org/project/
 
 CHANGE: Moved the golang zrok sdk into `sdk/golang/sdk` to normalize location for future sdk's. 
 
+CHANGE: add restart policies to docker compose samples used by the guide docs, e.g., reserved public share should auto-start on boot, temp public share should not.
+
 ## v0.4.17
 
 CHANGE: Replaced most in-line shell scripts in Docker Compose projects with installed scripts that are shared between the Docker and Linux service. This normalizes the operational configuration of both Docker shares and Linux service, i.e., to use the same env vars.
