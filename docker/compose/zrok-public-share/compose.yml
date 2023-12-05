@@ -34,8 +34,6 @@ services:
         condition: service_completed_successfully
     volumes:
       - zrok_env:/mnt
-    ports: []
-      # - 127.0.0.1:2019:2019  # Caddy admin API
     environment:
       # internal configuration
       STATE_DIRECTORY: /mnt  # zrok homedir in container
