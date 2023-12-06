@@ -2,9 +2,9 @@
 
 ## v0.4.18
 
-FEATURE: Python sdk added. Can be found on [pypi](https://test.pypi.org/project/zrok-sdk). `pastebin` example illustrates basic SDK usage (see `sdk/python/examples/README.md` for details) (https://github.com/openziti/zrok/issues/401)
+FEATURE: Python SDK added. Can be found on [pypi](https://test.pypi.org/project/zrok-sdk). `pastebin` example illustrates basic SDK usage (see `sdk/python/examples/README.md` for details) (https://github.com/openziti/zrok/issues/401)
 
-CHANGE: Moved the golang zrok sdk into `sdk/golang/sdk` to normalize location for future sdk's. 
+CHANGE: Moved the golang zrok sdk into `sdk/golang/sdk` to normalize location for future SDK's. 
 
 CHANGE: add restart policies to docker compose samples used by the guide docs, e.g., reserved public share should auto-start on boot, temp public share should not.
 
