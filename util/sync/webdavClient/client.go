@@ -97,6 +97,7 @@ type props struct {
 	ContentType string   `xml:"DAV: prop>getcontenttype,omitempty"`
 	ETag        string   `xml:"DAV: prop>getetag,omitempty"`
 	Modified    string   `xml:"DAV: prop>getlastmodified,omitempty"`
+	Checksum    string   `xml:"zrok: prop>checksum,omitempty"`
 }
 
 type Response struct {
@@ -159,7 +160,7 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 	}
 
 	err := c.propfind(path, false,
-		`<d:propfind xmlns:d='DAV:'>
+		`<d:propfind xmlns:d='DAV:' xmlns:z='zrok:'>
 			<d:prop>
 				<d:displayname/>
 				<d:resourcetype/>
@@ -167,6 +168,8 @@ func (c *Client) ReadDir(path string) ([]os.FileInfo, error) {
 				<d:getcontenttype/>
 				<d:getetag/>
 				<d:getlastmodified/>
+				<z:lastmodified/>
+				<z:checksum/>
 			</d:prop>
 		</d:propfind>`,
 		&Response{},
@@ -211,7 +214,7 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 	}
 
 	err := c.propfind(path, true,
-		`<d:propfind xmlns:d='DAV:'>
+		`<d:propfind xmlns:d='DAV:' xmlns:z='zrok:'>
 			<d:prop>
 				<d:displayname/>
 				<d:resourcetype/>
@@ -219,6 +222,7 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 				<d:getcontenttype/>
 				<d:getetag/>
 				<d:getlastmodified/>
+				<z:checksum/>
 			</d:prop>
 		</d:propfind>`,
 		&Response{},

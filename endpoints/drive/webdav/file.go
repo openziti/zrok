@@ -9,6 +9,7 @@ import (
 	"crypto/sha512"
 	"encoding/xml"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/fs"
 	"net/http"
@@ -121,7 +122,9 @@ func (f *webdavFile) checksum() (string, error) {
 	if _, err := io.Copy(hash, file); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+	sha512 := fmt.Sprintf("%x", hash.Sum(nil))
+	logrus.Infof("%v = %v", f.name, sha512)
+	return sha512, nil
 }
 
 func (f *webdavFile) updateModtime(path string, modtime time.Time) error {

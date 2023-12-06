@@ -15,6 +15,7 @@ type File struct {
 	modified    time.Time
 	etag        string
 	isdir       bool
+	checksum    string
 }
 
 // Path returns the full path of a file
@@ -60,6 +61,10 @@ func (f File) ETag() string {
 // IsDir let us see if a given file is a directory or not
 func (f File) IsDir() bool {
 	return f.isdir
+}
+
+func (f File) Checksum() string {
+	return f.checksum
 }
 
 // Sys ????
