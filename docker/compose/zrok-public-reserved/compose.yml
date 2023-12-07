@@ -21,7 +21,7 @@ services:
       STATE_DIRECTORY: /mnt
       ZROK_ENABLE_TOKEN:
       ZROK_API_ENDPOINT:
-      ZROK_ENVIRONMENT_NAME: docker-public-reserved
+      ZROK_ENVIRONMENT_NAME:
 
   # reserve zrok frontend subdomain and start sharing the target
   zrok-share:
@@ -38,8 +38,8 @@ services:
       STATE_DIRECTORY: /mnt  # zrok homedir in container
 
       # most relevant options
-      ZROK_BACKEND_MODE: proxy  # web, caddy, drive, proxy
-      ZROK_TARGET: http://zrok-test:9090  # backend target, is a path in container filesystem unless proxy mode
+      ZROK_BACKEND_MODE:    # web, caddy, drive, proxy
+      ZROK_TARGET:          # backend target, is a path in container filesystem unless proxy mode
       ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate
       ZROK_OAUTH_PROVIDER:  # google, github
       ZROK_OATH_EMAILS:     # allow space-separated list of OAuth email addresses or @domain.tld
