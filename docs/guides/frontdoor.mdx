@@ -9,6 +9,8 @@ import OsTabs from '@theme/OsTabs';
 import TabItem from '@theme/TabItem';
 import LinuxService from './_frontdoor-linux.mdx';
 import ReservedDocker from './_frontdoor-docker.mdx';
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **zrok frontdoor** is the heavy-duty front door to your app or site. It makes your website or app available to your online audience through the shield of zrok.io's hardened, managed frontends.
 
@@ -18,8 +20,14 @@ import ReservedDocker from './_frontdoor-docker.mdx';
 
 zrok frontends are the parts of zrok that proxy incoming public web traffic to zrok backend shares via OpenZiti. When you use zrok with a `zrok.io` frontend, you're using **zrok frontdoor**. `zrok.io` is zrok-as-a-service by NetFoundry, the team behind OpenZiti. You need a free account to use **zrok frontdoor**.
 
-![dark mode diagram](/img/zrok-frontdoor-dark-mode.svg#gh-dark-mode-only)
-![light mode diagram](/img/zrok-frontdoor-light-mode.svg#gh-light-mode-only)
+
+<ThemedImage
+  alt="frontdoor diagram"
+  sources={{
+    light: useBaseUrl('/img/zrok-frontdoor-light-mode.svg'),
+    dark: useBaseUrl('/img/zrok-frontdoor-dark-mode.svg'),
+  }}
+/>
 
 ## Choose your OS
 
