@@ -36,7 +36,7 @@ func (o *LoginReader) ReadResponse(response runtime.ClientResponse, consumer run
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /login] login", response, response.Code())
 	}
 }
 
@@ -77,6 +77,11 @@ func (o *LoginOK) IsServerError() bool {
 // IsCode returns true when this login o k response a status code equal to that given
 func (o *LoginOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the login o k response
+func (o *LoginOK) Code() int {
+	return 200
 }
 
 func (o *LoginOK) Error() string {
@@ -137,6 +142,11 @@ func (o *LoginUnauthorized) IsServerError() bool {
 // IsCode returns true when this login unauthorized response a status code equal to that given
 func (o *LoginUnauthorized) IsCode(code int) bool {
 	return code == 401
+}
+
+// Code gets the status code for the login unauthorized response
+func (o *LoginUnauthorized) Code() int {
+	return 401
 }
 
 func (o *LoginUnauthorized) Error() string {

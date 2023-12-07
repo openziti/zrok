@@ -42,7 +42,7 @@ func (o *VerifyReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /verify] verify", response, response.Code())
 	}
 }
 
@@ -83,6 +83,11 @@ func (o *VerifyOK) IsServerError() bool {
 // IsCode returns true when this verify o k response a status code equal to that given
 func (o *VerifyOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the verify o k response
+func (o *VerifyOK) Code() int {
+	return 200
 }
 
 func (o *VerifyOK) Error() string {
@@ -147,6 +152,11 @@ func (o *VerifyNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the verify not found response
+func (o *VerifyNotFound) Code() int {
+	return 404
+}
+
 func (o *VerifyNotFound) Error() string {
 	return fmt.Sprintf("[POST /verify][%d] verifyNotFound ", 404)
 }
@@ -196,6 +206,11 @@ func (o *VerifyInternalServerError) IsServerError() bool {
 // IsCode returns true when this verify internal server error response a status code equal to that given
 func (o *VerifyInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the verify internal server error response
+func (o *VerifyInternalServerError) Code() int {
+	return 500
 }
 
 func (o *VerifyInternalServerError) Error() string {

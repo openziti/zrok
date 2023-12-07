@@ -48,7 +48,7 @@ func (o *GetEnvironmentMetricsReader) ReadResponse(response runtime.ClientRespon
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /metrics/environment/{envId}] getEnvironmentMetrics", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *GetEnvironmentMetricsOK) IsServerError() bool {
 // IsCode returns true when this get environment metrics o k response a status code equal to that given
 func (o *GetEnvironmentMetricsOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get environment metrics o k response
+func (o *GetEnvironmentMetricsOK) Code() int {
+	return 200
 }
 
 func (o *GetEnvironmentMetricsOK) Error() string {
@@ -153,6 +158,11 @@ func (o *GetEnvironmentMetricsBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the get environment metrics bad request response
+func (o *GetEnvironmentMetricsBadRequest) Code() int {
+	return 400
+}
+
 func (o *GetEnvironmentMetricsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest ", 400)
 }
@@ -204,6 +214,11 @@ func (o *GetEnvironmentMetricsUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the get environment metrics unauthorized response
+func (o *GetEnvironmentMetricsUnauthorized) Code() int {
+	return 401
+}
+
 func (o *GetEnvironmentMetricsUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsUnauthorized ", 401)
 }
@@ -253,6 +268,11 @@ func (o *GetEnvironmentMetricsInternalServerError) IsServerError() bool {
 // IsCode returns true when this get environment metrics internal server error response a status code equal to that given
 func (o *GetEnvironmentMetricsInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get environment metrics internal server error response
+func (o *GetEnvironmentMetricsInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetEnvironmentMetricsInternalServerError) Error() string {

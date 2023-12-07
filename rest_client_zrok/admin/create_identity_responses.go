@@ -42,7 +42,7 @@ func (o *CreateIdentityReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /identity] createIdentity", response, response.Code())
 	}
 }
 
@@ -83,6 +83,11 @@ func (o *CreateIdentityCreated) IsServerError() bool {
 // IsCode returns true when this create identity created response a status code equal to that given
 func (o *CreateIdentityCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the create identity created response
+func (o *CreateIdentityCreated) Code() int {
+	return 201
 }
 
 func (o *CreateIdentityCreated) Error() string {
@@ -147,6 +152,11 @@ func (o *CreateIdentityUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the create identity unauthorized response
+func (o *CreateIdentityUnauthorized) Code() int {
+	return 401
+}
+
 func (o *CreateIdentityUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /identity][%d] createIdentityUnauthorized ", 401)
 }
@@ -196,6 +206,11 @@ func (o *CreateIdentityInternalServerError) IsServerError() bool {
 // IsCode returns true when this create identity internal server error response a status code equal to that given
 func (o *CreateIdentityInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the create identity internal server error response
+func (o *CreateIdentityInternalServerError) Code() int {
+	return 500
 }
 
 func (o *CreateIdentityInternalServerError) Error() string {

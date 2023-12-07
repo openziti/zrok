@@ -45,7 +45,7 @@ func (o *UpdateShareReader) ReadResponse(response runtime.ClientResponse, consum
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[PATCH /share] updateShare", response, response.Code())
 	}
 }
 
@@ -85,6 +85,11 @@ func (o *UpdateShareOK) IsServerError() bool {
 // IsCode returns true when this update share o k response a status code equal to that given
 func (o *UpdateShareOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the update share o k response
+func (o *UpdateShareOK) Code() int {
+	return 200
 }
 
 func (o *UpdateShareOK) Error() string {
@@ -138,6 +143,11 @@ func (o *UpdateShareUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the update share unauthorized response
+func (o *UpdateShareUnauthorized) Code() int {
+	return 401
+}
+
 func (o *UpdateShareUnauthorized) Error() string {
 	return fmt.Sprintf("[PATCH /share][%d] updateShareUnauthorized ", 401)
 }
@@ -189,6 +199,11 @@ func (o *UpdateShareNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the update share not found response
+func (o *UpdateShareNotFound) Code() int {
+	return 404
+}
+
 func (o *UpdateShareNotFound) Error() string {
 	return fmt.Sprintf("[PATCH /share][%d] updateShareNotFound ", 404)
 }
@@ -238,6 +253,11 @@ func (o *UpdateShareInternalServerError) IsServerError() bool {
 // IsCode returns true when this update share internal server error response a status code equal to that given
 func (o *UpdateShareInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the update share internal server error response
+func (o *UpdateShareInternalServerError) Code() int {
+	return 500
 }
 
 func (o *UpdateShareInternalServerError) Error() string {

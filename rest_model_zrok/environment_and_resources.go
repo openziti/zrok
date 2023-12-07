@@ -128,6 +128,11 @@ func (m *EnvironmentAndResources) ContextValidate(ctx context.Context, formats s
 func (m *EnvironmentAndResources) contextValidateEnvironment(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.Environment != nil {
+
+		if swag.IsZero(m.Environment) { // not required
+			return nil
+		}
+
 		if err := m.Environment.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("environment")

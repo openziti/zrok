@@ -30,7 +30,7 @@ func (o *VersionReader) ReadResponse(response runtime.ClientResponse, consumer r
 		}
 		return result, nil
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /version] version", response, response.Code())
 	}
 }
 
@@ -71,6 +71,11 @@ func (o *VersionOK) IsServerError() bool {
 // IsCode returns true when this version o k response a status code equal to that given
 func (o *VersionOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the version o k response
+func (o *VersionOK) Code() int {
+	return 200
 }
 
 func (o *VersionOK) Error() string {

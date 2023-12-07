@@ -36,7 +36,7 @@ func (o *GetAccountDetailReader) ReadResponse(response runtime.ClientResponse, c
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /detail/account] getAccountDetail", response, response.Code())
 	}
 }
 
@@ -77,6 +77,11 @@ func (o *GetAccountDetailOK) IsServerError() bool {
 // IsCode returns true when this get account detail o k response a status code equal to that given
 func (o *GetAccountDetailOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get account detail o k response
+func (o *GetAccountDetailOK) Code() int {
+	return 200
 }
 
 func (o *GetAccountDetailOK) Error() string {
@@ -137,6 +142,11 @@ func (o *GetAccountDetailInternalServerError) IsServerError() bool {
 // IsCode returns true when this get account detail internal server error response a status code equal to that given
 func (o *GetAccountDetailInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get account detail internal server error response
+func (o *GetAccountDetailInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetAccountDetailInternalServerError) Error() string {
