@@ -112,7 +112,7 @@ html {
 }
 
 .navbar__link:hover, .navbar__link--active {
-   font-weight: 600;
+  font-weight: 600;
 }
 
 code {
@@ -181,5 +181,11 @@ a code {
 
 /* hide the clipboard copy button on code blocks of type "buttonless" */
 .language-buttonless div > button {
+  display: none;
+}
+
+/* hide image sources from the other mode */
+[data-theme="light"] img[src$="#gh-dark-mode-only"],
+[data-theme="dark"] img[src$="#gh-light-mode-only"] {
   display: none;
 }
