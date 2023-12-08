@@ -27,6 +27,8 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
     if request.OauthProvider != "":
         out.auth_scheme = model.AUTH_SCHEME_OAUTH
 
+
+
     try:
         zrok = root.Client()
     except Exception as e:

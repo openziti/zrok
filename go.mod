@@ -3,6 +3,7 @@ module github.com/openziti/zrok
 go 1.20
 
 require (
+	github.com/TwiN/go-away v1.6.12
 	github.com/caddyserver/caddy/v2 v2.7.5-0.20230829153420-ed8bb13c5df7
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
@@ -226,7 +227,7 @@ require (
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230706204954-ccb25ca9f130 // indirect
