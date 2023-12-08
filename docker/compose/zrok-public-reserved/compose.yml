@@ -38,6 +38,7 @@ services:
       STATE_DIRECTORY: /mnt  # zrok homedir in container
 
       # most relevant options
+      ZROK_SUBDOMAIN:       # frontend subdomain, e.g. "myapp" for "myapp.in.zrok.io"
       ZROK_BACKEND_MODE:    # web, caddy, drive, proxy
       ZROK_TARGET:          # backend target, is a path in container filesystem unless proxy mode
       ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate
