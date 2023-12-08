@@ -15,6 +15,8 @@ PUBLIC_SHARE_MODE: ShareMode = "public"
 
 @dataclass
 class ShareRequest:
+    Reserved: bool = false
+    UniqueName: str = ""
     BackendMode: BackendMode
     ShareMode: ShareMode
     Target: str
