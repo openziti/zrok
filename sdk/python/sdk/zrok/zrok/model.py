@@ -15,8 +15,6 @@ PUBLIC_SHARE_MODE: ShareMode = "public"
 
 @dataclass
 class ShareRequest:
-    Reserved: bool = false
-    UniqueName: str = ""
     BackendMode: BackendMode
     ShareMode: ShareMode
     Target: str
@@ -25,6 +23,8 @@ class ShareRequest:
     OauthProvider: str = ""
     OauthEmailDomains: list[str] = field(default_factory=list[str])
     OauthAuthorizationCheckInterval: str = ""
+    Reserved: bool = False
+    UniqueName: str = ""
 
 @dataclass
 class Share:
