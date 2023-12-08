@@ -89,6 +89,14 @@ Save the enable token from the zrok console in the configuration file.
 ZROK_ENABLE_TOKEN="14cbfca9772f"
 ```
 
+## Choose a Subdomain
+
+This becomes the leading part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_SUBDOMAIN="my-prod-app"
+```
+
 ## Use Cases
 
 You may change the target for the current backend mode, e.g. `proxy`, by editing the configuration file and restarting the service. The reserved subdomain will remain the same.
