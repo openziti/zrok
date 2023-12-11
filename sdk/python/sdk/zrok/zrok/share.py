@@ -49,16 +49,20 @@ def __newPrivateShare(root: Root, request: model.ShareRequest) -> ShareRequest:
                  )
 
 def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
-    return ShareRequest(env_zid=root.env.ZitiIdentity,
+    ret= ShareRequest(env_zid=root.env.ZitiIdentity,
                  share_mode=request.ShareMode,
                  frontend_selection=request.Frontends,
                  backend_mode=request.BackendMode,
                  backend_proxy_endpoint=request.Target,
                  auth_scheme=model.AUTH_SCHEME_NONE,
                  oauth_email_domains=request.OauthEmailDomains,
-                 oauth_provider=request.OauthProvider,
-                 oauth_authorization_check_interval=request.OauthAuthroizationCheckInterval
+                 oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval
                  )
+    if request.OauthProvider != "":
+        ret.oauth_provider = request.OauthProvider
+
+    return ret
+
 
 def DeleteShare(root: Root, shr: model.Share):
     req = UnshareRequest(env_zid=root.env.ZitiIdentity,
