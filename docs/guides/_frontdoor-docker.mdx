@@ -22,6 +22,13 @@ When the project runs it will:
   ```bash title=".env"
   ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
   ```
+1. Name the Share
+
+    This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
+
+    ```bash title=".env"
+    ZROK_UNIQUE_NAME="my-prod-app"
+    ```
 
 1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
 
