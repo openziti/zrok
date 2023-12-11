@@ -36,7 +36,7 @@ func (o *OverviewReader) ReadResponse(response runtime.ClientResponse, consumer 
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /overview] overview", response, response.Code())
 	}
 }
 
@@ -77,6 +77,11 @@ func (o *OverviewOK) IsServerError() bool {
 // IsCode returns true when this overview o k response a status code equal to that given
 func (o *OverviewOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the overview o k response
+func (o *OverviewOK) Code() int {
+	return 200
 }
 
 func (o *OverviewOK) Error() string {
@@ -140,6 +145,11 @@ func (o *OverviewInternalServerError) IsServerError() bool {
 // IsCode returns true when this overview internal server error response a status code equal to that given
 func (o *OverviewInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the overview internal server error response
+func (o *OverviewInternalServerError) Code() int {
+	return 500
 }
 
 func (o *OverviewInternalServerError) Error() string {

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages  # noqa: H301
 import os
 
 NAME = "zrok_sdk"
-VERSION = "0.0.0.dev"
+VERSION = "0.4.0.dev"
 try:
     VERSION = os.environ['ZROK_VERSION']
 except KeyError: 

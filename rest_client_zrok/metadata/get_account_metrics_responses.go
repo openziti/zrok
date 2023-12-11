@@ -42,7 +42,7 @@ func (o *GetAccountMetricsReader) ReadResponse(response runtime.ClientResponse, 
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /metrics/account] getAccountMetrics", response, response.Code())
 	}
 }
 
@@ -83,6 +83,11 @@ func (o *GetAccountMetricsOK) IsServerError() bool {
 // IsCode returns true when this get account metrics o k response a status code equal to that given
 func (o *GetAccountMetricsOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get account metrics o k response
+func (o *GetAccountMetricsOK) Code() int {
+	return 200
 }
 
 func (o *GetAccountMetricsOK) Error() string {
@@ -147,6 +152,11 @@ func (o *GetAccountMetricsBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the get account metrics bad request response
+func (o *GetAccountMetricsBadRequest) Code() int {
+	return 400
+}
+
 func (o *GetAccountMetricsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest ", 400)
 }
@@ -196,6 +206,11 @@ func (o *GetAccountMetricsInternalServerError) IsServerError() bool {
 // IsCode returns true when this get account metrics internal server error response a status code equal to that given
 func (o *GetAccountMetricsInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get account metrics internal server error response
+func (o *GetAccountMetricsInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetAccountMetricsInternalServerError) Error() string {

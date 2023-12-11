@@ -48,7 +48,7 @@ func (o *AccessReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /access] access", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *AccessCreated) IsServerError() bool {
 // IsCode returns true when this access created response a status code equal to that given
 func (o *AccessCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the access created response
+func (o *AccessCreated) Code() int {
+	return 201
 }
 
 func (o *AccessCreated) Error() string {
@@ -153,6 +158,11 @@ func (o *AccessUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the access unauthorized response
+func (o *AccessUnauthorized) Code() int {
+	return 401
+}
+
 func (o *AccessUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /access][%d] accessUnauthorized ", 401)
 }
@@ -204,6 +214,11 @@ func (o *AccessNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the access not found response
+func (o *AccessNotFound) Code() int {
+	return 404
+}
+
 func (o *AccessNotFound) Error() string {
 	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
 }
@@ -253,6 +268,11 @@ func (o *AccessInternalServerError) IsServerError() bool {
 // IsCode returns true when this access internal server error response a status code equal to that given
 func (o *AccessInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the access internal server error response
+func (o *AccessInternalServerError) Code() int {
+	return 500
 }
 
 func (o *AccessInternalServerError) Error() string {

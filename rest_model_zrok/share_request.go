@@ -56,6 +56,9 @@ type ShareRequest struct {
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
+
+	// unique name
+	UniqueName string `json:"uniqueName,omitempty"`
 }
 
 // Validate validates this share request
@@ -267,6 +270,11 @@ func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats str
 	for i := 0; i < len(m.AuthUsers); i++ {
 
 		if m.AuthUsers[i] != nil {
+
+			if swag.IsZero(m.AuthUsers[i]) { // not required
+				return nil
+			}
+
 			if err := m.AuthUsers[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))

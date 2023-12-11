@@ -45,7 +45,7 @@ func (o *UpdateFrontendReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[PATCH /frontend] updateFrontend", response, response.Code())
 	}
 }
 
@@ -85,6 +85,11 @@ func (o *UpdateFrontendOK) IsServerError() bool {
 // IsCode returns true when this update frontend o k response a status code equal to that given
 func (o *UpdateFrontendOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the update frontend o k response
+func (o *UpdateFrontendOK) Code() int {
+	return 200
 }
 
 func (o *UpdateFrontendOK) Error() string {
@@ -138,6 +143,11 @@ func (o *UpdateFrontendUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the update frontend unauthorized response
+func (o *UpdateFrontendUnauthorized) Code() int {
+	return 401
+}
+
 func (o *UpdateFrontendUnauthorized) Error() string {
 	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendUnauthorized ", 401)
 }
@@ -189,6 +199,11 @@ func (o *UpdateFrontendNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the update frontend not found response
+func (o *UpdateFrontendNotFound) Code() int {
+	return 404
+}
+
 func (o *UpdateFrontendNotFound) Error() string {
 	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendNotFound ", 404)
 }
@@ -238,6 +253,11 @@ func (o *UpdateFrontendInternalServerError) IsServerError() bool {
 // IsCode returns true when this update frontend internal server error response a status code equal to that given
 func (o *UpdateFrontendInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the update frontend internal server error response
+func (o *UpdateFrontendInternalServerError) Code() int {
+	return 500
 }
 
 func (o *UpdateFrontendInternalServerError) Error() string {

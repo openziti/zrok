@@ -48,7 +48,7 @@ func (o *GetShareMetricsReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /metrics/share/{shrToken}] getShareMetrics", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *GetShareMetricsOK) IsServerError() bool {
 // IsCode returns true when this get share metrics o k response a status code equal to that given
 func (o *GetShareMetricsOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get share metrics o k response
+func (o *GetShareMetricsOK) Code() int {
+	return 200
 }
 
 func (o *GetShareMetricsOK) Error() string {
@@ -153,6 +158,11 @@ func (o *GetShareMetricsBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the get share metrics bad request response
+func (o *GetShareMetricsBadRequest) Code() int {
+	return 400
+}
+
 func (o *GetShareMetricsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsBadRequest ", 400)
 }
@@ -204,6 +214,11 @@ func (o *GetShareMetricsUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the get share metrics unauthorized response
+func (o *GetShareMetricsUnauthorized) Code() int {
+	return 401
+}
+
 func (o *GetShareMetricsUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsUnauthorized ", 401)
 }
@@ -253,6 +268,11 @@ func (o *GetShareMetricsInternalServerError) IsServerError() bool {
 // IsCode returns true when this get share metrics internal server error response a status code equal to that given
 func (o *GetShareMetricsInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get share metrics internal server error response
+func (o *GetShareMetricsInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetShareMetricsInternalServerError) Error() string {

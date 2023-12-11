@@ -48,7 +48,7 @@ func (o *InviteReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /invite] invite", response, response.Code())
 	}
 }
 
@@ -88,6 +88,11 @@ func (o *InviteCreated) IsServerError() bool {
 // IsCode returns true when this invite created response a status code equal to that given
 func (o *InviteCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the invite created response
+func (o *InviteCreated) Code() int {
+	return 201
 }
 
 func (o *InviteCreated) Error() string {
@@ -140,6 +145,11 @@ func (o *InviteBadRequest) IsServerError() bool {
 // IsCode returns true when this invite bad request response a status code equal to that given
 func (o *InviteBadRequest) IsCode(code int) bool {
 	return code == 400
+}
+
+// Code gets the status code for the invite bad request response
+func (o *InviteBadRequest) Code() int {
+	return 400
 }
 
 func (o *InviteBadRequest) Error() string {
@@ -202,6 +212,11 @@ func (o *InviteUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the invite unauthorized response
+func (o *InviteUnauthorized) Code() int {
+	return 401
+}
+
 func (o *InviteUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized ", 401)
 }
@@ -251,6 +266,11 @@ func (o *InviteInternalServerError) IsServerError() bool {
 // IsCode returns true when this invite internal server error response a status code equal to that given
 func (o *InviteInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the invite internal server error response
+func (o *InviteInternalServerError) Code() int {
+	return 500
 }
 
 func (o *InviteInternalServerError) Error() string {

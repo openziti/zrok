@@ -1513,6 +1513,9 @@ func init() {
             "public",
             "private"
           ]
+        },
+        "uniqueName": {
+          "type": "string"
         }
       }
     },
@@ -3130,6 +3133,9 @@ func init() {
             "public",
             "private"
           ]
+        },
+        "uniqueName": {
+          "type": "string"
         }
       }
     },

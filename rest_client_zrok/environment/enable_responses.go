@@ -48,7 +48,7 @@ func (o *EnableReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /enable] enable", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *EnableCreated) IsServerError() bool {
 // IsCode returns true when this enable created response a status code equal to that given
 func (o *EnableCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the enable created response
+func (o *EnableCreated) Code() int {
+	return 201
 }
 
 func (o *EnableCreated) Error() string {
@@ -153,6 +158,11 @@ func (o *EnableUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the enable unauthorized response
+func (o *EnableUnauthorized) Code() int {
+	return 401
+}
+
 func (o *EnableUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
 }
@@ -204,6 +214,11 @@ func (o *EnableNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the enable not found response
+func (o *EnableNotFound) Code() int {
+	return 404
+}
+
 func (o *EnableNotFound) Error() string {
 	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
 }
@@ -253,6 +268,11 @@ func (o *EnableInternalServerError) IsServerError() bool {
 // IsCode returns true when this enable internal server error response a status code equal to that given
 func (o *EnableInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the enable internal server error response
+func (o *EnableInternalServerError) Code() int {
+	return 500
 }
 
 func (o *EnableInternalServerError) Error() string {
