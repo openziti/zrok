@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
-import * as account from '../api/account';
-import * as metadata from "../api/metadata"
+import {MetadataApi, AccountApi, ResetPasswordRequest} from "../api/src"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import PasswordForm from "../components/password";
@@ -17,14 +16,17 @@ const SetNewPassword = (props) => {
 
     const errorMessage = <h2 className={"errorMessage"}>Reset Password Failed!</h2>;
 
+    const metadata = new MetadataApi()
+    const account = new AccountApi()
+
     useEffect(() => {
         metadata.configuration().then(resp => {
             if(!resp.error) {
-                setPasswordLength(resp.data.passwordRequirements.length)
-                setPasswordRequireCapital(resp.data.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.data.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.data.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.data.passwordRequirements.validSpecialCharacters)
+                setPasswordLength(resp.passwordRequirements.length)
+                setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+                setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+                setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+                setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
             }
         }).catch(err => {
             console.log("err", err);
@@ -36,14 +38,12 @@ const SetNewPassword = (props) => {
         if (password !== undefined && password !== "") {
         account.resetPassword({body: {"token": props.token, "password": password}})
             .then(resp => {
-                if(!resp.error) {
-                    setMessage(undefined);
-                    setComplete(true);
-                } else {
-                    setMessage(errorMessage);
-                }
+                console.log(resp)
+                setMessage(undefined);
+                setComplete(true);
             })
             .catch(resp => {
+                console.log(resp)
                 setMessage(errorMessage);
             })
         }

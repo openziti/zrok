@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import * as account from "../api/account";
-import * as metadata from "../api/metadata"
+import {MetadataApi, AccountApi} from "../api/src"
 import Success from "./Success";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import PasswordForm from "../components/password";
@@ -19,17 +18,20 @@ const SetPasswordForm = (props) => {
 
     const registerFailed = <h2 className={"errorMessage"}>Account creation failed!</h2>
 
+    const metadata = new MetadataApi()
+    const account = new AccountApi()
+
     useEffect(() => {
         metadata.configuration().then(resp => {
             if(!resp.error) {
-                if (resp.data.touLink !== undefined && resp.data.touLink.trim() !== "") {
-                    setTou(resp.data.touLink)
+                if (resp.touLink !== undefined && resp.touLink.trim() !== "") {
+                    setTou(resp.touLink)
                 }
-                setPasswordLength(resp.data.passwordRequirements.length)
-                setPasswordRequireCapital(resp.data.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.data.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.data.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.data.passwordRequirements.validSpecialCharacters)
+                setPasswordLength(resp.passwordRequirements.length)
+                setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+                setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+                setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+                setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
             }
         }).catch(err => {
             console.log("err", err);
@@ -41,14 +43,10 @@ const SetPasswordForm = (props) => {
         if (password !== undefined && password !== "") {
         account.register({body: {"token": props.token, "password": password}})
             .then(resp => {
-                if(!resp.error) {
-                    console.log("resp", resp)
-                    setMessage(undefined);
-                    setAuthToken(resp.data.token);
-                    setComplete(true);
-                } else {
-                    setMessage(registerFailed);
-                }
+                console.log("resp", resp)
+                setMessage(undefined);
+                setAuthToken(resp.token);
+                setComplete(true);
             })
             .catch(resp => {
                 console.log("resp", resp);

@@ -1,7 +1,10 @@
 import {Button} from "react-bootstrap";
-import * as environment from "../../../api/environment";
+import {EnvironmentApi} from "../../../api/src";
 
 const ActionsTab = (props) => {
+
+    const environment = new EnvironmentApi()
+
     const deleteEnvironment = (envZId) => {
         if(window.confirm("Really delete environment '" + envZId + "' and all shares within?")) {
             environment.disable({body: {identity: envZId}}).then(resp => {

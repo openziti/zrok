@@ -1,4 +1,4 @@
-import * as metadata from "../../../api/metadata";
+import {MetadataApi} from "../../../api/src";
 import React, {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
@@ -12,10 +12,12 @@ import MetricsTab from "./MetricsTab";
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
+    const metadata = new MetadataApi()
+
     useEffect(() => {
         metadata.getShareDetail(props.selection.shrToken)
             .then(resp => {
-                let detail = resp.data;
+                let detail = resp;
                 detail.envZId = props.selection.envZId;
                 setDetail(detail);
             });
@@ -27,7 +29,7 @@ const ShareDetail = (props) => {
             metadata.getShareDetail(props.selection.shrToken)
                 .then(resp => {
                     if(mounted) {
-                        let detail = resp.data;
+                        let detail = resp;
                         detail.envZId = props.selection.envZId;
                         setDetail(detail);
                     }

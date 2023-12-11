@@ -1,17 +1,18 @@
 import {mdiAccessPointNetwork} from "@mdi/js";
 import Icon from "@mdi/react";
 import {useEffect, useState} from "react";
-import {getFrontendDetail} from "../../../api/metadata";
+import {MetadataApi} from "../../../api/src";
 import {Tab, Tabs} from "react-bootstrap";
 import DetailTab from "./DetailTab";
 
 const AccessDetail = (props) => {
     const [detail, setDetail] = useState({});
+    const metadata = new MetadataApi()
 
     useEffect(() => {
-        getFrontendDetail(props.selection.feId)
+        metadata.getFrontendDetail(props.selection.feId)
             .then(resp => {
-                setDetail(resp.data);
+                setDetail(resp);
             });
     }, [props.selection]);
 

@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import Visualizer from "./visualizer/Visualizer";
 import Enable from "./modals/Enable";
 import Version from "./modals/Version";
-import * as metadata from "../api/metadata";
+import {MetadataApi} from "../api/src";
 import Detail from "./detail/Detail";
 
 const Console = (props) => {
@@ -17,11 +17,13 @@ const Console = (props) => {
 
     const [overview, setOverview] = useState({});
 
+    const metadata = new MetadataApi()
+
     useEffect(() => {
         let mounted = true;
         metadata.overview().then(resp => {
             if(mounted) {
-                setOverview(resp.data);
+                setOverview(resp);
             }
         });
     }, []);
@@ -31,7 +33,7 @@ const Console = (props) => {
         let interval = setInterval(() => {
             metadata.overview().then(resp => {
                 if(mounted) {
-                    setOverview(resp.data);
+                    setOverview(resp);
                 }
             })
         }, 1000);

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
-import * as account from "../api/account";
+import {AccountApi} from "../api/src";
 import InvalidRequest from "./InvalidRequest";
 import SetPasswordForm from "./SetPasswordForm";
 
@@ -11,6 +11,8 @@ const Register = () => {
     const [email, setEmail] = useState();
     const [activeRequest, setActiveRequest] = useState(true);
 
+    const account = new AccountApi()
+
     useEffect(() => {
         let mounted = true
         account.verify({body: {token: token}}).then(resp => {
@@ -18,7 +20,7 @@ const Register = () => {
                 if(resp.error) {
                     setActiveRequest(false);
                 } else {
-                    setEmail(resp.data.email);
+                    setEmail(resp.email);
                 }
             }
         }).catch(err => {

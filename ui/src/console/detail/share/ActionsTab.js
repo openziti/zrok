@@ -1,7 +1,8 @@
-import * as share from "../../../api/share";
+import {ShareApi} from "../../../api/src";
 import {Button} from "react-bootstrap";
 
 const ActionsTab = (props) => {
+    const share = new ShareApi()
     const deleteShare = (envZId, shrToken, reserved) => {
         console.log(envZId, shrToken, reserved);
         if(window.confirm("Really delete share '" + shrToken + "'?")) {

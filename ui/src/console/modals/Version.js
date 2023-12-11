@@ -1,15 +1,17 @@
 import {useEffect, useState} from "react";
-import * as metadata from "../../api/metadata";
+import {MetadataApi} from "../../api/src";
 import Modal from "react-bootstrap/Modal";
 
 const Version = (props) => {
     const [v, setV] = useState('');
 
+    const metadata = new MetadataApi()
+
     useEffect(() => {
         let mounted = true;
         metadata.version().then(resp => {
             if(mounted) {
-                setV(resp.data);
+                setV(resp);
             }
         });
         return () => {

@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
-import * as account from '../../api/account';
-import * as metadata from "../../api/metadata"
+import {MetadataApi, AccountApi} from "../../api/src"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -10,14 +9,17 @@ const Login = (props) => {
     const [message, setMessage] = useState();
     const [tou, setTou] = useState();
 
+    const metadata = new MetadataApi()
+    const account = new AccountApi()
+
     const errorMessage = <h2 className={"errorMessage"}>Login Failed!</h2>;
 
     useEffect(() => {
         metadata.configuration().then(resp => {
             console.log(resp)
             if(!resp.error) {
-                if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
-                    setTou(resp.data.touLink)
+                if (resp.touLink !== null && resp.touLink.trim() !== "") {
+                    setTou(resp.touLink)
                 }
             }
         }).catch(err => {
@@ -31,22 +33,18 @@ const Login = (props) => {
 
         account.login({body: {"email": email, "password": password}})
             .then(resp => {
-                if (!resp.error) {
-                    let user = {
-                        "email": email,
-                        "token": resp.data
-                    }
-                    props.loginSuccess(user)
-                    localStorage.setItem('user', JSON.stringify(user))
-                    console.log(user)
-                    console.log('login succeeded', resp)
-                } else {
-                    console.log('login failed')
-                    setMessage(errorMessage);
+                let user = {
+                    "email": email,
+                    "token": resp
                 }
+                props.loginSuccess(user)
+                localStorage.setItem('user', JSON.stringify(user))
+                console.log(user)
+                console.log('login succeeded', resp)
             })
             .catch((resp) => {
                 console.log('login failed', resp)
+                setMessage(errorMessage);
             });
     };
 

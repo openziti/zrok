@@ -13,6 +13,7 @@
     "eslint-config-react-app": "^7.0.1",
     "humanize-duration": "^3.27.3",
     "moment": "^2.29.4",
+    "querystring-es3": "^0.2.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.0",
     "react-data-table-component": "^7.5.2",
@@ -22,15 +23,17 @@
     "react-sizeme": "^3.0.2",
     "recharts": "^2.6.1",
     "styled-components": "^5.3.5",
+    "superagent": "^8.1.2",
     "svgo": "^3.0.2"
   },
   "devDependencies": {
+    "react-app-rewired": "^2.2.1",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

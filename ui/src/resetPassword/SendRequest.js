@@ -1,10 +1,12 @@
 import { useState } from "react";
-import * as account from '../api/account';
+import {AccountApi} from '../api/src';
 import { Button, Container, Form, Row } from "react-bootstrap";
 
 const SendRequest = () => {
     const [email, setEmail] = useState('');
     const [complete, setComplete] = useState(false);
+
+    const account = new AccountApi()
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -12,11 +14,7 @@ const SendRequest = () => {
 
         account.resetPasswordRequest({ body: { "emailAddress": email } })
             .then(resp => {
-                if (!resp.error) {
-                    setComplete(true)
-                } else {
-                    setComplete(true)
-                }
+                setComplete(true)
             })
             .catch((resp) => {
                 setComplete(true)

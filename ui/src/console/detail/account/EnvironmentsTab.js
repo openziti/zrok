@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from "react";
-import * as metadata from "../../../api/metadata";
+import {MetadataApi} from "../../../api/src";
 import {Area, AreaChart, ResponsiveContainer} from "recharts";
 import DataTable from "react-data-table-component";
 
 const EnvironmentsTab = (props) => {
     const [detail, setDetail] = useState([]);
+    const metadata = new MetadataApi()
 
     useEffect(() => {
         metadata.getAccountDetail()
             .then(resp => {
-                setDetail(resp.data);
+                setDetail(resp);
             });
     }, [props.selection]);
 
@@ -19,7 +20,7 @@ const EnvironmentsTab = (props) => {
             metadata.getAccountDetail()
                 .then(resp => {
                     if(mounted) {
-                        setDetail(resp.data);
+                        setDetail(resp);
                     }
                 });
         }, 5000);

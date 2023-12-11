@@ -1,25 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import * as gateway from "./api/gateway";
+import {ApiClient} from "./api/src"
 import App from "./App";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <App />
 );
-
-gateway.init({
-    url: '/api/v1',
-    getAuthorization
-});
-
-function getAuthorization(security) {
-    switch(security.id) {
-        case 'key': return getApiKey();
-        default: console.log('default');
-    }
-}
 
 function getApiKey() {
     const localUser = JSON.parse(localStorage.getItem("user"))
@@ -29,3 +17,11 @@ function getApiKey() {
         throw new Error("token not available");
     }
 }
+
+getApiKey().then(key => {
+    let defaultClient = ApiClient.instance;
+    // Configure API key authorization: key
+    let k = defaultClient.authentications['key'];
+    k.apiKey = key.apiKey;
+    
+})
