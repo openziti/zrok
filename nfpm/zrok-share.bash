@@ -110,8 +110,8 @@ case "${ZROK_BACKEND_MODE}" in
     ;;
 esac
 
-[[ -n "${ZROK_SUBDOMAIN:-}" ]] && {
-  ZROK_CMD+=" --unique-name ${ZROK_SUBDOMAIN}"
+[[ -n "${UNIQUE_NAME:-}" ]] && {
+  ZROK_CMD+=" --unique-name ${UNIQUE_NAME}"
 }
 
 ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_TARGET}"
