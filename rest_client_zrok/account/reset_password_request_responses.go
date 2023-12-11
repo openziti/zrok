@@ -41,7 +41,7 @@ func (o *ResetPasswordRequestReader) ReadResponse(response runtime.ClientRespons
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /resetPasswordRequest] resetPasswordRequest", response, response.Code())
 	}
 }
 
@@ -81,6 +81,11 @@ func (o *ResetPasswordRequestCreated) IsServerError() bool {
 // IsCode returns true when this reset password request created response a status code equal to that given
 func (o *ResetPasswordRequestCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the reset password request created response
+func (o *ResetPasswordRequestCreated) Code() int {
+	return 201
 }
 
 func (o *ResetPasswordRequestCreated) Error() string {
@@ -134,6 +139,11 @@ func (o *ResetPasswordRequestBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the reset password request bad request response
+func (o *ResetPasswordRequestBadRequest) Code() int {
+	return 400
+}
+
 func (o *ResetPasswordRequestBadRequest) Error() string {
 	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestBadRequest ", 400)
 }
@@ -183,6 +193,11 @@ func (o *ResetPasswordRequestInternalServerError) IsServerError() bool {
 // IsCode returns true when this reset password request internal server error response a status code equal to that given
 func (o *ResetPasswordRequestInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the reset password request internal server error response
+func (o *ResetPasswordRequestInternalServerError) Code() int {
+	return 500
 }
 
 func (o *ResetPasswordRequestInternalServerError) Error() string {

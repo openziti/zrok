@@ -14,7 +14,10 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
             out = __newPublicShare(root, request)
         case _:
             raise Exception("unknown share mode " + request.ShareMode)
-        
+    out.reserved = request.Reserved
+    if request.Reserved:
+        out.unique_name = request.UniqueName
+
     if len(request.BasicAuth) > 0:
         out.auth_scheme = model.AUTH_SCHEME_BASIC
         for pair in request.BasicAuth:

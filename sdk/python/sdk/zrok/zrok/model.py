@@ -23,6 +23,8 @@ class ShareRequest:
     OauthProvider: str = ""
     OauthEmailDomains: list[str] = field(default_factory=list[str])
     OauthAuthorizationCheckInterval: str = ""
+    Reserved: bool = False
+    UniqueName: str = ""
 
 @dataclass
 class Share:

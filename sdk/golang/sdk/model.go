@@ -22,6 +22,7 @@ const (
 
 type ShareRequest struct {
 	Reserved                        bool
+	UniqueName                      string
 	BackendMode                     BackendMode
 	ShareMode                       ShareMode
 	Target                          string

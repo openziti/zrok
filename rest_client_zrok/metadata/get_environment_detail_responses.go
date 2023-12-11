@@ -48,7 +48,7 @@ func (o *GetEnvironmentDetailReader) ReadResponse(response runtime.ClientRespons
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /detail/environment/{envZId}] getEnvironmentDetail", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *GetEnvironmentDetailOK) IsServerError() bool {
 // IsCode returns true when this get environment detail o k response a status code equal to that given
 func (o *GetEnvironmentDetailOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get environment detail o k response
+func (o *GetEnvironmentDetailOK) Code() int {
+	return 200
 }
 
 func (o *GetEnvironmentDetailOK) Error() string {
@@ -153,6 +158,11 @@ func (o *GetEnvironmentDetailUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the get environment detail unauthorized response
+func (o *GetEnvironmentDetailUnauthorized) Code() int {
+	return 401
+}
+
 func (o *GetEnvironmentDetailUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized ", 401)
 }
@@ -204,6 +214,11 @@ func (o *GetEnvironmentDetailNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get environment detail not found response
+func (o *GetEnvironmentDetailNotFound) Code() int {
+	return 404
+}
+
 func (o *GetEnvironmentDetailNotFound) Error() string {
 	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound ", 404)
 }
@@ -253,6 +268,11 @@ func (o *GetEnvironmentDetailInternalServerError) IsServerError() bool {
 // IsCode returns true when this get environment detail internal server error response a status code equal to that given
 func (o *GetEnvironmentDetailInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get environment detail internal server error response
+func (o *GetEnvironmentDetailInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetEnvironmentDetailInternalServerError) Error() string {

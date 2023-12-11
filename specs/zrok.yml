@@ -991,6 +991,8 @@ definitions:
         type: string
       reserved:
         type: boolean
+      uniqueName:
+        type: string
 
   shareResponse:
     type: object

@@ -54,7 +54,7 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /share] share", response, response.Code())
 	}
 }
 
@@ -95,6 +95,11 @@ func (o *ShareCreated) IsServerError() bool {
 // IsCode returns true when this share created response a status code equal to that given
 func (o *ShareCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the share created response
+func (o *ShareCreated) Code() int {
+	return 201
 }
 
 func (o *ShareCreated) Error() string {
@@ -159,6 +164,11 @@ func (o *ShareUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the share unauthorized response
+func (o *ShareUnauthorized) Code() int {
+	return 401
+}
+
 func (o *ShareUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /share][%d] shareUnauthorized ", 401)
 }
@@ -208,6 +218,11 @@ func (o *ShareNotFound) IsServerError() bool {
 // IsCode returns true when this share not found response a status code equal to that given
 func (o *ShareNotFound) IsCode(code int) bool {
 	return code == 404
+}
+
+// Code gets the status code for the share not found response
+func (o *ShareNotFound) Code() int {
+	return 404
 }
 
 func (o *ShareNotFound) Error() string {
@@ -261,6 +276,11 @@ func (o *ShareUnprocessableEntity) IsCode(code int) bool {
 	return code == 422
 }
 
+// Code gets the status code for the share unprocessable entity response
+func (o *ShareUnprocessableEntity) Code() int {
+	return 422
+}
+
 func (o *ShareUnprocessableEntity) Error() string {
 	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
 }
@@ -311,6 +331,11 @@ func (o *ShareInternalServerError) IsServerError() bool {
 // IsCode returns true when this share internal server error response a status code equal to that given
 func (o *ShareInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the share internal server error response
+func (o *ShareInternalServerError) Code() int {
+	return 500
 }
 
 func (o *ShareInternalServerError) Error() string {

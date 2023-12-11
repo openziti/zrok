@@ -257,6 +257,7 @@
  * @property {string[]} oauthEmailDomains 
  * @property {string} oauthAuthorizationCheckInterval 
  * @property {boolean} reserved 
+ * @property {string} uniqueName 
  */
 
 /**

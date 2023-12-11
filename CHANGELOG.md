@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.19
+
+FEATURE: Reserved shares now support unique names ("vanity tokens"). This allows for the creation of reserved shares with identifiable names rather than generated share tokens. Includes basic support for profanity checking (https://github.com/openziti/zrok/issues/401)
+
+CHANGE: The Python SDK has been updated to properly support the "reserved" flag on the `ShareRequest` passed to `CreateShare`
+
 ## v0.4.18
 
 FEATURE: Python SDK added. Can be found on [pypi](https://test.pypi.org/project/zrok-sdk). `pastebin` example illustrates basic SDK usage (see `sdk/python/examples/README.md` for details) (https://github.com/openziti/zrok/issues/401)

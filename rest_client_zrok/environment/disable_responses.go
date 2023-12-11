@@ -39,7 +39,7 @@ func (o *DisableReader) ReadResponse(response runtime.ClientResponse, consumer r
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /disable] disable", response, response.Code())
 	}
 }
 
@@ -79,6 +79,11 @@ func (o *DisableOK) IsServerError() bool {
 // IsCode returns true when this disable o k response a status code equal to that given
 func (o *DisableOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the disable o k response
+func (o *DisableOK) Code() int {
+	return 200
 }
 
 func (o *DisableOK) Error() string {
@@ -132,6 +137,11 @@ func (o *DisableUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the disable unauthorized response
+func (o *DisableUnauthorized) Code() int {
+	return 401
+}
+
 func (o *DisableUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /disable][%d] disableUnauthorized ", 401)
 }
@@ -181,6 +191,11 @@ func (o *DisableInternalServerError) IsServerError() bool {
 // IsCode returns true when this disable internal server error response a status code equal to that given
 func (o *DisableInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the disable internal server error response
+func (o *DisableInternalServerError) Code() int {
+	return 500
 }
 
 func (o *DisableInternalServerError) Error() string {

@@ -6,6 +6,7 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"slices"
@@ -17,6 +18,7 @@ func init() {
 }
 
 type reserveCommand struct {
+	uniqueName         string
 	basicAuth          []string
 	frontendSelection  []string
 	backendMode        string
@@ -34,6 +36,7 @@ func newReserveCommand() *reserveCommand {
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &reserveCommand{cmd: cmd}
+	cmd.Flags().StringVarP(&command.uniqueName, "unique-name", "n", "", "A unique name for the reserved share (defaults to generated identifier)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
@@ -54,6 +57,10 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	} else if shareMode == sdk.PublicShareMode && slices.Contains(privateOnlyModes, cmd.backendMode) {
 		tui.Error(fmt.Sprintf("invalid sharing mode for a %s share: %s", sdk.PublicShareMode, cmd.backendMode), nil)
+	}
+
+	if cmd.uniqueName != "" && !util.IsValidUniqueName(cmd.uniqueName) {
+		tui.Error("invalid unique name; must be lowercase alphanumeric, between 4 and 32 characters in length, screened for profanity", nil)
 	}
 
 	var target string
@@ -95,6 +102,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 
 	req := &sdk.ShareRequest{
 		Reserved:    true,
+		UniqueName:  cmd.uniqueName,
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   shareMode,
 		BasicAuth:   cmd.basicAuth,

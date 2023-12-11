@@ -48,7 +48,7 @@ func (o *ResetPasswordReader) ReadResponse(response runtime.ClientResponse, cons
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /resetPassword] resetPassword", response, response.Code())
 	}
 }
 
@@ -88,6 +88,11 @@ func (o *ResetPasswordOK) IsServerError() bool {
 // IsCode returns true when this reset password o k response a status code equal to that given
 func (o *ResetPasswordOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the reset password o k response
+func (o *ResetPasswordOK) Code() int {
+	return 200
 }
 
 func (o *ResetPasswordOK) Error() string {
@@ -141,6 +146,11 @@ func (o *ResetPasswordNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the reset password not found response
+func (o *ResetPasswordNotFound) Code() int {
+	return 404
+}
+
 func (o *ResetPasswordNotFound) Error() string {
 	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound ", 404)
 }
@@ -191,6 +201,11 @@ func (o *ResetPasswordUnprocessableEntity) IsServerError() bool {
 // IsCode returns true when this reset password unprocessable entity response a status code equal to that given
 func (o *ResetPasswordUnprocessableEntity) IsCode(code int) bool {
 	return code == 422
+}
+
+// Code gets the status code for the reset password unprocessable entity response
+func (o *ResetPasswordUnprocessableEntity) Code() int {
+	return 422
 }
 
 func (o *ResetPasswordUnprocessableEntity) Error() string {
@@ -251,6 +266,11 @@ func (o *ResetPasswordInternalServerError) IsServerError() bool {
 // IsCode returns true when this reset password internal server error response a status code equal to that given
 func (o *ResetPasswordInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the reset password internal server error response
+func (o *ResetPasswordInternalServerError) Code() int {
+	return 500
 }
 
 func (o *ResetPasswordInternalServerError) Error() string {
