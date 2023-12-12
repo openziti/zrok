@@ -4,7 +4,11 @@
 
 FEATURE: Reserved shares now support unique names ("vanity tokens"). This allows for the creation of reserved shares with identifiable names rather than generated share tokens. Includes basic support for profanity checking (https://github.com/openziti/zrok/issues/401)
 
+CHANGE: The `publicProxy` endpoint implementation used in the `zrok access public` frontend has been updated to use the new `RefreshService(serviceName)` call instead of `RefreshServices()`. This should greatly improve the performance of requests against missing or non-responsive zrok shares (https://github.com/openziti/zrok/issues/487)
+
 CHANGE: The Python SDK has been updated to properly support the "reserved" flag on the `ShareRequest` passed to `CreateShare`
+
+CHANGE: Dependency updates; `github.com/openziti/sdk-golang@v0.20.145`; `github.com/caddyserver/caddy/v2@2.7.6`; indirect dependencies
 
 ## v0.4.18
 
