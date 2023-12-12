@@ -19,25 +19,32 @@ When the project runs it will:
 1. Download [the reserved public share `compose.yml` project file](pathname:///zrok-public-reserved/compose.yml) into the same directory.
 1. Copy your zrok account's enable token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
 
-  ```bash title=".env"
-  ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
-  ```
+    ```bash title=".env"
+    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
+    ```
+1. Name the Share
+
+    This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
+
+    ```bash title=".env"
+    ZROK_UNIQUE_NAME="my-prod-app"
+    ```
 
 1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
 
-  ```bash
-  docker compose up --detach
-  ```
+    ```bash
+    docker compose up --detach
+    ```
 
 1. Get the public share URL from the output of the `zrok-share` service or by peeking in the zrok console where the share will appear in the graph.
 
-  ```bash
-  docker compose logs zrok-share
-  ```
+    ```bash
+    docker compose logs zrok-share
+    ```
 
-  ```buttonless title="Output"
-  zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
-  ```
+    ```buttonless title="Output"
+    zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
+    ```
 
 This concludes the minimum steps to begin sharing the demo web server. Read on to learn how to pivot to sharing any website or web service by leveraging additional zrok backend modes.
 
@@ -78,50 +85,50 @@ With Caddy, you can balance the workload for websites or web services or share s
 
 1. Create a Caddyfile. This example demonstrates proxying two HTTP servers with a weighted round-robin load balancer.
 
-  ```console title="Caddyfile"
-  http:// {
-    # zrok requires this bind address template
-    bind {{ .ZrokBindAddress }}
-    reverse_proxy /* {
-      to http://httpbin1:8080 http://httpbin2:8080
-      lb_policy weighted_round_robin 3 2
+    ```console title="Caddyfile"
+    http:// {
+      # zrok requires this bind address template
+      bind {{ .ZrokBindAddress }}
+      reverse_proxy /* {
+        to http://httpbin1:8080 http://httpbin2:8080
+        lb_policy weighted_round_robin 3 2
+      }
     }
-  }
-  ```
+    ```
 
 1. Create a file `compose.override.yml`. This example adds two `httpbin` containers for load balancing, and mounts the Caddyfile into the container.
 
-  ```yaml title="compose.override.yml"
-  services:
-    httpbin1:
-      image: mccutchen/go-httpbin  # 8080/tcp
-    httpbin2:
-      image: mccutchen/go-httpbin  # 8080/tcp
-    zrok-share:
-      volumes:
-        - ./Caddyfile:/mnt/.zrok/Caddyfile
-  ```
+    ```yaml title="compose.override.yml"
+    services:
+      httpbin1:
+        image: mccutchen/go-httpbin  # 8080/tcp
+      httpbin2:
+        image: mccutchen/go-httpbin  # 8080/tcp
+      zrok-share:
+        volumes:
+          - ./Caddyfile:/mnt/.zrok/Caddyfile
+    ```
 
 1. Start a new Docker Compose project or delete the existing state volume. 
 
-  ```bash
-  docker compose down --volumes
-  ```
+    ```bash
+    docker compose down --volumes
+    ```
 
   If you prefer to keep using the same zrok environment with the new share then delete `/mnt/.zrok/reserved.json` instead of the entire volume.
 
 1. Run the project to load the new configuration.
 
-  ```bash
-  docker compose up --detach
-  ```
+    ```bash
+    docker compose up --detach
+    ```
 
 1. Note the new reserved share URL from the log.
 
-  ```bash
-  docker compose logs zrok-share
-  ```
+    ```bash
+    docker compose logs zrok-share
+    ```
 
-  ```buttonless title="Output"
-  INFO: zrok public URL: https://88s803f2qvao.in.zrok.io/
-  ```
+    ```buttonless title="Output"
+    INFO: zrok public URL: https://88s803f2qvao.in.zrok.io/
+    ```
