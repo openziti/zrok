@@ -278,8 +278,8 @@ github.com/go-openapi/jsonreference v0.20.2 h1:3sVjiK66+uXK/6oQ8xgcRKcFgQ5KXa2Kv
 github.com/go-openapi/jsonreference v0.20.2/go.mod h1:Bl1zwGIM8/wsvqjsOQLJ/SH+En5Ap4rVB5KVcIDZG2k=
 github.com/go-openapi/loads v0.21.2 h1:r2a/xFIYeZ4Qd2TnGpWDIQNcP80dIaZgf704za8enro=
 github.com/go-openapi/loads v0.21.2/go.mod h1:Jq58Os6SSGz0rzh62ptiu8Z31I+OTHqmULx5e/gJbNw=
-github.com/go-openapi/runtime v0.26.0 h1:HYOFtG00FM1UvqrcxbEJg/SwvDRvYLQKGhw2zaQjTcc=
-github.com/go-openapi/runtime v0.26.0/go.mod h1:QgRGeZwrUcSHdeh4Ka9Glvo0ug1LC5WyE+EV88plZrQ=
+github.com/go-openapi/runtime v0.26.2 h1:elWyB9MacRzvIVgAZCBJmqTi7hBzU0hlKD4IvfX0Zl0=
+github.com/go-openapi/runtime v0.26.2/go.mod h1:O034jyRZ557uJKzngbMDJXkcKJVzXJiymdSfgejrcRw=
 github.com/go-openapi/spec v0.20.6/go.mod h1:2OpW+JddWPrpXSCIX8eOx7lZ5iyuWj3RYR6VaaBKcWA=
 github.com/go-openapi/spec v0.20.11 h1:J/TzFDLTt4Rcl/l1PmyErvkqlJDncGvPTMnCI39I4gY=
 github.com/go-openapi/spec v0.20.11/go.mod h1:2OpW+JddWPrpXSCIX8eOx7lZ5iyuWj3RYR6VaaBKcWA=
@@ -759,8 +759,8 @@ github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openziti/channel/v2 v2.0.111 h1:ZZDyUUFcyshitXjUqAMjdAKbaDMpgV7oX1Jp1I35Rc4=
 github.com/openziti/channel/v2 v2.0.111/go.mod h1:abw0qwT0MzWvh1eI2P6D6CD17PRHL8EEo1d3DHCyCdM=
-github.com/openziti/edge-api v0.26.5 h1:O360x1ucLiCzibDBIVPEDlW5iZmA1pBVx/kfXKZusH8=
-github.com/openziti/edge-api v0.26.5/go.mod h1:JskiZuulHR6CCCGT7P6MLupnC21Reg8viw127F4MRE8=
+github.com/openziti/edge-api v0.26.6 h1:qM5XRaYYZxRIkb3xDkAU1D2EkQx8a+oHvCWbd+v0fbA=
+github.com/openziti/edge-api v0.26.6/go.mod h1:DX+fKivCRgnl5oxuLLoEx044arhjlgI7peGlqxN+Iks=
 github.com/openziti/fabric v0.23.26 h1:wEPNh8m3qcq9sw1Zmg5YgFZw1FovsKGu53rRf8qzI7A=
 github.com/openziti/fabric v0.23.26/go.mod h1:0MtkZqIHs3cJPP4DB88xsWUemDm77nN/GvWBBfq7peo=
 github.com/openziti/foundation/v2 v2.0.35 h1:4VaMwZ2kAy6jwBYeQIBN2m8rcGroTDX4A2Jp7NAKb6M=
@@ -769,8 +769,8 @@ github.com/openziti/identity v1.0.68 h1:SaFr7BeFQBoWQDiT28vUb8D9w7v6lIAK6/9RkwmV
 github.com/openziti/identity v1.0.68/go.mod h1:HbOu3TQ032v8xE6xZWjO51azF4fUxRLjO/l/oGqJwUI=
 github.com/openziti/metrics v1.2.40 h1:gySRgR8prCPqaEjmUtX0eXFs7NkI9uPAzp+z6A8+JqA=
 github.com/openziti/metrics v1.2.40/go.mod h1:HXdVryf3xpZfnY4VcaOjMxiBv+qw0wJlEJNLbooB9hY=
-github.com/openziti/sdk-golang v0.20.145 h1:GL5glgLFtRR2P60EG/FLT8WZtmCUOkQYidN1QSTzotk=
-github.com/openziti/sdk-golang v0.20.145/go.mod h1:16j+e3WI+ztxG1V+X8Wl3MFyAUe0BO8a8ypxbzDF7Ao=
+github.com/openziti/sdk-golang v0.21.2 h1:P66cslOAmQX37VFan+df+MoD2PqaFjHWDNMpuhhXHSo=
+github.com/openziti/sdk-golang v0.21.2/go.mod h1:mepEUD39DsBm/v1WVLedYRoYCFdet5mmJ5Sxqm/zkFI=
 github.com/openziti/secretstream v0.1.14 h1:Ta+nB5Prcct+L5LIKUA1nE56QhWS6lMPQYTlpxUltU0=
 github.com/openziti/secretstream v0.1.14/go.mod h1:/hhuLfu+GIv0+cnapfsu/VOnXEvmTt3GKtCu+lQ0RIw=
 github.com/openziti/storage v0.2.6 h1:/pbIRzDwrczMWRVkN75PfwAXFbArplIqhpRsUrsUOBc=
@@ -1009,8 +1009,8 @@ go.etcd.io/etcd/api/v3 v3.5.0/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQc
 go.etcd.io/etcd/client/pkg/v3 v3.5.0/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.0/go.mod h1:h9puh54ZTgAKtEbut2oe9P4L/oqKCVB6xsXlzd7alYQ=
 go.mongodb.org/mongo-driver v1.10.0/go.mod h1:wsihk0Kdgv8Kqu1Anit4sfK+22vSFbUrAVEYRhCXrA8=
-go.mongodb.org/mongo-driver v1.13.0 h1:67DgFFjYOCMWdtTEmKFpV3ffWlFnh+CYZ8ZS/tXWUfY=
-go.mongodb.org/mongo-driver v1.13.0/go.mod h1:/rGBTebI3XYboVmgz+Wv3Bcbl3aD0QF9zl6kDDw18rQ=
+go.mongodb.org/mongo-driver v1.13.1 h1:YIc7HTYsKndGK4RFzJ3covLz1byri52x0IoMB0Pt/vk=
+go.mongodb.org/mongo-driver v1.13.1/go.mod h1:wcDf1JBCXy2mOW0bWHwO/IOYqdca1MPCwDtFu/Z9+eo=
 go.mozilla.org/pkcs7 v0.0.0-20210730143726-725912489c62/go.mod h1:SNgMg+EgDFwmvSmLRTNKC5fegJjB7v23qTQ0XLGUNHk=
 go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 h1:CCriYyAfq1Br1aIYettdHZTy8mBTIPo7We18TuO/bak=
 go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352/go.mod h1:SNgMg+EgDFwmvSmLRTNKC5fegJjB7v23qTQ0XLGUNHk=

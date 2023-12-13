@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.20
+
+CHANGE: OpenZiti SDK updated to `v0.21.2`. All `ziti.ListenOptions` listener options configured to use `WaitForNEstablishedListeners: 1`. When a `zrok share` client or an `sdk.Share` client are connected to an OpenZiti router that supports "listener established" events, then listen calls will not return until the listener is fully established on the OpenZiti network. Previously a `zrok share` client could report that it is fully operational and listening before the listener is fully established on the OpenZiti network; in practice this produced a very small window of time when the share would not be ready to accept requests. This change eliminates this window of time (https://github.com/openziti/zrok/issues/490)
+
 ## v0.4.19
 
 FEATURE: Reserved shares now support unique names ("vanity tokens"). This allows for the creation of reserved shares with identifiable names rather than generated share tokens. Includes basic support for profanity checking (https://github.com/openziti/zrok/issues/401)
