@@ -1,2 +1,2 @@
 from . import environment
-from . import access, model, share, overview
+from . import access, decor, model, share, overview
