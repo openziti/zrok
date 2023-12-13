@@ -149,16 +149,17 @@ func (l *looper) serviceListener() {
 		logrus.Errorf("error opening ziti config '%v': %v", l.zif, err)
 		return
 	}
-	opts := ziti.ListenOptions{
-		ConnectTimeout: 5 * time.Minute,
-		MaxConnections: 10,
+	options := ziti.ListenOptions{
+		ConnectTimeout:               5 * time.Minute,
+		MaxConnections:               64,
+		WaitForNEstablishedListeners: 1,
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {
 		logrus.Errorf("error loading ziti context: %v", err)
 		return
 	}
-	if l.listener, err = zctx.ListenWithOptions(l.shrToken, &opts); err == nil {
+	if l.listener, err = zctx.ListenWithOptions(l.shrToken, &options); err == nil {
 		if err := http.Serve(l.listener, l); err != nil {
 			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}

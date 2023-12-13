@@ -1,6 +1,7 @@
-from zrok.environment.root import Root
 import openziti
-    
+from zrok.environment.root import Root
+
+
 class Listener():
     shrToken: str
     root: Root
