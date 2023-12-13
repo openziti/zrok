@@ -3,6 +3,22 @@ from zrok_api.models import AccessRequest, UnaccessRequest
 from zrok_api.api import ShareApi
 from zrok import model
 
+class Access():
+    root: Root
+    request: model.AccessRequest
+    access: model.Access
+
+    def __init__(self, root: Root, request: model.AccessRequest):
+        self.root = root
+        self.request = request
+
+    def __enter__(self) -> model.Access:
+        self.access = CreateAccess(root=self.root, request=self.request)
+        return self.access
+    
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        DeleteAccess(root=self.root, acc=self.access)
+
 def CreateAccess(root: Root, request: model.AccessRequest) -> model.Access:
     if not root.IsEnabled():
         raise Exception("environment is not enabled; enable with 'zrok enable' first!")
