@@ -3,6 +3,22 @@ from zrok_api.models import ShareRequest, UnshareRequest, AuthUser
 from zrok_api.api import ShareApi
 from zrok import model
 
+class Share():
+    root: Root
+    request: model.ShareRequest
+    share: model.Share
+
+    def __init__(self, root: Root, request: model.ShareRequest):
+        self.root = root
+        self.request = request
+
+    def __enter__(self) -> model.Share:
+        self.share = CreateShare(root=self.root, request=self.request)
+        return self.share
+    
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        DeleteShare(root=self.root, shr=self.share)
+
 def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
     if not root.IsEnabled():
         raise Exception("environment is not enabled; enable with 'zrok enable' first!")

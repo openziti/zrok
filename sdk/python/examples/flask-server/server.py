@@ -40,7 +40,7 @@ if __name__ == '__main__':
         print("unable to create share", e)
         sys.exit(1)
 
-    zrok_opts['data'] = zrok.decor.Opts(root=root, shrToken=shrToken,bindPort=18081)
+    zrok_opts['cfg'] = zrok.decor.Opts(root=root, shrToken=shrToken,bindPort=18081)
     
     try:
         acc = zrok.access.CreateAccess(root=root, request=AccessRequest(

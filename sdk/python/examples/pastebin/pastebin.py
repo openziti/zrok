@@ -1,5 +1,6 @@
 #!python3
 import argparse
+import atexit
 import sys
 import os
 import zrok
@@ -29,20 +30,23 @@ class copyto:
             print("unable to create share", e)
             sys.exit(1)
 
+        def removeShare():
+            try:
+                zrok.share.DeleteShare(root, shr)
+            except Exception as e:
+                print("unable to delete share", e)
+                sys.exit(1)
+        atexit.register(removeShare)
+
         data = self.loadData()
         print("access your pastebin using 'pastebin.py pastefrom " + shr.Token + "'")
 
-        try:
-            with zrok.listener.Listener(shr.Token, root) as server:
-                while not exit_signal.is_set():
-                    conn, peer = server.accept()
-                    with conn:
-                        conn.sendall(data.encode('utf-8'))
+        with zrok.listener.Listener(shr.Token, root) as server:
+            while not exit_signal.is_set():
+                conn, peer = server.accept()
+                with conn:
+                    conn.sendall(data.encode('utf-8'))
 
-        except KeyboardInterrupt:
-            pass
-
-        zrok.share.DeleteShare(root, shr)
         print("Server stopped.")
         
 
@@ -62,15 +66,18 @@ def pastefrom(options):
     except Exception as e:
         print("unable to create access", e)
         sys.exit(1)
+    
+    def removeAccess():
+        try:
+            zrok.access.DeleteAccess(root, acc)
+        except Exception as e:
+            print("unable to delete access", e)
+            sys.exit(1)
+    atexit.register(removeAccess)
 
     client = zrok.dialer.Dialer(options.shrToken, root)
     data = client.recv(1024)
     print(data.decode('utf-8'))
-    try:
-        zrok.access.DeleteAccess(root, acc)
-    except Exception as e:
-        print("unable to delete access", e)
-        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
