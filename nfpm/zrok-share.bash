@@ -25,6 +25,10 @@ fi
 # set HOME to the first colon-sep dir in STATE_DIRECTORY inherited from systemd (/var/lib/zrok-share) or docker (/mnt)
 export HOME="${STATE_DIRECTORY%:*}"
 
+: "${ZROK_SHARE_RESERVED:=true}"
+
+echo "DEBUG: ZROK_SHARE_RESERVED=${ZROK_SHARE_RESERVED}"
+
 if (( $# )); then
   if [[ -s "$1" ]]; then
     echo "INFO: reading share configuration from $1"
@@ -60,9 +64,14 @@ elif [[ -s ~/.zrok/reserved.json ]]; then
     exit 1
   else
     echo "INFO: zrok backend is already reserved: ${ZROK_RESERVED_TOKEN}"
-    ZITI_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
-    ZITI_CMD+=" ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
-    share_reserved ${ZITI_CMD}
+    ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
+    ZROK_CMD+=" ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
+    if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
+      share_reserved ${ZROK_CMD}
+    else
+      echo "INFO: finished reserving zrok backend, continuing without sharing"
+      exit 0
+    fi
   fi
 else
   ZROK_CMD="reserve public --json-output ${ZROK_VERBOSE:-}"
@@ -158,6 +167,11 @@ else
     fi
     ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
     ZROK_CMD+=" ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
-    share_reserved ${ZROK_CMD}
+    if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
+      share_reserved ${ZROK_CMD}
+    else
+      echo "INFO: finished reserving zrok backend, continuing without sharing"
+      exit 0
+    fi
   fi
 fi
