@@ -2,9 +2,13 @@ package webdavClient
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -27,6 +31,35 @@ type Client struct {
 // NewClient creates a new instance of client
 func NewClient(uri, user, pw string) *Client {
 	return NewAuthClient(uri, NewAutoAuth(user, pw))
+}
+
+func NewZrokClient(zrokUrl *url.URL, root env_core.Root, auth Authorizer) (*Client, error) {
+	conn, err := sdk.NewDialer(zrokUrl.Host, root)
+	if err != nil {
+		return nil, err
+	}
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DialContext = func(_ context.Context, _, _ string) (net.Conn, error) {
+		return conn, nil
+	}
+	c := &http.Client{
+		Transport: transport,
+		CheckRedirect: func(rq *http.Request, via []*http.Request) error {
+			if len(via) >= 10 {
+				return ErrTooManyRedirects
+			}
+			if via[0].Header.Get(XInhibitRedirect) != "" {
+				return http.ErrUseLastResponse
+			}
+			return nil
+		},
+	}
+	httpUrl, err := url.Parse(zrokUrl.String())
+	if err != nil {
+		return nil, err
+	}
+	httpUrl.Scheme = "http"
+	return &Client{root: FixSlash(httpUrl.String()), headers: make(http.Header), interceptor: nil, c: c, auth: auth}, nil
 }
 
 // NewAuthClient creates a new client instance with a custom Authorizer

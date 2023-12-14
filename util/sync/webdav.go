@@ -2,18 +2,21 @@ package sync
 
 import (
 	"fmt"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/util/sync/webdavClient"
 	"github.com/pkg/errors"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
 )
 
 type WebDAVTargetConfig struct {
-	URL      string
+	URL      *url.URL
 	Username string
 	Password string
+	Root     env_core.Root
 }
 
 type WebDAVTarget struct {
@@ -21,7 +24,10 @@ type WebDAVTarget struct {
 }
 
 func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
-	c := webdavClient.NewClient(cfg.URL, cfg.Username, cfg.Password)
+	c, err := webdavClient.NewZrokClient(cfg.URL, cfg.Root, webdavClient.NewAutoAuth(cfg.Username, cfg.Password))
+	if err != nil {
+		return nil, err
+	}
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "error connecting to webdav target")
 	}
