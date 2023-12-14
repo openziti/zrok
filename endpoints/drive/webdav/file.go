@@ -6,10 +6,7 @@ package webdav
 
 import (
 	"context"
-	"crypto/sha512"
 	"encoding/xml"
-	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"io/fs"
 	"net/http"
@@ -67,21 +64,12 @@ type webdavFile struct {
 
 func (f *webdavFile) DeadProps() (map[xml.Name]Property, error) {
 	var (
-		xmlName       xml.Name
-		property      Property
-		properties    = make(map[xml.Name]Property)
-		checksum, err = f.checksum()
+		xmlName    xml.Name
+		property   Property
+		properties = make(map[xml.Name]Property)
 	)
-	if err == nil {
-		xmlName.Space = "zrok:"
-		xmlName.Local = "checksum"
-		property.XMLName = xmlName
-		property.InnerXML = []byte(checksum)
-		properties[xmlName] = property
-	}
-
 	var stat fs.FileInfo
-	stat, err = f.Stat()
+	stat, err := f.Stat()
 	if err == nil {
 		xmlName.Space = "zrok:"
 		xmlName.Local = "lastmodified"
@@ -110,21 +98,6 @@ func (f *webdavFile) Patch(patches []Proppatch) ([]Propstat, error) {
 		}
 	}
 	return []Propstat{stat}, nil
-}
-
-func (f *webdavFile) checksum() (string, error) {
-	file, err := os.Open(f.name)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-	hash := sha512.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-	sha512 := fmt.Sprintf("%x", hash.Sum(nil))
-	logrus.Infof("%v = %v", f.name, sha512)
-	return sha512, nil
 }
 
 func (f *webdavFile) updateModtime(path string, modtime time.Time) error {
