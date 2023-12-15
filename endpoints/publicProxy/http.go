@@ -253,6 +253,12 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
+									if claims.Audience != r.Host {
+										logrus.Errorf("audience claim '%s' does not match requested host '%s'; restarting auth flow", claims.Audience, r.Host)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										return
+									}
+
 									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
 										if castedDomains, ok := validDomains.([]interface{}); !ok {
 											logrus.Error("invalid email domain format")
@@ -313,15 +319,26 @@ type ZrokClaims struct {
 	Email                      string        `json:"email"`
 	AccessToken                string        `json:"accessToken"`
 	Provider                   string        `json:"provider"`
+	Audience                   string        `json:"aud"`
 	AuthorizationCheckInterval time.Duration `json:"authorizationCheckInterval"`
 	jwt.RegisteredClaims
 }
 
-func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider string, checkInterval time.Duration, key []byte) {
+func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
+	targetHost = strings.TrimSpace(targetHost)
+	if targetHost == "" {
+		logrus.Error("host claim must not be empty")
+		http.Error(w, "host claim must not be empty", http.StatusBadRequest)
+		return
+	}
+	targetHost = strings.Split(targetHost, "/")[0]
+	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
+
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, ZrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
 		Provider:                   provider,
+		Audience:                   targetHost,
 		AuthorizationCheckInterval: checkInterval,
 	})
 	sTkn, err := tkn.SignedString(key)
@@ -334,10 +351,12 @@ func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider s
 		Name:    "zrok-access",
 		Value:   sTkn,
 		MaxAge:  int(checkInterval.Seconds()),
-		Domain:  domain,
+		Domain:  cookieDomain,
 		Path:    "/",
 		Expires: time.Now().Add(checkInterval),
-		//Secure:  true, //When tls gets added have this be configured on if tls
+		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
+		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
+		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
 }
 
