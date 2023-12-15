@@ -20,7 +20,9 @@ type WebDAVTargetConfig struct {
 }
 
 type WebDAVTarget struct {
-	c *webdavClient.Client
+	cfg   *WebDAVTargetConfig
+	c     *webdavClient.Client
+	isDir bool
 }
 
 func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
@@ -31,15 +33,30 @@ func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
 	if err := c.Connect(); err != nil {
 		return nil, errors.Wrap(err, "error connecting to webdav target")
 	}
-	return &WebDAVTarget{c: c}, nil
+	return &WebDAVTarget{cfg: cfg, c: c}, nil
 }
 
 func (t *WebDAVTarget) Inventory() ([]*Object, error) {
+	fi, err := t.c.Stat("")
+	if !fi.IsDir() {
+		t.isDir = false
+		return []*Object{{
+			Path:     fi.Name(),
+			Size:     fi.Size(),
+			Modified: fi.ModTime(),
+		}}, nil
+	}
+
+	t.isDir = true
 	tree, err := t.recurse("", nil)
 	if err != nil {
 		return nil, err
 	}
 	return tree, nil
+}
+
+func (t *WebDAVTarget) IsDir() bool {
+	return t.isDir
 }
 
 func (t *WebDAVTarget) recurse(path string, tree []*Object) ([]*Object, error) {
@@ -69,7 +86,10 @@ func (t *WebDAVTarget) recurse(path string, tree []*Object) ([]*Object, error) {
 }
 
 func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
-	return t.c.ReadStream(path)
+	if t.isDir {
+		return t.c.ReadStream(path)
+	}
+	return t.c.ReadStream("")
 }
 
 func (t *WebDAVTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {

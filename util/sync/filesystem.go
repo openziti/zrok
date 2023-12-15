@@ -27,14 +27,27 @@ func NewFilesystemTarget(cfg *FilesystemTargetConfig) *FilesystemTarget {
 }
 
 func (t *FilesystemTarget) Inventory() ([]*Object, error) {
-	if _, err := os.Stat(t.cfg.Root); os.IsNotExist(err) {
+	fi, err := os.Stat(t.cfg.Root)
+	if os.IsNotExist(err) {
 		return nil, nil
 	}
+	if err != nil {
+		return nil, err
+	}
+
+	if !fi.IsDir() {
+		return []*Object{{Path: t.cfg.Root, Size: fi.Size(), Modified: fi.ModTime()}}, nil
+	}
+
 	t.tree = nil
 	if err := fs.WalkDir(t.root, ".", t.recurse); err != nil {
 		return nil, err
 	}
 	return t.tree, nil
+}
+
+func (t *FilesystemTarget) IsDir() bool {
+	return true
 }
 
 func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error {

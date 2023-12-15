@@ -33,18 +33,18 @@ func Synchronize(src, dst Target) error {
 		}
 	}
 
-	for _, target := range copyList {
-		ss, err := src.ReadStream(target.Path)
+	for _, copyPath := range copyList {
+		ss, err := src.ReadStream(copyPath.Path)
 		if err != nil {
 			return err
 		}
-		if err := dst.WriteStream(target.Path, ss, os.ModePerm); err != nil {
+		if err := dst.WriteStream(copyPath.Path, ss, os.ModePerm); err != nil {
 			return err
 		}
-		if err := dst.SetModificationTime(target.Path, target.Modified); err != nil {
+		if err := dst.SetModificationTime(copyPath.Path, copyPath.Modified); err != nil {
 			return err
 		}
-		logrus.Infof("=> %v", target.Path)
+		logrus.Infof("=> %v", copyPath.Path)
 	}
 
 	return nil
