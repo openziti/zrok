@@ -211,7 +211,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
 									var authCheckInterval time.Duration
 									if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
-										logrus.Errorf("Missing authorization check interval in share config. Defaulting to 3 hours")
+										logrus.Errorf("missing authorization check interval in share config. Defaulting to 3 hours")
 										authCheckInterval = 3 * time.Hour
 									} else {
 										i, err := time.ParseDuration(checkInterval.(string))
