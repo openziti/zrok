@@ -1,15 +1,19 @@
-from setuptools import setup, find_packages  # noqa: H301
 import os
 
-NAME = "zrok_sdk"
-VERSION = "0.4.0.dev"
-try:
-    VERSION = os.environ['ZROK_VERSION']
-except KeyError: 
-    pass
+from setuptools import find_packages, setup  # noqa: H301
+
+# optionally upload to TestPyPi with alternative name in testing repo
+NAME = os.getenv('ZROK_PY_NAME', "zrok_sdk")
+# inherit zrok version from environment or default to dev version
+VERSION = os.getenv('ZROK_VERSION', "0.4.0.dev")
+
 # To install the library, run the following
 #
 # python setup.py install
+#
+# or
+#
+# pip install --editable .
 #
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools

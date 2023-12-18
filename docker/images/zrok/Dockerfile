@@ -1,5 +1,5 @@
 # this builds docker.io/openziti/zrok
-ARG ZITI_CLI_TAG="0.31.0"
+ARG ZITI_CLI_TAG="0.31.2"
 ARG ZITI_CLI_IMAGE="docker.io/openziti/ziti-cli"
 # this builds docker.io/openziti/ziti-controller
 FROM ${ZITI_CLI_IMAGE}:${ZITI_CLI_TAG}

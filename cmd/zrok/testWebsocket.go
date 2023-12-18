@@ -87,7 +87,7 @@ func (cmd *testWebsocketCommand) run(_ *cobra.Command, args []string) {
 		addr = cmd.serviceName
 	} else {
 		if len(args) == 0 {
-			logrus.Error("Address required if not using ziti")
+			logrus.Error("address required if not using ziti")
 			flag.Usage()
 			os.Exit(1)
 		}
@@ -102,13 +102,13 @@ func (cmd *testWebsocketCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer c.Close(websocket.StatusInternalError, "the sky is falling")
 
-	logrus.Info("Writing to server...")
+	logrus.Info("writing to server...")
 	err = wsjson.Write(ctx, c, "hi")
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
-	logrus.Info("Reading response...")
+	logrus.Info("reading response...")
 	typ, dat, err := c.Read(ctx)
 	if err != nil {
 		logrus.Error(err)

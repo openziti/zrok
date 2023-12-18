@@ -9,7 +9,7 @@ import (
 )
 
 func NewListener(shrToken string, root env_core.Root) (edge.Listener, error) {
-	return NewListenerWithOptions(shrToken, root, &ziti.ListenOptions{ConnectTimeout: 30 * time.Second, MaxConnections: 64})
+	return NewListenerWithOptions(shrToken, root, &ziti.ListenOptions{ConnectTimeout: 30 * time.Second, MaxConnections: 64, WaitForNEstablishedListeners: 1})
 }
 
 func NewListenerWithOptions(shrToken string, root env_core.Root, opts *ziti.ListenOptions) (edge.Listener, error) {

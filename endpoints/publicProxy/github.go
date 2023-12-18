@@ -80,7 +80,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		return func(w http.ResponseWriter, r *http.Request) {
 			host, err := url.QueryUnescape(r.URL.Query().Get("targethost"))
 			if err != nil {
-				logrus.Errorf("Unable to unescape target host: %v", err)
+				logrus.Errorf("unable to unescape target host: %v", err)
 			}
 			rp.AuthURLHandler(func() string {
 				id := uuid.New().String()
@@ -99,7 +99,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 				})
 				s, err := t.SignedString(key)
 				if err != nil {
-					logrus.Errorf("Unable to sign intermediate JWT: %v", err)
+					logrus.Errorf("unable to sign intermediate JWT: %v", err)
 				}
 				return s
 			}, party, rp.WithURLParam("access_type", "offline"))(w, r)
@@ -121,7 +121,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens.AccessToken))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			logrus.Error("Error getting user info from github: " + err.Error() + "\n")
+			logrus.Errorf("error getting user info from github: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -130,14 +130,14 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		}()
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
-			logrus.Errorf("Error reading response body: %v", err)
+			logrus.Errorf("error reading response body: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		var rDat []githubUserResp
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
-			logrus.Errorf("Error unmarshalling google oauth response: %v", err)
+			logrus.Errorf("error unmarshalling google oauth response: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -165,8 +165,7 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		} else {
 			authCheckInterval = i
 		}
-
-		SetZrokCookie(w, cfg.CookieDomain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key)
+		SetZrokCookie(w, cfg.CookieDomain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 
