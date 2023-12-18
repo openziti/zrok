@@ -1,11 +1,9 @@
 #!python3
 from flask import Flask
-import openziti
 import sys
 import zrok
 from zrok.model import AccessRequest, ShareRequest
 import atexit
-import openziti
 
 app = Flask(__name__)
 zrok_opts = {}
