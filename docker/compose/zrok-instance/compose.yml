@@ -1,0 +1,76 @@
+services:
+  zrok_env:
+    image: busybox
+    command: chown -Rc 65534:65534 /var/lib/zrok/env; chmod ug=rwX,o-rwx -Rc /var/lib/zrok/env
+    volumes:
+      - zrok_env:/var/lib/zrok/env
+  zrok:
+    depends_on:
+       zrok_env:
+         condition: service_completed_successfully
+    image: openziti/zrok:0.4.20
+    command: controller --verbose ./etc/ctrl.yml
+    working_dir: /var/lib/zrok
+    volumes:
+      - ./zrok_etc:/var/lib/zrok/etc
+    networks:
+      quickstart:
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:18080:18080
+    environment:
+      PFXLOG_NO_JSON: "true"
+  frontend:
+    depends_on:
+       zrok_env:
+         condition: service_completed_successfully
+    image: openziti/zrok:0.4.20
+    command: access public --verbose ./etc/frontend.yml
+    working_dir: /var/lib/zrok
+    volumes:
+      - zrok_env:/var/lib/zrok/env
+      - ./zrok_etc:/var/lib/zrok/etc
+    networks:
+      quickstart:
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8080:8080
+      - 127.0.0.1:8081:8081
+    environment:
+      PFXLOG_NO_JSON: "true"
+      HOME: /var/lib/zrok/env
+      ZROK_ADMIN_TOKEN:
+      ZROK_API_ENDPOINT:
+  quickstart:
+    restart: unless-stopped
+    networks:
+      quickstart:
+        aliases:
+          - ziti.${ZROK_ZONE}
+  caddy:
+    build:
+      context: .
+      dockerfile: ./caddy.Dockerfile
+    restart: unless-stopped
+    environment:
+      DIGITALOCEAN_ACCESS_TOKEN:
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      quickstart:
+ 
+volumes:
+  caddy_data:
+  caddy_config:
+  zrok_env:
+
+networks:
+  quickstart:
+    driver: bridge
+

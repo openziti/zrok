@@ -1,0 +1,141 @@
+# this is a partial ziti controller configuration that redefines the quickstart's list of web listeners as two:
+# client-management (private listener) and edge-client (public listener)
+web:
+  # name - required
+  # Provides a name for this listener, used for logging output. Not required to be unique, but is highly suggested.
+  - name: edge-client
+    # bindPoints - required
+    # One or more bind points are required. A bind point specifies an interface (interface:port string) that defines
+    # where on the host machine the webListener will listen and the address (host:port) that should be used to
+    # publicly address the webListener(i.e. mydomain.com, localhost, 127.0.0.1). This public address may be used for
+    # incoming address resolution as well as used in responses in the API.
+    bindPoints:
+      #interface - required
+      # A host:port string on which network interface to listen on. 0.0.0.0 will listen on all interfaces
+      - interface: 0.0.0.0:1280
+        # address - required
+        # The public address that external incoming requests will be able to resolve. Used in request processing and
+        # response content that requires full host:port/path addresses.
+        address: ziti.${ZROK_ZONE}:1280
+    # identity - optional
+    # Allows the webListener to have a specific identity instead of defaulting to the root 'identity' section.
+    identity:
+      ca:          "/persistent/pki/root-ca/certs/root-ca.cert"
+      key:         "/persistent/pki/intermediate-ca/keys/server.key"
+      server_cert: "/persistent/pki/intermediate-ca/certs/server.chain.pem"
+      cert:        "/persistent/pki/intermediate-ca/certs/client.cert"
+      #alt_server_certs:
+      #- server_cert: ""
+      #  server_key:  ""
+      
+    # options - optional
+    # Allows the specification of webListener level options - mainly dealing with HTTP/TLS settings. These options are
+    # used for all http servers started by the current webListener.
+    options:
+      # idleTimeoutMs - optional, default 5000ms
+      # The maximum amount of idle time in milliseconds allowed for pipelined HTTP requests. Setting this too high
+      # can cause resources on the host to be consumed as clients remain connected and idle. Lowering this value
+      # will cause clients to reconnect on subsequent HTTPs requests.
+      idleTimeout: 5000ms  #http timeouts, new
+      # readTimeoutMs - optional, default 5000ms
+      # The maximum amount of time in milliseconds http servers will wait to read the first incoming requests. A higher
+      # value risks consuming resources on the host with clients that are acting bad faith or suffering from high latency
+      # or packet loss. A lower value can risk losing connections to high latency/packet loss clients.
+      readTimeout: 5000ms
+      # writeTimeoutMs - optional, default 100000ms
+      # The total maximum time in milliseconds that the http server will wait for a single requests to be received and
+      # responded too. A higher value can allow long-running requests to consume resources on the host. A lower value
+      # can risk ending requests before the server has a chance to respond.
+      writeTimeout: 100000ms
+      # minTLSVersion - optional, default TLS1.2
+      # The minimum version of TSL to support
+      minTLSVersion: TLS1.2
+      # maxTLSVersion - optional, default TLS1.3
+      # The maximum version of TSL to support
+      maxTLSVersion: TLS1.3
+    # apis - required
+    # Allows one or more APIs to be bound to this webListener
+    apis:
+      # binding - required
+      # Specifies an API to bind to this webListener. Built-in APIs are
+      #   - edge-management
+      #   - edge-client
+      #   - fabric-management
+      # - binding: edge-management
+      #   # options - arg optional/required
+      #   # This section is used to define values that are specified by the API they are associated with.
+      #   # These settings are per API. The example below is for the 'edge-api' and contains both optional values and
+      #   # required values.
+      #   options: { }
+      - binding: edge-client
+        options: { }
+          #- binding: fabric
+          #  options: { }
+  - name: client-management
+    # bindPoints - required
+    # One or more bind points are required. A bind point specifies an interface (interface:port string) that defines
+    # where on the host machine the webListener will listen and the address (host:port) that should be used to
+    # publicly address the webListener(i.e. mydomain.com, localhost, 127.0.0.1). This public address may be used for
+    # incoming address resolution as well as used in responses in the API.
+    bindPoints:
+      #interface - required
+      # A host:port string on which network interface to listen on. 0.0.0.0 will listen on all interfaces
+      - interface: 0.0.0.0:1281
+        # address - required
+        # The public address that external incoming requests will be able to resolve. Used in request processing and
+        # response content that requires full host:port/path addresses.
+        address: 127.0.0.1:1281
+    # identity - optional
+    # Allows the webListener to have a specific identity instead of defaulting to the root 'identity' section.
+    identity:
+      ca:          "/persistent/pki/root-ca/certs/root-ca.cert"
+      key:         "/persistent/pki/intermediate-ca/keys/server.key"
+      server_cert: "/persistent/pki/intermediate-ca/certs/server.chain.pem"
+      cert:        "/persistent/pki/intermediate-ca/certs/client.cert"
+      #alt_server_certs:
+      #- server_cert: ""
+      #  server_key:  ""
+      
+    # options - optional
+    # Allows the specification of webListener level options - mainly dealing with HTTP/TLS settings. These options are
+    # used for all http servers started by the current webListener.
+    options:
+      # idleTimeoutMs - optional, default 5000ms
+      # The maximum amount of idle time in milliseconds allowed for pipelined HTTP requests. Setting this too high
+      # can cause resources on the host to be consumed as clients remain connected and idle. Lowering this value
+      # will cause clients to reconnect on subsequent HTTPs requests.
+      idleTimeout: 5000ms  #http timeouts, new
+      # readTimeoutMs - optional, default 5000ms
+      # The maximum amount of time in milliseconds http servers will wait to read the first incoming requests. A higher
+      # value risks consuming resources on the host with clients that are acting bad faith or suffering from high latency
+      # or packet loss. A lower value can risk losing connections to high latency/packet loss clients.
+      readTimeout: 5000ms
+      # writeTimeoutMs - optional, default 100000ms
+      # The total maximum time in milliseconds that the http server will wait for a single requests to be received and
+      # responded too. A higher value can allow long-running requests to consume resources on the host. A lower value
+      # can risk ending requests before the server has a chance to respond.
+      writeTimeout: 100000ms
+      # minTLSVersion - optional, default TLS1.2
+      # The minimum version of TSL to support
+      minTLSVersion: TLS1.2
+      # maxTLSVersion - optional, default TLS1.3
+      # The maximum version of TSL to support
+      maxTLSVersion: TLS1.3
+    # apis - required
+    # Allows one or more APIs to be bound to this webListener
+    apis:
+      # binding - required
+      # Specifies an API to bind to this webListener. Built-in APIs are
+      #   - edge-management
+      #   - edge-client
+      #   - fabric-management
+      - binding: edge-management
+        # options - arg optional/required
+        # This section is used to define values that are specified by the API they are associated with.
+        # These settings are per API. The example below is for the 'edge-api' and contains both optional values and
+        # required values.
+        options: { }
+          #- binding: edge-client
+          #  options: { }
+      - binding: fabric
+        options: { }
