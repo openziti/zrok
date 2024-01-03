@@ -38,7 +38,8 @@ func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
 
 func (t *WebDAVTarget) Inventory() ([]*Object, error) {
 	fi, err := t.c.Stat("")
-	if !fi.IsDir() {
+
+	if fi != nil && !fi.IsDir() {
 		t.isDir = false
 		return []*Object{{
 			Path:     fi.Name(),
