@@ -3,7 +3,7 @@ import os
 from setuptools import find_packages, setup  # noqa: H301
 
 # optionally upload to TestPyPi with alternative name in testing repo
-NAME = os.getenv('ZROK_PY_NAME', "zrok_sdk")
+NAME = os.getenv('ZROK_PY_NAME', "zrok")
 # inherit zrok version from environment or default to dev version
 VERSION = os.getenv('ZROK_VERSION', "0.4.0.dev")
 
@@ -18,7 +18,7 @@ VERSION = os.getenv('ZROK_VERSION', "0.4.0.dev")
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil"]
+REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil", "openziti >= 0.8.1"]
 
 setup(
     name=NAME,

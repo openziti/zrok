@@ -3,6 +3,7 @@ from zrok_api.models import ShareRequest, UnshareRequest, AuthUser
 from zrok_api.api import ShareApi
 from zrok import model
 
+
 class Share():
     root: Root
     request: model.ShareRequest
@@ -15,14 +16,15 @@ class Share():
     def __enter__(self) -> model.Share:
         self.share = CreateShare(root=self.root, request=self.request)
         return self.share
-    
+
     def __exit__(self, exception_type, exception_value, exception_traceback):
         DeleteShare(root=self.root, shr=self.share)
+
 
 def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
     if not root.IsEnabled():
         raise Exception("environment is not enabled; enable with 'zrok enable' first!")
-    
+
     match request.ShareMode:
         case model.PRIVATE_SHARE_MODE:
             out = __newPrivateShare(root, request)
@@ -41,7 +43,7 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
             if len(tokens) == 2:
                 out.auth_users.append(AuthUser(username=tokens[0].strip(), password=tokens[1].strip()))
             else:
-                raise Exception("invalid username:password pair: " + pair) 
+                raise Exception("invalid username:password pair: " + pair)
 
     if request.OauthProvider != "":
         out.auth_scheme = model.AUTH_SCHEME_OAUTH
@@ -54,29 +56,30 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
         res = ShareApi(zrok).share(body=out)
     except Exception as e:
         raise Exception("unable to create share", e)
-    
+
     return model.Share(Token=res.shr_token,
                        FrontendEndpoints=res.frontend_proxy_endpoints)
-    
-        
+
+
 def __newPrivateShare(root: Root, request: model.ShareRequest) -> ShareRequest:
     return ShareRequest(env_zid=root.env.ZitiIdentity,
-                 share_mode=request.ShareMode,
-                 backend_mode=request.BackendMode,
-                 backend_proxy_endpoint=request.Target,
-                 auth_scheme=model.AUTH_SCHEME_NONE
-                 )
+                        share_mode=request.ShareMode,
+                        backend_mode=request.BackendMode,
+                        backend_proxy_endpoint=request.Target,
+                        auth_scheme=model.AUTH_SCHEME_NONE
+                        )
+
 
 def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
-    ret= ShareRequest(env_zid=root.env.ZitiIdentity,
-                 share_mode=request.ShareMode,
-                 frontend_selection=request.Frontends,
-                 backend_mode=request.BackendMode,
-                 backend_proxy_endpoint=request.Target,
-                 auth_scheme=model.AUTH_SCHEME_NONE,
-                 oauth_email_domains=request.OauthEmailDomains,
-                 oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval
-                 )
+    ret = ShareRequest(env_zid=root.env.ZitiIdentity,
+                       share_mode=request.ShareMode,
+                       frontend_selection=request.Frontends,
+                       backend_mode=request.BackendMode,
+                       backend_proxy_endpoint=request.Target,
+                       auth_scheme=model.AUTH_SCHEME_NONE,
+                       oauth_email_domains=request.OauthEmailDomains,
+                       oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval
+                       )
     if request.OauthProvider != "":
         ret.oauth_provider = request.OauthProvider
 
@@ -86,12 +89,12 @@ def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
 def DeleteShare(root: Root, shr: model.Share):
     req = UnshareRequest(env_zid=root.env.ZitiIdentity,
                          shr_token=shr.Token)
-    
+
     try:
         zrok = root.Client()
     except Exception as e:
         raise Exception("error getting zrok client", e)
-    
+
     try:
         ShareApi(zrok).unshare(body=req)
     except Exception as e:
