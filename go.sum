@@ -943,8 +943,6 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/studio-b12/gowebdav v0.9.0 h1:1j1sc9gQnNxbXXM4M/CebPOX4aXYtr7MojAVcN4dHjU=
-github.com/studio-b12/gowebdav v0.9.0/go.mod h1:bHA7t77X/QFExdeAnDzK6vKM34kEZAcE1OX4MfiwjkE=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tailscale/tscert v0.0.0-20230806124524-28a91b69a046 h1:8rUlviSVOEe7TMk7W0gIPrW8MqEzYfZHpsNWSf8s2vg=
 github.com/tailscale/tscert v0.0.0-20230806124524-28a91b69a046/go.mod h1:kNGUQ3VESx3VZwRwA9MSCUegIl6+saPL8Noq82ozCaU=
