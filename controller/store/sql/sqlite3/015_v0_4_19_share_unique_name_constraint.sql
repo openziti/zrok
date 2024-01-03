@@ -13,16 +13,17 @@ create table shares (
     backend_proxy_endpoint    string,
     reserved                  boolean             not null default(false),
     created_at                datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-    updated_at                datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')), deleted boolean not null default(false),
+    updated_at                datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
+    deleted                   boolean             not null default(false),
 
     constraint chk_z_id check (z_id <> ''),
     constraint chk_token check (token <> ''),
     constraint chk_share_mode check (share_mode == 'public' or share_mode == 'private'),
     constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'tcpTunnel' or backend_mode == 'udpTunnel' or backend_mode == 'caddy' or backend_mode == 'drive')
 );
-CREATE UNIQUE INDEX shares_token_idx ON shares(token) WHERE deleted is false;
 insert into shares select * from shares_old;
 drop table shares_old;
+create unique index shares_token_idx ON shares(token) WHERE deleted is false;
 
 alter table frontends rename to frontends_old;
 create table frontends (
@@ -38,7 +39,7 @@ create table frontends (
    deleted               boolean             not null default(false),
    private_share_id      integer             references shares(id)
 );
-insert into frontends select * from frontends_old;
+insert into frontends select * from frontends_old where not deleted;
 drop table frontends_old;
 
 alter table share_limit_journal rename to share_limit_journal_old;

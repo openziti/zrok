@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.21
+
+CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
+
+FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to remove soft-deleted records from the `frontends` table when applying. This was necessary to properly support the foreign key relationship when migrating. A future release will revisit sqlite3 foreign key relationships (https://github.com/openziti/zrok/issues/504)
+
 ## v0.4.20
 
 CHANGE: OpenZiti SDK updated to `v0.21.2`. All `ziti.ListenOptions` listener options configured to use `WaitForNEstablishedListeners: 1`. When a `zrok share` client or an `sdk.Share` client are connected to an OpenZiti router that supports "listener established" events, then listen calls will not return until the listener is fully established on the OpenZiti network. Previously a `zrok share` client could report that it is fully operational and listening before the listener is fully established on the OpenZiti network; in practice this produced a very small window of time when the share would not be ready to accept requests. This change eliminates this window of time (https://github.com/openziti/zrok/issues/490)
