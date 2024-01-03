@@ -2,6 +2,8 @@
 
 ## v0.4.21
 
+CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
+
 FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to remove soft-deleted records from the `frontends` table when applying. This was necessary to properly support the foreign key relationship when migrating. A future release will revisit sqlite3 foreign key relationships (https://github.com/openziti/zrok/issues/504)
 
 ## v0.4.20
