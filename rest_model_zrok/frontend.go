@@ -26,6 +26,9 @@ type Frontend struct {
 	// shr token
 	ShrToken string `json:"shrToken,omitempty"`
 
+	// token
+	Token string `json:"token,omitempty"`
+
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
 
