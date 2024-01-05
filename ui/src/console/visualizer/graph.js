@@ -78,7 +78,7 @@ export const mergeGraph = (oldGraph, user, accountLimited, newOverview) => {
                        id: 'ac:' + fe.id,
                        feId: fe.id,
                        target: fe.shrToken,
-                       label: fe.shrToken,
+                       label: fe.token,
                        type: "frontend",
                        val: 50
                    }

@@ -111,6 +111,7 @@
  * @memberof module:types
  * 
  * @property {number} id 
+ * @property {string} token 
  * @property {string} shrToken 
  * @property {string} zId 
  * @property {number} createdAt 

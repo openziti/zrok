@@ -1215,6 +1215,9 @@ func init() {
         "shrToken": {
           "type": "string"
         },
+        "token": {
+          "type": "string"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -2833,6 +2836,9 @@ func init() {
           "type": "integer"
         },
         "shrToken": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         },
         "updatedAt": {
