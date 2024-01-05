@@ -22,7 +22,6 @@ create table shares (
     constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'tcpTunnel' or backend_mode == 'udpTunnel' or backend_mode == 'caddy' or backend_mode == 'drive')
 );
 insert into shares select * from shares_old;
-drop table shares_old;
 create unique index shares_token_idx ON shares(token) WHERE deleted is false;
 
 alter table frontends rename to frontends_old;
@@ -39,7 +38,7 @@ create table frontends (
    deleted               boolean             not null default(false),
    private_share_id      integer             references shares(id)
 );
-insert into frontends select * from frontends_old where not deleted;
+insert into frontends select * from frontends_old;
 drop table frontends_old;
 
 alter table share_limit_journal rename to share_limit_journal_old;
@@ -54,3 +53,5 @@ create table share_limit_journal (
 );
 insert into share_limit_journal select * from share_limit_journal_old;
 drop table share_limit_journal_old;
+
+drop table shares_old;
