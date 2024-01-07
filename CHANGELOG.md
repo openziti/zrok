@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.4.21
+
+FEATURE: The web console now supports deleting `zrok access` frontends (https://github.com/openziti/zrok/issues/504)
+
+CHANGE: The web console now displays the frontend token as the label for any `zrok access` frontends throughout the user interface (https://github.com/openziti/zrok/issues/504)
+
+CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
+
+FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to delete the old `shares_old` table as the last step of the migration process. Not sure exactly why, but SQLite is unhappy otherwise (https://github.com/openziti/zrok/issues/504)
+
 ## v0.4.20
 
 CHANGE: OpenZiti SDK updated to `v0.21.2`. All `ziti.ListenOptions` listener options configured to use `WaitForNEstablishedListeners: 1`. When a `zrok share` client or an `sdk.Share` client are connected to an OpenZiti router that supports "listener established" events, then listen calls will not return until the listener is fully established on the OpenZiti network. Previously a `zrok share` client could report that it is fully operational and listening before the listener is fully established on the OpenZiti network; in practice this produced a very small window of time when the share would not be ready to accept requests. This change eliminates this window of time (https://github.com/openziti/zrok/issues/490)
