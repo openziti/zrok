@@ -38,6 +38,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     long_description="""\
-    zrok client access  # noqa: E501
+    Geo-scale, next-generation peer-to-peer sharing platform built on top of OpenZiti.
     """
 )
