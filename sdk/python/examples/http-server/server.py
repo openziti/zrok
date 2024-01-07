@@ -30,7 +30,7 @@ if __name__ == '__main__':
             BackendMode=zrok.model.TCP_TUNNEL_BACKEND_MODE,
             ShareMode=zrok.model.PUBLIC_SHARE_MODE,
             Frontends=['public'],
-            Target="flask-server"
+            Target="http-server"
         ))
         shrToken = shr.Token
         print("Access server at the following endpoints: ", "\n".join(shr.FrontendEndpoints))

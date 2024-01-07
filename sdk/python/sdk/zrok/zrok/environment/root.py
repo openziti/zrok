@@ -56,7 +56,7 @@ class Root:
         # "refs/heads/" or "refs/tags/"
         rxp = re.compile("^(refs/(heads|tags)/)?" + V)
         if not rxp.match(v):
-            raise Exception("Expected a '" + V + "' version, received: '" + v + "'")
+            raise Exception("expected a '" + V + "' version, received: '" + v + "'")
         return zrock_client
 
     def ApiEndpoint(self) -> ApiEndpoint:

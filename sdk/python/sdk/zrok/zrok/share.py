@@ -18,7 +18,8 @@ class Share():
         return self.share
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
-        DeleteShare(root=self.root, shr=self.share)
+        if not self.request.Reserved:
+            DeleteShare(root=self.root, shr=self.share)
 
 
 def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:

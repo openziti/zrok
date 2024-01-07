@@ -2,10 +2,10 @@ import os
 
 from setuptools import find_packages, setup  # noqa: H301
 
+import versioneer
+
 # optionally upload to TestPyPi with alternative name in testing repo
 NAME = os.getenv('ZROK_PY_NAME', "zrok")
-# inherit zrok version from environment or default to dev version
-VERSION = os.getenv('ZROK_VERSION', "0.4.0.dev")
 
 # To install the library, run the following
 #
@@ -22,7 +22,8 @@ REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil", "ope
 
 setup(
     name=NAME,
-    version=VERSION,
+    cmdclass=versioneer.get_cmdclass(dict()),
+    version=versioneer.get_version(),
     description="zrok",
     author_email="cameron.otts@netfoundry.io",
     url="https://zrok.io",
