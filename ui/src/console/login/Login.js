@@ -33,7 +33,7 @@ const Login = (props) => {
             .then(resp => {
                 if (!resp.error) {
                     let user = {
-                        "email": email,
+                        "email": email.toLowerCase(),
                         "token": resp.data
                     }
                     props.loginSuccess(user)
