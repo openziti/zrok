@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"slices"
 	"strings"
 	"time"
 )
@@ -368,23 +367,17 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 func deleteZrokCookies(w http.ResponseWriter, r *http.Request) {
 	// Get all cookies from the request
 	cookies := r.Cookies()
-	// List of cookies to delete, the pkce cookie might be okay to pass along to the HTTP backend, but zrok-access is
-	// not because it can contain the accessToken from any other OAuth enabled shares, so we delete it here when the
-	// current share is not OAuth-enabled. OAuth-enabled shares check the audience claim in the JWT to ensure it matches
-	// the requested share and will send the client back to the OAuth provider if it does not match.
-	deletedCookies := []string{"zrok-access", "pkce"}
-	// Filter the cookies to save
-	filteredCookies := make([]*http.Cookie, 0)
-	for _, cookie := range cookies {
-		if !slices.Contains(deletedCookies, cookie.Name) {
-			filteredCookies = append(filteredCookies, cookie)
-		}
-	}
-
-	// Set the Cookie header to the filtered list of cookies
+	// Clear the Cookie header
 	r.Header.Del("Cookie")
-	for _, cookie := range filteredCookies {
-		r.AddCookie(cookie)
+	// Save cookies not in the list of cookies to delete, the pkce cookie might be okay to pass along to the HTTP
+	// backend, but zrok-access is not because it can contain the accessToken from any other OAuth enabled shares, so we
+	// delete it here when the current share is not OAuth-enabled. OAuth-enabled shares check the audience claim in the
+	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
+	// match.
+	for _, cookie := range cookies {
+		if cookie.Name != "zrok-access" || cookie.Domain != "pkce" {
+			r.AddCookie(cookie)
+		}
 	}
 }
 
