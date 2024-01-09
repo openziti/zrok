@@ -375,7 +375,7 @@ func deleteZrokCookies(w http.ResponseWriter, r *http.Request) {
 	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
 	// match.
 	for _, cookie := range cookies {
-		if cookie.Name != "zrok-access" || cookie.Domain != "pkce" {
+		if cookie.Name != "zrok-access" || cookie.Name != "pkce" {
 			r.AddCookie(cookie)
 		}
 	}
