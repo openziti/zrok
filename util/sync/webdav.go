@@ -39,9 +39,10 @@ func (t *WebDAVTarget) Inventory() ([]*Object, error) {
 	}
 	var objects []*Object
 	for _, fi := range fis {
-		if !fi.IsDir {
+		if fi.Path != "/" {
 			objects = append(objects, &Object{
 				Path:     fi.Path,
+				IsDir:    fi.IsDir,
 				Size:     fi.Size,
 				Modified: fi.ModTime,
 				ETag:     fi.ETag,
@@ -49,6 +50,10 @@ func (t *WebDAVTarget) Inventory() ([]*Object, error) {
 		}
 	}
 	return objects, nil
+}
+
+func (t *WebDAVTarget) Mkdir(path string) error {
+	return t.dc.Mkdir(context.Background(), path)
 }
 
 func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
@@ -60,7 +65,7 @@ func (t *WebDAVTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) err
 	if err != nil {
 		return err
 	}
-	defer ws.Close()
+	defer func() { _ = ws.Close() }()
 	_, err = io.Copy(ws, rs)
 	if err != nil {
 		return err

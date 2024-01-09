@@ -36,7 +36,7 @@ func (t *FilesystemTarget) Inventory() ([]*Object, error) {
 	}
 
 	if !fi.IsDir() {
-		return []*Object{{Path: t.cfg.Root, Size: fi.Size(), Modified: fi.ModTime()}}, nil
+		return []*Object{{Path: "/" + t.cfg.Root, Size: fi.Size(), Modified: fi.ModTime()}}, nil
 	}
 
 	t.tree = nil
@@ -46,29 +46,39 @@ func (t *FilesystemTarget) Inventory() ([]*Object, error) {
 	return t.tree, nil
 }
 
-func (t *FilesystemTarget) IsDir() bool {
-	return true
+func (t *FilesystemTarget) Mkdir(path string) error {
+	return os.MkdirAll(filepath.Join(t.cfg.Root, path), os.ModePerm)
 }
 
 func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
 	}
-	if !d.IsDir() {
-		fi, err := d.Info()
+	fi, err := d.Info()
+	if err != nil {
+		return err
+	}
+	etag := ""
+	if v, ok := fi.(webdav.ETager); ok {
+		etag, err = v.ETag(context.Background())
 		if err != nil {
 			return err
 		}
-		etag := ""
-		if v, ok := fi.(webdav.ETager); ok {
-			etag, err = v.ETag(context.Background())
-			if err != nil {
-				return err
-			}
-		} else {
-			etag = fmt.Sprintf(`"%x%x"`, fi.ModTime().UTC().UnixNano(), fi.Size())
+	} else {
+		etag = fmt.Sprintf(`"%x%x"`, fi.ModTime().UTC().UnixNano(), fi.Size())
+	}
+	if path != "." {
+		outPath := "/" + path
+		if fi.IsDir() {
+			outPath = outPath + "/"
 		}
-		t.tree = append(t.tree, &Object{path, fi.Size(), fi.ModTime(), etag})
+		t.tree = append(t.tree, &Object{
+			Path:     outPath,
+			IsDir:    fi.IsDir(),
+			Size:     fi.Size(),
+			Modified: fi.ModTime(),
+			ETag:     etag,
+		})
 	}
 	return nil
 }
