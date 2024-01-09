@@ -157,6 +157,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 						switch scheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
+							deleteCookie(w, r)
 							handler.ServeHTTP(w, r)
 							return
 
@@ -202,6 +203,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								return
 							}
 
+							deleteCookie(w, r)
 							handler.ServeHTTP(w, r)
 
 						case string(sdk.Oauth):
@@ -358,6 +360,14 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
+}
+
+func deleteCookie(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("zrok-access")
+	if err == nil {
+		cookie.MaxAge = -1
+		http.SetCookie(w, cookie)
+	}
 }
 
 func basicAuthRequired(w http.ResponseWriter, realm string) {
