@@ -2,7 +2,6 @@ package sync
 
 import (
 	"context"
-	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/util/sync/driveClient"
 	"io"
 	"net/http"
@@ -15,13 +14,11 @@ type WebDAVTargetConfig struct {
 	URL      *url.URL
 	Username string
 	Password string
-	Root     env_core.Root
 }
 
 type WebDAVTarget struct {
-	cfg   *WebDAVTargetConfig
-	dc    *driveClient.Client
-	isDir bool
+	cfg *WebDAVTargetConfig
+	dc  *driveClient.Client
 }
 
 func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {

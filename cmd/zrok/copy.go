@@ -50,24 +50,33 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error loading root", err)
 	}
 
-	var access *sdk.Access
+	var srcAccess *sdk.Access
 	if sourceUrl.Scheme == "zrok" {
-		access, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: sourceUrl.Host})
+		srcAccess, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: sourceUrl.Host})
 		if err != nil {
 			tui.Error("error creating access", err)
 		}
 	}
-	if targetUrl.Scheme == "zrok" {
-		access, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: targetUrl.Host})
-		if err != nil {
-			tui.Error("error creating access", err)
-		}
-	}
-	if access != nil {
+	if srcAccess != nil {
 		defer func() {
-			err := sdk.DeleteAccess(root, access)
+			err := sdk.DeleteAccess(root, srcAccess)
 			if err != nil {
-				tui.Error("error deleting access", err)
+				tui.Error("error deleting source access", err)
+			}
+		}()
+	}
+	var dstAccess *sdk.Access
+	if targetUrl.Scheme == "zrok" {
+		dstAccess, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: targetUrl.Host})
+		if err != nil {
+			tui.Error("error creating access", err)
+		}
+	}
+	if dstAccess != nil {
+		defer func() {
+			err := sdk.DeleteAccess(root, dstAccess)
+			if err != nil {
+				tui.Error("error deleting target access", err)
 			}
 		}()
 	}
@@ -93,11 +102,10 @@ func (cmd *copyCommand) createTarget(t *url.URL, root env_core.Root) (sync.Targe
 	case "file":
 		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: t.Path}), nil
 
+	case "zrok":
+		return sync.NewZrokTarget(&sync.ZrokTargetConfig{URL: t, Root: root})
+
 	default:
-		target, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: t, Username: "", Password: "", Root: root})
-		if err != nil {
-			return nil, err
-		}
-		return target, nil
+		return sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: t, Username: "", Password: ""})
 	}
 }
