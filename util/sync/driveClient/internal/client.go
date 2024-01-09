@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -177,6 +178,35 @@ func (c *Client) PropFind(ctx context.Context, path string, depth Depth, propfin
 
 	req.Header.Add("Depth", depth.String())
 
+	return c.DoMultiStatus(req.WithContext(ctx))
+}
+
+func (c *Client) Touch(ctx context.Context, path string, mtime time.Time) (*MultiStatus, error) {
+	tstr := fmt.Sprintf("%d", mtime.Unix())
+	var v []RawXMLValue
+	for _, c := range tstr {
+		v = append(v, RawXMLValue{tok: xml.CharData{byte(c)}})
+	}
+	pup := &PropertyUpdate{
+		Set: []Set{
+			{
+				Prop: Prop{
+					Raw: []RawXMLValue{
+						*NewRawXMLElement(xml.Name{Space: "zrok:", Local: "lastmodified"}, nil, v),
+					},
+				},
+			},
+		},
+	}
+	status, err := c.PropUpdate(ctx, path, pup)
+	return status, err
+}
+
+func (c *Client) PropUpdate(ctx context.Context, path string, propupd *PropertyUpdate) (*MultiStatus, error) {
+	req, err := c.NewXMLRequest("PROPPATCH", path, propupd)
+	if err != nil {
+		return nil, err
+	}
 	return c.DoMultiStatus(req.WithContext(ctx))
 }
 

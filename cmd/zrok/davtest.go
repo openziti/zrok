@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"github.com/openziti/zrok/util/sync/driveClient"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/http"
+	"time"
 )
 
 func init() {
@@ -20,7 +20,7 @@ func newDavtestCommand() *davtestCommand {
 	cmd := &cobra.Command{
 		Use:   "davtest",
 		Short: "WebDAV testing wrapper",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 	}
 	command := &davtestCommand{cmd: cmd}
 	cmd.Run = command.run
@@ -32,11 +32,7 @@ func (cmd *davtestCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	fis, err := client.Readdir(context.Background(), "/", true)
-	if err != nil {
+	if err := client.Touch(context.Background(), args[1], time.Now().Add(-(24 * time.Hour))); err != nil {
 		panic(err)
-	}
-	for _, fi := range fis {
-		logrus.Infof("=> %s", fi.Path)
 	}
 }

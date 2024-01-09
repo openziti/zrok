@@ -205,6 +205,19 @@ func (c *Client) Create(ctx context.Context, name string) (io.WriteCloser, error
 	return &fileWriter{pw, done}, nil
 }
 
+func (c *Client) Touch(ctx context.Context, path string, mtime time.Time) error {
+	status, err := c.ic.Touch(ctx, path, mtime)
+	if err != nil {
+		return err
+	}
+	for _, resp := range status.Responses {
+		if resp.Err() != nil {
+			return resp.Err()
+		}
+	}
+	return nil
+}
+
 func (c *Client) RemoveAll(ctx context.Context, name string) error {
 	req, err := c.ic.NewRequest(http.MethodDelete, name, nil)
 	if err != nil {
