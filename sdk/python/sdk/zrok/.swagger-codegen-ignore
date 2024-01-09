@@ -29,3 +29,4 @@ test-requirements.txt
 test/
 docs/
 README.md
+setup.py
