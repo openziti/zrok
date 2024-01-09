@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package webdav provides a WebDAV server implementation.
-package webdav // import "golang.org/x/net/webdav"
+// Package driveServer provides a WebDAV server implementation.
+package driveServer
 
 import (
 	"errors"

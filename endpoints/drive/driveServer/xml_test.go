@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package webdav
+package driveServer
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ import (
 	"strings"
 	"testing"
 
-	ixml "github.com/openziti/zrok/endpoints/drive/webdav/internal/xml"
+	ixml "github.com/openziti/zrok/endpoints/drive/driveServer/internal/xml"
 )
 
 func TestReadLockInfo(t *testing.T) {

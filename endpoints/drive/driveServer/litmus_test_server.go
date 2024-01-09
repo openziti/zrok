@@ -21,7 +21,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/openziti/zrok/endpoints/drive/webdav"
+	"github.com/openziti/zrok/endpoints/drive/driveServer"
 	"log"
 	"net/http"
 	"net/url"
@@ -32,9 +32,9 @@ var port = flag.Int("port", 9999, "server port")
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	h := &webdav.Handler{
-		FileSystem: webdav.NewMemFS(),
-		LockSystem: webdav.NewMemLS(),
+	h := &driveServer.Handler{
+		FileSystem: driveServer.NewMemFS(),
+		LockSystem: driveServer.NewMemLS(),
 		Logger: func(r *http.Request, err error) {
 			litmus := r.Header.Get("X-Litmus")
 			if len(litmus) > 19 {

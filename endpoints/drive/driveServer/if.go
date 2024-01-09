@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package webdav
+package driveServer
 
 // The If header is covered by Section 10.4.
 // http://www.webdav.org/specs/rfc4918.html#HEADER_If

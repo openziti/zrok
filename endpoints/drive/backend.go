@@ -5,7 +5,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/drive/webdav"
+	"github.com/openziti/zrok/endpoints/drive/driveServer"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
@@ -43,9 +43,9 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, err
 	}
 
-	handler := &webdav.Handler{
-		FileSystem: webdav.Dir(cfg.DriveRoot),
-		LockSystem: webdav.NewMemLS(),
+	handler := &driveServer.Handler{
+		FileSystem: driveServer.Dir(cfg.DriveRoot),
+		LockSystem: driveServer.NewMemLS(),
 		Logger: func(r *http.Request, err error) {
 			if cfg.Requests != nil {
 				cfg.Requests <- &endpoints.Request{
