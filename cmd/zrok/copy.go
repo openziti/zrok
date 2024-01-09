@@ -7,7 +7,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util/sync"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"net/url"
 )
@@ -36,9 +35,6 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid source URL '%v'", args[0]), err)
 	}
-	if sourceUrl.Scheme != "zrok" && sourceUrl.Scheme != "file" {
-		tui.Error("source URL must be 'file://' or 'zrok://", nil)
-	}
 
 	targetStr := "file://."
 	if len(args) == 2 {
@@ -47,16 +43,6 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	targetUrl, err := url.Parse(targetStr)
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid target URL '%v'", targetStr), err)
-	}
-	if targetUrl.Scheme != "zrok" && targetUrl.Scheme != "file" {
-		tui.Error("target URL must be 'file://' or 'zrok://", nil)
-	}
-
-	if sourceUrl.Scheme != "zrok" && targetUrl.Scheme != "zrok" {
-		tui.Error("either <source> or <target> must be a 'zrok://' URL", nil)
-	}
-	if targetUrl.Scheme != "file" && sourceUrl.Scheme != "file" {
-		tui.Error("either <source> or <target> must be a 'file://' URL", nil)
 	}
 
 	root, err := environment.LoadRoot()
@@ -77,12 +63,14 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("error creating access", err)
 		}
 	}
-	defer func() {
-		err := sdk.DeleteAccess(root, access)
-		if err != nil {
-			tui.Error("error deleting access", err)
-		}
-	}()
+	if access != nil {
+		defer func() {
+			err := sdk.DeleteAccess(root, access)
+			if err != nil {
+				tui.Error("error deleting access", err)
+			}
+		}()
+	}
 
 	source, err := cmd.createTarget(sourceUrl, root)
 	if err != nil {
@@ -102,17 +90,14 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 
 func (cmd *copyCommand) createTarget(t *url.URL, root env_core.Root) (sync.Target, error) {
 	switch t.Scheme {
-	case "zrok":
+	case "file":
+		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: t.Path}), nil
+
+	default:
 		target, err := sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: t, Username: "", Password: "", Root: root})
 		if err != nil {
 			return nil, err
 		}
 		return target, nil
-
-	case "file":
-		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: t.Path}), nil
-
-	default:
-		return nil, errors.Errorf("invalid scheme")
 	}
 }
