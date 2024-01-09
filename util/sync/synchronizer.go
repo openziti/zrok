@@ -26,7 +26,7 @@ func Synchronize(src, dst Target) error {
 	for _, srcF := range srcTree {
 		if dstF, found := dstIndex[srcF.Path]; found {
 			if !srcF.IsDir && (dstF.Size != srcF.Size || dstF.Modified.Unix() != srcF.Modified.Unix()) {
-				logrus.Debugf("%v <- dstF.Size = '%d', srcF.Size = '%d', dstF.Modified.UTC = '%d', srcF.Modified.UTC = '%d'", srcF.Path, dstF.Size, srcF.Size, dstF.Modified, srcF.Modified)
+				logrus.Debugf("%v <- dstF.Size = '%d', srcF.Size = '%d', dstF.Modified.UTC = '%d', srcF.Modified.UTC = '%d'", srcF.Path, dstF.Size, srcF.Size, dstF.Modified.Unix(), srcF.Modified.Unix())
 				copyList = append(copyList, srcF)
 			}
 		} else {
