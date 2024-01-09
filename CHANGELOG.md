@@ -12,6 +12,8 @@ FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has be
 
 FIX: Email addresses have been made case-insensitive. Please note that there is a migration included in this release (`016_v0_4_21_lowercase_email.sql`) which will attempt to ensure that all email addresses in your existing database are stored in lowercase; **if this migration fails you will need to manually remediate the duplicate account entries** (https://github.com/openziti/zrok/issues/517)
 
+FIX: Stop sending authentication cookies to non-authenticated shares (https://github.com/openziti/zrok/issues/512)
+
 ## v0.4.20
 
 CHANGE: OpenZiti SDK updated to `v0.21.2`. All `ziti.ListenOptions` listener options configured to use `WaitForNEstablishedListeners: 1`. When a `zrok share` client or an `sdk.Share` client are connected to an OpenZiti router that supports "listener established" events, then listen calls will not return until the listener is fully established on the OpenZiti network. Previously a `zrok share` client could report that it is fully operational and listening before the listener is fully established on the OpenZiti network; in practice this produced a very small window of time when the share would not be ready to accept requests. This change eliminates this window of time (https://github.com/openziti/zrok/issues/490)

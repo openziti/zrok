@@ -157,6 +157,8 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 						switch scheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
+							// ensure cookies from other shares are not sent to this share, in case it's malicious
+							deleteZrokCookies(w, r)
 							handler.ServeHTTP(w, r)
 							return
 
@@ -202,6 +204,8 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								return
 							}
 
+							// ensure cookies from other shares are not sent to this share, in case it's malicious
+							deleteZrokCookies(w, r)
 							handler.ServeHTTP(w, r)
 
 						case string(sdk.Oauth):
@@ -358,6 +362,23 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
+}
+
+func deleteZrokCookies(w http.ResponseWriter, r *http.Request) {
+	// Get all cookies from the request
+	cookies := r.Cookies()
+	// Clear the Cookie header
+	r.Header.Del("Cookie")
+	// Save cookies not in the list of cookies to delete, the pkce cookie might be okay to pass along to the HTTP
+	// backend, but zrok-access is not because it can contain the accessToken from any other OAuth enabled shares, so we
+	// delete it here when the current share is not OAuth-enabled. OAuth-enabled shares check the audience claim in the
+	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
+	// match.
+	for _, cookie := range cookies {
+		if cookie.Name != "zrok-access" && cookie.Name != "pkce" {
+			r.AddCookie(cookie)
+		}
+	}
 }
 
 func basicAuthRequired(w http.ResponseWriter, realm string) {
