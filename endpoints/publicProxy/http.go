@@ -157,7 +157,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 						switch scheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
-							deleteCookie(w, r)
+							deleteZrokCookie(w, r)
 							handler.ServeHTTP(w, r)
 							return
 
@@ -203,7 +203,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								return
 							}
 
-							deleteCookie(w, r)
+							deleteZrokCookie(w, r)
 							handler.ServeHTTP(w, r)
 
 						case string(sdk.Oauth):
@@ -362,7 +362,7 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 	})
 }
 
-func deleteCookie(w http.ResponseWriter, r *http.Request) {
+func deleteZrokCookie(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("zrok-access")
 	if err == nil {
 		cookie.MaxAge = -1
