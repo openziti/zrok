@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -30,6 +31,22 @@ func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
 }
 
 func (t *WebDAVTarget) Inventory() ([]*Object, error) {
+	rootFi, err := t.dc.Stat(context.Background(), t.cfg.URL.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	if !rootFi.IsDir {
+		base := filepath.Base(t.cfg.URL.Path)
+		t.cfg.URL.Path = filepath.Dir(t.cfg.URL.Path)
+		return []*Object{{
+			Path:     "/" + base,
+			IsDir:    false,
+			Size:     rootFi.Size,
+			Modified: rootFi.ModTime,
+		}}, nil
+	}
+
 	fis, err := t.dc.Readdir(context.Background(), "", true)
 	if err != nil {
 		return nil, err
@@ -50,15 +67,15 @@ func (t *WebDAVTarget) Inventory() ([]*Object, error) {
 }
 
 func (t *WebDAVTarget) Mkdir(path string) error {
-	return t.dc.Mkdir(context.Background(), path)
+	return t.dc.Mkdir(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 }
 
 func (t *WebDAVTarget) ReadStream(path string) (io.ReadCloser, error) {
-	return t.dc.Open(context.Background(), path)
+	return t.dc.Open(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 }
 
 func (t *WebDAVTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) error {
-	ws, err := t.dc.Create(context.Background(), path)
+	ws, err := t.dc.Create(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 	if err != nil {
 		return err
 	}
@@ -71,5 +88,5 @@ func (t *WebDAVTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) err
 }
 
 func (t *WebDAVTarget) SetModificationTime(path string, mtime time.Time) error {
-	return t.dc.Touch(context.Background(), path, mtime)
+	return t.dc.Touch(context.Background(), filepath.Join(t.cfg.URL.Path, path), mtime)
 }
