@@ -52,6 +52,27 @@ func (t *FilesystemTarget) Inventory() ([]*Object, error) {
 	return t.tree, nil
 }
 
+func (t *FilesystemTarget) Dir(path string) ([]*Object, error) {
+	des, err := os.ReadDir(t.cfg.Root)
+	if err != nil {
+		return nil, err
+	}
+	var objects []*Object
+	for _, de := range des {
+		fi, err := de.Info()
+		if err != nil {
+			return nil, err
+		}
+		objects = append(objects, &Object{
+			Path:     de.Name(),
+			IsDir:    de.IsDir(),
+			Size:     fi.Size(),
+			Modified: fi.ModTime(),
+		})
+	}
+	return objects, nil
+}
+
 func (t *FilesystemTarget) Mkdir(path string) error {
 	return os.MkdirAll(filepath.Join(t.cfg.Root, path), os.ModePerm)
 }

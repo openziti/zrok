@@ -84,6 +84,25 @@ func (t *ZrokTarget) Inventory() ([]*Object, error) {
 	return objects, nil
 }
 
+func (t *ZrokTarget) Dir(path string) ([]*Object, error) {
+	fis, err := t.dc.Readdir(context.Background(), t.cfg.URL.Path, false)
+	if err != nil {
+		return nil, err
+	}
+	var objects []*Object
+	for _, fi := range fis {
+		if fi.Path != "/" {
+			objects = append(objects, &Object{
+				Path:     filepath.Base(fi.Path),
+				IsDir:    fi.IsDir,
+				Size:     fi.Size,
+				Modified: fi.ModTime,
+			})
+		}
+	}
+	return objects, nil
+}
+
 func (t *ZrokTarget) Mkdir(path string) error {
 	return t.dc.Mkdir(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 }

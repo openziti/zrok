@@ -16,6 +16,7 @@ type Object struct {
 
 type Target interface {
 	Inventory() ([]*Object, error)
+	Dir(path string) ([]*Object, error)
 	Mkdir(path string) error
 	ReadStream(path string) (io.ReadCloser, error)
 	WriteStream(path string, stream io.Reader, mode os.FileMode) error

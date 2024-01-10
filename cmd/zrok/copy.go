@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util/sync"
@@ -81,11 +80,11 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	source, err := cmd.createTarget(sourceUrl, root)
+	source, err := sync.TargetForURL(sourceUrl, root)
 	if err != nil {
 		tui.Error("error creating target", err)
 	}
-	target, err := cmd.createTarget(targetUrl, root)
+	target, err := sync.TargetForURL(targetUrl, root)
 	if err != nil {
 		tui.Error("error creating target", err)
 	}
@@ -95,17 +94,4 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	fmt.Println("copy complete!")
-}
-
-func (cmd *copyCommand) createTarget(url *url.URL, root env_core.Root) (sync.Target, error) {
-	switch url.Scheme {
-	case "file":
-		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: url.Path}), nil
-
-	case "zrok":
-		return sync.NewZrokTarget(&sync.ZrokTargetConfig{URL: url, Root: root})
-
-	default:
-		return sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: url, Username: "", Password: ""})
-	}
 }
