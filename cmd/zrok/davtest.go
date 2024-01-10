@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/openziti/zrok/util/sync/driveClient"
+	"github.com/openziti/zrok/drives/davClient"
 	"github.com/spf13/cobra"
 	"io"
 	"net/http"
@@ -29,7 +29,7 @@ func newDavtestCommand() *davtestCommand {
 }
 
 func (cmd *davtestCommand) run(_ *cobra.Command, args []string) {
-	client, err := driveClient.NewClient(http.DefaultClient, args[0])
+	client, err := davClient.NewClient(http.DefaultClient, args[0])
 	if err != nil {
 		panic(err)
 	}

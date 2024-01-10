@@ -2,9 +2,9 @@ package sync
 
 import (
 	"context"
+	"github.com/openziti/zrok/drives/davClient"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util/sync/driveClient"
 	"io"
 	"net"
 	"net/http"
@@ -24,7 +24,7 @@ type ZrokTargetConfig struct {
 
 type ZrokTarget struct {
 	cfg *ZrokTargetConfig
-	dc  *driveClient.Client
+	dc  *davClient.Client
 }
 
 type zrokDialContext struct {
@@ -41,7 +41,7 @@ func NewZrokTarget(cfg *ZrokTargetConfig) (*ZrokTarget, error) {
 	transport.DialContext = (&zrokDialContext{cfg.Root}).Dial
 	transport.TLSClientConfig.InsecureSkipVerify = true
 	httpUrl := strings.Replace(cfg.URL.String(), "zrok:", "http:", 1)
-	dc, err := driveClient.NewClient(&http.Client{Transport: transport}, httpUrl)
+	dc, err := davClient.NewClient(&http.Client{Transport: transport}, httpUrl)
 	if err != nil {
 		return nil, err
 	}

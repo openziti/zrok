@@ -1,9 +1,9 @@
-package driveClient
+package davClient
 
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/util/sync/driveClient/internal"
+	"github.com/openziti/zrok/drives/davClient/internal"
 	"io"
 	"net/http"
 	"time"
