@@ -21,9 +21,10 @@ type copyCommand struct {
 
 func newCopyCommand() *copyCommand {
 	cmd := &cobra.Command{
-		Use:   "copy <source> [<target>] (<target> defaults to 'file://.`)",
-		Short: "Copy (unidirectional sync) zrok drive contents from <source> to <target> ('http://', 'file://', and 'zrok://' supported)",
-		Args:  cobra.RangeArgs(1, 2),
+		Use:     "copy <source> [<target>] (<target> defaults to 'file://.`)",
+		Short:   "Copy (unidirectional sync) zrok drive contents from <source> to <target> ('http://', 'file://', and 'zrok://' supported)",
+		Aliases: []string{"cp"},
+		Args:    cobra.RangeArgs(1, 2),
 	}
 	command := &copyCommand{cmd: cmd}
 	cmd.Run = command.run
