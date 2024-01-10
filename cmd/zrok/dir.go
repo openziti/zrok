@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"net/url"
 	"os"
+	"sort"
 )
 
 func init() {
@@ -55,6 +56,9 @@ func (cmd *dirCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		tui.Error("error listing directory", err)
 	}
+	sort.Slice(objects, func(i, j int) bool {
+		return objects[i].Path < objects[j].Path
+	})
 
 	tw := table.NewWriter()
 	tw.SetOutputMirror(os.Stdout)
