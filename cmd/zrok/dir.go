@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/openziti/zrok/util/sync"
 	"github.com/spf13/cobra"
 	"net/url"
+	"os"
 )
 
 func init() {
@@ -54,12 +56,16 @@ func (cmd *dirCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error listing directory", err)
 	}
 
+	tw := table.NewWriter()
+	tw.SetOutputMirror(os.Stdout)
+	tw.SetStyle(table.StyleLight)
+	tw.AppendHeader(table.Row{"type", "Name", "Size", "Modified"})
 	for _, object := range objects {
 		if object.IsDir {
-			fmt.Printf("<dir> %-32s\n", object.Path)
+			tw.AppendRow(table.Row{"DIR", object.Path, "", ""})
 		} else {
-			fmt.Printf("      %-32s %-16s %s\n", object.Path, util.BytesToSize(object.Size), object.Modified.String())
+			tw.AppendRow(table.Row{"", object.Path, util.BytesToSize(object.Size), object.Modified.Local()})
 		}
 	}
-	fmt.Println()
+	tw.Render()
 }
