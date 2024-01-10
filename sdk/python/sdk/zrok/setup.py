@@ -23,6 +23,7 @@ setup(
     url="",
     keywords=["Swagger", "zrok"],
     install_requires=REQUIRES,
+    python_requires='>3.10.0',
     packages=find_packages(),
     include_package_data=True,
     long_description="""\
