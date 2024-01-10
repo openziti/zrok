@@ -3,7 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/endpoints/drive/driveServer"
+	"github.com/openziti/zrok/drives/davServer"
 	"io"
 	"io/fs"
 	"os"
@@ -59,7 +59,7 @@ func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error 
 		return err
 	}
 	etag := ""
-	if v, ok := fi.(driveServer.ETager); ok {
+	if v, ok := fi.(davServer.ETager); ok {
 		etag, err = v.ETag(context.Background())
 		if err != nil {
 			return err

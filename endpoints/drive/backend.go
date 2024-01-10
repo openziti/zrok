@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/drives/davServer"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/drive/driveServer"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
@@ -43,9 +43,9 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, err
 	}
 
-	handler := &driveServer.Handler{
-		FileSystem: driveServer.Dir(cfg.DriveRoot),
-		LockSystem: driveServer.NewMemLS(),
+	handler := &davServer.Handler{
+		FileSystem: davServer.Dir(cfg.DriveRoot),
+		LockSystem: davServer.NewMemLS(),
 		Logger: func(r *http.Request, err error) {
 			if cfg.Requests != nil {
 				cfg.Requests <- &endpoints.Request{
