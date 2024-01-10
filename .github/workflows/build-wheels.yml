@@ -35,7 +35,6 @@ jobs:
       - name: Build distro
         env:
           ZROK_VERSION: ${{ github.event.release.tag_name }}
-          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
         run: |
           python setup.py sdist
 

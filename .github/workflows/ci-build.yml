@@ -51,6 +51,14 @@ jobs:
         shell: bash
         run: go test -v ./...
 
+      - name: python deps
+        shell: bash
+        run: python -m pip install -U pip flake8
+
+      - name: python lint
+        shell: bash
+        run: flake8 sdk/python/sdk/zrok
+
       - name: solve GOBIN
         id: solve_go_bin
         shell: bash
