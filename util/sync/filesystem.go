@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti/zrok/drives/davServer"
-	"github.com/sirupsen/logrus"
 	"io"
 	"io/fs"
 	"os"
@@ -23,7 +22,6 @@ type FilesystemTarget struct {
 }
 
 func NewFilesystemTarget(cfg *FilesystemTargetConfig) *FilesystemTarget {
-	logrus.Infof("root = %v", cfg.Root)
 	root := os.DirFS(cfg.Root)
 	return &FilesystemTarget{cfg: cfg, root: root}
 }
@@ -38,7 +36,13 @@ func (t *FilesystemTarget) Inventory() ([]*Object, error) {
 	}
 
 	if !fi.IsDir() {
-		return []*Object{{Path: "/" + t.cfg.Root, Size: fi.Size(), Modified: fi.ModTime()}}, nil
+		t.cfg.Root = filepath.Dir(t.cfg.Root)
+		return []*Object{{
+			Path:     "/" + fi.Name(),
+			IsDir:    false,
+			Size:     fi.Size(),
+			Modified: fi.ModTime(),
+		}}, nil
 	}
 
 	t.tree = nil

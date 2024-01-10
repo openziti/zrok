@@ -7,7 +7,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util/sync"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
 )
@@ -22,8 +21,8 @@ type copyCommand struct {
 
 func newCopyCommand() *copyCommand {
 	cmd := &cobra.Command{
-		Use:   "copy <source> [<target>]",
-		Short: "Copy zrok drive contents from <source> to <target> ('file://' and 'zrok://' supported)",
+		Use:   "copy <source> [<target>] (<target> defaults to 'file://.`)",
+		Short: "Copy (unidirectional sync) zrok drive contents from <source> to <target> ('http://', 'file://', and 'zrok://' supported)",
 		Args:  cobra.RangeArgs(1, 2),
 	}
 	command := &copyCommand{cmd: cmd}
@@ -57,36 +56,29 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error loading root", err)
 	}
 
-	var srcAccess *sdk.Access
+	var allocatedAccesses []*sdk.Access
 	if sourceUrl.Scheme == "zrok" {
-		srcAccess, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: sourceUrl.Host})
+		access, err := sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: sourceUrl.Host})
 		if err != nil {
 			tui.Error("error creating access", err)
 		}
+		allocatedAccesses = append(allocatedAccesses, access)
 	}
-	if srcAccess != nil {
-		defer func() {
-			err := sdk.DeleteAccess(root, srcAccess)
-			if err != nil {
-				tui.Error("error deleting source access", err)
-			}
-		}()
-	}
-	var dstAccess *sdk.Access
 	if targetUrl.Scheme == "zrok" {
-		dstAccess, err = sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: targetUrl.Host})
+		access, err := sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: targetUrl.Host})
 		if err != nil {
 			tui.Error("error creating access", err)
 		}
+		allocatedAccesses = append(allocatedAccesses, access)
 	}
-	if dstAccess != nil {
-		defer func() {
-			err := sdk.DeleteAccess(root, dstAccess)
+	defer func() {
+		for _, access := range allocatedAccesses {
+			err := sdk.DeleteAccess(root, access)
 			if err != nil {
-				tui.Error("error deleting target access", err)
+				tui.Warning("error deleting target access", err)
 			}
-		}()
-	}
+		}
+	}()
 
 	source, err := cmd.createTarget(sourceUrl, root)
 	if err != nil {
@@ -107,7 +99,6 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 func (cmd *copyCommand) createTarget(url *url.URL, root env_core.Root) (sync.Target, error) {
 	switch url.Scheme {
 	case "file":
-		logrus.Infof("%v", url)
 		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: url.Path}), nil
 
 	case "zrok":

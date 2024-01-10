@@ -36,6 +36,7 @@ func Synchronize(src, dst Target) error {
 	}
 
 	for _, copyPath := range copyList {
+		logrus.Infof("copyPath: '%v' (%t)", copyPath.Path, copyPath.IsDir)
 		if copyPath.IsDir {
 			if err := dst.Mkdir(copyPath.Path); err != nil {
 				return err

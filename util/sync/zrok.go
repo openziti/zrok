@@ -49,7 +49,21 @@ func NewZrokTarget(cfg *ZrokTargetConfig) (*ZrokTarget, error) {
 }
 
 func (t *ZrokTarget) Inventory() ([]*Object, error) {
-	fis, err := t.dc.Readdir(context.Background(), "/", true)
+	rootFi, err := t.dc.Stat(context.Background(), t.cfg.URL.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	if !rootFi.IsDir {
+		return []*Object{{
+			Path:     t.cfg.URL.Path,
+			IsDir:    false,
+			Size:     rootFi.Size,
+			Modified: rootFi.ModTime,
+		}}, nil
+	}
+
+	fis, err := t.dc.Readdir(context.Background(), t.cfg.URL.Path, true)
 	if err != nil {
 		return nil, err
 	}
