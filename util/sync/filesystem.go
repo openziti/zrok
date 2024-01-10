@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/openziti/zrok/drives/davServer"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/fs"
 	"os"
@@ -22,6 +23,7 @@ type FilesystemTarget struct {
 }
 
 func NewFilesystemTarget(cfg *FilesystemTargetConfig) *FilesystemTarget {
+	logrus.Infof("root = %v", cfg.Root)
 	root := os.DirFS(cfg.Root)
 	return &FilesystemTarget{cfg: cfg, root: root}
 }

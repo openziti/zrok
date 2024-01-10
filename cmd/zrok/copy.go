@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util/sync"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
 )
@@ -35,6 +36,9 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid source URL '%v'", args[0]), err)
 	}
+	if sourceUrl.Scheme == "" {
+		sourceUrl.Scheme = "file"
+	}
 
 	targetStr := "file://."
 	if len(args) == 2 {
@@ -43,6 +47,9 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	targetUrl, err := url.Parse(targetStr)
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid target URL '%v'", targetStr), err)
+	}
+	if targetUrl.Scheme == "" {
+		targetUrl.Scheme = "file"
 	}
 
 	root, err := environment.LoadRoot()
@@ -97,15 +104,16 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	fmt.Println("copy complete!")
 }
 
-func (cmd *copyCommand) createTarget(t *url.URL, root env_core.Root) (sync.Target, error) {
-	switch t.Scheme {
+func (cmd *copyCommand) createTarget(url *url.URL, root env_core.Root) (sync.Target, error) {
+	switch url.Scheme {
 	case "file":
-		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: t.Path}), nil
+		logrus.Infof("%v", url)
+		return sync.NewFilesystemTarget(&sync.FilesystemTargetConfig{Root: url.Path}), nil
 
 	case "zrok":
-		return sync.NewZrokTarget(&sync.ZrokTargetConfig{URL: t, Root: root})
+		return sync.NewZrokTarget(&sync.ZrokTargetConfig{URL: url, Root: root})
 
 	default:
-		return sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: t, Username: "", Password: ""})
+		return sync.NewWebDAVTarget(&sync.WebDAVTargetConfig{URL: url, Username: "", Password: ""})
 	}
 }
