@@ -55,8 +55,10 @@ func (t *ZrokTarget) Inventory() ([]*Object, error) {
 	}
 
 	if !rootFi.IsDir {
+		base := filepath.Base(t.cfg.URL.Path)
+		t.cfg.URL.Path = filepath.Dir(t.cfg.URL.Path)
 		return []*Object{{
-			Path:     t.cfg.URL.Path,
+			Path:     "/" + base,
 			IsDir:    false,
 			Size:     rootFi.Size,
 			Modified: rootFi.ModTime,
