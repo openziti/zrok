@@ -8,6 +8,8 @@ CHANGE: The web console now displays the frontend token as the label for any `zr
 
 CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
 
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v0.22.6`
+
 FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to delete the old `shares_old` table as the last step of the migration process. Not sure exactly why, but SQLite is unhappy otherwise (https://github.com/openziti/zrok/issues/504)
 
 FIX: Email addresses have been made case-insensitive. Please note that there is a migration included in this release (`016_v0_4_21_lowercase_email.sql`) which will attempt to ensure that all email addresses in your existing database are stored in lowercase; **if this migration fails you will need to manually remediate the duplicate account entries** (https://github.com/openziti/zrok/issues/517)
