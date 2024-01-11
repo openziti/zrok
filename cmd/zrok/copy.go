@@ -48,7 +48,7 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		sourceUrl.Scheme = "file"
 	}
 
-	targetStr := "file://."
+	targetStr := "."
 	if len(args) == 2 {
 		targetStr = args[1]
 	}
