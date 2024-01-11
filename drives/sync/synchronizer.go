@@ -6,15 +6,18 @@ import (
 	"os"
 )
 
-func Synchronize(src, dst Target) error {
+func OneWay(src, dst Target, sync bool) error {
 	srcTree, err := src.Inventory()
 	if err != nil {
 		return errors.Wrap(err, "error creating source inventory")
 	}
 
-	dstTree, err := dst.Inventory()
-	if err != nil {
-		return errors.Wrap(err, "error creating destination inventory")
+	var dstTree []*Object
+	if sync {
+		dstTree, err = dst.Inventory()
+		if err != nil {
+			return errors.Wrap(err, "error creating destination inventory")
+		}
 	}
 
 	dstIndex := make(map[string]*Object)

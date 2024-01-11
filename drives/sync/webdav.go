@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"github.com/openziti/zrok/drives/davClient"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -85,6 +86,13 @@ func (t *WebDAVTarget) Dir(path string) ([]*Object, error) {
 }
 
 func (t *WebDAVTarget) Mkdir(path string) error {
+	fi, err := t.dc.Stat(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	if err == nil {
+		if fi.IsDir {
+			return nil
+		}
+		return errors.Errorf("'%v' already exists; not directory", path)
+	}
 	return t.dc.Mkdir(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 }
 

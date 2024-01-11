@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/zrok/drives/davClient"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/pkg/errors"
 	"io"
 	"net"
 	"net/http"
@@ -104,6 +105,13 @@ func (t *ZrokTarget) Dir(path string) ([]*Object, error) {
 }
 
 func (t *ZrokTarget) Mkdir(path string) error {
+	fi, err := t.dc.Stat(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	if err == nil {
+		if fi.IsDir {
+			return nil
+		}
+		return errors.Errorf("'%v' already exists; not directory", path)
+	}
 	return t.dc.Mkdir(context.Background(), filepath.Join(t.cfg.URL.Path, path))
 }
 

@@ -15,7 +15,8 @@ func init() {
 }
 
 type copyCommand struct {
-	cmd *cobra.Command
+	cmd  *cobra.Command
+	sync bool
 }
 
 func newCopyCommand() *copyCommand {
@@ -27,6 +28,7 @@ func newCopyCommand() *copyCommand {
 	}
 	command := &copyCommand{cmd: cmd}
 	cmd.Run = command.run
+	cmd.Flags().BoolVarP(&command.sync, "sync", "s", false, "Only copy modified files (one-way synchronize)")
 	return command
 }
 
@@ -89,7 +91,7 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error creating target", err)
 	}
 
-	if err := sync.Synchronize(source, target); err != nil {
+	if err := sync.OneWay(source, target, cmd.sync); err != nil {
 		tui.Error("error copying", err)
 	}
 
