@@ -23,9 +23,9 @@ type dirCommand struct {
 
 func newDirCommand() *dirCommand {
 	cmd := &cobra.Command{
-		Use:     "dir <target>",
-		Short:   "List the contents of <target> ('http://', 'zrok://', and 'file://' supported)",
-		Aliases: []string{"ls"},
+		Use:     "ls <target>",
+		Short:   "List the contents of drive <target> ('http://', 'zrok://', and 'file://' supported)",
+		Aliases: []string{"dir"},
 		Args:    cobra.ExactArgs(1),
 	}
 	command := &dirCommand{cmd: cmd}
