@@ -132,6 +132,10 @@ func (t *ZrokTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) error
 	return nil
 }
 
+func (t *ZrokTarget) Rm(path string) error {
+	return t.dc.RemoveAll(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+}
+
 func (t *ZrokTarget) SetModificationTime(path string, mtime time.Time) error {
 	return t.dc.Touch(context.Background(), filepath.Join(t.cfg.URL.Path, path), mtime)
 }

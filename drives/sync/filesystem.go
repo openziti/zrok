@@ -131,6 +131,10 @@ func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.Fi
 	return nil
 }
 
+func (t *FilesystemTarget) Rm(path string) error {
+	return os.RemoveAll(filepath.Join(t.cfg.Root, path))
+}
+
 func (t *FilesystemTarget) SetModificationTime(path string, mtime time.Time) error {
 	targetPath := filepath.Join(t.cfg.Root, path)
 	if err := os.Chtimes(targetPath, time.Now(), mtime); err != nil {

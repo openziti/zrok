@@ -14,29 +14,29 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newDirCommand().cmd)
+	rootCmd.AddCommand(newLsCommand().cmd)
 }
 
-type dirCommand struct {
+type lsCommand struct {
 	cmd *cobra.Command
 }
 
-func newDirCommand() *dirCommand {
+func newLsCommand() *lsCommand {
 	cmd := &cobra.Command{
 		Use:     "ls <target>",
-		Short:   "List the contents of drive <target> ('http://', 'zrok://', and 'file://' supported)",
+		Short:   "List the contents of drive <target> ('http://', 'zrok://','file://')",
 		Aliases: []string{"dir"},
 		Args:    cobra.ExactArgs(1),
 	}
-	command := &dirCommand{cmd: cmd}
+	command := &lsCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *dirCommand) run(_ *cobra.Command, args []string) {
+func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
 	targetUrl, err := url.Parse(args[0])
 	if err != nil {
-		tui.Error(fmt.Sprintf("invalid target URL '%v'", args[0]), err)
+		tui.Error(fmt.Sprintf("invalid target '%v'", args[0]), err)
 	}
 	if targetUrl.Scheme == "" {
 		targetUrl.Scheme = "file"
@@ -49,7 +49,7 @@ func (cmd *dirCommand) run(_ *cobra.Command, args []string) {
 
 	target, err := sync.TargetForURL(targetUrl, root)
 	if err != nil {
-		tui.Error(fmt.Sprintf("error creating target for '%v'", targetUrl.String()), err)
+		tui.Error(fmt.Sprintf("error creating target for '%v'", targetUrl), err)
 	}
 
 	objects, err := target.Dir("/")

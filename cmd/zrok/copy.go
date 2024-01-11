@@ -35,7 +35,7 @@ func newCopyCommand() *copyCommand {
 func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	sourceUrl, err := url.Parse(args[0])
 	if err != nil {
-		tui.Error(fmt.Sprintf("invalid source URL '%v'", args[0]), err)
+		tui.Error(fmt.Sprintf("invalid source '%v'", args[0]), err)
 	}
 	if sourceUrl.Scheme == "" {
 		sourceUrl.Scheme = "file"
@@ -47,7 +47,7 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 	}
 	targetUrl, err := url.Parse(targetStr)
 	if err != nil {
-		tui.Error(fmt.Sprintf("invalid target URL '%v'", targetStr), err)
+		tui.Error(fmt.Sprintf("invalid target '%v'", targetStr), err)
 	}
 	if targetUrl.Scheme == "" {
 		targetUrl.Scheme = "file"
@@ -84,11 +84,11 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 
 	source, err := sync.TargetForURL(sourceUrl, root)
 	if err != nil {
-		tui.Error("error creating target", err)
+		tui.Error(fmt.Sprintf("error creating target for '%v'", sourceUrl), err)
 	}
 	target, err := sync.TargetForURL(targetUrl, root)
 	if err != nil {
-		tui.Error("error creating target", err)
+		tui.Error(fmt.Sprintf("error creating target for '%v'", targetUrl), err)
 	}
 
 	if err := sync.OneWay(source, target, cmd.sync); err != nil {

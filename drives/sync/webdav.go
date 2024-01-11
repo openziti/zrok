@@ -113,6 +113,10 @@ func (t *WebDAVTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) err
 	return nil
 }
 
+func (t *WebDAVTarget) Rm(path string) error {
+	return t.dc.RemoveAll(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+}
+
 func (t *WebDAVTarget) SetModificationTime(path string, mtime time.Time) error {
 	return t.dc.Touch(context.Background(), filepath.Join(t.cfg.URL.Path, path), mtime)
 }
