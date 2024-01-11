@@ -131,6 +131,10 @@ func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.Fi
 	return nil
 }
 
+func (t *FilesystemTarget) Move(src, dest string) error {
+	return os.Rename(filepath.Join(t.cfg.Root, src), filepath.Join(filepath.Dir(t.cfg.Root), dest))
+}
+
 func (t *FilesystemTarget) Rm(path string) error {
 	return os.RemoveAll(filepath.Join(t.cfg.Root, path))
 }
