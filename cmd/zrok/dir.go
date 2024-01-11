@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/openziti/zrok/drives/sync"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/openziti/zrok/util/sync"
 	"github.com/spf13/cobra"
 	"net/url"
 	"os"
