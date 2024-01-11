@@ -92,7 +92,7 @@ func (t *ZrokTarget) Dir(path string) ([]*Object, error) {
 	}
 	var objects []*Object
 	for _, fi := range fis {
-		if fi.Path != "/" {
+		if fi.Path != "/" && fi.Path != t.cfg.URL.Path+"/" {
 			objects = append(objects, &Object{
 				Path:     filepath.Base(fi.Path),
 				IsDir:    fi.IsDir,
