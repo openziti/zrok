@@ -17,10 +17,8 @@ import (
 )
 
 type ZrokTargetConfig struct {
-	URL      *url.URL
-	Username string
-	Password string
-	Root     env_core.Root
+	URL  *url.URL
+	Root env_core.Root
 }
 
 type ZrokTarget struct {

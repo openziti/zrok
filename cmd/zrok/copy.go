@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 	"net/url"
+	"os"
 )
 
 func init() {
@@ -15,8 +16,9 @@ func init() {
 }
 
 type copyCommand struct {
-	cmd  *cobra.Command
-	sync bool
+	cmd       *cobra.Command
+	sync      bool
+	basicAuth string
 }
 
 func newCopyCommand() *copyCommand {
@@ -29,10 +31,15 @@ func newCopyCommand() *copyCommand {
 	command := &copyCommand{cmd: cmd}
 	cmd.Run = command.run
 	cmd.Flags().BoolVarP(&command.sync, "sync", "s", false, "Only copy modified files (one-way synchronize)")
+	cmd.Flags().StringVarP(&command.basicAuth, "basic-auth", "a", "", "Basic authentication <username:password>")
 	return command
 }
 
 func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
+	if cmd.basicAuth == "" {
+		cmd.basicAuth = os.Getenv("ZROK_DRIVES_BASIC_AUTH")
+	}
+
 	sourceUrl, err := url.Parse(args[0])
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid source '%v'", args[0]), err)
@@ -82,11 +89,11 @@ func (cmd *copyCommand) run(_ *cobra.Command, args []string) {
 		}
 	}()
 
-	source, err := sync.TargetForURL(sourceUrl, root)
+	source, err := sync.TargetForURL(sourceUrl, root, cmd.basicAuth)
 	if err != nil {
 		tui.Error(fmt.Sprintf("error creating target for '%v'", sourceUrl), err)
 	}
-	target, err := sync.TargetForURL(targetUrl, root)
+	target, err := sync.TargetForURL(targetUrl, root, cmd.basicAuth)
 	if err != nil {
 		tui.Error(fmt.Sprintf("error creating target for '%v'", targetUrl), err)
 	}

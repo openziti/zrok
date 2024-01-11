@@ -18,7 +18,8 @@ func init() {
 }
 
 type lsCommand struct {
-	cmd *cobra.Command
+	cmd       *cobra.Command
+	basicAuth string
 }
 
 func newLsCommand() *lsCommand {
@@ -30,10 +31,15 @@ func newLsCommand() *lsCommand {
 	}
 	command := &lsCommand{cmd: cmd}
 	cmd.Run = command.run
+	cmd.Flags().StringVarP(&command.basicAuth, "basic-auth", "a", "", "Basic authentication <username:password>")
 	return command
 }
 
 func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
+	if cmd.basicAuth == "" {
+		cmd.basicAuth = os.Getenv("ZROK_DRIVES_BASIC_AUTH")
+	}
+
 	targetUrl, err := url.Parse(args[0])
 	if err != nil {
 		tui.Error(fmt.Sprintf("invalid target '%v'", args[0]), err)
@@ -47,7 +53,7 @@ func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error loading root", err)
 	}
 
-	target, err := sync.TargetForURL(targetUrl, root)
+	target, err := sync.TargetForURL(targetUrl, root, cmd.basicAuth)
 	if err != nil {
 		tui.Error(fmt.Sprintf("error creating target for '%v'", targetUrl), err)
 	}

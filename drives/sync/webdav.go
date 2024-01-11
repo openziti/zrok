@@ -24,7 +24,12 @@ type WebDAVTarget struct {
 }
 
 func NewWebDAVTarget(cfg *WebDAVTargetConfig) (*WebDAVTarget, error) {
-	dc, err := davClient.NewClient(http.DefaultClient, cfg.URL.String())
+	var httpClient davClient.HTTPClient
+	httpClient = http.DefaultClient
+	if cfg.Username != "" || cfg.Password != "" {
+		httpClient = davClient.HTTPClientWithBasicAuth(httpClient, cfg.Username, cfg.Password)
+	}
+	dc, err := davClient.NewClient(httpClient, cfg.URL.String())
 	if err != nil {
 		return nil, err
 	}
