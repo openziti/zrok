@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.22
+
+FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
+
 ## v0.4.21
 
 FEATURE: The web console now supports deleting `zrok access` frontends (https://github.com/openziti/zrok/issues/504)
@@ -7,6 +11,8 @@ FEATURE: The web console now supports deleting `zrok access` frontends (https://
 CHANGE: The web console now displays the frontend token as the label for any `zrok access` frontends throughout the user interface (https://github.com/openziti/zrok/issues/504)
 
 CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
+
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v0.22.6`
 
 FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to delete the old `shares_old` table as the last step of the migration process. Not sure exactly why, but SQLite is unhappy otherwise (https://github.com/openziti/zrok/issues/504)
 
