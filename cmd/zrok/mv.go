@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/openziti/zrok/drives/sync"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
 	"os"
@@ -48,6 +50,18 @@ func (cmd *mvCommand) run(_ *cobra.Command, args []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("error loading root", err)
+	}
+
+	if targetUrl.Scheme == "zrok" {
+		access, err := sdk.CreateAccess(root, &sdk.AccessRequest{ShareToken: targetUrl.Host})
+		if err != nil {
+			tui.Error("error creating access", err)
+		}
+		defer func() {
+			if err := sdk.DeleteAccess(root, access); err != nil {
+				logrus.Warningf("error freeing access: %v", err)
+			}
+		}()
 	}
 
 	target, err := sync.TargetForURL(targetUrl, root, cmd.basicAuth)
