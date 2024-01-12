@@ -2,8 +2,6 @@ module github.com/openziti/zrok
 
 go 1.21
 
-toolchain go1.21.5
-
 require (
 	github.com/TwiN/go-away v1.6.12
 	github.com/caddyserver/caddy/v2 v2.7.6
