@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.22
+
+FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
+
 ## v0.4.21
 
 FEATURE: The web console now supports deleting `zrok access` frontends (https://github.com/openziti/zrok/issues/504)
