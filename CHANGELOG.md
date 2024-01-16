@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.4.23
+
+CHANGE: Versioning for the Python SDK has been updated to use versioneer for management.
+
+CHANGE: Python SDK package name has been renamed to `zrok`, dropping the `-sdk` postfix. [pypi](https://pypi.org/project/zrok).
+
+FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
+
+FEATURE: Python SDK share and access handling now supports context management.
+
+
+
 ## v0.4.22
 
 FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
