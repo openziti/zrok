@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.23
+
+FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/zrok_copy.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
+
 ## v0.4.22
 
 FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
