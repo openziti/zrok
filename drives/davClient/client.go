@@ -205,6 +205,30 @@ func (c *Client) Create(ctx context.Context, name string) (io.WriteCloser, error
 	return &fileWriter{pw, done}, nil
 }
 
+func (c *Client) CreateWithModTime(ctx context.Context, name string, modTime time.Time) (io.WriteCloser, error) {
+	pr, pw := io.Pipe()
+
+	req, err := c.ic.NewRequest(http.MethodPut, name, pr)
+	if err != nil {
+		pw.Close()
+		return nil, err
+	}
+	req.Header.Set("Zrok-Modtime", fmt.Sprintf("%d", modTime.Unix()))
+
+	done := make(chan error, 1)
+	go func() {
+		resp, err := c.ic.Do(req.WithContext(ctx))
+		if err != nil {
+			done <- err
+			return
+		}
+		resp.Body.Close()
+		done <- nil
+	}()
+
+	return &fileWriter{pw, done}, nil
+}
+
 func (c *Client) Touch(ctx context.Context, path string, mtime time.Time) error {
 	status, err := c.ic.Touch(ctx, path, mtime)
 	if err != nil {

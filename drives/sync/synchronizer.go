@@ -48,10 +48,7 @@ func OneWay(src, dst Target, sync bool) error {
 			if err != nil {
 				return err
 			}
-			if err := dst.WriteStream(copyPath.Path, ss, os.ModePerm); err != nil {
-				return err
-			}
-			if err := dst.SetModificationTime(copyPath.Path, copyPath.Modified); err != nil {
+			if err := dst.WriteStreamWithModTime(copyPath.Path, ss, os.ModePerm, copyPath.Modified); err != nil {
 				return err
 			}
 		}

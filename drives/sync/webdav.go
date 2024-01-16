@@ -118,6 +118,19 @@ func (t *WebDAVTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) err
 	return nil
 }
 
+func (t *WebDAVTarget) WriteStreamWithModTime(path string, rs io.Reader, _ os.FileMode, modTime time.Time) error {
+	ws, err := t.dc.CreateWithModTime(context.Background(), filepath.Join(t.cfg.URL.Path, path), modTime)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = ws.Close() }()
+	_, err = io.Copy(ws, rs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *WebDAVTarget) Move(src, dest string) error {
 	return t.dc.MoveAll(context.Background(), filepath.Join(t.cfg.URL.Path, src), dest, true)
 }

@@ -8,12 +8,14 @@ package davServer
 import (
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -271,6 +273,22 @@ func (h *Handler) handlePut(w http.ResponseWriter, r *http.Request) (status int,
 	}
 	_, copyErr := io.Copy(f, r.Body)
 	fi, statErr := f.Stat()
+
+	modTimes := r.Header["Zrok-Modtime"]
+	if len(modTimes) > 0 {
+		if modTimeV, err := strconv.ParseInt(modTimes[0], 10, 64); err == nil {
+			if v, ok := f.(*webdavFile); ok {
+				if err := v.updateModtime(reqPath, time.Unix(modTimeV, 0)); err != nil {
+					logrus.Warn(err)
+				}
+			} else {
+				logrus.Error("!ok")
+			}
+		} else {
+			logrus.Error(err)
+		}
+	}
+
 	closeErr := f.Close()
 	// TODO(rost): Returning 405 Method Not Allowed might not be appropriate.
 	if copyErr != nil {
