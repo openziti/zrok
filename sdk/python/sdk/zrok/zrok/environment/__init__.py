@@ -1,1 +1,1 @@
-from . import dirs, root
+from . import dirs, root # noqa

@@ -151,7 +151,6 @@ func (l *looper) serviceListener() {
 	}
 	options := ziti.ListenOptions{
 		ConnectTimeout:               5 * time.Minute,
-		MaxConnections:               64,
 		WaitForNEstablishedListeners: 1,
 	}
 	zctx, err := ziti.NewContext(zcfg)

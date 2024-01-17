@@ -2,6 +2,18 @@
 
 ## v0.4.23
 
+CHANGE: Improved OpenZiti resource cleanup resilience. Previous resource cleanup would stop when an error was encountered at any stage of the cleanup process (serps, sps, config, service). New cleanup implementation logs errors but continues to clean up anything that it can (https://github.com/openziti/zrok/issues/533)
+
+CHANGE: Instead of setting the `ListenOptions.MaxConnections` property to `64`, use the default value of `3`. This property actually controls the number of terminators created on the underlying OpenZiti network. This property is actually getting renamed to `ListenOptions.MaxTerminators` in an upcoming release of `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/535)
+
+CHANGE: Versioning for the Python SDK has been updated to use versioneer for management.
+
+CHANGE: Python SDK package name has been renamed to `zrok`, dropping the `-sdk` postfix. [pypi](https://pypi.org/project/zrok).
+
+FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
+
+FEATURE: Python SDK share and access handling now supports context management.
+
 FEATURE: TLS for `zrok` controller and acces endpoints. Add the specified stanza to your controller file (see `etc/ctrl.yml`). Your controller will now listen over TLS. (Note: you will need to update your client environments/configs to use the new https:// url). Likewise with `access` add the stanza to your frontend configuration (see `etc/frontend.yml`). Additionally you will have to update the frontend url template to emit a https:// scheme.
 
 ## v0.4.22
