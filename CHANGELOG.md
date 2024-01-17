@@ -14,6 +14,10 @@ FEATURE: Python SDK now has a decorator for integrating with various server side
 
 FEATURE: Python SDK share and access handling now supports context management.
 
+FEATURE: TLS for `zrok` controller and acces endpoints. Add the specified stanza to your controller file (see `etc/ctrl.yml`). Your controller will now listen over TLS. (Note: you will need to update your client environments/configs to use the new https:// url). Likewise with `access` add the stanza to your frontend configuration (see `etc/frontend.yml`). Additionally you will have to update the frontend url template to emit a https:// scheme.
+
+FEATURE: TLS for `zrok` controller and frontends. Add the `tls:` stanza to your controller configuration (see `etc/ctrl.yml`) to enable TLS support for the controller API. Add the `tls:` stanza to your frontend configuration (see `etc/frontend.yml`) to enable TLS support for frontends (be sure to check your `public` frontend template) (#24)(https://github.com/openziti/zrok/issues/24)
+
 ## v0.4.22
 
 FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects

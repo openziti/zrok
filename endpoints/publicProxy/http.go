@@ -69,7 +69,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, err
 	}
 	proxy.Transport = zTransport
-	if err := configureOauthHandlers(context.Background(), cfg, false); err != nil {
+	if err := configureOauthHandlers(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
 	handler := authHandler(util.NewProxyHandler(proxy), cfg, key, zCtx)
@@ -81,6 +81,9 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 }
 
 func (f *HttpFrontend) Run() error {
+	if f.cfg.Tls != nil {
+		return http.ListenAndServeTLS(f.cfg.Address, f.cfg.Tls.CertPath, f.cfg.Tls.KeyPath, f.handler)
+	}
 	return http.ListenAndServe(f.cfg.Address, f.handler)
 }
 
