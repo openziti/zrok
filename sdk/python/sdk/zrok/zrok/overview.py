@@ -1,9 +1,11 @@
 from zrok.environment.root import Root
 import urllib3
+
+
 def Overview(root: Root) -> str:
     if not root.IsEnabled():
         raise Exception("environment is not enabled; enable with 'zrok enable' first!")
-    
+
     http = urllib3.PoolManager()
     apiEndpoint = root.ApiEndpoint().endpoint
     try:

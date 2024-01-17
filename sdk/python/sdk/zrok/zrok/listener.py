@@ -10,7 +10,9 @@ class Listener():
     def __init__(self, shrToken: str, root: Root):
         self.shrToken = shrToken
         self.root = root
-        ztx = openziti.load(self.root.ZitiIdentityNamed(self.root.EnvironmentIdentityName()))
+        ztx = openziti.load(
+            self.root.ZitiIdentityNamed(
+                self.root.EnvironmentIdentityName()))
         self.__server = ztx.bind(self.shrToken)
 
     def __enter__(self) -> openziti.zitisock.ZitiSocket:

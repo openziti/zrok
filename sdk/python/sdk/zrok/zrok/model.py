@@ -13,6 +13,7 @@ ShareMode = str
 PRIVATE_SHARE_MODE: ShareMode = "private"
 PUBLIC_SHARE_MODE: ShareMode = "public"
 
+
 @dataclass
 class ShareRequest:
     BackendMode: BackendMode
@@ -26,14 +27,17 @@ class ShareRequest:
     Reserved: bool = False
     UniqueName: str = ""
 
+
 @dataclass
 class Share:
     Token: str
     FrontendEndpoints: list[str]
 
+
 @dataclass
 class AccessRequest:
     ShareToken: str
+
 
 @dataclass
 class Access:
@@ -41,16 +45,19 @@ class Access:
     ShareToken: str
     BackendMode: BackendMode
 
+
 @dataclass
 class SessionMetrics:
     BytesRead: int
     BytesWritten: int
     LastUpdate: int
 
+
 @dataclass
 class Metrics:
     Namespace: str
     Sessions: dict[str, SessionMetrics]
+
 
 AuthScheme = str
 

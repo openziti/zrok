@@ -6,6 +6,14 @@ CHANGE: Improved OpenZiti resource cleanup resilience. Previous resource cleanup
 
 CHANGE: Instead of setting the `ListenOptions.MaxConnections` property to `64`, use the default value of `3`. This property actually controls the number of terminators created on the underlying OpenZiti network. This property is actually getting renamed to `ListenOptions.MaxTerminators` in an upcoming release of `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/535)
 
+CHANGE: Versioning for the Python SDK has been updated to use versioneer for management.
+
+CHANGE: Python SDK package name has been renamed to `zrok`, dropping the `-sdk` postfix. [pypi](https://pypi.org/project/zrok).
+
+FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
+
+FEATURE: Python SDK share and access handling now supports context management.
+
 ## v0.4.22
 
 FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
