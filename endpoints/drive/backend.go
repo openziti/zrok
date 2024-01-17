@@ -27,7 +27,6 @@ type Backend struct {
 func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	options := ziti.ListenOptions{
 		ConnectTimeout:               5 * time.Minute,
-		MaxConnections:               64,
 		WaitForNEstablishedListeners: 1,
 	}
 	zcfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
