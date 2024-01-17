@@ -181,6 +181,12 @@ store:
   path:                           zrok.db
   type:                           sqlite3
 
+# The `tls` section sets the cert and key to use and enables serving over HTTPS
+#
+#tls:
+#  cert_path: "/Path/To/Cert/zrok.crt"
+#  key_path:  "/Path/To/Cert/zrok.key"
+
 # Ziti configuration.
 #
 ziti:
