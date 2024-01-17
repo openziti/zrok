@@ -4,6 +4,8 @@
 
 CHANGE: Improved OpenZiti resource cleanup resilience. Previous resource cleanup would stop when an error was encountered at any stage of the cleanup process (serps, sps, config, service). New cleanup implementation logs errors but continues to clean up anything that it can (https://github.com/openziti/zrok/issues/533)
 
+CHANGE: Instead of setting the `ListenOptions.MaxConnections` property to `64`, use the default value of `3`. This property actually controls the number of terminators created on the underlying OpenZiti network. This property is actually getting renamed to `ListenOptions.MaxTerminators` in an upcoming release of `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/535)
+
 ## v0.4.22
 
 FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
