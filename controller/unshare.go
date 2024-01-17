@@ -76,11 +76,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 
 	if sshr.Reserved == params.Body.Reserved {
 		// single tag-based share deallocator; should work regardless of sharing mode
-		if err := h.deallocateResources(senv, shrToken, shrZId, edge); err != nil {
-			logrus.Errorf("error unsharing ziti resources for '%v': %v", sshr, err)
-			return share.NewUnshareInternalServerError()
-		}
-
+		h.deallocateResources(senv, shrToken, shrZId, edge)
 		logrus.Debugf("deallocated share '%v'", shrToken)
 
 		if err := str.DeleteShare(sshr.Id, tx); err != nil {
@@ -120,21 +116,20 @@ func (h *unshareHandler) findShareZId(shrToken string, edge *rest_management_api
 	return "", errors.Errorf("share '%v' not found", shrToken)
 }
 
-func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) {
 	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, shrToken, edge); err != nil {
-		return err
+		logrus.Warnf("error deleting service edge router policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
 	if err := zrokEdgeSdk.DeleteServicePoliciesDial(senv.ZId, shrToken, edge); err != nil {
-		return err
+		logrus.Warnf("error deleting dial service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
 	if err := zrokEdgeSdk.DeleteServicePoliciesBind(senv.ZId, shrToken, edge); err != nil {
-		return err
+		logrus.Warnf("error deleting bind service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
 	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {
-		return err
+		logrus.Warnf("error deleting config for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
 	if err := zrokEdgeSdk.DeleteService(senv.ZId, shrZId, edge); err != nil {
-		return err
+		logrus.Warnf("error deleting service '%v' for share '%v' in environment '%v': %v", shrZId, shrToken, senv.ZId, err)
 	}
-	return nil
 }
