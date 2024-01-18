@@ -17,7 +17,7 @@ type PasswordResetRequest struct {
 }
 
 func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) ON CONFLICT(account_id) DO UPDATE SET token=$2 returning id")
+	stmt, err := tx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing password_reset_requests insert statement")
 	}
