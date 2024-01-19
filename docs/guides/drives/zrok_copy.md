@@ -1,10 +1,10 @@
-# The zrok Drives CLI
+# The Drives CLI
 
 The zrok Drives CLI tools allow for simple, ergonomic management and synchronization of local and remote file objects transparently.
 
 ## Sharing a Drive
 
-Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag with the `zrok share` command, using either the `public` or `private` sharing modes:
+Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag with the `zrok share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
 
 ```
 $ mkdir /tmp/junk
@@ -14,11 +14,11 @@ $ zrok share private --headless --backend-mode drive /tmp/junk
 zrok access private wkcfb58vj51l
 ```
 
-The command shown above creates an ephemeral `zrok` drive share pointed at the local `/tmp/junk` folder.
+The command shown above creates an ephemeral, `private` drive share pointed at the local `/tmp/junk` folder.
 
 Notice that the share token allocated by `zrok` is `wkcfb58vj51l`. We'll use that share token to identify our virtual drive in the following operations.
 
-## Working with the Drive Share
+## Working with a Private Drive Share
 
 First, let's copy a file into our virtual drive using the `zrok copy` command:
 
@@ -87,20 +87,154 @@ And we can remove files and directories from the virtual drive:
 
 ```
 $ zrok rm zrok://wkcfb58vj51l/LICENSE
-michael@fourtyfour Fri Jan 19 12:29:12 ~/Repos/nf/zrok 
 $ zrok ls zrok://wkcfb58vj51l
 ┌──────┬───────┬──────┬──────────┐
 │ TYPE │ NAME  │ SIZE │ MODIFIED │
 ├──────┼───────┼──────┼──────────┤
 │ DIR  │ stuff │      │          │
 └──────┴───────┴──────┴──────────┘
-michael@fourtyfour Fri Jan 19 12:29:14 ~/Repos/nf/zrok 
 $ zrok rm zrok://wkcfb58vj51l/stuff
-michael@fourtyfour Fri Jan 19 12:29:20 ~/Repos/nf/zrok 
 $ zrok ls zrok://wkcfb58vj51l
 ┌──────┬──────┬──────┬──────────┐
 │ TYPE │ NAME │ SIZE │ MODIFIED │
 ├──────┼──────┼──────┼──────────┤
 └──────┴──────┴──────┴──────────┘
 ```
+
+## Working with Public Shares
+
+Public shares work very similarly to private shares, they just use a different URL scheme:
+
+```
+$ zrok share public --headless --backend-mode drive /tmp/junk
+[   0.708]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[05e0f48b-242b-4fd9-8edb-259488535c47]} new service session
+[   0.878]    INFO main.(*sharePublicCommand).run: access your zrok share at the following endpoints:
+ https://6kiww4bn7iok.share.zrok.io
+```
+
+The same commands, with a different URL scheme work with the `zrok` drives CLI:
+
+```
+$ zrok copy util/ https://6kiww4bn7iok.share.zrok.io
+[   0.268]    INFO zrok/drives/sync.OneWay: => /email.go
+[   0.406]    INFO zrok/drives/sync.OneWay: => /headers.go
+[   0.530]    INFO zrok/drives/sync.OneWay: => /proxy.go
+[   0.655]    INFO zrok/drives/sync.OneWay: => /size.go
+[   0.714]    INFO zrok/drives/sync.OneWay: => /uniqueName.go
+copy complete!
+michael@fourtyfour Fri Jan 19 12:42:52 ~/Repos/nf/zrok 
+$ zrok ls https://6kiww4bn7iok.share.zrok.io
+┌──────┬───────────────┬───────┬───────────────────────────────┐
+│ TYPE │ NAME          │ SIZE  │ MODIFIED                      │
+├──────┼───────────────┼───────┼───────────────────────────────┤
+│      │ email.go      │ 329 B │ 2023-07-21 13:17:56 -0400 EDT │
+│      │ headers.go    │ 456 B │ 2023-07-21 13:17:56 -0400 EDT │
+│      │ proxy.go      │ 609 B │ 2023-07-21 13:17:56 -0400 EDT │
+│      │ size.go       │ 361 B │ 2023-07-21 13:17:56 -0400 EDT │
+│      │ uniqueName.go │ 423 B │ 2024-01-02 11:57:14 -0500 EST │
+└──────┴───────────────┴───────┴───────────────────────────────┘
+```
+
+For basic authentication provided by public shares, the `zrok` drives CLI offers the `--basic-auth` flag, which accepts a `<username>:<password>` parameter to specify the authentication for the public virtual drive (if it's required).
+
+Alternatively, the authentication can be set using the `ZROK_DRIVES_BASIC_AUTH` environment variable:
+
+```
+$ export ZROK_DRIVES_BASIC_AUTH=username:password
+```
+
+## One-way Synchronization
+
+The `zrok copy` command includes a `--sync` flag, which only copies files detected as _modified_. `zrok` considers a file with the same modification timestamp and size to be the same. Of course, this is not a strong guarantee that the files are equivalent. Future `zrok` drives versions will provide a cryptographically strong mechanism (a-la `rsync` and friends) to guarantee that files and trees of files are synchronized.
+
+For now, the `--sync` flag provides a convenience mechanism to allow resuming copies of large file trees and provide a reasonable guarantee that the trees are in sync.
+
+Let's take a look at `zrok copy --sync` in action:
+
+```
+$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+[   0.636]    INFO zrok/drives/sync.OneWay: => /_attic/
+[   0.760]    INFO zrok/drives/sync.OneWay: => /_attic/network/
+[   0.816]    INFO zrok/drives/sync.OneWay: => /_attic/network/_category_.json
+[   0.928]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/
+[   0.987]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/ziti-ctrl.service
+[   1.048]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/ziti-ctrl.yml
+[   1.107]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/ziti-router0.service
+[   1.167]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/ziti-router0.yml
+[   1.218]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/zrok-access-public.service
+[   1.273]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/zrok-ctrl.service
+[   1.328]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/zrok-ctrl.yml
+[   1.382]    INFO zrok/drives/sync.OneWay: => /_attic/network/prod/zrok.io-network-skeleton.md
+[   1.447]    INFO zrok/drives/sync.OneWay: => /_attic/overview.md
+[   1.572]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/
+[   1.622]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/_category_.json
+[   1.673]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/reserved_services.md
+[   1.737]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/sharing_modes.md
+[   1.793]    INFO zrok/drives/sync.OneWay: => /_attic/v0.2_account_requests.md
+[   1.902]    INFO zrok/drives/sync.OneWay: => /_attic/v0.4_limits.md
+...
+[   9.691]    INFO zrok/drives/sync.OneWay: => /images/zrok_web_ui_empty_shares.png
+[   9.812]    INFO zrok/drives/sync.OneWay: => /images/zrok_web_ui_new_environment.png
+[   9.870]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
+copy complete!
+```
+
+Because the target drive was empty, `zrok copy --sync` copied the entire contents of the local `docs/` tree into the virtual drive. However, if we run that command again, we get:
+
+```
+$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+copy complete!
+```
+
+The virtual drive contents are already in sync with the local filesystem tree, so there is nothing for it to copy.
+
+Let's alter the contents of the drive and run the `--sync` again:
+
+```
+$ zrok rm https://glmv049c62p7.share.zrok.io/images
+$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+[   0.364]    INFO zrok/drives/sync.OneWay: => /images/
+[   0.456]    INFO zrok/drives/sync.OneWay: => /images/zrok.png
+[   0.795]    INFO zrok/drives/sync.OneWay: => /images/zrok_cover.png
+[   0.866]    INFO zrok/drives/sync.OneWay: => /images/zrok_deployment.drawio
+...
+[   2.254]    INFO zrok/drives/sync.OneWay: => /images/zrok_web_ui_empty_shares.png
+[   2.340]    INFO zrok/drives/sync.OneWay: => /images/zrok_web_ui_new_environment.png
+[   2.391]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
+copy complete!
+```
+
+Because we removed the `images/` tree from the virtual drive, `zrok copy --sync` detected this and copied the local `images/` tree back onto the virtual drive.
+
+## Drive-to-Drive Copies and Synchronization
+
+The `zrok copy` CLI can operate on pairs of virtual drives remotely, without ever having to store files locally. This allow for drive-to-drive copies and synchronization.
+
+Here are a couple of examples:
+
+```
+$ zrok copy --sync https://glmv049c62p7.share.zrok.io https://glmv049c62p7.share.zrok.io
+copy complete!
+```
+
+Specifying the same URL for both the source and the target of a `--sync` operation should always result in nothing being copied... they are the same drive with the same state.
+
+We can copy files between two virtual drives with a single command:
+
+```
+$ zrok copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
+[   1.396]    INFO zrok/drives/sync.OneWay: => /_attic/
+[   2.083]    INFO zrok/drives/sync.OneWay: => /_attic/overview.md
+[   2.704]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/
+...
+[ 118.240]    INFO zrok/drives/sync.OneWay: => /images/zrok_web_console_empty.png
+[ 118.920]    INFO zrok/drives/sync.OneWay: => /images/zrok_enable_modal.png
+[ 119.589]    INFO zrok/drives/sync.OneWay: => /images/zrok_cover.png
+[ 120.214]    INFO zrok/drives/sync.OneWay: => /getting-started.mdx
+copy complete!
+$ zrok copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
+copy complete!
+```
+
+## Copying from Drives to the Local Filesystem
 
