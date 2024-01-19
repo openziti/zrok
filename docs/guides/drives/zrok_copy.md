@@ -1,10 +1,10 @@
 # The Drives CLI
 
-The zrok Drives CLI tools allow for simple, ergonomic management and synchronization of local and remote file objects transparently.
+The zrok drives CLI tools allow for simple, ergonomic management and synchronization of local and remote files.
 
 ## Sharing a Drive
 
-Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag with the `zrok share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
+Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag through the `zrok share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
 
 ```
 $ mkdir /tmp/junk
@@ -238,3 +238,77 @@ copy complete!
 
 ## Copying from Drives to the Local Filesystem
 
+In the current version of the drives CLI, `zrok copy` always assumes the destination is a directory. There is currently no way to do:
+
+```
+$ zrok copy somefile someotherfile
+```
+
+What you'll end up with on the local filesystem is:
+
+```
+somefile
+someotherfile/somefile
+```
+
+It's in the backlog to support file destinations in a future release of `zrok`. So, when using `zrok copy`, always take note of the destination.
+
+`zrok copy` supports a default destination of `file://.`, so you can do single parameter `zrok copy` commands like this:
+
+```
+$ zrok ls https://azc47r3cwjds.share.zrok.io
+┌──────┬─────────┬─────────┬───────────────────────────────┐
+│ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
+├──────┼─────────┼─────────┼───────────────────────────────┤
+│      │ LICENSE │ 11.3 kB │ 2023-07-21 13:17:56 -0400 EDT │
+└──────┴─────────┴─────────┴───────────────────────────────┘
+$ zrok copy https://azc47r3cwjds.share.zrok.io/LICENSE
+[   0.260]    INFO zrok/drives/sync.OneWay: => /LICENSE
+copy complete!
+$ ls -l
+total 12
+-rw-rw-r-- 1 michael michael 11346 Jan 19 13:29 LICENSE
+```
+
+You can also specify a local folder as the destination for your copy:
+
+```
+$ zrok copy https://azc47r3cwjds.share.zrok.io/LICENSE /tmp/inbox
+[   0.221]    INFO zrok/drives/sync.OneWay: => /LICENSE
+copy complete! 
+$ l /tmp/inbox
+total 12
+-rw-rw-r-- 1 michael michael 11346 Jan 19 13:30 LICENSE
+```
+
+## Unique Names and Reserved Shares
+
+Private reserved shares with unque names can be particularly useful with the drives CLI:
+
+```
+$ zrok reserve private -b drive --unique-name mydrive /tmp/junk
+[   0.315]    INFO main.(*reserveCommand).run: your reserved share token is 'mydrive'
+$ zrok share reserved --headless mydrive
+[   0.289]    INFO main.(*shareReservedCommand).run: sharing target: '/tmp/junk'
+[   0.289]    INFO main.(*shareReservedCommand).run: using existing backend proxy endpoint: /tmp/junk
+[   0.767]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[d519a436-9fb5-4207-afd5-7cbc28fb779a]} new service session
+[   0.927]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private mydrive'
+```
+
+This makes working with `zrok://` URLs particularly convenient:
+
+```
+$ zrok ls zrok://mydrive
+┌──────┬─────────┬─────────┬───────────────────────────────┐
+│ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
+├──────┼─────────┼─────────┼───────────────────────────────┤
+│      │ LICENSE │ 11.3 kB │ 2023-07-21 13:17:56 -0400 EDT │
+└──────┴─────────┴─────────┴───────────────────────────────┘
+```
+
+## Future Enhancements
+
+Coming in a future release of `zrok` drives are features like:
+
+* two-way synchronization between multiple hosts... allowing for shared "dropbox-like" usage scenarios between multiple environments
+* better ergonomics for single-file destinations
