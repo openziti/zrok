@@ -2,7 +2,7 @@
 
 ## v0.4.23
 
-FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/zrok_copy.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
+FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/cli.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
 
 FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
 
