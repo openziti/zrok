@@ -44,6 +44,7 @@ func Run(inCfg *config.Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = newZrokAuthenticator(cfg).authenticate
+	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
 	api.AccountRegisterHandler = newRegisterHandler(cfg)

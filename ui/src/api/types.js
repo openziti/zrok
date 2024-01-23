@@ -26,6 +26,15 @@
  */
 
 /**
+ * @typedef changePasswordRequest
+ * @memberof module:types
+ * 
+ * @property {string} email 
+ * @property {string} oldPassword 
+ * @property {string} newPassword 
+ */
+
+/**
  * @typedef configuration
  * @memberof module:types
  * 
