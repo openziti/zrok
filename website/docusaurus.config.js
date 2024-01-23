@@ -82,12 +82,8 @@ const config = {
         pages: {
           path: './src/pages'
         },
-        // googleAnalytics: {
-        //
-        // },
-        gtag: {
-          trackingID: 'G-V2KMEXWJ10',
-          anonymizeIP: true,
+        googleTagManager: {
+          containerId: 'GTM-MDFLZPK8',
         },
         sitemap: {
 
