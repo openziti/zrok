@@ -135,6 +135,16 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		sshr.FrontendEndpoint = &sshr.ShareMode
 	}
 
+	sh, err := str.FindShareWithToken(sshr.Token, trx)
+	if err != nil {
+		logrus.Errorf("error checking share token collision: %v", err)
+		return share.NewShareInternalServerError()
+	}
+	if sh != nil {
+		logrus.Errorf("attempting to create share with conflcting token: %v", sshr.Token)
+		return share.NewShareConflict()
+	}
+
 	sid, err := str.CreateShare(envId, sshr, trx)
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
