@@ -137,11 +137,11 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	sh, err := str.FindShareWithToken(sshr.Token, trx)
 	if err != nil {
-		logrus.Errorf("error checking share token collision: %v", err)
+		logrus.Errorf("error checking share for token collision: %v", err)
 		return share.NewShareInternalServerError()
 	}
 	if sh != nil {
-		logrus.Errorf("attempting to create share with conflcting token: %v", sshr.Token)
+		logrus.Errorf("token '%v' already exists; cannot create share", sshr.Token)
 		return share.NewShareConflict()
 	}
 
