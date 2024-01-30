@@ -62,7 +62,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessNotFound()
 	}
 
-	feToken, err := createToken()
+	feToken, err := CreateToken()
 	if err != nil {
 		logrus.Error(err)
 		return share.NewAccessInternalServerError()
