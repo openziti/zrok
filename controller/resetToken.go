@@ -37,6 +37,35 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams) middle
 	}
 
 	// Need to create new token and invalidate all other resources
+	token, err := createToken()
+	if err != nil {
+		logrus.Errorf("error creating token for request '%v': %v", params.Body.EmailAddress, err)
+		return account.NewResetTokenInternalServerError()
+	}
+
+	a.Token = token
+
+	if _, err := str.UpdateAccount(a, tx); err != nil {
+		logrus.Errorf("error updating account for request '%v': %v", params.Body.EmailAddress, err)
+		return account.NewResetTokenInternalServerError()
+	}
+
+	if err := str.DeletePasswordResetRequestByAccountId(a.Id, tx); err != nil {
+		logrus.Errorf("error deleting password reset requests for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
+	}
+
+	environmentIds, err := str.DeleteEnvironmentByAccountID(a.Id, tx)
+	if err != nil {
+		logrus.Errorf("error deleting environments for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
+	}
+
+	if err := str.DeleteFrontendsByEnvironmentIds(tx, environmentIds...); err != nil {
+		logrus.Errorf("error deleting frontends for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
+	}
+
+	if err := str.DeleteSharesByEnvironmentIds(tx, environmentIds...); err != nil {
+		logrus.Errorf("error deleting shares for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
+	}
 
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing '%v' (%v): %v", params.Body.EmailAddress, a.Email, err)
@@ -45,5 +74,5 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams) middle
 
 	logrus.Infof("reset token for '%v'", a.Email)
 
-	return account.NewResetTokenOK()
+	return account.NewResetTokenOK().WithPayload(&account.ResetTokenOKBody{Token: token})
 }

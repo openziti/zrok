@@ -9,12 +9,21 @@ const App = () => {
     const [user, setUser] = useState();
 
     useEffect(() => {
-        const localUser = localStorage.getItem("user");
-        if(localUser) {
-            setUser(JSON.parse(localUser));
-            console.log("reloaded user", localUser);
+        function checkUserData() {
+            const localUser = localStorage.getItem("user");
+            if(localUser) {
+                console.log(localUser)
+                setUser(JSON.parse(localUser));
+                console.log("reloaded user", localUser);
+            }
         }
-    }, []);
+      
+        document.addEventListener('storage', checkUserData)
+      
+        return () => {
+          document.removeEventListener('storage', checkUserData)
+        }
+      }, []);
 
     const logout = () => {
         setUser(null);

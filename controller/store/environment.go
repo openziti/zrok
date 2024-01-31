@@ -82,3 +82,23 @@ func (str *Store) DeleteEnvironment(id int, tx *sqlx.Tx) error {
 	}
 	return nil
 }
+
+func (str *Store) DeleteEnvironmentByAccountID(accountId int, tx *sqlx.Tx) ([]int, error) {
+	stmt, err := tx.Prepare("update environments set updated_at = current_timestamp, deleted = true where account_id = $1 returning id")
+	if err != nil {
+		return nil, errors.Wrap(err, "error preparing environments delete by account_id statement")
+	}
+	rows, err := stmt.Query(accountId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error executing environments delete by account_id statement")
+	}
+	var is []int
+	for rows.Next() {
+		var i int
+		if err := rows.Scan(&i); err != nil {
+			return nil, errors.Wrap(err, "error scanning environment id")
+		}
+		is = append(is, i)
+	}
+	return is, nil
+}

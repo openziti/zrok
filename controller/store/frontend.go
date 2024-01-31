@@ -1,8 +1,10 @@
 package store
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 type Frontend struct {
@@ -143,6 +145,24 @@ func (str *Store) DeleteFrontend(id int, tx *sqlx.Tx) error {
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return errors.Wrap(err, "error executing frontends delete statement")
+	}
+	return nil
+}
+
+func (str *Store) DeleteFrontendsByEnvironmentIds(tx *sqlx.Tx, environmentIds ...int) error {
+	queryStrs := make([]string, 0, len(environmentIds))
+	queryVals := make([]interface{}, 0, len(environmentIds))
+	for i, v := range environmentIds {
+		queryStrs = append(queryStrs, fmt.Sprintf("$%d", i))
+		queryVals = append(queryVals, v)
+	}
+	stmt, err := tx.Prepare(fmt.Sprintf("update frontends set updated_at = current_timestamp, deleted = true where environment_id in (%s)", strings.Join(queryStrs, ",")))
+	if err != nil {
+		return errors.Wrap(err, "error preparing frontends delete by environment_id statement")
+	}
+	_, err = stmt.Exec(queryVals...)
+	if err != nil {
+		return errors.Wrap(err, "error executing frontends delete by environment_id statement")
 	}
 	return nil
 }
