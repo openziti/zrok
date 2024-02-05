@@ -53,7 +53,7 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 		return account.NewResetPasswordUnprocessableEntity().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	hpwd, err := hashPassword(params.Body.Password)
+	hpwd, err := HashPassword(params.Body.Password)
 	if err != nil {
 		logrus.Errorf("error hashing password for '%v' (%v): %v", params.Body.Token, a.Email, err)
 		return account.NewResetPasswordRequestInternalServerError()

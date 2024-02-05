@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.24
+
+FEATURE: New `zrok admin create account` command that allows populating accounts directly into the underlying controller database (https://github.com/openziti/zrok/issues/551)
+
+CHANGE: The `zrok test loopback public` utility to report non-`200` errors and also ensure that the listening side of the test is fully established before starting loopback testing.
+
 ## v0.4.23
 
 FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/cli.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
