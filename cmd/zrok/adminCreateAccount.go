@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/openziti/zrok/controller"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -62,5 +62,5 @@ func (cmd *adminCreateAccount) run(_ *cobra.Command, args []string) {
 	if _, err := str.CreateAccount(a, trx); err != nil {
 		panic(err)
 	}
-	logrus.Infof("account token = %v", token)
+	fmt.Println(token)
 }
