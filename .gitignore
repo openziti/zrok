@@ -5,6 +5,7 @@
 automated-release-build
 etc/dev.yml
 etc/dev-frontend.yml
+etc/caddy/dev.Caddyfile
 
 # Dependencies
 /node_modules/
