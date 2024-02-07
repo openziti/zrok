@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
@@ -274,7 +275,8 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 											if len(castedDomains) > 0 {
 												found := false
 												for _, domain := range castedDomains {
-													if strings.HasSuffix(claims.Email, domain.(string)) {
+													match := glob.MustCompile(domain.(string))
+													if match.Match(claims.Email) {
 														found = true
 														break
 													}
