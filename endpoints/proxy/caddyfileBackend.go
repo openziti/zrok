@@ -3,16 +3,18 @@ package proxy
 import (
 	_ "embed"
 	"fmt"
+	"os"
+	"strings"
+	"text/template"
+
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp/fileserver"
+	"github.com/caddyserver/caddy/v2/modules/caddyhttp/templates"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
-	"text/template"
 )
 
 //go:embed browse.html
@@ -33,6 +35,8 @@ type CaddyfileBackend struct {
 }
 
 func NewCaddyfileBackend(cfg *CaddyfileBackendConfig) (*CaddyfileBackend, error) {
+	caddy.RegisterModule(ZrokTemplateExtender{shrToken: cfg.Shr.Token})
+
 	cdyf, err := preprocessCaddyfile(cfg.CaddyfilePath, cfg.Shr)
 	if err != nil {
 		return nil, err
@@ -46,6 +50,7 @@ func NewCaddyfileBackend(cfg *CaddyfileBackendConfig) (*CaddyfileBackend, error)
 	for _, warning := range warnings {
 		logrus.Warnf("%v [%d] (%v): %v", cfg.CaddyfilePath, warning.Line, warning.Directive, warning.Message)
 	}
+
 	return &CaddyfileBackend{cfg: caddyCfg}, nil
 }
 
@@ -75,3 +80,33 @@ func preprocessCaddyfile(inF string, shr *sdk.Share) (string, error) {
 type caddyfileData struct {
 	ZrokBindAddress string
 }
+
+type ZrokTemplateExtender struct {
+	shrToken string
+}
+
+func (z ZrokTemplateExtender) CaddyModule() caddy.ModuleInfo {
+	return caddy.ModuleInfo{
+		ID: "http.handlers.templates.functions.zrok_template",
+		New: func() caddy.Module {
+			ret := new(ZrokTemplateExtender)
+			ret.shrToken = z.shrToken
+			return ret
+		},
+	}
+}
+
+func (z ZrokTemplateExtender) CustomTemplateFunctions() template.FuncMap {
+	return template.FuncMap{
+		"zrok_share_token": func() string { return z.shrToken },
+	}
+}
+
+func (*ZrokTemplateExtender) UnmarshalCaddyfile(_ *caddyfile.Dispenser) error {
+	return nil
+}
+
+var (
+	_ templates.CustomFunctions = (*ZrokTemplateExtender)(nil)
+	_ caddyfile.Unmarshaler     = (*ZrokTemplateExtender)(nil)
+)
