@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gobwas/glob"
 	"github.com/openziti/zrok/endpoints"
 	drive "github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -116,6 +117,16 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailDomains = cmd.oauthEmailDomains
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
+
+		for _, g := range cmd.oauthEmailDomains {
+			_, err := glob.Compile(g)
+			if err != nil {
+				if !panicInstead {
+					tui.Error(fmt.Sprintf("unable to create share, invalid oauth email glob (%v)", g), err)
+				}
+				panic(err)
+			}
+		}
 	}
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {

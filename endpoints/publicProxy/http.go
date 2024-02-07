@@ -275,7 +275,12 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 											if len(castedDomains) > 0 {
 												found := false
 												for _, domain := range castedDomains {
-													match := glob.MustCompile(domain.(string))
+													match, err := glob.Compile(domain.(string))
+													if err != nil {
+														logrus.Errorf("invalid glob pattern: '%v'", err)
+														unauthorizedUi.WriteUnauthorized(w)
+														return
+													}
 													if match.Match(claims.Email) {
 														found = true
 														break
