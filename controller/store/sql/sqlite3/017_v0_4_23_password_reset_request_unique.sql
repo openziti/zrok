@@ -7,7 +7,7 @@ CREATE TABLE password_reset_requests (
   token                 string              not null unique,
   created_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
   updated_at            datetime            not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-  account_id            integer             not null constraint fk_accounts_password_reset_requests references accounts on delete cascade,
+  account_id            integer             not null constraint fk_accounts_password_reset_requests references accounts,
   deleted               boolean             not null default(false),
 
   constraint chk_token check(token <> '')
