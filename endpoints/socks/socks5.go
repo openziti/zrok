@@ -16,6 +16,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net"
@@ -86,6 +87,9 @@ type Server struct {
 	// Username and Password, if set, are the credential clients must provide.
 	Username string
 	Password string
+
+	// For notifying user-facing components about activity
+	Requests chan *endpoints.Request
 }
 
 func (s *Server) dial(ctx context.Context, network, addr string) (net.Conn, error) {
@@ -170,6 +174,14 @@ func (c *Conn) handleRequest() error {
 		return fmt.Errorf("unsupported command %v", req.command)
 	}
 	c.request = req
+
+	if c.srv.Requests != nil {
+		c.srv.Requests <- &endpoints.Request{
+			Stamp:  time.Now(),
+			Method: "CONNECT",
+			Path:   fmt.Sprintf("%v:%d", c.request.destination, c.request.port),
+		}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

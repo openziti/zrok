@@ -41,7 +41,7 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	return &Backend{
 		cfg:      cfg,
 		listener: listener,
-		server:   &Server{},
+		server:   &Server{Requests: cfg.Requests},
 	}, nil
 }
 
