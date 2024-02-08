@@ -22,6 +22,7 @@ create table shares (
     constraint chk_backend_mode check (backend_mode == 'proxy' or backend_mode == 'web' or backend_mode == 'tcpTunnel' or backend_mode == 'udpTunnel' or backend_mode == 'caddy' or backend_mode == 'drive' or backend_mode == 'socks')
 );
 insert into shares select * from shares_old;
+drop index shares_token_idx;
 create unique index shares_token_idx ON shares(token) WHERE deleted is false;
 
 alter table frontends rename to frontends_old;
