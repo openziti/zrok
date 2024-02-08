@@ -2,6 +2,8 @@
 
 ## v0.4.24
 
+FEATURE: New `socks` backend mode for use with private sharing. Use `zrok share private --backend-mode socks` and then `zrok access private` that share from somewhere else... very lightweight VPN-like functionality (https://github.com/openziti/zrok/issues/558)
+
 FEATURE: New `zrok admin create account` command that allows populating accounts directly into the underlying controller database (https://github.com/openziti/zrok/issues/551)
 
 CHANGE: The `zrok test loopback public` utility to report non-`200` errors and also ensure that the listening side of the test is fully established before starting loopback testing.
