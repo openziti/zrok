@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/environment"
@@ -255,6 +256,27 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running drive backend: %v", err)
+			}
+		}()
+
+	case "socks":
+		cfg := &socks.BackendConfig{
+			IdentityPath: zif,
+			ShrToken:     shrToken,
+			Requests:     requests,
+		}
+
+		be, err := socks.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating socks backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running socks backend: %v", err)
 			}
 		}()
 
