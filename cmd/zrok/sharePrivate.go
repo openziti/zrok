@@ -34,9 +34,9 @@ type sharePrivateCommand struct {
 
 func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "private <target>",
+		Use:   "private [<target>]",
 		Short: "Share a target resource privately",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
@@ -52,6 +52,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	switch cmd.backendMode {
 	case "proxy":
+		if len(args) != 1 {
+			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+		}
 		v, err := parseUrl(args[0])
 		if err != nil {
 			if !panicInstead {
@@ -62,23 +65,40 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = v
 
 	case "web":
+		if len(args) != 1 {
+			tui.Error("the 'web' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "tcpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "udpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "caddy":
+		if len(args) != 1 {
+			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 		cmd.headless = true
 
 	case "drive":
+		if len(args) != 1 {
+			tui.Error("the 'drive' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "socks":
-		target = ""
+		if len(args) != 0 {
+			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+		}
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
