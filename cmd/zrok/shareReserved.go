@@ -93,23 +93,25 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("sharing target: '%v'", target)
+	if resp.Payload.BackendMode != "socks" {
+		logrus.Infof("sharing target: '%v'", target)
 
-	if resp.Payload.BackendProxyEndpoint != target {
-		upReq := share.NewUpdateShareParams()
-		upReq.Body = &rest_model_zrok.UpdateShareRequest{
-			ShrToken:             shrToken,
-			BackendProxyEndpoint: target,
-		}
-		if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
-			if !panicInstead {
-				tui.Error("unable to update backend proxy endpoint", err)
+		if resp.Payload.BackendProxyEndpoint != target {
+			upReq := share.NewUpdateShareParams()
+			upReq.Body = &rest_model_zrok.UpdateShareRequest{
+				ShrToken:             shrToken,
+				BackendProxyEndpoint: target,
 			}
-			panic(err)
+			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
+				if !panicInstead {
+					tui.Error("unable to update backend proxy endpoint", err)
+				}
+				panic(err)
+			}
+			logrus.Infof("updated backend proxy endpoint to: %v", target)
+		} else {
+			logrus.Infof("using existing backend proxy endpoint: %v", target)
 		}
-		logrus.Infof("updated backend proxy endpoint to: %v", target)
-	} else {
-		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
 	var shareDescription string
