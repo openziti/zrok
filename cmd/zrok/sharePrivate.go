@@ -6,6 +6,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/environment"
@@ -33,13 +34,13 @@ type sharePrivateCommand struct {
 
 func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
-		Use:   "private <target>",
+		Use:   "private [<target>]",
 		Short: "Share a target resource privately",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Run = command.run
@@ -51,6 +52,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	switch cmd.backendMode {
 	case "proxy":
+		if len(args) != 1 {
+			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+		}
 		v, err := parseUrl(args[0])
 		if err != nil {
 			if !panicInstead {
@@ -61,20 +65,40 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = v
 
 	case "web":
+		if len(args) != 1 {
+			tui.Error("the 'web' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "tcpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "udpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 
 	case "caddy":
+		if len(args) != 1 {
+			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+		}
 		target = args[0]
 		cmd.headless = true
 
 	case "drive":
+		if len(args) != 1 {
+			tui.Error("the 'drive' backend mode expects a <target>", nil)
+		}
 		target = args[0]
+
+	case "socks":
+		if len(args) != 0 {
+			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+		}
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
@@ -261,6 +285,27 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running drive backend: %v", err)
+			}
+		}()
+
+	case "socks":
+		cfg := &socks.BackendConfig{
+			IdentityPath: zif,
+			ShrToken:     shr.Token,
+			Requests:     requests,
+		}
+
+		be, err := socks.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating socks backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running socks backend: %v", err)
 			}
 		}()
 
