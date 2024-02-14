@@ -65,7 +65,7 @@ func createShareToken() (string, error) {
 	return gen(), nil
 }
 
-func createToken() (string, error) {
+func CreateToken() (string, error) {
 	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 12)
 	if err != nil {
 		return "", err
