@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.25
+
+FEATURE: Added self service password change. There is a new tab in the `zrok` control panel that holds self service actions. Here you will find the ability to immediately change your password.
+
 ## v0.4.23
 
 FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/cli.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
