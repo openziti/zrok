@@ -1,10 +1,10 @@
 # CHANGELOG
 
-## v0.4.24
+## v0.4.25
 
-CHANGE: Update to share creation. Now checks for token collision and returns a relevant error.
+CHANGE: Update to share creation. Now checks for token collision and returns a relevant error. (https://github.com/openziti/zrok/issues/531)
 
-CHANGE: Update UI to add a 'true' value on booleans.
+CHANGE: Update UI to add a 'true' value on booleans. (https://github.com/openziti/zrok/issues/443)
 
 ## v0.4.23
 
