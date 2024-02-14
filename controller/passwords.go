@@ -24,7 +24,7 @@ func salt() string {
 	return base64.StdEncoding.EncodeToString(buf)
 }
 
-func hashPassword(password string) (*hashedPassword, error) {
+func HashPassword(password string) (*hashedPassword, error) {
 	return rehashPassword(password, salt())
 }
 
