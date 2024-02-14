@@ -143,6 +143,28 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}()
 
+	case "socks":
+		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
+			BindAddress:  cmd.bindAddress,
+			IdentityName: env.EnvironmentIdentityName(),
+			ShrToken:     args[0],
+			RequestsChan: requests,
+		})
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private access", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("error starting access", err)
+				}
+				panic(err)
+			}
+		}()
+
 	default:
 		cfg := proxy.DefaultFrontendConfig(env.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken

@@ -38,7 +38,7 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		return account.NewRegisterNotFound()
 	}
 
-	token, err := createToken()
+	token, err := CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating token for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()
@@ -49,7 +49,7 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		return account.NewRegisterUnprocessableEntity().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	hpwd, err := hashPassword(params.Body.Password)
+	hpwd, err := HashPassword(params.Body.Password)
 	if err != nil {
 		logrus.Errorf("error hashing password for request '%v' (%v): %v", params.Body.Token, ar.Email, err)
 		return account.NewRegisterInternalServerError()

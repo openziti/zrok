@@ -31,14 +31,14 @@ type reserveCommand struct {
 
 func newReserveCommand() *reserveCommand {
 	cmd := &cobra.Command{
-		Use:   "reserve <public|private> <target>",
+		Use:   "reserve <public|private> [<target>]",
 		Short: "Create a reserved share",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.RangeArgs(1, 2),
 	}
 	command := &reserveCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.uniqueName, "unique-name", "n", "", "A unique name for the reserved share (defaults to generated identifier)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel)")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel, socks)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
@@ -52,7 +52,7 @@ func newReserveCommand() *reserveCommand {
 
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	shareMode := sdk.ShareMode(args[0])
-	privateOnlyModes := []string{"tcpTunnel", "udpTunnel"}
+	privateOnlyModes := []string{"tcpTunnel", "udpTunnel", "socks"}
 	if shareMode != sdk.PublicShareMode && shareMode != sdk.PrivateShareMode {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	} else if shareMode == sdk.PublicShareMode && slices.Contains(privateOnlyModes, cmd.backendMode) {
@@ -66,6 +66,9 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	var target string
 	switch cmd.backendMode {
 	case "proxy":
+		if len(args) != 2 {
+			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+		}
 		v, err := parseUrl(args[1])
 		if err != nil {
 			tui.Error("invalid target endpoint URL", err)
@@ -73,22 +76,42 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		target = v
 
 	case "web":
+		if len(args) != 2 {
+			tui.Error("the 'web' backend mode expects a <target>", nil)
+		}
 		target = args[1]
 
 	case "tcpTunnel":
+		if len(args) != 2 {
+			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[1]
 
 	case "udpTunnel":
+		if len(args) != 2 {
+			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+		}
 		target = args[1]
 
 	case "caddy":
+		if len(args) != 2 {
+			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+		}
 		target = args[1]
 
 	case "drive":
+		if len(args) != 2 {
+			tui.Error("the 'drive' backend mode expects a <target>", nil)
+		}
 		target = args[1]
 
+	case "socks":
+		if len(args) != 1 {
+			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+		}
+
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}", cmd.backendMode), nil)
 	}
 
 	env, err := environment.LoadRoot()

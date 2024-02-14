@@ -6,7 +6,10 @@
 #
 # 
 
-set -o pipefail -e -u
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o xtrace
 
 # if no architectures supplied then default list of three
 if (( ${#} )); then
@@ -30,6 +33,16 @@ else
     BACKGROUND=""   # run normally in foreground
     PROCS_PER_JOB=0 # invokes gox default to use all CPUs-1
 fi
+
+(
+    HOME=/tmp/builder
+    # Navigate to the "ui" directory and run npm commands
+    npm config set cache /mnt/.npm
+    cd ./ui/
+    mkdir -p $HOME
+    npm install
+    npm run build
+)
 
 for ARCH in ${JOBS[@]}; do
     GOX_CMD="

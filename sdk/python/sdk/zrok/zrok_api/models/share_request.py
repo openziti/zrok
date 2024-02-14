@@ -184,7 +184,7 @@ class ShareRequest(object):
         :param backend_mode: The backend_mode of this ShareRequest.  # noqa: E501
         :type: str
         """
-        allowed_values = ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive"]  # noqa: E501
+        allowed_values = ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks"]  # noqa: E501
         if backend_mode not in allowed_values:
             raise ValueError(
                 "Invalid value for `backend_mode` ({0}), must be one of {1}"  # noqa: E501

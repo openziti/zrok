@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/environment"
@@ -92,23 +93,25 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("sharing target: '%v'", target)
+	if resp.Payload.BackendMode != "socks" {
+		logrus.Infof("sharing target: '%v'", target)
 
-	if resp.Payload.BackendProxyEndpoint != target {
-		upReq := share.NewUpdateShareParams()
-		upReq.Body = &rest_model_zrok.UpdateShareRequest{
-			ShrToken:             shrToken,
-			BackendProxyEndpoint: target,
-		}
-		if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
-			if !panicInstead {
-				tui.Error("unable to update backend proxy endpoint", err)
+		if resp.Payload.BackendProxyEndpoint != target {
+			upReq := share.NewUpdateShareParams()
+			upReq.Body = &rest_model_zrok.UpdateShareRequest{
+				ShrToken:             shrToken,
+				BackendProxyEndpoint: target,
 			}
-			panic(err)
+			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
+				if !panicInstead {
+					tui.Error("unable to update backend proxy endpoint", err)
+				}
+				panic(err)
+			}
+			logrus.Infof("updated backend proxy endpoint to: %v", target)
+		} else {
+			logrus.Infof("using existing backend proxy endpoint: %v", target)
 		}
-		logrus.Infof("updated backend proxy endpoint to: %v", target)
-	} else {
-		logrus.Infof("using existing backend proxy endpoint: %v", target)
 	}
 
 	var shareDescription string
@@ -255,6 +258,27 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running drive backend: %v", err)
+			}
+		}()
+
+	case "socks":
+		cfg := &socks.BackendConfig{
+			IdentityPath: zif,
+			ShrToken:     shrToken,
+			Requests:     requests,
+		}
+
+		be, err := socks.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating socks backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running socks backend: %v", err)
 			}
 		}()
 

@@ -9,14 +9,14 @@ require (
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/go-openapi/errors v0.21.0
-	github.com/go-openapi/loads v0.21.3
-	github.com/go-openapi/runtime v0.26.2
-	github.com/go-openapi/spec v0.20.12
-	github.com/go-openapi/strfmt v0.21.10
-	github.com/go-openapi/swag v0.22.5
-	github.com/go-openapi/validate v0.22.4
-	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/google/uuid v1.5.0
+	github.com/go-openapi/loads v0.21.5
+	github.com/go-openapi/runtime v0.27.1
+	github.com/go-openapi/spec v0.20.14
+	github.com/go-openapi/strfmt v0.22.0
+	github.com/go-openapi/swag v0.22.9
+	github.com/go-openapi/validate v0.22.6
+	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/iancoleman/strcase v0.2.0
 	github.com/influxdata/influxdb-client-go/v2 v2.11.0
@@ -30,25 +30,25 @@ require (
 	github.com/michaelquigley/pfxlog v0.6.10
 	github.com/muesli/reflow v0.3.0
 	github.com/nxadm/tail v1.4.8
-	github.com/openziti/channel/v2 v2.0.113
-	github.com/openziti/edge-api v0.26.7
+	github.com/openziti/channel/v2 v2.0.119
+	github.com/openziti/edge-api v0.26.10
 	github.com/openziti/fabric v0.23.26
-	github.com/openziti/identity v1.0.68
-	github.com/openziti/sdk-golang v0.22.6
-	github.com/openziti/transport/v2 v2.0.119
+	github.com/openziti/identity v1.0.70
+	github.com/openziti/sdk-golang v0.22.28
+	github.com/openziti/transport/v2 v2.0.122
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.8.1
 	github.com/rubenv/sql-migrate v1.6.0
-	github.com/shirou/gopsutil/v3 v3.23.11
+	github.com/shirou/gopsutil/v3 v3.24.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v2 v2.12.0
 	go.uber.org/zap v1.25.0
-	golang.org/x/crypto v0.17.0
-	golang.org/x/net v0.19.0
-	golang.org/x/oauth2 v0.13.0
+	golang.org/x/crypto v0.18.0
+	golang.org/x/net v0.20.0
+	golang.org/x/oauth2 v0.16.0
 	golang.org/x/time v0.3.0
 	nhooyr.io/websocket v1.8.10
 )
@@ -97,13 +97,13 @@ require (
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/go-logr/logr v1.3.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/go-openapi/analysis v0.21.5 // indirect
-	github.com/go-openapi/jsonpointer v0.20.1 // indirect
-	github.com/go-openapi/jsonreference v0.20.3 // indirect
-	github.com/go-resty/resty/v2 v2.10.0 // indirect
+	github.com/go-openapi/analysis v0.22.2 // indirect
+	github.com/go-openapi/jsonpointer v0.20.2 // indirect
+	github.com/go-openapi/jsonreference v0.20.4 // indirect
+	github.com/go-resty/resty/v2 v2.11.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -162,9 +162,9 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.9.5 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
-	github.com/openziti/foundation/v2 v2.0.35 // indirect
-	github.com/openziti/metrics v1.2.41 // indirect
-	github.com/openziti/secretstream v0.1.15 // indirect
+	github.com/openziti/foundation/v2 v2.0.37 // indirect
+	github.com/openziti/metrics v1.2.45 // indirect
+	github.com/openziti/secretstream v0.1.16 // indirect
 	github.com/openziti/storage v0.2.6 // indirect
 	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
@@ -225,9 +225,9 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
