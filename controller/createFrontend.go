@@ -50,7 +50,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	feToken, err := createToken()
+	feToken, err := CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating frontend token: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
