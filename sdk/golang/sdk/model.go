@@ -29,7 +29,7 @@ type ShareRequest struct {
 	Frontends                       []string
 	BasicAuth                       []string
 	OauthProvider                   string
-	OauthEmailDomains               []string
+	OauthEmailAddressPatterns       []string
 	OauthAuthorizationCheckInterval time.Duration
 }
 

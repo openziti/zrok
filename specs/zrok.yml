@@ -985,7 +985,7 @@ definitions:
       oauthProvider:
         type: string
         enum: ["github", "google"]
-      oauthEmailDomains:
+      oauthEmailAddressPatterns:
         type: array
         items:
           type: string

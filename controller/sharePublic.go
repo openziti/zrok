@@ -27,7 +27,7 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 		BasicAuthUsers: authUsers,
 		Oauth: &sdk.OauthConfig{
 			Provider:                   params.Body.OauthProvider,
-			EmailDomains:               params.Body.OauthEmailDomains,
+			EmailDomains:               params.Body.OauthEmailAddressPatterns,
 			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
 		},
 	}

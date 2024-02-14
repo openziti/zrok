@@ -43,8 +43,8 @@ type ShareRequest struct {
 	// oauth authorization check interval
 	OauthAuthorizationCheckInterval string `json:"oauthAuthorizationCheckInterval,omitempty"`
 
-	// oauth email domains
-	OauthEmailDomains []string `json:"oauthEmailDomains"`
+	// oauth email address patterns
+	OauthEmailAddressPatterns []string `json:"oauthEmailAddressPatterns"`
 
 	// oauth provider
 	// Enum: [github google]

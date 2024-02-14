@@ -25,15 +25,15 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth          []string
-	frontendSelection  []string
-	backendMode        string
-	headless           bool
-	insecure           bool
-	oauthProvider      string
-	oauthEmailDomains  []string
-	oauthCheckInterval time.Duration
-	cmd                *cobra.Command
+	basicAuth                 []string
+	frontendSelection         []string
+	backendMode               string
+	headless                  bool
+	insecure                  bool
+	oauthProvider             string
+	oauthEmailAddressPatterns []string
+	oauthCheckInterval        time.Duration
+	cmd                       *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -50,7 +50,7 @@ func newSharePublicCommand() *sharePublicCommand {
 
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
-	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domain globs to authenticate via OAuth")
+	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domain globs to authenticate via OAuth")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
@@ -115,10 +115,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
-		req.OauthEmailDomains = cmd.oauthEmailDomains
+		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
 
-		for _, g := range cmd.oauthEmailDomains {
+		for _, g := range cmd.oauthEmailAddressPatterns {
 			_, err := glob.Compile(g)
 			if err != nil {
 				if !panicInstead {

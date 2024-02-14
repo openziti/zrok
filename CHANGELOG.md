@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## v0.4.23
+## v0.4.25
 
-FEATURE: Public share oauth email domains now takes a glob to match against. 
+FEATURE: Public share oauth email domains renamed to `email address patterns`. These now take a glob to match against.
+Old `zrok share` and `zrok reserve` flag: `oauth-email-domains`. Changed to: `oauth-email-address-patterns`.
 
 ## v0.4.23
 
