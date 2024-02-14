@@ -34,7 +34,7 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	token, err = createToken()
+	token, err = CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating token for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
