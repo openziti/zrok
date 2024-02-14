@@ -76,6 +76,11 @@ func init() {
     },
     "/changePassword": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "account"
         ],
@@ -1750,6 +1755,11 @@ func init() {
     },
     "/changePassword": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "account"
         ],

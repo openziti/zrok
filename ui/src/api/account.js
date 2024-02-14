@@ -110,7 +110,12 @@ export function verify(options) {
 const changePasswordOperation = {
   path: '/changePassword',
   contentTypes: ['application/zrok.v1+json'],
-  method: 'post'
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const inviteOperation = {

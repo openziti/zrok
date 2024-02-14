@@ -30,7 +30,7 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	ChangePassword(params *ChangePasswordParams, opts ...ClientOption) (*ChangePasswordOK, error)
+	ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordOK, error)
 
 	Invite(params *InviteParams, opts ...ClientOption) (*InviteCreated, error)
 
@@ -50,7 +50,7 @@ type ClientService interface {
 /*
 ChangePassword change password API
 */
-func (a *Client) ChangePassword(params *ChangePasswordParams, opts ...ClientOption) (*ChangePasswordOK, error) {
+func (a *Client) ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewChangePasswordParams()
@@ -64,6 +64,7 @@ func (a *Client) ChangePassword(params *ChangePasswordParams, opts ...ClientOpti
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &ChangePasswordReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

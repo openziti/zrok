@@ -19,6 +19,8 @@ paths:
     post:
       tags:
         - account
+      security:
+        - key: []
       operationId: changePassword
       parameters:
         - name: body
