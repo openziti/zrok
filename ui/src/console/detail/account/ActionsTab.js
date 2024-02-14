@@ -14,9 +14,6 @@ const ActionsTab = (props) => {
             <ResetToken show={showResetTokenModal} onHide={closeResetTokenModal} user={props.user}/>
         </div>
     )
-    const returnState = () => {
-        setActionState("menu")
-    }
 
     const renderActions = () => {
         switch (actionState) {
