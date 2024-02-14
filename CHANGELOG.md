@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.24
+
+FIX: Updated password reset to handle multiple reset requests.
+
 ## v0.4.23
 
 CHANGE: Improved OpenZiti resource cleanup resilience. Previous resource cleanup would stop when an error was encountered at any stage of the cleanup process (serps, sps, config, service). New cleanup implementation logs errors but continues to clean up anything that it can (https://github.com/openziti/zrok/issues/533)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type PasswordResetRequest struct {
@@ -17,6 +18,10 @@ type PasswordResetRequest struct {
 }
 
 func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sqlx.Tx) (int, error) {
+	if err := str.DeletePasswordResetRequestsByAccountId(prr.AccountId, tx); err != nil {
+		logrus.Errorf("unable to delete old password reset requests for account '%v', but continuing: %v", prr.AccountId, err)
+	}
+
 	stmt, err := tx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing password_reset_requests insert statement")
@@ -95,6 +100,18 @@ func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) er
 	_, err = stmt.Exec(anyIds...)
 	if err != nil {
 		return errors.Wrap(err, "error executing password_reset_requests delete multiple statement")
+	}
+	return nil
+}
+
+func (str *Store) DeletePasswordResetRequestsByAccountId(accountId int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where account_id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing password_reset_requests delete by account_id statement")
+	}
+	_, err = stmt.Exec(accountId)
+	if err != nil {
+		return errors.Wrap(err, "error executing password_reset_requests delete by account_id statement")
 	}
 	return nil
 }
