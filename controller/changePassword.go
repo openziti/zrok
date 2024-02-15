@@ -52,7 +52,7 @@ func (handler *changePasswordHandler) Handle(params account.ChangePasswordParams
 		return account.NewChangePasswordUnprocessableEntity().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	nhpwd, err := hashPassword(params.Body.NewPassword)
+	nhpwd, err := HashPassword(params.Body.NewPassword)
 	if err != nil {
 		logrus.Errorf("error hashing password for '%v': %v", a.Email, err)
 		return account.NewChangePasswordInternalServerError()

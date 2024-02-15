@@ -8,6 +8,10 @@ const ActionsTab = (props) => {
     const openResetTokenModal = () => setShowResetTokenModal(true);
     const closeResetTokenModal = () => setShowResetTokenModal(false);
 
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+    const openChangePasswordModal = () => setShowChangePasswordModal(true);
+    const closeChangePasswordModal = () => setShowChangePasswordModal(false);
+
     return (
         <div className={"actions-tab"}>
             <div id={"token-regeneration"}>
@@ -29,6 +33,15 @@ const ActionsTab = (props) => {
                 </p>
                 <Button variant={"danger"} onClick={openResetTokenModal}>Regenerate Account Token</Button>
                 <ResetToken show={showResetTokenModal} onHide={closeResetTokenModal} user={props.user}/>
+            </div>
+            <div id={"change-password"} style={{"padding-top": "10px"}}>
+                <h3>Change Password</h3>
+                <p>
+                    You can change your password to a new one here!
+                </p>
+                <p>Note that this will <strong>not</strong> log out of any already logged in sessions.</p>
+                <Button onClick={openChangePasswordModal}>Change Password</Button>
+                <ChangePassword show={showChangePasswordModal} onHide={closeChangePasswordModal} user={props.user}/>
             </div>
         </div>
     )
