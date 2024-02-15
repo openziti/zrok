@@ -125,6 +125,8 @@ paths:
     post:
       tags:
         - account
+      security:
+        - key: []
       operationId: resetToken
       parameters:
         - name: body

@@ -40,7 +40,7 @@ type ClientService interface {
 
 	ResetPasswordRequest(params *ResetPasswordRequestParams, opts ...ClientOption) (*ResetPasswordRequestCreated, error)
 
-	ResetToken(params *ResetTokenParams, opts ...ClientOption) (*ResetTokenOK, error)
+	ResetToken(params *ResetTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetTokenOK, error)
 
 	Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, error)
 
@@ -240,7 +240,7 @@ func (a *Client) ResetPasswordRequest(params *ResetPasswordRequestParams, opts .
 /*
 ResetToken reset token API
 */
-func (a *Client) ResetToken(params *ResetTokenParams, opts ...ClientOption) (*ResetTokenOK, error) {
+func (a *Client) ResetToken(params *ResetTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetTokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewResetTokenParams()
@@ -254,6 +254,7 @@ func (a *Client) ResetToken(params *ResetTokenParams, opts ...ClientOption) (*Re
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &ResetTokenReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

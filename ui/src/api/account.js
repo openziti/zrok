@@ -140,7 +140,12 @@ const resetPasswordRequestOperation = {
 const resetTokenOperation = {
   path: '/resetToken',
   contentTypes: ['application/zrok.v1+json'],
-  method: 'post'
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const verifyOperation = {

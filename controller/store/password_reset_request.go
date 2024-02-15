@@ -98,15 +98,3 @@ func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) er
 	}
 	return nil
 }
-
-func (str *Store) DeletePasswordResetRequestByAccountId(accountId int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where account_id = $1")
-	if err != nil {
-		return errors.Wrap(err, "error preparing password_reset_requests by account_id delete statement")
-	}
-	_, err = stmt.Exec(accountId)
-	if err != nil {
-		return errors.Wrap(err, "error executing password_reset_requests by account_id delete statement")
-	}
-	return nil
-}

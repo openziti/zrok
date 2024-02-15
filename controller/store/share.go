@@ -1,10 +1,8 @@
 package store
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 type Share struct {
@@ -110,24 +108,6 @@ func (str *Store) DeleteShare(id int, tx *sqlx.Tx) error {
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return errors.Wrap(err, "error executing shares delete statement")
-	}
-	return nil
-}
-
-func (str *Store) DeleteSharesByEnvironmentIds(tx *sqlx.Tx, environmentIds ...int) error {
-	queryStrs := make([]string, 0, len(environmentIds))
-	queryVals := make([]interface{}, 0, len(environmentIds))
-	for i, v := range environmentIds {
-		queryStrs = append(queryStrs, fmt.Sprintf("$%d", i))
-		queryVals = append(queryVals, v)
-	}
-	stmt, err := tx.Prepare(fmt.Sprintf("update shares set updated_at = current_timestamp, deleted = true where environment_id in (%s)", strings.Join(queryStrs, ",")))
-	if err != nil {
-		return errors.Wrap(err, "error preparing Shares delete by environment_id statement")
-	}
-	_, err = stmt.Exec(queryVals...)
-	if err != nil {
-		return errors.Wrap(err, "error executing Shares delete by environment_id statement")
 	}
 	return nil
 }

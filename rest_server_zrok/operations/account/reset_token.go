@@ -12,19 +12,21 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ResetTokenHandlerFunc turns a function with the right signature into a reset token handler
-type ResetTokenHandlerFunc func(ResetTokenParams) middleware.Responder
+type ResetTokenHandlerFunc func(ResetTokenParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn ResetTokenHandlerFunc) Handle(params ResetTokenParams) middleware.Responder {
-	return fn(params)
+func (fn ResetTokenHandlerFunc) Handle(params ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	return fn(params, principal)
 }
 
 // ResetTokenHandler interface for that can handle valid reset token params
 type ResetTokenHandler interface {
-	Handle(ResetTokenParams) middleware.Responder
+	Handle(ResetTokenParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
 // NewResetToken creates a new http.Handler for the reset token operation
@@ -48,12 +50,25 @@ func (o *ResetToken) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		*r = *rCtx
 	}
 	var Params = NewResetTokenParams()
+	uprinc, aCtx, err := o.Context.Authorize(r, route)
+	if err != nil {
+		o.Context.Respond(rw, r, route.Produces, route, err)
+		return
+	}
+	if aCtx != nil {
+		*r = *aCtx
+	}
+	var principal *rest_model_zrok.Principal
+	if uprinc != nil {
+		principal = uprinc.(*rest_model_zrok.Principal) // this is really a rest_model_zrok.Principal, I promise
+	}
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
-	res := o.Handler.Handle(Params) // actually handle the request
+	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

@@ -834,6 +834,11 @@ func init() {
     },
     "/resetToken": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "account"
         ],
@@ -2497,6 +2502,11 @@ func init() {
     },
     "/resetToken": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "tags": [
           "account"
         ],

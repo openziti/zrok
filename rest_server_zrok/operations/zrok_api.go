@@ -115,7 +115,7 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
 		}),
-		AccountResetTokenHandler: account.ResetTokenHandlerFunc(func(params account.ResetTokenParams) middleware.Responder {
+		AccountResetTokenHandler: account.ResetTokenHandlerFunc(func(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetToken has not yet been implemented")
 		}),
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {

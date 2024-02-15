@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
@@ -12,7 +13,7 @@ func newResetTokenHandler() *resetTokenHandler {
 	return &resetTokenHandler{}
 }
 
-func (handler *resetTokenHandler) Handle(params account.ResetTokenParams) middleware.Responder {
+func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if params.Body.EmailAddress == "" {
 		logrus.Error("missing email")
 		return account.NewResetTokenNotFound()
@@ -37,7 +38,7 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams) middle
 	}
 
 	// Need to create new token and invalidate all other resources
-	token, err := createToken()
+	token, err := CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating token for request '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetTokenInternalServerError()
@@ -48,23 +49,6 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams) middle
 	if _, err := str.UpdateAccount(a, tx); err != nil {
 		logrus.Errorf("error updating account for request '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetTokenInternalServerError()
-	}
-
-	if err := str.DeletePasswordResetRequestByAccountId(a.Id, tx); err != nil {
-		logrus.Errorf("error deleting password reset requests for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
-	}
-
-	environmentIds, err := str.DeleteEnvironmentByAccountID(a.Id, tx)
-	if err != nil {
-		logrus.Errorf("error deleting environments for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
-	}
-
-	if err := str.DeleteFrontendsByEnvironmentIds(tx, environmentIds...); err != nil {
-		logrus.Errorf("error deleting frontends for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
-	}
-
-	if err := str.DeleteSharesByEnvironmentIds(tx, environmentIds...); err != nil {
-		logrus.Errorf("error deleting shares for request '%v', but continuing on: %v", params.Body.EmailAddress, err)
 	}
 
 	if err := tx.Commit(); err != nil {
