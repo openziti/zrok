@@ -23,7 +23,6 @@ const ResetToken = (props) => {
     }
 
     let resetToken = () => {
-        console.log("I should reset my token")
         account.resetToken({ body: { "emailAddress": props.user.email } }).then(resp => {
             console.log(resp)
             let user = JSON.parse(localStorage.getItem('user'))
@@ -34,13 +33,19 @@ const ResetToken = (props) => {
             document.dispatchEvent(new Event('storage'))
             setModalBody((
                 <div>
-                    <p>You will need to update your environment file ($HOME/.zrok/environmetn.json)</p>
-                    Token: <span id={"zrok-token"}>{resp.data.token}</span>{' '}
+                    <p>
+                        You will need to update your environment files <code> &#36;&#123;HOME&#125;/.zrok/environment.json </code>
+                        with the new <code> zrok_token </code>.
+                    </p>
+                    <p>
+                        Your new <code> zrok_token </code> is: <code><span id={"zrok-token"}>{resp.data.token}</span></code>{' '}
                         <Icon ref={target} path={mdiContentCopy} size={0.7} onClick={handleCopy}/>
+                    </p>
+
                 </div>
             ));
             setModalHeader((
-                <span>Token Reset Successful</span>
+                <span>Account Token Regenerated!</span>
             ))
         }).catch(err => {
             console.log("err", err);
@@ -48,28 +53,25 @@ const ResetToken = (props) => {
     }
 
     let hide = () => {
+        setModalHeader(defaultHeader)
         setModalBody(defaultModal)
         props.onHide()
     }
 
-    let defaultHeader = (<span>WARNING - Are you Sure?</span>)
+    let defaultHeader = (<span>Are you sure?</span>)
     let defaultModal = (
         <div>
-            <div>
-                <div>Reseting your token will revoke access from any CLI environments.</div>
-                <div>You will need to update $HOME/.zrok/environments.yml with your new token.</div>
-            </div>
-            <div style={{display: 'flex', alignItems:'center', justifyContent: 'center'}}>
-                <Button variant={"light"} onClick={resetToken}>Reset Token</Button>
-                <Button variant={"dark"} onClick={props.onHide}>Cancel</Button>
-            </div>
+            <p>Did you read the warning on the previous screen? This action will reset all of your active environments and shares!</p>
+            <p>You will need to update each of your <code> &#36;&#123;HOME&#125;/.zrok/environments.yml</code> files with your new token!</p>
+            <p align={"right"}>
+                <Button onClick={props.onHide}>Cancel</Button>
+                <Button variant={"danger"} onClick={resetToken}>Regenerate Token</Button>
+            </p>
         </div>
     );
 
     const [modalBody, setModalBody] = useState(defaultModal);
     const [modalHeader, setModalHeader] = useState(defaultHeader);
-
-
 
     return (
         <div>
