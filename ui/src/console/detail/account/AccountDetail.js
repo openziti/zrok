@@ -27,8 +27,8 @@ const AccountDetail = (props) => {
                     <MetricsTab />
                 </Tab>
                 <Tab eventKey={"actions"} title={"Actions"}>
-                     <ActionsTab user={props.user}/>
-                 </Tab>
+                      <ActionsTab user={props.user}/>
+                  </Tab>
             </Tabs>
         </div>
     );

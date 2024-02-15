@@ -94,6 +94,21 @@ export function resetPasswordRequest(options) {
 
 /**
  * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} token reset
+ */
+export function resetToken(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(resetTokenOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.verifyRequest} [options.body] 
  * @return {Promise<module:types.verifyResponse>} token ready
  */
@@ -146,6 +161,17 @@ const resetPasswordRequestOperation = {
   path: '/resetPasswordRequest',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post'
+}
+
+const resetTokenOperation = {
+  path: '/resetToken',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const verifyOperation = {

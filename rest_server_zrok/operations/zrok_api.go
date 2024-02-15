@@ -118,6 +118,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
 		}),
+		AccountResetTokenHandler: account.ResetTokenHandlerFunc(func(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.ResetToken has not yet been implemented")
+		}),
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
@@ -235,6 +238,8 @@ type ZrokAPI struct {
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
+	// AccountResetTokenHandler sets the operation handler for the reset token operation
+	AccountResetTokenHandler account.ResetTokenHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
@@ -398,6 +403,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
+	}
+	if o.AccountResetTokenHandler == nil {
+		unregistered = append(unregistered, "account.ResetTokenHandler")
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
@@ -611,6 +619,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/resetPasswordRequest"] = account.NewResetPasswordRequest(o.context, o.AccountResetPasswordRequestHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/resetToken"] = account.NewResetToken(o.context, o.AccountResetTokenHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

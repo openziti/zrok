@@ -50,6 +50,7 @@ func Run(inCfg *config.Config) error {
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
+	api.AccountResetTokenHandler = newResetTokenHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()

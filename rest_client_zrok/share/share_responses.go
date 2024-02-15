@@ -41,6 +41,12 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 			return nil, err
 		}
 		return nil, result
+	case 409:
+		result := NewShareConflict()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 422:
 		result := NewShareUnprocessableEntity()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -234,6 +240,62 @@ func (o *ShareNotFound) String() string {
 }
 
 func (o *ShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewShareConflict creates a ShareConflict with default headers values
+func NewShareConflict() *ShareConflict {
+	return &ShareConflict{}
+}
+
+/*
+ShareConflict describes a response with status code 409, with default header values.
+
+conflict
+*/
+type ShareConflict struct {
+}
+
+// IsSuccess returns true when this share conflict response has a 2xx status code
+func (o *ShareConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this share conflict response has a 3xx status code
+func (o *ShareConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this share conflict response has a 4xx status code
+func (o *ShareConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this share conflict response has a 5xx status code
+func (o *ShareConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this share conflict response a status code equal to that given
+func (o *ShareConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the share conflict response
+func (o *ShareConflict) Code() int {
+	return 409
+}
+
+func (o *ShareConflict) Error() string {
+	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
+}
+
+func (o *ShareConflict) String() string {
+	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
+}
+
+func (o *ShareConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

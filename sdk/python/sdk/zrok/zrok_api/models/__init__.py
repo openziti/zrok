@@ -32,6 +32,7 @@ from zrok_api.models.error_message import ErrorMessage
 from zrok_api.models.frontend import Frontend
 from zrok_api.models.frontends import Frontends
 from zrok_api.models.identity_body import IdentityBody
+from zrok_api.models.inline_response200 import InlineResponse200
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.invite_request import InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
@@ -48,6 +49,7 @@ from zrok_api.models.register_request import RegisterRequest
 from zrok_api.models.register_response import RegisterResponse
 from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.models.reset_password_request_body import ResetPasswordRequestBody
+from zrok_api.models.reset_token_body import ResetTokenBody
 from zrok_api.models.share import Share
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse

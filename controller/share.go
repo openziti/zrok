@@ -72,6 +72,15 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			logrus.Errorf("invalid unique name '%v' for account '%v'", uniqueName, principal.Email)
 			return share.NewShareUnprocessableEntity()
 		}
+		shareExists, err := str.ShareWithTokenExists(uniqueName, trx)
+		if err != nil {
+			logrus.Errorf("error checking share for token collision: %v", err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		if shareExists {
+			logrus.Errorf("token '%v' already exists; cannot create share", uniqueName)
+			return share.NewShareConflict()
+		}
 		shrToken = uniqueName
 	}
 
