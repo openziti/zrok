@@ -832,6 +832,50 @@ func init() {
         }
       }
     },
+    "/resetToken": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token reset",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -864,6 +908,9 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
           },
           "422": {
             "description": "unprocessable"
@@ -2456,6 +2503,50 @@ func init() {
         }
       }
     },
+    "/resetToken": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token reset",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -2488,6 +2579,9 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
           },
           "422": {
             "description": "unprocessable"

@@ -2,7 +2,13 @@
 
 ## v0.4.25
 
-FIX: Updated password reset to handle multiple reset requests.
+FEATURE: The web console now supports revoking your current account token and generating a new one (https://github.com/openziti/zrok/issues/191)
+
+CHANGE: Creating a reserved share checks for token collision and returns a more appropriate error message (https://github.com/openziti/zrok/issues/531)
+
+CHANGE: Update UI to add a 'true' value on `reserved` boolean (https://github.com/openziti/zrok/issues/443)
+
+FIX: Fixed bug where a second password reset request would for any account would fail (https://github.com/openziti/zrok/issues/452)
 
 ## v0.4.24
 

@@ -18,7 +18,7 @@ const rowToValue = (row) => {
     if(row.property.endsWith("At")) {
         return new Date(row.value).toLocaleString();
     }
-    return row.value;
+    return row.value.toString();
 };
 
 const PropertyTable = (props) => {
