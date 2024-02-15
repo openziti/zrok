@@ -865,6 +865,9 @@ func init() {
           "404": {
             "description": "not found"
           },
+          "409": {
+            "description": "conflict"
+          },
           "422": {
             "description": "unprocessable"
           },
@@ -2488,6 +2491,9 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
           },
           "422": {
             "description": "unprocessable"
