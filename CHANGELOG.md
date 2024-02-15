@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.25
+
+CHANGE: Creating a reserved share checks for token collision and returns a more appropriate error message (https://github.com/openziti/zrok/issues/531)
+
+CHANGE: Update UI to add a 'true' value on `reserved` boolean (https://github.com/openziti/zrok/issues/443)
+
 ## v0.4.24
 
 FEATURE: New `socks` backend mode for use with private sharing. Use `zrok share private --backend-mode socks` and then `zrok access private` that share from somewhere else... very lightweight VPN-like functionality (https://github.com/openziti/zrok/issues/558)
