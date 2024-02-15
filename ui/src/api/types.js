@@ -255,7 +255,7 @@
  * @property {string} authScheme 
  * @property {module:types.authUser[]} authUsers 
  * @property {string} oauthProvider 
- * @property {string[]} oauthEmailAddressPatterns 
+ * @property {string[]} oauthEmailDomains 
  * @property {string} oauthAuthorizationCheckInterval 
  * @property {boolean} reserved 
  * @property {string} uniqueName 

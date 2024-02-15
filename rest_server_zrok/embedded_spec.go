@@ -1495,7 +1495,7 @@ func init() {
         "oauthAuthorizationCheckInterval": {
           "type": "string"
         },
-        "oauthEmailAddressPatterns": {
+        "oauthEmailDomains": {
           "type": "array",
           "items": {
             "type": "string"
@@ -3119,7 +3119,7 @@ func init() {
         "oauthAuthorizationCheckInterval": {
           "type": "string"
         },
-        "oauthEmailAddressPatterns": {
+        "oauthEmailDomains": {
           "type": "array",
           "items": {
             "type": "string"

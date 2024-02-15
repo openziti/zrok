@@ -36,7 +36,7 @@ class ShareRequest(object):
         'auth_scheme': 'str',
         'auth_users': 'list[AuthUser]',
         'oauth_provider': 'str',
-        'oauth_email_address_patterns': 'list[str]',
+        'oauth_email_domains': 'list[str]',
         'oauth_authorization_check_interval': 'str',
         'reserved': 'bool',
         'unique_name': 'str'
@@ -51,13 +51,13 @@ class ShareRequest(object):
         'auth_scheme': 'authScheme',
         'auth_users': 'authUsers',
         'oauth_provider': 'oauthProvider',
-        'oauth_email_address_patterns': 'oauthEmailAddressPatterns',
+        'oauth_email_domains': 'oauthEmailDomains',
         'oauth_authorization_check_interval': 'oauthAuthorizationCheckInterval',
         'reserved': 'reserved',
         'unique_name': 'uniqueName'
     }
 
-    def __init__(self, env_zid=None, share_mode=None, frontend_selection=None, backend_mode=None, backend_proxy_endpoint=None, auth_scheme=None, auth_users=None, oauth_provider=None, oauth_email_address_patterns=None, oauth_authorization_check_interval=None, reserved=None, unique_name=None):  # noqa: E501
+    def __init__(self, env_zid=None, share_mode=None, frontend_selection=None, backend_mode=None, backend_proxy_endpoint=None, auth_scheme=None, auth_users=None, oauth_provider=None, oauth_email_domains=None, oauth_authorization_check_interval=None, reserved=None, unique_name=None):  # noqa: E501
         """ShareRequest - a model defined in Swagger"""  # noqa: E501
         self._env_zid = None
         self._share_mode = None
@@ -67,7 +67,7 @@ class ShareRequest(object):
         self._auth_scheme = None
         self._auth_users = None
         self._oauth_provider = None
-        self._oauth_email_address_patterns = None
+        self._oauth_email_domains = None
         self._oauth_authorization_check_interval = None
         self._reserved = None
         self._unique_name = None
@@ -88,8 +88,8 @@ class ShareRequest(object):
             self.auth_users = auth_users
         if oauth_provider is not None:
             self.oauth_provider = oauth_provider
-        if oauth_email_address_patterns is not None:
-            self.oauth_email_address_patterns = oauth_email_address_patterns
+        if oauth_email_domains is not None:
+            self.oauth_email_domains = oauth_email_domains
         if oauth_authorization_check_interval is not None:
             self.oauth_authorization_check_interval = oauth_authorization_check_interval
         if reserved is not None:
@@ -284,25 +284,25 @@ class ShareRequest(object):
         self._oauth_provider = oauth_provider
 
     @property
-    def oauth_email_address_patterns(self):
-        """Gets the oauth_email_address_patterns of this ShareRequest.  # noqa: E501
+    def oauth_email_domains(self):
+        """Gets the oauth_email_domains of this ShareRequest.  # noqa: E501
 
 
-        :return: The oauth_email_address_patterns of this ShareRequest.  # noqa: E501
+        :return: The oauth_email_domains of this ShareRequest.  # noqa: E501
         :rtype: list[str]
         """
-        return self._oauth_email_address_patterns
+        return self._oauth_email_domains
 
-    @oauth_email_address_patterns.setter
-    def oauth_email_address_patterns(self, oauth_email_address_patterns):
-        """Sets the oauth_email_address_patterns of this ShareRequest.
+    @oauth_email_domains.setter
+    def oauth_email_domains(self, oauth_email_domains):
+        """Sets the oauth_email_domains of this ShareRequest.
 
 
-        :param oauth_email_address_patterns: The oauth_email_address_patterns of this ShareRequest.  # noqa: E501
+        :param oauth_email_domains: The oauth_email_domains of this ShareRequest.  # noqa: E501
         :type: list[str]
         """
 
-        self._oauth_email_address_patterns = oauth_email_address_patterns
+        self._oauth_email_domains = oauth_email_domains
 
     @property
     def oauth_authorization_check_interval(self):
