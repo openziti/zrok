@@ -63,6 +63,14 @@ func (str *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, erro
 	return shr, nil
 }
 
+func (str *Store) ShareWithTokenExists(shrToken string, tx *sqlx.Tx) (bool, error) {
+	count := 0
+	if err := tx.QueryRowx("select count(0) from shares where token = $1 and not deleted", shrToken).Scan(&count); err != nil {
+		return true, errors.Wrap(err, "error selecting share count by token")
+	}
+	return count > 0, nil
+}
+
 func (str *Store) FindShareWithZIdAndDeleted(zId string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
 	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
