@@ -74,6 +74,48 @@ func init() {
         }
       }
     },
+    "/changePassword": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/changePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "changed password"
+          },
+          "400": {
+            "description": "password not changed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/configuration": {
       "get": {
         "tags": [
@@ -1111,6 +1153,20 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "changePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
           "type": "string"
         }
       }
@@ -1745,6 +1801,48 @@ func init() {
         }
       }
     },
+    "/changePassword": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/changePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "changed password"
+          },
+          "400": {
+            "description": "password not changed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/configuration": {
       "get": {
         "tags": [
@@ -2782,6 +2880,20 @@ func init() {
           "type": "string"
         },
         "username": {
+          "type": "string"
+        }
+      }
+    },
+    "changePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
           "type": "string"
         }
       }

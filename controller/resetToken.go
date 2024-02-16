@@ -14,11 +14,12 @@ func newResetTokenHandler() *resetTokenHandler {
 }
 
 func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	if params.Body.EmailAddress == "" {
-		logrus.Error("missing email")
+	logrus.Infof("received token regeneration request for email '%v'", principal.Email)
+
+	if params.Body.EmailAddress != principal.Email {
+		logrus.Errorf("mismatched account '%v' for '%v'", params.Body.EmailAddress, principal.Email)
 		return account.NewResetTokenNotFound()
 	}
-	logrus.Infof("received token reset request for email '%v'", params.Body.EmailAddress)
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -56,7 +57,7 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, princi
 		return account.NewResetTokenInternalServerError()
 	}
 
-	logrus.Infof("reset token for '%v'", a.Email)
+	logrus.Infof("regenerated token '%v' for '%v'", a.Token, a.Email)
 
 	return account.NewResetTokenOK().WithPayload(&account.ResetTokenOKBody{Token: token})
 }
