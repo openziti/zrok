@@ -2,6 +2,8 @@
 
 ## v0.4.25
 
+FEATURE: New action in the web console that allows changing the password of the logged-in account (https://github.com/openziti/zrok/issues/148)
+
 FEATURE: Added self service password change. There is a new tab in the `zrok` control panel that holds self service actions. Here you will find the ability to immediately change your password.
 
 FEATURE: The web console now supports revoking your current account token and generating a new one (https://github.com/openziti/zrok/issues/191)
