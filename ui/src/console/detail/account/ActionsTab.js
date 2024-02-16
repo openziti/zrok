@@ -16,7 +16,7 @@ const ActionsTab = (props) => {
         <div className={"actions-tab"}>
             <div id={"change-password"} style={{"padding-top": "10px"}}>
                 <h3>Change Password?</h3>
-                <p>Note that this will <strong>not</strong> log out of any already logged in sessions.</p>
+                <p>Change your password here. Note that this will <strong>not</strong> log you out of any already logged in sessions.</p>
                 <Button variant={"danger"} onClick={openChangePasswordModal}>Change Password</Button>
                 <ChangePassword show={showChangePasswordModal} onHide={closeChangePasswordModal} user={props.user}/>
             </div>

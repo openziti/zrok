@@ -64,7 +64,6 @@ const ResetToken = (props) => {
             <p>Did you read the warning on the previous screen? This action will reset all of your active environments and shares!</p>
             <p>You will need to update each of your <code> &#36;&#123;HOME&#125;/.zrok/environments.yml</code> files with your new token!</p>
             <p align={"right"}>
-                <Button onClick={props.onHide}>Cancel</Button>
                 <Button variant={"danger"} onClick={resetToken}>Regenerate Token</Button>
             </p>
         </div>
@@ -75,7 +74,7 @@ const ResetToken = (props) => {
 
     return (
         <div>
-            <Modal show={props.show} onHide={hide} centered>
+            <Modal show={props.show} onHide={hide} size={"lg"} centered>
                 <Modal.Header closeButton>{modalHeader}</Modal.Header>
                 <Modal.Body>
                     {modalBody}
