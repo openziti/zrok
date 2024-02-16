@@ -14,6 +14,15 @@ const ActionsTab = (props) => {
 
     return (
         <div className={"actions-tab"}>
+            <div id={"change-password"} style={{"padding-top": "10px"}}>
+                <h3>Change Password?</h3>
+                <p>Note that this will <strong>not</strong> log out of any already logged in sessions.</p>
+                <Button variant={"danger"} onClick={openChangePasswordModal}>Change Password</Button>
+                <ChangePassword show={showChangePasswordModal} onHide={closeChangePasswordModal} user={props.user}/>
+            </div>
+
+            <hr/>
+
             <div id={"token-regeneration"}>
                 <h3>Regenerate your account token <strong>(DANGER!)</strong>?</h3>
                 <p>
@@ -34,16 +43,7 @@ const ActionsTab = (props) => {
                 <Button variant={"danger"} onClick={openResetTokenModal}>Regenerate Account Token</Button>
                 <ResetToken show={showResetTokenModal} onHide={closeResetTokenModal} user={props.user}/>
             </div>
-            <div id={"change-password"} style={{"padding-top": "10px"}}>
-                <h3>Change Password</h3>
-                <p>
-                    You can change your password to a new one here!
-                </p>
-                <p>Note that this will <strong>not</strong> log out of any already logged in sessions.</p>
-                <Button onClick={openChangePasswordModal}>Change Password</Button>
-                <ChangePassword show={showChangePasswordModal} onHide={closeChangePasswordModal} user={props.user}/>
             </div>
-        </div>
     )
 }
 

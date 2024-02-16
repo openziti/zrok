@@ -8,7 +8,7 @@ import Modal from "react-bootstrap/Modal";
 const ChangePassword = (props) => {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [message, setMessage] = useState();
+    const [message, setMessage] = useState('');
     const [complete, setComplete] = useState(false);
     const [passwordLength, setPasswordLength] = useState(10);
     const [passwordRequireCapital, setPasswordRequireCapital] = useState(true);
@@ -53,7 +53,7 @@ const ChangePassword = (props) => {
 
     let hide = () => {
         props.onHide();
-        setMessage();
+        setMessage("");
         setComplete(false);
         setOldPassword("");
         setNewPassword("");
