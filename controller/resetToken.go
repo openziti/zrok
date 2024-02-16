@@ -20,6 +20,11 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, princi
 	}
 	logrus.Infof("received token reset request for email '%v'", params.Body.EmailAddress)
 
+	if params.Body.EmailAddress != principal.Email {
+		logrus.Errorf("mismatched account '%v' for '%v'", params.Body.EmailAddress, principal.Email)
+		return account.NewResetTokenNotFound()
+	}
+
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", params.Body.EmailAddress, err)

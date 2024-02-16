@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import ChangePassword from "./actions/ChangePassword";
-import ResetToken from "./actions/ResetToken";
 import {Button} from "react-bootstrap";
+import RegenerateToken from "./actions/RegenerateToken";
 
 const ActionsTab = (props) => {
-    const [showResetTokenModal, setShowResetTokenModal] = useState(false);
-    const openResetTokenModal = () => setShowResetTokenModal(true);
-    const closeResetTokenModal = () => setShowResetTokenModal(false);
+    const [showRegenerateTokenModal, setShowRegenerateTokenModal] = useState(false);
+    const openRegenerateTokenModal = () => setShowRegenerateTokenModal(true);
+    const closeRegenerateTokenModal = () => setShowRegenerateTokenModal(false);
 
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const openChangePasswordModal = () => setShowChangePasswordModal(true);
@@ -40,8 +40,8 @@ const ActionsTab = (props) => {
                     need to preserve, your best bet is to update the <code>zrok_token</code> in those environments as
                     described above.
                 </p>
-                <Button variant={"danger"} onClick={openResetTokenModal}>Regenerate Account Token</Button>
-                <ResetToken show={showResetTokenModal} onHide={closeResetTokenModal} user={props.user}/>
+                <Button variant={"danger"} onClick={openRegenerateTokenModal}>Regenerate Account Token</Button>
+                <RegenerateToken show={showRegenerateTokenModal} onHide={closeRegenerateTokenModal} user={props.user}/>
             </div>
             </div>
     )
