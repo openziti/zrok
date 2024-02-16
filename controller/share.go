@@ -72,6 +72,15 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			logrus.Errorf("invalid unique name '%v' for account '%v'", uniqueName, principal.Email)
 			return share.NewShareUnprocessableEntity()
 		}
+		shareExists, err := str.ShareWithTokenExists(uniqueName, trx)
+		if err != nil {
+			logrus.Errorf("error checking share for token collision: %v", err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		if shareExists {
+			logrus.Errorf("token '%v' already exists; cannot create share", uniqueName)
+			return share.NewShareConflict()
+		}
 		shrToken = uniqueName
 	}
 
@@ -133,16 +142,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		sshr.FrontendEndpoint = &frontendEndpoints[0]
 	} else if sshr.ShareMode == string(sdk.PrivateShareMode) {
 		sshr.FrontendEndpoint = &sshr.ShareMode
-	}
-
-	sh, err := str.FindShareWithToken(sshr.Token, trx)
-	if err != nil {
-		logrus.Errorf("error checking share for token collision: %v", err)
-		return share.NewShareInternalServerError()
-	}
-	if sh != nil {
-		logrus.Errorf("token '%v' already exists; cannot create share", sshr.Token)
-		return share.NewShareConflict()
 	}
 
 	sid, err := str.CreateShare(envId, sshr, trx)
