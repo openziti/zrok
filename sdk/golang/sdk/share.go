@@ -84,7 +84,7 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 		BackendMode:                     string(request.BackendMode),
 		BackendProxyEndpoint:            request.Target,
 		AuthScheme:                      string(None),
-		OauthEmailDomains:               request.OauthEmailDomains,
+		OauthEmailDomains:               request.OauthEmailAddressPatterns,
 		OauthProvider:                   request.OauthProvider,
 		OauthAuthorizationCheckInterval: request.OauthAuthorizationCheckInterval.String(),
 	}

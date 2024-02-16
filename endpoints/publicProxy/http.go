@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
@@ -266,21 +267,33 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 										return
 									}
 
-									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
-										if castedDomains, ok := validDomains.([]interface{}); !ok {
-											logrus.Error("invalid email domain format")
+									if validEmailAddressPatterns, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
+										if castedPatterns, ok := validEmailAddressPatterns.([]interface{}); !ok {
+											logrus.Error("invalid email pattern array format")
 											return
 										} else {
-											if len(castedDomains) > 0 {
+											if len(castedPatterns) > 0 {
 												found := false
-												for _, domain := range castedDomains {
-													if strings.HasSuffix(claims.Email, domain.(string)) {
-														found = true
-														break
+												for _, pattern := range castedPatterns {
+													if castedPattern, ok := pattern.(string); ok {
+														match, err := glob.Compile(castedPattern)
+														if err != nil {
+															logrus.Errorf("invalid email address pattern glob '%v': %v", pattern.(string), err)
+															unauthorizedUi.WriteUnauthorized(w)
+															return
+														}
+														if match.Match(claims.Email) {
+															found = true
+															break
+														}
+													} else {
+														logrus.Errorf("invalid email address pattern '%v'", pattern)
+														unauthorizedUi.WriteUnauthorized(w)
+														return
 													}
 												}
 												if !found {
-													logrus.Warnf("invalid email domain")
+													logrus.Warnf("unauthorized email '%v' for '%v'", claims.Email, shrToken)
 													unauthorizedUi.WriteUnauthorized(w)
 													return
 												}

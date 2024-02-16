@@ -22,7 +22,7 @@ class ShareRequest:
     Frontends: list[str] = field(default_factory=list[str])
     BasicAuth: list[str] = field(default_factory=list[str])
     OauthProvider: str = ""
-    OauthEmailDomains: list[str] = field(default_factory=list[str])
+    OauthEmailAddressPatterns: list[str] = field(default_factory=list[str])
     OauthAuthorizationCheckInterval: str = ""
     Reserved: bool = False
     UniqueName: str = ""

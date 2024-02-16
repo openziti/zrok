@@ -78,7 +78,7 @@ def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
                        backend_mode=request.BackendMode,
                        backend_proxy_endpoint=request.Target,
                        auth_scheme=model.AUTH_SCHEME_NONE,
-                       oauth_email_domains=request.OauthEmailDomains,
+                       oauth_email_domains=request.OauthEmailAddressPatterns,
                        oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval
                        )
     if request.OauthProvider != "":

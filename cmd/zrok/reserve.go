@@ -18,15 +18,15 @@ func init() {
 }
 
 type reserveCommand struct {
-	uniqueName         string
-	basicAuth          []string
-	frontendSelection  []string
-	backendMode        string
-	jsonOutput         bool
-	oauthProvider      string
-	oauthEmailDomains  []string
-	oauthCheckInterval time.Duration
-	cmd                *cobra.Command
+	uniqueName                string
+	basicAuth                 []string
+	frontendSelection         []string
+	backendMode               string
+	jsonOutput                bool
+	oauthProvider             string
+	oauthEmailAddressPatterns []string
+	oauthCheckInterval        time.Duration
+	cmd                       *cobra.Command
 }
 
 func newReserveCommand() *reserveCommand {
@@ -42,7 +42,7 @@ func newReserveCommand() *reserveCommand {
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
-	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domains to authenticate via OAuth")
+	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domains to authenticate via OAuth")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
@@ -139,7 +139,7 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("--oauth-provider only supported for public shares", nil)
 		}
 		req.OauthProvider = cmd.oauthProvider
-		req.OauthEmailDomains = cmd.oauthEmailDomains
+		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
 	}
 	shr, err := sdk.CreateShare(env, req)
