@@ -13,6 +13,7 @@ type Account struct {
 	Token     string
 	Limitless bool
 	Deleted   bool
+	Disabled  bool
 }
 
 func (str *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
@@ -37,7 +38,7 @@ func (str *Store) GetAccount(id int, tx *sqlx.Tx) (*Account, error) {
 
 func (str *Store) FindAccountWithEmail(email string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where email = lower($1) and not deleted", email).StructScan(a); err != nil {
+	if err := tx.QueryRowx("select * from accounts where email = lower($1) and not deleted and not disabled", email).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by email")
 	}
 	return a, nil
@@ -53,7 +54,7 @@ func (str *Store) FindAccountWithEmailAndDeleted(email string, tx *sqlx.Tx) (*Ac
 
 func (str *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where token = $1 and not deleted", token).StructScan(a); err != nil {
+	if err := tx.QueryRowx("select * from accounts where token = $1 and not deleted and not disabled", token).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by token")
 	}
 	return a, nil

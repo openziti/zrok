@@ -47,6 +47,10 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 		logrus.Errorf("account '%v' for '%v' deleted", a.Email, a.Token)
 		return account.NewResetPasswordNotFound()
 	}
+	if a.Disabled {
+		logrus.Errorf("account '%v' for '%v' disabled", a.Email, a.Token)
+		return account.NewResetPasswordNotFound()
+	}
 
 	if err := validatePassword(handler.cfg, params.Body.Password); err != nil {
 		logrus.Errorf("password not valid for request '%v', (%v): %v", params.Body.Token, a.Email, err)

@@ -37,6 +37,10 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, princi
 		logrus.Errorf("account '%v' for '%v' deleted", a.Email, a.Token)
 		return account.NewResetTokenNotFound()
 	}
+	if a.Disabled {
+		logrus.Errorf("account '%v' for '%v' disabled", a.Email, a.Token)
+		return account.NewResetTokenNotFound()
+	}
 
 	// Need to create new token and invalidate all other resources
 	token, err := CreateToken()
