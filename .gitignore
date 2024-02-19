@@ -29,6 +29,8 @@ go.work
 go.work.sum
 zrok-venv
 
+# cache used by local dev cross-build script
+/.npm
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

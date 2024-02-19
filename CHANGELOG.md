@@ -1,5 +1,83 @@
 # CHANGELOG
 
+## v0.4.25
+
+FEATURE: New action in the web console that allows changing the password of the logged-in account (https://github.com/openziti/zrok/issues/148)
+
+FEATURE: The web console now supports revoking your current account token and generating a new one (https://github.com/openziti/zrok/issues/191)
+
+CHANGE: When specifying OAuth configuration for public shares from the `zrok share public` or `zrok reserve` public commands, the flags and functionality for restricting the allowed email addresses of the authenticating users has changed. The old flag was `--oauth-email-domains`, which took a string value that needed to be contained in the user's email address. The new flag is `--oauth-email-address-patterns`, which accepts a glob-style filter, using https://github.com/gobwas/glob (https://github.com/openziti/zrok/issues/413)
+
+CHANGE: Creating a reserved share checks for token collision and returns a more appropriate error message (https://github.com/openziti/zrok/issues/531)
+
+CHANGE: Update UI to add a 'true' value on `reserved` boolean (https://github.com/openziti/zrok/issues/443)
+
+FIX: Fixed bug where a second password reset request would for any account would fail (https://github.com/openziti/zrok/issues/452)
+
+## v0.4.24
+
+FEATURE: New `socks` backend mode for use with private sharing. Use `zrok share private --backend-mode socks` and then `zrok access private` that share from somewhere else... very lightweight VPN-like functionality (https://github.com/openziti/zrok/issues/558)
+
+FEATURE: New `zrok admin create account` command that allows populating accounts directly into the underlying controller database (https://github.com/openziti/zrok/issues/551)
+
+CHANGE: The `zrok test loopback public` utility to report non-`200` errors and also ensure that the listening side of the test is fully established before starting loopback testing.
+
+CHANGE: The OpenZiti SDK for golang (https://github.com/openziti/sdk-golang) has been updated to version `v0.22.28`
+
+## v0.4.23
+
+FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/cli.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
+
+FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
+
+FEATURE: Python SDK share and access handling now supports context management.
+
+FEATURE: TLS for `zrok` controller and frontends. Add the `tls:` stanza to your controller configuration (see `etc/ctrl.yml`) to enable TLS support for the controller API. Add the `tls:` stanza to your frontend configuration (see `etc/frontend.yml`) to enable TLS support for frontends (be sure to check your `public` frontend template) (#24)(https://github.com/openziti/zrok/issues/24)
+
+CHANGE: Improved OpenZiti resource cleanup resilience. Previous resource cleanup would stop when an error was encountered at any stage of the cleanup process (serps, sps, config, service). New cleanup implementation logs errors but continues to clean up anything that it can (https://github.com/openziti/zrok/issues/533)
+
+CHANGE: Instead of setting the `ListenOptions.MaxConnections` property to `64`, use the default value of `3`. This property actually controls the number of terminators created on the underlying OpenZiti network. This property is actually getting renamed to `ListenOptions.MaxTerminators` in an upcoming release of `github.com/openziti/sdk-golang` (https://github.com/openziti/zrok/issues/535)
+
+CHANGE: Versioning for the Python SDK has been updated to use versioneer for management.
+
+CHANGE: Python SDK package name has been renamed to `zrok`, dropping the `-sdk` postfix. [pypi](https://pypi.org/project/zrok).
+
+## v0.4.22
+
+FIX: The goreleaser action is not updated to work with the latest golang build. Modifed `go.mod` to comply with what goreleaser expects
+
+## v0.4.21
+
+FEATURE: The web console now supports deleting `zrok access` frontends (https://github.com/openziti/zrok/issues/504)
+
+CHANGE: The web console now displays the frontend token as the label for any `zrok access` frontends throughout the user interface (https://github.com/openziti/zrok/issues/504)
+
+CHANGE: Updated `github.com/rubenv/sql-migrate` to `v1.6.0`
+
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v0.22.6`
+
+FIX: The migration `sqlite3/015_v0_4_19_share_unique_name_constraint.sql` has been adjusted to delete the old `shares_old` table as the last step of the migration process. Not sure exactly why, but SQLite is unhappy otherwise (https://github.com/openziti/zrok/issues/504)
+
+FIX: Email addresses have been made case-insensitive. Please note that there is a migration included in this release (`016_v0_4_21_lowercase_email.sql`) which will attempt to ensure that all email addresses in your existing database are stored in lowercase; **if this migration fails you will need to manually remediate the duplicate account entries** (https://github.com/openziti/zrok/issues/517)
+
+FIX: Stop sending authentication cookies to non-authenticated shares (https://github.com/openziti/zrok/issues/512)
+
+## v0.4.20
+
+CHANGE: OpenZiti SDK updated to `v0.21.2`. All `ziti.ListenOptions` listener options configured to use `WaitForNEstablishedListeners: 1`. When a `zrok share` client or an `sdk.Share` client are connected to an OpenZiti router that supports "listener established" events, then listen calls will not return until the listener is fully established on the OpenZiti network. Previously a `zrok share` client could report that it is fully operational and listening before the listener is fully established on the OpenZiti network; in practice this produced a very small window of time when the share would not be ready to accept requests. This change eliminates this window of time (https://github.com/openziti/zrok/issues/490)
+
+FIX: Require the JWT in a zrok OAuth cookie to have an audience claim that matches the public share hostname. This prevents a cookie from one share from being use to log in to another share.
+
+## v0.4.19
+
+FEATURE: Reserved shares now support unique names ("vanity tokens"). This allows for the creation of reserved shares with identifiable names rather than generated share tokens. Includes basic support for profanity checking (https://github.com/openziti/zrok/issues/401)
+
+CHANGE: The `publicProxy` endpoint implementation used in the `zrok access public` frontend has been updated to use the new `RefreshService(serviceName)` call instead of `RefreshServices()`. This should greatly improve the performance of requests against missing or non-responsive zrok shares (https://github.com/openziti/zrok/issues/487)
+
+CHANGE: The Python SDK has been updated to properly support the "reserved" flag on the `ShareRequest` passed to `CreateShare`
+
+CHANGE: Dependency updates; `github.com/openziti/sdk-golang@v0.20.145`; `github.com/caddyserver/caddy/v2@2.7.6`; indirect dependencies
+
 ## v0.4.18
 
 FEATURE: Python SDK added. Can be found on [pypi](https://test.pypi.org/project/zrok-sdk). `pastebin` example illustrates basic SDK usage (see `sdk/python/examples/README.md` for details) (https://github.com/openziti/zrok/issues/401)

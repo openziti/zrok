@@ -74,6 +74,48 @@ func init() {
         }
       }
     },
+    "/changePassword": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/changePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "changed password"
+          },
+          "400": {
+            "description": "password not changed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/configuration": {
       "get": {
         "tags": [
@@ -832,6 +874,50 @@ func init() {
         }
       }
     },
+    "/resetToken": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token reset",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -864,6 +950,9 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
           },
           "422": {
             "description": "unprocessable"
@@ -1068,6 +1157,20 @@ func init() {
         }
       }
     },
+    "changePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
+          "type": "string"
+        }
+      }
+    },
     "configuration": {
       "type": "object",
       "properties": {
@@ -1213,6 +1316,9 @@ func init() {
           "type": "integer"
         },
         "shrToken": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -1473,7 +1579,8 @@ func init() {
             "tcpTunnel",
             "udpTunnel",
             "caddy",
-            "drive"
+            "drive",
+            "socks"
           ]
         },
         "backendProxyEndpoint": {
@@ -1513,6 +1620,9 @@ func init() {
             "public",
             "private"
           ]
+        },
+        "uniqueName": {
+          "type": "string"
         }
       }
     },
@@ -1691,6 +1801,48 @@ func init() {
         }
       }
     },
+    "/changePassword": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/changePasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "changed password"
+          },
+          "400": {
+            "description": "password not changed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/configuration": {
       "get": {
         "tags": [
@@ -2449,6 +2601,50 @@ func init() {
         }
       }
     },
+    "/resetToken": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "resetToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "emailAddress": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "token reset",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -2481,6 +2677,9 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
           },
           "422": {
             "description": "unprocessable"
@@ -2685,6 +2884,20 @@ func init() {
         }
       }
     },
+    "changePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        },
+        "oldPassword": {
+          "type": "string"
+        }
+      }
+    },
     "configuration": {
       "type": "object",
       "properties": {
@@ -2830,6 +3043,9 @@ func init() {
           "type": "integer"
         },
         "shrToken": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -3090,7 +3306,8 @@ func init() {
             "tcpTunnel",
             "udpTunnel",
             "caddy",
-            "drive"
+            "drive",
+            "socks"
           ]
         },
         "backendProxyEndpoint": {
@@ -3130,6 +3347,9 @@ func init() {
             "public",
             "private"
           ]
+        },
+        "uniqueName": {
+          "type": "string"
         }
       }
     },

@@ -31,7 +31,7 @@ When the service starts it will:
 1. If you set up the repository by following the guide, then also install the `zrok-share` package. This package provides the systemd service.
 
     ```bash title="Ubuntu, Debian"
-    sudo sudo apt install zrok-share
+    sudo apt install zrok-share
     ```
 
     ```bash title="Fedora, Rocky"
@@ -87,6 +87,14 @@ Save the enable token from the zrok console in the configuration file.
 
 ```bash title="/opt/openziti/etc/zrok/zrok-share.env"
 ZROK_ENABLE_TOKEN="14cbfca9772f"
+```
+
+## Name your Share
+
+This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_UNIQUE_NAME="my-prod-app"
 ```
 
 ## Use Cases

@@ -48,7 +48,7 @@ func (o *GetFrontendDetailReader) ReadResponse(response runtime.ClientResponse, 
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /detail/frontend/{feId}] getFrontendDetail", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *GetFrontendDetailOK) IsServerError() bool {
 // IsCode returns true when this get frontend detail o k response a status code equal to that given
 func (o *GetFrontendDetailOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get frontend detail o k response
+func (o *GetFrontendDetailOK) Code() int {
+	return 200
 }
 
 func (o *GetFrontendDetailOK) Error() string {
@@ -153,6 +158,11 @@ func (o *GetFrontendDetailUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the get frontend detail unauthorized response
+func (o *GetFrontendDetailUnauthorized) Code() int {
+	return 401
+}
+
 func (o *GetFrontendDetailUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /detail/frontend/{feId}][%d] getFrontendDetailUnauthorized ", 401)
 }
@@ -204,6 +214,11 @@ func (o *GetFrontendDetailNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get frontend detail not found response
+func (o *GetFrontendDetailNotFound) Code() int {
+	return 404
+}
+
 func (o *GetFrontendDetailNotFound) Error() string {
 	return fmt.Sprintf("[GET /detail/frontend/{feId}][%d] getFrontendDetailNotFound ", 404)
 }
@@ -253,6 +268,11 @@ func (o *GetFrontendDetailInternalServerError) IsServerError() bool {
 // IsCode returns true when this get frontend detail internal server error response a status code equal to that given
 func (o *GetFrontendDetailInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get frontend detail internal server error response
+func (o *GetFrontendDetailInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetFrontendDetailInternalServerError) Error() string {

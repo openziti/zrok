@@ -1,5 +1,13 @@
 # Multiple Backends Example
 #
+
+# global config must be first
+{
+    # no listen on 2019/tcp with admin API
+    admin off
+}
+
+# zrok site block
 http:// {
     # Bind to the zrok share
     bind {{ .ZrokBindAddress }}

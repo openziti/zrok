@@ -22,13 +22,14 @@ const (
 
 type ShareRequest struct {
 	Reserved                        bool
+	UniqueName                      string
 	BackendMode                     BackendMode
 	ShareMode                       ShareMode
 	Target                          string
 	Frontends                       []string
 	BasicAuth                       []string
 	OauthProvider                   string
-	OauthEmailDomains               []string
+	OauthEmailAddressPatterns       []string
 	OauthAuthorizationCheckInterval time.Duration
 }
 

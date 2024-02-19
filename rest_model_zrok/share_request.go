@@ -28,7 +28,7 @@ type ShareRequest struct {
 	AuthUsers []*AuthUser `json:"authUsers"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// backend proxy endpoint
@@ -56,6 +56,9 @@ type ShareRequest struct {
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
+
+	// unique name
+	UniqueName string `json:"uniqueName,omitempty"`
 }
 
 // Validate validates this share request
@@ -114,7 +117,7 @@ var shareRequestTypeBackendModePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -141,6 +144,9 @@ const (
 
 	// ShareRequestBackendModeDrive captures enum value "drive"
 	ShareRequestBackendModeDrive string = "drive"
+
+	// ShareRequestBackendModeSocks captures enum value "socks"
+	ShareRequestBackendModeSocks string = "socks"
 )
 
 // prop value enum
@@ -267,6 +273,11 @@ func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats str
 	for i := 0; i < len(m.AuthUsers); i++ {
 
 		if m.AuthUsers[i] != nil {
+
+			if swag.IsZero(m.AuthUsers[i]) { // not required
+				return nil
+			}
+
 			if err := m.AuthUsers[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))

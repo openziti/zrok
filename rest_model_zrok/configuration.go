@@ -87,6 +87,11 @@ func (m *Configuration) ContextValidate(ctx context.Context, formats strfmt.Regi
 func (m *Configuration) contextValidatePasswordRequirements(ctx context.Context, formats strfmt.Registry) error {
 
 	if m.PasswordRequirements != nil {
+
+		if swag.IsZero(m.PasswordRequirements) { // not required
+			return nil
+		}
+
 		if err := m.PasswordRequirements.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("passwordRequirements")

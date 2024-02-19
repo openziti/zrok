@@ -31,6 +31,7 @@ type Config struct {
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
 	Ziti          *zrokEdgeSdk.Config
+	Tls           *TlsConfig
 }
 
 type AdminConfig struct {
@@ -81,6 +82,11 @@ type ResetPasswordMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
+}
+
+type TlsConfig struct {
+	CertPath string
+	KeyPath  string
 }
 
 func DefaultConfig() *Config {

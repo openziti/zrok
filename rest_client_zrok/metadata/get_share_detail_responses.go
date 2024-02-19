@@ -48,7 +48,7 @@ func (o *GetShareDetailReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /detail/share/{shrToken}] getShareDetail", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *GetShareDetailOK) IsServerError() bool {
 // IsCode returns true when this get share detail o k response a status code equal to that given
 func (o *GetShareDetailOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the get share detail o k response
+func (o *GetShareDetailOK) Code() int {
+	return 200
 }
 
 func (o *GetShareDetailOK) Error() string {
@@ -153,6 +158,11 @@ func (o *GetShareDetailUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the get share detail unauthorized response
+func (o *GetShareDetailUnauthorized) Code() int {
+	return 401
+}
+
 func (o *GetShareDetailUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /detail/share/{shrToken}][%d] getShareDetailUnauthorized ", 401)
 }
@@ -204,6 +214,11 @@ func (o *GetShareDetailNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get share detail not found response
+func (o *GetShareDetailNotFound) Code() int {
+	return 404
+}
+
 func (o *GetShareDetailNotFound) Error() string {
 	return fmt.Sprintf("[GET /detail/share/{shrToken}][%d] getShareDetailNotFound ", 404)
 }
@@ -253,6 +268,11 @@ func (o *GetShareDetailInternalServerError) IsServerError() bool {
 // IsCode returns true when this get share detail internal server error response a status code equal to that given
 func (o *GetShareDetailInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the get share detail internal server error response
+func (o *GetShareDetailInternalServerError) Code() int {
+	return 500
 }
 
 func (o *GetShareDetailInternalServerError) Error() string {

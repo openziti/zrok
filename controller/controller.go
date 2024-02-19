@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"github.com/jessevdk/go-flags"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
@@ -43,11 +44,13 @@ func Run(inCfg *config.Config) error {
 
 	api := operations.NewZrokAPI(swaggerSpec)
 	api.KeyAuth = newZrokAuthenticator(cfg).authenticate
+	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
+	api.AccountResetTokenHandler = newResetTokenHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()
@@ -128,8 +131,16 @@ func Run(inCfg *config.Config) error {
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
-	server.Host = cfg.Endpoint.Host
-	server.Port = cfg.Endpoint.Port
+	if cfg.Tls != nil {
+		server.TLSHost = cfg.Endpoint.Host
+		server.TLSPort = cfg.Endpoint.Port
+		server.TLSCertificate = flags.Filename(cfg.Tls.CertPath)
+		server.TLSCertificateKey = flags.Filename(cfg.Tls.KeyPath)
+		server.EnabledListeners = []string{"https"}
+	} else {
+		server.Host = cfg.Endpoint.Host
+		server.Port = cfg.Endpoint.Port
+	}
 	rest_server_zrok.HealthCheck = HealthCheckHTTP
 	server.ConfigureAPI()
 	if err := server.Serve(); err != nil {

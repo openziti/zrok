@@ -54,7 +54,7 @@ func (o *CreateFrontendReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /frontend] createFrontend", response, response.Code())
 	}
 }
 
@@ -95,6 +95,11 @@ func (o *CreateFrontendCreated) IsServerError() bool {
 // IsCode returns true when this create frontend created response a status code equal to that given
 func (o *CreateFrontendCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the create frontend created response
+func (o *CreateFrontendCreated) Code() int {
+	return 201
 }
 
 func (o *CreateFrontendCreated) Error() string {
@@ -159,6 +164,11 @@ func (o *CreateFrontendBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the create frontend bad request response
+func (o *CreateFrontendBadRequest) Code() int {
+	return 400
+}
+
 func (o *CreateFrontendBadRequest) Error() string {
 	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
 }
@@ -208,6 +218,11 @@ func (o *CreateFrontendUnauthorized) IsServerError() bool {
 // IsCode returns true when this create frontend unauthorized response a status code equal to that given
 func (o *CreateFrontendUnauthorized) IsCode(code int) bool {
 	return code == 401
+}
+
+// Code gets the status code for the create frontend unauthorized response
+func (o *CreateFrontendUnauthorized) Code() int {
+	return 401
 }
 
 func (o *CreateFrontendUnauthorized) Error() string {
@@ -261,6 +276,11 @@ func (o *CreateFrontendNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the create frontend not found response
+func (o *CreateFrontendNotFound) Code() int {
+	return 404
+}
+
 func (o *CreateFrontendNotFound) Error() string {
 	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
 }
@@ -310,6 +330,11 @@ func (o *CreateFrontendInternalServerError) IsServerError() bool {
 // IsCode returns true when this create frontend internal server error response a status code equal to that given
 func (o *CreateFrontendInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the create frontend internal server error response
+func (o *CreateFrontendInternalServerError) Code() int {
+	return 500
 }
 
 func (o *CreateFrontendInternalServerError) Error() string {

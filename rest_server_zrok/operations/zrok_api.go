@@ -52,6 +52,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
+		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
+		}),
 		MetadataConfigurationHandler: metadata.ConfigurationHandlerFunc(func(params metadata.ConfigurationParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Configuration has not yet been implemented")
 		}),
@@ -114,6 +117,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
+		}),
+		AccountResetTokenHandler: account.ResetTokenHandlerFunc(func(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.ResetToken has not yet been implemented")
 		}),
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Share has not yet been implemented")
@@ -188,6 +194,8 @@ type ZrokAPI struct {
 
 	// ShareAccessHandler sets the operation handler for the access operation
 	ShareAccessHandler share.AccessHandler
+	// AccountChangePasswordHandler sets the operation handler for the change password operation
+	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataConfigurationHandler sets the operation handler for the configuration operation
 	MetadataConfigurationHandler metadata.ConfigurationHandler
 	// AdminCreateFrontendHandler sets the operation handler for the create frontend operation
@@ -230,6 +238,8 @@ type ZrokAPI struct {
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
+	// AccountResetTokenHandler sets the operation handler for the reset token operation
+	AccountResetTokenHandler account.ResetTokenHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
@@ -328,6 +338,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.ShareAccessHandler == nil {
 		unregistered = append(unregistered, "share.AccessHandler")
 	}
+	if o.AccountChangePasswordHandler == nil {
+		unregistered = append(unregistered, "account.ChangePasswordHandler")
+	}
 	if o.MetadataConfigurationHandler == nil {
 		unregistered = append(unregistered, "metadata.ConfigurationHandler")
 	}
@@ -390,6 +403,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
+	}
+	if o.AccountResetTokenHandler == nil {
+		unregistered = append(unregistered, "account.ResetTokenHandler")
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
@@ -515,6 +531,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/access"] = share.NewAccess(o.context, o.ShareAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -602,6 +622,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/resetToken"] = account.NewResetToken(o.context, o.AccountResetTokenHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/share"] = share.NewShare(o.context, o.ShareShareHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
@@ -668,6 +692,6 @@ func (o *ZrokAPI) AddMiddlewareFor(method, path string, builder middleware.Build
 	}
 	o.Init()
 	if h, ok := o.handlers[um][path]; ok {
-		o.handlers[method][path] = builder(h)
+		o.handlers[um][path] = builder(h)
 	}
 }

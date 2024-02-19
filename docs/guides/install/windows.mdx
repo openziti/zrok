@@ -29,7 +29,7 @@ import styles from '@site/src/css/download-card.module.css';
 
     ```text
     $source = Join-Path -Path $env:TEMP -ChildPath "zrok\zrok.exe"
-    $destination = Join-Path -Path $env:HOME -ChildPath "bin\zrok.exe"
+    $destination = Join-Path -Path $env:USERPROFILE -ChildPath "bin\zrok.exe"
     New-Item -Path $destination -ItemType Directory -ErrorAction SilentlyContinue
     Copy-Item -Path $source -Destination $destination
     $env:path += ";"+$destination

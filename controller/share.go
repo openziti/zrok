@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -33,14 +34,14 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
-				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
+				logrus.Debugf("found identity '%v' for account '%v'", envZId, principal.Email)
 				envId = env.Id
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
+			logrus.Errorf("environment '%v' not found for account '%v'", envZId, principal.Email)
 			return share.NewShareUnauthorized()
 		}
 	} else {
@@ -58,10 +59,29 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		logrus.Error(err)
 		return share.NewShareInternalServerError()
 	}
+
+	reserved := params.Body.Reserved
+	uniqueName := params.Body.UniqueName
 	shrToken, err := createShareToken()
 	if err != nil {
 		logrus.Error(err)
 		return share.NewShareInternalServerError()
+	}
+	if reserved && uniqueName != "" {
+		if !util.IsValidUniqueName(uniqueName) {
+			logrus.Errorf("invalid unique name '%v' for account '%v'", uniqueName, principal.Email)
+			return share.NewShareUnprocessableEntity()
+		}
+		shareExists, err := str.ShareWithTokenExists(uniqueName, trx)
+		if err != nil {
+			logrus.Errorf("error checking share for token collision: %v", err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		if shareExists {
+			logrus.Errorf("token '%v' already exists; cannot create share", uniqueName)
+			return share.NewShareConflict()
+		}
+		shrToken = uniqueName
 	}
 
 	var shrZId string
@@ -94,7 +114,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		}
 
 	case string(sdk.PrivateShareMode):
-		logrus.Info("doing private")
 		shrZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
 		if err != nil {
 			logrus.Error(err)
@@ -108,7 +127,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	logrus.Debugf("allocated share '%v'", shrToken)
 
-	reserved := params.Body.Reserved
 	sshr := &store.Share{
 		ZId:                  shrZId,
 		Token:                shrToken,

@@ -55,7 +55,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Infof("using invite token '%v' to process invite request for '%v'", inviteToken.Token, params.Body.Email)
 	}
 
-	token, err = createToken()
+	token, err = CreateToken()
 	if err != nil {
 		logrus.Error(err)
 		return account.NewInviteInternalServerError()

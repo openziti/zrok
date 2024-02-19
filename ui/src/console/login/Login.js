@@ -33,9 +33,19 @@ const Login = (props) => {
 
         account.login({body: {"email": email, "password": password}})
             .then(resp => {
-                let user = {
-                    "email": email,
-                    "token": resp
+                if (!resp.error) {
+                    let user = {
+                        "email": email.toLowerCase(),
+                        "token": resp.data
+                    }
+                    props.loginSuccess(user)
+                    localStorage.setItem('user', JSON.stringify(user))
+                    console.log(user)
+                    console.log('login succeeded', resp)
+                    document.dispatchEvent(new Event('storage'))
+                } else {
+                    console.log('login failed')
+                    setMessage(errorMessage);
                 }
                 props.loginSuccess(user)
                 localStorage.setItem('user', JSON.stringify(user))

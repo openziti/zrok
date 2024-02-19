@@ -15,6 +15,32 @@ paths:
   #
   # account
   #
+  /changePassword:
+    post:
+      tags:
+        - account
+      security:
+        - key: []
+      operationId: changePassword
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/changePasswordRequest'
+      responses:
+        200:
+          description: changed password
+        400:
+          description: password not changed
+        401:
+          description: unauthorized
+        422:
+          description: password validation failure
+          schema:
+            $ref: '#/definitions/errorMessage'
+        500:
+          description: internal server error
+
   /invite:
     post:
       tags:
@@ -118,6 +144,32 @@ paths:
           description: forgot password request created
         400:
           description: forgot password request not created
+        500:
+          description: internal server error
+
+  /resetToken:
+    post:
+      tags:
+        - account
+      security:
+        - key: []
+      operationId: resetToken
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              emailAddress:
+                type: string
+      responses:
+        200:
+          description: token reset
+          schema:
+            properties:
+              token:
+                type: string
+        404:
+          description: account not found
         500:
           description: internal server error
 
@@ -577,6 +629,8 @@ paths:
           description: unauthorized
         404:
           description: not found
+        409:
+          description: conflict
         422:
           description: unprocessable
         500:
@@ -674,6 +728,16 @@ definitions:
         type: string
       password:
         type: string
+
+  changePasswordRequest:
+    type: object
+    properties:
+      email:
+        type: string
+      oldPassword:
+        type: string
+      newPassword:
+         type: string
 
   configuration:
     type: object
@@ -778,6 +842,8 @@ definitions:
     properties:
       id:
         type: integer
+      token:
+        type: string
       shrToken:
         type: string
       zId:
@@ -971,7 +1037,7 @@ definitions:
           type: string
       backendMode:
         type: string
-        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive"]
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks"]
       backendProxyEndpoint:
         type: string
       authScheme:
@@ -991,6 +1057,8 @@ definitions:
         type: string
       reserved:
         type: boolean
+      uniqueName:
+        type: string
 
   shareResponse:
     type: object

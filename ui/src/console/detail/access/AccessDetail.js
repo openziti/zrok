@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {MetadataApi} from "../../../api/src";
 import {Tab, Tabs} from "react-bootstrap";
 import DetailTab from "./DetailTab";
+import ActionsTab from "./ActionsTab";
 
 const AccessDetail = (props) => {
     const [detail, setDetail] = useState({});
@@ -18,10 +19,13 @@ const AccessDetail = (props) => {
 
     return (
         <div>
-            <h2><Icon path={mdiAccessPointNetwork} size={2} />{" "}{detail.shrToken} ({detail.id})</h2>
+            <h2><Icon path={mdiAccessPointNetwork} size={2} />{" "}{detail.token}</h2>
             <Tabs defaultActiveKey={"detail"} className={"mb-3"}>
                 <Tab eventKey={"detail"} title={"Detail"}>
                     <DetailTab frontend={detail} />
+                </Tab>
+                <Tab eventKey={"actions"} title={"Actions"}>
+                    <ActionsTab frontend={detail} />
                 </Tab>
             </Tabs>
         </div>

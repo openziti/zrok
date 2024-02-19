@@ -45,7 +45,7 @@ func (o *DeleteFrontendReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[DELETE /frontend] deleteFrontend", response, response.Code())
 	}
 }
 
@@ -85,6 +85,11 @@ func (o *DeleteFrontendOK) IsServerError() bool {
 // IsCode returns true when this delete frontend o k response a status code equal to that given
 func (o *DeleteFrontendOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the delete frontend o k response
+func (o *DeleteFrontendOK) Code() int {
+	return 200
 }
 
 func (o *DeleteFrontendOK) Error() string {
@@ -138,6 +143,11 @@ func (o *DeleteFrontendUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the delete frontend unauthorized response
+func (o *DeleteFrontendUnauthorized) Code() int {
+	return 401
+}
+
 func (o *DeleteFrontendUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendUnauthorized ", 401)
 }
@@ -189,6 +199,11 @@ func (o *DeleteFrontendNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the delete frontend not found response
+func (o *DeleteFrontendNotFound) Code() int {
+	return 404
+}
+
 func (o *DeleteFrontendNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendNotFound ", 404)
 }
@@ -238,6 +253,11 @@ func (o *DeleteFrontendInternalServerError) IsServerError() bool {
 // IsCode returns true when this delete frontend internal server error response a status code equal to that given
 func (o *DeleteFrontendInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the delete frontend internal server error response
+func (o *DeleteFrontendInternalServerError) Code() int {
+	return 500
 }
 
 func (o *DeleteFrontendInternalServerError) Error() string {

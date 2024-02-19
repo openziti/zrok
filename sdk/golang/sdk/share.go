@@ -26,6 +26,9 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 		return nil, errors.Errorf("unknown share mode '%v'", request.ShareMode)
 	}
 	out.Body.Reserved = request.Reserved
+	if request.Reserved {
+		out.Body.UniqueName = request.UniqueName
+	}
 
 	if len(request.BasicAuth) > 0 {
 		out.Body.AuthScheme = string(Basic)
@@ -81,7 +84,7 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 		BackendMode:                     string(request.BackendMode),
 		BackendProxyEndpoint:            request.Target,
 		AuthScheme:                      string(None),
-		OauthEmailDomains:               request.OauthEmailDomains,
+		OauthEmailDomains:               request.OauthEmailAddressPatterns,
 		OauthProvider:                   request.OauthProvider,
 		OauthAuthorizationCheckInterval: request.OauthAuthorizationCheckInterval.String(),
 	}

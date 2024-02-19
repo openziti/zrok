@@ -38,7 +38,8 @@ class ShareRequest(object):
         'oauth_provider': 'str',
         'oauth_email_domains': 'list[str]',
         'oauth_authorization_check_interval': 'str',
-        'reserved': 'bool'
+        'reserved': 'bool',
+        'unique_name': 'str'
     }
 
     attribute_map = {
@@ -52,10 +53,11 @@ class ShareRequest(object):
         'oauth_provider': 'oauthProvider',
         'oauth_email_domains': 'oauthEmailDomains',
         'oauth_authorization_check_interval': 'oauthAuthorizationCheckInterval',
-        'reserved': 'reserved'
+        'reserved': 'reserved',
+        'unique_name': 'uniqueName'
     }
 
-    def __init__(self, env_zid=None, share_mode=None, frontend_selection=None, backend_mode=None, backend_proxy_endpoint=None, auth_scheme=None, auth_users=None, oauth_provider=None, oauth_email_domains=None, oauth_authorization_check_interval=None, reserved=None):  # noqa: E501
+    def __init__(self, env_zid=None, share_mode=None, frontend_selection=None, backend_mode=None, backend_proxy_endpoint=None, auth_scheme=None, auth_users=None, oauth_provider=None, oauth_email_domains=None, oauth_authorization_check_interval=None, reserved=None, unique_name=None):  # noqa: E501
         """ShareRequest - a model defined in Swagger"""  # noqa: E501
         self._env_zid = None
         self._share_mode = None
@@ -68,6 +70,7 @@ class ShareRequest(object):
         self._oauth_email_domains = None
         self._oauth_authorization_check_interval = None
         self._reserved = None
+        self._unique_name = None
         self.discriminator = None
         if env_zid is not None:
             self.env_zid = env_zid
@@ -91,6 +94,8 @@ class ShareRequest(object):
             self.oauth_authorization_check_interval = oauth_authorization_check_interval
         if reserved is not None:
             self.reserved = reserved
+        if unique_name is not None:
+            self.unique_name = unique_name
 
     @property
     def env_zid(self):
@@ -179,7 +184,7 @@ class ShareRequest(object):
         :param backend_mode: The backend_mode of this ShareRequest.  # noqa: E501
         :type: str
         """
-        allowed_values = ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy"]  # noqa: E501
+        allowed_values = ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks"]  # noqa: E501
         if backend_mode not in allowed_values:
             raise ValueError(
                 "Invalid value for `backend_mode` ({0}), must be one of {1}"  # noqa: E501
@@ -340,6 +345,27 @@ class ShareRequest(object):
         """
 
         self._reserved = reserved
+
+    @property
+    def unique_name(self):
+        """Gets the unique_name of this ShareRequest.  # noqa: E501
+
+
+        :return: The unique_name of this ShareRequest.  # noqa: E501
+        :rtype: str
+        """
+        return self._unique_name
+
+    @unique_name.setter
+    def unique_name(self, unique_name):
+        """Sets the unique_name of this ShareRequest.
+
+
+        :param unique_name: The unique_name of this ShareRequest.  # noqa: E501
+        :type: str
+        """
+
+        self._unique_name = unique_name
 
     def to_dict(self):
         """Returns the model properties as a dict"""
