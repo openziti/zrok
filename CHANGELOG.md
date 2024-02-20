@@ -8,6 +8,8 @@ FEATURE: The web console now supports revoking your current account token and ge
 
 CHANGE: When specifying OAuth configuration for public shares from the `zrok share public` or `zrok reserve` public commands, the flags and functionality for restricting the allowed email addresses of the authenticating users has changed. The old flag was `--oauth-email-domains`, which took a string value that needed to be contained in the user's email address. The new flag is `--oauth-email-address-patterns`, which accepts a glob-style filter, using https://github.com/gobwas/glob (https://github.com/openziti/zrok/issues/413)
 
+CHANGE: Added disabled field to accounts. Manually accessible for now.
+
 CHANGE: Creating a reserved share checks for token collision and returns a more appropriate error message (https://github.com/openziti/zrok/issues/531)
 
 CHANGE: Update UI to add a 'true' value on `reserved` boolean (https://github.com/openziti/zrok/issues/443)
