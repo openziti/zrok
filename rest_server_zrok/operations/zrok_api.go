@@ -109,6 +109,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
+		AccountRegenerateTokenHandler: account.RegenerateTokenHandlerFunc(func(params account.RegenerateTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.RegenerateToken has not yet been implemented")
+		}),
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
@@ -117,9 +120,6 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
-		}),
-		AccountResetTokenHandler: account.ResetTokenHandlerFunc(func(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation account.ResetToken has not yet been implemented")
 		}),
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Share has not yet been implemented")
@@ -232,14 +232,14 @@ type ZrokAPI struct {
 	AccountLoginHandler account.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
+	// AccountRegenerateTokenHandler sets the operation handler for the regenerate token operation
+	AccountRegenerateTokenHandler account.RegenerateTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
 	// AccountResetPasswordHandler sets the operation handler for the reset password operation
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
-	// AccountResetTokenHandler sets the operation handler for the reset token operation
-	AccountResetTokenHandler account.ResetTokenHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
@@ -395,6 +395,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
+	if o.AccountRegenerateTokenHandler == nil {
+		unregistered = append(unregistered, "account.RegenerateTokenHandler")
+	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
 	}
@@ -403,9 +406,6 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
-	}
-	if o.AccountResetTokenHandler == nil {
-		unregistered = append(unregistered, "account.ResetTokenHandler")
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
@@ -610,6 +610,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/regenerateToken"] = account.NewRegenerateToken(o.context, o.AccountRegenerateTokenHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -619,10 +623,6 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/resetPasswordRequest"] = account.NewResetPasswordRequest(o.context, o.AccountResetPasswordRequestHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
-	o.handlers["POST"]["/resetToken"] = account.NewResetToken(o.context, o.AccountResetTokenHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

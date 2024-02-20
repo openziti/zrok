@@ -219,12 +219,9 @@ class Configuration(six.with_metaclass(TypeWithDefault, object)):
 
         :return: The token for basic HTTP authentication.
         """
-        token = ""
-        if self.username or self.password:
-            token = urllib3.util.make_headers(
-                basic_auth=self.username + ':' + self.password
-            ).get('authorization')
-        return token
+        return urllib3.util.make_headers(
+            basic_auth=self.username + ':' + self.password
+        ).get('authorization')
 
     def auth_settings(self):
         """Gets Auth Settings dict for api client.
