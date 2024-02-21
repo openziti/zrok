@@ -39,7 +39,7 @@ func (handler *regenerateTokenHandler) Handle(params account.RegenerateTokenPara
 	}
 	if a.Disabled {
 		logrus.Errorf("account '%v' for '%v' disabled", a.Email, a.Token)
-		return account.NewResetTokenNotFound()
+		return account.NewRegenerateTokenNotFound()
 	}
 
 	// Need to create new token and invalidate all other resources
