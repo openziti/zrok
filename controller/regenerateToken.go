@@ -7,35 +7,35 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type resetTokenHandler struct{}
+type regenerateTokenHandler struct{}
 
-func newResetTokenHandler() *resetTokenHandler {
-	return &resetTokenHandler{}
+func newRegenerateTokenHandler() *regenerateTokenHandler {
+	return &regenerateTokenHandler{}
 }
 
-func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (handler *regenerateTokenHandler) Handle(params account.RegenerateTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	logrus.Infof("received token regeneration request for email '%v'", principal.Email)
 
 	if params.Body.EmailAddress != principal.Email {
 		logrus.Errorf("mismatched account '%v' for '%v'", params.Body.EmailAddress, principal.Email)
-		return account.NewResetTokenNotFound()
+		return account.NewRegenerateTokenNotFound()
 	}
 
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", params.Body.EmailAddress, err)
-		return account.NewResetTokenInternalServerError()
+		return account.NewRegenerateTokenInternalServerError()
 	}
 	defer tx.Rollback()
 
 	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
 	if err != nil {
 		logrus.Errorf("error finding account for '%v': %v", params.Body.EmailAddress, err)
-		return account.NewResetTokenNotFound()
+		return account.NewRegenerateTokenNotFound()
 	}
 	if a.Deleted {
 		logrus.Errorf("account '%v' for '%v' deleted", a.Email, a.Token)
-		return account.NewResetTokenNotFound()
+		return account.NewRegenerateTokenNotFound()
 	}
 	if a.Disabled {
 		logrus.Errorf("account '%v' for '%v' disabled", a.Email, a.Token)
@@ -46,22 +46,22 @@ func (handler *resetTokenHandler) Handle(params account.ResetTokenParams, princi
 	token, err := CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating token for request '%v': %v", params.Body.EmailAddress, err)
-		return account.NewResetTokenInternalServerError()
+		return account.NewRegenerateTokenInternalServerError()
 	}
 
 	a.Token = token
 
 	if _, err := str.UpdateAccount(a, tx); err != nil {
 		logrus.Errorf("error updating account for request '%v': %v", params.Body.EmailAddress, err)
-		return account.NewResetTokenInternalServerError()
+		return account.NewRegenerateTokenInternalServerError()
 	}
 
 	if err := tx.Commit(); err != nil {
 		logrus.Errorf("error committing '%v' (%v): %v", params.Body.EmailAddress, a.Email, err)
-		return account.NewResetTokenInternalServerError()
+		return account.NewRegenerateTokenInternalServerError()
 	}
 
 	logrus.Infof("regenerated token '%v' for '%v'", a.Token, a.Email)
 
-	return account.NewResetTokenOK().WithPayload(&account.ResetTokenOKBody{Token: token})
+	return account.NewRegenerateTokenOK().WithPayload(&account.RegenerateTokenOKBody{Token: token})
 }

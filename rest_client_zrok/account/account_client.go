@@ -36,13 +36,13 @@ type ClientService interface {
 
 	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
 
+	RegenerateToken(params *RegenerateTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateTokenOK, error)
+
 	Register(params *RegisterParams, opts ...ClientOption) (*RegisterOK, error)
 
 	ResetPassword(params *ResetPasswordParams, opts ...ClientOption) (*ResetPasswordOK, error)
 
 	ResetPasswordRequest(params *ResetPasswordRequestParams, opts ...ClientOption) (*ResetPasswordRequestCreated, error)
-
-	ResetToken(params *ResetTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetTokenOK, error)
 
 	Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, error)
 
@@ -165,6 +165,45 @@ func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, err
 }
 
 /*
+RegenerateToken regenerate token API
+*/
+func (a *Client) RegenerateToken(params *RegenerateTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateTokenOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRegenerateTokenParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "regenerateToken",
+		Method:             "POST",
+		PathPattern:        "/regenerateToken",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RegenerateTokenReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RegenerateTokenOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for regenerateToken: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 Register register API
 */
 func (a *Client) Register(params *RegisterParams, opts ...ClientOption) (*RegisterOK, error) {
@@ -275,45 +314,6 @@ func (a *Client) ResetPasswordRequest(params *ResetPasswordRequestParams, opts .
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for resetPasswordRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-ResetToken reset token API
-*/
-func (a *Client) ResetToken(params *ResetTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ResetTokenOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewResetTokenParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "resetToken",
-		Method:             "POST",
-		PathPattern:        "/resetToken",
-		ProducesMediaTypes: []string{"application/zrok.v1+json"},
-		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &ResetTokenReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*ResetTokenOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for resetToken: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
