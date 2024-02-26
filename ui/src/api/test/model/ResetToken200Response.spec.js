@@ -28,7 +28,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new Zrok.Frontend();
+    instance = new Zrok.ResetToken200Response();
   });
 
   var getProperty = function(object, getter, property) {
@@ -47,46 +47,16 @@
       object[property] = value;
   }
 
-  describe('Frontend', function() {
-    it('should create an instance of Frontend', function() {
-      // uncomment below and update the code to test Frontend
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be.a(Zrok.Frontend);
-    });
-
-    it('should have the property id (base name: "id")', function() {
-      // uncomment below and update the code to test the property id
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be();
+  describe('ResetToken200Response', function() {
+    it('should create an instance of ResetToken200Response', function() {
+      // uncomment below and update the code to test ResetToken200Response
+      //var instance = new Zrok.ResetToken200Response();
+      //expect(instance).to.be.a(Zrok.ResetToken200Response);
     });
 
     it('should have the property token (base name: "token")', function() {
       // uncomment below and update the code to test the property token
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property shrToken (base name: "shrToken")', function() {
-      // uncomment below and update the code to test the property shrToken
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property zId (base name: "zId")', function() {
-      // uncomment below and update the code to test the property zId
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property createdAt (base name: "createdAt")', function() {
-      // uncomment below and update the code to test the property createdAt
-      //var instance = new Zrok.Frontend();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property updatedAt (base name: "updatedAt")', function() {
-      // uncomment below and update the code to test the property updatedAt
-      //var instance = new Zrok.Frontend();
+      //var instance = new Zrok.ResetToken200Response();
       //expect(instance).to.be();
     });
 

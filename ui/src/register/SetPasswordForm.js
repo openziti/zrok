@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {MetadataApi, AccountApi} from "../api/src"
 import Success from "./Success";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import PasswordForm from "../components/password";
+import { accountApi, metadataApi } from "..";
 
 const SetPasswordForm = (props) => {
     const [password, setPassword] = useState('');
@@ -18,21 +18,16 @@ const SetPasswordForm = (props) => {
 
     const registerFailed = <h2 className={"errorMessage"}>Account creation failed!</h2>
 
-    const metadata = new MetadataApi()
-    const account = new AccountApi()
-
     useEffect(() => {
-        metadata.configuration().then(resp => {
-            if(!resp.error) {
-                if (resp.touLink !== undefined && resp.touLink.trim() !== "") {
-                    setTou(resp.touLink)
-                }
-                setPasswordLength(resp.passwordRequirements.length)
-                setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
+        metadataApi.configuration().then(resp => {
+            if (resp.touLink !== undefined && resp.touLink.trim() !== "") {
+                setTou(resp.touLink)
             }
+            setPasswordLength(resp.passwordRequirements.length)
+            setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+            setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+            setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+            setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
         }).catch(err => {
             console.log("err", err);
         });
@@ -41,7 +36,7 @@ const SetPasswordForm = (props) => {
     const handleSubmit = async e => {
         e.preventDefault();
         if (password !== undefined && password !== "") {
-        account.register({body: {"token": props.token, "password": password}})
+            accountApi.register({body: {"token": props.token, "password": password}})
             .then(resp => {
                 console.log("resp", resp)
                 setMessage(undefined);

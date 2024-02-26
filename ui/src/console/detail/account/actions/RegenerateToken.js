@@ -1,11 +1,12 @@
 import Modal from "react-bootstrap/Modal";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import React, {useState} from "react";
-import * as account from "../../../../api/account";
+import {accountApi} from "../../../..";
 
 const RegenerateToken = (props) => {
     const [confirmEmail, setConfirmEmail] = useState('');
     const [message, setMessage] = useState('');
+
 
     const hide = () => {
         props.onHide();
@@ -21,16 +22,16 @@ const RegenerateToken = (props) => {
             return;
         }
 
-        account.resetToken({body: {emailAddress: props.user.email}})
+        accountApi.resetToken({body: {emailAddress: props.user.email}})
             .then(resp => {
                 console.log(resp);
                 let user = JSON.parse(localStorage.getItem('user'));
                 localStorage.setItem('user', JSON.stringify({
                     email: user.email,
-                    token: resp.data.token
+                    token: resp.token
                 }));
                 document.dispatchEvent(new Event('storage'));
-                setMessage("Your new account token is: " + resp.data.token);
+                setMessage("Your new account token is: " + resp.token);
             }).catch(err => {
                 setMessage("Account token regeneration failed!");
                 console.log("account token regeneration failed", err);

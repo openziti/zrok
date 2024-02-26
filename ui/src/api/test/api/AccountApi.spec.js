@@ -48,6 +48,16 @@
   }
 
   describe('AccountApi', function() {
+    describe('changePassword', function() {
+      it('should call changePassword successfully', function(done) {
+        //uncomment below and update the code to test changePassword
+        //instance.changePassword(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('invite', function() {
       it('should call invite successfully', function(done) {
         //uncomment below and update the code to test invite
@@ -92,6 +102,16 @@
       it('should call resetPasswordRequest successfully', function(done) {
         //uncomment below and update the code to test resetPasswordRequest
         //instance.resetPasswordRequest(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
+    describe('resetToken', function() {
+      it('should call resetToken successfully', function(done) {
+        //uncomment below and update the code to test resetToken
+        //instance.resetToken(function(error) {
         //  if (error) throw error;
         //expect().to.be();
         //});

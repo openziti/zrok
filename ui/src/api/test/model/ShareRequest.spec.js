@@ -120,6 +120,12 @@
       //expect(instance).to.be();
     });
 
+    it('should have the property uniqueName (base name: "uniqueName")', function() {
+      // uncomment below and update the code to test the property uniqueName
+      //var instance = new Zrok.ShareRequest();
+      //expect(instance).to.be();
+    });
+
   });
 
 }));

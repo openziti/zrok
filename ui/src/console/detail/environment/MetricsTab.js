@@ -1,26 +1,31 @@
 import React, {useEffect, useState} from "react";
 import {buildMetrics} from "../../metrics/util";
-import {MetadataApi} from "../../../api/src";
 import MetricsView from "../../metrics/MetricsView";
+import { metadataApi } from "../../..";
 
 const MetricsTab = (props) => {
 	const [metrics30, setMetrics30] = useState(buildMetrics([]));
 	const [metrics7, setMetrics7] = useState(buildMetrics([]));
 	const [metrics1, setMetrics1] = useState(buildMetrics([]));
-	const metadata = new MetadataApi()
 
 	useEffect(() => {
-		metadata.getEnvironmentMetrics(props.selection.envZId)
+		metadataApi.getEnvironmentMetrics(props.selection.envZId)
 			.then(resp => {
 				setMetrics30(buildMetrics(resp));
+			}).catch(err => {
+				console.log(err)
 			});
-		metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
+		metadataApi.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
 			.then(resp => {
 				setMetrics7(buildMetrics(resp));
+			}).catch(err => {
+				console.log(err)
 			});
-		metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
+		metadataApi.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
 			.then(resp => {
 				setMetrics1(buildMetrics(resp));
+			}).catch(err => {
+				console.log(err)
 			});
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [props.selection.id]);
@@ -28,19 +33,25 @@ const MetricsTab = (props) => {
 	useEffect(() => {
 		let mounted = true;
 		let interval = setInterval(() => {
-			metadata.getEnvironmentMetrics(props.selection.envZId)
+			metadataApi.getEnvironmentMetrics(props.selection.envZId)
 				.then(resp => {
 					if(mounted) {
 						setMetrics30(buildMetrics(resp));
 					}
+				}).catch(err => {
+					console.log(err)
 				});
-			metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
+			metadataApi.getEnvironmentMetrics(props.selection.envZId, {duration: "168h"})
 				.then(resp => {
 					setMetrics7(buildMetrics(resp));
+				}).catch(err => {
+					console.log(err)
 				});
-			metadata.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
+			metadataApi.getEnvironmentMetrics(props.selection.envZId, {duration: "24h"})
 				.then(resp => {
 					setMetrics1(buildMetrics(resp));
+				}).catch(err => {
+					console.log(err)
 				});
 		}, 5000);
 		return () => {

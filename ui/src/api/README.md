@@ -100,12 +100,18 @@ Please follow the [installation](#installation) instruction and execute the foll
 ```javascript
 var Zrok = require('zrok');
 
+var defaultClient = Zrok.ApiClient.instance;
+// Configure API key authorization: key
+var key = defaultClient.authentications['key'];
+key.apiKey = "YOUR API KEY"
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//key.apiKeyPrefix['x-token'] = "Token"
 
 var api = new Zrok.AccountApi()
 var opts = {
-  'body': new Zrok.InviteRequest() // {InviteRequest} 
+  'body': new Zrok.ChangePasswordRequest() // {ChangePasswordRequest} 
 };
-api.invite(opts).then(function() {
+api.changePassword(opts).then(function() {
   console.log('API called successfully.');
 }, function(error) {
   console.error(error);
@@ -120,11 +126,13 @@ All URIs are relative to */api/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*Zrok.AccountApi* | [**changePassword**](docs/AccountApi.md#changePassword) | **POST** /changePassword | 
 *Zrok.AccountApi* | [**invite**](docs/AccountApi.md#invite) | **POST** /invite | 
 *Zrok.AccountApi* | [**login**](docs/AccountApi.md#login) | **POST** /login | 
 *Zrok.AccountApi* | [**register**](docs/AccountApi.md#register) | **POST** /register | 
 *Zrok.AccountApi* | [**resetPassword**](docs/AccountApi.md#resetPassword) | **POST** /resetPassword | 
 *Zrok.AccountApi* | [**resetPasswordRequest**](docs/AccountApi.md#resetPasswordRequest) | **POST** /resetPasswordRequest | 
+*Zrok.AccountApi* | [**resetToken**](docs/AccountApi.md#resetToken) | **POST** /resetToken | 
 *Zrok.AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
 *Zrok.AdminApi* | [**createFrontend**](docs/AdminApi.md#createFrontend) | **POST** /frontend | 
 *Zrok.AdminApi* | [**createIdentity**](docs/AdminApi.md#createIdentity) | **POST** /identity | 
@@ -156,6 +164,7 @@ Class | Method | HTTP request | Description
  - [Zrok.AccessRequest](docs/AccessRequest.md)
  - [Zrok.AccessResponse](docs/AccessResponse.md)
  - [Zrok.AuthUser](docs/AuthUser.md)
+ - [Zrok.ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [Zrok.Configuration](docs/Configuration.md)
  - [Zrok.CreateFrontendRequest](docs/CreateFrontendRequest.md)
  - [Zrok.CreateFrontendResponse](docs/CreateFrontendResponse.md)
@@ -181,6 +190,7 @@ Class | Method | HTTP request | Description
  - [Zrok.RegisterResponse](docs/RegisterResponse.md)
  - [Zrok.ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Zrok.ResetPasswordRequestRequest](docs/ResetPasswordRequestRequest.md)
+ - [Zrok.ResetToken200Response](docs/ResetToken200Response.md)
  - [Zrok.Share](docs/Share.md)
  - [Zrok.ShareRequest](docs/ShareRequest.md)
  - [Zrok.ShareResponse](docs/ShareResponse.md)

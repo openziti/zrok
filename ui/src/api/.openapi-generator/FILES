@@ -1,11 +1,13 @@
 .babelrc
 .gitignore
+.travis.yml
 README.md
 docs/AccessRequest.md
 docs/AccessResponse.md
 docs/AccountApi.md
 docs/AdminApi.md
 docs/AuthUser.md
+docs/ChangePasswordRequest.md
 docs/Configuration.md
 docs/CreateFrontendRequest.md
 docs/CreateFrontendResponse.md
@@ -33,6 +35,7 @@ docs/RegisterRequest.md
 docs/RegisterResponse.md
 docs/ResetPasswordRequest.md
 docs/ResetPasswordRequestRequest.md
+docs/ResetToken200Response.md
 docs/Share.md
 docs/ShareApi.md
 docs/ShareRequest.md
@@ -44,6 +47,7 @@ docs/UpdateFrontendRequest.md
 docs/UpdateShareRequest.md
 docs/VerifyRequest.md
 docs/VerifyResponse.md
+git_push.sh
 mocha.opts
 package.json
 src/ApiClient.js
@@ -56,6 +60,7 @@ src/index.js
 src/model/AccessRequest.js
 src/model/AccessResponse.js
 src/model/AuthUser.js
+src/model/ChangePasswordRequest.js
 src/model/Configuration.js
 src/model/CreateFrontendRequest.js
 src/model/CreateFrontendResponse.js
@@ -81,6 +86,7 @@ src/model/RegisterRequest.js
 src/model/RegisterResponse.js
 src/model/ResetPasswordRequest.js
 src/model/ResetPasswordRequestRequest.js
+src/model/ResetToken200Response.js
 src/model/Share.js
 src/model/ShareRequest.js
 src/model/ShareResponse.js

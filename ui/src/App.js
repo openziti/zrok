@@ -4,6 +4,7 @@ import Console from "./console/Console";
 import {useEffect, useState} from "react";
 import Login from "./console/login/Login";
 import ResetPassword from "./resetPassword/ResetPassword"
+import {updateApiKey} from "./index"
 
 const App = () => {
     const [user, setUser] = useState();
@@ -14,6 +15,7 @@ const App = () => {
             if(localUser) {
                 console.log(localUser)
                 setUser(JSON.parse(localUser));
+                updateApiKey()
                 console.log("reloaded user", localUser);
             }
         }

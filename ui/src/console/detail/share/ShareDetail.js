@@ -1,4 +1,3 @@
-import {MetadataApi} from "../../../api/src";
 import React, {useEffect, useState} from "react";
 import {mdiShareVariant} from "@mdi/js";
 import Icon from "@mdi/react";
@@ -8,14 +7,13 @@ import ActionsTab from "./ActionsTab";
 import SecretToggle from "../../SecretToggle";
 import {Area, AreaChart, ResponsiveContainer} from "recharts";
 import MetricsTab from "./MetricsTab";
+import { metadataApi } from "../../..";
 
 const ShareDetail = (props) => {
     const [detail, setDetail] = useState({});
 
-    const metadata = new MetadataApi()
-
     useEffect(() => {
-        metadata.getShareDetail(props.selection.shrToken)
+        metadataApi.getShareDetail(props.selection.shrToken)
             .then(resp => {
                 let detail = resp;
                 detail.envZId = props.selection.envZId;
@@ -26,7 +24,7 @@ const ShareDetail = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getShareDetail(props.selection.shrToken)
+            metadataApi.getShareDetail(props.selection.shrToken)
                 .then(resp => {
                     if(mounted) {
                         let detail = resp;

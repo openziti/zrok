@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **oauthEmailDomains** | **[String]** |  | [optional] 
 **oauthAuthorizationCheckInterval** | **String** |  | [optional] 
 **reserved** | **Boolean** |  | [optional] 
+**uniqueName** | **String** |  | [optional] 
 
 
 
@@ -43,6 +44,8 @@ Name | Type | Description | Notes
 * `caddy` (value: `"caddy"`)
 
 * `drive` (value: `"drive"`)
+
+* `socks` (value: `"socks"`)
 
 
 

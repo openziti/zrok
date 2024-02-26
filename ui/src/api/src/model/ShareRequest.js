@@ -81,6 +81,9 @@ class ShareRequest {
             if (data.hasOwnProperty('reserved')) {
                 obj['reserved'] = ApiClient.convertToType(data['reserved'], 'Boolean');
             }
+            if (data.hasOwnProperty('uniqueName')) {
+                obj['uniqueName'] = ApiClient.convertToType(data['uniqueName'], 'String');
+            }
         }
         return obj;
     }
@@ -136,6 +139,10 @@ class ShareRequest {
         // ensure the json data is a string
         if (data['oauthAuthorizationCheckInterval'] && !(typeof data['oauthAuthorizationCheckInterval'] === 'string' || data['oauthAuthorizationCheckInterval'] instanceof String)) {
             throw new Error("Expected the field `oauthAuthorizationCheckInterval` to be a primitive type in the JSON string but got " + data['oauthAuthorizationCheckInterval']);
+        }
+        // ensure the json data is a string
+        if (data['uniqueName'] && !(typeof data['uniqueName'] === 'string' || data['uniqueName'] instanceof String)) {
+            throw new Error("Expected the field `uniqueName` to be a primitive type in the JSON string but got " + data['uniqueName']);
         }
 
         return true;
@@ -200,6 +207,11 @@ ShareRequest.prototype['oauthAuthorizationCheckInterval'] = undefined;
  * @member {Boolean} reserved
  */
 ShareRequest.prototype['reserved'] = undefined;
+
+/**
+ * @member {String} uniqueName
+ */
+ShareRequest.prototype['uniqueName'] = undefined;
 
 
 
@@ -267,7 +279,13 @@ ShareRequest['BackendModeEnum'] = {
      * value: "drive"
      * @const
      */
-    "drive": "drive"
+    "drive": "drive",
+
+    /**
+     * value: "socks"
+     * @const
+     */
+    "socks": "socks"
 };
 
 

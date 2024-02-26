@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
-import * as account from "../../../../api/account";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import * as metadata from "../../../../api/metadata";
+import { accountApi, metadataApi } from "../../../..";
 
 const validatePassword = (password, l, rc, rn, rs, spc, cb) => {
     if(password.length < l) {
@@ -39,14 +38,13 @@ const ChangePassword = (props) => {
     const [passwordValidSpecialCharacters, setPasswordValidSpecialCharacters] = useState("");
 
     useEffect(() => {
-        metadata.configuration().then(resp => {
-            if (!resp.error) {
-                setPasswordLength(resp.data.passwordRequirements.length)
-                setPasswordRequireCapital(resp.data.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.data.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.data.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.data.passwordRequirements.validSpecialCharacters)
-            }
+        metadataApi.configuration().then(resp => {
+            console.log(resp)
+            setPasswordLength(resp.passwordRequirements.length)
+            setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+            setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+            setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+            setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
         }).catch(err => {
             console.log("error getting configuration", err);
         });
@@ -71,14 +69,10 @@ const ChangePassword = (props) => {
             return;
         }
 
-        account.changePassword({ body: { oldPassword: oldPassword, newPassword: newPassword, email: props.user.email } })
+        accountApi.changePassword({ body: { oldPassword: oldPassword, newPassword: newPassword, email: props.user.email } })
             .then(resp => {
-                if (!resp.error) {
-                    console.log("resp", resp)
-                    setMessage("Password successfully changed!");
-                } else {
-                    setMessage("Failure changing password! Is old password correct?");
-                }
+                console.log("resp", resp)
+                setMessage("Password successfully changed!");
             }).catch(resp => {
                 console.log("resp", resp)
                 setMessage("Failure changing password! Is old password correct?")

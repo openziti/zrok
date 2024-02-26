@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {MetadataApi, AccountApi, ResetPasswordRequest} from "../api/src"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import PasswordForm from "../components/password";
+import { accountApi, metadataApi } from "..";
 
 const SetNewPassword = (props) => {
     const [password, setPassword] = useState('');
@@ -16,18 +16,13 @@ const SetNewPassword = (props) => {
 
     const errorMessage = <h2 className={"errorMessage"}>Reset Password Failed!</h2>;
 
-    const metadata = new MetadataApi()
-    const account = new AccountApi()
-
     useEffect(() => {
-        metadata.configuration().then(resp => {
-            if(!resp.error) {
-                setPasswordLength(resp.passwordRequirements.length)
-                setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
-            }
+        metadataApi.configuration().then(resp => {
+            setPasswordLength(resp.passwordRequirements.length)
+            setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+            setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+            setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+            setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
         }).catch(err => {
             console.log("err", err);
         });
@@ -36,7 +31,7 @@ const SetNewPassword = (props) => {
     const handleSubmit = async e => {
         e.preventDefault();
         if (password !== undefined && password !== "") {
-        account.resetPassword({body: {"token": props.token, "password": password}})
+            accountApi.resetPassword({body: {"token": props.token, "password": password}})
             .then(resp => {
                 console.log(resp)
                 setMessage(undefined);

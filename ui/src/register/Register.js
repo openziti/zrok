@@ -1,8 +1,8 @@
 import { useParams } from 'react-router-dom';
 import {useEffect, useState} from "react";
-import {AccountApi} from "../api/src";
 import InvalidRequest from "./InvalidRequest";
 import SetPasswordForm from "./SetPasswordForm";
+import { accountApi } from '..';
 
 let step;
 
@@ -11,17 +11,11 @@ const Register = () => {
     const [email, setEmail] = useState();
     const [activeRequest, setActiveRequest] = useState(true);
 
-    const account = new AccountApi()
-
     useEffect(() => {
         let mounted = true
-        account.verify({body: {token: token}}).then(resp => {
+        accountApi.verify({body: {token: token}}).then(resp => {
             if(mounted) {
-                if(resp.error) {
-                    setActiveRequest(false);
-                } else {
-                    setEmail(resp.email);
-                }
+                setEmail(resp.email);
             }
         }).catch(err => {
             console.log("err", err);

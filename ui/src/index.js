@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import {ApiClient} from "./api/src"
+import {ApiClient, AccountApi, MetadataApi} from "./api/src"
 import App from "./App";
 
+export const zrokClient = new ApiClient()
+export const accountApi = new AccountApi(zrokClient)
+export const metadataApi = new MetadataApi(zrokClient)
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <App />
@@ -18,10 +21,14 @@ function getApiKey() {
     }
 }
 
-getApiKey().then(key => {
-    let defaultClient = ApiClient.instance;
-    // Configure API key authorization: key
-    let k = defaultClient.authentications['key'];
-    k.apiKey = key.apiKey;
-    
-})
+export function updateApiKey() {
+    getApiKey().then(key => {
+        // Configure API key authorization: key
+
+        let v = zrokClient.authentications['key'];
+        v.apiKey = key.apiKey
+    })
+}
+
+updateApiKey();
+

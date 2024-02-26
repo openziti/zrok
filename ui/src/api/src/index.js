@@ -16,6 +16,7 @@ import ApiClient from './ApiClient';
 import AccessRequest from './model/AccessRequest';
 import AccessResponse from './model/AccessResponse';
 import AuthUser from './model/AuthUser';
+import ChangePasswordRequest from './model/ChangePasswordRequest';
 import Configuration from './model/Configuration';
 import CreateFrontendRequest from './model/CreateFrontendRequest';
 import CreateFrontendResponse from './model/CreateFrontendResponse';
@@ -41,6 +42,7 @@ import RegisterRequest from './model/RegisterRequest';
 import RegisterResponse from './model/RegisterResponse';
 import ResetPasswordRequest from './model/ResetPasswordRequest';
 import ResetPasswordRequestRequest from './model/ResetPasswordRequestRequest';
+import ResetToken200Response from './model/ResetToken200Response';
 import Share from './model/Share';
 import ShareRequest from './model/ShareRequest';
 import ShareResponse from './model/ShareResponse';
@@ -113,6 +115,12 @@ export {
      * @property {module:model/AuthUser}
      */
     AuthUser,
+
+    /**
+     * The ChangePasswordRequest model constructor.
+     * @property {module:model/ChangePasswordRequest}
+     */
+    ChangePasswordRequest,
 
     /**
      * The Configuration model constructor.
@@ -263,6 +271,12 @@ export {
      * @property {module:model/ResetPasswordRequestRequest}
      */
     ResetPasswordRequestRequest,
+
+    /**
+     * The ResetToken200Response model constructor.
+     * @property {module:model/ResetToken200Response}
+     */
+    ResetToken200Response,
 
     /**
      * The Share model constructor.

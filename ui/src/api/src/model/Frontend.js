@@ -50,6 +50,9 @@ class Frontend {
             if (data.hasOwnProperty('id')) {
                 obj['id'] = ApiClient.convertToType(data['id'], 'Number');
             }
+            if (data.hasOwnProperty('token')) {
+                obj['token'] = ApiClient.convertToType(data['token'], 'String');
+            }
             if (data.hasOwnProperty('shrToken')) {
                 obj['shrToken'] = ApiClient.convertToType(data['shrToken'], 'String');
             }
@@ -73,6 +76,10 @@ class Frontend {
      */
     static validateJSON(data) {
         // ensure the json data is a string
+        if (data['token'] && !(typeof data['token'] === 'string' || data['token'] instanceof String)) {
+            throw new Error("Expected the field `token` to be a primitive type in the JSON string but got " + data['token']);
+        }
+        // ensure the json data is a string
         if (data['shrToken'] && !(typeof data['shrToken'] === 'string' || data['shrToken'] instanceof String)) {
             throw new Error("Expected the field `shrToken` to be a primitive type in the JSON string but got " + data['shrToken']);
         }
@@ -93,6 +100,11 @@ class Frontend {
  * @member {Number} id
  */
 Frontend.prototype['id'] = undefined;
+
+/**
+ * @member {String} token
+ */
+Frontend.prototype['token'] = undefined;
 
 /**
  * @member {String} shrToken

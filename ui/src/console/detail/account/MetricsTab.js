@@ -1,24 +1,23 @@
 import React, {useEffect, useState} from "react";
 import {buildMetrics} from "../../metrics/util";
-import {MetadataApi} from "../../../api/src";
 import MetricsView from "../../metrics/MetricsView";
+import { metadataApi } from "../../..";
 
 const MetricsTab = () => {
     const [metrics30, setMetrics30] = useState(buildMetrics([]));
     const [metrics7, setMetrics7] = useState(buildMetrics([]));
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
-    const metadata = new MetadataApi()
 
     useEffect(() => {
-        metadata.getAccountMetrics()
+        metadataApi.getAccountMetrics()
             .then(resp => {
                 setMetrics30(buildMetrics(resp));
             });
-        metadata.getAccountMetrics({duration: "168h"})
+        metadataApi.getAccountMetrics({duration: "168h"})
             .then(resp => {
                 setMetrics7(buildMetrics(resp));
             });
-        metadata.getAccountMetrics({duration: "24h"})
+        metadataApi.getAccountMetrics({duration: "24h"})
             .then(resp => {
                 setMetrics1(buildMetrics(resp));
             });
@@ -27,17 +26,17 @@ const MetricsTab = () => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getAccountMetrics()
+            metadataApi.getAccountMetrics()
                 .then(resp => {
                     if(mounted) {
                         setMetrics30(buildMetrics(resp));
                     }
                 });
-            metadata.getAccountMetrics({duration: "168h"})
+            metadataApi.getAccountMetrics({duration: "168h"})
                 .then(resp => {
                     setMetrics7(buildMetrics(resp));
                 });
-            metadata.getAccountMetrics({duration: "24h"})
+            metadataApi.getAccountMetrics({duration: "24h"})
                 .then(resp => {
                     setMetrics1(buildMetrics(resp));
                 });
