@@ -40,6 +40,20 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "src/api/**/*"
+        ],
+        "rules": {
+          "no-unused-vars": "off",
+          "eqeqeq": "off",
+          "no-useless-escape": "off",
+          "no-loop-func": "off",
+          "no-redeclare": "off"
+        }
+      }
     ]
   },
   "browserslist": {
