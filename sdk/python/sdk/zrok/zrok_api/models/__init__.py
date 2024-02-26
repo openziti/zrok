@@ -45,11 +45,11 @@ from zrok_api.models.password_requirements import PasswordRequirements
 from zrok_api.models.principal import Principal
 from zrok_api.models.public_frontend import PublicFrontend
 from zrok_api.models.public_frontend_list import PublicFrontendList
+from zrok_api.models.regenerate_token_body import RegenerateTokenBody
 from zrok_api.models.register_request import RegisterRequest
 from zrok_api.models.register_response import RegisterResponse
 from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.models.reset_password_request_body import ResetPasswordRequestBody
-from zrok_api.models.reset_token_body import ResetTokenBody
 from zrok_api.models.share import Share
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
