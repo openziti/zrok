@@ -16,11 +16,11 @@ import ApiClient from "../ApiClient";
 import ChangePasswordRequest from '../model/ChangePasswordRequest';
 import InviteRequest from '../model/InviteRequest';
 import LoginRequest from '../model/LoginRequest';
+import RegenerateToken200Response from '../model/RegenerateToken200Response';
+import RegenerateTokenRequest from '../model/RegenerateTokenRequest';
 import RegisterRequest from '../model/RegisterRequest';
 import RegisterResponse from '../model/RegisterResponse';
 import ResetPasswordRequest from '../model/ResetPasswordRequest';
-import ResetPasswordRequestRequest from '../model/ResetPasswordRequestRequest';
-import ResetToken200Response from '../model/ResetToken200Response';
 import VerifyRequest from '../model/VerifyRequest';
 import VerifyResponse from '../model/VerifyResponse';
 
@@ -172,6 +172,48 @@ export default class AccountApi {
 
     /**
      * @param {Object} opts Optional parameters
+     * @param {module:model/RegenerateTokenRequest} [body] 
+     * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/RegenerateToken200Response} and HTTP response
+     */
+    regenerateTokenWithHttpInfo(opts) {
+      opts = opts || {};
+      let postBody = opts['body'];
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = ['key'];
+      let contentTypes = ['application/zrok.v1+json'];
+      let accepts = ['application/zrok.v1+json'];
+      let returnType = RegenerateToken200Response;
+      return this.apiClient.callApi(
+        '/regenerateToken', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null
+      );
+    }
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {module:model/RegenerateTokenRequest} opts.body 
+     * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/RegenerateToken200Response}
+     */
+    regenerateToken(opts) {
+      return this.regenerateTokenWithHttpInfo(opts)
+        .then(function(response_and_data) {
+          return response_and_data.data;
+        });
+    }
+
+
+    /**
+     * @param {Object} opts Optional parameters
      * @param {module:model/RegisterRequest} [body] 
      * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/RegisterResponse} and HTTP response
      */
@@ -256,7 +298,7 @@ export default class AccountApi {
 
     /**
      * @param {Object} opts Optional parameters
-     * @param {module:model/ResetPasswordRequestRequest} [body] 
+     * @param {module:model/RegenerateTokenRequest} [body] 
      * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing HTTP response
      */
     resetPasswordRequestWithHttpInfo(opts) {
@@ -285,53 +327,11 @@ export default class AccountApi {
 
     /**
      * @param {Object} opts Optional parameters
-     * @param {module:model/ResetPasswordRequestRequest} opts.body 
+     * @param {module:model/RegenerateTokenRequest} opts.body 
      * @return {Promise} a {@link https://www.promisejs.org/|Promise}
      */
     resetPasswordRequest(opts) {
       return this.resetPasswordRequestWithHttpInfo(opts)
-        .then(function(response_and_data) {
-          return response_and_data.data;
-        });
-    }
-
-
-    /**
-     * @param {Object} opts Optional parameters
-     * @param {module:model/ResetPasswordRequestRequest} [body] 
-     * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with an object containing data of type {@link module:model/ResetToken200Response} and HTTP response
-     */
-    resetTokenWithHttpInfo(opts) {
-      opts = opts || {};
-      let postBody = opts['body'];
-
-      let pathParams = {
-      };
-      let queryParams = {
-      };
-      let headerParams = {
-      };
-      let formParams = {
-      };
-
-      let authNames = ['key'];
-      let contentTypes = ['application/zrok.v1+json'];
-      let accepts = ['application/zrok.v1+json'];
-      let returnType = ResetToken200Response;
-      return this.apiClient.callApi(
-        '/resetToken', 'POST',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, null
-      );
-    }
-
-    /**
-     * @param {Object} opts Optional parameters
-     * @param {module:model/ResetPasswordRequestRequest} opts.body 
-     * @return {Promise} a {@link https://www.promisejs.org/|Promise}, with data of type {@link module:model/ResetToken200Response}
-     */
-    resetToken(opts) {
-      return this.resetTokenWithHttpInfo(opts)
         .then(function(response_and_data) {
           return response_and_data.data;
         });

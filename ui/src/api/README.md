@@ -129,10 +129,10 @@ Class | Method | HTTP request | Description
 *Zrok.AccountApi* | [**changePassword**](docs/AccountApi.md#changePassword) | **POST** /changePassword | 
 *Zrok.AccountApi* | [**invite**](docs/AccountApi.md#invite) | **POST** /invite | 
 *Zrok.AccountApi* | [**login**](docs/AccountApi.md#login) | **POST** /login | 
+*Zrok.AccountApi* | [**regenerateToken**](docs/AccountApi.md#regenerateToken) | **POST** /regenerateToken | 
 *Zrok.AccountApi* | [**register**](docs/AccountApi.md#register) | **POST** /register | 
 *Zrok.AccountApi* | [**resetPassword**](docs/AccountApi.md#resetPassword) | **POST** /resetPassword | 
 *Zrok.AccountApi* | [**resetPasswordRequest**](docs/AccountApi.md#resetPasswordRequest) | **POST** /resetPasswordRequest | 
-*Zrok.AccountApi* | [**resetToken**](docs/AccountApi.md#resetToken) | **POST** /resetToken | 
 *Zrok.AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
 *Zrok.AdminApi* | [**createFrontend**](docs/AdminApi.md#createFrontend) | **POST** /frontend | 
 *Zrok.AdminApi* | [**createIdentity**](docs/AdminApi.md#createIdentity) | **POST** /identity | 
@@ -186,11 +186,11 @@ Class | Method | HTTP request | Description
  - [Zrok.PasswordRequirements](docs/PasswordRequirements.md)
  - [Zrok.Principal](docs/Principal.md)
  - [Zrok.PublicFrontend](docs/PublicFrontend.md)
+ - [Zrok.RegenerateToken200Response](docs/RegenerateToken200Response.md)
+ - [Zrok.RegenerateTokenRequest](docs/RegenerateTokenRequest.md)
  - [Zrok.RegisterRequest](docs/RegisterRequest.md)
  - [Zrok.RegisterResponse](docs/RegisterResponse.md)
  - [Zrok.ResetPasswordRequest](docs/ResetPasswordRequest.md)
- - [Zrok.ResetPasswordRequestRequest](docs/ResetPasswordRequestRequest.md)
- - [Zrok.ResetToken200Response](docs/ResetToken200Response.md)
  - [Zrok.Share](docs/Share.md)
  - [Zrok.ShareRequest](docs/ShareRequest.md)
  - [Zrok.ShareResponse](docs/ShareResponse.md)

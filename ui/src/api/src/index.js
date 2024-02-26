@@ -38,11 +38,11 @@ import Overview from './model/Overview';
 import PasswordRequirements from './model/PasswordRequirements';
 import Principal from './model/Principal';
 import PublicFrontend from './model/PublicFrontend';
+import RegenerateToken200Response from './model/RegenerateToken200Response';
+import RegenerateTokenRequest from './model/RegenerateTokenRequest';
 import RegisterRequest from './model/RegisterRequest';
 import RegisterResponse from './model/RegisterResponse';
 import ResetPasswordRequest from './model/ResetPasswordRequest';
-import ResetPasswordRequestRequest from './model/ResetPasswordRequestRequest';
-import ResetToken200Response from './model/ResetToken200Response';
 import Share from './model/Share';
 import ShareRequest from './model/ShareRequest';
 import ShareResponse from './model/ShareResponse';
@@ -249,6 +249,18 @@ export {
     PublicFrontend,
 
     /**
+     * The RegenerateToken200Response model constructor.
+     * @property {module:model/RegenerateToken200Response}
+     */
+    RegenerateToken200Response,
+
+    /**
+     * The RegenerateTokenRequest model constructor.
+     * @property {module:model/RegenerateTokenRequest}
+     */
+    RegenerateTokenRequest,
+
+    /**
      * The RegisterRequest model constructor.
      * @property {module:model/RegisterRequest}
      */
@@ -265,18 +277,6 @@ export {
      * @property {module:model/ResetPasswordRequest}
      */
     ResetPasswordRequest,
-
-    /**
-     * The ResetPasswordRequestRequest model constructor.
-     * @property {module:model/ResetPasswordRequestRequest}
-     */
-    ResetPasswordRequestRequest,
-
-    /**
-     * The ResetToken200Response model constructor.
-     * @property {module:model/ResetToken200Response}
-     */
-    ResetToken200Response,
 
     /**
      * The Share model constructor.

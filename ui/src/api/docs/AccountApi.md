@@ -7,10 +7,10 @@ Method | HTTP request | Description
 [**changePassword**](AccountApi.md#changePassword) | **POST** /changePassword | 
 [**invite**](AccountApi.md#invite) | **POST** /invite | 
 [**login**](AccountApi.md#login) | **POST** /login | 
+[**regenerateToken**](AccountApi.md#regenerateToken) | **POST** /regenerateToken | 
 [**register**](AccountApi.md#register) | **POST** /register | 
 [**resetPassword**](AccountApi.md#resetPassword) | **POST** /resetPassword | 
 [**resetPasswordRequest**](AccountApi.md#resetPasswordRequest) | **POST** /resetPasswordRequest | 
-[**resetToken**](AccountApi.md#resetToken) | **POST** /resetToken | 
 [**verify**](AccountApi.md#verify) | **POST** /verify | 
 
 
@@ -153,6 +153,56 @@ No authorization required
 - **Accept**: application/zrok.v1+json
 
 
+## regenerateToken
+
+> RegenerateToken200Response regenerateToken(opts)
+
+
+
+### Example
+
+```javascript
+import Zrok from 'zrok';
+let defaultClient = Zrok.ApiClient.instance;
+// Configure API key authorization: key
+let key = defaultClient.authentications['key'];
+key.apiKey = 'YOUR API KEY';
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//key.apiKeyPrefix = 'Token';
+
+let apiInstance = new Zrok.AccountApi();
+let opts = {
+  'body': new Zrok.RegenerateTokenRequest() // RegenerateTokenRequest | 
+};
+apiInstance.regenerateToken(opts).then((data) => {
+  console.log('API called successfully. Returned data: ' + data);
+}, (error) => {
+  console.error(error);
+});
+
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**RegenerateTokenRequest**](RegenerateTokenRequest.md)|  | [optional] 
+
+### Return type
+
+[**RegenerateToken200Response**](RegenerateToken200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+- **Content-Type**: application/zrok.v1+json
+- **Accept**: application/zrok.v1+json
+
+
 ## register
 
 > RegisterResponse register(opts)
@@ -254,7 +304,7 @@ import Zrok from 'zrok';
 
 let apiInstance = new Zrok.AccountApi();
 let opts = {
-  'body': new Zrok.ResetPasswordRequestRequest() // ResetPasswordRequestRequest | 
+  'body': new Zrok.RegenerateTokenRequest() // RegenerateTokenRequest | 
 };
 apiInstance.resetPasswordRequest(opts).then(() => {
   console.log('API called successfully.');
@@ -269,7 +319,7 @@ apiInstance.resetPasswordRequest(opts).then(() => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ResetPasswordRequestRequest**](ResetPasswordRequestRequest.md)|  | [optional] 
+ **body** | [**RegenerateTokenRequest**](RegenerateTokenRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -283,56 +333,6 @@ No authorization required
 
 - **Content-Type**: application/zrok.v1+json
 - **Accept**: Not defined
-
-
-## resetToken
-
-> ResetToken200Response resetToken(opts)
-
-
-
-### Example
-
-```javascript
-import Zrok from 'zrok';
-let defaultClient = Zrok.ApiClient.instance;
-// Configure API key authorization: key
-let key = defaultClient.authentications['key'];
-key.apiKey = 'YOUR API KEY';
-// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-//key.apiKeyPrefix = 'Token';
-
-let apiInstance = new Zrok.AccountApi();
-let opts = {
-  'body': new Zrok.ResetPasswordRequestRequest() // ResetPasswordRequestRequest | 
-};
-apiInstance.resetToken(opts).then((data) => {
-  console.log('API called successfully. Returned data: ' + data);
-}, (error) => {
-  console.error(error);
-});
-
-```
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **body** | [**ResetPasswordRequestRequest**](ResetPasswordRequestRequest.md)|  | [optional] 
-
-### Return type
-
-[**ResetToken200Response**](ResetToken200Response.md)
-
-### Authorization
-
-[key](../README.md#key)
-
-### HTTP request headers
-
-- **Content-Type**: application/zrok.v1+json
-- **Accept**: application/zrok.v1+json
 
 
 ## verify

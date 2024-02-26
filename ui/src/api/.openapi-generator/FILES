@@ -1,6 +1,5 @@
 .babelrc
 .gitignore
-.travis.yml
 README.md
 docs/AccessRequest.md
 docs/AccessResponse.md
@@ -31,11 +30,11 @@ docs/Overview.md
 docs/PasswordRequirements.md
 docs/Principal.md
 docs/PublicFrontend.md
+docs/RegenerateToken200Response.md
+docs/RegenerateTokenRequest.md
 docs/RegisterRequest.md
 docs/RegisterResponse.md
 docs/ResetPasswordRequest.md
-docs/ResetPasswordRequestRequest.md
-docs/ResetToken200Response.md
 docs/Share.md
 docs/ShareApi.md
 docs/ShareRequest.md
@@ -47,7 +46,6 @@ docs/UpdateFrontendRequest.md
 docs/UpdateShareRequest.md
 docs/VerifyRequest.md
 docs/VerifyResponse.md
-git_push.sh
 mocha.opts
 package.json
 src/ApiClient.js
@@ -82,11 +80,11 @@ src/model/Overview.js
 src/model/PasswordRequirements.js
 src/model/Principal.js
 src/model/PublicFrontend.js
+src/model/RegenerateToken200Response.js
+src/model/RegenerateTokenRequest.js
 src/model/RegisterRequest.js
 src/model/RegisterResponse.js
 src/model/ResetPasswordRequest.js
-src/model/ResetPasswordRequestRequest.js
-src/model/ResetToken200Response.js
 src/model/Share.js
 src/model/ShareRequest.js
 src/model/ShareResponse.js
@@ -97,3 +95,5 @@ src/model/UpdateFrontendRequest.js
 src/model/UpdateShareRequest.js
 src/model/VerifyRequest.js
 src/model/VerifyResponse.js
+test/model/RegenerateToken200Response.spec.js
+test/model/RegenerateTokenRequest.spec.js
