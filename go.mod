@@ -15,6 +15,7 @@ require (
 	github.com/go-openapi/strfmt v0.22.0
 	github.com/go-openapi/swag v0.22.9
 	github.com/go-openapi/validate v0.22.6
+	github.com/gobwas/glob v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
@@ -34,7 +35,7 @@ require (
 	github.com/openziti/edge-api v0.26.10
 	github.com/openziti/fabric v0.23.26
 	github.com/openziti/identity v1.0.70
-	github.com/openziti/sdk-golang v0.22.28
+	github.com/openziti/sdk-golang v0.22.29
 	github.com/openziti/transport/v2 v2.0.122
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.8.1
@@ -106,7 +107,6 @@ require (
 	github.com/go-resty/resty/v2 v2.11.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
-	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/glog v1.1.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
