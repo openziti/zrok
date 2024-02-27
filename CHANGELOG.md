@@ -12,6 +12,8 @@ CHANGE: Creating a reserved share checks for token collision and returns a more 
 
 CHANGE: Update UI to add a 'true' value on `reserved` boolean (https://github.com/openziti/zrok/issues/443)
 
+CHANGE: OpenZiti SDK (github.com/openziti/sdk-golang) updated to version `v0.22.29`, which introduces changes to OpenZiti API session handling
+
 FIX: Fixed bug where a second password reset request would for any account would fail (https://github.com/openziti/zrok/issues/452)
 
 ## v0.4.24
