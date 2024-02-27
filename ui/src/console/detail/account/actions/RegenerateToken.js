@@ -22,7 +22,7 @@ const RegenerateToken = (props) => {
             return;
         }
 
-        account.regenerateToken({body: {emailAddress: props.user.email}})
+        accountApi.regenerateToken({body: {emailAddress: props.user.email}})
             .then(resp => {
                 console.log(resp);
                 let user = JSON.parse(localStorage.getItem('user'));
