@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.26
+
+FIX: The regenerate account token dialog incorrectly specified the path `${HOME}/.zrok/environments.yml`. This was corrected to be `${HOME}/.zrok/environments.json`
+
 ## v0.4.25
 
 FEATURE: New action in the web console that allows changing the password of the logged-in account (https://github.com/openziti/zrok/issues/148)

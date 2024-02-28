@@ -49,7 +49,7 @@ const RegenerateToken = (props) => {
                         </p>
                         <p>
                             You will need to update each of
-                            your <code> &#36;&#123;HOME&#125;/.zrok/environments.yml</code> files
+                            your <code> &#36;&#123;HOME&#125;/.zrok/environments.json</code> files
                             with your new token to allow them to continue working!
                         </p>
                         <p>
