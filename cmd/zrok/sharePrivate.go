@@ -99,6 +99,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		if len(args) != 0 {
 			tui.Error("the 'socks' backend mode does not expect <target>", nil)
 		}
+		target = "socks"
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
