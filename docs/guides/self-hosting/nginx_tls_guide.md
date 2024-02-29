@@ -1,9 +1,9 @@
 ---
 sidebar_position: 50
-sidebar_label: Nginx TLS
+sidebar_label: NGINX TLS
 ---
 
-# Nginx Reverse Proxy for zrok
+# NGINX Reverse Proxy for zrok
 
 ## Walkthrough Video
 
@@ -11,7 +11,7 @@ sidebar_label: Nginx TLS
 
 ## Before You Begin
 
-I'll assume you have a running zrok controller and public frontend and wish to front both with Nginx providing server TLS. Go back to [Self-Hosting Guide](./self_hosting_guide.md) if you still need to spin those up.
+I'll assume you have a running zrok controller and frontend and wish to front both with NGINX providing server TLS. Go back to [Self-Hosting Guide](./self_hosting_guide.md) if you still need to spin those up.
 
 ## Choose a Reverse Proxy Address
 
@@ -29,9 +29,9 @@ You must complete a DNS challenge to obtain a wildcard certificate from Let's En
     sudo certbot certonly --manual
     ````
 
-## [Install Nginx](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/)
+## [Install NGINX](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/)
 
-## Configure Nginx
+## Configure NGINX
 
 ```
 server {
@@ -78,15 +78,15 @@ server {
 }
 ```
 
-## Restart Nginx
+## Restart NGINX
 
-Load the new configuration by restarting Nginx. Check the logs to make sure it's happy.
+Load the new configuration by restarting NGINX. Check the logs to make sure it's happy.
 
 > Started A high performance web server and a reverse proxy server.
 
 ## Check the Firewall
 
-If you followed the non-TLS quickstart then you may have opened 8080,108080/tcp in your firewall. You can go ahead and replace those exceptions with 443/tcp because only Nginx needs to be reachable for zrok to function.
+If you followed the non-TLS quickstart then you may have opened 8080,108080/tcp in your firewall. You can go ahead and replace those exceptions with 443/tcp because only NGINX needs to be reachable for zrok to function.
 
 ## Update the zrok Frontend
 
@@ -99,7 +99,7 @@ $ zrok admin list frontends
  2NiDTRYUww18  7DsLh9DXG  public       http://{token}.zrok.quigley.com:8080  2023-01-19 05:29:20.793 +0000 UTC  2023-01-19 06:17:25 +0000 UTC 
 ```
 
-Update the URL template to use Nginx.
+Update the URL template to use NGINX.
 
 ```bash
 $ zrok admin update frontend 2NiDTRYUww18 --url-template https://{token}.zrok.quigley.com:443

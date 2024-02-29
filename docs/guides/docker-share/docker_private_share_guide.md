@@ -1,18 +1,32 @@
 ---
+title: Docker Private Share
 sidebar_position: 20
 sidebar_label: Private Share
 ---
 
+## Goal
 
-# Docker Private Share
+Privately share a Docker Compose service with a separate zrok environment and a permanent zrok share token.
 
-With zrok, you can privately share a server app that's running in Docker, or any server that's reachable by the zrok container. Then, a zrok private access running somewhere else can use the private share. In this guide we'll cover both sides: the private share and the private access.
+## Overview
+
+With zrok, you can privately share a service that's running in Docker. You need a zrok private share running somewhere that it can reach the service you're sharing, and a zrok private access running somewhere else where you want to use the private share. Together, the private share and private access form a private point-to-point tunnel.
 
 Here's a short article with an overview of [private sharing with zrok](/concepts/sharing-private.md).
 
 ## Walkthrough Video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/HxyvtFAvwUE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## How it Works
+
+The Docker Compose project uses your zrok account token to reserve a private share token and keep sharing the backend target.
+
+When the project runs it will:
+
+1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
+1. reserve a private share token for the service unless `/mnt/.zrok/reserved.json` exists
+1. start sharing the target specified in the `ZROK_TARGET` environment variable
 
 ## Before You Begin
 

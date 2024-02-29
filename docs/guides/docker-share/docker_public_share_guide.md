@@ -1,10 +1,16 @@
 ---
-title: Docker Public Share
+title: Docker Compose Public Share
 sidebar_position: 10
 sidebar_label: Public Share
 ---
 
-With zrok and Docker, you can publicly share a web server that's running in a local container or anywhere that's reachable by the zrok container. The share can be reached through a temporary public URL that expires when the container is stopped. If you're looking for a reserved subdomain for the share, check out [zrok frontdoor](/guides/frontdoor.mdx).
+## Goal
+
+Publicly share a Docker Compose service with a separate zrok environment and a permanent zrok share URL.
+
+## Overview
+
+With zrok, you can publicly share a service that's running in Docker. You need a zrok public share running somewhere that it can reach the service you're sharing. As long as that public share is running and your service is available, anyone with the address can use your service.
 
 Here's a short article with an overview of [public sharing with zrok](/concepts/sharing-public.md).
 
@@ -12,101 +18,134 @@ Here's a short article with an overview of [public sharing with zrok](/concepts/
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/ycov--9ZtB4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-## Before You Begin
+## How it Works
 
-To follow this guide you will need [Docker](https://docs.docker.com/get-docker/) and [the Docker Compose plugin](https://docs.docker.com/compose/install/) for running `docker compose` commands in your terminal.
+The Docker Compose project uses your zrok account token to reserve a public subdomain and keep sharing the backend
+target.
 
-## Begin Sharing with Docker Compose
+When the project runs it will:
 
-A temporary public share is a great way to share a web server running in a container with someone else for a short time.
+1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
+1. reserve a public subdomain for the service unless `/mnt/.zrok/reserved.json` exists
+1. start sharing the target specified in the `ZROK_TARGET` environment variable
 
-1. Make a folder on your computer to use as a Docker Compose project for your zrok public share.
-1. In your terminal, change directory to the newly-created project folder.
-1. Download [the temporary public share project file](pathname:///zrok-public-share/compose.yml).
-1. Copy your zrok environment token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
+## Create the Docker Project
 
-  ```bash title=".env"
-  ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
-  ```
+1. Make a folder on your computer to use as a Docker Compose project for your zrok public share with a reserved subdomain and switch to the new directory in your terminal.
+1. Download [the reserved public share `compose.yml` project file](pathname:///zrok-public-reserved/compose.yml) into the same directory.
+1. Copy your zrok account's enable token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
 
-1. Set the zrok API endpoint if self-hosting zrok. Skip this if using zrok.io.
+    ```bash title=".env"
+    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
+    ```
 
-  ```bash title=".env"
-  ZROK_API_ENDPOINT="https://zrok.example.com"
-  ```
+1. Name the Share
 
-1. Run the Compose project to start sharing the built-in demo web server.
+    This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
 
-  ```bash
-  docker compose up --detach
-  ```
+    ```bash title=".env"
+    ZROK_UNIQUE_NAME="my-prod-app"
+    ```
 
-1. Get the public share URL from the output of the `zrok-share` service or by peeking in the zrok console where the share will be graphed.
+1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
 
-  ```bash
-  docker compose logs zrok-share
-  ```
+    ```bash
+    docker compose up --detach
+    ```
 
-  ```buttonless title="Output"
-  zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
-  ```
+1. Get the public share URL from the output of the `zrok-share` service or by peeking in the zrok console where the share will appear in the graph.
 
-This concludes sharing the demo web server. Read on to learn how to pivot to sharing any web server leveraging additional zrok backend modes.
+    ```bash
+    docker compose logs zrok-share
+    ```
+
+    ```buttonless title="Output"
+    zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
+    ```
+
+This concludes the minimum steps to begin sharing the demo web server. Read on to learn how to pivot to sharing any website or web service by leveraging additional zrok backend modes.
 
 ## Proxy Any Web Server
 
-The simplest way to share your web server is to set `ZROK_TARGET` (e.g. `https://example.com`) in the environment file.
+The simplest way to share your existing HTTP server is to set `ZROK_TARGET` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that URL.
 
 ```bash title=".env"
 ZROK_TARGET="http://example.com:8080"
 ```
 
+```bash
+docker compose down && docker compose up
+```
+
 ## Require Authentication
 
-You can require authentication for your public share by setting `ZROK_OAUTH_PROVIDER` to `github` or `google` with zrok.io. You could parse the authenticated email address from the request cookie if you're building a custom server app. Read more about the OAuth features in [this blog post](https://blog.openziti.io/the-zrok-oauth-public-frontend).
+You can require a password or an OAuth login with certain email addresses.
+
+### OAuth Email
+
+You can allow specific email addresses or an email domain by setting `ZROK_OAUTH_PROVIDER` to `github` or `google` and
+`ZROK_SHARE_OPTS` to specify additional command-line options to `zrok reserve public`. Read more about the OAuth
+features in [this blog post](https://blog.openziti.io/the-zrok-oauth-public-frontend).
 
 ```bash title=".env"
 ZROK_OAUTH_PROVIDER="github"
+ZROK_SHARE_OPTS="--oauth-email-domains @example.com"
 ```
 
-## Customize Temporary Public Share
+## Caddy is Powerful
 
-This technique is useful for adding a containerized service to the project, or mounting a filesystem directory into the container to share as a static website or file server.
+The reserved public share project uses zrok's default backend mode, `proxy`. Another backend mode, `caddy`, accepts a path to [a Caddyfile](https://caddyserver.com/docs/caddyfile) as the value of `ZROK_TARGET` ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)). 
 
-Any additional services specified in the override file will be merged with `compose.yml` when you `up` the project.
+Caddy is the most powerful and flexible backend mode in zrok. You must reserve a new public subdomain whenever you switch the backend mode, so using `caddy` reduces the risk that you'll have to share a new frontend URL with your users. 
 
-You may override individual values from in `compose.yml` by specifying them in the override file.
+With Caddy, you can balance the workload for websites or web services or share static sites and files or all of the above at the same time. You can update the Caddyfile and restart the Docker Compose project to start sharing the new configuration with the same reserved public subdomain.
 
-1. Create a file `compose.override.yml`. This example demonstrates sharing a static HTML directory `/tmp/html` from the Docker host's filesystem.
+1. Create a Caddyfile. This example demonstrates proxying two HTTP servers with a weighted round-robin load balancer.
 
-  ```yaml title="compose.override.yml"
-  services:
-    zrok-share:
-      command: share public --headless --backend-mode web /tmp/html
-      volumes:
-        - /tmp/html:/tmp/html
-  ```
-
-1. Re-run the project to load the new configuration.
-
-  ```bash
-  docker compose up --force-recreate --detach
-  ```
-
-1. Get the new tempoary public share URL for the `zrok-share` container.
-
-  ```bash
-  docker compose logs zrok-share
-  ```
-
-  ```buttonless title="Output"
-  zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
+    ```console title="Caddyfile"
+    http:// {
+      # zrok requires this bind address template
+      bind {{ .ZrokBindAddress }}
+      reverse_proxy /* {
+        to http://httpbin1:8080 http://httpbin2:8080
+        lb_policy weighted_round_robin 3 2
+      }
+    }
     ```
 
-## Destroy the zrok Environment
+1. Create a file `compose.override.yml`. This example adds two `httpbin` containers for load balancing, and mounts the Caddyfile into the container.
 
-This destroys the Docker volumes containing the zrok environment secrets. The zrok environment can also be destroyed in the web console.
+    ```yaml title="compose.override.yml"
+    services:
+      httpbin1:
+        image: mccutchen/go-httpbin  # 8080/tcp
+      httpbin2:
+        image: mccutchen/go-httpbin  # 8080/tcp
+      zrok-share:
+        volumes:
+          - ./Caddyfile:/mnt/.zrok/Caddyfile
+    ```
 
-```bash
-docker compose down --volumes
-```
+1. Start a new Docker Compose project or delete the existing state volume. 
+
+    ```bash
+    docker compose down --volumes
+    ```
+
+  If you prefer to keep using the same zrok environment with the new share then delete `/mnt/.zrok/reserved.json` instead of the entire volume.
+
+1. Run the project to load the new configuration.
+
+    ```bash
+    docker compose up --detach
+    ```
+
+1. Note the new reserved share URL from the log.
+
+    ```bash
+    docker compose logs zrok-share
+    ```
+
+    ```buttonless title="Output"
+    INFO: zrok public URL: https://88s803f2qvao.in.zrok.io/
+    ```

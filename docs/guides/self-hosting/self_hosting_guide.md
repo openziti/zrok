@@ -188,7 +188,7 @@ zitiLogin
 ziti edge list identities
 ```
 
-The id is shown for the "frontend" identity. 
+The id is shown for the frontend identity named "public."
 
 Nice work! The `zrok` controller is fully configured now that you have created the zrok frontend.
 
@@ -217,10 +217,10 @@ $ zrok access public etc/http-frontend.yml
 [   0.002]    INFO main.(*accessPublicCommand).run: {
 	...
 }
-[   0.002]    INFO zrok/endpoints/public_frontend.newMetricsAgent: loaded 'frontend' identity
+[   0.002]    INFO zrok/endpoints/public_frontend.newMetricsAgent: loaded 'public' identity
 ```
 
-This process uses the `frontend` identity created during the bootstrap process to provide public access for the `zrok` deployment. It is expected that the configured listener for this `frontend` corresponds to the DNS template specified when creating the public frontend record above.
+The zrok frontend uses the `public` identity created during the bootstrap process to securely access zrok backends. to provide public access for the `zrok` deployment. It is expected that the configured listener for this frontend corresponds to the DNS template specified when creating the public frontend record above.
 
 ## Invite Yourself
 
