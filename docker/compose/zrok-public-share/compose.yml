@@ -44,7 +44,7 @@ services:
       ZROK_TARGET: http://zrok-test:9090  # backend target, is a path in container filesystem unless proxy mode
       ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate
       ZROK_OAUTH_PROVIDER:  # google, github
-      ZROK_OAUTH_EMAILS:    # space-separated list of OAuth email addresses or @domain.tld to allow
+      ZROK_OAUTH_EMAILS:    # allow space-separated list of OAuth email address glob patterns
       ZROK_BASIC_AUTH:      # username:password, mutually-exclusive with ZROK_OAUTH_PROVIDER
 
       # least relevant options
