@@ -57,6 +57,11 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessNotFound()
 	}
 
+	if shr.PermissionMode != store.OpenPermissionMode {
+		logrus.Errorf("closed permission mode selected")
+		return share.NewAccessNotFound()
+	}
+
 	if err := h.checkLimits(shr, trx); err != nil {
 		logrus.Errorf("cannot access limited share for '%v': %v", principal.Email, err)
 		return share.NewAccessNotFound()

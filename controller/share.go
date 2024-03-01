@@ -134,6 +134,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
+		PermissionMode:       store.OpenPermissionMode,
 	}
 	if len(params.Body.FrontendSelection) > 0 {
 		sshr.FrontendSelection = &params.Body.FrontendSelection[0]
