@@ -139,7 +139,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 
 	logrus.Debugf("allocated share '%v'", shrToken)
-	logrus.Infof("permission mode '%v'", params.Body.PermissionMode)
 
 	sshr := &store.Share{
 		ZId:                  shrZId,
