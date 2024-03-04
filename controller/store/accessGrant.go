@@ -23,10 +23,10 @@ func (str *Store) CreateAccessGrant(shareId, accountId int, tx *sqlx.Tx) (int, e
 	return id, nil
 }
 
-func (str *Store) FindAccessGrantsForAccount(accountId int, tx *sqlx.Tx) ([]*AccessGrant, error) {
-	rows, err := tx.Queryx("select access_grants.* from access_grants where account_id = $1 and not deleted", accountId)
+func (str *Store) FindAccessGrantsForShare(shrId int, tx *sqlx.Tx) ([]*AccessGrant, error) {
+	rows, err := tx.Queryx("select access_grants.* from access_grants where share_id = $1 and not deleted", shrId)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting access_grants by account_id")
+		return nil, errors.Wrap(err, "error selecting access_grants by share_id")
 	}
 	var ags []*AccessGrant
 	for rows.Next() {
@@ -37,6 +37,15 @@ func (str *Store) FindAccessGrantsForAccount(accountId int, tx *sqlx.Tx) ([]*Acc
 		ags = append(ags, ag)
 	}
 	return ags, nil
+}
+
+func (str *Store) CheckAccessGrantForShareAndAccount(shrId, acctId int, tx *sqlx.Tx) (int, error) {
+	count := 0
+	err := tx.QueryRowx("select count(0) from access_grans where share_id = $1 and account_id = $2", shrId, acctId).StructScan(&count)
+	if err != nil {
+		return 0, errors.Wrap(err, "error selecting access_grants by share_id and account_id")
+	}
+	return count, nil
 }
 
 func (str *Store) DeleteAccessGrant(id int, tx *sqlx.Tx) error {
