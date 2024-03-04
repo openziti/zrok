@@ -71,6 +71,8 @@ func newPrivateShare(root env_core.Root, request *ShareRequest) *share.SharePara
 		BackendMode:          string(request.BackendMode),
 		BackendProxyEndpoint: request.Target,
 		AuthScheme:           string(None),
+		PermissionMode:       string(request.PermissionMode),
+		AccessGrants:         request.AccessGrants,
 	}
 	return req
 }
@@ -87,6 +89,8 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 		OauthEmailDomains:               request.OauthEmailAddressPatterns,
 		OauthProvider:                   request.OauthProvider,
 		OauthAuthorizationCheckInterval: request.OauthAuthorizationCheckInterval.String(),
+		PermissionMode:                  string(request.PermissionMode),
+		AccessGrants:                    request.AccessGrants,
 	}
 	return req
 }
