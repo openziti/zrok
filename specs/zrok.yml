@@ -1057,6 +1057,13 @@ definitions:
         type: string
       reserved:
         type: boolean
+      permissionMode:
+        type: string
+        enum: ["open", "closed"]
+      accessGrants:
+        type: array
+        items:
+          type: string
       uniqueName:
         type: string
 

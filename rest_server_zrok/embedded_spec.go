@@ -1562,6 +1562,12 @@ func init() {
     "shareRequest": {
       "type": "object",
       "properties": {
+        "accessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "authScheme": {
           "type": "string"
         },
@@ -1609,6 +1615,13 @@ func init() {
           "enum": [
             "github",
             "google"
+          ]
+        },
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
           ]
         },
         "reserved": {
@@ -3289,6 +3302,12 @@ func init() {
     "shareRequest": {
       "type": "object",
       "properties": {
+        "accessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "authScheme": {
           "type": "string"
         },
@@ -3336,6 +3355,13 @@ func init() {
           "enum": [
             "github",
             "google"
+          ]
+        },
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
           ]
         },
         "reserved": {
