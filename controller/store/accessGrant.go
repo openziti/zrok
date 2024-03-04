@@ -11,7 +11,7 @@ type AccessGrant struct {
 	AccountId int
 }
 
-func (str *Store) CreateAccessGrant(shareId, accountId, tx *sqlx.Tx) (int, error) {
+func (str *Store) CreateAccessGrant(shareId, accountId int, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into access_grants (share_id, account_id) values ($1, $2) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing access_grant insert statement")
