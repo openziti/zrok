@@ -33,6 +33,8 @@ type sharePublicCommand struct {
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
 	oauthCheckInterval        time.Duration
+	closed                    bool
+	accessGrants              []string
 	cmd                       *cobra.Command
 }
 
@@ -47,6 +49,8 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that area allowed to access this share (see --closed)")
 
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
@@ -112,6 +116,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		Frontends:   cmd.frontendSelection,
 		BasicAuth:   cmd.basicAuth,
 		Target:      target,
+	}
+	if cmd.closed {
+		req.PermissionMode = sdk.ClosedPermissionMode
+		req.AccessGrants = cmd.accessGrants
 	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider

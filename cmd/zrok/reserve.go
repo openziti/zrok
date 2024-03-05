@@ -26,6 +26,8 @@ type reserveCommand struct {
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
 	oauthCheckInterval        time.Duration
+	closed                    bool
+	accessGrants              []string
 	cmd                       *cobra.Command
 }
 
@@ -45,6 +47,8 @@ func newReserveCommand() *reserveCommand {
 	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domains to authenticate via OAuth")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that area allowed to access this share (see --closed)")
 
 	cmd.Run = command.run
 	return command
@@ -141,6 +145,10 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
+	}
+	if cmd.closed {
+		req.PermissionMode = sdk.ClosedPermissionMode
+		req.AccessGrants = cmd.accessGrants
 	}
 	shr, err := sdk.CreateShare(env, req)
 	if err != nil {
