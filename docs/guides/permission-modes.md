@@ -1,5 +1,5 @@
 ---
-sidebar_position: 40
+sidebar_position: 22
 sidebar_label: Permission Modes
 ---
 
