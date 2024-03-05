@@ -59,3 +59,15 @@ func (str *Store) DeleteAccessGrant(id int, tx *sqlx.Tx) error {
 	}
 	return nil
 }
+
+func (str *Store) DeleteAccessGrantsForShare(shrId int, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("update access_grants set updated_at = current_timestamp, deleted = true where share_id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing access_grants delete for shares statement")
+	}
+	_, err = stmt.Exec(shrId)
+	if err != nil {
+		return errors.Wrap(err, "error executing access_grants delete for shares statement")
+	}
+	return nil
+}
