@@ -27,14 +27,12 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 
 	envZId := params.Body.EnvZID
 	envId := 0
-	ownerAcctId := 0
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx); err == nil {
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
 				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
 				envId = env.Id
-				ownerAcctId = *env.AccountId
 				found = true
 				break
 			}
@@ -51,7 +49,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	shrToken := params.Body.ShrToken
 	shr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share")
+		logrus.Errorf("error finding share with token '%v': %v", shrToken, err)
 		return share.NewAccessNotFound()
 	}
 	if shr == nil {
@@ -60,8 +58,15 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	}
 
 	if shr.PermissionMode == store.ClosedPermissionMode {
-		if err := h.checkAccessGrants(shr, ownerAcctId, principal, trx); err != nil {
+		shrEnv, err := str.GetEnvironment(shr.EnvironmentId, trx)
+		if err != nil {
+			logrus.Errorf("error getting environment for share '%v': %v", shrToken, err)
+			return share.NewAccessInternalServerError()
+		}
+
+		if err := h.checkAccessGrants(shr, *shrEnv.AccountId, principal, trx); err != nil {
 			logrus.Errorf("closed permission mode for '%v' fails for '%v': %v", shr.Token, principal.Email, err)
+			return share.NewAccessUnauthorized()
 		}
 	}
 
@@ -127,9 +132,11 @@ func (h *accessHandler) checkAccessGrants(shr *store.Share, ownerAccountId int, 
 	}
 	count, err := str.CheckAccessGrantForShareAndAccount(shr.Id, int(principal.ID), trx)
 	if err != nil {
+		logrus.Infof("error checking access grants for '%v': %v", shr.Token, err)
 		return err
 	}
 	if count > 0 {
+		logrus.Infof("found '%d' grants for '%v'", count, principal.Email)
 		return nil
 	}
 	return errors.Errorf("access denied for '%v' accessing '%v'", principal.Email, shr.Token)
