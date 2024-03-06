@@ -41,7 +41,7 @@ zrok access private y6h4at5xvn6o
 And now `anotheruser@test.com` will be allowed to access the share:
 
 ```
-$ HOME=/tmp/zrok zrok access private --headless y6h4at5xvn6o
+$ zrok access private --headless y6h4at5xvn6o
 [   0.049]    INFO main.(*accessPrivateCommand).run: allocated frontend 'VyvrJihAOEHD'
 [   0.051]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: http://127.0.0.1:9191
 ```
