@@ -58,7 +58,7 @@ $ zrok share private --headless --closed -b web .
 zrok access private s4czjylwk7wa
 ```
 
-In another terminal window you can execute:
+In another shell in the same environment you can execute:
 
 ```
 $ zrok modify share s4czjylwk7wa --add-access-grant anotheruser@test.com
