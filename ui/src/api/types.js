@@ -321,6 +321,8 @@
  * 
  * @property {string} shrToken 
  * @property {string} backendProxyEndpoint 
+ * @property {string[]} addAccessGrants 
+ * @property {string[]} removeAccessGrants 
  */
 
 /**

@@ -36,6 +36,31 @@ func (o *UpdateShareOK) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	rw.WriteHeader(200)
 }
 
+// UpdateShareBadRequestCode is the HTTP code returned for type UpdateShareBadRequest
+const UpdateShareBadRequestCode int = 400
+
+/*
+UpdateShareBadRequest bad request
+
+swagger:response updateShareBadRequest
+*/
+type UpdateShareBadRequest struct {
+}
+
+// NewUpdateShareBadRequest creates UpdateShareBadRequest with default headers values
+func NewUpdateShareBadRequest() *UpdateShareBadRequest {
+
+	return &UpdateShareBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *UpdateShareBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // UpdateShareUnauthorizedCode is the HTTP code returned for type UpdateShareUnauthorized
 const UpdateShareUnauthorizedCode int = 401
 

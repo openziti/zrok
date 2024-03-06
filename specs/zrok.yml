@@ -651,6 +651,8 @@ paths:
       responses:
         200:
           description: share updated
+        400:
+          description: bad request
         401:
           description: unauthorized
         404:
@@ -1127,6 +1129,14 @@ definitions:
         type: string
       backendProxyEndpoint:
         type: string
+      addAccessGrants:
+        type: array
+        items:
+          type: string
+      removeAccessGrants:
+        type: array
+        items:
+          type: string
 
   verifyRequest:
     type: object

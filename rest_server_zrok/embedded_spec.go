@@ -988,6 +988,9 @@ func init() {
           "200": {
             "description": "share updated"
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
           },
@@ -1721,8 +1724,20 @@ func init() {
     "updateShareRequest": {
       "type": "object",
       "properties": {
+        "addAccessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "backendProxyEndpoint": {
           "type": "string"
+        },
+        "removeAccessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "shrToken": {
           "type": "string"
@@ -2728,6 +2743,9 @@ func init() {
           "200": {
             "description": "share updated"
           },
+          "400": {
+            "description": "bad request"
+          },
           "401": {
             "description": "unauthorized"
           },
@@ -3461,8 +3479,20 @@ func init() {
     "updateShareRequest": {
       "type": "object",
       "properties": {
+        "addAccessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "backendProxyEndpoint": {
           "type": "string"
+        },
+        "removeAccessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "shrToken": {
           "type": "string"
