@@ -23,11 +23,12 @@ type modifyShareCommand struct {
 func newModifyShareCommand() *modifyShareCommand {
 	cmd := &cobra.Command{
 		Use:   "share <shareToken>",
+		Args:  cobra.ExactArgs(1),
 		Short: "Modify a share",
 	}
 	command := &modifyShareCommand{cmd: cmd}
-	cmd.Flags().StringArrayVar(&command.addAccessGrants, "add-access-grant", []string{}, "Add an additional access grant")
-	cmd.Flags().StringArrayVar(&command.removeAccessGrants, "remove-access-grant", []string{}, "Remove an access grant")
+	cmd.Flags().StringArrayVar(&command.addAccessGrants, "add-access-grant", []string{}, "Add an access grant (email address)")
+	cmd.Flags().StringArrayVar(&command.removeAccessGrants, "remove-access-grant", []string{}, "Remove an access grant (email address)")
 	cmd.Run = command.run
 	return command
 }
