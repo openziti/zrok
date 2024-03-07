@@ -17,6 +17,8 @@ const App = () => {
                 console.log("reloaded user", localUser);
             }
         }
+
+        checkUserData()
       
         document.addEventListener('storage', checkUserData)
       
