@@ -10,7 +10,9 @@ CHANGE: Enhancements to the look and feel of the account actions tab in the web 
 
 FIX: The regenerate account token dialog incorrectly specified the path `${HOME}/.zrok/environments.yml`. This, was corrected to be `${HOME}/.zrok/environments.json`.
 
-FIX: align zrok frontdoor examples and Linux package (`zrok-share`) with the new OAuth email flag `--oauth-email-address-patterns` introduced in v0.4.25.
+FIX: Align zrok frontdoor examples and Linux package (`zrok-share`) with the new OAuth email flag `--oauth-email-address-patterns` introduced in v0.4.25.
+
+FIX: Reloading the web console when logged in no longer provokes the user to the login page.
 
 ## v0.4.25
 
