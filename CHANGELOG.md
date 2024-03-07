@@ -10,6 +10,8 @@ CHANGE: Enhancements to the look and feel of the account actions tab in the web 
 
 FIX: The regenerate account token dialog incorrectly specified the path `${HOME}/.zrok/environments.yml`. This, was corrected to be `${HOME}/.zrok/environments.json`.
 
+FIX: align zrok frontdoor examples and Linux package (`zrok-share`) with the new OAuth email flag `--oauth-email-address-patterns` introduced in v0.4.25.
+
 ## v0.4.25
 
 FEATURE: New action in the web console that allows changing the password of the logged-in account (https://github.com/openziti/zrok/issues/148)

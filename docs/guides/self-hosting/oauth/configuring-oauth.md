@@ -121,21 +121,22 @@ Both the `google` and `github` providers accept a `client_id` and `client_secret
 With your public frontend configured to support OAuth, you can test this by creating a public share. There are new command line options to support this:
 
 ```text
-$ zrok share public
-Error: accepts 1 arg(s), received 0
+$ zrok share public --help
+Share a target resource publicly
+
 Usage:
   zrok share public <target> [flags]
 
 Flags:
-  -b, --backend-mode string               The backend mode {proxy, web, caddy, drive} (default "proxy")
-      --basic-auth stringArray            Basic authentication users (<username:password>,...)
-      --frontends stringArray             Selected frontends to use for the share (default [public])
-      --headless                          Disable TUI and run headless
-  -h, --help                              help for public
-      --insecure                          Enable insecure TLS certificate validation for <target>
-      --oauth-check-interval duration     Maximum lifetime for OAuth authentication; reauthenticate after expiry (default 3h0m0s)
-      --oauth-email-domains stringArray   Allow only these email domains to authenticate via OAuth
-      --oauth-provider string             Enable OAuth provider [google, github]
+  -b, --backend-mode string                        The backend mode {proxy, web, caddy, drive} (default "proxy")
+      --basic-auth stringArray                     Basic authentication users (<username:password>,...)
+      --frontends stringArray                      Selected frontends to use for the share (default [public])
+      --headless                                   Disable TUI and run headless
+  -h, --help                                       help for public
+      --insecure                                   Enable insecure TLS certificate validation for <target>
+      --oauth-check-interval duration              Maximum lifetime for OAuth authentication; reauthenticate after expiry (default 3h0m0s)
+      --oauth-email-address-patterns stringArray   Allow only these email domain globs to authenticate via OAuth
+      --oauth-provider string                      Enable OAuth provider [google, github]
 
 Global Flags:
   -p, --panic     Panic instead of showing pretty errors
@@ -144,12 +145,12 @@ Global Flags:
 
 The `--oauth-provider` flag enables OAuth for the share using the specified provider.
 
-The `--oauth-email-domains` flag accepts a comma-separated list of authenticated email address domains that are allowed to access the share.
+The `--oauth-email-address-patterns` flag accepts a single glob pattern that matches an authenticated email address that is allowed to access the share. Use this flag multiple times to allow different patterns.
 
 The `--oauth-check-interval` flag specifies how frequently the authentication must be checked.
 
 An example public share:
 
 ```text
-zrok share public --backend-mode web --oauth-provider github --oauth-email-domains zrok.io ~/public
+zrok share public --backend-mode web --oauth-provider github --oauth-email-address-patterns '*@zrok.io' ~/public
 ```
