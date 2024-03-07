@@ -9,7 +9,7 @@ Shares created in zrok `v0.4.26` and newer now include a choice of _permission m
 
 Shares created with zrok `v0.4.25` and older were created using what is now called the _open permission mode_. Whether _public_ or _private_, these shares can be accessed by any user of the zrok service instance, as long as they know the _share token_ of the share. Effectively shares with the _open permission mode_ are accessible by any user of the zrok service instance.
 
-zrok now supports a _closed permission mode_, which allows for more fine-grained control over which zrok users are allowed to privately access (`zrok access private`) your shares.
+zrok now supports a _closed permission mode_, which allows for more fine-grained control over which zrok users are allowed to privately access your shares using `zrok access private`.
 
 zrok defaults to continuing to create shares with the _open permission mode_. This will likely change in a future release. We're leaving the default behavior in place to allow users a period of time to get comfortable with the new permission modes.
 
@@ -23,7 +23,7 @@ $ zrok share private --headless --closed -b web .
 zrok access private 0vzwzodf0c7g
 ```
 
-By default any environment owned by the account that created the share is _allowed_ to access (`zrok access private`) the new share. But a user trying to access the share from an environment owned by a different account will enounter:
+By default any environment owned by the account that created the share is _allowed_ to access the new share. But a user trying to access the share from an environment owned by a different account will enounter the following error message:
 
 ```
 $ zrok access private 0vzwzodf0c7g
