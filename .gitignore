@@ -15,6 +15,7 @@ etc/dev-frontend.yml
 # Generated files
 .docusaurus
 .cache-loader
+openapitools.json
 
 sdk/python/sdk/build/
 

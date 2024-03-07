@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {buildMetrics} from "../../metrics/util";
-import * as metadata from "../../../api/metadata";
 import MetricsView from "../../metrics/MetricsView";
+import { metadataApi } from "../../..";
 
 const MetricsTab = (props) => {
     const [metrics30, setMetrics30] = useState(buildMetrics([]));
@@ -10,17 +10,17 @@ const MetricsTab = (props) => {
 
     useEffect(() => {
         if(props.share.token) {
-            metadata.getShareMetrics(props.share.token)
+            metadataApi.getShareMetrics(props.share.token)
                 .then(resp => {
-                    setMetrics30(buildMetrics(resp.data));
+                    setMetrics30(buildMetrics(resp));
                 });
-            metadata.getShareMetrics(props.share.token, {duration: "168h"})
+            metadataApi.getShareMetrics(props.share.token, {duration: "168h"})
                 .then(resp => {
-                    setMetrics7(buildMetrics(resp.data));
+                    setMetrics7(buildMetrics(resp));
                 });
-            metadata.getShareMetrics(props.share.token, {duration: "24h"})
+            metadataApi.getShareMetrics(props.share.token, {duration: "24h"})
                 .then(resp => {
-                    setMetrics1(buildMetrics(resp.data));
+                    setMetrics1(buildMetrics(resp));
                 });
         }
     }, [props.share]);
@@ -29,22 +29,22 @@ const MetricsTab = (props) => {
         let mounted = true;
         let interval = setInterval(() => {
             if(props.share.token) {
-                metadata.getShareMetrics(props.share.token)
+                metadataApi.getShareMetrics(props.share.token)
                     .then(resp => {
                         if(mounted) {
-                            setMetrics30(buildMetrics(resp.data));
+                            setMetrics30(buildMetrics(resp));
                         }
                     });
-                metadata.getShareMetrics(props.share.token, {duration: "168h"})
+                metadataApi.getShareMetrics(props.share.token, {duration: "168h"})
                     .then(resp => {
                         if(mounted) {
-                            setMetrics7(buildMetrics(resp.data));
+                            setMetrics7(buildMetrics(resp));
                         }
                     });
-                metadata.getShareMetrics(props.share.token, {duration: "24h"})
+                metadataApi.getShareMetrics(props.share.token, {duration: "24h"})
                     .then(resp => {
                         if(mounted) {
-                            setMetrics1(buildMetrics(resp.data));
+                            setMetrics1(buildMetrics(resp));
                         }
                     });
             }

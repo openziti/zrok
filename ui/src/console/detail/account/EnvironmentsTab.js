@@ -1,25 +1,28 @@
 import React, {useEffect, useState} from "react";
-import * as metadata from "../../../api/metadata";
 import {Area, AreaChart, ResponsiveContainer} from "recharts";
 import DataTable from "react-data-table-component";
+import { metadataApi } from "../../..";
 
 const EnvironmentsTab = (props) => {
     const [detail, setDetail] = useState([]);
 
     useEffect(() => {
-        metadata.getAccountDetail()
+        console.log("getting account details")
+        metadataApi.getAccountDetail()
             .then(resp => {
-                setDetail(resp.data);
+                setDetail(resp);
+            }).catch(err => {
+                console.log(err)
             });
     }, [props.selection]);
 
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getAccountDetail()
+            metadataApi.getAccountDetail()
                 .then(resp => {
                     if(mounted) {
-                        setDetail(resp.data);
+                        setDetail(resp);
                     }
                 });
         }, 5000);

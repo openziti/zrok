@@ -1,7 +1,8 @@
-import * as share from "../../../api/share";
+import {ShareApi} from "../../../api/src";
 import {Button} from "react-bootstrap";
 
 const ActionsTab = (props) => {
+    const share = new ShareApi()
     const deleteFrontend = (feToken, shrToken, envZId) => {
         if(window.confirm("Really delete access frontend '" + feToken + "' for share '" + shrToken + "'?")) {
             share.unaccess({body: {frontendToken: feToken, shrToken: shrToken, envZId: envZId}}).then(resp => {

@@ -3,18 +3,18 @@ import SharesTab from "./SharesTab";
 import {useEffect, useState} from "react";
 import Icon from "@mdi/react";
 import {mdiConsoleNetwork} from "@mdi/js";
-import {getEnvironmentDetail} from "../../../api/metadata";
 import DetailTab from "./DetailTab";
 import ActionsTab from "./ActionsTab";
 import MetricsTab from "./MetricsTab";
+import { metadataApi } from "../../..";
 
 const EnvironmentDetail = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        getEnvironmentDetail(props.selection.envZId)
+        metadataApi.getEnvironmentDetail(props.selection.envZId)
             .then(resp => {
-                setDetail(resp.data);
+                setDetail(resp);
             });
     }, [props.selection]);
 

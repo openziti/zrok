@@ -3,8 +3,8 @@ import {useEffect, useState} from "react";
 import Visualizer from "./visualizer/Visualizer";
 import Enable from "./modals/Enable";
 import Version from "./modals/Version";
-import * as metadata from "../api/metadata";
 import Detail from "./detail/Detail";
+import { metadataApi } from "..";
 
 const Console = (props) => {
     const [showEnableModal, setShowEnableModal] = useState(false);
@@ -19,9 +19,9 @@ const Console = (props) => {
 
     useEffect(() => {
         let mounted = true;
-        metadata.overview().then(resp => {
+        metadataApi.overview().then(resp => {
             if(mounted) {
-                setOverview(resp.data);
+                setOverview(resp);
             }
         });
     }, []);
@@ -29,9 +29,9 @@ const Console = (props) => {
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.overview().then(resp => {
+            metadataApi.overview().then(resp => {
                 if(mounted) {
-                    setOverview(resp.data);
+                    setOverview(resp);
                 }
             })
         }, 1000);

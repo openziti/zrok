@@ -1,25 +1,25 @@
-import * as metadata from "../../../api/metadata";
 import React, {useEffect, useState} from "react";
 import DataTable from 'react-data-table-component';
 import {Area, AreaChart, ResponsiveContainer} from "recharts";
+import { metadataApi } from "../../..";
 
 const SharesTab = (props) => {
     const [detail, setDetail] = useState({});
 
     useEffect(() => {
-        metadata.getEnvironmentDetail(props.selection.envZId)
+        metadataApi.getEnvironmentDetail(props.selection.envZId)
             .then(resp => {
-                setDetail(resp.data);
+                setDetail(resp);
             });
     }, [props.selection]);
 
     useEffect(() => {
         let mounted = true;
         let interval = setInterval(() => {
-            metadata.getEnvironmentDetail(props.selection.envZId)
+            metadataApi.getEnvironmentDetail(props.selection.envZId)
                 .then(resp => {
                     if(mounted) {
-                        setDetail(resp.data);
+                        setDetail(resp);
                     }
                 });
         }, 5000);

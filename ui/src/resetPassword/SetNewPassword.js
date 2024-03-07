@@ -1,9 +1,8 @@
 import {useEffect, useState} from "react";
-import * as account from '../api/account';
-import * as metadata from "../api/metadata"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import PasswordForm from "../components/password";
+import { accountApi, metadataApi } from "..";
 
 const SetNewPassword = (props) => {
     const [password, setPassword] = useState('');
@@ -18,14 +17,12 @@ const SetNewPassword = (props) => {
     const errorMessage = <h2 className={"errorMessage"}>Reset Password Failed!</h2>;
 
     useEffect(() => {
-        metadata.configuration().then(resp => {
-            if(!resp.error) {
-                setPasswordLength(resp.data.passwordRequirements.length)
-                setPasswordRequireCapital(resp.data.passwordRequirements.requireCapital)
-                setPasswordRequireNumeric(resp.data.passwordRequirements.requireNumeric)
-                setPasswordRequireSpecial(resp.data.passwordRequirements.requireSpecial)
-                setPasswordValidSpecialCharacters(resp.data.passwordRequirements.validSpecialCharacters)
-            }
+        metadataApi.configuration().then(resp => {
+            setPasswordLength(resp.passwordRequirements.length)
+            setPasswordRequireCapital(resp.passwordRequirements.requireCapital)
+            setPasswordRequireNumeric(resp.passwordRequirements.requireNumeric)
+            setPasswordRequireSpecial(resp.passwordRequirements.requireSpecial)
+            setPasswordValidSpecialCharacters(resp.passwordRequirements.validSpecialCharacters)
         }).catch(err => {
             console.log("err", err);
         });
@@ -34,16 +31,14 @@ const SetNewPassword = (props) => {
     const handleSubmit = async e => {
         e.preventDefault();
         if (password !== undefined && password !== "") {
-        account.resetPassword({body: {"token": props.token, "password": password}})
+            accountApi.resetPassword({body: {"token": props.token, "password": password}})
             .then(resp => {
-                if(!resp.error) {
-                    setMessage(undefined);
-                    setComplete(true);
-                } else {
-                    setMessage(errorMessage);
-                }
+                console.log(resp)
+                setMessage(undefined);
+                setComplete(true);
             })
             .catch(resp => {
+                console.log(resp)
                 setMessage(errorMessage);
             })
         }

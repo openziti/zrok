@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import * as account from '../../api/account';
-import * as metadata from "../../api/metadata"
 import {Button, Container, Form, Row} from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { accountApi } from "../..";
+import { metadataApi } from "../..";
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
@@ -13,12 +13,10 @@ const Login = (props) => {
     const errorMessage = <h2 className={"errorMessage"}>Login Failed!</h2>;
 
     useEffect(() => {
-        metadata.configuration().then(resp => {
+        metadataApi.configuration().then(resp => {
             console.log(resp)
-            if(!resp.error) {
-                if (resp.data.touLink !== null && resp.data.touLink.trim() !== "") {
-                    setTou(resp.data.touLink)
-                }
+            if (resp.touLink !== null && resp.touLink.trim() !== "") {
+                setTou(resp.touLink)
             }
         }).catch(err => {
             console.log("err", err);
@@ -29,25 +27,21 @@ const Login = (props) => {
         e.preventDefault()
         console.log(email, password);
 
-        account.login({body: {"email": email, "password": password}})
+        accountApi.login({body: {"email": email, "password": password}})
             .then(resp => {
-                if (!resp.error) {
-                    let user = {
-                        "email": email.toLowerCase(),
-                        "token": resp.data
-                    }
-                    props.loginSuccess(user)
-                    localStorage.setItem('user', JSON.stringify(user))
-                    console.log(user)
-                    console.log('login succeeded', resp)
-                    document.dispatchEvent(new Event('storage'))
-                } else {
-                    console.log('login failed')
-                    setMessage(errorMessage);
+                let user = {
+                    "email": email.toLowerCase(),
+                    "token": resp
                 }
+                props.loginSuccess(user)
+                localStorage.setItem('user', JSON.stringify(user))
+                console.log(user)
+                console.log('login succeeded', resp)
+                document.dispatchEvent(new Event('storage'))
             })
             .catch((resp) => {
                 console.log('login failed', resp)
+                setMessage(errorMessage);
             });
     };
 
