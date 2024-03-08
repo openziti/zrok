@@ -25,11 +25,13 @@ func init() {
 }
 
 type sharePrivateCommand struct {
-	basicAuth   []string
-	backendMode string
-	headless    bool
-	insecure    bool
-	cmd         *cobra.Command
+	basicAuth    []string
+	backendMode  string
+	headless     bool
+	insecure     bool
+	closed       bool
+	accessGrants []string
+	cmd          *cobra.Command
 }
 
 func newSharePrivateCommand() *sharePrivateCommand {
@@ -43,6 +45,8 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Run = command.run
 	return command
 }
@@ -130,6 +134,10 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		ShareMode:   sdk.PrivateShareMode,
 		BasicAuth:   cmd.basicAuth,
 		Target:      target,
+	}
+	if cmd.closed {
+		req.PermissionMode = sdk.ClosedPermissionMode
+		req.AccessGrants = cmd.accessGrants
 	}
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {

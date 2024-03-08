@@ -20,6 +20,13 @@ const (
 	PublicShareMode  ShareMode = "public"
 )
 
+type PermissionMode string
+
+const (
+	OpenPermissionMode   PermissionMode = "open"
+	ClosedPermissionMode PermissionMode = "closed"
+)
+
 type ShareRequest struct {
 	Reserved                        bool
 	UniqueName                      string
@@ -31,6 +38,8 @@ type ShareRequest struct {
 	OauthProvider                   string
 	OauthEmailAddressPatterns       []string
 	OauthAuthorizationCheckInterval time.Duration
+	PermissionMode                  PermissionMode
+	AccessGrants                    []string
 }
 
 type Share struct {

@@ -48,15 +48,49 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 		return share.NewUpdateShareNotFound()
 	}
 
-	sshr.BackendProxyEndpoint = &backendProxyEndpoint
-	if err := str.UpdateShare(sshr, tx); err != nil {
-		logrus.Errorf("error updating share '%v': %v", shrToken, err)
-		return share.NewUpdateShareInternalServerError()
+	doCommit := false
+	if backendProxyEndpoint != "" {
+		sshr.BackendProxyEndpoint = &backendProxyEndpoint
+		if err := str.UpdateShare(sshr, tx); err != nil {
+			logrus.Errorf("error updating share '%v': %v", shrToken, err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		doCommit = true
 	}
 
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for share '%v' update: %v", shrToken, err)
-		return share.NewUpdateShareInternalServerError()
+	for _, addr := range params.Body.AddAccessGrants {
+		acct, err := str.FindAccountWithEmail(addr, tx)
+		if err != nil {
+			logrus.Errorf("error looking up account by email '%v' for user '%v': %v", addr, principal.Email, err)
+			return share.NewUpdateShareBadRequest()
+		}
+		if _, err := str.CreateAccessGrant(sshr.Id, acct.Id, tx); err != nil {
+			logrus.Errorf("error adding access grant '%v' for share '%v': %v", acct.Email, shrToken, err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		logrus.Infof("added access grant '%v' to share '%v'", acct.Email, shrToken)
+		doCommit = true
+	}
+
+	for _, addr := range params.Body.RemoveAccessGrants {
+		acct, err := str.FindAccountWithEmail(addr, tx)
+		if err != nil {
+			logrus.Errorf("error looking up account by email '%v' for user '%v': %v", addr, principal.Email, err)
+			return share.NewUpdateShareBadRequest()
+		}
+		if err := str.DeleteAccessGrantsForShareAndAccount(sshr.Id, acct.Id, tx); err != nil {
+			logrus.Errorf("error removing access grant '%v' for share '%v': %v", acct.Email, shrToken, err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		logrus.Infof("removed access grant '%v' from share '%v'", acct.Email, shrToken)
+		doCommit = true
+	}
+
+	if doCommit {
+		if err := tx.Commit(); err != nil {
+			logrus.Errorf("error committing transaction for share '%v' update: %v", shrToken, err)
+			return share.NewUpdateShareInternalServerError()
+		}
 	}
 
 	return share.NewUpdateShareOK()

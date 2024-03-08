@@ -29,23 +29,33 @@ class UpdateShareRequest(object):
     """
     swagger_types = {
         'shr_token': 'str',
-        'backend_proxy_endpoint': 'str'
+        'backend_proxy_endpoint': 'str',
+        'add_access_grants': 'list[str]',
+        'remove_access_grants': 'list[str]'
     }
 
     attribute_map = {
         'shr_token': 'shrToken',
-        'backend_proxy_endpoint': 'backendProxyEndpoint'
+        'backend_proxy_endpoint': 'backendProxyEndpoint',
+        'add_access_grants': 'addAccessGrants',
+        'remove_access_grants': 'removeAccessGrants'
     }
 
-    def __init__(self, shr_token=None, backend_proxy_endpoint=None):  # noqa: E501
+    def __init__(self, shr_token=None, backend_proxy_endpoint=None, add_access_grants=None, remove_access_grants=None):  # noqa: E501
         """UpdateShareRequest - a model defined in Swagger"""  # noqa: E501
         self._shr_token = None
         self._backend_proxy_endpoint = None
+        self._add_access_grants = None
+        self._remove_access_grants = None
         self.discriminator = None
         if shr_token is not None:
             self.shr_token = shr_token
         if backend_proxy_endpoint is not None:
             self.backend_proxy_endpoint = backend_proxy_endpoint
+        if add_access_grants is not None:
+            self.add_access_grants = add_access_grants
+        if remove_access_grants is not None:
+            self.remove_access_grants = remove_access_grants
 
     @property
     def shr_token(self):
@@ -88,6 +98,48 @@ class UpdateShareRequest(object):
         """
 
         self._backend_proxy_endpoint = backend_proxy_endpoint
+
+    @property
+    def add_access_grants(self):
+        """Gets the add_access_grants of this UpdateShareRequest.  # noqa: E501
+
+
+        :return: The add_access_grants of this UpdateShareRequest.  # noqa: E501
+        :rtype: list[str]
+        """
+        return self._add_access_grants
+
+    @add_access_grants.setter
+    def add_access_grants(self, add_access_grants):
+        """Sets the add_access_grants of this UpdateShareRequest.
+
+
+        :param add_access_grants: The add_access_grants of this UpdateShareRequest.  # noqa: E501
+        :type: list[str]
+        """
+
+        self._add_access_grants = add_access_grants
+
+    @property
+    def remove_access_grants(self):
+        """Gets the remove_access_grants of this UpdateShareRequest.  # noqa: E501
+
+
+        :return: The remove_access_grants of this UpdateShareRequest.  # noqa: E501
+        :rtype: list[str]
+        """
+        return self._remove_access_grants
+
+    @remove_access_grants.setter
+    def remove_access_grants(self, remove_access_grants):
+        """Sets the remove_access_grants of this UpdateShareRequest.
+
+
+        :param remove_access_grants: The remove_access_grants of this UpdateShareRequest.  # noqa: E501
+        :type: list[str]
+        """
+
+        self._remove_access_grants = remove_access_grants
 
     def to_dict(self):
         """Returns the model properties as a dict"""

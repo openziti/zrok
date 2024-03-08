@@ -79,8 +79,12 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		h.deallocateResources(senv, shrToken, shrZId, edge)
 		logrus.Debugf("deallocated share '%v'", shrToken)
 
+		if err := str.DeleteAccessGrantsForShare(sshr.Id, tx); err != nil {
+			logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
+			return share.NewUnshareInternalServerError()
+		}
 		if err := str.DeleteShare(sshr.Id, tx); err != nil {
-			logrus.Errorf("error deactivating share '%v': %v", shrZId, err)
+			logrus.Errorf("error deleting share '%v': %v", shrToken, err)
 			return share.NewUnshareInternalServerError()
 		}
 		if err := tx.Commit(); err != nil {

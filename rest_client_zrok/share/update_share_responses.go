@@ -26,6 +26,12 @@ func (o *UpdateShareReader) ReadResponse(response runtime.ClientResponse, consum
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewUpdateShareBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewUpdateShareUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -101,6 +107,62 @@ func (o *UpdateShareOK) String() string {
 }
 
 func (o *UpdateShareOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewUpdateShareBadRequest creates a UpdateShareBadRequest with default headers values
+func NewUpdateShareBadRequest() *UpdateShareBadRequest {
+	return &UpdateShareBadRequest{}
+}
+
+/*
+UpdateShareBadRequest describes a response with status code 400, with default header values.
+
+bad request
+*/
+type UpdateShareBadRequest struct {
+}
+
+// IsSuccess returns true when this update share bad request response has a 2xx status code
+func (o *UpdateShareBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this update share bad request response has a 3xx status code
+func (o *UpdateShareBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this update share bad request response has a 4xx status code
+func (o *UpdateShareBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this update share bad request response has a 5xx status code
+func (o *UpdateShareBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this update share bad request response a status code equal to that given
+func (o *UpdateShareBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the update share bad request response
+func (o *UpdateShareBadRequest) Code() int {
+	return 400
+}
+
+func (o *UpdateShareBadRequest) Error() string {
+	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest ", 400)
+}
+
+func (o *UpdateShareBadRequest) String() string {
+	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest ", 400)
+}
+
+func (o *UpdateShareBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

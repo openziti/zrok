@@ -21,6 +21,9 @@ import (
 // swagger:model shareRequest
 type ShareRequest struct {
 
+	// access grants
+	AccessGrants []string `json:"accessGrants"`
+
 	// auth scheme
 	AuthScheme string `json:"authScheme,omitempty"`
 
@@ -50,6 +53,10 @@ type ShareRequest struct {
 	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
+	// permission mode
+	// Enum: [open closed]
+	PermissionMode string `json:"permissionMode,omitempty"`
+
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
@@ -74,6 +81,10 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOauthProvider(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePermissionMode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -206,6 +217,48 @@ func (m *ShareRequest) validateOauthProvider(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateOauthProviderEnum("oauthProvider", "body", m.OauthProvider); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var shareRequestTypePermissionModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["open","closed"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypePermissionModePropEnum = append(shareRequestTypePermissionModePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestPermissionModeOpen captures enum value "open"
+	ShareRequestPermissionModeOpen string = "open"
+
+	// ShareRequestPermissionModeClosed captures enum value "closed"
+	ShareRequestPermissionModeClosed string = "closed"
+)
+
+// prop value enum
+func (m *ShareRequest) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypePermissionModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validatePermissionMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.PermissionMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validatePermissionModeEnum("permissionMode", "body", m.PermissionMode); err != nil {
 		return err
 	}
 

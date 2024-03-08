@@ -651,6 +651,8 @@ paths:
       responses:
         200:
           description: share updated
+        400:
+          description: bad request
         401:
           description: unauthorized
         404:
@@ -1057,6 +1059,13 @@ definitions:
         type: string
       reserved:
         type: boolean
+      permissionMode:
+        type: string
+        enum: ["open", "closed"]
+      accessGrants:
+        type: array
+        items:
+          type: string
       uniqueName:
         type: string
 
@@ -1120,6 +1129,14 @@ definitions:
         type: string
       backendProxyEndpoint:
         type: string
+      addAccessGrants:
+        type: array
+        items:
+          type: string
+      removeAccessGrants:
+        type: array
+        items:
+          type: string
 
   verifyRequest:
     type: object

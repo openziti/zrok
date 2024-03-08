@@ -17,8 +17,14 @@ import (
 // swagger:model updateShareRequest
 type UpdateShareRequest struct {
 
+	// add access grants
+	AddAccessGrants []string `json:"addAccessGrants"`
+
 	// backend proxy endpoint
 	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
+
+	// remove access grants
+	RemoveAccessGrants []string `json:"removeAccessGrants"`
 
 	// shr token
 	ShrToken string `json:"shrToken,omitempty"`

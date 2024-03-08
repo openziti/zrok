@@ -54,6 +54,19 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareUnauthorized()
 	}
 
+	var accessGrantAcctIds []int
+	if store.PermissionMode(params.Body.PermissionMode) == store.ClosedPermissionMode {
+		for _, email := range params.Body.AccessGrants {
+			acct, err := str.FindAccountWithEmail(email, trx)
+			if err != nil {
+				logrus.Errorf("unable to find account '%v' for share request from '%v'", email, principal.Email)
+				return share.NewShareNotFound()
+			}
+			logrus.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
+			accessGrantAcctIds = append(accessGrantAcctIds, acct.Id)
+		}
+	}
+
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
@@ -134,6 +147,10 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
+		PermissionMode:       store.OpenPermissionMode,
+	}
+	if params.Body.PermissionMode != "" {
+		sshr.PermissionMode = store.PermissionMode(params.Body.PermissionMode)
 	}
 	if len(params.Body.FrontendSelection) > 0 {
 		sshr.FrontendSelection = &params.Body.FrontendSelection[0]
@@ -148,6 +165,16 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
 		return share.NewShareInternalServerError()
+	}
+
+	if sshr.PermissionMode == store.ClosedPermissionMode {
+		for _, acctId := range accessGrantAcctIds {
+			_, err := str.CreateAccessGrant(sid, acctId, trx)
+			if err != nil {
+				logrus.Errorf("error creating access grant for '%v': %v", principal.Email, err)
+				return share.NewShareInternalServerError()
+			}
+		}
 	}
 
 	if err := trx.Commit(); err != nil {

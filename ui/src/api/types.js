@@ -267,6 +267,8 @@
  * @property {string[]} oauthEmailDomains 
  * @property {string} oauthAuthorizationCheckInterval 
  * @property {boolean} reserved 
+ * @property {string} permissionMode 
+ * @property {string[]} accessGrants 
  * @property {string} uniqueName 
  */
 
@@ -319,6 +321,8 @@
  * 
  * @property {string} shrToken 
  * @property {string} backendProxyEndpoint 
+ * @property {string[]} addAccessGrants 
+ * @property {string[]} removeAccessGrants 
  */
 
 /**

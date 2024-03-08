@@ -49,12 +49,25 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	shrToken := params.Body.ShrToken
 	shr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share")
+		logrus.Errorf("error finding share with token '%v': %v", shrToken, err)
 		return share.NewAccessNotFound()
 	}
 	if shr == nil {
 		logrus.Errorf("unable to find share '%v' for user '%v'", shrToken, principal.Email)
 		return share.NewAccessNotFound()
+	}
+
+	if shr.PermissionMode == store.ClosedPermissionMode {
+		shrEnv, err := str.GetEnvironment(shr.EnvironmentId, trx)
+		if err != nil {
+			logrus.Errorf("error getting environment for share '%v': %v", shrToken, err)
+			return share.NewAccessInternalServerError()
+		}
+
+		if err := h.checkAccessGrants(shr, *shrEnv.AccountId, principal, trx); err != nil {
+			logrus.Errorf("closed permission mode for '%v' fails for '%v': %v", shr.Token, principal.Email, err)
+			return share.NewAccessUnauthorized()
+		}
 	}
 
 	if err := h.checkLimits(shr, trx); err != nil {
@@ -110,4 +123,21 @@ func (h *accessHandler) checkLimits(shr *store.Share, trx *sqlx.Tx) error {
 		}
 	}
 	return nil
+}
+
+func (h *accessHandler) checkAccessGrants(shr *store.Share, ownerAccountId int, principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
+	if int(principal.ID) == ownerAccountId {
+		logrus.Infof("accessing own share '%v' for '%v'", shr.Token, principal.Email)
+		return nil
+	}
+	count, err := str.CheckAccessGrantForShareAndAccount(shr.Id, int(principal.ID), trx)
+	if err != nil {
+		logrus.Infof("error checking access grants for '%v': %v", shr.Token, err)
+		return err
+	}
+	if count > 0 {
+		logrus.Infof("found '%d' grants for '%v'", count, principal.Email)
+		return nil
+	}
+	return errors.Errorf("access denied for '%v' accessing '%v'", principal.Email, shr.Token)
 }
