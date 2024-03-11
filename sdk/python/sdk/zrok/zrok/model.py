@@ -34,6 +34,7 @@ class ShareRequest:
     PermissionMode: PermissionMode = OPEN_PERMISSION_MODE
     AccessGrants: list[str] = field(default_factory=list[str])
 
+
 @dataclass
 class Share:
     Token: str
