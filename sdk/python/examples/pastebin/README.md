@@ -16,7 +16,7 @@ The zrok SDK requires Python 3.10 or later.
 If you haven't already installed them, you'll need the dependent libraries used in the examples.
 
 ```bash
-pip install -r ./sdk/python/examples/requirements.txt
+pip install -r ./sdk/python/examples/pastebin/requirements.txt
 ```
 
 ## Running the Example :arrow_forward:
@@ -25,7 +25,7 @@ This example contains a `copyto` server portion and `pastefrom` client portion.
 
 ### copyto
 
-The server portion expects to get data you want to send via stdin. It can be evoked by:
+The server portion expects to get the data you want to send via stdin. It can be invoked by:
 
 ```bash
 echo "this is a cool test" | python pastebin.py copyto

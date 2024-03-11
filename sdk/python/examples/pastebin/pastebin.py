@@ -12,14 +12,16 @@ import threading
 
 exit_signal = threading.Event()
 
+
 def signal_handler(signum, frame):
     print("\nCtrl-C detected. Next connection will close server")
     exit_signal.set()
 
+
 class copyto:
     def handle(self, *args, **kwargs):
         root = zrok.environment.root.Load()
-        
+
         try:
             shr = zrok.share.CreateShare(root=root, request=ShareRequest(
                 BackendMode=zrok.model.TCP_TUNNEL_BACKEND_MODE,
@@ -48,13 +50,13 @@ class copyto:
                     conn.sendall(data.encode('utf-8'))
 
         print("Server stopped.")
-        
 
     def loadData(self):
         if not os.isatty(sys.stdin.fileno()):
             return sys.stdin.read()
         else:
             raise Exception("'copyto' requires input from stdin; direct your paste buffer into stdin")
+
 
 def pastefrom(options):
     root = zrok.environment.root.Load()
@@ -66,7 +68,7 @@ def pastefrom(options):
     except Exception as e:
         print("unable to create access", e)
         sys.exit(1)
-    
+
     def removeAccess():
         try:
             zrok.access.DeleteAccess(root, acc)
@@ -78,6 +80,7 @@ def pastefrom(options):
     client = zrok.dialer.Dialer(options.shrToken, root)
     data = client.recv(1024)
     print(data.decode('utf-8'))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
