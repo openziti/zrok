@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.27
+
+FIX: Also update the Python SDK to include the permission mode and access grants fields on the `ShareRequest` (https://github.com/openziti/zrok/issues/432)
+
 ## v0.4.26
 
 FEATURE: New _permission modes_ available for shares. _Open permission mode_ retains the behavior of previous zrok releases and is the default setting. _Closed permission mode_ (`--closed`) only allows a share to be accessed (`zrok access`) by users who have been granted access with the `--access-grant` flag. See the documentation at (https://docs.zrok.io/docs/guides/permission-modes/) (https://github.com/openziti/zrok/issues/432)

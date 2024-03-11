@@ -13,6 +13,11 @@ ShareMode = str
 PRIVATE_SHARE_MODE: ShareMode = "private"
 PUBLIC_SHARE_MODE: ShareMode = "public"
 
+PermissionMode = str
+
+OPEN_PERMISSION_MODE: PermissionMode = "open"
+CLOSED_PERMISSION_MODE: PermissionMode = "closed"
+
 
 @dataclass
 class ShareRequest:
@@ -26,6 +31,8 @@ class ShareRequest:
     OauthAuthorizationCheckInterval: str = ""
     Reserved: bool = False
     UniqueName: str = ""
+    PermissionMode: PermissionMode = OPEN_PERMISSION_MODE
+    AccessGrants: list[str] = field(default_factory=list[str])
 
 
 @dataclass

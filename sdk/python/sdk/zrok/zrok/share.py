@@ -67,7 +67,9 @@ def __newPrivateShare(root: Root, request: model.ShareRequest) -> ShareRequest:
                         share_mode=request.ShareMode,
                         backend_mode=request.BackendMode,
                         backend_proxy_endpoint=request.Target,
-                        auth_scheme=model.AUTH_SCHEME_NONE
+                        auth_scheme=model.AUTH_SCHEME_NONE,
+                        permission_mode=request.permission_mode,
+                        access_grants=request.access_grants
                         )
 
 
@@ -79,7 +81,9 @@ def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
                        backend_proxy_endpoint=request.Target,
                        auth_scheme=model.AUTH_SCHEME_NONE,
                        oauth_email_domains=request.OauthEmailAddressPatterns,
-                       oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval
+                       oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval,
+                       permission_mode=request.permission_mode,
+                       access_grants=request.access_grants
                        )
     if request.OauthProvider != "":
         ret.oauth_provider = request.OauthProvider
