@@ -7,5 +7,9 @@ export function express(shrToken: string): Express.Application {
 }
 
 export async function init(root: Root): Promise<any> {
-    return ziti.init(root.env.ZitiIdentity)
+    return ziti.init(root.ZitiIdentityNamed(root.EnvironmentIdentityName()))
+}
+
+export function dialer(root: Root, shrToken: string, callback: any): ziti.dialer {
+    ziti.listen(shrToken, false, undefined, callback)
 }

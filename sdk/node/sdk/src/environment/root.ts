@@ -116,11 +116,11 @@ export class Root {
         return "public"
     }
 
-    private EnvironmentIdentityName(): string {
+    public EnvironmentIdentityName(): string {
         return "environment"
     }
 
-    private ZitiIdentityName(name: string): string {
+    public ZitiIdentityNamed(name: string): string {
         return identityFile(name)
     }
 }
