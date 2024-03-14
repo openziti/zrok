@@ -56,13 +56,19 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+	var username string
 	user, err := user2.Current()
 	if err != nil {
-		panic(err)
+		username := os.Getenv("USER")
+		if username == "" {
+			logrus.Panicf("unable to determine the current user: %v", err)
+		}
+	} else {
+		username = user.Username
 	}
-	hostDetail = fmt.Sprintf("%v; %v", user.Username, hostDetail)
+	hostDetail = fmt.Sprintf("%v; %v", username, hostDetail)
 	if cmd.description == "<user>@<hostname>" {
-		cmd.description = fmt.Sprintf("%v@%v", user.Username, hostName)
+		cmd.description = fmt.Sprintf("%v@%v", username, hostName)
 	}
 	zrok, err := env.Client()
 	if err != nil {
