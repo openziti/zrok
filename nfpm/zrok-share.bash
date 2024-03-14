@@ -147,10 +147,13 @@ if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   exec zrok ${ZROK_CMD}
 else
   # reserve and continue
-  zrok ${ZROK_CMD} | jq -rc | tee ~/.zrok/reserved.json
+  zrok ${ZROK_CMD} > ~/.zrok/reserved.json
   # share the reserved backend target until exit
   if ! [[ -s ~/.zrok/reserved.json ]]; then
     echo "ERROR: empty or missing $(realpath ~/.zrok)/reserved.json" >&2
+    exit 1
+  elif ! jq . < ~/.zrok/reserved.json &>/dev/null; then
+    echo "ERROR: invalid JSON in $(realpath ~/.zrok)/reserved.json" >&2
     exit 1
   else
     ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' ~/.zrok/reserved.json 2>/dev/null)
