@@ -2,6 +2,8 @@
 
 ## v0.4.27
 
+CHANGE: Update to OpenZiti SDK (`github.com/openziti/sdk-golang`) at `v0.23.10`.
+
 FIX: Also update the Python SDK to include the permission mode and access grants fields on the `ShareRequest` (https://github.com/openziti/zrok/issues/432)
 
 FIX: Add a way to find the username on Linux when /etc/passwd and stdlib can't resolve the UID (https://github.com/openziti/zrok/issues/454)
