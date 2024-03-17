@@ -1,0 +1,30 @@
+
+{
+    email ${ZROK_ACME_EMAIL}
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+*.${ZROK_ZONE} {
+    tls {
+        dns digitalocean {env.DIGITALOCEAN_ACCESS_TOKEN}
+        propagation_timeout 60m
+    }
+
+    log {
+        output stdout
+        format console
+        level DEBUG
+    }
+
+    @oauth host oauth.${ZROK_ZONE}
+    reverse_proxy @oauth frontend:8181
+
+    @ctrl host ctrl.${ZROK_ZONE}
+    reverse_proxy @ctrl zrok:18080
+
+    reverse_proxy frontend:8080 {
+        header_up Host {http.request.host}
+    }
+
+}
+
