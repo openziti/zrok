@@ -1,6 +1,6 @@
 {
-  "name": "zrok",
-  "version": "1.0.0",
+  "name": "@openziti/zrok",
+  "version": "0.1.0",
   "description": "SDK to enable programmatic use of the zrok sharing methods",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

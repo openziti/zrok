@@ -1,8 +1,15 @@
-name: Build/Relesae Node SDK
+name: Build/Release Node SDK
 
 on:
   release:
     types: [ published ]
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
+  pull_request:
+    branches: [ main ]
 
 jobs:
 
@@ -51,9 +58,9 @@ jobs:
 
     - name: Build NodeJS-SDK
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm install
-        npm run build:package -- --target_arch=${{ matrix.config.arch }}
+        npm run build
       env:
         PRESET: ci-${{ matrix.config.target }}-${{ matrix.config.arch }}
         TARGET_ARCH: ${{ matrix.config.arch }}
