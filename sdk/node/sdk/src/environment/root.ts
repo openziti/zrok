@@ -153,9 +153,13 @@ function loadMetadata(): Metadata {
 
 function loadConfig(): Config {
     let cf = configFile()
-    let data = fs.readFileSync(cf)
-    let serial = JSON.parse(data.toString())
-    return new Config(serial.api_endpoint)
+    if (fs.existsSync(cf)) {    // the config.json file may not be present
+        let data = fs.readFileSync(cf)
+        let serial = JSON.parse(data.toString())
+        return new Config(serial.api_endpoint)    
+    } else {
+        return new Config('')    
+    }
 }
 
 function loadEnvironment(): Environment {

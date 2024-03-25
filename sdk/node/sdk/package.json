@@ -1,7 +1,7 @@
 {
   "name": "zrok",
   "version": "1.0.0",
-  "description": "SDK to enable programmatic usee of the zrok sharing methods",
+  "description": "SDK to enable programmatic use of the zrok sharing methods",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/openziti/zrok#readme",
   "dependencies": {
-    "@openziti/ziti-sdk-nodejs": "^0.14.2",
+    "@openziti/ziti-sdk-nodejs": "^0.15.0",
     "axios": "^1.6.2",
     "express": "^4.18.2"
   },

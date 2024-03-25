@@ -10,6 +10,10 @@ export async function init(root: Root): Promise<any> {
     return ziti.init(root.ZitiIdentityNamed(root.EnvironmentIdentityName()))
 }
 
-export function dialer(root: Root, shrToken: string, callback: any): ziti.dialer {
-    ziti.listen(shrToken, false, undefined, callback)
+export function dialer(root: Root, shrToken: string, connectCallback: any, dataCallback: any): ziti.dialer {
+    ziti.dial(shrToken, false, connectCallback, dataCallback)
+}
+
+export function setLogLevel(level:number) {
+    ziti.setLogLevel(level)
 }

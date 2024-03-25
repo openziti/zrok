@@ -26,10 +26,10 @@ export async function CreateAccess(root: Root, request: model.AccessRequest): Pr
         })
 
     if (shr.frontendToken == undefined) {
-        throw new Error("excpedted frontend token from access. Got none")
+        throw new Error("expected frontend token from access. Got none")
     }
     if (shr.backendMode == undefined) {
-        throw new Error("excpedted backend mode from access. Got none")
+        throw new Error("expected backend mode from access. Got none")
     }
 
     return new model.Access(shr.frontendToken, request.ShareToken, shr.backendMode)
