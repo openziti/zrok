@@ -6,10 +6,10 @@ api/apis.ts
 api/environmentApi.ts
 api/metadataApi.ts
 api/shareApi.ts
-git_push.sh
 model/accessRequest.ts
 model/accessResponse.ts
 model/authUser.ts
+model/changePasswordRequest.ts
 model/configuration.ts
 model/createFrontendRequest.ts
 model/createFrontendResponse.ts
@@ -32,10 +32,11 @@ model/overview.ts
 model/passwordRequirements.ts
 model/principal.ts
 model/publicFrontend.ts
+model/regenerateToken200Response.ts
+model/regenerateTokenRequest.ts
 model/registerRequest.ts
 model/registerResponse.ts
 model/resetPasswordRequest.ts
-model/resetPasswordRequestRequest.ts
 model/share.ts
 model/shareRequest.ts
 model/shareResponse.ts

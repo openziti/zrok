@@ -25,6 +25,9 @@ export class ShareRequest {
     'oauthEmailDomains'?: Array<string>;
     'oauthAuthorizationCheckInterval'?: string;
     'reserved'?: boolean;
+    'permissionMode'?: ShareRequest.PermissionModeEnum;
+    'accessGrants'?: Array<string>;
+    'uniqueName'?: string;
 
     static discriminator: string | undefined = undefined;
 
@@ -83,6 +86,21 @@ export class ShareRequest {
             "name": "reserved",
             "baseName": "reserved",
             "type": "boolean"
+        },
+        {
+            "name": "permissionMode",
+            "baseName": "permissionMode",
+            "type": "ShareRequest.PermissionModeEnum"
+        },
+        {
+            "name": "accessGrants",
+            "baseName": "accessGrants",
+            "type": "Array<string>"
+        },
+        {
+            "name": "uniqueName",
+            "baseName": "uniqueName",
+            "type": "string"
         }    ];
 
     static getAttributeTypeMap() {
@@ -100,10 +118,16 @@ export namespace ShareRequest {
         Web = <any> 'web',
         TcpTunnel = <any> 'tcpTunnel',
         UdpTunnel = <any> 'udpTunnel',
-        Caddy = <any> 'caddy'
+        Caddy = <any> 'caddy',
+        Drive = <any> 'drive',
+        Socks = <any> 'socks'
     }
     export enum OauthProviderEnum {
         Github = <any> 'github',
         Google = <any> 'google'
+    }
+    export enum PermissionModeEnum {
+        Open = <any> 'open',
+        Closed = <any> 'closed'
     }
 }

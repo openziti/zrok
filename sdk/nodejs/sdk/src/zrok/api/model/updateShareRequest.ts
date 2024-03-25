@@ -15,6 +15,8 @@ import { RequestFile } from './models';
 export class UpdateShareRequest {
     'shrToken'?: string;
     'backendProxyEndpoint'?: string;
+    'addAccessGrants'?: Array<string>;
+    'removeAccessGrants'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
@@ -28,6 +30,16 @@ export class UpdateShareRequest {
             "name": "backendProxyEndpoint",
             "baseName": "backendProxyEndpoint",
             "type": "string"
+        },
+        {
+            "name": "addAccessGrants",
+            "baseName": "addAccessGrants",
+            "type": "Array<string>"
+        },
+        {
+            "name": "removeAccessGrants",
+            "baseName": "removeAccessGrants",
+            "type": "Array<string>"
         }    ];
 
     static getAttributeTypeMap() {

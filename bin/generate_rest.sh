@@ -46,7 +46,7 @@ echo "...generating js client"
 openapi -s specs/zrok.yml -o ui/src/api -l js
 
 echo "...generating ts client"
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/node/sdk/src/zrok/api -g typescript-node
+openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/zrok/api -g typescript-node
 
 echo "...generating python client"
 swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python

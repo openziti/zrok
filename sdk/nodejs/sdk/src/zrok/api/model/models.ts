@@ -3,6 +3,7 @@ import localVarRequest from 'request';
 export * from './accessRequest';
 export * from './accessResponse';
 export * from './authUser';
+export * from './changePasswordRequest';
 export * from './configuration';
 export * from './createFrontendRequest';
 export * from './createFrontendResponse';
@@ -24,10 +25,11 @@ export * from './overview';
 export * from './passwordRequirements';
 export * from './principal';
 export * from './publicFrontend';
+export * from './regenerateToken200Response';
+export * from './regenerateTokenRequest';
 export * from './registerRequest';
 export * from './registerResponse';
 export * from './resetPasswordRequest';
-export * from './resetPasswordRequestRequest';
 export * from './share';
 export * from './shareRequest';
 export * from './shareResponse';
@@ -55,6 +57,7 @@ export type RequestFile = string | Buffer | fs.ReadStream | RequestDetailedFile;
 import { AccessRequest } from './accessRequest';
 import { AccessResponse } from './accessResponse';
 import { AuthUser } from './authUser';
+import { ChangePasswordRequest } from './changePasswordRequest';
 import { Configuration } from './configuration';
 import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateFrontendResponse } from './createFrontendResponse';
@@ -76,10 +79,11 @@ import { Overview } from './overview';
 import { PasswordRequirements } from './passwordRequirements';
 import { Principal } from './principal';
 import { PublicFrontend } from './publicFrontend';
+import { RegenerateToken200Response } from './regenerateToken200Response';
+import { RegenerateTokenRequest } from './regenerateTokenRequest';
 import { RegisterRequest } from './registerRequest';
 import { RegisterResponse } from './registerResponse';
 import { ResetPasswordRequest } from './resetPasswordRequest';
-import { ResetPasswordRequestRequest } from './resetPasswordRequestRequest';
 import { Share } from './share';
 import { ShareRequest } from './shareRequest';
 import { ShareResponse } from './shareResponse';
@@ -107,12 +111,14 @@ let enumsMap: {[index: string]: any} = {
         "ShareRequest.ShareModeEnum": ShareRequest.ShareModeEnum,
         "ShareRequest.BackendModeEnum": ShareRequest.BackendModeEnum,
         "ShareRequest.OauthProviderEnum": ShareRequest.OauthProviderEnum,
+        "ShareRequest.PermissionModeEnum": ShareRequest.PermissionModeEnum,
 }
 
 let typeMap: {[index: string]: any} = {
     "AccessRequest": AccessRequest,
     "AccessResponse": AccessResponse,
     "AuthUser": AuthUser,
+    "ChangePasswordRequest": ChangePasswordRequest,
     "Configuration": Configuration,
     "CreateFrontendRequest": CreateFrontendRequest,
     "CreateFrontendResponse": CreateFrontendResponse,
@@ -134,10 +140,11 @@ let typeMap: {[index: string]: any} = {
     "PasswordRequirements": PasswordRequirements,
     "Principal": Principal,
     "PublicFrontend": PublicFrontend,
+    "RegenerateToken200Response": RegenerateToken200Response,
+    "RegenerateTokenRequest": RegenerateTokenRequest,
     "RegisterRequest": RegisterRequest,
     "RegisterResponse": RegisterResponse,
     "ResetPasswordRequest": ResetPasswordRequest,
-    "ResetPasswordRequestRequest": ResetPasswordRequestRequest,
     "Share": Share,
     "ShareRequest": ShareRequest,
     "ShareResponse": ShareResponse,

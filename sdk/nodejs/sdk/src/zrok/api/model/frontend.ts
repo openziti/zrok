@@ -14,6 +14,7 @@ import { RequestFile } from './models';
 
 export class Frontend {
     'id'?: number;
+    'token'?: string;
     'shrToken'?: string;
     'zId'?: string;
     'createdAt'?: number;
@@ -26,6 +27,11 @@ export class Frontend {
             "name": "id",
             "baseName": "id",
             "type": "number"
+        },
+        {
+            "name": "token",
+            "baseName": "token",
+            "type": "string"
         },
         {
             "name": "shrToken",
