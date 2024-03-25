@@ -45,7 +45,7 @@ func (o *InviteTokenGenerateReader) ReadResponse(response runtime.ClientResponse
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /invite/token/generate] inviteTokenGenerate", response, response.Code())
 	}
 }
 
@@ -85,6 +85,11 @@ func (o *InviteTokenGenerateCreated) IsServerError() bool {
 // IsCode returns true when this invite token generate created response a status code equal to that given
 func (o *InviteTokenGenerateCreated) IsCode(code int) bool {
 	return code == 201
+}
+
+// Code gets the status code for the invite token generate created response
+func (o *InviteTokenGenerateCreated) Code() int {
+	return 201
 }
 
 func (o *InviteTokenGenerateCreated) Error() string {
@@ -138,6 +143,11 @@ func (o *InviteTokenGenerateBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the invite token generate bad request response
+func (o *InviteTokenGenerateBadRequest) Code() int {
+	return 400
+}
+
 func (o *InviteTokenGenerateBadRequest) Error() string {
 	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateBadRequest ", 400)
 }
@@ -189,6 +199,11 @@ func (o *InviteTokenGenerateUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the invite token generate unauthorized response
+func (o *InviteTokenGenerateUnauthorized) Code() int {
+	return 401
+}
+
 func (o *InviteTokenGenerateUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateUnauthorized ", 401)
 }
@@ -238,6 +253,11 @@ func (o *InviteTokenGenerateInternalServerError) IsServerError() bool {
 // IsCode returns true when this invite token generate internal server error response a status code equal to that given
 func (o *InviteTokenGenerateInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the invite token generate internal server error response
+func (o *InviteTokenGenerateInternalServerError) Code() int {
+	return 500
 }
 
 func (o *InviteTokenGenerateInternalServerError) Error() string {

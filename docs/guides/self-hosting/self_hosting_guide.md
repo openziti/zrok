@@ -24,7 +24,7 @@ I specifically used the "Host OpenZiti Anywhere" variant because it provides a p
 
 Keep track of the generated admin password when running the `expressInstall` script. The script will prompt you like this:
 
-```
+```text
 Do you want to keep the generated admin password 'XO0xHp75uuyeireO2xmmVlK91T7B9fpD'? (Y/n)
 ```
 
@@ -100,6 +100,8 @@ In my case, I've set:
 ```bash
 export ZROK_API_ENDPOINT=http://127.0.0.1:18080
 ```
+
+[Read more about configuring your self-hosted `zrok` instance](/guides/self-hosting/instance-configuration.mdx).
 
 ## Bootstrap OpenZiti for zrok
 

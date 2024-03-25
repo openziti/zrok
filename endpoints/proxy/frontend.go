@@ -7,7 +7,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,6 +22,7 @@ type FrontendConfig struct {
 	IdentityName string
 	ShrToken     string
 	Address      string
+	Tls          *endpoints.TlsConfig
 	RequestsChan chan *endpoints.Request
 }
 
@@ -76,6 +77,9 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 }
 
 func (h *Frontend) Run() error {
+	if h.cfg.Tls != nil {
+		return http.ListenAndServeTLS(h.cfg.Address, h.cfg.Tls.CertPath, h.cfg.Tls.KeyPath, h.handler)
+	}
 	return http.ListenAndServe(h.cfg.Address, h.handler)
 }
 

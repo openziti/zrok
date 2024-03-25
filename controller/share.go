@@ -7,7 +7,8 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -33,14 +34,14 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
-				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
+				logrus.Debugf("found identity '%v' for account '%v'", envZId, principal.Email)
 				envId = env.Id
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
+			logrus.Errorf("environment '%v' not found for account '%v'", envZId, principal.Email)
 			return share.NewShareUnauthorized()
 		}
 	} else {
@@ -53,15 +54,47 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareUnauthorized()
 	}
 
+	var accessGrantAcctIds []int
+	if store.PermissionMode(params.Body.PermissionMode) == store.ClosedPermissionMode {
+		for _, email := range params.Body.AccessGrants {
+			acct, err := str.FindAccountWithEmail(email, trx)
+			if err != nil {
+				logrus.Errorf("unable to find account '%v' for share request from '%v'", email, principal.Email)
+				return share.NewShareNotFound()
+			}
+			logrus.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
+			accessGrantAcctIds = append(accessGrantAcctIds, acct.Id)
+		}
+	}
+
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
 		return share.NewShareInternalServerError()
 	}
+
+	reserved := params.Body.Reserved
+	uniqueName := params.Body.UniqueName
 	shrToken, err := createShareToken()
 	if err != nil {
 		logrus.Error(err)
 		return share.NewShareInternalServerError()
+	}
+	if reserved && uniqueName != "" {
+		if !util.IsValidUniqueName(uniqueName) {
+			logrus.Errorf("invalid unique name '%v' for account '%v'", uniqueName, principal.Email)
+			return share.NewShareUnprocessableEntity()
+		}
+		shareExists, err := str.ShareWithTokenExists(uniqueName, trx)
+		if err != nil {
+			logrus.Errorf("error checking share for token collision: %v", err)
+			return share.NewUpdateShareInternalServerError()
+		}
+		if shareExists {
+			logrus.Errorf("token '%v' already exists; cannot create share", uniqueName)
+			return share.NewShareConflict()
+		}
+		shrToken = uniqueName
 	}
 
 	var shrZId string
@@ -94,7 +127,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		}
 
 	case string(sdk.PrivateShareMode):
-		logrus.Info("doing private")
 		shrZId, frontendEndpoints, err = newPrivateResourceAllocator().allocate(envZId, shrToken, params, edge)
 		if err != nil {
 			logrus.Error(err)
@@ -108,7 +140,6 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	logrus.Debugf("allocated share '%v'", shrToken)
 
-	reserved := params.Body.Reserved
 	sshr := &store.Share{
 		ZId:                  shrZId,
 		Token:                shrToken,
@@ -116,6 +147,10 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
+		PermissionMode:       store.OpenPermissionMode,
+	}
+	if params.Body.PermissionMode != "" {
+		sshr.PermissionMode = store.PermissionMode(params.Body.PermissionMode)
 	}
 	if len(params.Body.FrontendSelection) > 0 {
 		sshr.FrontendSelection = &params.Body.FrontendSelection[0]
@@ -130,6 +165,16 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
 		return share.NewShareInternalServerError()
+	}
+
+	if sshr.PermissionMode == store.ClosedPermissionMode {
+		for _, acctId := range accessGrantAcctIds {
+			_, err := str.CreateAccessGrant(sid, acctId, trx)
+			if err != nil {
+				logrus.Errorf("error creating access grant for '%v': %v", principal.Email, err)
+				return share.NewShareInternalServerError()
+			}
+		}
 	}
 
 	if err := trx.Commit(); err != nil {

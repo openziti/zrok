@@ -26,6 +26,15 @@
  */
 
 /**
+ * @typedef changePasswordRequest
+ * @memberof module:types
+ * 
+ * @property {string} email 
+ * @property {string} oldPassword 
+ * @property {string} newPassword 
+ */
+
+/**
  * @typedef configuration
  * @memberof module:types
  * 
@@ -111,6 +120,7 @@
  * @memberof module:types
  * 
  * @property {number} id 
+ * @property {string} token 
  * @property {string} shrToken 
  * @property {string} zId 
  * @property {number} createdAt 
@@ -257,6 +267,9 @@
  * @property {string[]} oauthEmailDomains 
  * @property {string} oauthAuthorizationCheckInterval 
  * @property {boolean} reserved 
+ * @property {string} permissionMode 
+ * @property {string[]} accessGrants 
+ * @property {string} uniqueName 
  */
 
 /**
@@ -308,6 +321,8 @@
  * 
  * @property {string} shrToken 
  * @property {string} backendProxyEndpoint 
+ * @property {string[]} addAccessGrants 
+ * @property {string[]} removeAccessGrants 
  */
 
 /**

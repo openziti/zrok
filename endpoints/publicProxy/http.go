@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
@@ -11,7 +12,7 @@ import (
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
 	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -69,7 +70,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, err
 	}
 	proxy.Transport = zTransport
-	if err := configureOauthHandlers(context.Background(), cfg, false); err != nil {
+	if err := configureOauthHandlers(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
 	handler := authHandler(util.NewProxyHandler(proxy), cfg, key, zCtx)
@@ -81,6 +82,9 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 }
 
 func (f *HttpFrontend) Run() error {
+	if f.cfg.Tls != nil {
+		return http.ListenAndServeTLS(f.cfg.Address, f.cfg.Tls.CertPath, f.cfg.Tls.KeyPath, f.handler)
+	}
 	return http.ListenAndServe(f.cfg.Address, f.handler)
 }
 
@@ -157,6 +161,8 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 						switch scheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
+							// ensure cookies from other shares are not sent to this share, in case it's malicious
+							deleteZrokCookies(w, r)
 							handler.ServeHTTP(w, r)
 							return
 
@@ -202,6 +208,8 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								return
 							}
 
+							// ensure cookies from other shares are not sent to this share, in case it's malicious
+							deleteZrokCookies(w, r)
 							handler.ServeHTTP(w, r)
 
 						case string(sdk.Oauth):
@@ -211,7 +219,7 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
 									var authCheckInterval time.Duration
 									if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
-										logrus.Errorf("Missing authorization check interval in share config. Defaulting to 3 hours")
+										logrus.Errorf("missing authorization check interval in share config. Defaulting to 3 hours")
 										authCheckInterval = 3 * time.Hour
 									} else {
 										i, err := time.ParseDuration(checkInterval.(string))
@@ -253,21 +261,39 @@ func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Contex
 										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
-									if validDomains, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
-										if castedDomains, ok := validDomains.([]interface{}); !ok {
-											logrus.Error("invalid email domain format")
+									if claims.Audience != r.Host {
+										logrus.Errorf("audience claim '%s' does not match requested host '%s'; restarting auth flow", claims.Audience, r.Host)
+										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										return
+									}
+
+									if validEmailAddressPatterns, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
+										if castedPatterns, ok := validEmailAddressPatterns.([]interface{}); !ok {
+											logrus.Error("invalid email pattern array format")
 											return
 										} else {
-											if len(castedDomains) > 0 {
+											if len(castedPatterns) > 0 {
 												found := false
-												for _, domain := range castedDomains {
-													if strings.HasSuffix(claims.Email, domain.(string)) {
-														found = true
-														break
+												for _, pattern := range castedPatterns {
+													if castedPattern, ok := pattern.(string); ok {
+														match, err := glob.Compile(castedPattern)
+														if err != nil {
+															logrus.Errorf("invalid email address pattern glob '%v': %v", pattern.(string), err)
+															unauthorizedUi.WriteUnauthorized(w)
+															return
+														}
+														if match.Match(claims.Email) {
+															found = true
+															break
+														}
+													} else {
+														logrus.Errorf("invalid email address pattern '%v'", pattern)
+														unauthorizedUi.WriteUnauthorized(w)
+														return
 													}
 												}
 												if !found {
-													logrus.Warnf("invalid email domain")
+													logrus.Warnf("unauthorized email '%v' for '%v'", claims.Email, shrToken)
 													unauthorizedUi.WriteUnauthorized(w)
 													return
 												}
@@ -313,15 +339,26 @@ type ZrokClaims struct {
 	Email                      string        `json:"email"`
 	AccessToken                string        `json:"accessToken"`
 	Provider                   string        `json:"provider"`
+	Audience                   string        `json:"aud"`
 	AuthorizationCheckInterval time.Duration `json:"authorizationCheckInterval"`
 	jwt.RegisteredClaims
 }
 
-func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider string, checkInterval time.Duration, key []byte) {
+func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
+	targetHost = strings.TrimSpace(targetHost)
+	if targetHost == "" {
+		logrus.Error("host claim must not be empty")
+		http.Error(w, "host claim must not be empty", http.StatusBadRequest)
+		return
+	}
+	targetHost = strings.Split(targetHost, "/")[0]
+	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
+
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, ZrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
 		Provider:                   provider,
+		Audience:                   targetHost,
 		AuthorizationCheckInterval: checkInterval,
 	})
 	sTkn, err := tkn.SignedString(key)
@@ -334,11 +371,30 @@ func SetZrokCookie(w http.ResponseWriter, domain, email, accessToken, provider s
 		Name:    "zrok-access",
 		Value:   sTkn,
 		MaxAge:  int(checkInterval.Seconds()),
-		Domain:  domain,
+		Domain:  cookieDomain,
 		Path:    "/",
 		Expires: time.Now().Add(checkInterval),
-		//Secure:  true, //When tls gets added have this be configured on if tls
+		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
+		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
+		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
+}
+
+func deleteZrokCookies(w http.ResponseWriter, r *http.Request) {
+	// Get all cookies from the request
+	cookies := r.Cookies()
+	// Clear the Cookie header
+	r.Header.Del("Cookie")
+	// Save cookies not in the list of cookies to delete, the pkce cookie might be okay to pass along to the HTTP
+	// backend, but zrok-access is not because it can contain the accessToken from any other OAuth enabled shares, so we
+	// delete it here when the current share is not OAuth-enabled. OAuth-enabled shares check the audience claim in the
+	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
+	// match.
+	for _, cookie := range cookies {
+		if cookie.Name != "zrok-access" && cookie.Name != "pkce" {
+			r.AddCookie(cookie)
+		}
+	}
 }
 
 func basicAuthRequired(w http.ResponseWriter, realm string) {

@@ -47,6 +47,7 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 	}
 	payload := &rest_model_zrok.Frontend{
 		ID:        int64(fe.Id),
+		Token:     fe.Token,
 		ZID:       fe.ZId,
 		CreatedAt: fe.CreatedAt.UnixMilli(),
 		UpdatedAt: fe.UpdatedAt.UnixMilli(),

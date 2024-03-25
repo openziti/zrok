@@ -108,6 +108,31 @@ func (o *ShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	rw.WriteHeader(404)
 }
 
+// ShareConflictCode is the HTTP code returned for type ShareConflict
+const ShareConflictCode int = 409
+
+/*
+ShareConflict conflict
+
+swagger:response shareConflict
+*/
+type ShareConflict struct {
+}
+
+// NewShareConflict creates ShareConflict with default headers values
+func NewShareConflict() *ShareConflict {
+
+	return &ShareConflict{}
+}
+
+// WriteResponse to the client
+func (o *ShareConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(409)
+}
+
 // ShareUnprocessableEntityCode is the HTTP code returned for type ShareUnprocessableEntity
 const ShareUnprocessableEntityCode int = 422
 

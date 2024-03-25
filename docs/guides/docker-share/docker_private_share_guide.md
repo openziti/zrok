@@ -8,6 +8,8 @@ sidebar_label: Private Share
 
 With zrok, you can privately share a server app that's running in Docker, or any server that's reachable by the zrok container. Then, a zrok private access running somewhere else can use the private share. In this guide we'll cover both sides: the private share and the private access.
 
+Here's a short article with an overview of [private sharing with zrok](/concepts/sharing-private.md).
+
 ## Walkthrough Video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/HxyvtFAvwUE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -18,7 +20,7 @@ To follow this guide you will need [Docker](https://docs.docker.com/get-docker/)
 
 If you have installed Docker Desktop on macOS or Windows then you are all set.
 
-## Private Share with Docker Compose
+## Begin Sharing Privately with zrok in Docker
 
 First, let's create the private share.
 
@@ -53,9 +55,9 @@ First, let's create the private share.
 
     Keep track of this token so you can use it in your zrok private access project.
 
-## Private Access with Docker Compose
+## Access the Private Share
 
-Now that we have a private share we can access it with zrok running in Docker. Next, let's access the demo web server in a web browser.
+Now that we have a private share we can access it with the zrok command or by running a separate Docker Compose project.
 
 1. Make a folder on your computer to use as a Docker Compose project for your zrok private access.
 1. In your terminal, change directory to your newly-created project folder.

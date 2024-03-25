@@ -3,6 +3,7 @@ package publicProxy
 import (
 	"context"
 	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
@@ -16,6 +17,7 @@ type Config struct {
 	Address   string
 	HostMatch string
 	Oauth     *OauthConfig
+	Tls       *endpoints.TlsConfig
 }
 
 type OauthConfig struct {

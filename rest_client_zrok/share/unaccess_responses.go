@@ -45,7 +45,7 @@ func (o *UnaccessReader) ReadResponse(response runtime.ClientResponse, consumer 
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[DELETE /unaccess] unaccess", response, response.Code())
 	}
 }
 
@@ -85,6 +85,11 @@ func (o *UnaccessOK) IsServerError() bool {
 // IsCode returns true when this unaccess o k response a status code equal to that given
 func (o *UnaccessOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the unaccess o k response
+func (o *UnaccessOK) Code() int {
+	return 200
 }
 
 func (o *UnaccessOK) Error() string {
@@ -138,6 +143,11 @@ func (o *UnaccessUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the unaccess unauthorized response
+func (o *UnaccessUnauthorized) Code() int {
+	return 401
+}
+
 func (o *UnaccessUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /unaccess][%d] unaccessUnauthorized ", 401)
 }
@@ -189,6 +199,11 @@ func (o *UnaccessNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the unaccess not found response
+func (o *UnaccessNotFound) Code() int {
+	return 404
+}
+
 func (o *UnaccessNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /unaccess][%d] unaccessNotFound ", 404)
 }
@@ -238,6 +253,11 @@ func (o *UnaccessInternalServerError) IsServerError() bool {
 // IsCode returns true when this unaccess internal server error response a status code equal to that given
 func (o *UnaccessInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the unaccess internal server error response
+func (o *UnaccessInternalServerError) Code() int {
+	return 500
 }
 
 func (o *UnaccessInternalServerError) Error() string {

@@ -42,7 +42,7 @@ func (o *ListFrontendsReader) ReadResponse(response runtime.ClientResponse, cons
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /frontends] listFrontends", response, response.Code())
 	}
 }
 
@@ -83,6 +83,11 @@ func (o *ListFrontendsOK) IsServerError() bool {
 // IsCode returns true when this list frontends o k response a status code equal to that given
 func (o *ListFrontendsOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the list frontends o k response
+func (o *ListFrontendsOK) Code() int {
+	return 200
 }
 
 func (o *ListFrontendsOK) Error() string {
@@ -145,6 +150,11 @@ func (o *ListFrontendsUnauthorized) IsCode(code int) bool {
 	return code == 401
 }
 
+// Code gets the status code for the list frontends unauthorized response
+func (o *ListFrontendsUnauthorized) Code() int {
+	return 401
+}
+
 func (o *ListFrontendsUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized ", 401)
 }
@@ -194,6 +204,11 @@ func (o *ListFrontendsInternalServerError) IsServerError() bool {
 // IsCode returns true when this list frontends internal server error response a status code equal to that given
 func (o *ListFrontendsInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the list frontends internal server error response
+func (o *ListFrontendsInternalServerError) Code() int {
+	return 500
 }
 
 func (o *ListFrontendsInternalServerError) Error() string {

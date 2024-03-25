@@ -33,13 +33,14 @@ const Login = (props) => {
             .then(resp => {
                 if (!resp.error) {
                     let user = {
-                        "email": email,
+                        "email": email.toLowerCase(),
                         "token": resp.data
                     }
                     props.loginSuccess(user)
                     localStorage.setItem('user', JSON.stringify(user))
                     console.log(user)
                     console.log('login succeeded', resp)
+                    document.dispatchEvent(new Event('storage'))
                 } else {
                     console.log('login failed')
                     setMessage(errorMessage);

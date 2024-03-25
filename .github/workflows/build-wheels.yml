@@ -1,0 +1,77 @@
+name: build wheels
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  build_wheels:
+    defaults:
+      run:
+        working-directory: sdk/python/sdk/zrok
+    strategy:
+      fail-fast: false
+      matrix:
+        spec:
+          - { name: 'linux x86_64', runner: ubuntu-20.04, target: manylinux_2_27_x86_64 }
+          - { name: 'macOS x86_64', runner: macos-11, target: macosx_10_14_x86_64 }
+          - { name: 'Windows x86_64', runner: windows-2019, target: win_amd64 }
+    name: building ${{ matrix.spec.name }}
+    runs-on: ${{ matrix.spec.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Install Python Tools
+        run: python -m pip install -U pip setuptools
+
+      - name: Build distro
+        env:
+          ZROK_VERSION: ${{ github.event.release.tag_name }}
+          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
+        run: |
+          python setup.py sdist
+
+      - uses: actions/upload-artifact@v3
+        if: startsWith(matrix.spec.name, 'linux')
+        with:
+          name: zrok_sdk
+          path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
+
+  publish:
+    runs-on: ubuntu-20.04
+    needs: [ build_wheels ]
+    permissions:
+          id-token: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: download
+
+      - name: check
+        run: |
+          ls -lR download
+          mkdir dist
+          cp download/*/* dist
+
+      - name: Publish wheels (TestPYPI)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages_dir: dist
+          skip_existing: true
+          verbose: true
+
+      - name: Publish wheels (PyPI)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages_dir: dist
+          verbose: true

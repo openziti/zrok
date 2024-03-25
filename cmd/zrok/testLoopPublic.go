@@ -13,7 +13,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
@@ -136,35 +136,42 @@ func (l *looper) run() {
 
 	l.startup()
 	logrus.Infof("looper #%d, shrToken: %v, frontend: %v", l.id, l.shrToken, l.proxyEndpoint)
-	go l.serviceListener()
-	l.dwell()
-	l.iterate()
+	if l.serviceListener() {
+		l.dwell()
+		l.iterate()
+	}
 	logrus.Infof("looper #%d: complete", l.id)
 	l.shutdown()
 }
 
-func (l *looper) serviceListener() {
+func (l *looper) serviceListener() bool {
 	zcfg, err := ziti.NewConfigFromFile(l.zif)
 	if err != nil {
 		logrus.Errorf("error opening ziti config '%v': %v", l.zif, err)
-		return
+		return false
 	}
-	opts := ziti.ListenOptions{
-		ConnectTimeout: 5 * time.Minute,
-		MaxConnections: 10,
+	options := ziti.ListenOptions{
+		ConnectTimeout:               5 * time.Minute,
+		WaitForNEstablishedListeners: 1,
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {
 		logrus.Errorf("error loading ziti context: %v", err)
-		return
+		return false
 	}
-	if l.listener, err = zctx.ListenWithOptions(l.shrToken, &opts); err == nil {
+
+	if l.listener, err = zctx.ListenWithOptions(l.shrToken, &options); err != nil {
+		logrus.Errorf("looper #%d, error listening: %v", l.id, err)
+		return false
+	}
+
+	go func() {
 		if err := http.Serve(l.listener, l); err != nil {
 			logrus.Errorf("looper #%d, error serving: %v", l.id, err)
 		}
-	} else {
-		logrus.Errorf("looper #%d, error listening: %v", l.id, err)
-	}
+	}()
+
+	return true
 }
 
 func (l *looper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -239,6 +246,9 @@ func (l *looper) iterate() {
 		if req, err := http.NewRequest("POST", l.proxyEndpoint, bytes.NewBufferString(outbase64)); err == nil {
 			client := &http.Client{Timeout: time.Second * time.Duration(l.cmd.timeoutSeconds)}
 			if resp, err := client.Do(req); err == nil {
+				if resp.StatusCode != 200 {
+					logrus.Errorf("looper #%d unexpected response status code %v!", l.id, resp.StatusCode)
+				}
 				inpayload := new(bytes.Buffer)
 				io.Copy(inpayload, resp.Body)
 				inbase64 := inpayload.String()

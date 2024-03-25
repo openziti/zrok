@@ -16,16 +16,17 @@ type Share struct {
 	FrontendEndpoint     *string
 	BackendProxyEndpoint *string
 	Reserved             bool
+	PermissionMode       PermissionMode
 	Deleted              bool
 }
 
 func (str *Store) CreateShare(envId int, shr *Share, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id")
+	stmt, err := tx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing shares insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.PermissionMode).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing shares insert statement")
 	}
 	return id, nil
@@ -63,6 +64,14 @@ func (str *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, erro
 	return shr, nil
 }
 
+func (str *Store) ShareWithTokenExists(shrToken string, tx *sqlx.Tx) (bool, error) {
+	count := 0
+	if err := tx.QueryRowx("select count(0) from shares where token = $1 and not deleted", shrToken).Scan(&count); err != nil {
+		return true, errors.Wrap(err, "error selecting share count by token")
+	}
+	return count > 0, nil
+}
+
 func (str *Store) FindShareWithZIdAndDeleted(zId string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
 	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
@@ -88,12 +97,12 @@ func (str *Store) FindSharesForEnvironment(envId int, tx *sqlx.Tx) ([]*Share, er
 }
 
 func (str *Store) UpdateShare(shr *Share, tx *sqlx.Tx) error {
-	sql := "update shares set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, updated_at = current_timestamp where id = $9"
+	sql := "update shares set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, permission_mode = $9, updated_at = current_timestamp where id = $10"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares update statement")
 	}
-	_, err = stmt.Exec(shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.Id)
+	_, err = stmt.Exec(shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.PermissionMode, shr.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing shares update statement")
 	}

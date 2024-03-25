@@ -7,3 +7,10 @@ const (
 	WarningAction LimitJournalAction = "warning"
 	ClearAction   LimitJournalAction = "clear"
 )
+
+type PermissionMode string
+
+const (
+	OpenPermissionMode   PermissionMode = "open"
+	ClosedPermissionMode PermissionMode = "closed"
+)

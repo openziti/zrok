@@ -26,6 +26,7 @@ func init() {
 	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(modifyCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
 	transport.AddAddressParser(tcp.AddressParser{})
@@ -83,6 +84,12 @@ var loopCmd = &cobra.Command{
 	Use:     "loopback",
 	Aliases: []string{"loop"},
 	Short:   "Loopback testing utilities",
+}
+
+var modifyCmd = &cobra.Command{
+	Use:     "modify",
+	Aliases: []string{"mod"},
+	Short:   "Modify resources",
 }
 
 var shareCmd = &cobra.Command{

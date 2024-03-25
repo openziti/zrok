@@ -48,7 +48,7 @@ func (o *RegisterReader) ReadResponse(response runtime.ClientResponse, consumer 
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /register] register", response, response.Code())
 	}
 }
 
@@ -89,6 +89,11 @@ func (o *RegisterOK) IsServerError() bool {
 // IsCode returns true when this register o k response a status code equal to that given
 func (o *RegisterOK) IsCode(code int) bool {
 	return code == 200
+}
+
+// Code gets the status code for the register o k response
+func (o *RegisterOK) Code() int {
+	return 200
 }
 
 func (o *RegisterOK) Error() string {
@@ -153,6 +158,11 @@ func (o *RegisterNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the register not found response
+func (o *RegisterNotFound) Code() int {
+	return 404
+}
+
 func (o *RegisterNotFound) Error() string {
 	return fmt.Sprintf("[POST /register][%d] registerNotFound ", 404)
 }
@@ -203,6 +213,11 @@ func (o *RegisterUnprocessableEntity) IsServerError() bool {
 // IsCode returns true when this register unprocessable entity response a status code equal to that given
 func (o *RegisterUnprocessableEntity) IsCode(code int) bool {
 	return code == 422
+}
+
+// Code gets the status code for the register unprocessable entity response
+func (o *RegisterUnprocessableEntity) Code() int {
+	return 422
 }
 
 func (o *RegisterUnprocessableEntity) Error() string {
@@ -263,6 +278,11 @@ func (o *RegisterInternalServerError) IsServerError() bool {
 // IsCode returns true when this register internal server error response a status code equal to that given
 func (o *RegisterInternalServerError) IsCode(code int) bool {
 	return code == 500
+}
+
+// Code gets the status code for the register internal server error response
+func (o *RegisterInternalServerError) Code() int {
+	return 500
 }
 
 func (o *RegisterInternalServerError) Error() string {

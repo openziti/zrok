@@ -21,6 +21,9 @@ import (
 // swagger:model shareRequest
 type ShareRequest struct {
 
+	// access grants
+	AccessGrants []string `json:"accessGrants"`
+
 	// auth scheme
 	AuthScheme string `json:"authScheme,omitempty"`
 
@@ -28,7 +31,7 @@ type ShareRequest struct {
 	AuthUsers []*AuthUser `json:"authUsers"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// backend proxy endpoint
@@ -50,12 +53,19 @@ type ShareRequest struct {
 	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
+	// permission mode
+	// Enum: [open closed]
+	PermissionMode string `json:"permissionMode,omitempty"`
+
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
+
+	// unique name
+	UniqueName string `json:"uniqueName,omitempty"`
 }
 
 // Validate validates this share request
@@ -71,6 +81,10 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOauthProvider(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePermissionMode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -114,7 +128,7 @@ var shareRequestTypeBackendModePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -141,6 +155,9 @@ const (
 
 	// ShareRequestBackendModeDrive captures enum value "drive"
 	ShareRequestBackendModeDrive string = "drive"
+
+	// ShareRequestBackendModeSocks captures enum value "socks"
+	ShareRequestBackendModeSocks string = "socks"
 )
 
 // prop value enum
@@ -200,6 +217,48 @@ func (m *ShareRequest) validateOauthProvider(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateOauthProviderEnum("oauthProvider", "body", m.OauthProvider); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var shareRequestTypePermissionModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["open","closed"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypePermissionModePropEnum = append(shareRequestTypePermissionModePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestPermissionModeOpen captures enum value "open"
+	ShareRequestPermissionModeOpen string = "open"
+
+	// ShareRequestPermissionModeClosed captures enum value "closed"
+	ShareRequestPermissionModeClosed string = "closed"
+)
+
+// prop value enum
+func (m *ShareRequest) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypePermissionModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validatePermissionMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.PermissionMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validatePermissionModeEnum("permissionMode", "body", m.PermissionMode); err != nil {
 		return err
 	}
 
@@ -267,6 +326,11 @@ func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats str
 	for i := 0; i < len(m.AuthUsers); i++ {
 
 		if m.AuthUsers[i] != nil {
+
+			if swag.IsZero(m.AuthUsers[i]) { // not required
+				return nil
+			}
+
 			if err := m.AuthUsers[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))

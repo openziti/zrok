@@ -8,14 +8,19 @@ import (
 	"strings"
 )
 
-func GetRefreshedService(name string, ctx ziti.Context) (*rest_model.ServiceDetail, bool) {
-	svc, found := ctx.GetService(name)
+func GetRefreshedService(svcName string, ctx ziti.Context) (*rest_model.ServiceDetail, bool) {
+	svc, found := ctx.GetService(svcName)
 	if !found {
-		if err := ctx.RefreshServices(); err != nil {
-			logrus.Errorf("error refreshing services: %v", err)
+		svc, err := ctx.RefreshService(svcName)
+		if err != nil {
+			logrus.Errorf("error refreshing service '%v': %v", svcName, err)
 			return nil, false
 		}
-		return ctx.GetService(name)
+		if svc == nil {
+			logrus.Errorf("service '%v' not found", svcName)
+			return nil, false
+		}
+		return svc, true
 	}
 	return svc, found
 }

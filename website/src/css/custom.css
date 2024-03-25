@@ -112,7 +112,7 @@ html {
 }
 
 .navbar__link:hover, .navbar__link--active {
-   font-weight: 600;
+  font-weight: 600;
 }
 
 code {

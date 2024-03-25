@@ -16,6 +16,8 @@ dist/
 .docusaurus
 .cache-loader
 
+sdk/python/sdk/build/
+
 # Misc
 .DS_Store
 .env.local
@@ -24,7 +26,10 @@ dist/
 .env.production.local
 go.work
 go.work.sum
+zrok-venv
 
+# cache used by local dev cross-build script
+/.npm
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -4,6 +4,21 @@ import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
+ * @param {module:types.changePasswordRequest} [options.body] 
+ * @return {Promise<object>} changed password
+ */
+export function changePassword(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(changePasswordOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.inviteRequest} [options.body] 
  * @return {Promise<object>} invitation created
  */
@@ -30,6 +45,21 @@ export function login(options) {
     }
   }
   return gateway.request(loginOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} regenerate account token
+ */
+export function regenerateToken(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(regenerateTokenOperation, parameters)
 }
 
 /**
@@ -92,6 +122,17 @@ export function verify(options) {
   return gateway.request(verifyOperation, parameters)
 }
 
+const changePasswordOperation = {
+  path: '/changePassword',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
 const inviteOperation = {
   path: '/invite',
   contentTypes: ['application/zrok.v1+json'],
@@ -102,6 +143,17 @@ const loginOperation = {
   path: '/login',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post'
+}
+
+const regenerateTokenOperation = {
+  path: '/regenerateToken',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const registerOperation = {

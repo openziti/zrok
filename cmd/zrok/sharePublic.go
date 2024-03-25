@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gobwas/glob"
 	"github.com/openziti/zrok/endpoints"
 	drive "github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/sdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -24,15 +25,17 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth          []string
-	frontendSelection  []string
-	backendMode        string
-	headless           bool
-	insecure           bool
-	oauthProvider      string
-	oauthEmailDomains  []string
-	oauthCheckInterval time.Duration
-	cmd                *cobra.Command
+	basicAuth                 []string
+	frontendSelection         []string
+	backendMode               string
+	headless                  bool
+	insecure                  bool
+	oauthProvider             string
+	oauthEmailAddressPatterns []string
+	oauthCheckInterval        time.Duration
+	closed                    bool
+	accessGrants              []string
+	cmd                       *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -46,10 +49,12 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
-	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domains", []string{}, "Allow only these email domains to authenticate via OAuth")
+	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domain globs to authenticate via OAuth")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
@@ -112,10 +117,24 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		BasicAuth:   cmd.basicAuth,
 		Target:      target,
 	}
+	if cmd.closed {
+		req.PermissionMode = sdk.ClosedPermissionMode
+		req.AccessGrants = cmd.accessGrants
+	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
-		req.OauthEmailDomains = cmd.oauthEmailDomains
+		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
+
+		for _, g := range cmd.oauthEmailAddressPatterns {
+			_, err := glob.Compile(g)
+			if err != nil {
+				if !panicInstead {
+					tui.Error(fmt.Sprintf("unable to create share, invalid oauth email glob (%v)", g), err)
+				}
+				panic(err)
+			}
+		}
 	}
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
