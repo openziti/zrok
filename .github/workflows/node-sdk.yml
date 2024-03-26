@@ -1,0 +1,88 @@
+name: Build/Release Node SDK
+
+on:
+  release:
+    types: [ published ]
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
+
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    
+    strategy:
+      matrix:
+        config:
+          - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
+        node_ver: [ 20 ]
+      fail-fast: false
+
+    steps:
+
+    - name: Node Version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node_ver }}
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: 'recursive'
+
+    - name: Bump semver
+      if: github.ref == 'refs/heads/main'
+      uses: TriPSs/conventional-changelog-action@v3
+      with:
+        github-token: ${{ secrets.GH_ACTION }}
+        git-message: 'chore(release): {version}'
+        preset: 'angular'
+        tag-prefix: 'v'
+        output-file: 'CHANGELOG.md'
+        skip-on-empty: true # do not alter semver when we push 'chore: ...' commits
+        release-count: 0 # ensure changelog is generated to contain ALL updates
+
+    - name: Pull newly bumped semver
+      if: github.ref == 'refs/heads/main'
+      run: git pull
+
+    - name: Setup .npmrc
+      if: github.ref == 'refs/heads/main'
+      # Setup .npmrc file to prepare for possible publish to npm
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Build NodeJS-SDK
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm install
+        npm run build
+      env:
+        BUILD_DATE: ${{ steps.date.outputs.date }}
+
+    - name: Publish production release
+      if: github.ref == 'refs/heads/main'
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: NPM Publish
+      uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
+        access: public
+      if: |
+        startsWith(github.ref, 'refs/tags/')
