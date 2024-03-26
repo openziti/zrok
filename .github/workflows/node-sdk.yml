@@ -24,12 +24,8 @@ jobs:
     strategy:
       matrix:
         config:
-          - { os: windows-latest, target: "windows", arch: "x64" }
           - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
-          - { os: ubuntu-20.04,   target: "linux", arch: "arm64" }
-          - { os: macos-latest,   target: "macos", arch: "x64" }
-          - { os: macos-latest,   target: "macos", arch: "arm64" }
-        node_ver: [ 16, 18, 19, 20, 21]
+        node_ver: [ 20 ]
       fail-fast: false
 
     steps:
@@ -40,12 +36,6 @@ jobs:
         fetch-depth: 0
         submodules: 'recursive'
 
-    - name: Get crossbuild tools
-      if: matrix.config.target == 'linux' && matrix.config.arch != 'x64'
-      run: |
-        sudo apt update -y
-        sudo apt install -y crossbuild-essential-${{ matrix.config.arch }}
-
     - name: Node Version
       uses: actions/setup-node@v3
       with:
@@ -55,15 +45,12 @@ jobs:
       id: date
       run: echo "date=$(date)" >> $GITHUB_OUTPUT
 
-
     - name: Build NodeJS-SDK
       run: |
         cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm install
         npm run build
       env:
-        PRESET: ci-${{ matrix.config.target }}-${{ matrix.config.arch }}
-        TARGET_ARCH: ${{ matrix.config.arch }}
         BUILD_DATE: ${{ steps.date.outputs.date }}
 
     - name: NPM Publish
@@ -72,4 +59,4 @@ jobs:
         token: ${{ secrets.NPM_TOKEN }}
         access: public
       if: |
-        matrix.config.os == 'ubuntu-20.04' && matrix.node_ver == '20' && matrix.config.arch == 'x64' && startsWith(github.ref, 'refs/tags/')
+        startsWith(github.ref, 'refs/tags/')
