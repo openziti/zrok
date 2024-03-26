@@ -30,20 +30,40 @@ jobs:
 
     steps:
 
+    - name: Node Version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node_ver }}
+
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: 'recursive'
 
-    - name: Node Version
-      uses: actions/setup-node@v4
+    - name: Bump semver
+      if: github.ref == 'refs/heads/main'
+      uses: TriPSs/conventional-changelog-action@v3
       with:
-        node-version: ${{ matrix.node_ver }}
+        github-token: ${{ secrets.GH_ACTION }}
+        git-message: 'chore(release): {version}'
+        preset: 'angular'
+        tag-prefix: 'v'
+        output-file: 'CHANGELOG.md'
+        skip-on-empty: true # do not alter semver when we push 'chore: ...' commits
+        release-count: 0 # ensure changelog is generated to contain ALL updates
 
-    - name: Get current date
-      id: date
-      run: echo "date=$(date)" >> $GITHUB_OUTPUT
+    - name: Pull newly bumped semver
+      if: github.ref == 'refs/heads/main'
+      run: git pull
+
+    - name: Setup .npmrc
+      if: github.ref == 'refs/heads/main'
+      # Setup .npmrc file to prepare for possible publish to npm
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Build NodeJS-SDK
       run: |
@@ -52,6 +72,12 @@ jobs:
         npm run build
       env:
         BUILD_DATE: ${{ steps.date.outputs.date }}
+
+    - name: Publish production release
+      if: github.ref == 'refs/heads/main'
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: NPM Publish
       uses: JS-DevTools/npm-publish@v1
