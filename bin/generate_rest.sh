@@ -9,10 +9,12 @@ command -v swagger >/dev/null 2>&1 || {
 
 command -v openapi >/dev/null 2>&1 || {
   echo >&2 "command 'openapi' not installed. see: https://www.npmjs.com/package/openapi-client for installation"
+  exit 1
 }
 
 command -v swagger-codegen 2>&1 || {
   echo >&2 "command 'swagger-codegen. see: https://github.com/swagger-api/swagger-codegen for installation"
+  exit 1
 }
 
 scriptPath=$(realpath $0)

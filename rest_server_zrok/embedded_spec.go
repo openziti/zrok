@@ -1589,7 +1589,8 @@ func init() {
             "udpTunnel",
             "caddy",
             "drive",
-            "socks"
+            "socks",
+            "vpn"
           ]
         },
         "backendProxyEndpoint": {
@@ -3344,7 +3345,8 @@ func init() {
             "udpTunnel",
             "caddy",
             "drive",
-            "socks"
+            "socks",
+            "vpn"
           ]
         },
         "backendProxyEndpoint": {
