@@ -14,19 +14,35 @@ program
     var data = readlineSync.question('Input some text... ');
 
     console.log("data is: ", data)
+
+    var enc = new TextEncoder();
+    var buf = enc.encode(data); //
+
     let root = zrok.Load()
     await zrok.init( root ).catch(( err: Error ) => { console.error(err); return process.exit(1) });
     zrok.setLogLevel(0)
     console.log("setting up zrok.CreateShare...")
     let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.TCP_TUNNEL_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "pastebin", ["private"]));
-    console.log("access your pastebin using 'pastefrom ", shr.Token)
-    let app = zrok.express( shr.Token );
-    app.get('/',function(_: Request,res: any){
-      res.write(data)
-      res.end()
-    });
-    app.listen(undefined, () => {
-    })
+    console.log(`access your pastebin using 'pastefrom ${shr.Token}'`)
+
+    zrok.listener(
+      shr.Token,
+      (data: any) => {      // listenCallback
+      },
+      (data: any) => {      // listenClientCallback
+      },
+      (data: any) => {      // clientConnectCallback
+        // when we receive a client connection, then write the data to them
+        zrok.write(
+          data.client,
+          buf,
+          (data: any) => {  // writeCallback
+          }
+        );
+      },
+      (data: any) => {      // clientDataCallback
+      },
+    );
 
     // Delete the private share upon CTRL-C
     process.on('SIGINT', async () => { 
@@ -47,35 +63,26 @@ program
     await zrok.init(root).catch((err: any) => {
       console.log(err)
     });
+    zrok.setLogLevel(0)
     let acc = await zrok.CreateAccess(root, new zrok.AccessRequest(shrToken))
 
-    ziti.httpRequest( 
+    var dec = new TextDecoder("utf-8");
+
+    zrok.dialer(
+      root, 
       shrToken, 
-      undefined, 
-      'GET', 
-      '/', 
-      [],
-      (data: any) => {  // on_req_cb
-        console.log("in on_req_cb")
-        console.log("data is: ", data)
+      (data: any) => {  // on_connect_cb
       },
-      (data: any) => {  // on_resp_cb
-        console.log("in on_resp_cb")
-        console.log("data is: ", data)
+      (data: any) => {  // on_data_cb
+        console.log("data is: ", dec.decode(data));
+        process.exit(0);
       },
-      async (data: any) => {  // on_resp_data_cb
-        console.log("in on_resp_data_cb")
-        console.log("data is: ", data)
-        if (data.body) {
-          console.log('----------- pastefrom is: ', data.body.toString());
-
-          await zrok.DeleteAccess(root, acc)
-
-          process.exit(0);
-        }
-
-      }
     );
+  
+    process.on('SIGINT', async () => { 
+      process.exit(15);
+    });
+
   });
 
 program.parse(process.argv)

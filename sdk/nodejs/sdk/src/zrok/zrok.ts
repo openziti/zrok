@@ -14,6 +14,15 @@ export function dialer(root: Root, shrToken: string, connectCallback: any, dataC
     ziti.dial(shrToken, false, connectCallback, dataCallback)
 }
 
+export function listener(shrToken: string, listenCallback: any, listenClientCallback: any, clientConnectCallback: any, clientDataCallback: any): ziti.listener {
+    ziti.listen(shrToken, 0, listenCallback, listenClientCallback, clientConnectCallback, clientDataCallback)
+}
+
+export function write(conn: any, buf: any, writeCallback: any ){
+    ziti.write(conn, buf, writeCallback)
+}
+
+
 export function setLogLevel(level:number) {
     ziti.setLogLevel(level)
 }

@@ -61,16 +61,10 @@ export class Root {
 
     public async Client(): Promise<Configuration> {
         let apiEndpoint = this.ApiEndpoint()
-
-        //let headers = {
-        //    "X-TOKEN": this.env.Token
-        //}
-
-       let conf = new Configuration({
-        basePath: apiEndpoint.endpoint + '/api/v1',
-        apiKey: this.env.Token,
-        //headers: headers
-       })
+        let conf = new Configuration({
+            basePath: apiEndpoint.endpoint + '/api/v1',
+            apiKey: this.env.Token,
+        })
 
        let mapi = new MetadataApi(conf)
        let ver: Promise<string> = mapi.version()
