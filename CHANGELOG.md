@@ -2,6 +2,8 @@
 
 ## v0.4.27
 
+FEATURE: New `VPN` share mode. Use `sudo zrok share private --backend-mode vpn` on the _VPN server_ host, then `sudo zrok access private <token>` on _VPN client_ machine. It also works with share reservations `zrok reserve private --backend-mode vpn`
+
 CHANGE: Update to OpenZiti SDK (`github.com/openziti/sdk-golang`) at `v0.23.10`.
 
 FIX: Also update the Python SDK to include the permission mode and access grants fields on the `ShareRequest` (https://github.com/openziti/zrok/issues/432)
