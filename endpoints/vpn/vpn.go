@@ -31,9 +31,9 @@ func (d dest) toInt32() uint32 {
 }
 
 func ipToDest(addr net.IP) dest {
-	return dest{
-		addr: [4]byte{addr[0], addr[1], addr[2], addr[3]},
-	}
+	d := dest{}
+	copy(d.addr[:], addr.To4())
+	return d
 }
 
 type packet []byte

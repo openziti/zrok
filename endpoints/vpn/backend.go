@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/songgao/water/waterutil"
+	"io"
 	"net"
 	"sync/atomic"
 	"time"
@@ -88,10 +89,15 @@ func (b *Backend) readTun() {
 
 		logrus.WithField("packet", pkt).Trace("read from tun device")
 		dest := pkt.destination()
-
 		if clt, ok := b.clients.Get(dest); ok {
 			_, err := clt.conn.Write(pkt)
 			if err != nil {
+				b.cfg.RequestsChan <- &endpoints.Request{
+					Stamp:      time.Now(),
+					RemoteAddr: dest.String(),
+					Method:     "DISCONNECTED",
+				}
+
 				logrus.WithError(err).Errorf("failed to write packet to clt[%v]", dest)
 				_ = clt.conn.Close()
 				b.clients.Remove(dest)
@@ -153,6 +159,13 @@ func (b *Backend) handle(conn net.Conn) {
 		MTU:      b.mtu,
 	}
 
+	b.cfg.RequestsChan <- &endpoints.Request{
+		Stamp:      time.Now(),
+		RemoteAddr: ipv4.String(),
+		Method:     "CONNECTED",
+		Path:       cfg.ServerIP,
+	}
+
 	j, err := json.Marshal(&cfg)
 	if err != nil {
 		logrus.WithError(err).Error("failed to write client VPN config")
@@ -171,14 +184,22 @@ func (b *Backend) handle(conn net.Conn) {
 	for {
 		read, err := conn.Read(buf)
 		if err != nil {
-			logrus.Error("read error", err)
+			if err != io.EOF {
+				logrus.WithError(err).Error("read error")
+			}
+			b.cfg.RequestsChan <- &endpoints.Request{
+				Stamp:      time.Now(),
+				RemoteAddr: ipv4.String(),
+				Method:     "DISCONNECTED",
+			}
 			return
 		}
 		pkt := packet(buf[:read])
-		logrus.WithField("packet", pkt).Info("read from ziti")
+		logrus.WithField("packet", pkt).Trace("read from ziti")
 		_, err = b.tun.Write(pkt)
 		if err != nil {
 			logrus.WithError(err).Error("failed to write packet to tun")
+			return
 		}
 	}
 }
