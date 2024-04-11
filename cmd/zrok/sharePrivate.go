@@ -9,6 +9,7 @@ import (
 	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
+	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -42,7 +43,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	}
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
@@ -104,6 +105,9 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("the 'socks' backend mode does not expect <target>", nil)
 		}
 		target = "socks"
+
+	case "vpn":
+		target = "vpn"
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
@@ -315,6 +319,28 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running socks backend: %v", err)
+			}
+		}()
+
+	case "vpn":
+		cfg := &vpn.BackendConfig{
+			IdentityPath:    zif,
+			EndpointAddress: target,
+			ShrToken:        shr.Token,
+			RequestsChan:    requests,
+		}
+
+		be, err := vpn.NewBackend(cfg)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("error creating VPN backend", err)
+			}
+			panic(err)
+		}
+
+		go func() {
+			if err := be.Run(); err != nil {
+				logrus.Errorf("error running VPN backend: %v", err)
 			}
 		}()
 
