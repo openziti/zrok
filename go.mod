@@ -31,6 +31,7 @@ require (
 	github.com/michaelquigley/pfxlog v0.6.10
 	github.com/muesli/reflow v0.3.0
 	github.com/net-byte/vtun v1.7.0
+	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
 	github.com/openziti/channel/v2 v2.0.121
 	github.com/openziti/edge-api v0.26.12
@@ -38,6 +39,7 @@ require (
 	github.com/openziti/identity v1.0.72
 	github.com/openziti/sdk-golang v0.23.10
 	github.com/openziti/transport/v2 v2.0.124
+	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.8.1
 	github.com/rubenv/sql-migrate v1.6.0
@@ -166,7 +168,6 @@ require (
 	github.com/muesli/termenv v0.13.0 // indirect
 	github.com/muhlemmer/gu v0.3.1 // indirect
 	github.com/net-byte/go-gateway v0.0.2 // indirect
-	github.com/net-byte/water v0.0.7 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.9.5 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
@@ -174,7 +175,6 @@ require (
 	github.com/openziti/metrics v1.2.47 // indirect
 	github.com/openziti/secretstream v0.1.17 // indirect
 	github.com/openziti/storage v0.2.6 // indirect
-	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
