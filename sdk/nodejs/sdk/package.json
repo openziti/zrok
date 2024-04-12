@@ -30,9 +30,9 @@
   },
   "homepage": "https://github.com/openziti/zrok#readme",
   "dependencies": {
-    "@openziti/ziti-sdk-nodejs": "^0.15.0",
-    "axios": "^1.6.2",
-    "express": "^4.18.2"
+    "@openziti/ziti-sdk-nodejs": "^0.16.0",
+    "axios": "^1.6.8",
+    "express": "^4.19.2"
   },
   "exports": {
     ".": "./dist/index.js",

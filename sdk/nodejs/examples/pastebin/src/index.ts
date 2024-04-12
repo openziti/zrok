@@ -1,6 +1,5 @@
 const { Command } = require("commander");
-const zrok = require("zrok")
-const ziti =  require('@openziti/ziti-sdk-nodejs')
+const zrok = require("@openziti/zrok")
 var readlineSync = require('readline-sync');
 
 
@@ -18,9 +17,10 @@ program
     var enc = new TextEncoder();
     var buf = enc.encode(data); //
 
+    zrok.setLogLevel(0)
+
     let root = zrok.Load()
     await zrok.init( root ).catch(( err: Error ) => { console.error(err); return process.exit(1) });
-    zrok.setLogLevel(0)
     console.log("setting up zrok.CreateShare...")
     let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.TCP_TUNNEL_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "pastebin", ["private"]));
     console.log(`access your pastebin using 'pastefrom ${shr.Token}'`)
@@ -58,12 +58,13 @@ program
   .version("1.0.0")
   .description("command to paste content from coptyo")
   .action(async (shrToken: string) => {
-    
+
+    zrok.setLogLevel(0)
+
     let root = zrok.Load();
     await zrok.init(root).catch((err: any) => {
       console.log(err)
     });
-    zrok.setLogLevel(0)
     let acc = await zrok.CreateAccess(root, new zrok.AccessRequest(shrToken))
 
     var dec = new TextDecoder("utf-8");
