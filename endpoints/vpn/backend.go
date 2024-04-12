@@ -125,7 +125,9 @@ func (b *Backend) readTun() {
 				b.clients.Remove(dest)
 			}
 		} else {
-			logrus.Errorf("no client with address[%v]", dest)
+			if b.subnet.Contains(net.IP(dest.addr[:])) {
+				logrus.Errorf("no client with address[%v]", dest)
+			}
 		}
 	}
 }
