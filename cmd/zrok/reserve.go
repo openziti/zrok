@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net"
 	"slices"
 	"time"
 )
@@ -115,7 +117,15 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	case "vpn":
-		target = "vpn"
+		if len(args) == 2 {
+			_, _, err := net.ParseCIDR(args[1])
+			if err != nil {
+				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
+			}
+			target = args[1]
+		} else {
+			target = vpn.DefaultTarget()
+		}
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; "+

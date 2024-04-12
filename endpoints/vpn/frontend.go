@@ -82,8 +82,8 @@ func (f *Frontend) Run() error {
 	cfg := config.Config{
 		ServerIP:   cltCfg.ServerIP,
 		CIDR:       cltCfg.CIDR,
-		ServerIPv6: "fced::ffff:c0a8:7f01",
-		CIDRv6:     "fced::ffff:c0a8:7f16/64",
+		ServerIPv6: cltCfg.ServerIPv6,
+		CIDRv6:     cltCfg.CIDR6,
 		MTU:        cltCfg.MTU,
 		Verbose:    false,
 	}

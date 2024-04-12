@@ -2,6 +2,7 @@ package vpn
 
 import (
 	"encoding/json"
+	"github.com/google/go-cmp/cmp"
 	"github.com/net-byte/vtun/common/config"
 	"github.com/net-byte/vtun/tun"
 	_ "github.com/net-byte/vtun/tun"
@@ -15,6 +16,7 @@ import (
 	"github.com/songgao/water/waterutil"
 	"io"
 	"net"
+	"strconv"
 	"sync/atomic"
 	"time"
 )
@@ -34,9 +36,12 @@ type Backend struct {
 	cfg      *BackendConfig
 	listener edge.Listener
 
-	cidr net.IPAddr
-	tun  *water.Interface
-	mtu  int
+	addr    net.IP
+	addr6   net.IP
+	subnet  *net.IPNet
+	subnet6 *net.IPNet
+	tun     *water.Interface
+	mtu     int
 
 	counter atomic.Uint32
 	clients cmap.ConcurrentMap[dest, *client]
@@ -60,6 +65,19 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error listening")
 	}
+
+	addr6 := zrokIPv6Addr
+	addr4 := zrokIPv4Addr
+	sub4 := zrokIPv4
+	sub6 := zrokIPv6
+
+	if cfg.EndpointAddress != "" {
+		addr4, sub4, err = net.ParseCIDR(cfg.EndpointAddress)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse VPN subnet config")
+		}
+	}
+
 	b := &Backend{
 		cfg:      cfg,
 		listener: listener,
@@ -67,6 +85,10 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		clients: cmap.NewWithCustomShardingFunction[dest, *client](func(key dest) uint32 {
 			return key.toInt32()
 		}),
+		addr:    addr4,
+		addr6:   addr6,
+		subnet:  sub4,
+		subnet6: sub6,
 	}
 	b.counter.Store(1)
 	return b, nil
@@ -112,15 +134,18 @@ func (b *Backend) Run() error {
 	logrus.Info("started")
 	defer logrus.Info("exited")
 
+	bits, _ := b.subnet.Mask.Size()
+	bits6, _ := b.subnet6.Mask.Size()
+
 	tunCfg := config.Config{
-		ServerIP:   "192.168.127.1",
-		ServerIPv6: "fced::ffff:c0a8:7f01",
-		CIDR:       "192.168.127.1/24",
-		CIDRv6:     "fced::ffff:c0a8:7f01/64",
+		ServerIP:   b.addr.String(),
+		ServerIPv6: b.addr6.String(),
+		CIDR:       b.addr.String() + "/" + strconv.Itoa(bits),
+		CIDRv6:     b.addr6.String() + "/" + strconv.Itoa(bits6),
 		MTU:        ZROK_VPN_MTU,
 		Verbose:    true,
 	}
-
+	logrus.Infof("%+v", tunCfg)
 	b.tun = tun.CreateTun(tunCfg)
 	defer func() {
 		_ = b.tun.Close()
@@ -142,21 +167,19 @@ func (b *Backend) handle(conn net.Conn) {
 		_ = conn.Close()
 	}(conn)
 
-	num := uint32(0)
-	for num == 0 || num == 1 {
-		num = b.counter.Add(1)
-		num = num % 256
-	}
-
-	ipv4 := net.IPv4(192, 168, 127, byte(num))
+	ipv4, ipv6 := b.nextIP()
 	ip := ipToDest(ipv4)
 
+	bits, _ := b.subnet.Mask.Size()
+	bits6, _ := b.subnet6.Mask.Size()
+
 	cfg := &ClientConfig{
-		Greeting: "Welcome to zrok VPN",
-		IP:       ipv4.String(),
-		ServerIP: "192.168.127.1",
-		CIDR:     ipv4.String() + "/24",
-		MTU:      b.mtu,
+		Greeting:   "Welcome to zrok VPN",
+		ServerIP:   b.addr.String(),
+		ServerIPv6: b.addr6.String(),
+		CIDR:       ipv4.String() + "/" + strconv.Itoa(bits),
+		CIDR6:      ipv6.String() + "/" + strconv.Itoa(bits6),
+		MTU:        b.mtu,
 	}
 
 	b.cfg.RequestsChan <- &endpoints.Request{
@@ -202,4 +225,41 @@ func (b *Backend) handle(conn net.Conn) {
 			return
 		}
 	}
+}
+
+func (b *Backend) nextIP() (net.IP, net.IP) {
+	ip4 := make([]byte, len(b.subnet.IP))
+	for {
+		copy(ip4, b.subnet.IP)
+		n := b.counter.Add(1)
+		if n == 0 {
+			continue
+		}
+
+		for i := 0; i < len(ip4); i++ {
+			b := (n >> (i * 8)) % 0xff
+			ip4[len(ip4)-1-i] ^= byte(b)
+		}
+
+		// subnet overflow
+		if !b.subnet.Contains(ip4) {
+			b.counter.Store(1)
+			continue
+		}
+
+		if cmp.Equal(b.addr, ip4) {
+			continue
+		}
+
+		if b.clients.Has(ipToDest(ip4)) {
+			continue
+		}
+
+		break
+	}
+
+	ip6 := append([]byte{}, b.subnet6.IP...)
+	copy(ip6[net.IPv6len-net.IPv4len:], ip4)
+
+	return ip4, ip6
 }

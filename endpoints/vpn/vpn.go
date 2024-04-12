@@ -9,13 +9,44 @@ import (
 
 const ZROK_VPN_MTU = 16 * 1024
 
+var (
+	zrokIPv4Addr = net.IPv4(10, 'z', 0, 0)
+	zrokIPv4     = &net.IPNet{
+		IP:   net.IPv4(10, 'z', 0, 0),
+		Mask: net.CIDRMask(16, 8*net.IPv4len),
+	}
+
+	zrokIPv6Addr = net.IP{0xfd, 0, 'z', 'r', 'o', 'k', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+	zrokIPv6     = &net.IPNet{
+		IP: net.IP{0xfd, 0, 'z', 'r', 'o', 'k', // prefix + global ID
+			0, 0, // subnet id
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+		},
+		Mask: net.CIDRMask(64, 8*net.IPv6len),
+	}
+)
+
+func DefaultTarget() string {
+	l := len(zrokIPv4Addr)
+	subnet := net.IPNet{
+		IP:   make([]byte, l),
+		Mask: zrokIPv4.Mask,
+	}
+
+	copy(subnet.IP, zrokIPv4Addr)
+	subnet.IP[l-1] = 1
+	return subnet.String()
+}
+
 type ClientConfig struct {
-	Greeting string
-	IP       string
-	CIDR     string
-	ServerIP string
-	Routes   []string
-	MTU      int
+	Greeting   string
+	CIDR       string
+	CIDR6      string
+	ServerIP   string
+	ServerIPv6 string
+	Routes     []string
+	MTU        int
 }
 
 type dest struct {

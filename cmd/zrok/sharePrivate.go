@@ -16,6 +16,7 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -107,7 +108,15 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		target = "socks"
 
 	case "vpn":
-		target = "vpn"
+		if len(args) == 1 {
+			_, _, err := net.ParseCIDR(args[0])
+			if err != nil {
+				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
+			}
+			target = args[0]
+		} else {
+			target = vpn.DefaultTarget()
+		}
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode), nil)
