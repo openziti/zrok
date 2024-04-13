@@ -2,7 +2,7 @@
 
 ## v0.4.27
 
-CHANGE: Update to OpenZiti SDK (`github.com/openziti/sdk-golang`) at `v0.23.10`.
+CHANGE: Update to OpenZiti SDK (`github.com/openziti/sdk-golang`) at `v0.23.22`.
 
 FIX: Also update the Python SDK to include the permission mode and access grants fields on the `ShareRequest` (https://github.com/openziti/zrok/issues/432)
 
