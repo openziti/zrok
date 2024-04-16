@@ -25,6 +25,10 @@ create table shares (
 insert into shares select * from shares_old;
 drop index shares_token_idx;
 create unique index shares_token_idx ON shares(token) WHERE deleted is false;
+drop index shares_token_perf_idx;
+create index shares_token_perf_idx on shares (token);
+drop index shares_environment_id_idx;
+create index shares_environment_id_idx on shares (environment_id);
 
 alter table frontends rename to frontends_old;
 create table frontends (
@@ -42,6 +46,7 @@ create table frontends (
 );
 insert into frontends select * from frontends_old;
 drop table frontends_old;
+create index frontends_environment_id_idx on frontends (environment_id);
 
 alter table share_limit_journal rename to share_limit_journal_old;
 create table share_limit_journal (
