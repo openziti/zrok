@@ -1,3 +1,7 @@
+---
+sidebar_label: VPN
+---
+
 # zrok VPN Guide
 
 zrok VPN backend allows for simple host-to-host VPN setup.
