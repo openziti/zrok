@@ -2,6 +2,8 @@
 
 ## v0.4.27
 
+FEATURE: New `vpn` backend mode. Use `sudo zrok share private --backend-mode vpn` on the _VPN server_ host, then `sudo zrok access private <token>` on _VPN client_ machine. Works with reserved shares using `zrok reserve private --backend-mode vpn`. Use `<target>` parameter to override default VPN network settings `zrok share private -b vpn 192.168.255.42/24` -- server IP is `192.168.255.42` and VPN netmask will be `192.168.255.0/24`. Client IPs are assigned automatically from netmask range.
+
 CHANGE: Update to OpenZiti SDK (`github.com/openziti/sdk-golang`) at `v0.23.22`.
 
 CHANGE: Added indexes to `environments`, `shares`, and `frontends` tables to improve overall query performance on both PostgreSQL and Sqlite.
