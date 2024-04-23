@@ -8,7 +8,6 @@ hide_table_of_contents: true
 import OsTabs from '@theme/OsTabs';
 import TabItem from '@theme/TabItem';
 import LinuxService from './_frontdoor-linux.mdx';
-import ReservedDocker from './_frontdoor-docker.mdx';
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -37,8 +36,7 @@ Choose between installing the Linux package or running zrok with Docker (Linux, 
   queryString="os"
   values={[
     { label: 'Linux', value: 'Linux', },
-    { label: 'macOS', value: 'Mac OS', },
-    { label: 'Windows', value: 'Windows', },
+    { label: 'Docker', value: 'Docker', },
   ]}
 >
 
@@ -46,25 +44,13 @@ Choose between installing the Linux package or running zrok with Docker (Linux, 
 
 On Linux, zrok frontdoor is implemented natively as a system service provided by the `zrok-share` DEB or RPM package.
 
-If you'd prefer to run zrok in Docker instead of installing the package then you can follow the Docker instructions. With Docker, the steps are the same for Linux, [macOS](./?os=Mac+OS), and [Windows](./?os=Windows).
-
     <LinuxService/>
 
   </TabItem>
 
-  <TabItem value="Mac OS">
+  <TabItem value="Docker">
 
-On macOS, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service.
-
-    <ReservedDocker/>
-
-  </TabItem>
-
-  <TabItem value="Windows">
-
-On Windows, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service.
-
-    <ReservedDocker/>
+On macOS and Windows, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service and manages a zrok environment that's separate from the Docker host. [Link to the Docker Public Share Guide](/guides/docker-share/docker_public_share_guide.md)
 
   </TabItem>
 

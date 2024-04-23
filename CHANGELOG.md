@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.28
+
+CHANGE: the container images run as "ziggy" (UID 2171) instead of the generic restricted user "nobody" (UID 65534). This reduces the risk of unexpected file permissions when binding the Docker host's filesystem to a zrok container.
+
+CHANGE: the Docker sharing guides were simplified and expanded
+
 ## v0.4.27
 
 FEATURE: New `vpn` backend mode. Use `sudo zrok share private --backend-mode vpn` on the _VPN server_ host, then `sudo zrok access private <token>` on _VPN client_ machine. Works with reserved shares using `zrok reserve private --backend-mode vpn`. Use `<target>` parameter to override default VPN network settings `zrok share private -b vpn 192.168.255.42/24` -- server IP is `192.168.255.42` and VPN netmask will be `192.168.255.0/24`. Client IPs are assigned automatically from netmask range.
