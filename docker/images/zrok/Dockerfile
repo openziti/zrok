@@ -20,15 +20,11 @@ LABEL name="openziti/zrok" \
 
 USER root
 
-### install packages: findutils provides xargs which is used by the zrok Helm chart's controller bootstrapping script to
-#create the default account enable token
-RUN   INSTALL_PKGS="findutils" && \
-      microdnf -y update --setopt=install_weak_deps=0 --setopt=tsflags=nodocs && \
-      microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs ${INSTALL_PKGS}
-
 ### add licenses to this directory
 RUN mkdir -p -m0755 /licenses
 COPY ./LICENSE /licenses/apache.txt
+
+ENV PFXLOG_NO_JSON=true
 
 RUN mkdir -p /usr/local/bin
 COPY ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok \
