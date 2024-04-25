@@ -1,9 +1,8 @@
 ---
 sidebar_position: 40
-sidebar_label: Linux VPS
+title: Self-Hosting Guide for Linux
+sidebar_label: Linux
 ---
-
-# Self-Hosting Guide for Linux
 
 ## Walkthrough Video
 
@@ -146,6 +145,8 @@ Notice this warning:
 [   0.120] WARNING zrok/controller.Bootstrap: missing public frontend for ziti id 'sqJRAINSiB'; please use 'zrok admin create frontend sqJRAINSiB public https://{token}.your.dns.name' to create a frontend instance
 ```
 
+If you find it necessary to re-run the `zrok admin bootstrap` command, you may need to add the `--skip-frontend` flag to avoid re-creating the default `public` frontend's Ziti identity and router policy.
+
 ## Run zrok Controller
 
 The `zrok` bootstrap process wants us to create a "public frontend" for our service. `zrok` uses public frontends to allow users to specify where they would like public traffic to ingress from.
@@ -188,7 +189,7 @@ zitiLogin
 ziti edge list identities
 ```
 
-The id is shown for the "frontend" identity. 
+The id is shown for the frontend identity named "public."
 
 Nice work! The `zrok` controller is fully configured now that you have created the zrok frontend.
 
@@ -217,10 +218,10 @@ $ zrok access public etc/http-frontend.yml
 [   0.002]    INFO main.(*accessPublicCommand).run: {
 	...
 }
-[   0.002]    INFO zrok/endpoints/public_frontend.newMetricsAgent: loaded 'frontend' identity
+[   0.002]    INFO zrok/endpoints/public_frontend.newMetricsAgent: loaded 'public' identity
 ```
 
-This process uses the `frontend` identity created during the bootstrap process to provide public access for the `zrok` deployment. It is expected that the configured listener for this `frontend` corresponds to the DNS template specified when creating the public frontend record above.
+The zrok frontend uses the `public` identity created during the bootstrap process to securely access zrok backends. to provide public access for the `zrok` deployment. It is expected that the configured listener for this frontend corresponds to the DNS template specified when creating the public frontend record above.
 
 ## Invite Yourself
 
