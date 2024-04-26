@@ -5,7 +5,7 @@
 
 The quickstart makes these assumptions about your global DNS configuration.
 
-1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/caddy-dns))
+1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc))
 1. You have designated A DNS zone for zrok, e.g. `example.com` or `share.example.com` and created (and delegated, if necessary) the zone on your DNS provider's platform.
 1. A wildcard record exists for the IP address where the zrok instance will run, e.g. if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`.
 1. You have created an API token in your DNS provider's platform and the token has permission to create DNS records in the DNS zone.
@@ -14,7 +14,23 @@ The quickstart makes these assumptions about your global DNS configuration.
 
 Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "quickstart" container and is managed exclusively by zrok.
 
-1. Get the ziti quickstart Compose file.
+#### Shortcut option
+
+1. Run this script to download the files.
+
+    ```bash
+    curl https://get.openziti.io/zrok-docker/fetch.bash | bash
+    ```
+
+    Optionally, customize the install path instead of using the current directory.
+    
+    ```bash
+    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/install
+    ```
+
+#### Do it Yourself
+
+1. Fetch the ziti quickstart Compose file.
 
     ```bash
     wget https://get.openziti.io/dock/all-in-one/compose.yml
