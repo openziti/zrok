@@ -21,7 +21,8 @@ ARG ZROK_OAUTH_GITHUB_CLIENT_ID
 ARG ZROK_OAUTH_GITHUB_CLIENT_SECRET
 
 # render zrok frontend config.yml
-COPY ./envsubst.bash /usr/local/bin/
+COPY ./envsubst.bash ./bootstrap-frontend.bash /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/envsubst.bash /usr/local/bin/bootstrap-frontend.bash
 COPY ./zrok-frontend-config.yml.envsubst /tmp/
 RUN mkdir -p /etc/zrok-frontend/
 RUN envsubst.bash \
@@ -34,9 +35,6 @@ RUN envsubst.bash \
       ZROK_OAUTH_GITHUB_CLIENT_ID=${ZROK_OAUTH_GITHUB_CLIENT_ID} \
       ZROK_OAUTH_GITHUB_CLIENT_SECRET=${ZROK_OAUTH_GITHUB_CLIENT_SECRET} \
       < /tmp/zrok-frontend-config.yml.envsubst > /etc/zrok-frontend/config.yml
-
-# install bootstrapping script as entrypoint
-COPY ./bootstrap-frontend.bash /usr/local/bin/
 
 # run as ziggy (or ZIGGY_UID if set in compose project)
 USER ziggy

@@ -19,6 +19,7 @@ ARG ZITI_PWD
 
 # render zrok controller config.yml
 COPY ./envsubst.bash ./bootstrap-controller.bash /usr/local/bin/
+RUN chmod 0755 /usr/local/bin/envsubst.bash /usr/local/bin/bootstrap-controller.bash
 COPY ./zrok-controller-config.yml.envsubst /tmp/
 RUN mkdir -p /etc/zrok-controller/
 RUN envsubst.bash \

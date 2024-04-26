@@ -46,7 +46,8 @@ services:
     # ports:
     #   - 127.0.0.1:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
     environment:
-      ZROK_ADMIN_PWD: ${ZROK_ADMIN_PWD} # admin account password (initial user account)
+      ZROK_USER_PWD: ${ZROK_USER_PWD} # admin account password     (initial user account)
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}  # login email address (initial user account)
 
   zrok-frontend:
     profiles:
@@ -63,7 +64,7 @@ services:
         ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
         ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
         ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
-        ZROK_OAUTH_HASH_KEY: ${ZROK_OAUTH_HASH_KEY}
+        ZROK_OAUTH_HASH_KEY: ${ZROK_OAUTH_HASH_KEY-noop}
         ZROK_OAUTH_GOOGLE_CLIENT_ID: ${ZROK_OAUTH_GOOGLE_CLIENT_ID:-noop}
         ZROK_OAUTH_GOOGLE_CLIENT_SECRET: ${ZROK_OAUTH_GOOGLE_CLIENT_SECRET:-noop}
         ZROK_OAUTH_GITHUB_CLIENT_ID: ${ZROK_OAUTH_GITHUB_CLIENT_ID:-noop}
@@ -113,9 +114,9 @@ services:
       - 443/udp   # Caddy's HTTP/3 (QUIC) (not published)
       - 2019/tcp  # Caddy's admin API     (not published)
     ports:
-      - ${CADDY_INTERFACE}:80:80
-      - ${CADDY_INTERFACE}:443:443
-      # - ${CADDY_INTERFACE}:443:443/udp"  # future: HTTP/3 (QUIC)
+      - ${CADDY_INTERFACE:-0.0.0.0}:80:80
+      - ${CADDY_INTERFACE:-0.0.0.0}:443:443
+      # - ${CADDY_INTERFACE:-0.0.0.0}:443:443/udp"  # future: HTTP/3 (QUIC)
     volumes:
       - caddy_data:/data
       - caddy_config:/config

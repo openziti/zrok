@@ -19,11 +19,11 @@ wget https://get.openziti.io/dock/all-in-one/compose.yml
 wget -O ./compose.override.yml https://get.openziti.io/zrok-quick/compose.yml
 ```
 
-The project files provide these service containers.
+These two Compose project files provide different service containers.
 
-- `compose.yml`
+- `compose.yml` defines the service containers for Compose profile "ziti"
   - `quickstart`
-- `compose.override.yml`
+- `compose.override.yml` defines the service containers for Compose profile "zrok"
   - `zrok-controller`
   - `zrok-frontend`
   - `caddy`
@@ -99,16 +99,16 @@ You must enable each device environment with the account token obtained when the
 
 Follow [the getting started guide](/docs/getting-started#installing-the-zrok-command) to install the zrok CLI on some device and enable a zrok environment.
 
-1. Enable an environment on this device with the account token from the previous step.
-
-    ```bash
-    zrok enable heMqncCyxZcx
-    ```
-
 1. Configure the environment with the zrok API. Substitute the API endpoint with the one you're using, e.g. `https://zrok.${ZROK_DNS_ZONE}`.
 
     ```bash
     zrok config set apiEndpoint https://zrok.share.example.com
+    ```
+
+1. Enable an environment on this device with the account token from the previous step.
+
+    ```bash
+    zrok enable heMqncCyxZcx
     ```
 
 ### Firewall Configuration
@@ -185,7 +185,7 @@ The `quickstart` and `caddy` containers publish ports to all devices that use zr
 
 1. Use the Caddy admin API.
 
-    You can use the Caddy admin API to check the status of the Caddy instance. The admin API is available on port `2019/tcp` inside the Docker compose project. You can modify `compose.override.yml` to publish the port if you want to access the admin API from the Docker host or elsewhere.
+    You can use the Caddy admin API to check the status of the Caddy instance. The admin API is available on port `2019/tcp` inside the Docker Compose project. You can modify `compose.override.yml` to publish the port if you want to access the admin API from the Docker host or elsewhere.
 
     ```bash
     docker compose exec caddy curl http://localhost:2019/config/ | jq
