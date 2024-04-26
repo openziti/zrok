@@ -5,9 +5,9 @@
 
 The quickstart makes these assumptions about your global DNS configuration.
 
+1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/caddy-dns))
 1. You have designated A DNS zone for zrok, e.g. `example.com` or `share.example.com` and created (and delegated, if necessary) the zone on your DNS provider's platform.
 1. A wildcard record exists for the IP address where the zrok instance will run, e.g. if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`.
-1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/caddy-dns))
 1. You have created an API token in your DNS provider's platform and the token has permission to create DNS records in the DNS zone.
 
 ### Create the Docker Compose Project
@@ -39,16 +39,16 @@ Create an `.env` file in the working directory.
 ```bash title=".env required"
 ZROK_DNS_ZONE=share.example.com
 
+CADDY_DNS_PLUGIN=cloudflare
+CADDY_DNS_PLUGIN_TOKEN=abcd1234
+CADDY_ACME_EMAIL=me@example.com
+
 # this must == ziti.${ZROK_DNS_ZONE}
 ZITI_CTRL_ADVERTISED_ADDRESS=ziti.share.example.com
 ZITI_PWD=zitiadminpw
 
 ZROK_ADMIN_TOKEN=zroktoken
 ZROK_USER_PWD=zrokuserpw
-
-CADDY_DNS_PLUGIN=cloudflare
-CADDY_DNS_PLUGIN_TOKEN=abcd1234
-CADDY_ACME_EMAIL=me@example.com
 ```
 
 ```bash title=".env options"
@@ -193,4 +193,23 @@ The `quickstart` and `caddy` containers publish ports to all devices that use zr
 
     ```bash
     docker compose exec caddy curl http://localhost:2019/config/ | jq
+    ```
+
+1. My provider, e.g., Route53 doesn't give me a single API token.
+
+    As long as your DNS provider is supported by Caddy then it will work. You can modify the Caddyfile to use a different set of properties than the example. Here's how the `tls` section should look for Route53.
+
+    ```json
+    tls {
+      dns {$CADDY_DNS_PLUGIN} {
+        access_key_id {$AWS_ACCESS_KEY_ID}
+        secret_access_key {$AWS_SECRET_ACCESS_KEY}
+      }
+    }
+    ```
+
+    ```bash title=".env"
+    CADDY_DNS_PLUGIN=route53
+    AWS_ACCESS_KEY_ID=abcd1234
+    AWS_SECRET_ACCESS_KEY=abcd1234
     ```

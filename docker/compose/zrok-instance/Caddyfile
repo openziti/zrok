@@ -11,7 +11,6 @@ http:// {
 *.{$ZROK_DNS_ZONE} {
 	tls {
 		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
-		propagation_timeout 60m
 	}
 
 	log {
