@@ -20,16 +20,16 @@ Create a working directory on your Docker host and save these Docker Compose pro
     wget https://get.openziti.io/dock/all-in-one/compose.yml
     ```
 
-1. Get the zrok quickstart ZIP file.
+1. Get the zrok repo ZIP file.
 
     ```bash
     wget https://github.com/openziti/zrok/archive/refs/heads/main.zip
     ```
 
-1. Unzip the zrok quickstart in the project directory.
+1. Unzip the zrok-instance files into the project directory.
 
     ```bash
-    unzip -j -d . main.zip '*/docker/compose/quickstart/*'
+    unzip -j -d . main.zip '*/docker/compose/zrok-instance/*'
     ```
 
 ### Configure the Docker Compose Project Environment
