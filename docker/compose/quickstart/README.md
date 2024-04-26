@@ -10,23 +10,27 @@ The quickstart makes these assumptions about your global DNS configuration.
 1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/caddy-dns))
 1. You have created an API token in your DNS provider's platform and the token has permission to create DNS records in the DNS zone.
 
-### Create a Docker Compose Project
+### Create the Docker Compose Project
 
 Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "quickstart" container and is managed exclusively by zrok.
 
-```bash
-wget https://get.openziti.io/dock/all-in-one/compose.yml
-wget -O ./compose.override.yml https://get.openziti.io/zrok-quick/compose.yml
-```
+1. Get the ziti quickstart Compose file.
 
-These two Compose project files provide different service containers.
+    ```bash
+    wget https://get.openziti.io/dock/all-in-one/compose.yml
+    ```
 
-- `compose.yml` defines the service containers for Compose profile "ziti"
-  - `quickstart`
-- `compose.override.yml` defines the service containers for Compose profile "zrok"
-  - `zrok-controller`
-  - `zrok-frontend`
-  - `caddy`
+1. Get the zrok quickstart ZIP file.
+
+    ```bash
+    wget https://github.com/openziti/zrok/archive/refs/heads/main.zip
+    ```
+
+1. Unzip the zrok quickstart in the project directory.
+
+    ```bash
+    unzip -j -d . main.zip '*/docker/compose/quickstart/*'
+    ```
 
 ### Configure the Docker Compose Project Environment
 
