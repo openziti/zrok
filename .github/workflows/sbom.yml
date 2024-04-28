@@ -10,5 +10,5 @@ jobs:
    with:
     dt-url: "https://dt-api-hacktech.org.dependencytrack.com"
     api-key: "odt_IuAIwBBrOjgu07uncoo7EWulI4gt1pBf"
-    project-name: "Wafa Abbas"
+    project-name: "new test"
     project-version: "1.1"
