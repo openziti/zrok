@@ -9,6 +9,6 @@ jobs:
   uses: CryptosoftInc/Dependency-Track-Javascript@1.0.0
    with:
     dt-url: "https://dt-api-hacktech.org.dependencytrack.com"
-    api-key: "odt_IuAIwBBrOjgu07uncoo7EWulI4gt1pBf"
-    project-name: "new test"
+    api-key: "odt_FpoclA7I1HHgebBVJRxr7gaWch5f7VR5"
+    project-name: "depdencycheck"
     project-version: "1.1"
