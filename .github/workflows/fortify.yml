@@ -23,8 +23,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
-  schedule:
-    - cron: '27 22 * * 3'
+  pull_request:
+  branches: [ master]
 
 jobs:
   FoD-SAST-Scan:
