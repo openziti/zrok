@@ -1,0 +1,25 @@
+#    _____ __ ___ | | __
+#   |_  / '__/ _ \| |/ /
+#    / /| | | (_) |   <
+#   /___|_|  \___/|_|\_\
+# controller configuration
+
+v: 3
+admin:
+  # generate these admin tokens from a source of randomness, e.g. 
+  #  LC_ALL=C tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c32
+  secrets:
+    - ${ZROK_ADMIN_TOKEN}
+endpoint:
+  host: 0.0.0.0
+  port: ${ZROK_CTRL_PORT}
+invites:
+  invites_open: true
+  token_strategy: store
+store:
+  path: /var/lib/zrok-controller/sqlite3.db
+  type: sqlite3
+ziti:
+  api_endpoint: https://ziti.${ZROK_DNS_ZONE}:${ZITI_CTRL_ADVERTISED_PORT}/edge/management/v1
+  username: admin
+  password: ${ZITI_PWD}
