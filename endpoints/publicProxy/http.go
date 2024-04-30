@@ -106,6 +106,9 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
+		if cfg.NoForwarder {
+			req.Header["X-Forwarded-For"] = nil
+		}
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {

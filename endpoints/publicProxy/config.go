@@ -12,12 +12,13 @@ import (
 const V = 3
 
 type Config struct {
-	V         int
-	Identity  string
-	Address   string
-	HostMatch string
-	Oauth     *OauthConfig
-	Tls       *endpoints.TlsConfig
+	V           int
+	Identity    string
+	Address     string
+	HostMatch   string
+	NoForwarder bool
+	Oauth       *OauthConfig
+	Tls         *endpoints.TlsConfig
 }
 
 type OauthConfig struct {
