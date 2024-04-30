@@ -1,0 +1,28 @@
+
+on: [push]
+
+jobs:
+  terrascan_job:
+    runs-on: ubuntu-latest
+    name: terrascan-action
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Run Terrascan
+      id: terrascan
+      uses: tenable/terrascan-action@main
+      with:
+        iac_type: 'terraform'
+        iac_version: 'v14'
+        policy_type: 'aws'
+        only_warn: true
+        sarif_upload: true
+        #non_recursive:
+        #iac_dir:
+        #policy_path:
+        #skip_rules:
+        #config_path:
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: terrascan.sarif
