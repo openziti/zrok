@@ -77,7 +77,6 @@ main() {
         echo "WARN: installing anyway in a few seconds...press Ctrl-C to abort" >&2
         sleep 9
     }
-    fetchFile "${ZITI_QUICK_COMPOSE:-"https://get.openziti.io/dock/all-in-one/compose.yml"}" "compose.yml"
     fetchFile "${ZROK_REPO_ZIP:-"https://github.com/openziti/zrok/archive/refs/heads/main.zip"}" "zrok.zip"
     unzip -j -d . zrok.zip '*/docker/compose/zrok-instance/*'
     rm zrok.zip .gitignore fetch.bash

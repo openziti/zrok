@@ -14,27 +14,21 @@ The quickstart makes these assumptions about your global DNS configuration.
 
 Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "quickstart" container and is managed exclusively by zrok.
 
-#### Shortcut option
+#### Shortcut Option
 
-1. Run this script to download the files.
+1. Run this script to download the files in the current directory.
 
     ```bash
     curl https://get.openziti.io/zrok-docker/fetch.bash | bash
     ```
 
-    Optionally, customize the install path instead of using the current directory.
+    Or, specify the Compose project directory.
     
     ```bash
-    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/install
+    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/compose/project/dir
     ```
 
-#### Do it Yourself
-
-1. Fetch the ziti quickstart Compose file.
-
-    ```bash
-    wget https://get.openziti.io/dock/all-in-one/compose.yml
-    ```
+#### Manual Option
 
 1. Get the zrok repo ZIP file.
 
