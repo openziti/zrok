@@ -2,6 +2,77 @@
 # https://get.openziti.io/dock/all-in-one/compose.yml to compose.override.yml
 
 services:
+  ziti-quickstart:
+    image: ${ZITI_CLI_IMAGE:-docker.io/openziti/ziti-cli}:${ZITI_CLI_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      zrok-instance:
+        # this allows other containers to use the same external DNS name to reach the quickstart container from within the
+        # Docker network that clients outside the Docker network use to reach the quickstart container via port forwarding
+        aliases:
+          - ziti.${ZROK_DNS_ZONE}
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        ZITI_CMD+=" --ctrl-address ziti.${ZROK_DNS_ZONE}"\
+        " --ctrl-port ${ZITI_CTRL_ADVERTISED_PORT:-1280}"\
+        " --router-address ziti.${ZROK_DNS_ZONE}"\
+        " --router-port ${ZITI_ROUTER_PORT:-3022}"\
+        " --password ${ZITI_PWD:-admin}"
+        echo "DEBUG: run command is: ziti $${@} $${ZITI_CMD}"
+        exec ziti "$${@}" $${ZITI_CMD}
+    command: -- edge quickstart --home /home/ziggy/quickstart
+    user: ${ZIGGY_UID:-1000}
+    environment:
+      HOME: /home/ziggy
+      PFXLOG_NO_JSON: "${PFXLOG_NO_JSON:-true}"
+      ZITI_ROUTER_NAME: ${ZITI_ROUTER_NAME:-quickstart-router}
+    volumes:
+      # store the quickstart state in a named volume "ziti_home" or store the quickstart state on the Docker host in a
+      # directory, ZITI_HOME 
+      - ${ZITI_HOME:-ziti_home}:/home/ziggy
+    ports:
+      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_CTRL_ADVERTISED_PORT:-1280}:${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_ROUTER_PORT:-3022}:${ZITI_ROUTER_PORT:-3022}
+    expose:
+      - ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_ROUTER_PORT:-3022}
+    depends_on:
+      ziti-quickstart-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - ziti
+        - agent
+        - stats
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  # this service is used to initialize the ziti_home volume by setting the owner to the UID of the user running the
+  # quickstart container
+  ziti-quickstart-init:
+    image: busybox
+    command: chown -Rc ${ZIGGY_UID:-1000} /home/ziggy
+    user: root
+    environment:
+      HOME: /home/ziggy
+    volumes:
+      # store the quickstart state in a named volume "ziti_home" or store the quickstart state on the Docker host in a
+      # directory, ZITI_HOME 
+      - ${ZITI_HOME:-ziti_home}:/home/ziggy
+
+  # add a health check for the quickstart network
+  ziti-quickstart-check:
+    image: busybox
+    command: echo "Ziti is cooking"
+    depends_on:
+      ziti-quickstart:
+        condition: service_healthy
+
   zrok-permissions:
     image: busybox
     command:
@@ -15,8 +86,6 @@ services:
       - zrok_frontend:/var/lib/zrok-frontend
 
   zrok-controller:
-    profiles:
-      - zrok
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
@@ -36,7 +105,7 @@ services:
     volumes:
       - zrok_ctrl:/var/lib/zrok-controller
     networks:
-      quickstart:
+      zrok-instance:
         aliases:
           - zrok.${ZROK_DNS_ZONE}
     restart: unless-stopped
@@ -50,8 +119,6 @@ services:
       CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}  # login email address (initial user account)
 
   zrok-frontend:
-    profiles:
-      - zrok
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
@@ -74,7 +141,7 @@ services:
     volumes:
       - zrok_frontend:/var/lib/zrok-frontend
     networks:
-      quickstart:
+      zrok-instance:
     restart: unless-stopped
     expose:
       - ${ZROK_FRONTEND_PORT:-8080}  # (not published)
@@ -91,8 +158,6 @@ services:
       ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
 
   caddy:
-    profiles:
-      - zrok
     build:
       context: .
       dockerfile: ./caddy.Dockerfile
@@ -121,17 +186,16 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks:
-      quickstart:
-
-  quickstart:
-    profiles:
-      - ziti
-  quickstart-check:
-    profiles:
-      - ziti
+      zrok-instance:
 
 volumes:
-  caddy_data:
-  caddy_config:
+  ziti_home:  # this will not be used if you switch from named volume to bind mount volume
   zrok_ctrl:
   zrok_frontend:
+  caddy_data:
+  caddy_config:
+
+# define a custom network so that we can also define DNS aliases
+networks:
+  zrok-instance:
+    driver: bridge
