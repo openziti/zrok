@@ -1,8 +1,35 @@
-  - name: Qualys CloudView IaC Security
-  # You may pin to the exact commit or the version.
-  # uses: Qualys/github_action_qiac@05f6a53b396561bc45316dd4732eec4e9735e916
-  uses: Qualys/github_action_qiac@v1.0.0
-  with:
-    # directory with infrastructure code to scan
-    directory: # optional, default is .
-          
+name: Qualys IAC Scan
+on:
+ push:
+   branches:
+     - main
+  pull_request:
+  branches:
+  - main
+  schedule:
+  - cron: '0 */2 * * *'
+jobs:
+ Qualys_iac_scan:
+ runs-on: ubuntu-latest
+ name: Qualys IaC Scan
+ steps:
+ - name: Checkout
+ uses: actions/checkout@v2
+ with:
+ fetch-depth: 0
+
+ - name: Qualys IAC scan action step
+ uses: Qualys/github_action_qiac@main
+ id: qiac
+ env:
+ URL: ${{ secrets.URL }}
+ UNAME: ${{ secrets.USERNAME }}
+ PASS: ${{ secrets.PASSWORD }}
+ with:
+ directory:
+
+ - name: Upload SAIF file
+ uses: github/codeql-action/upload-sarif@v1
+ if: always()
+ with:
+     sarif_file: response.sarif
