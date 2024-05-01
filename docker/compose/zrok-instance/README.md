@@ -53,8 +53,6 @@ CADDY_DNS_PLUGIN=cloudflare
 CADDY_DNS_PLUGIN_TOKEN=abcd1234
 CADDY_ACME_EMAIL=me@example.com
 
-# this must == ziti.${ZROK_DNS_ZONE}
-ZITI_CTRL_ADVERTISED_ADDRESS=ziti.share.example.com
 ZITI_PWD=zitiadminpw
 
 ZROK_ADMIN_TOKEN=zroktoken
@@ -62,6 +60,7 @@ ZROK_USER_PWD=zrokuserpw
 ```
 
 ```bash title=".env options"
+# ziti ports
 ZITI_CTRL_ADVERTISED_PORT=1280
 ZITI_ROUTER_PORT=3022
 
@@ -78,18 +77,12 @@ CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 
 ### Start the Docker Compose Project
 
-1. Start the ziti network. This runs `ziti edge quickstart` ([link to readme](https://github.com/openziti/ziti/tree/main/quickstart/docker/all-in-one#readme)).
-
-    ```bash
-    docker compose --profile ziti up --detach
-    ```
-
 1. Start the zrok instance.
 
     The container images for zrok (including caddy) are built in this step. This provides a simple configuration to get started. You can modify the templates named like `*.envsubst` or mount a customized configuration file to mask the one that was built in.
 
     ```bash
-    docker compose --profile zrok up --build --detach
+    docker compose up --build --detach
     ```
 
 ### Set up a User Account

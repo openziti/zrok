@@ -4,23 +4,20 @@
 services:
   ziti-quickstart:
     image: ${ZITI_CLI_IMAGE:-docker.io/openziti/ziti-cli}:${ZITI_CLI_TAG:-latest}
-    profiles:
-      - ziti
     restart: unless-stopped
     networks:
       zrok-instance:
         # this allows other containers to use the same external DNS name to reach the quickstart container from within the
         # Docker network that clients outside the Docker network use to reach the quickstart container via port forwarding
         aliases:
-          - ${ZITI_CTRL_ADVERTISED_ADDRESS:-ziti-controller}
-          - ${ZITI_ROUTER_ADVERTISED_ADDRESS:-ziti-router}
+          - ziti.${ZROK_DNS_ZONE}
     entrypoint:
       - bash
       - -euc
       - |
-        ZITI_CMD+=" --ctrl-address ${ZITI_CTRL_ADVERTISED_ADDRESS:-ziti-quickstart}"\
+        ZITI_CMD+=" --ctrl-address ziti.${ZROK_DNS_ZONE}"\
         " --ctrl-port ${ZITI_CTRL_ADVERTISED_PORT:-1280}"\
-        " --router-address ${ZITI_ROUTER_ADVERTISED_ADDRESS:-${ZITI_CTRL_ADVERTISED_ADDRESS:-ziti-quickstart}}"\
+        " --router-address ziti.${ZROK_DNS_ZONE}"\
         " --router-port ${ZITI_ROUTER_PORT:-3022}"\
         " --password ${ZITI_PWD:-admin}"
         echo "DEBUG: run command is: ziti $${@} $${ZITI_CMD}"
@@ -71,16 +68,12 @@ services:
   # add a health check for the quickstart network
   ziti-quickstart-check:
     image: busybox
-    profiles:
-      - ziti
     command: echo "Ziti is cooking"
     depends_on:
       ziti-quickstart:
         condition: service_healthy
 
   zrok-permissions:
-    profiles:
-      - zrok
     image: busybox
     command:
       - /bin/sh
@@ -93,8 +86,6 @@ services:
       - zrok_frontend:/var/lib/zrok-frontend
 
   zrok-controller:
-    profiles:
-      - zrok
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
@@ -128,8 +119,6 @@ services:
       CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}  # login email address (initial user account)
 
   zrok-frontend:
-    profiles:
-      - zrok
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
@@ -169,8 +158,6 @@ services:
       ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
 
   caddy:
-    profiles:
-      - zrok
     build:
       context: .
       dockerfile: ./caddy.Dockerfile
