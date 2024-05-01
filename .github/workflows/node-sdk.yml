@@ -27,7 +27,7 @@ jobs:
           - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
         node_ver: [ 20 ]
       fail-fast: false
-
+    
     steps:
 
     - name: Node Version
@@ -41,19 +41,25 @@ jobs:
         fetch-depth: 0
         submodules: 'recursive'
 
-    - name: Bump semver
-      if: github.ref == 'refs/heads/main'
-      uses: TriPSs/conventional-changelog-action@v3
-      with:
-        github-token: ${{ secrets.GH_ACTION }}
-        git-message: 'chore(release): {version}'
-        preset: 'angular'
-        tag-prefix: 'v'
-        output-file: 'CHANGELOG.md'
-        skip-on-empty: true # do not alter semver when we push 'chore: ...' commits
-        release-count: 0 # ensure changelog is generated to contain ALL updates
+    - name: Get current zrok repo tag
+      id: tag
+      run: echo ::set-output name=TAG::$(git describe --tags --abbrev=0)
 
-    - name: Pull newly bumped semver
+    - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git commit -am "Update package.json version to ${{ steps.tag.outputs.TAG }}" || echo "No changes to commit"
+
+    - name: Push changes to zrok NodeJS-SDK's package.json
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+    - name: Pull newly bumped zrok NodeJS-SDK semver
       if: github.ref == 'refs/heads/main'
       run: git pull
 
@@ -65,7 +71,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
 
-    - name: Build NodeJS-SDK
+    - name: Build the zrok NodeJS-SDK
       run: |
         cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm install
@@ -75,7 +81,9 @@ jobs:
 
     - name: Publish production release
       if: github.ref == 'refs/heads/main'
-      run: npm publish --access public
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
