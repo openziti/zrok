@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
+	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
@@ -146,6 +147,30 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "socks":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
+			IdentityName: env.EnvironmentIdentityName(),
+			ShrToken:     args[0],
+			RequestsChan: requests,
+		})
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to create private access", err)
+			}
+			panic(err)
+		}
+		go func() {
+			if err := fe.Run(); err != nil {
+				if !panicInstead {
+					tui.Error("error starting access", err)
+				}
+				panic(err)
+			}
+		}()
+
+	case "vpn":
+		endpointUrl = &url.URL{
+			Scheme: "VPN",
+		}
+		fe, err := vpn.NewFrontend(&vpn.FrontendConfig{
 			IdentityName: env.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,

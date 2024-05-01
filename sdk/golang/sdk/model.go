@@ -11,6 +11,8 @@ const (
 	UdpTunnelBackendMode BackendMode = "udpTunnel"
 	CaddyBackendMode     BackendMode = "caddy"
 	DriveBackendMode     BackendMode = "drive"
+	SocksBackendMode     BackendMode = "socks"
+	VpnBackendMode       BackendMode = "vpn"
 )
 
 type ShareMode string
