@@ -21,7 +21,7 @@ program
 
     // Create the zrok private share that will represent this web server
     console.log("Now creating your private zrok share...")
-    let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.PROXY_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "http-server", ["private"]));
+    let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.PROXY_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "http-server", []));
     console.log(`access your private HTTP Server on another machine using:  'zrok access private ${shr.Token}'`)
 
     // Create a NodeJS Express web server that listens NOT on a TCP port, but for incoming Ziti connections to the private zrok share

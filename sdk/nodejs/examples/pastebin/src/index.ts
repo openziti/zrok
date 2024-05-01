@@ -22,7 +22,7 @@ program
     let root = zrok.Load()
     await zrok.init( root ).catch(( err: Error ) => { console.error(err); return process.exit(1) });
     console.log("setting up zrok.CreateShare...")
-    let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.TCP_TUNNEL_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "pastebin", ["private"]));
+    let shr = await zrok.CreateShare(root, new zrok.ShareRequest(zrok.TCP_TUNNEL_BACKEND_MODE, zrok.PRIVATE_SHARE_MODE, "pastebin", []));
     console.log(`access your pastebin using 'pastefrom ${shr.Token}'`)
 
     zrok.listener(
