@@ -27,7 +27,7 @@ if __name__ == '__main__':
     root = zrok.environment.root.Load()
     try:
         shr = zrok.share.CreateShare(root=root, request=ShareRequest(
-            BackendMode=zrok.model.TCP_TUNNEL_BACKEND_MODE,
+            BackendMode=zrok.model.PROXY_BACKEND_MODE,
             ShareMode=zrok.model.PUBLIC_SHARE_MODE,
             Frontends=['public'],
             Target="http-server"

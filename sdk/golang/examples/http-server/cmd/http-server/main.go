@@ -20,7 +20,7 @@ func main() {
 	}
 
 	shr, err := sdk.CreateShare(root, &sdk.ShareRequest{
-		BackendMode: sdk.TcpTunnelBackendMode,
+		BackendMode: sdk.ProxyBackendMode,
 		ShareMode:   sdk.PublicShareMode,
 		Frontends:   []string{"public"},
 		Target:      "http-server",
