@@ -109,7 +109,7 @@ With your OpenZiti network running and your configuration saved to a local file 
 Use the `zrok admin bootstrap` command to bootstrap like this:
 
 ```bash
-$ zrok admin bootstrap etc/ctrl.yml 
+$ zrok admin bootstrap etc/ctrl.yml
 [   0.002]    INFO main.(*adminBootstrap).run: {
 	...
 }
@@ -181,10 +181,9 @@ $ zrok admin create frontend sqJRAINSiB public http://{token}.zrok.quigley.com:8
 The id of the frontend was emitted earlier in by the zrok controller when we ran the bootstrap command. If you don't have that log message the you can find the id again with the `ziti` CLI like this:
 
 ```bash
-# initialize the Ziti quickstart env
-source ~/.ziti/quickstart/$(hostname -s)/$(hostname -s).env
-# login as admin
-zitiLogin
+# log in as admin (example)
+ziti edge login localhost:1280 -u admin -p XO0xHp75uuyeireO2xmmVlK91T7B9fpD
+
 # list Ziti identities created by the quickstart and bootstrap
 ziti edge list identities
 ```

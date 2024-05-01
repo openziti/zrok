@@ -1,0 +1,97 @@
+name: Build/Release Node SDK
+
+on:
+  release:
+    types: [ published ]
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
+
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    
+    strategy:
+      matrix:
+        config:
+          - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
+        node_ver: [ 20 ]
+      fail-fast: false
+    
+    steps:
+
+    - name: Node Version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node_ver }}
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: 'recursive'
+
+    - name: Get current zrok repo tag
+      id: tag
+      run: echo ::set-output name=TAG::$(git describe --tags --abbrev=0)
+
+    - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
+      if: github.ref == 'refs/heads/main'
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git commit -am "Update package.json version to ${{ steps.tag.outputs.TAG }}" || echo "No changes to commit"
+
+    - name: Push changes to zrok NodeJS-SDK's package.json
+      if: github.ref == 'refs/heads/main'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+    - name: Pull newly bumped zrok NodeJS-SDK semver
+      if: github.ref == 'refs/heads/main'
+      run: git pull
+
+    - name: Setup .npmrc
+      if: github.ref == 'refs/heads/main'
+      # Setup .npmrc file to prepare for possible publish to npm
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Build the zrok NodeJS-SDK
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm install
+        npm run build
+      env:
+        BUILD_DATE: ${{ steps.date.outputs.date }}
+
+    - name: Publish production release
+      if: github.ref == 'refs/heads/main'
+      run: |
+        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: NPM Publish
+      if: github.ref == 'refs/heads/main'
+      uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.NPM_TOKEN }}
+        access: public

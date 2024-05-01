@@ -2,6 +2,8 @@
 
 ## v0.4.28
 
+FEATURE: A Docker Compose project for self-hosting a zrok instance and [accompanying Docker guide](https://docs.zrok.io/docs/guides/self-hosting/docker) for more information.
+
 FEATURE: Added `no_forwarder` option to the public frontend configuration to avoid setting client addresses of intermediate infrastructure (https://github.com/openziti/zrok/issues/609)
 
 CHANGE: the container images run as "ziggy" (UID 2171) instead of the generic restricted user "nobody" (UID 65534). This reduces the risk of unexpected file permissions when binding the Docker host's filesystem to a zrok container.
