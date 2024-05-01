@@ -3,7 +3,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 requireBashVersion() {
     if (( "${BASH_VERSION%%.*}" < 4 )); then
