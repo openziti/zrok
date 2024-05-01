@@ -14,27 +14,21 @@ The quickstart makes these assumptions about your global DNS configuration.
 
 Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "quickstart" container and is managed exclusively by zrok.
 
-#### Shortcut option
+#### Shortcut Option
 
-1. Run this script to download the files.
+1. Run this script to download the files in the current directory.
 
     ```bash
     curl https://get.openziti.io/zrok-docker/fetch.bash | bash
     ```
 
-    Optionally, customize the install path instead of using the current directory.
+    Or, specify the Compose project directory.
     
     ```bash
-    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/install
+    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/compose/project/dir
     ```
 
-#### Do it Yourself
-
-1. Fetch the ziti quickstart Compose file.
-
-    ```bash
-    wget https://get.openziti.io/dock/all-in-one/compose.yml
-    ```
+#### Manual Option
 
 1. Get the zrok repo ZIP file.
 
@@ -59,8 +53,6 @@ CADDY_DNS_PLUGIN=cloudflare
 CADDY_DNS_PLUGIN_TOKEN=abcd1234
 CADDY_ACME_EMAIL=me@example.com
 
-# this must == ziti.${ZROK_DNS_ZONE}
-ZITI_CTRL_ADVERTISED_ADDRESS=ziti.share.example.com
 ZITI_PWD=zitiadminpw
 
 ZROK_ADMIN_TOKEN=zroktoken
@@ -68,6 +60,7 @@ ZROK_USER_PWD=zrokuserpw
 ```
 
 ```bash title=".env options"
+# ziti ports
 ZITI_CTRL_ADVERTISED_PORT=1280
 ZITI_ROUTER_PORT=3022
 
@@ -84,18 +77,12 @@ CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 
 ### Start the Docker Compose Project
 
-1. Start the ziti network. This runs `ziti edge quickstart` ([link to readme](https://github.com/openziti/ziti/tree/main/quickstart/docker/all-in-one#readme)).
-
-    ```bash
-    docker compose --profile ziti up --detach
-    ```
-
 1. Start the zrok instance.
 
     The container images for zrok (including caddy) are built in this step. This provides a simple configuration to get started. You can modify the templates named like `*.envsubst` or mount a customized configuration file to mask the one that was built in.
 
     ```bash
-    docker compose --profile zrok up --build --detach
+    docker compose up --build --detach
     ```
 
 ### Set up a User Account
