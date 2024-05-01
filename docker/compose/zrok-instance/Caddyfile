@@ -1,0 +1,31 @@
+{
+	email {$CADDY_ACME_EMAIL}
+	acme_ca {$CADDY_ACME_API}
+	admin 0.0.0.0:2019
+}
+
+http:// {
+	redir https://{host}{uri} permanent
+}
+
+*.{$ZROK_DNS_ZONE} {
+	tls {
+		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+	}
+
+	log {
+		output stdout
+		format console
+		level DEBUG
+	}
+
+	@oauth host oauth.{$ZROK_DNS_ZONE}
+	reverse_proxy @oauth zrok-frontend:{$ZROK_OAUTH_PORT}
+
+	@ctrl host zrok.{$ZROK_DNS_ZONE}
+	reverse_proxy @ctrl zrok-controller:{$ZROK_CTRL_PORT}
+
+	reverse_proxy zrok-frontend:{$ZROK_FRONTEND_PORT} {
+		header_up Host {http.request.host}
+	}
+}

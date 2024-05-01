@@ -1,0 +1,18 @@
+v: 3
+
+host_match: ${ZROK_DNS_ZONE}
+address: 0.0.0.0:${ZROK_FRONTEND_PORT}
+
+# delete if not using oauth for public shares
+oauth:
+  bind_address: 0.0.0.0:${ZROK_OAUTH_PORT}
+  redirect_url: https://oauth.${ZROK_DNS_ZONE}
+  cookie_domain: ${ZROK_DNS_ZONE}
+  hash_key: ${ZROK_OAUTH_HASH_KEY}
+  providers:
+    - name: github
+      client_id: ${ZROK_OAUTH_GITHUB_CLIENT_ID}
+      client_secret: ${ZROK_OAUTH_GITHUB_CLIENT_SECRET}
+    - name: google
+      client_id: ${ZROK_OAUTH_GOOGLE_CLIENT_ID}
+      client_secret: ${ZROK_OAUTH_GOOGLE_CLIENT_SECRET}
