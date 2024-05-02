@@ -19,13 +19,13 @@ Create a working directory on your Docker host and save these Docker Compose pro
 1. Run this script to download the files in the current directory.
 
     ```bash
-    curl https://get.openziti.io/zrok-docker/fetch.bash | bash
+    curl https://get.openziti.io/zrok-instance/fetch.bash | bash
     ```
 
     Or, specify the Compose project directory.
     
     ```bash
-    curl https://get.openziti.io/zrok-docker/fetch.bash | bash -s /path/to/compose/project/dir
+    curl https://get.openziti.io/zrok-instance/fetch.bash | bash -s /path/to/compose/project/dir
     ```
 
 #### Manual Option
