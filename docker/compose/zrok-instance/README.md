@@ -1,11 +1,11 @@
 
-## Docker Quickstart
+## Docker Instance
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/zoWmTzTa1cg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ### DNS Configuration
 
-The quickstart makes these assumptions about your global DNS configuration.
+The Compose project makes these assumptions about your global DNS configuration.
 
 1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc))
 1. You have designated A DNS zone for zrok, e.g. `example.com` or `share.example.com` and created (and delegated, if necessary) the zone on your DNS provider's platform.
@@ -14,7 +14,7 @@ The quickstart makes these assumptions about your global DNS configuration.
 
 ### Create the Docker Compose Project
 
-Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "quickstart" container and is managed exclusively by zrok.
+Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "ziti-quickstart" container and is managed exclusively by zrok.
 
 #### Shortcut Option
 
@@ -122,13 +122,13 @@ Follow [the getting started guide](/docs/getting-started#installing-the-zrok-com
 
 ### Firewall Configuration
 
-The `quickstart` and `caddy` containers publish ports to all devices that use zrok shares. The `zrok-controller` and `zrok-frontend` containers expose ports only to the `caddy` container and the Docker host's loopback interface.
+The `ziti-quickstart` and `caddy` containers publish ports to all devices that use zrok shares. The `zrok-controller` and `zrok-frontend` containers expose ports only to the `caddy` container and the Docker host's loopback interface.
 
 #### Required
 
 1. `443/tcp` - reverse proxy handles HTTPS requests for zrok API, OAuth, and public shares (published by container `caddy`)
-1. `1280/tcp` - ziti ctrl plane (published by container `quickstart`)
-1. `3022/tcp` - ziti data plane (published by container `quickstart`)
+1. `1280/tcp` - ziti ctrl plane (published by container `ziti-quickstart`)
+1. `3022/tcp` - ziti data plane (published by container `ziti-quickstart`)
 
 #### Optional
 
@@ -139,7 +139,7 @@ The `quickstart` and `caddy` containers publish ports to all devices that use zr
 
 1. Check the ziti and zrok logs.
 
-    You can substitute the service container name of each to check their logs individually: `quickstart` (ziti container), `zrok-controller`, `zrok-frontend`.
+    You can substitute the service container name of each to check their logs individually: `ziti-quickstart`, `zrok-controller`, `zrok-frontend`.
 
     ```bash
     docker compose logs zrok-controller
