@@ -109,9 +109,9 @@ The `ziti` section defines how the `zrok` controller should communicate with you
 
 :::note
 
-Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
+Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
 
-See the separate guides on [configuring metrics](./metrics-and-limits/configuring-metrics.md) and [configuring limits](./metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
+See the separate guides on [configuring metrics](/guides/self-hosting/metrics-and-limits/configuring-metrics.md) and [configuring limits](/guides/self-hosting/metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
 
 :::
 
@@ -233,7 +233,7 @@ This frontend config file has a `host_match` pattern that represents the DNS zon
 
 The frontend does not provide server TLS, but you may front the server with a reverse proxy. It is essential the reverse proxy forwards the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
 
-You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](oauth/configuring-oauth.md#configuring-your-public-frontend).
+You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](/guides/self-hosting/oauth/configuring-oauth.md#configuring-your-public-frontend).
 
 ## Start Public Frontend
 

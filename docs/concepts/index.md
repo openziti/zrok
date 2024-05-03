@@ -10,4 +10,4 @@ sidebar_position: 25
 Sharing with `zrok` can be either [`public`](./sharing-public.md) or [`private`](./sharing-private.md).
 Naturally, regular web-based resources can be shared but `zrok` also includes support for sharing raw [TCP](./tunnels.md) and [UDP](./tunnels.md) network connections, and also includes a [website and file sharing](./files.md) feature.
 
-Learn about `zrok` [hosting here](./hosting.md), including instructions on how to [install your own `zrok` instance](/guides/self-hosting/linux.mdx).
+Learn about `zrok` [hosting here](./hosting.md), including instructions on how to [install your own `zrok` instance]/guides/self-hosting/linux/index.mdx).
