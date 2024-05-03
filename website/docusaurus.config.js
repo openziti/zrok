@@ -39,6 +39,10 @@ const config = {
             from: ['/docs/guides/self-hosting/self_hosting_guide'],
           },
           {
+            to: '/docs/guides/self-hosting/linux/nginx',
+            from: ['/docs/guides/self-hosting/nginx_tls_guide/']
+          },
+          {
             to: '/docs/guides/self-hosting/metrics-and-limits/configuring-limits',
             from: ['/docs/guides/metrics-and-limits/configuring-limits'],
           },

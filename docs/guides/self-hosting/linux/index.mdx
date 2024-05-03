@@ -10,34 +10,56 @@ sidebar_label: Linux
 
 ## Before you Begin
 
-This will get you up and running with a self-hosted instance of zrok. I'll assume you have the following:
+This will get you up and running with a self-hosted instance of `zrok`. I'll assume you have the following:
 
 * a Linux server with a public IP
 * a wildcard DNS record like `*.zrok.quigley.com` that resolves to the server IP
 
-## OpenZiti Quickstart
+## OpenZiti
 
-The first step is to log in to your Linux server and run the OpenZiti quickstart. This will install a Ziti controller and Ziti router as systemd services.
+OpenZiti (a.k.a. "Ziti") provides secure network backhaul for `zrok` public and private shares. You need a Ziti Controller and a Ziti Router. You can run everything on the same Linux VPS. 
 
-I specifically used the "Host OpenZiti Anywhere" variant because it provides a public controller. We'll need that to use zrok with multiple devices across different networks.
 
-Keep track of the generated admin password when running the `expressInstall` script. The script will prompt you like this:
+1. Install the Ziti Controller package by following the [Linux controller deployment guide](https://openziti.io/docs/category/deployments).
+  1. Ensure your answer file (`/opt/openziti/etc/controller/bootstrap.env`) has the FQDN of your Linux server and an admin password defined.
+  1. Ensure your firewall allows the controller port from the answer file.
+  1. Start the controller service (`ziti-controller.service`) and check the status.
+1. Log in to the Ziti Controller
 
-```text
-Do you want to keep the generated admin password 'XO0xHp75uuyeireO2xmmVlK91T7B9fpD'? (Y/n)
-```
+    ```bash
+    ziti edge login localhost:1280 -u admin -p <password>
+    ```
 
-You'll need that generated password (`XO0xHp75uuyeireO2xmmVlK91T7B9fpD`) when building your `zrok` controller configuration.
+1. Administratively Create a Ziti Router
 
-BEGIN: [Run the OpenZiti Quickstart](https://docs.openziti.io/docs/learn/quickstarts/network/hosted)
+    ```bash
+    ziti edge create edge-router "router1" -o /tmp/router1.jwt
+    ```
+
+1. Install the Ziti Router package by following [the Linux router deployment guide](https://openziti.io/docs/category/deployments).
+  1. Ensure your answer file (`/opt/openziti/etc/router/bootstrap.env`) has the FQDN of your Linux server for both controller and router addresses and the enrollment token from the previous step.
+  1. Ensure your firewall allows the router port from the answer file.
+  1. Start the router service (`ziti-router.service`) and check the status.
+
+1. Verify the new router is online.
+
+    ```bash
+    ziti edge list edge-routers
+    ```
 
 ## Install zrok
 
-Download [the latest release](https://github.com/openziti/zrok/releases/latest) from GitHub.
+Debian and RPM packages are available for `zrok`.
+
+```bash
+sudo apt install zrok
+```
+
+Follow [the Linux installation guide](/guides/install/linux.mdx) to install the `zrok` package from the repository or manually install the binary for your platform.
 
 ## Configure the Controller
 
-Create a controller configuration file in `etc/ctrl.yml`. The controller does not provide server TLS, but you may front the server with a reverse proxy. This example will expose the non-TLS listener for the controller.
+Create a `zrok` controller configuration file in `etc/ctrl.yml`. The controller can terminate TLS or you may front the server with a reverse proxy that continually renews the necessary wildcard certificate (e.g., Caddy w/ a DNS provider plugin). This example will expose the non-TLS listener for the controller.
 
 ```yaml
 #    _____ __ ___ | | __
@@ -66,9 +88,14 @@ store:
   type:             sqlite3
 
 ziti:
-  api_endpoint:     "https://127.0.0.1:8441"
+  api_endpoint:     "https://127.0.0.1:1280"
   username:         admin
   password:         "XO0xHp75uuyeireO2xmmVlK91T7B9fpD"
+
+# you can use certbot to renew the wildcard cert for the controller with a DNS provider API token or front this `zrok` # controller with Caddy
+#tls:
+#  cert_path: "/Path/To/Cert/zrok.crt"
+#  key_path:  "/Path/To/Cert/zrok.key"
 
 ```
 
@@ -82,9 +109,9 @@ The `ziti` section defines how the `zrok` controller should communicate with you
 
 :::note
 
-Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
+Be sure to see the [reference configuration at `etc/ctrl.yml`](../../../../etc/ctrl.yml) for the complete documentation of the current configuration file format for the `zrok` controller and service instance components.
 
-See the separate guides on [configuring metrics](./metrics-and-limits/configuring-metrics.md) and [configuring limits](./metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
+See the separate guides on [configuring metrics](/guides/self-hosting/metrics-and-limits/configuring-metrics.md) and [configuring limits](/guides/self-hosting/metrics-and-limits/configuring-limits.md) for details about both of these specialized areas of service instance configuration.
 
 :::
 
@@ -178,7 +205,7 @@ $ zrok admin create frontend sqJRAINSiB public http://{token}.zrok.quigley.com:8
 [   0.037]    INFO main.(*adminCreateFrontendCommand).run: created global public frontend 'WEirJNHVlcW9'
 ```
 
-The id of the frontend was emitted earlier in by the zrok controller when we ran the bootstrap command. If you don't have that log message the you can find the id again with the `ziti` CLI like this:
+The id of the frontend was emitted earlier in by the `zrok` controller when we ran the bootstrap command. If you don't have that log message the you can find the id again with the `ziti` CLI like this:
 
 ```bash
 # log in as admin (example)
@@ -190,7 +217,7 @@ ziti edge list identities
 
 The id is shown for the frontend identity named "public."
 
-Nice work! The `zrok` controller is fully configured now that you have created the zrok frontend.
+Nice work! The `zrok` controller is fully configured now that you have created the `zrok` frontend.
 
 ## Configure the Public Frontend
 
@@ -202,11 +229,11 @@ host_match:         zrok.quigley.com
 address:            0.0.0.0:8080
 ```
 
-This frontend config file has a `host_match` pattern that represents the DNS zone you're using with this instance of zrok. Incoming HTTP requests with a matching `Host` header will be handled by this frontend. You may also specify the interface address where the frontend will listen for public access requests.
+This frontend config file has a `host_match` pattern that represents the DNS zone you're using with this instance of `zrok`. Incoming HTTP requests with a matching `Host` header will be handled by this frontend. You may also specify the interface address where the frontend will listen for public access requests.
 
 The frontend does not provide server TLS, but you may front the server with a reverse proxy. It is essential the reverse proxy forwards the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
 
-You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](oauth/configuring-oauth.md#configuring-your-public-frontend).
+You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](/guides/self-hosting/oauth/configuring-oauth.md#configuring-your-public-frontend).
 
 ## Start Public Frontend
 
@@ -220,9 +247,25 @@ $ zrok access public etc/http-frontend.yml
 [   0.002]    INFO zrok/endpoints/public_frontend.newMetricsAgent: loaded 'public' identity
 ```
 
-The zrok frontend uses the `public` identity created during the bootstrap process to securely access zrok backends. to provide public access for the `zrok` deployment. It is expected that the configured listener for this frontend corresponds to the DNS template specified when creating the public frontend record above.
+The `zrok` frontend uses the `public` identity created during the bootstrap process to securely access zrok backends. to provide public access for the `zrok` deployment. It is expected that the configured listener for this frontend corresponds to the DNS template specified when creating the public frontend record above.
 
-## Invite Yourself
+## Create a User Account
+
+With our `ZROK_ADMIN_TOKEN` and `ZROK_API_ENDPOINT` environment variables set, we can create our first user account.
+
+```bash
+zrok admin create account etc/ctrl.yml <email> <password>
+```
+
+The output is the account token you will use to enable each device's zrok environment.
+
+```buttonless title="Example output"
+SuGzRPjVDIcF
+```
+
+## Invite Additional Users
+
+Offer this onboarding method to your users if you have configured an email-sending service in your `zrok` controller configuration.
 
 ```bash
 $ zrok invite
@@ -253,11 +296,39 @@ After doing that, I see the following output in my controller console:
 
 Keep track of the token listed above (`SuGzRPjVDIcF`). We'll use this to enable our shell for this `zrok` deployment.
 
-## Enable Your Shell
+## Enable Your Environment
+
+On another device that can reach your Linux server by FQDN, configure the API endpoint and enable the environment with the account token you received when you created the first user account.
 
 ```bash
-$ zrok enable SuGzRPjVDIcF
+export ZROK_API_ENDPOINT=https://zrok.quigley.com
+# or
+zrok config set apiEndpoint https://zrok.quigley.com
+```
+
+```bash
+zrok enable SuGzRPjVDIcF
+```
+
+```buttonless title="Example output"
 zrok environment '2AS1WZ3Sz' enabled for 'SuGzRPjVDIcF'
+```
+
+```bash
+zrok status --secrets
+```
+
+```buttonless title="Example output"
+Config:
+
+  CONFIG       VALUE                      SOURCE
+  apiEndpoint  https://zrok.quigley.com   env
+
+Environment:
+
+  PROPERTY       VALUE
+  Secret Token   SuGzRPjVDIcF
+  Ziti Identity  2AS1WZ3Sz
 ```
 
 Congratulations. You have a working `zrok` environment!

@@ -3,11 +3,6 @@ name: Build/Release Node SDK
 on:
   release:
     types: [ published ]
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - 'package.json'
-      - 'CHANGELOG.md'
   pull_request:
     branches: [ main ]
 
@@ -50,20 +45,6 @@ jobs:
       run: |
         cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git commit -am "Update package.json version to ${{ steps.tag.outputs.TAG }}" || echo "No changes to commit"
-
-    - name: Push changes to zrok NodeJS-SDK's package.json
-      if: github.ref == 'refs/heads/main'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
-
-    - name: Pull newly bumped zrok NodeJS-SDK semver
-      if: github.ref == 'refs/heads/main'
-      run: git pull
 
     - name: Setup .npmrc
       if: github.ref == 'refs/heads/main'
@@ -81,17 +62,11 @@ jobs:
       env:
         BUILD_DATE: ${{ steps.date.outputs.date }}
 
-    - name: Publish production release
-      if: github.ref == 'refs/heads/main'
+    - name: NPM Publish
+      if: github.ref_type == 'tag'
       run: |
         cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    - name: NPM Publish
-      if: github.ref == 'refs/heads/main'
-      uses: JS-DevTools/npm-publish@v1
-      with:
-        token: ${{ secrets.NPM_TOKEN }}
-        access: public
