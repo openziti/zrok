@@ -41,13 +41,13 @@ jobs:
       run: echo ::set-output name=TAG::$(git describe --tags --abbrev=0)
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
-      if: github.ref == 'refs/heads/main'
+      if: github.ref_type == 'tag'
       run: |
         cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
 
     - name: Setup .npmrc
-      if: github.ref == 'refs/heads/main'
+      if: github.ref_type == 'tag'
       # Setup .npmrc file to prepare for possible publish to npm
       uses: actions/setup-node@v1
       with:
