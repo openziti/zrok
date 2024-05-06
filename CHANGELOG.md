@@ -2,6 +2,8 @@
 
 ## v0.4.28
 
+FEATURE: Node.js support for the zrok SDK (https://github.com/openziti/zrok/issues/400)
+
 FEATURE: A Docker Compose project for self-hosting a zrok instance and [accompanying Docker guide](https://docs.zrok.io/docs/guides/self-hosting/docker) for more information.
 
 FEATURE: Added `no_forwarder` option to the public frontend configuration to avoid setting client addresses of intermediate infrastructure (https://github.com/openziti/zrok/issues/609)
