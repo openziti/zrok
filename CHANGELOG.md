@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.29
+
+FIX: Backed out an incorrect change to support a FreeBSD port in progress.
+
 ## v0.4.28
 
 FEATURE: Node.js support for the zrok SDK (https://github.com/openziti/zrok/issues/400)
