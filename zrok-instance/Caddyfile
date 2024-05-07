@@ -11,12 +11,21 @@ http:// {
 *.{$ZROK_DNS_ZONE} {
 	tls {
 		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+		propagation_timeout 60m
 	}
 
 	log {
 		output stdout
 		format console
-		level DEBUG
+		level INFO
+	}
+
+	# ziti administration console uses :443 for the benefit of a web UI cert and accesses the ziti edge-management API
+	@ziti host ziti.{$ZROK_DNS_ZONE}
+	reverse_proxy @ziti ziti-quickstart:{$ZITI_CTRL_ADVERTISED_PORT:1280} {
+		transport http {
+			tls_insecure_skip_verify
+		}
 	}
 
 	@oauth host oauth.{$ZROK_DNS_ZONE}
