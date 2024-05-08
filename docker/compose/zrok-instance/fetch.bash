@@ -143,7 +143,6 @@ main() {
             ;;
         esac
     done
-    requireBashVersion
     declare -a BINS=(unzip find)
     for BIN in "${BINS[@]}"; do
         requireCommand "$BIN"
@@ -157,4 +156,5 @@ main() {
     rm zrok.zip .gitignore fetch.bash
 }
 
+requireBashVersion
 main "${@}"
