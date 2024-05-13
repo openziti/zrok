@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.31
+
+FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606)
+
 ## v0.4.30
 
 FIX: Fix to the Node.js release process to properly support releasing on a tag.
