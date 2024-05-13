@@ -5,12 +5,68 @@ set -o nounset
 set -o pipefail
 # set -o xtrace
 
+_usage(){
+    if (( $# )); then
+        echo -e "\nERROR: unexpected arg '$1'" >&2
+    fi
+    echo -e "\n Usage:\n"\
+            "   fetch.bash\n"\
+            "\n Options:\n"\
+            "   --quiet\t\tsuppress INFO messages\n"\
+            "   --verbose\t\tshow DEBUG messages\n"
+}
+
 requireBashVersion() {
     if (( "${BASH_VERSION%%.*}" < 4 )); then
         echo "This script requires Bash major version 4 or greater."
         echo "Detected version: $BASH_VERSION"
         exit 1;
     fi
+}
+
+logger() {
+    local caller="${FUNCNAME[1]}"
+
+    if (( $# < 1 )); then
+        echo "ERROR: $caller() takes 1 or more args" >&2
+        return 1
+    fi
+
+    local message="$*"
+
+    if [[ "$message" =~ ^r\'(.+)\'$ ]]; then
+        raw_message="${BASH_REMATCH[1]}"
+        message="$raw_message"
+    fi
+
+    caller_level="${caller##log}"
+    if (( DEBUG )); then
+        line="${caller_level^^} ${FUNCNAME[2]}:${BASH_LINENO[1]}: $message"
+    else
+        line="${caller_level^^} $message"
+    fi
+
+    if [[ -n "${raw_message-}" ]]; then
+        echo -E "$line"
+    else
+        echo -e "$line"
+    fi
+}
+
+logInfo() {
+    logger "$*"
+}
+
+logWarn() {
+    logger "$*" >&2
+}
+
+logError() {
+    logger "$*" >&2
+}
+
+logDebug() {
+    logger "$*" >&3
 }
 
 fetchFile() {
@@ -68,7 +124,25 @@ setWorkingDir() {
 }
 
 main() {
-    requireBashVersion
+    : "${DEBUG:=0}"
+    while (( $# )); do
+        case "$1" in
+            -q|--quiet)     exec > /dev/null
+                            shift
+            ;;
+            -v|--verbose)
+                            DEBUG=1
+                            exec 3>&1
+                            shift
+            ;;
+            -h|*help)       _usage
+                            exit 0
+            ;;
+            *)              _usage "$1"
+                            exit
+            ;;
+        esac
+    done
     declare -a BINS=(unzip find)
     for BIN in "${BINS[@]}"; do
         requireCommand "$BIN"
@@ -82,4 +156,5 @@ main() {
     rm zrok.zip .gitignore fetch.bash
 }
 
+requireBashVersion
 main "${@}"
