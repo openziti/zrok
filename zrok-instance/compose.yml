@@ -1,0 +1,167 @@
+
+services:
+  ziti-quickstart:
+    image: ${ZITI_CLI_IMAGE:-docker.io/openziti/ziti-cli}:${ZITI_CLI_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      zrok-instance:
+        # this allows other containers to use the same external DNS name to reach the quickstart container from within the
+        # Docker network that clients outside the Docker network use to reach the quickstart container via port forwarding
+        aliases:
+          - ziti.${ZROK_DNS_ZONE}
+    entrypoint:
+      - bash
+      - -euc
+      - |
+        ZITI_CMD+=" --ctrl-address ziti.${ZROK_DNS_ZONE}"\
+        " --ctrl-port ${ZITI_CTRL_ADVERTISED_PORT:-1280}"\
+        " --router-address ziti.${ZROK_DNS_ZONE}"\
+        " --router-port ${ZITI_ROUTER_PORT:-3022}"\
+        " --password ${ZITI_PWD:-admin}"
+        echo "DEBUG: run command is: ziti $${@} $${ZITI_CMD}"
+        exec ziti "$${@}" $${ZITI_CMD}
+    command: -- edge quickstart --home /home/ziggy/quickstart
+    user: ${ZIGGY_UID:-1000}
+    environment:
+      HOME: /home/ziggy
+      PFXLOG_NO_JSON: "${PFXLOG_NO_JSON:-true}"
+      ZITI_ROUTER_NAME: ${ZITI_ROUTER_NAME:-quickstart-router}
+    volumes:
+      # store the quickstart state in a named volume "ziti_home" or store the quickstart state on the Docker host in a
+      # directory, ZITI_HOME 
+      - ${ZITI_HOME:-ziti_home}:/home/ziggy
+    ports:
+      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_CTRL_ADVERTISED_PORT:-1280}:${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_ROUTER_PORT:-3022}:${ZITI_ROUTER_PORT:-3022}
+    expose:
+      - ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_ROUTER_PORT:-3022}
+    depends_on:
+      ziti-quickstart-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - ziti
+        - agent
+        - stats
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  # this service is used to initialize the ziti_home volume by setting the owner to the UID of the user running the
+  # quickstart container
+  ziti-quickstart-init:
+    image: busybox
+    command: chown -Rc ${ZIGGY_UID:-1000} /home/ziggy
+    user: root
+    environment:
+      HOME: /home/ziggy
+    volumes:
+      # store the quickstart state in a named volume "ziti_home" or store the quickstart state on the Docker host in a
+      # directory, ZITI_HOME 
+      - ${ZITI_HOME:-ziti_home}:/home/ziggy
+
+  # add a health check for the quickstart network
+  ziti-quickstart-check:
+    image: busybox
+    command: echo "Ziti is cooking"
+    depends_on:
+      ziti-quickstart:
+        condition: service_healthy
+
+  zrok-permissions:
+    image: busybox
+    command:
+      - /bin/sh
+      - -euxc
+      - |
+        chown -Rc ${ZIGGY_UID:-2171} /var/lib/zrok-*;
+        chmod -Rc ug=rwX,o-rwx /var/lib/zrok-*;
+    volumes:
+      - zrok_ctrl:/var/lib/zrok-controller
+      - zrok_frontend:/var/lib/zrok-frontend
+
+  zrok-controller:
+    depends_on:
+        zrok-permissions:
+          condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: ./zrok-controller.Dockerfile
+      args:
+        ZROK_CLI_IMAGE: ${ZROK_CLI_IMAGE:-openziti/zrok}
+        ZROK_CLI_TAG: ${ZROK_CLI_TAG:-latest}
+        ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
+        ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+        ZROK_ADMIN_TOKEN: ${ZROK_ADMIN_TOKEN} # zrok controller admin password
+        ZROK_CTRL_PORT: ${ZROK_CTRL_PORT:-18080}
+        ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
+    user: ${ZIGGY_UID:-2171}
+    command: zrok controller /etc/zrok-controller/config.yml --verbose
+    volumes:
+      - zrok_ctrl:/var/lib/zrok-controller
+    networks:
+      zrok-instance:
+        aliases:
+          - zrok.${ZROK_DNS_ZONE}
+    restart: unless-stopped
+    expose:
+      - ${ZROK_CTRL_PORT:-18080}  # (not published)
+    ports:
+      - 127.0.0.1:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
+    environment:
+      ZROK_USER_PWD: ${ZROK_USER_PWD} # admin account password     (initial user account)
+      ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # login email address (initial user account)
+
+  zrok-frontend:
+    depends_on:
+        zrok-permissions:
+          condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: zrok-frontend.Dockerfile
+      args:
+        ZROK_CLI_IMAGE: ${ZROK_CLI_IMAGE:-openziti/zrok}
+        ZROK_CLI_TAG: ${ZROK_CLI_TAG:-latest}
+        ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
+        ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
+        ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
+        ZROK_OAUTH_HASH_KEY: ${ZROK_OAUTH_HASH_KEY-noop}
+        ZROK_OAUTH_GOOGLE_CLIENT_ID: ${ZROK_OAUTH_GOOGLE_CLIENT_ID:-noop}
+        ZROK_OAUTH_GOOGLE_CLIENT_SECRET: ${ZROK_OAUTH_GOOGLE_CLIENT_SECRET:-noop}
+        ZROK_OAUTH_GITHUB_CLIENT_ID: ${ZROK_OAUTH_GITHUB_CLIENT_ID:-noop}
+        ZROK_OAUTH_GITHUB_CLIENT_SECRET: ${ZROK_OAUTH_GITHUB_CLIENT_SECRET:-noop}
+    user: ${ZIGGY_UID:-2171}
+    command: zrok access public /etc/zrok-frontend/config.yml --verbose
+    volumes:
+      - zrok_frontend:/var/lib/zrok-frontend
+    networks:
+      zrok-instance:
+    restart: unless-stopped
+    expose:
+      - ${ZROK_FRONTEND_PORT:-8080}  # (not published)
+      - ${ZROK_OAUTH_PORT:-8081}     # (not published)
+    ports:
+      - 127.0.0.1:${ZROK_FRONTEND_PORT:-8080}:${ZROK_FRONTEND_PORT:-8080}
+      - 127.0.0.1:${ZROK_OAUTH_PORT:-8081}:${ZROK_OAUTH_PORT:-8081}
+    environment:
+      HOME: /var/lib/zrok-frontend
+      ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
+      ZROK_ADMIN_TOKEN: ${ZROK_ADMIN_TOKEN} # zrok controller admin password
+      ZROK_API_ENDPOINT: http://zrok-controller:${ZROK_CTRL_PORT:-18080} # bridge address of the zrok controller
+      ZROK_FRONTEND_SCHEME: http
+      ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
+      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
+
+volumes:
+  ziti_home:  # this will not be used if you switch from named volume to bind mount volume
+  zrok_ctrl:
+  zrok_frontend:
+
+# define a custom network so that we can also define DNS aliases
+networks:
+  zrok-instance:
+    driver: bridge
