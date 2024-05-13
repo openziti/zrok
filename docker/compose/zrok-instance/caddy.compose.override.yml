@@ -1,0 +1,41 @@
+# delete this file from your compose project if you do not want to use Caddy for TLS termination
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: ./caddy.Dockerfile
+      args:
+        CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN} # e.g., "digitalocean" (see github.com/caddy-dns)
+    restart: unless-stopped
+    environment:
+      CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN}  # e.g., "digitalocean" (see github.com/caddy-dns)
+      CADDY_DNS_PLUGIN_TOKEN: ${CADDY_DNS_PLUGIN_TOKEN}  # API token from DNS provider used by plugin to solve the ACME challenge
+      ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # email address sent to CA for ACME account and renewal notifications
+      CADDY_ACME_API: ${CADDY_ACME_API:-https://acme-v02.api.letsencrypt.org/directory}  # ACME API endpoint
+      ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
+      ZROK_CTRL_PORT: ${ZROK_CTRL_PORT:-18080}
+      ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
+      ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
+    expose:
+      - 80/tcp
+      - 443/tcp
+      - 443/udp   # Caddy's HTTP/3 (QUIC) (not published)
+      - 2019/tcp  # Caddy's admin API     (not published)
+    ports:
+      - ${CADDY_INTERFACE:-0.0.0.0}:80:80
+      - ${CADDY_INTERFACE:-0.0.0.0}:443:443
+      # - ${CADDY_INTERFACE:-0.0.0.0}:443:443/udp"  # future: HTTP/3 (QUIC)
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      zrok-instance:
+  
+  zrok-frontend:
+    environment:
+      ZROK_FRONTEND_SCHEME: https
+      ZROK_FRONTEND_PORT: 443
+
+volumes:
+  caddy_data:
+  caddy_config:

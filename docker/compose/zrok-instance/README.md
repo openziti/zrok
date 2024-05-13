@@ -1,20 +1,25 @@
 
 ## Docker Instance
 
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/zoWmTzTa1cg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/70zJ_h4uiD8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+This Docker Compose project creates a zrok instance and includes a ziti controller and router. An optional Caddy container is included to provide HTTPS and reverse proxy services for the zrok API and public shares.
 
 ### DNS Configuration
 
-The Compose project makes these assumptions about your global DNS configuration.
-
-1. A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc))
-1. You have designated A DNS zone for zrok, e.g. `example.com` or `share.example.com` and created (and delegated, if necessary) the zone on your DNS provider's platform.
 1. A wildcard record exists for the IP address where the zrok instance will run, e.g. if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`.
-1. You have created an API token in your DNS provider's platform and the token has permission to create DNS records in the DNS zone.
+
+#### Additional DNS Configuration for Caddy TLS
+
+The included Caddy container can automatically manage a wildcard certificate for your zrok instance. You can enable Caddy in this compose project by renaming `caddy.compose.override.yml` as `compose.override.yml`.
+
+1. Ensure A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc)).
+1. Designate A DNS zone for zrok, e.g. `example.com` or `share.example.com` and create the zone on your DNS provider's platform.
+1. Created an API token in your DNS provider that has permission to manage zrok's DNS zone.
 
 ### Create the Docker Compose Project
 
-Create a working directory on your Docker host and save these Docker Compose project files. A OpenZiti network is provided by the "ziti-quickstart" container and is managed exclusively by zrok.
+Create a working directory on your Docker host and save these Docker Compose project files.
 
 #### Shortcut Option
 
@@ -51,17 +56,26 @@ Create an `.env` file in the working directory.
 ```bash title=".env required"
 ZROK_DNS_ZONE=share.example.com
 
-CADDY_DNS_PLUGIN=cloudflare
-CADDY_DNS_PLUGIN_TOKEN=abcd1234
-CADDY_ACME_EMAIL=me@example.com
+ZROK_USER_EMAIL=me@example.com
+ZROK_USER_PWD=zrokuserpw
 
 ZITI_PWD=zitiadminpw
-
 ZROK_ADMIN_TOKEN=zroktoken
-ZROK_USER_PWD=zrokuserpw
 ```
 
 ```bash title=".env options"
+# plugin name for your DNS provider
+CADDY_DNS_PLUGIN=cloudflare
+# API token from your DNS provider
+CADDY_DNS_PLUGIN_TOKEN=abcd1234
+# use the staging API until you're sure everything is working to avoid hitting the rate limit
+CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
+
+# zrok version, e.g., 1.0.0
+ZROK_IMAGE_TAG=latest
+
+# ziti version, e.g., 1.0.0
+ZITI_IMAGE_TAG=latest
 # ziti ports
 ZITI_CTRL_ADVERTISED_PORT=1280
 ZITI_ROUTER_PORT=3022
@@ -72,9 +86,6 @@ ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
 ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
-
-# use the staging API until you're sure everything is working to avoid hitting the main CA's rate limit
-CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 ```
 
 ### Start the Docker Compose Project
@@ -89,10 +100,10 @@ CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 
 ### Set up a User Account
 
-This step creates a user account. You will log in to the zrok web console with the account password created in this step. The CADDY_ACME_EMAIL and ZROK_USER_PWD variables are set in the `.env` file. You can create more user accounts the same way by substituting a different email and password.
+This step creates a user account. You will log in to the zrok web console with the account password created in this step. The ZROK_USER_EMAIL and ZROK_USER_PWD variables are set in the `.env` file. You can create more user accounts the same way by substituting a different email and password.
 
-```bash
-docker compose exec zrok-controller bash -xc 'zrok admin create account /etc/zrok-controller/config.yml ${CADDY_ACME_EMAIL} ${ZROK_USER_PWD}'
+```bash title="Create the first user account"
+docker compose exec zrok-controller bash -xc 'zrok admin create account /etc/zrok-controller/config.yml ${ZROK_USER_EMAIL} ${ZROK_USER_PWD}'
 ```
 
 ```buttonless title="Example output"
@@ -100,6 +111,12 @@ docker compose exec zrok-controller bash -xc 'zrok admin create account /etc/zro
 [   0.000]    INFO zrok/controller/store.Open: database connected
 [   0.002]    INFO zrok/controller/store.(*Store).migrate: applied 0 migrations
 heMqncCyxZcx
+```
+
+Create additional users by running the command again with a different email and password.
+
+```bash title="Create another user"
+docker compose exec zrok-controller zrok admin create account /etc/zrok-controller/config.yml <email> <password>
 ```
 
 ### Enable the User Environment
@@ -112,6 +129,12 @@ Follow [the getting started guide](/docs/getting-started#installing-the-zrok-com
 
     ```bash
     zrok config set apiEndpoint https://zrok.share.example.com
+    ```
+
+    or, if not using Caddy for TLS:
+
+    ```bash
+    zrok config set apiEndpoint http://zrok.share.example.com:18080
     ```
 
 1. Enable an environment on this device with the account token from the previous step.
