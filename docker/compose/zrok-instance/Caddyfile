@@ -1,5 +1,5 @@
 {
-	email {$CADDY_ACME_EMAIL}
+	email {$ZROK_USER_EMAIL}
 	acme_ca {$CADDY_ACME_API}
 	admin 0.0.0.0:2019
 }

@@ -1,5 +1,3 @@
-# this compose file is designed to merge with the ziti all-in-one quickstart compose file by renaming 
-# https://get.openziti.io/dock/all-in-one/compose.yml to compose.override.yml
 
 services:
   ziti-quickstart:
@@ -111,12 +109,11 @@ services:
     restart: unless-stopped
     expose:
       - ${ZROK_CTRL_PORT:-18080}  # (not published)
-    # Caddy's published ports provide a TLS reverse proxy for the zrok controller
-    # ports:
-    #   - 127.0.0.1:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
+    ports:
+      - 127.0.0.1:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
     environment:
       ZROK_USER_PWD: ${ZROK_USER_PWD} # admin account password     (initial user account)
-      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}  # login email address (initial user account)
+      ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # login email address (initial user account)
 
   zrok-frontend:
     depends_on:
@@ -146,54 +143,23 @@ services:
     expose:
       - ${ZROK_FRONTEND_PORT:-8080}  # (not published)
       - ${ZROK_OAUTH_PORT:-8081}     # (not published)
-    # ports:
-    #   - 127.0.0.1:${ZROK_FRONTEND_PORT:-8080}:${ZROK_FRONTEND_PORT:-8080}
-    #   - 127.0.0.1:${ZROK_OAUTH_PORT:-8081}:${ZROK_OAUTH_PORT:-8081}
+    ports:
+      - 127.0.0.1:${ZROK_FRONTEND_PORT:-8080}:${ZROK_FRONTEND_PORT:-8080}
+      - 127.0.0.1:${ZROK_OAUTH_PORT:-8081}:${ZROK_OAUTH_PORT:-8081}
     environment:
       HOME: /var/lib/zrok-frontend
       ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
       ZROK_ADMIN_TOKEN: ${ZROK_ADMIN_TOKEN} # zrok controller admin password
       ZROK_API_ENDPOINT: http://zrok-controller:${ZROK_CTRL_PORT:-18080} # bridge address of the zrok controller
+      ZROK_FRONTEND_SCHEME: http
+      ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
       ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-1280}
       ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
-
-  caddy:
-    build:
-      context: .
-      dockerfile: ./caddy.Dockerfile
-      args:
-        CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN} # e.g., "digitalocean" (see github.com/caddy-dns)
-    restart: unless-stopped
-    environment:
-      CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN}  # e.g., "digitalocean" (see github.com/caddy-dns)
-      CADDY_DNS_PLUGIN_TOKEN: ${CADDY_DNS_PLUGIN_TOKEN}  # API token from DNS provider used by plugin to solve the ACME challenge
-      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}  # email address sent to CA for ACME account and renewal notifications
-      CADDY_ACME_API: ${CADDY_ACME_API:-https://acme-v02.api.letsencrypt.org/directory}  # ACME API endpoint
-      ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
-      ZROK_CTRL_PORT: ${ZROK_CTRL_PORT:-18080}
-      ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
-      ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
-    expose:
-      - 80/tcp
-      - 443/tcp
-      - 443/udp   # Caddy's HTTP/3 (QUIC) (not published)
-      - 2019/tcp  # Caddy's admin API     (not published)
-    ports:
-      - ${CADDY_INTERFACE:-0.0.0.0}:80:80
-      - ${CADDY_INTERFACE:-0.0.0.0}:443:443
-      # - ${CADDY_INTERFACE:-0.0.0.0}:443:443/udp"  # future: HTTP/3 (QUIC)
-    volumes:
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      zrok-instance:
 
 volumes:
   ziti_home:  # this will not be used if you switch from named volume to bind mount volume
   zrok_ctrl:
   zrok_frontend:
-  caddy_data:
-  caddy_config:
 
 # define a custom network so that we can also define DNS aliases
 networks:
