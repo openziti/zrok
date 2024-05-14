@@ -10,7 +10,7 @@ type AccountLimitJournal struct {
 	AccountId int
 	RxBytes   int64
 	TxBytes   int64
-	Action    LimitJournalAction
+	Action    LimitAction
 }
 
 func (str *Store) CreateAccountLimitJournal(j *AccountLimitJournal, trx *sqlx.Tx) (int, error) {

@@ -11,7 +11,7 @@ type EnvironmentLimitJournal struct {
 	EnvironmentId int
 	RxBytes       int64
 	TxBytes       int64
-	Action        LimitJournalAction
+	Action        LimitAction
 }
 
 func (str *Store) CreateEnvironmentLimitJournal(j *EnvironmentLimitJournal, trx *sqlx.Tx) (int, error) {

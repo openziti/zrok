@@ -127,7 +127,7 @@ func (h *overviewHandler) isAccountLimited(principal *rest_model_zrok.Principal,
 			return false, err
 		}
 	}
-	return alj != nil && alj.Action == store.LimitAction, nil
+	return alj != nil && alj.Action == store.LimitLimitAction, nil
 }
 
 type sharesLimitedMap struct {
@@ -145,7 +145,7 @@ func newSharesLimitedMap(shrs []*store.Share, trx *sqlx.Tx) (*sharesLimitedMap, 
 	}
 	slm := &sharesLimitedMap{v: make(map[int]struct{})}
 	for i := range shrsLimited {
-		if shrsLimited[i].Action == store.LimitAction {
+		if shrsLimited[i].Action == store.LimitLimitAction {
 			slm.v[shrsLimited[i].ShareId] = struct{}{}
 		}
 	}
@@ -172,7 +172,7 @@ func newEnvironmentsLimitedMap(envs []*store.Environment, trx *sqlx.Tx) (*enviro
 	}
 	elm := &environmentsLimitedMap{v: make(map[int]struct{})}
 	for i := range envsLimited {
-		if envsLimited[i].Action == store.LimitAction {
+		if envsLimited[i].Action == store.LimitLimitAction {
 			elm.v[envsLimited[i].EnvironmentId] = struct{}{}
 		}
 	}

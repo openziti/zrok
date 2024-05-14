@@ -1,11 +1,19 @@
 package store
 
-type LimitJournalAction string
+type LimitAction string
 
 const (
-	LimitAction   LimitJournalAction = "limit"
-	WarningAction LimitJournalAction = "warning"
-	ClearAction   LimitJournalAction = "clear"
+	LimitLimitAction   LimitAction = "limit"
+	WarningLimitAction LimitAction = "warning"
+	ClearLimitAction   LimitAction = "clear"
+)
+
+type LimitScope string
+
+const (
+	AccountLimitScope     LimitScope = "account"
+	EnvironmentLimitScope LimitScope = "environment"
+	ShareLimitScope       LimitScope = "share"
 )
 
 type PermissionMode string

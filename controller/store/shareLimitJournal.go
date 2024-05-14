@@ -11,7 +11,7 @@ type ShareLimitJournal struct {
 	ShareId int
 	RxBytes int64
 	TxBytes int64
-	Action  LimitJournalAction
+	Action  LimitAction
 }
 
 func (str *Store) CreateShareLimitJournal(j *ShareLimitJournal, trx *sqlx.Tx) (int, error) {

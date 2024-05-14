@@ -71,7 +71,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if alj.Action == store.LimitAction {
+			if alj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -98,7 +98,7 @@ func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if alj.Action == store.LimitAction {
+			if alj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -110,7 +110,7 @@ func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if elj.Action == store.LimitAction {
+			if elj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -150,7 +150,7 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if slj.Action == store.LimitAction {
+			if slj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -166,7 +166,7 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if elj.Action == store.LimitAction {
+			if elj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -183,7 +183,7 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 				if err != nil {
 					return false, err
 				}
-				if alj.Action == store.LimitAction {
+				if alj.Action == store.LimitLimitAction {
 					return false, nil
 				}
 			} else if err != nil {
@@ -257,7 +257,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 			var enforcedAt time.Time
 			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
 				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
-					enforced = latest.Action == store.LimitAction
+					enforced = latest.Action == store.LimitLimitAction
 					enforcedAt = latest.UpdatedAt
 				}
 			}
@@ -267,7 +267,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					AccountId: int(u.AccountId),
 					RxBytes:   rxBytes,
 					TxBytes:   txBytes,
-					Action:    store.LimitAction,
+					Action:    store.LimitLimitAction,
 				}, trx)
 				if err != nil {
 					return err
@@ -294,7 +294,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 			var warnedAt time.Time
 			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
 				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
-					warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+					warned = latest.Action == store.WarningLimitAction || latest.Action == store.LimitLimitAction
 					warnedAt = latest.UpdatedAt
 				}
 			}
@@ -304,7 +304,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					AccountId: int(u.AccountId),
 					RxBytes:   rxBytes,
 					TxBytes:   txBytes,
-					Action:    store.WarningAction,
+					Action:    store.WarningLimitAction,
 				}, trx)
 				if err != nil {
 					return err
@@ -333,7 +333,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					var enforcedAt time.Time
 					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
 						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
-							enforced = latest.Action == store.LimitAction
+							enforced = latest.Action == store.LimitLimitAction
 							enforcedAt = latest.UpdatedAt
 						}
 					}
@@ -343,7 +343,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							EnvironmentId: int(u.EnvironmentId),
 							RxBytes:       rxBytes,
 							TxBytes:       txBytes,
-							Action:        store.LimitAction,
+							Action:        store.LimitLimitAction,
 						}, trx)
 						if err != nil {
 							return err
@@ -370,7 +370,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 					var warnedAt time.Time
 					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
 						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
-							warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+							warned = latest.Action == store.WarningLimitAction || latest.Action == store.LimitLimitAction
 							warnedAt = latest.UpdatedAt
 						}
 					}
@@ -380,7 +380,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							EnvironmentId: int(u.EnvironmentId),
 							RxBytes:       rxBytes,
 							TxBytes:       txBytes,
-							Action:        store.WarningAction,
+							Action:        store.WarningLimitAction,
 						}, trx)
 						if err != nil {
 							return err
@@ -414,7 +414,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							var enforcedAt time.Time
 							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
 								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
-									enforced = latest.Action == store.LimitAction
+									enforced = latest.Action == store.LimitLimitAction
 									enforcedAt = latest.UpdatedAt
 								}
 							}
@@ -424,7 +424,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 									ShareId: shr.Id,
 									RxBytes: rxBytes,
 									TxBytes: txBytes,
-									Action:  store.LimitAction,
+									Action:  store.LimitLimitAction,
 								}, trx)
 								if err != nil {
 									return err
@@ -452,7 +452,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 							var warnedAt time.Time
 							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
 								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
-									warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
+									warned = latest.Action == store.WarningLimitAction || latest.Action == store.LimitLimitAction
 									warnedAt = latest.UpdatedAt
 								}
 							}
@@ -462,7 +462,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 									ShareId: shr.Id,
 									RxBytes: rxBytes,
 									TxBytes: txBytes,
-									Action:  store.WarningAction,
+									Action:  store.WarningLimitAction,
 								}, trx)
 								if err != nil {
 									return err
@@ -509,10 +509,10 @@ func (a *Agent) relax() error {
 	if sljs, err := a.str.FindAllLatestShareLimitJournal(trx); err == nil {
 		for _, slj := range sljs {
 			if shr, err := a.str.GetShare(slj.ShareId, trx); err == nil {
-				if slj.Action == store.WarningAction || slj.Action == store.LimitAction {
+				if slj.Action == store.WarningLimitAction || slj.Action == store.LimitLimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkShareLimit(shr.Token); err == nil {
 						if !enforce && !warning {
-							if slj.Action == store.LimitAction {
+							if slj.Action == store.LimitLimitAction {
 								// run relax actions for share
 								for _, action := range a.shrRelaxActions {
 									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
@@ -545,10 +545,10 @@ func (a *Agent) relax() error {
 	if eljs, err := a.str.FindAllLatestEnvironmentLimitJournal(trx); err == nil {
 		for _, elj := range eljs {
 			if env, err := a.str.GetEnvironment(elj.EnvironmentId, trx); err == nil {
-				if elj.Action == store.WarningAction || elj.Action == store.LimitAction {
+				if elj.Action == store.WarningLimitAction || elj.Action == store.LimitLimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkEnvironmentLimit(int64(elj.EnvironmentId)); err == nil {
 						if !enforce && !warning {
-							if elj.Action == store.LimitAction {
+							if elj.Action == store.LimitLimitAction {
 								// run relax actions for environment
 								for _, action := range a.envRelaxActions {
 									if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
@@ -581,10 +581,10 @@ func (a *Agent) relax() error {
 	if aljs, err := a.str.FindAllLatestAccountLimitJournal(trx); err == nil {
 		for _, alj := range aljs {
 			if acct, err := a.str.GetAccount(alj.AccountId, trx); err == nil {
-				if alj.Action == store.WarningAction || alj.Action == store.LimitAction {
+				if alj.Action == store.WarningLimitAction || alj.Action == store.LimitLimitAction {
 					if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(int64(alj.AccountId)); err == nil {
 						if !enforce && !warning {
-							if alj.Action == store.LimitAction {
+							if alj.Action == store.LimitLimitAction {
 								// run relax actions for account
 								for _, action := range a.acctRelaxActions {
 									if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
