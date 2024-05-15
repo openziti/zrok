@@ -6,12 +6,12 @@ import (
 )
 
 func (str *Store) LimitCheckLock(acctId int, trx *sqlx.Tx) error {
-	rows, err := trx.Queryx("select * from limit_check_locks where account_id = $1 for update", acctId)
+	stmt, err := trx.Prepare("insert into limit_check_locks (account_id) values ($1) on conflict (account_id) do update set updated_at = current_timestamp")
 	if err != nil {
-		return errors.Wrap(err, "error preparing limit_check_locks select statement")
+		return errors.Wrap(err, "error preparing upsert on limit_check_locks")
 	}
-	if !rows.Next() {
-		return errors.Errorf("no limit_check_locks entry for account_id '%d'", acctId)
+	if _, err := stmt.Exec(acctId); err != nil {
+		return errors.Wrap(err, "error executing upsert on limit_check_locks")
 	}
 	return nil
 }
