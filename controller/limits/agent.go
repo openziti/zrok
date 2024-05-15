@@ -66,6 +66,9 @@ func (a *Agent) Stop() {
 
 func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
+			return false, err
+		}
 		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
 			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
 			if err != nil {
@@ -93,6 +96,9 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 
 func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
+			return false, err
+		}
 		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
 			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
 			if err != nil {
