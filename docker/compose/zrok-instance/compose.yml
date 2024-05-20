@@ -110,7 +110,7 @@ services:
     expose:
       - ${ZROK_CTRL_PORT:-18080}  # (not published)
     ports:
-      - 127.0.0.1:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
+      - ${ZROK_INSECURE_INTERFACE:-127.0.0.1}:${ZROK_CTRL_PORT:-18080}:${ZROK_CTRL_PORT:-18080}
     environment:
       ZROK_USER_PWD: ${ZROK_USER_PWD} # admin account password     (initial user account)
       ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # login email address (initial user account)
@@ -144,8 +144,8 @@ services:
       - ${ZROK_FRONTEND_PORT:-8080}  # (not published)
       - ${ZROK_OAUTH_PORT:-8081}     # (not published)
     ports:
-      - 127.0.0.1:${ZROK_FRONTEND_PORT:-8080}:${ZROK_FRONTEND_PORT:-8080}
-      - 127.0.0.1:${ZROK_OAUTH_PORT:-8081}:${ZROK_OAUTH_PORT:-8081}
+      - ${ZROK_INSECURE_INTERFACE:-127.0.0.1}:${ZROK_FRONTEND_PORT:-8080}:${ZROK_FRONTEND_PORT:-8080}
+      - ${ZROK_INSECURE_INTERFACE:-127.0.0.1}:${ZROK_OAUTH_PORT:-8081}:${ZROK_OAUTH_PORT:-8081}
     environment:
       HOME: /var/lib/zrok-frontend
       ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
