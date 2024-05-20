@@ -64,6 +64,7 @@ ZROK_ADMIN_TOKEN=zroktoken
 ```
 
 ```bash title=".env options"
+# Caddy TLS option: rename caddy.compose.override.yml to compose.override.yml and set these vars; allow 80,443 in firewall
 # plugin name for your DNS provider
 CADDY_DNS_PLUGIN=cloudflare
 # API token from your DNS provider
@@ -71,12 +72,13 @@ CADDY_DNS_PLUGIN_TOKEN=abcd1234
 # use the staging API until you're sure everything is working to avoid hitting the rate limit
 CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 
-# zrok version, e.g., 1.0.0
-ZROK_IMAGE_TAG=latest
+# no TLS option: publish the insecure ports to the internet and allow them in the firewall 
+ZROK_INSECURE_INTERFACE=0.0.0.0
+ZROK_CTRL_PORT=18080
+ZROK_FRONTEND_PORT=8080
+ZROK_OAUTH_PORT=8081
 
-# ziti version, e.g., 1.0.0
-ZITI_IMAGE_TAG=latest
-# ziti ports
+# ziti ports must be published to the internet and allowed by firewall
 ZITI_CTRL_ADVERTISED_PORT=1280
 ZITI_ROUTER_PORT=3022
 
@@ -86,6 +88,11 @@ ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
 ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
+
+# zrok version, e.g., 1.0.0
+ZROK_IMAGE_TAG=latest
+# ziti version, e.g., 1.0.0
+ZITI_IMAGE_TAG=latest
 ```
 
 ### Start the Docker Compose Project
