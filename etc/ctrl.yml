@@ -81,6 +81,8 @@ invites:
 limits:
   environments:     -1
   shares:           -1
+  reserved_shares:  -1
+  unique_names:     -1
   bandwidth:
     per_account:
       period:       5m
