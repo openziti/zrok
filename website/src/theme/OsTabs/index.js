@@ -7,9 +7,9 @@ function OsTabs(props) {
 
   useEffect(() => {
     // Based on the OS or any other client-side condition, set the default value
-    const tabs = ['Mac OS', 'Windows', 'Linux']
-    if (tabs.includes(osName)) {
-      setDefaultValue(osName);
+    const dockerTabs = ['Mac OS', 'Windows']
+    if (dockerTabs.includes(osName)) {
+      setDefaultValue('Docker');
     } else {
       setDefaultValue('Linux');
     }
