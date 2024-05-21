@@ -5,11 +5,13 @@ import "time"
 const Unlimited = -1
 
 type Config struct {
-	Environments int
-	Shares       int
-	Bandwidth    *BandwidthConfig
-	Cycle        time.Duration
-	Enforcing    bool
+	Environments   int
+	Shares         int
+	ReservedShares int
+	UniqueNames    int
+	Bandwidth      *BandwidthConfig
+	Cycle          time.Duration
+	Enforcing      bool
 }
 
 type BandwidthConfig struct {
@@ -48,8 +50,10 @@ func DefaultBandwidthPerPeriod() *BandwidthPerPeriod {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Environments: Unlimited,
-		Shares:       Unlimited,
+		Environments:   Unlimited,
+		Shares:         Unlimited,
+		ReservedShares: Unlimited,
+		UniqueNames:    Unlimited,
 		Bandwidth: &BandwidthConfig{
 			PerAccount:     DefaultBandwidthPerPeriod(),
 			PerEnvironment: DefaultBandwidthPerPeriod(),
