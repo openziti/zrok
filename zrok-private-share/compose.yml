@@ -1,8 +1,8 @@
 services:
   zrok-init:
     image: busybox
-    # matches uid:gid of "nobody" in zrok container image
-    command: chown -Rc 65534:65534 /mnt/.zrok
+    # matches uid:gid of "ziggy" in zrok container image
+    command: chown -Rc 2171:2171 /mnt/.zrok
     user: root
     volumes:
       - zrok_env:/mnt/.zrok
