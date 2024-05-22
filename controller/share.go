@@ -147,6 +147,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
+		UniqueName:           reserved && uniqueName != "",
 		PermissionMode:       store.OpenPermissionMode,
 	}
 	if params.Body.PermissionMode != "" {
