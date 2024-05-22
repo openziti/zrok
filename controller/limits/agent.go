@@ -94,7 +94,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
@@ -123,19 +123,35 @@ func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
 			return false, err
 		}
 
-		if a.cfg.Shares > Unlimited {
+		if a.cfg.Shares > Unlimited || (reserved && a.cfg.ReservedShares > Unlimited) || (reserved && uniqueName && a.cfg.UniqueNames > Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
 			}
 			total := 0
+			reserveds := 0
+			uniqueNames := 0
 			for i := range envs {
 				shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
 				if err != nil {
 					return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
 				}
 				total += len(shrs)
+				for _, shr := range shrs {
+					if shr.Reserved {
+						reserveds++
+					}
+					if shr.UniqueName {
+						uniqueNames++
+					}
+				}
 				if total+1 > a.cfg.Shares {
+					return false, nil
+				}
+				if reserved && reserveds+1 > a.cfg.ReservedShares {
+					return false, nil
+				}
+				if reserved && uniqueName && uniqueNames+1 > a.cfg.UniqueNames {
 					return false, nil
 				}
 				logrus.Infof("total = %d", total)
