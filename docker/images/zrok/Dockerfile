@@ -24,8 +24,6 @@ USER root
 RUN mkdir -p -m0755 /licenses
 COPY ./LICENSE /licenses/apache.txt
 
-ENV PFXLOG_NO_JSON=true
-
 RUN mkdir -p /usr/local/bin
 COPY ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok \
       ./nfpm/zrok-enable.bash \
