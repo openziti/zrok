@@ -146,12 +146,15 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, trx
 					}
 				}
 				if total+1 > a.cfg.Shares {
+					logrus.Debugf("account '%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
 					return false, nil
 				}
 				if reserved && reserveds+1 > a.cfg.ReservedShares {
+					logrus.Debugf("account '%v', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
 					return false, nil
 				}
 				if reserved && uniqueName && uniqueNames+1 > a.cfg.UniqueNames {
+					logrus.Debugf("account '%v', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
 					return false, nil
 				}
 				logrus.Infof("total = %d", total)
