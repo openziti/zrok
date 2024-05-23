@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -94,7 +95,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, shareMode sdk.ShareMode, backendMode sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
@@ -121,6 +122,16 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, trx
 			}
 		} else if err != nil {
 			return false, err
+		}
+
+		alc, err := a.str.FindLimitClassesForAccount(acctId, trx)
+		if err != nil {
+			logrus.Errorf("error finding limit classes for account with id '%d': %v", acctId, err)
+			return false, err
+		}
+		sortLimitClasses(alc)
+		if len(alc) > 0 {
+			logrus.Infof("selected limit class: %v", alc[0])
 		}
 
 		if a.cfg.Shares > Unlimited || (reserved && a.cfg.ReservedShares > Unlimited) || (reserved && uniqueName && a.cfg.UniqueNames > Unlimited) {

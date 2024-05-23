@@ -1,6 +1,7 @@
 package store
 
 import (
+	"encoding/json"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
@@ -8,14 +9,26 @@ import (
 
 type LimitClass struct {
 	Model
-	LimitScope    LimitScope
-	LimitAction   LimitAction
-	ShareMode     sdk.ShareMode
-	BackendMode   sdk.BackendMode
-	PeriodMinutes int
-	RxBytes       int64
-	TxBytes       int64
-	TotalBytes    int64
+	LimitScope     LimitScope
+	LimitAction    LimitAction
+	ShareMode      sdk.ShareMode
+	BackendMode    sdk.BackendMode
+	Shares         int
+	ReservedShares int
+	UniqueNames    int
+	PeriodMinutes  int
+	RxBytes        int64
+	TxBytes        int64
+	TotalBytes     int64
+}
+
+func (lc LimitClass) String() string {
+	out, err := json.MarshalIndent(&lc, "", "  ")
+	if err != nil {
+		return ""
+
+	}
+	return string(out)
 }
 
 func (str *Store) CreateLimitClass(lc *LimitClass, trx *sqlx.Tx) (int, error) {
