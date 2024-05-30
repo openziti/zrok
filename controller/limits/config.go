@@ -9,15 +9,9 @@ type Config struct {
 	Shares         int
 	ReservedShares int
 	UniqueNames    int
-	Bandwidth      *BandwidthConfig
+	Bandwidth      *BandwidthPerPeriod
 	Cycle          time.Duration
 	Enforcing      bool
-}
-
-type BandwidthConfig struct {
-	PerAccount     *BandwidthPerPeriod
-	PerEnvironment *BandwidthPerPeriod
-	PerShare       *BandwidthPerPeriod
 }
 
 type BandwidthPerPeriod struct {
@@ -54,12 +48,8 @@ func DefaultConfig() *Config {
 		Shares:         Unlimited,
 		ReservedShares: Unlimited,
 		UniqueNames:    Unlimited,
-		Bandwidth: &BandwidthConfig{
-			PerAccount:     DefaultBandwidthPerPeriod(),
-			PerEnvironment: DefaultBandwidthPerPeriod(),
-			PerShare:       DefaultBandwidthPerPeriod(),
-		},
-		Enforcing: false,
-		Cycle:     15 * time.Minute,
+		Bandwidth:      DefaultBandwidthPerPeriod(),
+		Enforcing:      false,
+		Cycle:          15 * time.Minute,
 	}
 }
