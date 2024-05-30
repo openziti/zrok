@@ -1,14 +1,12 @@
 package limits
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"reflect"
@@ -83,7 +81,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, shareMode sdk.ShareMode, backendMode sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ sdk.ShareMode, _ sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
@@ -416,7 +414,7 @@ func (a *Agent) relax() error {
 func (a *Agent) checkAccountLimit(acctId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
 	period := 24 * time.Hour
 	limit := DefaultBandwidthPerPeriod()
-	if a.cfg.Bandwidth != nil && a.cfg.Bandwidth != nil {
+	if a.cfg.Bandwidth != nil {
 		limit = a.cfg.Bandwidth
 	}
 	if limit.Period > 0 {
@@ -453,30 +451,4 @@ func (a *Agent) checkLimit(cfg *BandwidthPerPeriod, rx, tx int64) (enforce, warn
 	}
 
 	return false, false
-}
-
-func describeLimit(cfg *BandwidthPerPeriod, rx, tx int64) string {
-	out := ""
-
-	if cfg.Limit.Rx != Unlimited && rx > cfg.Limit.Rx {
-		out += fmt.Sprintf("['%v' over rx limit '%v']", util.BytesToSize(rx), util.BytesToSize(cfg.Limit.Rx))
-	}
-	if cfg.Limit.Tx != Unlimited && tx > cfg.Limit.Tx {
-		out += fmt.Sprintf("['%v' over tx limit '%v']", util.BytesToSize(tx), util.BytesToSize(cfg.Limit.Tx))
-	}
-	if cfg.Limit.Total != Unlimited && rx+tx > cfg.Limit.Total {
-		out += fmt.Sprintf("['%v' over total limit '%v']", util.BytesToSize(rx+tx), util.BytesToSize(cfg.Limit.Total))
-	}
-
-	if cfg.Warning.Rx != Unlimited && rx > cfg.Warning.Rx {
-		out += fmt.Sprintf("['%v' over rx warning '%v']", util.BytesToSize(rx), util.BytesToSize(cfg.Warning.Rx))
-	}
-	if cfg.Warning.Tx != Unlimited && tx > cfg.Warning.Tx {
-		out += fmt.Sprintf("['%v' over tx warning '%v']", util.BytesToSize(tx), util.BytesToSize(cfg.Warning.Tx))
-	}
-	if cfg.Warning.Total != Unlimited && rx+tx > cfg.Warning.Total {
-		out += fmt.Sprintf("['%v' over total warning '%v']", util.BytesToSize(rx+tx), util.BytesToSize(cfg.Warning.Total))
-	}
-
-	return out
 }
