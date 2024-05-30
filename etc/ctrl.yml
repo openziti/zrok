@@ -84,36 +84,15 @@ limits:
   reserved_shares:  -1
   unique_names:     -1
   bandwidth:
-    per_account:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      7242880
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      10485760
-    per_environment:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
-    per_share:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
+    period:         5m
+    warning:
+      rx:           -1
+      tx:           -1
+      total:        7242880
+    limit:
+      rx:           -1
+      tx:           -1
+      total:        10485760
   enforcing:        false
   cycle:            5m
 
