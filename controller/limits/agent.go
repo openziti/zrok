@@ -227,7 +227,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return nil
 	}
 
-	if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(u.AccountId); err == nil {
+	if enforce, warning, rxBytes, txBytes, err := a.checkBandwidthLimit(u.AccountId); err == nil {
 		if enforce {
 			enforced := false
 			var enforcedAt time.Time
@@ -324,7 +324,7 @@ func (a *Agent) relax() error {
 		for _, alj := range aljs {
 			if acct, err := a.str.GetAccount(alj.AccountId, trx); err == nil {
 				if alj.Action == store.WarningLimitAction || alj.Action == store.LimitLimitAction {
-					if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(int64(alj.AccountId)); err == nil {
+					if enforce, warning, rxBytes, txBytes, err := a.checkBandwidthLimit(int64(alj.AccountId)); err == nil {
 						if !enforce && !warning {
 							if alj.Action == store.LimitLimitAction {
 								// run relax actions for account
@@ -365,7 +365,7 @@ func (a *Agent) relax() error {
 	return nil
 }
 
-func (a *Agent) checkAccountLimit(acctId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
+func (a *Agent) checkBandwidthLimit(acctId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
 	period := 24 * time.Hour
 	limit := DefaultBandwidthPerPeriod()
 	if a.cfg.Bandwidth != nil {
