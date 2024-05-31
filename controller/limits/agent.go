@@ -227,6 +227,12 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return nil
 	}
 
+	shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("share: '%v', shareMode: '%v', backendMode: '%v'", shr.Token, shr.ShareMode, shr.BackendMode)
+
 	if enforce, warning, rxBytes, txBytes, err := a.checkBandwidthLimit(u.AccountId); err == nil {
 		if enforce {
 			enforced := false
