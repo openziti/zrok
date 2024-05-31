@@ -37,7 +37,7 @@ func (str *Store) CreateLimitClass(lc *LimitClass, trx *sqlx.Tx) (int, error) {
 		return 0, errors.Wrap(err, "error preparing limit_classes insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(lc.LimitScope, lc.LimitAction, lc.ShareMode, lc.BackendMode, lc.PeriodMinutes).Scan(&id); err != nil {
+	if err := stmt.QueryRow(lc.LimitScope, lc.LimitAction, lc.ShareMode, lc.BackendMode, lc.PeriodMinutes, lc.RxBytes, lc.TxBytes, lc.TotalBytes).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing limit_classes insert statement")
 	}
 	return id, nil

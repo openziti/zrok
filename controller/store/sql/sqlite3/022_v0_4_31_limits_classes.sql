@@ -1,7 +1,7 @@
 -- +migrate Up
 
 create table limit_classes (
-    id                  serial                  primary key,
+    id                  integer                  primary key,
 
     limit_scope         string                  not null default ('account'),
     limit_action        string                  not null default ('limit'),
@@ -23,7 +23,7 @@ create table limit_classes (
 );
 
 create table applied_limit_classes (
-    id                  serial                  primary key,
+    id                  integer                  primary key,
     account_id          integer                 not null references accounts (id),
     limit_class_id      integer                 not null references limit_classes (id),
     created_at          datetime                not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
