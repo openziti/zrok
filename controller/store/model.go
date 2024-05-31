@@ -5,7 +5,6 @@ type LimitAction string
 const (
 	LimitLimitAction   LimitAction = "limit"
 	WarningLimitAction LimitAction = "warning"
-	ClearLimitAction   LimitAction = "clear"
 )
 
 type LimitScope string

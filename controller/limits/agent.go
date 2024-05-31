@@ -56,8 +56,8 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
+		if empty, err := a.str.IsBandwidthLimitJournalEmpty(acctId, trx); err == nil && !empty {
+			alj, err := a.str.FindLatestBandwidthLimitJournal(acctId, trx)
 			if err != nil {
 				return false, err
 			}
@@ -86,24 +86,12 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
+		if empty, err := a.str.IsBandwidthLimitJournalEmpty(acctId, trx); err == nil && !empty {
+			alj, err := a.str.FindLatestBandwidthLimitJournal(acctId, trx)
 			if err != nil {
 				return false, err
 			}
 			if alj.Action == store.LimitLimitAction {
-				return false, nil
-			}
-		} else if err != nil {
-			return false, err
-		}
-
-		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(envId, trx); err == nil && !empty {
-			elj, err := a.str.FindLatestEnvironmentLimitJournal(envId, trx)
-			if err != nil {
-				return false, err
-			}
-			if elj.Action == store.LimitLimitAction {
 				return false, nil
 			}
 		} else if err != nil {
@@ -167,8 +155,8 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
-			slj, err := a.str.FindLatestShareLimitJournal(shr.Id, trx)
+		if empty, err := a.str.IsBandwidthLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
+			slj, err := a.str.FindLatestBandwidthLimitJournal(shr.Id, trx)
 			if err != nil {
 				return false, err
 			}
@@ -177,40 +165,6 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 			}
 		} else if err != nil {
 			return false, err
-		}
-
-		env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
-		if err != nil {
-			return false, err
-		}
-		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(env.Id, trx); err == nil && !empty {
-			elj, err := a.str.FindLatestEnvironmentLimitJournal(env.Id, trx)
-			if err != nil {
-				return false, err
-			}
-			if elj.Action == store.LimitLimitAction {
-				return false, nil
-			}
-		} else if err != nil {
-			return false, err
-		}
-
-		if env.AccountId != nil {
-			acct, err := a.str.GetAccount(*env.AccountId, trx)
-			if err != nil {
-				return false, err
-			}
-			if empty, err := a.str.IsAccountLimitJournalEmpty(acct.Id, trx); err == nil && !empty {
-				alj, err := a.str.FindLatestAccountLimitJournal(acct.Id, trx)
-				if err != nil {
-					return false, err
-				}
-				if alj.Action == store.LimitLimitAction {
-					return false, nil
-				}
-			} else if err != nil {
-				return false, err
-			}
 		}
 	}
 	return true, nil
@@ -277,15 +231,15 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		if enforce {
 			enforced := false
 			var enforcedAt time.Time
-			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
+			if empty, err := a.str.IsBandwidthLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestBandwidthLimitJournal(int(u.AccountId), trx); err == nil {
 					enforced = latest.Action == store.LimitLimitAction
 					enforcedAt = latest.UpdatedAt
 				}
 			}
 
 			if !enforced {
-				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
+				_, err := a.str.CreateBandwidthLimitJournalEntry(&store.BandwidthLimitJournalEntry{
 					AccountId: int(u.AccountId),
 					RxBytes:   rxBytes,
 					TxBytes:   txBytes,
@@ -314,15 +268,15 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		} else if warning {
 			warned := false
 			var warnedAt time.Time
-			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
+			if empty, err := a.str.IsBandwidthLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestBandwidthLimitJournal(int(u.AccountId), trx); err == nil {
 					warned = latest.Action == store.WarningLimitAction || latest.Action == store.LimitLimitAction
 					warnedAt = latest.UpdatedAt
 				}
 			}
 
 			if !warned {
-				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
+				_, err := a.str.CreateBandwidthLimitJournalEntry(&store.BandwidthLimitJournalEntry{
 					AccountId: int(u.AccountId),
 					RxBytes:   rxBytes,
 					TxBytes:   txBytes,
@@ -366,7 +320,7 @@ func (a *Agent) relax() error {
 
 	commit := false
 
-	if aljs, err := a.str.FindAllLatestAccountLimitJournal(trx); err == nil {
+	if aljs, err := a.str.FindAllLatestBandwidthLimitJournal(trx); err == nil {
 		for _, alj := range aljs {
 			if acct, err := a.str.GetAccount(alj.AccountId, trx); err == nil {
 				if alj.Action == store.WarningLimitAction || alj.Action == store.LimitLimitAction {
@@ -382,7 +336,7 @@ func (a *Agent) relax() error {
 							} else {
 								logrus.Infof("relaxing warning for '%v'", acct.Email)
 							}
-							if err := a.str.DeleteAccountLimitJournalForAccount(acct.Id, trx); err == nil {
+							if err := a.str.DeleteBandwidthLimitJournal(acct.Id, trx); err == nil {
 								commit = true
 							} else {
 								logrus.Errorf("error deleting account_limit_journal for '%v': %v", acct.Email, err)
