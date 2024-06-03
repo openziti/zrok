@@ -1,13 +1,10 @@
 -- +migrate Up
 
-create type limit_scope as enum ('account', 'environment', 'share');
 create type limit_action as enum ('warning', 'limit');
 
 create table limit_classes (
     id                  serial                  primary key,
 
-    limit_scope         limit_scope             not null default ('account'),
-    limit_action        limit_action            not null default ('limit'),
     share_mode          share_mode,
     backend_mode        backend_mode,
 
@@ -19,6 +16,8 @@ create table limit_classes (
     rx_bytes            bigint                  not null default (-1),
     tx_bytes            bigint                  not null default (-1),
     total_bytes         bigint                  not null default (-1),
+
+    limit_action        limit_action            not null default ('limit'),
 
     created_at          timestamptz             not null default(current_timestamp),
     updated_at          timestamptz             not null default(current_timestamp),

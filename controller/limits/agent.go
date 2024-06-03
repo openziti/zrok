@@ -14,30 +14,30 @@ import (
 )
 
 type Agent struct {
-	cfg                *Config
-	ifx                *influxReader
-	zCfg               *zrokEdgeSdk.Config
-	str                *store.Store
-	queue              chan *metrics.Usage
-	acctWarningActions []AccountAction
-	acctLimitActions   []AccountAction
-	acctRelaxActions   []AccountAction
-	close              chan struct{}
-	join               chan struct{}
+	cfg            *Config
+	ifx            *influxReader
+	zCfg           *zrokEdgeSdk.Config
+	str            *store.Store
+	queue          chan *metrics.Usage
+	warningActions []AccountAction
+	limitActions   []AccountAction
+	relaxActions   []AccountAction
+	close          chan struct{}
+	join           chan struct{}
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	a := &Agent{
-		cfg:                cfg,
-		ifx:                newInfluxReader(ifxCfg),
-		zCfg:               zCfg,
-		str:                str,
-		queue:              make(chan *metrics.Usage, 1024),
-		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
-		acctLimitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
-		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
-		close:              make(chan struct{}),
-		join:               make(chan struct{}),
+		cfg:            cfg,
+		ifx:            newInfluxReader(ifxCfg),
+		zCfg:           zCfg,
+		str:            str,
+		queue:          make(chan *metrics.Usage, 1024),
+		warningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
+		limitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
+		relaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
+		close:          make(chan struct{}),
+		join:           make(chan struct{}),
 	}
 	return a, nil
 }
@@ -258,8 +258,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				if err != nil {
 					return err
 				}
-				// run account limit actions
-				for _, action := range a.acctLimitActions {
+				for _, action := range a.limitActions {
 					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
 						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 					}
@@ -295,8 +294,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				if err != nil {
 					return err
 				}
-				// run account warning actions
-				for _, action := range a.acctWarningActions {
+				for _, action := range a.warningActions {
 					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
 						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 					}
@@ -334,7 +332,7 @@ func (a *Agent) relax() error {
 						if !enforce && !warning {
 							if alj.Action == store.LimitLimitAction {
 								// run relax actions for account
-								for _, action := range a.acctRelaxActions {
+								for _, action := range a.relaxActions {
 									if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
 										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 									}
