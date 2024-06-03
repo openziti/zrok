@@ -11,12 +11,17 @@ type configBandwidthClass struct {
 	limitAction     store.LimitAction
 }
 
-func newConfigBandwidthClasses(cfgClass *BandwidthPerPeriod) []store.BandwidthClass {
+func newConfigBandwidthClasses(cfg *BandwidthPerPeriod) []store.BandwidthClass {
 	return []store.BandwidthClass{
 		&configBandwidthClass{
-			periodInMinutes: int(cfgClass.Period.Minutes()),
-			bw:              cfgClass.Warning,
+			periodInMinutes: int(cfg.Period.Minutes()),
+			bw:              cfg.Warning,
 			limitAction:     store.WarningLimitAction,
+		},
+		&configBandwidthClass{
+			periodInMinutes: int(cfg.Period.Minutes()),
+			bw:              cfg.Limit,
+			limitAction:     store.LimitLimitAction,
 		},
 	}
 }
