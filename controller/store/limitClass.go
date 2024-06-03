@@ -7,6 +7,17 @@ import (
 	"github.com/pkg/errors"
 )
 
+type BandwidthClass interface {
+	IsGlobal() bool
+	GetShareMode() sdk.ShareMode
+	GetBackendMode() sdk.BackendMode
+	GetPeriodMinutes() int
+	GetRxBytes() int64
+	GetTxBytes() int64
+	GetTotalBytes() int64
+	GetLimitAction() LimitAction
+}
+
 type LimitClass struct {
 	Model
 	ShareMode      sdk.ShareMode
@@ -20,6 +31,38 @@ type LimitClass struct {
 	TxBytes        int64
 	TotalBytes     int64
 	LimitAction    LimitAction
+}
+
+func (lc *LimitClass) IsGlobal() bool {
+	return false
+}
+
+func (lc *LimitClass) GetShareMode() sdk.ShareMode {
+	return lc.ShareMode
+}
+
+func (lc *LimitClass) GetBackendMode() sdk.BackendMode {
+	return lc.BackendMode
+}
+
+func (lc *LimitClass) GetPeriodMinutes() int {
+	return lc.PeriodMinutes
+}
+
+func (lc *LimitClass) GetRxBytes() int64 {
+	return lc.RxBytes
+}
+
+func (lc *LimitClass) GetTxBytes() int64 {
+	return lc.TxBytes
+}
+
+func (lc *LimitClass) GetTotalBytes() int64 {
+	return lc.TotalBytes
+}
+
+func (lc *LimitClass) GetLimitAction() LimitAction {
+	return lc.LimitAction
 }
 
 func (lc LimitClass) String() string {

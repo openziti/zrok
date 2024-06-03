@@ -98,16 +98,6 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 			return false, err
 		}
 
-		alc, err := a.str.FindLimitClassesForAccount(acctId, trx)
-		if err != nil {
-			logrus.Errorf("error finding limit classes for account with id '%d': %v", acctId, err)
-			return false, err
-		}
-		sortLimitClasses(alc)
-		if len(alc) > 0 {
-			logrus.Infof("selected limit class: %v", alc[0])
-		}
-
 		if a.cfg.Shares > Unlimited || (reserved && a.cfg.ReservedShares > Unlimited) || (reserved && uniqueName && a.cfg.UniqueNames > Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
