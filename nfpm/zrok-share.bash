@@ -133,7 +133,7 @@ if [[ -n "${ZROK_OAUTH_PROVIDER:-}" ]]; then
   ZROK_CMD+=" --oauth-provider ${ZROK_OAUTH_PROVIDER}"
   if [[ -n "${ZROK_OAUTH_EMAILS:-}" ]]; then
     for EMAIL in ${ZROK_OAUTH_EMAILS}; do
-      ZROK_CMD+=" --oauth-email-address-patterns '${EMAIL}'"
+      ZROK_CMD+=" --oauth-email-address-patterns ${EMAIL}"
     done
   fi
 elif [[ -n "${ZROK_BASIC_AUTH:-}" ]]; then
