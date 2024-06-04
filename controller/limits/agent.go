@@ -33,9 +33,9 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Confi
 		zCfg:           zCfg,
 		str:            str,
 		queue:          make(chan *metrics.Usage, 1024),
-		warningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
-		limitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
-		relaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
+		warningActions: []AccountAction{newWarningAction(emailCfg, str)},
+		limitActions:   []AccountAction{newLimitAction(str, zCfg)},
+		relaxActions:   []AccountAction{newRelaxAction(str, zCfg)},
 		close:          make(chan struct{}),
 		join:           make(chan struct{}),
 	}

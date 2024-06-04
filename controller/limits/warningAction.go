@@ -9,16 +9,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type accountWarningAction struct {
+type warningAction struct {
 	str *store.Store
 	cfg *emailUi.Config
 }
 
-func newAccountWarningAction(cfg *emailUi.Config, str *store.Store) *accountWarningAction {
-	return &accountWarningAction{str, cfg}
+func newWarningAction(cfg *emailUi.Config, str *store.Store) *warningAction {
+	return &warningAction{str, cfg}
 }
 
-func (a *accountWarningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, _ *sqlx.Tx) error {
+func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, _ *sqlx.Tx) error {
 	logrus.Infof("warning '%v'", acct.Email)
 
 	if a.cfg != nil {

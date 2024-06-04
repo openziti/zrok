@@ -8,16 +8,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type accountLimitAction struct {
+type limitAction struct {
 	str  *store.Store
 	zCfg *zrokEdgeSdk.Config
 }
 
-func newAccountLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *accountLimitAction {
-	return &accountLimitAction{str, zCfg}
+func newLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *limitAction {
+	return &limitAction{str, zCfg}
 }
 
-func (a *accountLimitAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("limiting '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)

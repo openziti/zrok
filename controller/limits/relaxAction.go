@@ -10,16 +10,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type accountRelaxAction struct {
+type relaxAction struct {
 	str  *store.Store
 	zCfg *zrokEdgeSdk.Config
 }
 
-func newAccountRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *accountRelaxAction {
-	return &accountRelaxAction{str, zCfg}
+func newRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *relaxAction {
+	return &relaxAction{str, zCfg}
 }
 
-func (a *accountRelaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
 	logrus.Infof("relaxing '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
