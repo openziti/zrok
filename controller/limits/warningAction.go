@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type warningAction struct {
@@ -18,27 +19,27 @@ func newWarningAction(cfg *emailUi.Config, str *store.Store) *warningAction {
 	return &warningAction{str, cfg}
 }
 
-func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit *BandwidthPerPeriod, _ *sqlx.Tx) error {
+func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, limit store.BandwidthClass, _ *sqlx.Tx) error {
 	logrus.Infof("warning '%v'", acct.Email)
 
 	if a.cfg != nil {
 		rxLimit := "(unlimited bytes)"
-		if limit.Limit.Rx != Unlimited {
-			rxLimit = util.BytesToSize(limit.Limit.Rx)
+		if limit.GetRxBytes() != Unlimited {
+			rxLimit = util.BytesToSize(limit.GetRxBytes())
 		}
 		txLimit := "(unlimited bytes)"
-		if limit.Limit.Tx != Unlimited {
-			txLimit = util.BytesToSize(limit.Limit.Tx)
+		if limit.GetTxBytes() != Unlimited {
+			txLimit = util.BytesToSize(limit.GetTxBytes())
 		}
 		totalLimit := "(unlimited bytes)"
-		if limit.Limit.Total != Unlimited {
-			totalLimit = util.BytesToSize(limit.Limit.Total)
+		if limit.GetTotalBytes() != Unlimited {
+			totalLimit = util.BytesToSize(limit.GetTotalBytes())
 		}
 
 		detail := newDetailMessage()
 		detail = detail.append("Your account has received %v and sent %v (for a total of %v), which has triggered a transfer limit warning.", util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
-		detail = detail.append("This zrok instance only allows an account to receive %v, send %v, totalling not more than %v for each %v.", rxLimit, txLimit, totalLimit, limit.Period)
-		detail = detail.append("If you exceed the transfer limit, access to your shares will be temporarily disabled (until the last %v falls below the transfer limit)", limit.Period)
+		detail = detail.append("This zrok instance only allows an account to receive %v, send %v, totalling not more than %v for each %v.", rxLimit, txLimit, totalLimit, time.Duration(limit.GetPeriodMinutes())*time.Minute)
+		detail = detail.append("If you exceed the transfer limit, access to your shares will be temporarily disabled (until the last %v falls below the transfer limit)", time.Duration(limit.GetPeriodMinutes())*time.Minute)
 
 		if err := sendLimitWarningEmail(a.cfg, acct.Email, detail); err != nil {
 			return errors.Wrapf(err, "error sending limit warning email to '%v'", acct.Email)

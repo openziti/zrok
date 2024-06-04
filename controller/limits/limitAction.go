@@ -17,7 +17,7 @@ func newLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *limitAction {
 	return &limitAction{str, zCfg}
 }
 
-func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, _ store.BandwidthClass, trx *sqlx.Tx) error {
 	logrus.Infof("limiting '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)

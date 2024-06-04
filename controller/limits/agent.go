@@ -217,87 +217,82 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return nil
 	}
 
-	shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
+	shr, err := a.str.FindShareWithTokenEvenIfDeleted(u.ShareToken, trx)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("share: '%v', shareMode: '%v', backendMode: '%v'", shr.Token, shr.ShareMode, shr.BackendMode)
+	logrus.Debugf("share: '%v', shareMode: '%v', backendMode: '%v'", shr.Token, shr.ShareMode, shr.BackendMode)
 
-	if enforce, warning, rxBytes, txBytes, err := a.checkBandwidthLimit(u.AccountId); err == nil {
-		if enforce {
-			enforced := false
-			var enforcedAt time.Time
-			if empty, err := a.str.IsBandwidthLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestBandwidthLimitJournal(int(u.AccountId), trx); err == nil {
-					enforced = latest.Action == store.LimitLimitAction
+	alcs, err := a.str.FindAppliedLimitClassesForAccount(int(u.AccountId), trx)
+	if err != nil {
+		return err
+	}
+	exceededLc, rxBytes, txBytes, err := a.isOverLimitClass(u, alcs)
+	if err != nil {
+		return errors.Wrap(err, "error checking limit classes")
+	}
+
+	if exceededLc != nil {
+		enforced := false
+		var enforcedAt time.Time
+
+		if exceededLc.IsGlobal() {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(int(u.AccountId), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestBandwidthLimitJournalForGlobal(int(u.AccountId), trx); err == nil {
+					enforced = latest.Action == exceededLc.GetLimitAction()
 					enforcedAt = latest.UpdatedAt
 				}
 			}
-
-			if !enforced {
-				_, err := a.str.CreateBandwidthLimitJournalEntry(&store.BandwidthLimitJournalEntry{
-					AccountId: int(u.AccountId),
-					RxBytes:   rxBytes,
-					TxBytes:   txBytes,
-					Action:    store.LimitLimitAction,
-				}, trx)
-				if err != nil {
-					return err
+		} else {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(int(u.AccountId), exceededLc.GetLimitClassId(), trx); err == nil && !empty {
+				if latest, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(int(u.AccountId), exceededLc.GetLimitClassId(), trx); err == nil {
+					enforced = latest.Action == exceededLc.GetLimitAction()
+					enforcedAt = latest.UpdatedAt
 				}
-				acct, err := a.str.GetAccount(int(u.AccountId), trx)
-				if err != nil {
-					return err
-				}
-				for _, action := range a.limitActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-					}
-				}
-				if err := trx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				logrus.Debugf("already enforced limit for account '#%d' at %v", u.AccountId, enforcedAt)
-			}
-
-		} else if warning {
-			warned := false
-			var warnedAt time.Time
-			if empty, err := a.str.IsBandwidthLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestBandwidthLimitJournal(int(u.AccountId), trx); err == nil {
-					warned = latest.Action == store.WarningLimitAction || latest.Action == store.LimitLimitAction
-					warnedAt = latest.UpdatedAt
-				}
-			}
-
-			if !warned {
-				_, err := a.str.CreateBandwidthLimitJournalEntry(&store.BandwidthLimitJournalEntry{
-					AccountId: int(u.AccountId),
-					RxBytes:   rxBytes,
-					TxBytes:   txBytes,
-					Action:    store.WarningLimitAction,
-				}, trx)
-				if err != nil {
-					return err
-				}
-				acct, err := a.str.GetAccount(int(u.AccountId), trx)
-				if err != nil {
-					return err
-				}
-				for _, action := range a.warningActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-					}
-				}
-				if err := trx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				logrus.Debugf("already warned account '#%d' at %v", u.AccountId, warnedAt)
 			}
 		}
-	} else {
-		logrus.Error(err)
+
+		if !enforced {
+			je := &store.BandwidthLimitJournalEntry{
+				AccountId: int(u.AccountId),
+				RxBytes:   rxBytes,
+				TxBytes:   txBytes,
+				Action:    exceededLc.GetLimitAction(),
+			}
+			if !exceededLc.IsGlobal() {
+				lcId := exceededLc.GetLimitClassId()
+				je.LimitClassId = &lcId
+			}
+			_, err := a.str.CreateBandwidthLimitJournalEntry(je, trx)
+
+			if err != nil {
+				return err
+			}
+			acct, err := a.str.GetAccount(int(u.AccountId), trx)
+			if err != nil {
+				return err
+			}
+			switch exceededLc.GetLimitAction() {
+			case store.LimitLimitAction:
+				for _, limitAction := range a.limitActions {
+					if err := limitAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, trx); err != nil {
+						return errors.Wrapf(err, "%v", reflect.TypeOf(limitAction).String())
+					}
+				}
+
+			case store.WarningLimitAction:
+				for _, warningAction := range a.warningActions {
+					if err := warningAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, trx); err != nil {
+						return errors.Wrapf(err, "%v", reflect.TypeOf(warningAction).String())
+					}
+				}
+			}
+			if err := trx.Commit(); err != nil {
+				return err
+			}
+		} else {
+			logrus.Debugf("already enforced limit for account '%d' at %v", u.AccountId, enforcedAt)
+		}
 	}
 
 	return nil
@@ -314,36 +309,77 @@ func (a *Agent) relax() error {
 
 	commit := false
 
-	if aljs, err := a.str.FindAllLatestBandwidthLimitJournal(trx); err == nil {
-		for _, alj := range aljs {
-			if acct, err := a.str.GetAccount(alj.AccountId, trx); err == nil {
-				if alj.Action == store.WarningLimitAction || alj.Action == store.LimitLimitAction {
-					if enforce, warning, rxBytes, txBytes, err := a.checkBandwidthLimit(int64(alj.AccountId)); err == nil {
-						if !enforce && !warning {
-							if alj.Action == store.LimitLimitAction {
-								// run relax actions for account
-								for _, action := range a.relaxActions {
-									if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-							} else {
-								logrus.Infof("relaxing warning for '%v'", acct.Email)
-							}
-							if err := a.str.DeleteBandwidthLimitJournal(acct.Id, trx); err == nil {
-								commit = true
-							} else {
-								logrus.Errorf("error deleting account_limit_journal for '%v': %v", acct.Email, err)
-							}
-						} else {
-							logrus.Infof("account '%v' still over limit", acct.Email)
-						}
-					} else {
-						logrus.Errorf("error checking account limit for '%v': %v", acct.Email, err)
-					}
+	if bwjes, err := a.str.FindAllBandwidthLimitJournal(trx); err == nil {
+		periodBw := make(map[int]struct {
+			rx int64
+			tx int64
+		})
+
+		accounts := make(map[int]*store.Account)
+
+		for _, bwje := range bwjes {
+			if _, found := accounts[bwje.AccountId]; !found {
+				if acct, err := a.str.GetAccount(bwje.AccountId, trx); err == nil {
+					accounts[bwje.AccountId] = acct
+				} else {
+					return err
+				}
+			}
+
+			var bwc store.BandwidthClass
+			if bwje.LimitClassId != nil {
+				globalBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)
+				if bwje.Action == store.WarningLimitAction {
+					bwc = globalBwcs[0]
+				} else {
+					bwc = globalBwcs[1]
 				}
 			} else {
-				logrus.Errorf("error getting account for '#%d': %v", alj.AccountId, err)
+				lc, err := a.str.GetLimitClass(*bwje.LimitClassId, trx)
+				if err != nil {
+					return err
+				}
+				bwc = lc
+			}
+
+			if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
+				rx, tx, err := a.ifx.totalRxTxForAccount(int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
+				if err != nil {
+					return err
+				}
+				periodBw[bwc.GetPeriodMinutes()] = struct {
+					rx int64
+					tx int64
+				}{
+					rx: rx,
+					tx: tx,
+				}
+			}
+
+			used := periodBw[bwc.GetPeriodMinutes()]
+			if !a.limitExceeded(used.rx, used.tx, bwc) {
+				if bwc.GetLimitAction() == store.LimitLimitAction {
+					for _, action := range a.relaxActions {
+						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, trx); err != nil {
+							return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
+						}
+					}
+				} else {
+					logrus.Infof("relaxing warning for '%v'", accounts[bwje.AccountId].Email)
+				}
+				var lcId *int
+				if !bwc.IsGlobal() {
+					newLcId := 0
+					newLcId = bwc.GetLimitClassId()
+					lcId = &newLcId
+				}
+				if err := a.str.DeleteBandwidthLimitJournalEntryForLimitClass(bwje.AccountId, lcId, trx); err == nil {
+					commit = true
+				} else {
+					logrus.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+				}
+			} else {
+				logrus.Infof("account '%v' still over limit: %v", accounts[bwje.AccountId].Email, bwc)
 			}
 		}
 	} else {
@@ -359,44 +395,87 @@ func (a *Agent) relax() error {
 	return nil
 }
 
-func (a *Agent) checkBandwidthLimit(acctId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
-	period := 24 * time.Hour
-	limit := DefaultBandwidthPerPeriod()
-	if a.cfg.Bandwidth != nil {
-		limit = a.cfg.Bandwidth
+func (a *Agent) isOverLimitClass(u *metrics.Usage, alcs []*store.LimitClass) (store.BandwidthClass, int64, int64, error) {
+	periodBw := make(map[int]struct {
+		rx int64
+		tx int64
+	})
+
+	var allBwcs []store.BandwidthClass
+	for _, alc := range alcs {
+		allBwcs = append(allBwcs, alc)
 	}
-	if limit.Period > 0 {
-		period = limit.Period
-	}
-	rx, tx, err := a.ifx.totalRxTxForAccount(acctId, period)
-	if err != nil {
-		logrus.Error(err)
+	for _, globBwc := range newConfigBandwidthClasses(a.cfg.Bandwidth) {
+		allBwcs = append(allBwcs, globBwc)
 	}
 
-	enforce, warning = a.checkLimit(limit, rx, tx)
-	return enforce, warning, rx, tx, nil
+	// find period data for each class
+	for _, bwc := range allBwcs {
+		if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
+			rx, tx, err := a.ifx.totalRxTxForAccount(u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
+			if err != nil {
+				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%d'", u.AccountId)
+			}
+			periodBw[bwc.GetPeriodMinutes()] = struct {
+				rx int64
+				tx int64
+			}{
+				rx: rx,
+				tx: tx,
+			}
+		}
+	}
+
+	// find the highest, most specific limit class that has been exceeded
+	var selectedLc store.BandwidthClass
+	selectedLcPoints := -1
+	var rxBytes int64
+	var txBytes int64
+	for _, bwc := range allBwcs {
+		points := a.bandwidthClassPoints(bwc)
+		if points >= selectedLcPoints {
+			period := periodBw[bwc.GetPeriodMinutes()]
+			if a.limitExceeded(period.rx, period.tx, bwc) {
+				selectedLc = bwc
+				selectedLcPoints = points
+				rxBytes = period.rx
+				txBytes = period.tx
+			}
+		}
+	}
+
+	return selectedLc, rxBytes, txBytes, nil
 }
 
-func (a *Agent) checkLimit(cfg *BandwidthPerPeriod, rx, tx int64) (enforce, warning bool) {
-	if cfg.Limit.Rx != Unlimited && rx > cfg.Limit.Rx {
-		return true, false
+func (a *Agent) bandwidthClassPoints(bwc store.BandwidthClass) int {
+	points := 0
+	if !bwc.IsGlobal() {
+		points++
 	}
-	if cfg.Limit.Tx != Unlimited && tx > cfg.Limit.Tx {
-		return true, false
+	if bwc.GetLimitAction() == store.WarningLimitAction {
+		points++
 	}
-	if cfg.Limit.Total != Unlimited && rx+tx > cfg.Limit.Total {
-		return true, false
+	if bwc.GetLimitAction() == store.LimitLimitAction {
+		points += 2
 	}
+	if bwc.GetShareMode() != "" {
+		points += 5
+	}
+	if bwc.GetBackendMode() != "" {
+		points += 10
+	}
+	return points
+}
 
-	if cfg.Warning.Rx != Unlimited && rx > cfg.Warning.Rx {
-		return false, true
+func (a *Agent) limitExceeded(rx, tx int64, bwc store.BandwidthClass) bool {
+	if bwc.GetTxBytes() != Unlimited && tx >= bwc.GetTxBytes() {
+		return true
 	}
-	if cfg.Warning.Tx != Unlimited && tx > cfg.Warning.Tx {
-		return false, true
+	if bwc.GetRxBytes() != Unlimited && rx >= bwc.GetRxBytes() {
+		return true
 	}
-	if cfg.Warning.Total != Unlimited && rx+tx > cfg.Warning.Total {
-		return false, true
+	if bwc.GetTxBytes() != Unlimited && bwc.GetRxBytes() != Unlimited && tx+rx >= bwc.GetTxBytes()+bwc.GetRxBytes() {
+		return true
 	}
-
-	return false, false
+	return false
 }

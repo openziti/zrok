@@ -23,7 +23,7 @@ func (str *Store) ApplyLimitClass(lc *AppliedLimitClass, trx *sqlx.Tx) (int, err
 	return id, nil
 }
 
-func (str *Store) FindLimitClassesForAccount(acctId int, trx *sqlx.Tx) ([]*LimitClass, error) {
+func (str *Store) FindAppliedLimitClassesForAccount(acctId int, trx *sqlx.Tx) ([]*LimitClass, error) {
 	rows, err := trx.Queryx("select limit_classes.* from applied_limit_classes, limit_classes where applied_limit_classes.account_id = $1 and applied_limit_classes.limit_class_id = limit_classes.id", acctId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding limit classes for account")

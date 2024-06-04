@@ -30,6 +30,10 @@ func (bc *configBandwidthClass) IsGlobal() bool {
 	return true
 }
 
+func (bc *configBandwidthClass) GetLimitClassId() int {
+	return -1
+}
+
 func (bc *configBandwidthClass) GetShareMode() sdk.ShareMode {
 	return ""
 }

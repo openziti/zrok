@@ -19,7 +19,7 @@ func newRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *relaxAction {
 	return &relaxAction{str, zCfg}
 }
 
-func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
+func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, _ store.BandwidthClass, trx *sqlx.Tx) error {
 	logrus.Infof("relaxing '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)

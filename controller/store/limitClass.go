@@ -9,6 +9,7 @@ import (
 
 type BandwidthClass interface {
 	IsGlobal() bool
+	GetLimitClassId() int
 	GetShareMode() sdk.ShareMode
 	GetBackendMode() sdk.BackendMode
 	GetPeriodMinutes() int
@@ -33,35 +34,39 @@ type LimitClass struct {
 	LimitAction    LimitAction
 }
 
-func (lc *LimitClass) IsGlobal() bool {
+func (lc LimitClass) IsGlobal() bool {
 	return false
 }
 
-func (lc *LimitClass) GetShareMode() sdk.ShareMode {
+func (lc LimitClass) GetLimitClassId() int {
+	return lc.Id
+}
+
+func (lc LimitClass) GetShareMode() sdk.ShareMode {
 	return lc.ShareMode
 }
 
-func (lc *LimitClass) GetBackendMode() sdk.BackendMode {
+func (lc LimitClass) GetBackendMode() sdk.BackendMode {
 	return lc.BackendMode
 }
 
-func (lc *LimitClass) GetPeriodMinutes() int {
+func (lc LimitClass) GetPeriodMinutes() int {
 	return lc.PeriodMinutes
 }
 
-func (lc *LimitClass) GetRxBytes() int64 {
+func (lc LimitClass) GetRxBytes() int64 {
 	return lc.RxBytes
 }
 
-func (lc *LimitClass) GetTxBytes() int64 {
+func (lc LimitClass) GetTxBytes() int64 {
 	return lc.TxBytes
 }
 
-func (lc *LimitClass) GetTotalBytes() int64 {
+func (lc LimitClass) GetTotalBytes() int64 {
 	return lc.TotalBytes
 }
 
-func (lc *LimitClass) GetLimitAction() LimitAction {
+func (lc LimitClass) GetLimitAction() LimitAction {
 	return lc.LimitAction
 }
 
@@ -74,6 +79,8 @@ func (lc LimitClass) String() string {
 	return string(out)
 }
 
+var _ BandwidthClass = (*LimitClass)(nil)
+
 func (str *Store) CreateLimitClass(lc *LimitClass, trx *sqlx.Tx) (int, error) {
 	stmt, err := trx.Prepare("insert into limit_classes (share_mode, backend_mode, environments, shares, reserved_shares, unique_names, period_minutes, rx_bytes, tx_bytes, total_bytes, limit_action) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
 	if err != nil {
@@ -84,4 +91,12 @@ func (str *Store) CreateLimitClass(lc *LimitClass, trx *sqlx.Tx) (int, error) {
 		return 0, errors.Wrap(err, "error executing limit_classes insert statement")
 	}
 	return id, nil
+}
+
+func (str *Store) GetLimitClass(lcId int, trx *sqlx.Tx) (*LimitClass, error) {
+	lc := &LimitClass{}
+	if err := trx.QueryRowx("select * from limit_classes where id = $1", lcId).StructScan(lc); err != nil {
+		return nil, errors.Wrap(err, "error selecting limit_class by id")
+	}
+	return lc, nil
 }
