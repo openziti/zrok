@@ -202,16 +202,55 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsBandwidthLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
-			slj, err := a.str.FindLatestBandwidthLimitJournal(shr.Id, trx)
+		env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
+		if err != nil {
+			return false, err
+		}
+		if env.AccountId != nil {
+			alcs, err := a.str.FindAppliedLimitClassesForAccount(*env.AccountId, trx)
 			if err != nil {
 				return false, err
 			}
-			if slj.Action == store.LimitLimitAction {
-				return false, nil
+			maxShares := a.cfg.Shares
+			maxReservedShares := a.cfg.ReservedShares
+			maxUniqueNames := a.cfg.UniqueNames
+			var lcId *int
+			var points = -1
+			for _, alc := range alcs {
+				if a.bandwidthClassPoints(alc) > points {
+					if alc.Shares >= maxShares || alc.ReservedShares >= maxReservedShares || alc.UniqueNames >= maxUniqueNames {
+						maxShares = alc.Shares
+						maxReservedShares = alc.ReservedShares
+						maxUniqueNames = alc.UniqueNames
+						lcId = &alc.Id
+						points = a.bandwidthClassPoints(alc)
+					}
+				}
 			}
-		} else if err != nil {
-			return false, err
+
+			if lcId == nil {
+				if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(*env.AccountId, trx); err == nil && !empty {
+					lj, err := a.str.FindLatestBandwidthLimitJournalForGlobal(*env.AccountId, trx)
+					if err != nil {
+						return false, err
+					}
+					if lj.Action == store.LimitLimitAction {
+						return false, nil
+					}
+				}
+			} else {
+				if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(*env.AccountId, *lcId, trx); err == nil && !empty {
+					lj, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(*env.AccountId, *lcId, trx)
+					if err != nil {
+						return false, err
+					}
+					if lj.Action == store.LimitLimitAction {
+						return false, nil
+					}
+				}
+			}
+		} else {
+			return false, nil
 		}
 	}
 	return true, nil
