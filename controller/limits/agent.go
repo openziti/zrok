@@ -102,28 +102,60 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			}
 		}
 	}
-	
+
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ sdk.ShareMode, _ sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, shareMode sdk.ShareMode, backendMode sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsBandwidthLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestBandwidthLimitJournal(acctId, trx)
-			if err != nil {
-				return false, err
-			}
-			if alj.Action == store.LimitLimitAction {
-				return false, nil
-			}
-		} else if err != nil {
+
+		alcs, err := a.str.FindAppliedLimitClassesForAccount(acctId, trx)
+		if err != nil {
 			return false, err
 		}
+		maxShares := a.cfg.Shares
+		maxReservedShares := a.cfg.ReservedShares
+		maxUniqueNames := a.cfg.UniqueNames
+		var lcId *int
+		var points = -1
+		for _, alc := range alcs {
+			if a.bandwidthClassPoints(alc) > points {
+				if alc.Shares >= maxShares || alc.ReservedShares >= maxReservedShares || alc.UniqueNames >= maxUniqueNames {
+					maxShares = alc.Shares
+					maxReservedShares = alc.ReservedShares
+					maxUniqueNames = alc.UniqueNames
+					lcId = &alc.Id
+					points = a.bandwidthClassPoints(alc)
+				}
+			}
+		}
 
-		if a.cfg.Shares > Unlimited || (reserved && a.cfg.ReservedShares > Unlimited) || (reserved && uniqueName && a.cfg.UniqueNames > Unlimited) {
+		if lcId == nil {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(acctId, trx); err == nil && !empty {
+				lj, err := a.str.FindLatestBandwidthLimitJournalForGlobal(acctId, trx)
+				if err != nil {
+					return false, err
+				}
+				if lj.Action == store.LimitLimitAction {
+					return false, nil
+				}
+			}
+		} else {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(acctId, *lcId, trx); err == nil && !empty {
+				lj, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(acctId, *lcId, trx)
+				if err != nil {
+					return false, err
+				}
+				if lj.Action == store.LimitLimitAction {
+					return false, nil
+				}
+			}
+		}
+
+		if maxShares > Unlimited || (reserved && maxReservedShares > Unlimited) || (reserved && uniqueName && maxUniqueNames > Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
