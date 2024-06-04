@@ -56,19 +56,43 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsBandwidthLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestBandwidthLimitJournal(acctId, trx)
-			if err != nil {
-				return false, err
-			}
-			if alj.Action == store.LimitLimitAction {
-				return false, nil
-			}
-		} else if err != nil {
+
+		alcs, err := a.str.FindAppliedLimitClassesForAccount(acctId, trx)
+		if err != nil {
 			return false, err
 		}
+		maxEnvironments := a.cfg.Environments
+		var lcId *int
+		for _, alc := range alcs {
+			if alc.ShareMode == "" && alc.BackendMode == "" && alc.Environments > maxEnvironments {
+				maxEnvironments = alc.Environments
+				lcId = &alc.Id
+			}
+		}
 
-		if a.cfg.Environments > Unlimited {
+		if lcId == nil {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(acctId, trx); err == nil && !empty {
+				lj, err := a.str.FindLatestBandwidthLimitJournalForGlobal(acctId, trx)
+				if err != nil {
+					return false, err
+				}
+				if lj.Action == store.LimitLimitAction {
+					return false, nil
+				}
+			}
+		} else {
+			if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(acctId, *lcId, trx); err == nil && !empty {
+				lj, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(acctId, *lcId, trx)
+				if err != nil {
+					return false, err
+				}
+				if lj.Action == store.LimitLimitAction {
+					return false, nil
+				}
+			}
+		}
+
+		if maxEnvironments > Unlimited {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
@@ -78,6 +102,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			}
 		}
 	}
+	
 	return true, nil
 }
 
