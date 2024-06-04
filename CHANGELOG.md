@@ -1,9 +1,12 @@
 # CHANGELOG
 
+## v0.4.31
+
+FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
+
 ## v0.4.30
 
 FIX: Fix to the Node.js release process to properly support releasing on a tag.
-FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
 
 ## v0.4.29
 
