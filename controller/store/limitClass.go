@@ -1,11 +1,13 @@
 package store
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 )
+
+const Unlimited = -1
 
 type ResourceCountClass interface {
 	IsGlobal() bool
@@ -14,7 +16,7 @@ type ResourceCountClass interface {
 	GetShares() int
 	GetReservedShares() int
 	GetUniqueNames() int
-	String()
+	String() string
 }
 
 type BandwidthClass interface {
@@ -52,6 +54,22 @@ func (lc LimitClass) GetLimitClassId() int {
 	return lc.Id
 }
 
+func (lc LimitClass) GetEnvironments() int {
+	return lc.Environments
+}
+
+func (lc LimitClass) GetShares() int {
+	return lc.Shares
+}
+
+func (lc LimitClass) GetReservedShares() int {
+	return lc.ReservedShares
+}
+
+func (lc LimitClass) GetUniqueNames() int {
+	return lc.UniqueNames
+}
+
 func (lc LimitClass) GetShareMode() sdk.ShareMode {
 	if lc.ShareMode == nil {
 		return ""
@@ -87,10 +105,39 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 }
 
 func (lc LimitClass) String() string {
-	if out, err := json.Marshal(&lc); err == nil {
-		return "LimitClass<" + string(out) + ">"
+	out := fmt.Sprintf("LimitClass<%d", lc.Id)
+	if lc.ShareMode != nil {
+		out += fmt.Sprintf(", shareMode: '%s'", *lc.ShareMode)
 	}
-	return "<<ERROR>>"
+	if lc.BackendMode != nil {
+		out += fmt.Sprintf(", backendMode: '%s'", *lc.BackendMode)
+	}
+	if lc.Environments > Unlimited {
+		out += fmt.Sprintf(", environments: %d", lc.Environments)
+	}
+	if lc.Shares > Unlimited {
+		out += fmt.Sprintf(", shares: %d", lc.Shares)
+	}
+	if lc.ReservedShares > Unlimited {
+		out += fmt.Sprintf(", reservedShares: %d", lc.ReservedShares)
+	}
+	if lc.UniqueNames > Unlimited {
+		out += fmt.Sprintf(", uniqueNames: %d", lc.UniqueNames)
+	}
+	if lc.RxBytes > Unlimited || lc.TxBytes > Unlimited || lc.TotalBytes > Unlimited {
+		out += fmt.Sprintf(", periodMinutes: %d", lc.PeriodMinutes)
+	}
+	if lc.RxBytes > Unlimited {
+		out += fmt.Sprintf(", rxBytes: %d", lc.RxBytes)
+	}
+	if lc.TxBytes > Unlimited {
+		out += fmt.Sprintf(", txBytes: %d", lc.TxBytes)
+	}
+	if lc.TotalBytes > Unlimited {
+		out += fmt.Sprintf(", totalBytes: %d", lc.TotalBytes)
+	}
+	out += fmt.Sprintf(", limitAction: '%v'>", lc.LimitAction)
+	return out
 }
 
 var _ BandwidthClass = (*LimitClass)(nil)

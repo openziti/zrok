@@ -13,5 +13,7 @@ type userLimits struct {
 }
 
 func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
-	return nil, nil
+	_ = newConfigBandwidthClasses(a.cfg.Bandwidth)
+	userLimits := &userLimits{}
+	return userLimits, nil
 }

@@ -23,16 +23,16 @@ func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int6
 	logrus.Infof("warning '%v'", acct.Email)
 
 	if a.cfg != nil {
-		rxLimit := "(unlimited bytes)"
-		if limit.GetRxBytes() != Unlimited {
+		rxLimit := "(store.Unlimited bytes)"
+		if limit.GetRxBytes() != store.Unlimited {
 			rxLimit = util.BytesToSize(limit.GetRxBytes())
 		}
-		txLimit := "(unlimited bytes)"
-		if limit.GetTxBytes() != Unlimited {
+		txLimit := "(store.Unlimited bytes)"
+		if limit.GetTxBytes() != store.Unlimited {
 			txLimit = util.BytesToSize(limit.GetTxBytes())
 		}
-		totalLimit := "(unlimited bytes)"
-		if limit.GetTotalBytes() != Unlimited {
+		totalLimit := "(store.Unlimited bytes)"
+		if limit.GetTotalBytes() != store.Unlimited {
 			totalLimit = util.BytesToSize(limit.GetTotalBytes())
 		}
 

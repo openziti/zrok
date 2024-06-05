@@ -92,7 +92,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			}
 		}
 
-		if maxEnvironments > Unlimited {
+		if maxEnvironments > store.Unlimited {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
@@ -155,7 +155,7 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, sha
 			}
 		}
 
-		if maxShares > Unlimited || (reserved && maxReservedShares > Unlimited) || (reserved && uniqueName && maxUniqueNames > Unlimited) {
+		if maxShares > store.Unlimited || (reserved && maxReservedShares > store.Unlimited) || (reserved && uniqueName && maxUniqueNames > store.Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
@@ -577,13 +577,13 @@ func (a *Agent) bandwidthClassPoints(bwc store.BandwidthClass) int {
 }
 
 func (a *Agent) limitExceeded(rx, tx int64, bwc store.BandwidthClass) bool {
-	if bwc.GetTxBytes() != Unlimited && tx >= bwc.GetTxBytes() {
+	if bwc.GetTxBytes() != store.Unlimited && tx >= bwc.GetTxBytes() {
 		return true
 	}
-	if bwc.GetRxBytes() != Unlimited && rx >= bwc.GetRxBytes() {
+	if bwc.GetRxBytes() != store.Unlimited && rx >= bwc.GetRxBytes() {
 		return true
 	}
-	if bwc.GetTotalBytes() != Unlimited && tx+rx >= bwc.GetTotalBytes() {
+	if bwc.GetTotalBytes() != store.Unlimited && tx+rx >= bwc.GetTotalBytes() {
 		return true
 	}
 	return false

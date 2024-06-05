@@ -1,8 +1,9 @@
 package limits
 
-import "time"
-
-const Unlimited = -1
+import (
+	"github.com/openziti/zrok/controller/store"
+	"time"
+)
 
 type Config struct {
 	Environments   int
@@ -30,24 +31,24 @@ func DefaultBandwidthPerPeriod() *BandwidthPerPeriod {
 	return &BandwidthPerPeriod{
 		Period: 24 * time.Hour,
 		Warning: &Bandwidth{
-			Rx:    Unlimited,
-			Tx:    Unlimited,
-			Total: Unlimited,
+			Rx:    store.Unlimited,
+			Tx:    store.Unlimited,
+			Total: store.Unlimited,
 		},
 		Limit: &Bandwidth{
-			Rx:    Unlimited,
-			Tx:    Unlimited,
-			Total: Unlimited,
+			Rx:    store.Unlimited,
+			Tx:    store.Unlimited,
+			Total: store.Unlimited,
 		},
 	}
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		Environments:   Unlimited,
-		Shares:         Unlimited,
-		ReservedShares: Unlimited,
-		UniqueNames:    Unlimited,
+		Environments:   store.Unlimited,
+		Shares:         store.Unlimited,
+		ReservedShares: store.Unlimited,
+		UniqueNames:    store.Unlimited,
 		Bandwidth:      DefaultBandwidthPerPeriod(),
 		Enforcing:      false,
 		Cycle:          15 * time.Minute,
