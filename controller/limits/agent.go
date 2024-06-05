@@ -313,17 +313,17 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return nil
 	}
 
-	//shr, err := a.str.FindShareWithTokenEvenIfDeleted(u.ShareToken, trx)
-	//if err != nil {
-	//	return err
-	//}
+	shr, err := a.str.FindShareWithTokenEvenIfDeleted(u.ShareToken, trx)
+	if err != nil {
+		return err
+	}
 
 	ul, err := a.getUserLimits(int(u.AccountId), trx)
 	if err != nil {
 		return err
 	}
 
-	exceededLc, rxBytes, txBytes, err := a.isOverLimitClass(u, ul.bandwidth)
+	exceededLc, rxBytes, txBytes, err := a.isOverLimitClass(u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
 	if err != nil {
 		return errors.Wrap(err, "error checking limit classes")
 	}

@@ -14,6 +14,18 @@ type userLimits struct {
 	scopes    map[sdk.BackendMode]store.BandwidthClass
 }
 
+func (ul *userLimits) toBandwidthArray(backendMode sdk.BackendMode) []store.BandwidthClass {
+	if scopedBwc, found := ul.scopes[backendMode]; found {
+		out := make([]store.BandwidthClass, 0)
+		for _, bwc := range ul.bandwidth {
+			out = append(out, bwc)
+		}
+		out = append(out, scopedBwc)
+		return out
+	}
+	return ul.bandwidth
+}
+
 func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 	resource := newConfigResourceCountClass(a.cfg)
 	cfgBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)
