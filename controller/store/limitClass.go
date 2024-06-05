@@ -7,10 +7,19 @@ import (
 	"github.com/pkg/errors"
 )
 
+type ResourceCountClass interface {
+	IsGlobal() bool
+	GetLimitClassId() int
+	GetEnvironments() int
+	GetShares() int
+	GetReservedShares() int
+	GetUniqueNames() int
+	String()
+}
+
 type BandwidthClass interface {
 	IsGlobal() bool
 	GetLimitClassId() int
-	GetShareMode() sdk.ShareMode
 	GetBackendMode() sdk.BackendMode
 	GetPeriodMinutes() int
 	GetRxBytes() int64
@@ -22,8 +31,8 @@ type BandwidthClass interface {
 
 type LimitClass struct {
 	Model
-	ShareMode      sdk.ShareMode
-	BackendMode    sdk.BackendMode
+	ShareMode      *sdk.ShareMode
+	BackendMode    *sdk.BackendMode
 	Environments   int
 	Shares         int
 	ReservedShares int
@@ -44,11 +53,17 @@ func (lc LimitClass) GetLimitClassId() int {
 }
 
 func (lc LimitClass) GetShareMode() sdk.ShareMode {
-	return lc.ShareMode
+	if lc.ShareMode == nil {
+		return ""
+	}
+	return *lc.ShareMode
 }
 
 func (lc LimitClass) GetBackendMode() sdk.BackendMode {
-	return lc.BackendMode
+	if lc.BackendMode == nil {
+		return ""
+	}
+	return *lc.BackendMode
 }
 
 func (lc LimitClass) GetPeriodMinutes() int {

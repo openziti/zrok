@@ -64,7 +64,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 		maxEnvironments := a.cfg.Environments
 		var lcId *int
 		for _, alc := range alcs {
-			if alc.ShareMode == "" && alc.BackendMode == "" && alc.Environments > maxEnvironments {
+			if alc.ShareMode == nil && alc.BackendMode == nil && alc.Environments > maxEnvironments {
 				maxEnvironments = alc.Environments
 				lcId = &alc.Id
 			}
@@ -569,9 +569,6 @@ func (a *Agent) bandwidthClassPoints(bwc store.BandwidthClass) int {
 	}
 	if bwc.GetLimitAction() == store.LimitLimitAction {
 		points += 2
-	}
-	if bwc.GetShareMode() != "" {
-		points += 5
 	}
 	if bwc.GetBackendMode() != "" {
 		points += 10
