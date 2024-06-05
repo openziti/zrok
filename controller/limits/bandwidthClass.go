@@ -1,6 +1,8 @@
 package limits
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 )
@@ -60,4 +62,11 @@ func (bc *configBandwidthClass) GetTotalBytes() int64 {
 
 func (bc *configBandwidthClass) GetLimitAction() store.LimitAction {
 	return bc.limitAction
+}
+
+func (bc *configBandwidthClass) String() string {
+	if out, err := json.Marshal(bc.bw); err == nil {
+		return fmt.Sprintf("Config<period: %d, %s, action: %s>", bc.periodInMinutes, string(out), bc.limitAction)
+	}
+	return "<<ERROR>>"
 }

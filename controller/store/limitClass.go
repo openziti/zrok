@@ -17,6 +17,7 @@ type BandwidthClass interface {
 	GetTxBytes() int64
 	GetTotalBytes() int64
 	GetLimitAction() LimitAction
+	String() string
 }
 
 type LimitClass struct {
@@ -71,12 +72,10 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 }
 
 func (lc LimitClass) String() string {
-	out, err := json.MarshalIndent(&lc, "", "  ")
-	if err != nil {
-		return ""
-
+	if out, err := json.Marshal(&lc); err == nil {
+		return "LimitClass<" + string(out) + ">"
 	}
-	return string(out)
+	return "<<ERROR>>"
 }
 
 var _ BandwidthClass = (*LimitClass)(nil)

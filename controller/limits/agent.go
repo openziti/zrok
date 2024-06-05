@@ -337,14 +337,24 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				if latest, err := a.str.FindLatestBandwidthLimitJournalForGlobal(int(u.AccountId), trx); err == nil {
 					enforced = latest.Action == exceededLc.GetLimitAction()
 					enforcedAt = latest.UpdatedAt
+					logrus.Debugf("limit '%v' already applied (enforced: %t)", exceededLc, enforced)
+				} else {
+					logrus.Errorf("error getting latest global bandwidth journal entry: %v", err)
 				}
+			} else {
+				logrus.Debugf("no bandwidth limit journal entry for '%v'", exceededLc)
 			}
 		} else {
 			if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(int(u.AccountId), exceededLc.GetLimitClassId(), trx); err == nil && !empty {
 				if latest, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(int(u.AccountId), exceededLc.GetLimitClassId(), trx); err == nil {
 					enforced = latest.Action == exceededLc.GetLimitAction()
 					enforcedAt = latest.UpdatedAt
+					logrus.Debugf("limit '%v' already applied (enforced: %t)", exceededLc, enforced)
+				} else {
+					logrus.Errorf("error getting latest bandwidth limit journal entry for limit class '%d': %v", exceededLc.GetLimitClassId(), err)
 				}
+			} else {
+				logrus.Debugf("no bandwidth limit journal entry for '%v'", exceededLc)
 			}
 		}
 
@@ -423,7 +433,7 @@ func (a *Agent) relax() error {
 			}
 
 			var bwc store.BandwidthClass
-			if bwje.LimitClassId != nil {
+			if bwje.LimitClassId == nil {
 				globalBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)
 				if bwje.Action == store.WarningLimitAction {
 					bwc = globalBwcs[0]
@@ -455,27 +465,30 @@ func (a *Agent) relax() error {
 			used := periodBw[bwc.GetPeriodMinutes()]
 			if !a.limitExceeded(used.rx, used.tx, bwc) {
 				if bwc.GetLimitAction() == store.LimitLimitAction {
+					logrus.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
 					for _, action := range a.relaxActions {
 						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, trx); err != nil {
 							return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 						}
 					}
 				} else {
-					logrus.Infof("relaxing warning for '%v'", accounts[bwje.AccountId].Email)
+					logrus.Infof("relaxing warning '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
 				}
-				var lcId *int
-				if !bwc.IsGlobal() {
-					newLcId := 0
-					newLcId = bwc.GetLimitClassId()
-					lcId = &newLcId
-				}
-				if err := a.str.DeleteBandwidthLimitJournalEntryForLimitClass(bwje.AccountId, lcId, trx); err == nil {
-					commit = true
+				if bwc.IsGlobal() {
+					if err := a.str.DeleteBandwidthLimitJournalEntryForGlobal(bwje.AccountId, trx); err == nil {
+						commit = true
+					} else {
+						logrus.Errorf("error deleting global bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+					}
 				} else {
-					logrus.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+					if err := a.str.DeleteBandwidthLimitJournalEntryForLimitClass(bwje.AccountId, *bwje.LimitClassId, trx); err == nil {
+						commit = true
+					} else {
+						logrus.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+					}
 				}
 			} else {
-				logrus.Infof("account '%v' still over limit: %v", accounts[bwje.AccountId].Email, bwc)
+				logrus.Infof("account '%v' still over limit: '%v' with rx: %d, tx: %d", accounts[bwje.AccountId].Email, bwc, used.rx, used.tx)
 			}
 		}
 	} else {
@@ -536,6 +549,9 @@ func (a *Agent) isOverLimitClass(u *metrics.Usage, alcs []*store.LimitClass) (st
 				selectedLcPoints = points
 				rxBytes = period.rx
 				txBytes = period.tx
+				logrus.Debugf("exceeded limit '%v' with rx: %d, tx: %d", bwc.String(), period.rx, period.tx)
+			} else {
+				logrus.Debugf("limit '%v' ok with rx: %d, tx: %d", bwc.String(), period.rx, period.tx)
 			}
 		}
 	}
@@ -570,7 +586,7 @@ func (a *Agent) limitExceeded(rx, tx int64, bwc store.BandwidthClass) bool {
 	if bwc.GetRxBytes() != Unlimited && rx >= bwc.GetRxBytes() {
 		return true
 	}
-	if bwc.GetTxBytes() != Unlimited && bwc.GetRxBytes() != Unlimited && tx+rx >= bwc.GetTxBytes()+bwc.GetRxBytes() {
+	if bwc.GetTotalBytes() != Unlimited && tx+rx >= bwc.GetTotalBytes() {
 		return true
 	}
 	return false
