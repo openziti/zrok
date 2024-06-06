@@ -379,14 +379,14 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 			switch exceededLc.GetLimitAction() {
 			case store.LimitLimitAction:
 				for _, limitAction := range a.limitActions {
-					if err := limitAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, trx); err != nil {
+					if err := limitAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, ul, trx); err != nil {
 						return errors.Wrapf(err, "%v", reflect.TypeOf(limitAction).String())
 					}
 				}
 
 			case store.WarningLimitAction:
 				for _, warningAction := range a.warningActions {
-					if err := warningAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, trx); err != nil {
+					if err := warningAction.HandleAccount(acct, rxBytes, txBytes, exceededLc, ul, trx); err != nil {
 						return errors.Wrapf(err, "%v", reflect.TypeOf(warningAction).String())
 					}
 				}
@@ -420,11 +420,18 @@ func (a *Agent) relax() error {
 		})
 
 		accounts := make(map[int]*store.Account)
+		uls := make(map[int]*userLimits)
 
 		for _, bwje := range bwjes {
 			if _, found := accounts[bwje.AccountId]; !found {
 				if acct, err := a.str.GetAccount(bwje.AccountId, trx); err == nil {
 					accounts[bwje.AccountId] = acct
+					ul, err := a.getUserLimits(acct.Id, trx)
+					if err != nil {
+						return errors.Wrapf(err, "error getting user limits for '%v'", acct.Email)
+					}
+					uls[bwje.AccountId] = ul
+
 				} else {
 					return err
 				}
@@ -465,7 +472,7 @@ func (a *Agent) relax() error {
 				if bwc.GetLimitAction() == store.LimitLimitAction {
 					logrus.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
 					for _, action := range a.relaxActions {
-						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, trx); err != nil {
+						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, uls[bwje.AccountId], trx); err != nil {
 							return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 						}
 					}
@@ -486,7 +493,7 @@ func (a *Agent) relax() error {
 					}
 				}
 			} else {
-				logrus.Infof("account '%v' still over limit: '%v' with rx: %d, tx: %d", accounts[bwje.AccountId].Email, bwc, used.rx, used.tx)
+				logrus.Infof("account '%v' still over limit: '%v' with rx: %d, tx: %d, total: %d", accounts[bwje.AccountId].Email, bwc, used.rx, used.tx, used.rx+used.tx)
 			}
 		}
 	} else {

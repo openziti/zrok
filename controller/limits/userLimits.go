@@ -26,6 +26,19 @@ func (ul *userLimits) toBandwidthArray(backendMode sdk.BackendMode) []store.Band
 	return ul.bandwidth
 }
 
+func (ul *userLimits) ignoreBackends(bwc store.BandwidthClass) map[sdk.BackendMode]bool {
+	if bwc.IsScoped() {
+		ignoreBackends := make(map[sdk.BackendMode]bool)
+		for backendMode := range ul.scopes {
+			if backendMode != bwc.GetBackendMode() {
+				ignoreBackends[backendMode] = true
+			}
+		}
+		return ignoreBackends
+	}
+	return nil
+}
+
 func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 	resource := newConfigResourceCountClass(a.cfg)
 	cfgBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)

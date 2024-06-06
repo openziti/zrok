@@ -19,7 +19,7 @@ func newRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *relaxAction {
 	return &relaxAction{str, zCfg}
 }
 
-func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, _ store.BandwidthClass, trx *sqlx.Tx) error {
+func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, _ *userLimits, trx *sqlx.Tx) error {
 	logrus.Infof("relaxing '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
@@ -39,14 +39,17 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, _ store.Ban
 		}
 
 		for _, shr := range shrs {
-			switch shr.ShareMode {
-			case string(sdk.PublicShareMode):
-				if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
-					return errors.Wrap(err, "error relaxing public share")
-				}
-			case string(sdk.PrivateShareMode):
-				if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
-					return errors.Wrap(err, "error relaxing private share")
+			// TODO: when relaxing unscoped classes; need to not relax other scoped limits
+			if !bwc.IsScoped() || bwc.GetBackendMode() == sdk.BackendMode(shr.BackendMode) {
+				switch shr.ShareMode {
+				case string(sdk.PublicShareMode):
+					if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
+						return errors.Wrap(err, "error relaxing public share")
+					}
+				case string(sdk.PrivateShareMode):
+					if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
+						return errors.Wrap(err, "error relaxing private share")
+					}
 				}
 			}
 		}

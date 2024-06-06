@@ -1,7 +1,6 @@
 package limits
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -30,6 +29,10 @@ func newConfigBandwidthClasses(cfg *BandwidthPerPeriod) []store.BandwidthClass {
 
 func (bc *configBandwidthClass) IsGlobal() bool {
 	return true
+}
+
+func (bc *configBandwidthClass) IsScoped() bool {
+	return false
 }
 
 func (bc *configBandwidthClass) GetLimitClassId() int {
@@ -65,8 +68,16 @@ func (bc *configBandwidthClass) GetLimitAction() store.LimitAction {
 }
 
 func (bc *configBandwidthClass) String() string {
-	if out, err := json.Marshal(bc.bw); err == nil {
-		return fmt.Sprintf("Config<period: %d, %s, action: %s>", bc.periodInMinutes, string(out), bc.limitAction)
+	out := fmt.Sprintf("ConfigClass<periodMinutes: %d", bc.periodInMinutes)
+	if bc.bw.Rx > store.Unlimited {
+		out += fmt.Sprintf(", rxBytes: %d", bc.bw.Rx)
 	}
-	return "<<ERROR>>"
+	if bc.bw.Tx > store.Unlimited {
+		out += fmt.Sprintf(", txBytes: %d", bc.bw.Tx)
+	}
+	if bc.bw.Total > store.Unlimited {
+		out += fmt.Sprintf(", totalBytes: %d", bc.bw.Total)
+	}
+	out += fmt.Sprintf(", limitAction: %s>", bc.limitAction)
+	return out
 }

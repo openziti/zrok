@@ -9,26 +9,29 @@ import (
 
 const Unlimited = -1
 
-type ResourceCountClass interface {
+type BaseLimitClass interface {
 	IsGlobal() bool
 	GetLimitClassId() int
+	String() string
+}
+
+type ResourceCountClass interface {
+	BaseLimitClass
 	GetEnvironments() int
 	GetShares() int
 	GetReservedShares() int
 	GetUniqueNames() int
-	String() string
 }
 
 type BandwidthClass interface {
-	IsGlobal() bool
-	GetLimitClassId() int
+	BaseLimitClass
+	IsScoped() bool
 	GetBackendMode() sdk.BackendMode
 	GetPeriodMinutes() int
 	GetRxBytes() int64
 	GetTxBytes() int64
 	GetTotalBytes() int64
 	GetLimitAction() LimitAction
-	String() string
 }
 
 type LimitClass struct {
@@ -48,6 +51,10 @@ type LimitClass struct {
 
 func (lc LimitClass) IsGlobal() bool {
 	return false
+}
+
+func (lc LimitClass) IsScoped() bool {
+	return lc.BackendMode != nil
 }
 
 func (lc LimitClass) GetLimitClassId() int {
@@ -105,7 +112,7 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 }
 
 func (lc LimitClass) String() string {
-	out := fmt.Sprintf("LimitClass<%d", lc.Id)
+	out := fmt.Sprintf("LimitClass<id: %d", lc.Id)
 	if lc.ShareMode != nil {
 		out += fmt.Sprintf(", shareMode: '%s'", *lc.ShareMode)
 	}
