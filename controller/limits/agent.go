@@ -323,7 +323,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return err
 	}
 
-	exceededLc, rxBytes, txBytes, err := a.isOverLimitClass(u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
+	exceededLc, rxBytes, txBytes, err := a.hasExceededBandwidthLimit(u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
 	if err != nil {
 		return errors.Wrap(err, "error checking limit classes")
 	}
@@ -369,9 +369,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				lcId := exceededLc.GetLimitClassId()
 				je.LimitClassId = &lcId
 			}
-			_, err := a.str.CreateBandwidthLimitJournalEntry(je, trx)
-
-			if err != nil {
+			if _, err := a.str.CreateBandwidthLimitJournalEntry(je, trx); err != nil {
 				return err
 			}
 			acct, err := a.str.GetAccount(int(u.AccountId), trx)
@@ -504,7 +502,7 @@ func (a *Agent) relax() error {
 	return nil
 }
 
-func (a *Agent) isOverLimitClass(u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
+func (a *Agent) hasExceededBandwidthLimit(u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
 	periodBw := make(map[int]struct {
 		rx int64
 		tx int64
