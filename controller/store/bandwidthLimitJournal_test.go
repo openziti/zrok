@@ -38,7 +38,6 @@ func TestBandwidthLimitJournal(t *testing.T) {
 	assert.Equal(t, int64(2048), latestJe.TxBytes)
 
 	lc := &LimitClass{
-		ShareMode:     new(sdk.ShareMode),
 		BackendMode:   new(sdk.BackendMode),
 		PeriodMinutes: 60,
 		RxBytes:       4096,
@@ -46,7 +45,6 @@ func TestBandwidthLimitJournal(t *testing.T) {
 		TotalBytes:    10240,
 		LimitAction:   LimitLimitAction,
 	}
-	*lc.ShareMode = sdk.PrivateShareMode
 	*lc.BackendMode = sdk.ProxyBackendMode
 	lcId, err := str.CreateLimitClass(lc, trx)
 	assert.NoError(t, err)
