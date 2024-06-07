@@ -106,13 +106,6 @@ func (str *Store) FindAllLatestBandwidthLimitJournal(trx *sqlx.Tx) ([]*Bandwidth
 	return jes, nil
 }
 
-func (str *Store) DeleteBandwidthLimitJournal(acctId int, trx *sqlx.Tx) error {
-	if _, err := trx.Exec("delete from bandwidth_limit_journal where account_id = $1", acctId); err != nil {
-		return errors.Wrapf(err, "error deleting from bandwidth_limit_journal for account_id = %d", acctId)
-	}
-	return nil
-}
-
 func (str *Store) DeleteBandwidthLimitJournalEntryForGlobal(acctId int, trx *sqlx.Tx) error {
 	if _, err := trx.Exec("delete from bandwidth_limit_journal where account_id = $1 and limit_class_id is null", acctId); err != nil {
 		return errors.Wrapf(err, "error deleting from bandwidth_limit_journal for account_id = %d and limit_class_id is null", acctId)
