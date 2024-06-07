@@ -35,6 +35,12 @@ func (ul *userLimits) ignoreBackends(bwc store.BandwidthClass) map[sdk.BackendMo
 			}
 		}
 		return ignoreBackends
+	} else {
+		ignoreBackends := make(map[sdk.BackendMode]bool)
+		for backendMode := range ul.scopes {
+			ignoreBackends[backendMode] = true
+		}
+		return ignoreBackends
 	}
 	return nil
 }
