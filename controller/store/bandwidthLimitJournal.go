@@ -90,6 +90,22 @@ func (str *Store) FindAllBandwidthLimitJournal(trx *sqlx.Tx) ([]*BandwidthLimitJ
 	return jes, nil
 }
 
+func (str *Store) FindAllLatestBandwidthLimitJournalForAccount(acctId int, trx *sqlx.Tx) ([]*BandwidthLimitJournalEntry, error) {
+	rows, err := trx.Queryx("select * from bandwidth_limit_journal where account_id = $1", acctId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding all for account from bandwidth_limit_journal")
+	}
+	var jes []*BandwidthLimitJournalEntry
+	for rows.Next() {
+		je := &BandwidthLimitJournalEntry{}
+		if err := rows.StructScan(je); err != nil {
+			return nil, errors.Wrap(err, "error scanning bandwidth_limit_journal")
+		}
+		jes = append(jes, je)
+	}
+	return jes, nil
+}
+
 func (str *Store) FindAllLatestBandwidthLimitJournal(trx *sqlx.Tx) ([]*BandwidthLimitJournalEntry, error) {
 	rows, err := trx.Queryx("select id, account_id, limit_class_id, action, rx_bytes, tx_bytes, created_at, updated_at from bandwidth_limit_journal where id in (select max(id) as id from bandwidth_limit_journal group by account_id)")
 	if err != nil {

@@ -27,6 +27,23 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
 	}
 
+	jes, err := a.str.FindAllLatestBandwidthLimitJournalForAccount(acct.Id, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding latest bandwidth limit journal entries for account '%v'", acct.Email)
+	}
+	limitedBackends := make(map[sdk.BackendMode]bool)
+	for _, je := range jes {
+		if je.LimitClassId != nil {
+			lc, err := a.str.GetLimitClass(*je.LimitClassId, trx)
+			if err != nil {
+				return err
+			}
+			if lc.BackendMode != nil && lc.LimitAction == store.LimitLimitAction {
+				limitedBackends[*lc.BackendMode] = true
+			}
+		}
+	}
+
 	edge, err := zrokEdgeSdk.Client(a.zCfg)
 	if err != nil {
 		return err
@@ -39,8 +56,8 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		}
 
 		for _, shr := range shrs {
-			// TODO: when relaxing unscoped classes; need to not relax other scoped limits
-			if !bwc.IsScoped() || bwc.GetBackendMode() == sdk.BackendMode(shr.BackendMode) {
+			_, stayLimited := limitedBackends[sdk.BackendMode(shr.BackendMode)]
+			if (!bwc.IsScoped() && !stayLimited) || bwc.GetBackendMode() == sdk.BackendMode(shr.BackendMode) {
 				switch shr.ShareMode {
 				case string(sdk.PublicShareMode):
 					if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
