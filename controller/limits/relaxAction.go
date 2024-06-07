@@ -44,11 +44,11 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 				switch shr.ShareMode {
 				case string(sdk.PublicShareMode):
 					if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
-						return errors.Wrap(err, "error relaxing public share")
+						logrus.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				case string(sdk.PrivateShareMode):
 					if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
-						return errors.Wrap(err, "error relaxing private share")
+						logrus.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				}
 			}

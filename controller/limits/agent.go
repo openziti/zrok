@@ -87,14 +87,23 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 			return false, err
 		}
 
-		bwcs := ul.toBandwidthArray(backendMode)
-		for _, bwc := range bwcs {
-			latestJe, err := a.isBandwidthClassLimitedForAccount(acctId, bwc, trx)
+		if scopedBwc, found := ul.scopes[backendMode]; found {
+			latestScopedJe, err := a.isBandwidthClassLimitedForAccount(acctId, scopedBwc, trx)
 			if err != nil {
 				return false, err
 			}
-			if latestJe != nil {
+			if latestScopedJe != nil {
 				return false, nil
+			}
+		} else {
+			for _, bwc := range ul.bandwidth {
+				latestJe, err := a.isBandwidthClassLimitedForAccount(acctId, bwc, trx)
+				if err != nil {
+					return false, err
+				}
+				if latestJe != nil {
+					return false, nil
+				}
 			}
 		}
 
