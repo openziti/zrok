@@ -11,7 +11,7 @@ import (
 type userLimits struct {
 	resource  store.ResourceCountClass
 	bandwidth []store.BandwidthClass
-	scopes    map[sdk.BackendMode]store.BandwidthClass
+	scopes    map[sdk.BackendMode]*store.LimitClass
 }
 
 func (ul *userLimits) toBandwidthArray(backendMode sdk.BackendMode) []store.BandwidthClass {
@@ -50,7 +50,7 @@ func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 	cfgBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)
 	bwWarning := cfgBwcs[0]
 	bwLimit := cfgBwcs[1]
-	scopes := map[sdk.BackendMode]store.BandwidthClass{}
+	scopes := make(map[sdk.BackendMode]*store.LimitClass)
 
 	alcs, err := a.str.FindAppliedLimitClassesForAccount(acctId, trx)
 	if err != nil {
@@ -65,10 +65,10 @@ func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 			} else {
 				bwLimit = alc
 			}
-		} else if a.isScopedBandwidthClass(alc) {
+		} else if a.isScopedLimitClass(alc) {
 			scopes[*alc.BackendMode] = alc
 		} else {
-			logrus.Warnf("unknown type of limit class '%v'", alc)
+			logrus.Warnf("unknown type of limit class '%v' for account '#%d'", alc, acctId)
 		}
 	}
 
@@ -107,11 +107,11 @@ func (a *Agent) isUnscopedBandwidthClass(alc *store.LimitClass) bool {
 	return true
 }
 
-func (a *Agent) isScopedBandwidthClass(alc *store.LimitClass) bool {
+func (a *Agent) isScopedLimitClass(alc *store.LimitClass) bool {
 	if alc.BackendMode == nil {
 		return false
 	}
-	if alc.Environments > store.Unlimited || alc.Shares > store.Unlimited || alc.ReservedShares > store.Unlimited || alc.UniqueNames > store.Unlimited {
+	if alc.Environments > store.Unlimited {
 		return false
 	}
 	if alc.PeriodMinutes < 1 {

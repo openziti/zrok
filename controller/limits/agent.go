@@ -107,7 +107,11 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 			}
 		}
 
-		if ul.resource.GetShares() > store.Unlimited || (reserved && ul.resource.GetReservedShares() > store.Unlimited) || (reserved && uniqueName && ul.resource.GetUniqueNames() > store.Unlimited) {
+		rc := ul.resource
+		if scopeRc, found := ul.scopes[backendMode]; found {
+			rc = scopeRc
+		}
+		if rc.GetShares() > store.Unlimited || (reserved && rc.GetReservedShares() > store.Unlimited) || (reserved && uniqueName && rc.GetUniqueNames() > store.Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
@@ -129,15 +133,15 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 						uniqueNames++
 					}
 				}
-				if total+1 > ul.resource.GetShares() {
+				if total+1 > rc.GetShares() {
 					logrus.Debugf("account '%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
 					return false, nil
 				}
-				if reserved && reserveds+1 > ul.resource.GetReservedShares() {
+				if reserved && reserveds+1 > rc.GetReservedShares() {
 					logrus.Debugf("account '%v', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
 					return false, nil
 				}
-				if reserved && uniqueName && uniqueNames+1 > ul.resource.GetUniqueNames() {
+				if reserved && uniqueName && uniqueNames+1 > rc.GetUniqueNames() {
 					logrus.Debugf("account '%v', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
 					return false, nil
 				}
