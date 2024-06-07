@@ -54,9 +54,12 @@ fi
   exit 1
 }
 
-# default mode is reserved (public), override mode is temp-public, i.e., "share public" without a reserved subdomain
+# default mode is 'temp-public' (unreserved), override modes are temp-private, reserver-public, reserved-private.
+: "${ZROK_FRONTEND_MODE:-temp-public}"
 if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   ZROK_CMD="share public --headless ${ZROK_VERBOSE:-}"
+elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
+  ZROK_CMD="share private --headless ${ZROK_VERBOSE:-}"
 elif [[ -s ~/.zrok/reserved.json ]]; then
   ZROK_RESERVED_TOKEN="$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)"
   if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
@@ -73,8 +76,13 @@ elif [[ -s ~/.zrok/reserved.json ]]; then
       exit 0
     fi
   fi
-else
+elif [[ "${ZROK_FRONTEND_MODE:-}" == reserved-public ]]; then
   ZROK_CMD="reserve public --json-output ${ZROK_VERBOSE:-}"
+elif [[ "${ZROK_FRONTEND_MODE:-}" == reserved-private ]]; then
+  ZROK_CMD="reserve private --json-output ${ZROK_VERBOSE:-}"
+else
+  echo "ERROR: invalid value for ZROK_FRONTEND_MODE '${ZROK_FRONTEND_MODE}'" >&2
+  exit 1
 fi
 
 [[ -n "${ZROK_BACKEND_MODE:-}" ]] || {
@@ -88,12 +96,12 @@ case "${ZROK_BACKEND_MODE}" in
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an HTTP URL" >&2
       exit 1
     else
-      echo "INFO: validated backend mode ${ZROK_BACKEND_MODE} and target ${ZROK_TARGET}"
+      echo "INFO: validated backend mode '${ZROK_BACKEND_MODE}' and target '${ZROK_TARGET}'"
     fi
     ;;
   caddy)
     if ! [[ "${ZROK_TARGET}" =~ ^/ ]]; then
-      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path." >&2
+      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path" >&2
       exit 1
     elif ! [[ -f "${ZROK_TARGET}" && -r "${ZROK_TARGET}" ]]; then
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not a readable regular file" >&2
@@ -104,7 +112,7 @@ case "${ZROK_BACKEND_MODE}" in
     ;;
   web|drive)
     if ! [[ "${ZROK_TARGET}" =~ ^/ ]]; then
-      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path." >&2
+      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path" >&2
       exit 1
     elif ! [[ -d "${ZROK_TARGET}" && -r "${ZROK_TARGET}" ]]; then
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not a readable directory" >&2
@@ -142,8 +150,9 @@ fi
 
 echo "INFO: running: zrok ${ZROK_CMD}"
 
-if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
-  # share until exit
+if [[ "${ZROK_FRONTEND_MODE:-}" =~ ^temp- ]]; then
+  # frontend mode starts with 'temp-', so is temporary.
+  # share without reserving until exit.
   exec zrok ${ZROK_CMD}
 else
   # reserve and continue
