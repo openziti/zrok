@@ -3,7 +3,6 @@
 create table limit_classes (
     id                  integer                  primary key,
 
-    share_mode          string,
     backend_mode        string,
 
     environments        integer                 not null default (-1),
@@ -30,3 +29,6 @@ create table applied_limit_classes (
     updated_at          datetime                not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
     deleted             boolean                 not null default(false)
 );
+
+create index applied_limit_classes_account_id_idx on applied_limit_classes (account_id);
+create index applied_limit_classes_limit_class_id_idx on applied_limit_classes (limit_class_id);

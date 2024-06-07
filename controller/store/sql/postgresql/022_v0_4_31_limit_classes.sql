@@ -5,7 +5,6 @@ create type limit_action as enum ('warning', 'limit');
 create table limit_classes (
     id                  serial                  primary key,
 
-    share_mode          share_mode,
     backend_mode        backend_mode,
 
     environments        int                     not null default (-1),
@@ -32,3 +31,6 @@ create table applied_limit_classes (
     updated_at          timestamptz             not null default(current_timestamp),
     deleted             boolean                 not null default(false)
 );
+
+create index applied_limit_classes_account_id_idx on applied_limit_classes (account_id);
+create index applied_limit_classes_limit_class_id_idx on applied_limit_classes (limit_class_id);
