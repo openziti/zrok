@@ -105,13 +105,13 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			}
 			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
 				if !panicInstead {
-					tui.Error("unable to update backend proxy endpoint", err)
+					tui.Error("unable to update backend target", err)
 				}
 				panic(err)
 			}
-			logrus.Infof("updated backend proxy endpoint to: %v", target)
+			logrus.Infof("updated backend target to: %v", target)
 		} else {
-			logrus.Infof("using existing backend proxy endpoint: %v", target)
+			logrus.Infof("using existing backend target: %v", target)
 		}
 	}
 
