@@ -4,6 +4,8 @@
 
 FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
 
+CHANGE: log messages that said "backend proxy endpoint" were clarified to say "backend target"
+
 ## v0.4.30
 
 FIX: Fix to the Node.js release process to properly support releasing on a tag.
