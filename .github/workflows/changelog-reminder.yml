@@ -7,9 +7,9 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Changelog Reminder
-      uses: peterjgrainger/action-changelog-reminder@v1.3.0
+      uses: netfoundry/action-changelog-reminder@main
       with:
-        changelog_regex: '/CHANGELOG\.md'
+        changelog_regex: '/CHANGELOG\.md/'
         customPrMessage: 'Please update CHANGELOG.md if appropriate.'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
