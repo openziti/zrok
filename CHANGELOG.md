@@ -5,6 +5,7 @@
 FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
 
 CHANGE: log messages that said "backend proxy endpoint" were clarified to say "backend target"
+CHANGE: add changelog reminder bot
 
 ## v0.4.30
 

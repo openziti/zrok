@@ -1,0 +1,17 @@
+on: pull_request
+name: Changelog Reminder
+permissions:
+  pull-requests: write
+jobs:
+  remind:
+    name: Changelog Reminder
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Changelog Reminder
+      uses: netfoundry/action-changelog-reminder@main
+      with:
+        changelog_regex: CHANGELOG\.md
+        customPrMessage: Did you forget to update CHANGELOG.md?
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
