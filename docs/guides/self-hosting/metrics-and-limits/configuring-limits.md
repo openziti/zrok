@@ -78,6 +78,32 @@ Bandwidth limits can be specified in terms of `tx` (or _transmitted_ data), `rx`
 
 The `period` specifies the time window for the bandwidth limit. See the documentation for [`time.Duration.ParseDuration`](https://pkg.go.dev/time#ParseDuration) for details about the format used for these durations. If the `period` is set to 5 minutes, then the limits agent will monitor the transmitted and receivde traffic for the account for the last 5 minutes, and if the amount of data is greater than either the `warning` or the `limit` threshold, action will be taken.
 
+## Limit Classes
+
+The zrok limits agent includes a concept called _limit classes_. Limit classes can be used to define resource count and bandwidth limits that can be selectively applied to individual accounts in a service instance.
+
+Limit classes are created by creating a record in the `limit_classes` table in the zrok controller database. The table has this schema:
+
+```
+                                         Table "public.limit_classes"
+     Column      |           Type           | Collation | Nullable |                  Default                  
+-----------------+--------------------------+-----------+----------+-------------------------------------------
+ id              | integer                  |           | not null | nextval('limit_classes_id_seq'::regclass)
+ backend_mode    | backend_mode             |           |          | 
+ environments    | integer                  |           | not null | '-1'::integer
+ shares          | integer                  |           | not null | '-1'::integer
+ reserved_shares | integer                  |           | not null | '-1'::integer
+ unique_names    | integer                  |           | not null | '-1'::integer
+ period_minutes  | integer                  |           | not null | 1440
+ rx_bytes        | bigint                   |           | not null | '-1'::integer
+ tx_bytes        | bigint                   |           | not null | '-1'::integer
+ total_bytes     | bigint                   |           | not null | '-1'::integer
+ limit_action    | limit_action             |           | not null | 'limit'::limit_action
+ created_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ deleted         | boolean                  |           | not null | false
+```
+
 ## Limit Actions
 
 When an account exceeds a bandwidth limit, the limits agent will seek to limit the affected shares (based on the combination of global configuration, unscoped limit classes, and scoped limit classes). It applies the limit by removing the underlying OpenZiti dial policies for any frontends that are trying to access the share.
