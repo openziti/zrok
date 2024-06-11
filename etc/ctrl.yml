@@ -74,7 +74,7 @@ invites:
   #
   token_contact:                  invite@zrok.io
 
-# Service instance limits configuration.
+# Service instance limits global configuration.
 #
 # See `docs/guides/metrics-and-limits/configuring-limits.md` for details.
 #

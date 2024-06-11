@@ -6,48 +6,53 @@ sidebar_position: 40
 
 > If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.
 
-The limits facility in `zrok` is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured thresholds.
+:::note
+This guide is current as of zrok version `v0.4.31`.
+:::
 
-Take this `zrok` controller configuration stanza as an example:
+The limits facility in zrok is used to control the amount of resources that can be consumed by any account in a service instance. 
+
+Limits can be specified that control the number of environments, shares, reserved shares, and unique names. Limits that control the number of resources are called _resource count limits_.
+
+Limits can be specified that control the amount of data that can be transferred for different types of share backend modes. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
+
+The limits facility in zrok is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured thresholds.
+
+zrok limits can be specified _globally_, applying to all users in a service instance. Individual limits can be specified and applied to individual accounts using a new facility called _limit classes_. Limit classes can be used to specify resource count and bandwidth limit defaults per-account. Separate limits for each type share backend can also be specified and applied to user accounts.
+
+## The Global Configuration
+
+The reference configuration for the zrok controller (found at [`etc/ctrl.yaml`](https://github.com/openziti/zrok/blob/main/etc/ctrl.yml) in the [repository](https://github.com/openziti/zrok)) contains the global limits configuration, which looks like this:
 
 ```yaml
+# Service instance limits global configuration.
+#
+# See `docs/guides/metrics-and-limits/configuring-limits.md` for details.
+#
 limits:
-  enforcing:        true
-  cycle:            1m
   environments:     -1
   shares:           -1
+  reserved_shares:  -1
+  unique_names:     -1
   bandwidth:
-    per_account:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      7242880
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      10485760
-    per_environment:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
-    per_share:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
+    period:         5m
+    warning:
+      rx:           -1
+      tx:           -1
+      total:        7242880
+    limit:
+      rx:           -1
+      tx:           -1
+      total:        10485760
+  enforcing:        false
+  cycle:            5m
 ```
+
+The `environments`, `shares`, `reserved_shares`, and `unique_names` specify the resource count limits, globally for the service instance. 
+
+:::note
+A value of `-1` appearing in the limits configuration mean the value is _unlimited_.
+:::
 
 ## The Global Controls
 
