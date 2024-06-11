@@ -173,9 +173,9 @@ The `accounts` table in the database includes a `limitless` column. When this co
 
 ## Experimental Limits Locking
 
-zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the race). 
+zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the limits race). 
 
-This was due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implemention.
+This occurs due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implemention.
 
 If you're running PostgreSQL for your service instance and you want to enable the new experimental locking facility that eliminates the potential resource count race condition, add the `enable_locking: true` flag to your `store` definition:
 
