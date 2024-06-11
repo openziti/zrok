@@ -4,10 +4,12 @@ sidebar_position: 40
 
 # Configuring Limits
 
-> If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.
-
 :::note
 This guide is current as of zrok version `v0.4.31`.
+:::
+
+:::warning
+If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.
 :::
 
 The limits facility in zrok is used to control the amount of resources that can be consumed by any account in a service instance. 
@@ -48,27 +50,26 @@ limits:
   cycle:            5m
 ```
 
-The `environments`, `shares`, `reserved_shares`, and `unique_names` specify the resource count limits, globally for the service instance. 
-
 :::note
 A value of `-1` appearing in the limits configuration mean the value is _unlimited_.
 :::
 
-## The Global Controls
+The `enforcing` boolean specifies whether or not limits are enabled in the service instance. By default, limits is disabled. No matter what else is configured in this stanza, if `enforcing` is set to `false`, there will be no limits placed on any account in the service instance.
 
-The `enforcing` boolean will globally enable or disable limits for the controller.
+The `cycle` value controls how frequently the limits agent will evaluate enforced limits. When a user exceeds a limit and has their shares disabled, the limits agent will evaluate their bandwidth usage on this interval looking to "relax" the limit once their usage falls below the threshold.
 
-The `cycle` value controls how frequently the limits system will look for limited resources to re-enable.
+### Global Resouce Count Limits
 
-## Resource Limits
+The `environments`, `shares`, `reserved_shares`, and `unique_names` specify the resource count limits, globally for the service instance. 
 
-The `environments` and `shares` values control the number of environments and shares that are allowed per-account. Any limit value can be set to `-1`, which means _unlimited_.
+These resource counts will be applied to all users in the service instance by default.
 
-## Bandwidth Limits
+## Global Bandwidth Limits
+
+The `bandwidth` section defines the global bandwidth limits for all users in the service instance.
 
 The `bandwidth` section is designed to provide a configurable system for controlling the amount of data transfer that can be performed by users of the `zrok` service instance. The bandwidth limits are configurable for each share, environment, and account.
 
-`per_account`, `per_environment`, and `per_share` are all configured the same way:
 
 The `period` specifies the time window for the bandwidth limit. See the documentation for [`time.Duration.ParseDuration`](https://pkg.go.dev/time#ParseDuration) for details about the format used for these durations. If the `period` is set to 5 minutes, then the limits implementation will monitor the send and receive traffic for the resource (share, environment, or account) for the last 5 minutes, and if the amount of data is greater than either the `warning` or the `limit` threshold, action will be taken.
 
