@@ -171,6 +171,19 @@ This means that public frontends will simply return a `404` as if the share is n
 
 The `accounts` table in the database includes a `limitless` column. When this column is set to `true` the account is not subject to any of the limits in the system.
 
+## Experimental Limits Locking
+
+zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the race). 
+
+This was due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implemention.
+
+If you're running PostgreSQL for your service instance and you want to enable the new experimental locking facility that eliminates the potential resource count race condition, add the `enable_locking: true` flag to your `store` definition:
+
+```yaml
+store:
+  enable_locking: true
+```
+
 ## Caveats
 
 There are a number of caveats that are important to understand when using the limits agent with more complicated limits scenarios:
