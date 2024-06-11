@@ -54,8 +54,8 @@ fi
   exit 1
 }
 
-# default mode is 'temp-public' (unreserved), override modes are temp-private, reserver-public, reserved-private.
-: "${ZROK_FRONTEND_MODE:-temp-public}"
+# default mode is 'reserved-public', override modes are reserved-private, temp-public, temp-private.
+: "${ZROK_FRONTEND_MODE:-reserved-public}"
 if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   ZROK_CMD="share public --headless ${ZROK_VERBOSE:-}"
 elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
