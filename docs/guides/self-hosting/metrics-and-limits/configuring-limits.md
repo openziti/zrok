@@ -84,25 +84,82 @@ The zrok limits agent includes a concept called _limit classes_. Limit classes c
 
 Limit classes are created by creating a record in the `limit_classes` table in the zrok controller database. The table has this schema:
 
+```sql
+CREATE TABLE public.limit_classes (
+    id integer NOT NULL,
+    backend_mode public.backend_mode,
+    environments integer DEFAULT '-1'::integer NOT NULL,
+    shares integer DEFAULT '-1'::integer NOT NULL,
+    reserved_shares integer DEFAULT '-1'::integer NOT NULL,
+    unique_names integer DEFAULT '-1'::integer NOT NULL,
+    period_minutes integer DEFAULT 1440 NOT NULL,
+    rx_bytes bigint DEFAULT '-1'::integer NOT NULL,
+    tx_bytes bigint DEFAULT '-1'::integer NOT NULL,
+    total_bytes bigint DEFAULT '-1'::integer NOT NULL,
+    limit_action public.limit_action DEFAULT 'limit'::public.limit_action NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted boolean DEFAULT false NOT NULL
+);
+
 ```
-                                         Table "public.limit_classes"
-     Column      |           Type           | Collation | Nullable |                  Default                  
------------------+--------------------------+-----------+----------+-------------------------------------------
- id              | integer                  |           | not null | nextval('limit_classes_id_seq'::regclass)
- backend_mode    | backend_mode             |           |          | 
- environments    | integer                  |           | not null | '-1'::integer
- shares          | integer                  |           | not null | '-1'::integer
- reserved_shares | integer                  |           | not null | '-1'::integer
- unique_names    | integer                  |           | not null | '-1'::integer
- period_minutes  | integer                  |           | not null | 1440
- rx_bytes        | bigint                   |           | not null | '-1'::integer
- tx_bytes        | bigint                   |           | not null | '-1'::integer
- total_bytes     | bigint                   |           | not null | '-1'::integer
- limit_action    | limit_action             |           | not null | 'limit'::limit_action
- created_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
- updated_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
- deleted         | boolean                  |           | not null | false
+
+This schema supports constructing the 3 different types of limits classes that the system supports.
+
+After defining a limit class in the database, it can be applied to specific user accounts (overriding the relevant parts of the global configuration) by inserting a row into the `applied_limit_classes` table:
+
+```sql
+CREATE TABLE public.applied_limit_classes (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    limit_class_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted boolean DEFAULT false NOT NULL
+);
 ```
+
+Create a row in this table linking the `account_id` to the `limit_class_id` to apply the limit class to a specific user account.
+
+### Unscoped Resource Count Classes
+
+To support overriding the resource count limits defined in the global limits configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
+
+```sql
+insert into limit_classes (environments, shares, reserved_shares, unique_names) values (1, 1, 1, 1);
+```
+
+This creates a limit class that sets the `environments`, `shares`, `reserved_shares`, and `unique_names` all to `1`.
+
+When this limit class is applied to a user account those values would override the default resource count values configured globally.
+
+Applying an unscoped resource count class _does not_ affect the bandwidth limits (either globally configured, or via a limit class).
+
+### Unscoped Bandwidth Classes
+
+To support overriding the bandwidth limits defined in the global configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
+
+```sql
+insert into limit_classes (period_minutes, total_bytes, limit_action) values (2, 204800, 'limit');
+```
+
+This inserts a limit class that allows for a total bandwidth transfer of `204800` bytes every `2` minutes.
+
+When this limit class is applied to a user account, those values would override the default bandwidth values configured globally.
+
+Applying an unscoped bandwidth class _does not_ affect the resource count limits (either globally configured, or via a limit class).
+
+### Scoped Classes
+
+A scoped limit class specifies _both_ the resource counts (`shares`, `reserved_shares`, and `unique_names`, but *NOT* `environments`) for a *specific* backend mode. Insert a row like this:
+
+```sql
+insert into limit_classes (backend_mode, shares, reserved_shares, unique_names, period_minutes, total_bytes, limit_action) values ('web', 2, 1, 1, 2, 4096000, 'limit');
+```
+
+Scoped limits are designed to _increase_ the limits for a specific backend mode beyond what the global configuration and the unscoped classes provide. The general approach is to use the global configuration and the unscoped classes to provide the general account limits, and then the scoped classes can be used to further increase (or potentially _decrease_)  the limits for a specific backend mode.
+
+If a scoped limit class exists for a specific backend mode, then the limits agent will use that limit in making a decision about limiting the resource count or bandwidth. All other types of shares will fall back to the unscoped classes or the global configuration.
 
 ## Limit Actions
 
@@ -113,3 +170,17 @@ This means that public frontends will simply return a `404` as if the share is n
 ## Unlimited Accounts
 
 The `accounts` table in the database includes a `limitless` column. When this column is set to `true` the account is not subject to any of the limits in the system.
+
+## Caveats
+
+There are a number of caveats that are important to understand when using the limits agent with more complicated limits scenarios:
+
+### Aggregate Bandwidth
+
+The zrok limits agent is a work in progress. The system currently does not track bandwidth individually for each backend mode type, which means all bandwidth values are aggregated between all of the share types that an account might be using. This will likely change in an upcoming release.
+
+### Administration Through SQL
+
+There are currently no administrative API endpoints (or corresponding CLI tools) to support creating and applying limit classes in the current release. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
+
+A future release may provide API and CLI tooling to support the human administration of the limits agent.
