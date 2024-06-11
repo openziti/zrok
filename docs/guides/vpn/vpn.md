@@ -53,7 +53,7 @@ eugene@hermes $ zrok reserve private -b vpn
 
 eugene@hermes $ sudo -E zrok share reserved k77y2cl7jmjl --headless
 [   0.211]    INFO main.(*shareReservedCommand).run: sharing target: '10.122.0.1/16'
-[   0.211]    INFO main.(*shareReservedCommand).run: using existing backend proxy endpoint: 10.122.0.1/16
+[   0.211]    INFO main.(*shareReservedCommand).run: using existing backend target: 10.122.0.1/16
 [   0.463]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[22c5708d-e2f2-41aa-a507-454055f8bfcc]} new service session
 [   0.641]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private k77y2cl7jmjl'
 [
