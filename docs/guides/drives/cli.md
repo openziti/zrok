@@ -290,7 +290,7 @@ $ zrok reserve private -b drive --unique-name mydrive /tmp/junk
 [   0.315]    INFO main.(*reserveCommand).run: your reserved share token is 'mydrive'
 $ zrok share reserved --headless mydrive
 [   0.289]    INFO main.(*shareReservedCommand).run: sharing target: '/tmp/junk'
-[   0.289]    INFO main.(*shareReservedCommand).run: using existing backend proxy endpoint: /tmp/junk
+[   0.289]    INFO main.(*shareReservedCommand).run: using existing backend target: /tmp/junk
 [   0.767]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[d519a436-9fb5-4207-afd5-7cbc28fb779a]} new service session
 [   0.927]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private mydrive'
 ```
