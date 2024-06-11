@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/fs"
 	"net/http"
 	"os"
@@ -10,7 +9,6 @@ import (
 )
 
 func Middleware(handler http.Handler, healthCheck func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	logrus.Infof("building")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/api/v1") {
 			handler.ServeHTTP(w, r)

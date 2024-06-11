@@ -19,8 +19,6 @@ func newLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *limitAction {
 }
 
 func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, ul *userLimits, trx *sqlx.Tx) error {
-	logrus.Infof("limiting '%v'", acct.Email)
-
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
@@ -32,7 +30,6 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 	}
 
 	ignoreBackends := ul.ignoreBackends(bwc)
-	logrus.Warnf("ignore backends excluding '%v': %v", bwc, ignoreBackends)
 	for _, env := range envs {
 		shrs, err := a.str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {

@@ -2,7 +2,7 @@
 
 ## v0.4.31
 
-FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606)
+FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606). This new feature allows for extensive limits customization on a per-user basis, with fallback to the global defaults in the controller configuration.
 
 FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
 

@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"reflect"
@@ -134,15 +135,15 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 					}
 				}
 				if total+1 > rc.GetShares() {
-					logrus.Debugf("account '%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
+					logrus.Debugf("account '#%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
 					return false, nil
 				}
 				if reserved && reserveds+1 > rc.GetReservedShares() {
-					logrus.Debugf("account '%v', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
+					logrus.Debugf("account '#%d', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
 					return false, nil
 				}
 				if reserved && uniqueName && uniqueNames+1 > rc.GetUniqueNames() {
-					logrus.Debugf("account '%v', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
+					logrus.Debugf("account '#%d', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
 					return false, nil
 				}
 				logrus.Infof("total = %d", total)
@@ -263,7 +264,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return err
 	}
 
-	exceededBwc, rxBytes, txBytes, err := a.anyBandwidthLimitExceeded(u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
+	exceededBwc, rxBytes, txBytes, err := a.anyBandwidthLimitExceeded(acct, u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
 	if err != nil {
 		return errors.Wrap(err, "error checking limit classes")
 	}
@@ -408,7 +409,7 @@ func (a *Agent) relax() error {
 					}
 				}
 			} else {
-				logrus.Infof("account '%v' still over limit: '%v' with rx: %d, tx: %d, total: %d", accounts[bwje.AccountId].Email, bwc, used.rx, used.tx, used.rx+used.tx)
+				logrus.Infof("'%v' still over limit: '%v' with rx: %v, tx: %v, total: %v", accounts[bwje.AccountId].Email, bwc, util.BytesToSize(used.rx), util.BytesToSize(used.tx), util.BytesToSize(used.rx+used.tx))
 			}
 		}
 	} else {
@@ -432,7 +433,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 				return nil, err
 			}
 			if je.Action == store.LimitLimitAction {
-				logrus.Infof("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
+				logrus.Debugf("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
 				return je, nil
 			}
 		} else if err != nil {
@@ -445,7 +446,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 				return nil, err
 			}
 			if je.Action == store.LimitLimitAction {
-				logrus.Infof("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
+				logrus.Debugf("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
 				return je, nil
 			}
 		} else if err != nil {
@@ -455,7 +456,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 	return nil, nil
 }
 
-func (a *Agent) anyBandwidthLimitExceeded(u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
+func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
 	periodBw := make(map[int]struct {
 		rx int64
 		tx int64
@@ -469,7 +470,7 @@ func (a *Agent) anyBandwidthLimitExceeded(u *metrics.Usage, bwcs []store.Bandwid
 		if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
 			rx, tx, err := a.ifx.totalRxTxForAccount(u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
 			if err != nil {
-				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%d'", u.AccountId)
+				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
 			}
 			periodBw[bwc.GetPeriodMinutes()] = struct {
 				rx int64
@@ -486,12 +487,12 @@ func (a *Agent) anyBandwidthLimitExceeded(u *metrics.Usage, bwcs []store.Bandwid
 			rxBytes = period.rx
 			txBytes = period.tx
 		} else {
-			logrus.Debugf("limit ok '%v' with rx: %d, tx: %d, total: %d", bwc, period.rx, period.tx, period.rx+period.tx)
+			logrus.Debugf("'%v' limit ok '%v' with rx: %v, tx: %v, total: %v", acct.Email, bwc, util.BytesToSize(period.rx), util.BytesToSize(period.tx), util.BytesToSize(period.rx+period.tx))
 		}
 	}
 
 	if selectedLc != nil {
-		logrus.Infof("exceeded limit '%v' with rx: %d, tx: %d, total: %d", selectedLc, rxBytes, txBytes, rxBytes+txBytes)
+		logrus.Infof("'%v' exceeded limit '%v' with rx: %v, tx: %v, total: %v", acct.Email, selectedLc, util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
 	}
 
 	return selectedLc, rxBytes, txBytes, nil

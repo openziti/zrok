@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 )
 
 type configBandwidthClass struct {
@@ -70,13 +71,13 @@ func (bc *configBandwidthClass) GetLimitAction() store.LimitAction {
 func (bc *configBandwidthClass) String() string {
 	out := fmt.Sprintf("ConfigClass<periodMinutes: %d", bc.periodInMinutes)
 	if bc.bw.Rx > store.Unlimited {
-		out += fmt.Sprintf(", rxBytes: %d", bc.bw.Rx)
+		out += fmt.Sprintf(", rxBytes: %v", util.BytesToSize(bc.bw.Rx))
 	}
 	if bc.bw.Tx > store.Unlimited {
-		out += fmt.Sprintf(", txBytes: %d", bc.bw.Tx)
+		out += fmt.Sprintf(", txBytes: %v", util.BytesToSize(bc.bw.Tx))
 	}
 	if bc.bw.Total > store.Unlimited {
-		out += fmt.Sprintf(", totalBytes: %d", bc.bw.Total)
+		out += fmt.Sprintf(", totalBytes: %v", util.BytesToSize(bc.bw.Total))
 	}
 	out += fmt.Sprintf(", limitAction: %s>", bc.limitAction)
 	return out

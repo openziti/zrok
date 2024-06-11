@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 )
 
@@ -104,7 +105,7 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 }
 
 func (lc LimitClass) String() string {
-	out := fmt.Sprintf("LimitClass<id: %d", lc.Id)
+	out := fmt.Sprintf("LimitClass<#%d", lc.Id)
 	if lc.BackendMode != nil {
 		out += fmt.Sprintf(", backendMode: '%s'", *lc.BackendMode)
 	}
@@ -124,13 +125,13 @@ func (lc LimitClass) String() string {
 		out += fmt.Sprintf(", periodMinutes: %d", lc.PeriodMinutes)
 	}
 	if lc.RxBytes > Unlimited {
-		out += fmt.Sprintf(", rxBytes: %d", lc.RxBytes)
+		out += fmt.Sprintf(", rxBytes: %v", util.BytesToSize(lc.RxBytes))
 	}
 	if lc.TxBytes > Unlimited {
-		out += fmt.Sprintf(", txBytes: %d", lc.TxBytes)
+		out += fmt.Sprintf(", txBytes: %v", util.BytesToSize(lc.TxBytes))
 	}
 	if lc.TotalBytes > Unlimited {
-		out += fmt.Sprintf(", totalBytes: %d", lc.TotalBytes)
+		out += fmt.Sprintf(", totalBytes: %v", util.BytesToSize(lc.TotalBytes))
 	}
 	out += fmt.Sprintf(", limitAction: '%v'>", lc.LimitAction)
 	return out
