@@ -4,9 +4,9 @@
 
 FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606). This new feature allows for extensive limits customization on a per-user basis, with fallback to the global defaults in the controller configuration.
 
-FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
+CHANGE: Log messages that said `backend proxy endpoint` were clarified to say `backend target`.
 
-CHANGE: log messages that said "backend proxy endpoint" were clarified to say "backend target"
+FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching.
 
 ## v0.4.30
 
