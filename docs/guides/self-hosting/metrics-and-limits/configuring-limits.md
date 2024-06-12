@@ -24,7 +24,7 @@ Limits can be specified that control the number of environments, shares, reserve
 
 Limits can be specified to control the amount of data that can be transferred within a time period. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
 
-zrok limits can be specified _globally_, applying to all users in a service instance. Individual limits can be specified and applied to individual accounts using a facility called _limit classes_. Limit classes can be used to specify resource count and bandwidth limit defaults per-account. Separate limits for each type share backend can also be specified and applied to user accounts.
+zrok limits can be specified _globally_, applying to all users in a service instance. Limit _classes_ can be created to provide different levels of resource allocation. A single limit class can then be _applied_ to multiple accounts, to alter their limit allocation beyond what's configured in the global configuration.
 
 ## The Global Configuration
 
