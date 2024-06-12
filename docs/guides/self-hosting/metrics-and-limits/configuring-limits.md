@@ -14,9 +14,11 @@ If you have not yet configured [metrics](configuring-metrics.md), please visit t
 
 ## Understanding the zrok Limits Agent
 
-The limits agent is a component of the zrok controller.
+The limits agent is a component of the zrok controller. It can be enabled and configured through the zrok controller configuration.
 
-The limits agent is responsible for controlling the number of resources in use (environments, shares, etc.) and also for ensuring that accounts are held below the configured bandwidth thresholds.
+The limits agent is responsible for controlling the number of resources in use (environments, shares, etc.) and also for ensuring that accounts are held below the configured data transfer bandwidth thresholds. The limits agent exists to manage resource consumption for larger, multi-user zrok installations.
+
+### Types of Limits
 
 Limits can be specified that control the number of environments, shares, reserved shares, and unique names that can be created by an account. Limits that control the allowed number of resources are called _resource count limits_.
 
