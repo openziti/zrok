@@ -24,7 +24,7 @@ Limits can be specified that control the number of environments, shares, reserve
 
 Limits can be specified to control the amount of data that can be transferred within a time period. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
 
-zrok limits can be specified _globally_, applying to all users in a service instance. Limit _classes_ can be created to provide different levels of resource allocation. A single limit class can then be _applied_ to multiple accounts, to alter their limit allocation beyond what's configured in the global configuration.
+zrok limits can be specified _globally_, applying to all users in a service instance. Limit _classes_ can be created to provide additional levels of resource allocation. Limit classes can then be _applied_ to multiple accounts, to alter their limit allocation beyond what's configured in the global configuration.
 
 ## The Global Configuration
 
@@ -72,13 +72,15 @@ These resource counts will be applied to all users in the service instance by de
 
 The `bandwidth` section defines the global bandwidth limits for all users in the service instance.
 
-There are two levels of bandwidth limits that can be specified in the global configuration. The first limit defines a _warning_ threshold where the user will receive an email that they are using increased data transfer amounts and will ultimately be subject to a limit.
+There are two levels of bandwidth limits that can be specified in the global configuration. The first limit defines a _warning_ threshold where the user will receive an email that they are using increased data transfer amounts and will ultimately be subject to a limit. If you do not want this warning email to be sent, then configure all of the values to `-1` (unlimited).
 
 The second limit defines the the actual _limit_ threshold, where the limits agent will disabled traffic for the account's shares.
 
 Bandwidth limits can be specified in terms of `tx` (or _transmitted_ data), `rx` (or _received_ data), and the `total` bytes that are sent in either direction. If you only want to set the `total` transferred limit, you can set `rx` and `tx` to `-1` (for _unlimited_). You can configure any combination of these these values at either the limit or warning levels.
 
 The `period` specifies the time window for the bandwidth limit. See the documentation for [`time.Duration.ParseDuration`](https://pkg.go.dev/time#ParseDuration) for details about the format used for these durations. If the `period` is set to 5 minutes, then the limits agent will monitor the transmitted and receivde traffic for the account for the last 5 minutes, and if the amount of data is greater than either the `warning` or the `limit` threshold, action will be taken.
+
+In the global configuration example above users are allowed to transfer a total of `10485760` bytes in a `5m` period, and they will receive a warning email after they transfer more than `7242880` bytes in a `5m` period.
 
 ## Limit Classes
 
