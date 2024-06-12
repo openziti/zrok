@@ -14,13 +14,13 @@ If you have not yet configured [metrics](configuring-metrics.md), please visit t
 
 ## Understanding the zrok Limits Agent
 
-The limits agent in zrok is used to control the amount of resources that can be consumed by any account in a service instance. The limits agent is a component in the zrok controller.
+The limits agent is a component of the zrok controller.
 
-Limits can be specified that control the number of environments, shares, reserved shares, and unique names. Limits that control the allowed number of resources are called _resource count limits_.
+The limits agent is responsible for controlling the number of resources in use (environments, shares, etc.) and also for ensuring that accounts are held below the configured bandwidth thresholds.
 
-Limits can be specified that control the amount of data that can be transferred within a time period for different types of share backend modes. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
+Limits can be specified that control the number of environments, shares, reserved shares, and unique names that can be created by an account. Limits that control the allowed number of resources are called _resource count limits_.
 
-The limits agent in zrok is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured bandwidth thresholds.
+Limits can be specified to control the amount of data that can be transferred within a time period. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
 
 zrok limits can be specified _globally_, applying to all users in a service instance. Individual limits can be specified and applied to individual accounts using a facility called _limit classes_. Limit classes can be used to specify resource count and bandwidth limit defaults per-account. Separate limits for each type share backend can also be specified and applied to user accounts.
 
@@ -197,3 +197,7 @@ The zrok limits agent is a work in progress. The system currently does not track
 There are currently no administrative API endpoints (or corresponding CLI tools) to support creating and applying limit classes in the current release. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
 
 A future release may provide API and CLI tooling to support the human administration of the limits agent.
+
+### Performance
+
+Be sure to minimize the number of different periods used for specifying bandwidth limits. Specifying limits in multiple different periods can cause a multiplicity of queries to be executed against the metrics store (InfluxDB). Standardizing on a period like `24h` or `6h` and using that consistently is the best way to to manage the performance of the metrics store.
