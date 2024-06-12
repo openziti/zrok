@@ -330,13 +330,9 @@ func (a *Agent) relax() error {
 	commit := false
 
 	if bwjes, err := a.str.FindAllBandwidthLimitJournal(trx); err == nil {
-		periodBw := make(map[int]struct {
-			rx int64
-			tx int64
-		})
-
 		accounts := make(map[int]*store.Account)
 		uls := make(map[int]*userLimits)
+		accountPeriods := make(map[int]map[int]*periodBwValues)
 
 		for _, bwje := range bwjes {
 			if _, found := accounts[bwje.AccountId]; !found {
@@ -347,7 +343,7 @@ func (a *Agent) relax() error {
 						return errors.Wrapf(err, "error getting user limits for '%v'", acct.Email)
 					}
 					uls[bwje.AccountId] = ul
-
+					accountPeriods[bwje.AccountId] = make(map[int]*periodBwValues)
 				} else {
 					return err
 				}
@@ -369,21 +365,20 @@ func (a *Agent) relax() error {
 				bwc = lc
 			}
 
-			if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
-				rx, tx, err := a.ifx.totalRxTxForAccount(int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
-				if err != nil {
-					return err
+			if periods, accountFound := accountPeriods[bwje.AccountId]; accountFound {
+				if _, periodFound := periods[bwc.GetPeriodMinutes()]; !periodFound {
+					rx, tx, err := a.ifx.totalRxTxForAccount(int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
+					if err != nil {
+						return err
+					}
+					periods[bwc.GetPeriodMinutes()] = &periodBwValues{rx: rx, tx: tx}
+					accountPeriods[bwje.AccountId] = periods
 				}
-				periodBw[bwc.GetPeriodMinutes()] = struct {
-					rx int64
-					tx int64
-				}{
-					rx: rx,
-					tx: tx,
-				}
+			} else {
+				return errors.New("accountPeriods corrupted")
 			}
 
-			used := periodBw[bwc.GetPeriodMinutes()]
+			used := accountPeriods[bwje.AccountId][bwc.GetPeriodMinutes()]
 			if !a.transferBytesExceeded(used.rx, used.tx, bwc) {
 				if bwc.GetLimitAction() == store.LimitLimitAction {
 					logrus.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
@@ -457,10 +452,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 }
 
 func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
-	periodBw := make(map[int]struct {
-		rx int64
-		tx int64
-	})
+	periodBw := make(map[int]periodBwValues)
 
 	var selectedLc store.BandwidthClass
 	var rxBytes int64
@@ -472,13 +464,7 @@ func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage,
 			if err != nil {
 				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
 			}
-			periodBw[bwc.GetPeriodMinutes()] = struct {
-				rx int64
-				tx int64
-			}{
-				rx: rx,
-				tx: tx,
-			}
+			periodBw[bwc.GetPeriodMinutes()] = periodBwValues{rx: rx, tx: tx}
 		}
 		period := periodBw[bwc.GetPeriodMinutes()]
 
@@ -509,4 +495,9 @@ func (a *Agent) transferBytesExceeded(rx, tx int64, bwc store.BandwidthClass) bo
 		return true
 	}
 	return false
+}
+
+type periodBwValues struct {
+	rx int64
+	tx int64
 }
