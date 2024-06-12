@@ -14,15 +14,15 @@ If you have not yet configured [metrics](configuring-metrics.md), please visit t
 
 ## Understanding the zrok Limits Agent
 
-The limits agent in zrok is used to control the amount of resources that can be consumed by any account in a service instance. 
+The limits agent in zrok is used to control the amount of resources that can be consumed by any account in a service instance. The limits agent is a component in the zrok controller.
 
-Limits can be specified that control the number of environments, shares, reserved shares, and unique names. Limits that control the number of resources are called _resource count limits_.
+Limits can be specified that control the number of environments, shares, reserved shares, and unique names. Limits that control the allowed number of resources are called _resource count limits_.
 
-Limits can be specified that control the amount of data that can be transferred for different types of share backend modes. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
+Limits can be specified that control the amount of data that can be transferred within a time period for different types of share backend modes. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
 
-The limits agent in zrok is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured thresholds.
+The limits agent in zrok is responsible for controlling the number of resources in use (environments, shares) and also for ensuring that any single account, environment, or share is held below the configured bandwidth thresholds.
 
-zrok limits can be specified _globally_, applying to all users in a service instance. Individual limits can be specified and applied to individual accounts using a new facility called _limit classes_. Limit classes can be used to specify resource count and bandwidth limit defaults per-account. Separate limits for each type share backend can also be specified and applied to user accounts.
+zrok limits can be specified _globally_, applying to all users in a service instance. Individual limits can be specified and applied to individual accounts using a facility called _limit classes_. Limit classes can be used to specify resource count and bandwidth limit defaults per-account. Separate limits for each type share backend can also be specified and applied to user accounts.
 
 ## The Global Configuration
 
