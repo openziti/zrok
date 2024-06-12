@@ -9,7 +9,7 @@
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
 # versions and will refer to you to the documentation when the configuration structure changes.
 #
-v: 3
+v: 4
 
 admin:
   # The `secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
