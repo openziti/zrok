@@ -10,32 +10,64 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type shareRelaxAction struct {
+type relaxAction struct {
 	str  *store.Store
 	zCfg *zrokEdgeSdk.Config
 }
 
-func newShareRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *shareRelaxAction {
-	return &shareRelaxAction{str, zCfg}
+func newRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *relaxAction {
+	return &relaxAction{str, zCfg}
 }
 
-func (a *shareRelaxAction) HandleShare(shr *store.Share, _, _ int64, _ *BandwidthPerPeriod, trx *sqlx.Tx) error {
-	logrus.Infof("relaxing '%v'", shr.Token)
+func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, _ *userLimits, trx *sqlx.Tx) error {
+	logrus.Debugf("relaxing '%v'", acct.Email)
 
-	if !shr.Deleted {
-		edge, err := zrokEdgeSdk.Client(a.zCfg)
-		if err != nil {
-			return err
-		}
+	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
+	}
 
-		switch shr.ShareMode {
-		case string(sdk.PublicShareMode):
-			if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
+	jes, err := a.str.FindAllLatestBandwidthLimitJournalForAccount(acct.Id, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding latest bandwidth limit journal entries for account '%v'", acct.Email)
+	}
+	limitedBackends := make(map[sdk.BackendMode]bool)
+	for _, je := range jes {
+		if je.LimitClassId != nil {
+			lc, err := a.str.GetLimitClass(*je.LimitClassId, trx)
+			if err != nil {
 				return err
 			}
-		case string(sdk.PrivateShareMode):
-			if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
-				return err
+			if lc.BackendMode != nil && lc.LimitAction == store.LimitLimitAction {
+				limitedBackends[*lc.BackendMode] = true
+			}
+		}
+	}
+
+	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	if err != nil {
+		return err
+	}
+
+	for _, env := range envs {
+		shrs, err := a.str.FindSharesForEnvironment(env.Id, trx)
+		if err != nil {
+			return errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId)
+		}
+
+		for _, shr := range shrs {
+			_, stayLimited := limitedBackends[sdk.BackendMode(shr.BackendMode)]
+			if (!bwc.IsScoped() && !stayLimited) || bwc.GetBackendMode() == sdk.BackendMode(shr.BackendMode) {
+				switch shr.ShareMode {
+				case string(sdk.PublicShareMode):
+					if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
+						logrus.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+					}
+				case string(sdk.PrivateShareMode):
+					if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
+						logrus.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+					}
+				}
 			}
 		}
 	}

@@ -9,7 +9,7 @@
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
 # versions and will refer to you to the documentation when the configuration structure changes.
 #
-v: 3
+v: 4
 
 admin:
   # The `secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
@@ -74,44 +74,25 @@ invites:
   #
   token_contact:                  invite@zrok.io
 
-# Service instance limits configuration.
+# Service instance limits global configuration.
 #
 # See `docs/guides/metrics-and-limits/configuring-limits.md` for details.
 #
 limits:
   environments:     -1
   shares:           -1
+  reserved_shares:  -1
+  unique_names:     -1
   bandwidth:
-    per_account:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      7242880
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      10485760
-    per_environment:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
-    per_share:
-      period:       5m
-      warning:
-        rx:         -1
-        tx:         -1
-        total:      -1
-      limit:
-        rx:         -1
-        tx:         -1
-        total:      -1
+    period:         5m
+    warning:
+      rx:           -1
+      tx:           -1
+      total:        7242880
+    limit:
+      rx:           -1
+      tx:           -1
+      total:        10485760
   enforcing:        false
   cycle:            5m
 

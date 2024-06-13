@@ -1,12 +1,12 @@
 package limits
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -15,42 +15,30 @@ import (
 )
 
 type Agent struct {
-	cfg                *Config
-	ifx                *influxReader
-	zCfg               *zrokEdgeSdk.Config
-	str                *store.Store
-	queue              chan *metrics.Usage
-	acctWarningActions []AccountAction
-	acctLimitActions   []AccountAction
-	acctRelaxActions   []AccountAction
-	envWarningActions  []EnvironmentAction
-	envLimitActions    []EnvironmentAction
-	envRelaxActions    []EnvironmentAction
-	shrWarningActions  []ShareAction
-	shrLimitActions    []ShareAction
-	shrRelaxActions    []ShareAction
-	close              chan struct{}
-	join               chan struct{}
+	cfg            *Config
+	ifx            *influxReader
+	zCfg           *zrokEdgeSdk.Config
+	str            *store.Store
+	queue          chan *metrics.Usage
+	warningActions []AccountAction
+	limitActions   []AccountAction
+	relaxActions   []AccountAction
+	close          chan struct{}
+	join           chan struct{}
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	a := &Agent{
-		cfg:                cfg,
-		ifx:                newInfluxReader(ifxCfg),
-		zCfg:               zCfg,
-		str:                str,
-		queue:              make(chan *metrics.Usage, 1024),
-		acctWarningActions: []AccountAction{newAccountWarningAction(emailCfg, str)},
-		acctLimitActions:   []AccountAction{newAccountLimitAction(str, zCfg)},
-		acctRelaxActions:   []AccountAction{newAccountRelaxAction(str, zCfg)},
-		envWarningActions:  []EnvironmentAction{newEnvironmentWarningAction(emailCfg, str)},
-		envLimitActions:    []EnvironmentAction{newEnvironmentLimitAction(str, zCfg)},
-		envRelaxActions:    []EnvironmentAction{newEnvironmentRelaxAction(str, zCfg)},
-		shrWarningActions:  []ShareAction{newShareWarningAction(emailCfg, str)},
-		shrLimitActions:    []ShareAction{newShareLimitAction(str, zCfg)},
-		shrRelaxActions:    []ShareAction{newShareRelaxAction(str, zCfg)},
-		close:              make(chan struct{}),
-		join:               make(chan struct{}),
+		cfg:            cfg,
+		ifx:            newInfluxReader(ifxCfg),
+		zCfg:           zCfg,
+		str:            str,
+		queue:          make(chan *metrics.Usage, 1024),
+		warningActions: []AccountAction{newWarningAction(emailCfg, str)},
+		limitActions:   []AccountAction{newLimitAction(str, zCfg)},
+		relaxActions:   []AccountAction{newRelaxAction(str, zCfg)},
+		close:          make(chan struct{}),
+		join:           make(chan struct{}),
 	}
 	return a, nil
 }
@@ -66,19 +54,16 @@ func (a *Agent) Stop() {
 
 func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
-		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
-			if err != nil {
-				return false, err
-			}
-			if alj.Action == store.LimitAction {
-				return false, nil
-			}
-		} else if err != nil {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
 
-		if a.cfg.Environments > Unlimited {
+		ul, err := a.getUserLimits(acctId, trx)
+		if err != nil {
+			return false, err
+		}
+
+		if ul.resource.GetEnvironments() > store.Unlimited {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
@@ -88,48 +73,77 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			}
 		}
 	}
+
 	return true, nil
 }
 
-func (a *Agent) CanCreateShare(acctId, envId int, trx *sqlx.Tx) (bool, error) {
+func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ sdk.ShareMode, backendMode sdk.BackendMode, trx *sqlx.Tx) (bool, error) {
 	if a.cfg.Enforcing {
-		if empty, err := a.str.IsAccountLimitJournalEmpty(acctId, trx); err == nil && !empty {
-			alj, err := a.str.FindLatestAccountLimitJournal(acctId, trx)
-			if err != nil {
-				return false, err
-			}
-			if alj.Action == store.LimitAction {
-				return false, nil
-			}
-		} else if err != nil {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
 			return false, err
 		}
 
-		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(envId, trx); err == nil && !empty {
-			elj, err := a.str.FindLatestEnvironmentLimitJournal(envId, trx)
-			if err != nil {
-				return false, err
-			}
-			if elj.Action == store.LimitAction {
-				return false, nil
-			}
-		} else if err != nil {
+		ul, err := a.getUserLimits(acctId, trx)
+		if err != nil {
 			return false, err
 		}
 
-		if a.cfg.Shares > Unlimited {
+		if scopedBwc, found := ul.scopes[backendMode]; found {
+			latestScopedJe, err := a.isBandwidthClassLimitedForAccount(acctId, scopedBwc, trx)
+			if err != nil {
+				return false, err
+			}
+			if latestScopedJe != nil {
+				return false, nil
+			}
+		} else {
+			for _, bwc := range ul.bandwidth {
+				latestJe, err := a.isBandwidthClassLimitedForAccount(acctId, bwc, trx)
+				if err != nil {
+					return false, err
+				}
+				if latestJe != nil {
+					return false, nil
+				}
+			}
+		}
+
+		rc := ul.resource
+		if scopeRc, found := ul.scopes[backendMode]; found {
+			rc = scopeRc
+		}
+		if rc.GetShares() > store.Unlimited || (reserved && rc.GetReservedShares() > store.Unlimited) || (reserved && uniqueName && rc.GetUniqueNames() > store.Unlimited) {
 			envs, err := a.str.FindEnvironmentsForAccount(acctId, trx)
 			if err != nil {
 				return false, err
 			}
 			total := 0
+			reserveds := 0
+			uniqueNames := 0
 			for i := range envs {
 				shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
 				if err != nil {
 					return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
 				}
 				total += len(shrs)
-				if total+1 > a.cfg.Shares {
+				for _, shr := range shrs {
+					if shr.Reserved {
+						reserveds++
+					}
+					if shr.UniqueName {
+						uniqueNames++
+					}
+				}
+				if total+1 > rc.GetShares() {
+					logrus.Debugf("account '#%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
+					return false, nil
+				}
+				if reserved && reserveds+1 > rc.GetReservedShares() {
+					logrus.Debugf("account '#%d', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
+					return false, nil
+				}
+				if reserved && uniqueName && uniqueNames+1 > rc.GetUniqueNames() {
+					logrus.Debugf("account '#%d', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
 					return false, nil
 				}
 				logrus.Infof("total = %d", total)
@@ -145,50 +159,39 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
-			slj, err := a.str.FindLatestShareLimitJournal(shr.Id, trx)
-			if err != nil {
-				return false, err
-			}
-			if slj.Action == store.LimitAction {
-				return false, nil
-			}
-		} else if err != nil {
-			return false, err
-		}
-
 		env, err := a.str.GetEnvironment(shr.EnvironmentId, trx)
 		if err != nil {
 			return false, err
 		}
-		if empty, err := a.str.IsEnvironmentLimitJournalEmpty(env.Id, trx); err == nil && !empty {
-			elj, err := a.str.FindLatestEnvironmentLimitJournal(env.Id, trx)
-			if err != nil {
-				return false, err
-			}
-			if elj.Action == store.LimitAction {
-				return false, nil
-			}
-		} else if err != nil {
-			return false, err
-		}
-
 		if env.AccountId != nil {
-			acct, err := a.str.GetAccount(*env.AccountId, trx)
+			ul, err := a.getUserLimits(*env.AccountId, trx)
 			if err != nil {
 				return false, err
 			}
-			if empty, err := a.str.IsAccountLimitJournalEmpty(acct.Id, trx); err == nil && !empty {
-				alj, err := a.str.FindLatestAccountLimitJournal(acct.Id, trx)
-				if err != nil {
-					return false, err
+
+			if ul.resource.IsGlobal() {
+				if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(*env.AccountId, trx); err == nil && !empty {
+					lj, err := a.str.FindLatestBandwidthLimitJournalForGlobal(*env.AccountId, trx)
+					if err != nil {
+						return false, err
+					}
+					if lj.Action == store.LimitLimitAction {
+						return false, nil
+					}
 				}
-				if alj.Action == store.LimitAction {
-					return false, nil
+			} else {
+				if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(*env.AccountId, ul.resource.GetLimitClassId(), trx); err == nil && !empty {
+					lj, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(*env.AccountId, ul.resource.GetLimitClassId(), trx)
+					if err != nil {
+						return false, err
+					}
+					if lj.Action == store.LimitLimitAction {
+						return false, nil
+					}
 				}
-			} else if err != nil {
-				return false, err
 			}
+		} else {
+			return false, nil
 		}
 	}
 	return true, nil
@@ -251,245 +254,65 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 		return nil
 	}
 
-	if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(u.AccountId); err == nil {
-		if enforce {
-			enforced := false
-			var enforcedAt time.Time
-			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
-					enforced = latest.Action == store.LimitAction
-					enforcedAt = latest.UpdatedAt
-				}
-			}
+	shr, err := a.str.FindShareWithTokenEvenIfDeleted(u.ShareToken, trx)
+	if err != nil {
+		return err
+	}
 
-			if !enforced {
-				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
-					AccountId: int(u.AccountId),
-					RxBytes:   rxBytes,
-					TxBytes:   txBytes,
-					Action:    store.LimitAction,
-				}, trx)
-				if err != nil {
-					return err
-				}
-				acct, err := a.str.GetAccount(int(u.AccountId), trx)
-				if err != nil {
-					return err
-				}
-				// run account limit actions
-				for _, action := range a.acctLimitActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-					}
-				}
-				if err := trx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				logrus.Debugf("already enforced limit for account '#%d' at %v", u.AccountId, enforcedAt)
-			}
+	ul, err := a.getUserLimits(int(u.AccountId), trx)
+	if err != nil {
+		return err
+	}
 
-		} else if warning {
-			warned := false
-			var warnedAt time.Time
-			if empty, err := a.str.IsAccountLimitJournalEmpty(int(u.AccountId), trx); err == nil && !empty {
-				if latest, err := a.str.FindLatestAccountLimitJournal(int(u.AccountId), trx); err == nil {
-					warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
-					warnedAt = latest.UpdatedAt
-				}
-			}
+	exceededBwc, rxBytes, txBytes, err := a.anyBandwidthLimitExceeded(acct, u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
+	if err != nil {
+		return errors.Wrap(err, "error checking limit classes")
+	}
 
-			if !warned {
-				_, err := a.str.CreateAccountLimitJournal(&store.AccountLimitJournal{
-					AccountId: int(u.AccountId),
-					RxBytes:   rxBytes,
-					TxBytes:   txBytes,
-					Action:    store.WarningAction,
-				}, trx)
-				if err != nil {
-					return err
-				}
-				acct, err := a.str.GetAccount(int(u.AccountId), trx)
-				if err != nil {
-					return err
-				}
-				// run account warning actions
-				for _, action := range a.acctWarningActions {
-					if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-					}
-				}
-				if err := trx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				logrus.Debugf("already warned account '#%d' at %v", u.AccountId, warnedAt)
-			}
-
-		} else {
-			if enforce, warning, rxBytes, txBytes, err := a.checkEnvironmentLimit(u.EnvironmentId); err == nil {
-				if enforce {
-					enforced := false
-					var enforcedAt time.Time
-					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
-						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
-							enforced = latest.Action == store.LimitAction
-							enforcedAt = latest.UpdatedAt
-						}
-					}
-
-					if !enforced {
-						_, err := a.str.CreateEnvironmentLimitJournal(&store.EnvironmentLimitJournal{
-							EnvironmentId: int(u.EnvironmentId),
-							RxBytes:       rxBytes,
-							TxBytes:       txBytes,
-							Action:        store.LimitAction,
-						}, trx)
-						if err != nil {
-							return err
-						}
-						env, err := a.str.GetEnvironment(int(u.EnvironmentId), trx)
-						if err != nil {
-							return err
-						}
-						// run environment limit actions
-						for _, action := range a.envLimitActions {
-							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-								return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-							}
-						}
-						if err := trx.Commit(); err != nil {
-							return err
-						}
-					} else {
-						logrus.Debugf("already enforced limit for environment '#%d' at %v", u.EnvironmentId, enforcedAt)
-					}
-
-				} else if warning {
-					warned := false
-					var warnedAt time.Time
-					if empty, err := a.str.IsEnvironmentLimitJournalEmpty(int(u.EnvironmentId), trx); err == nil && !empty {
-						if latest, err := a.str.FindLatestEnvironmentLimitJournal(int(u.EnvironmentId), trx); err == nil {
-							warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
-							warnedAt = latest.UpdatedAt
-						}
-					}
-
-					if !warned {
-						_, err := a.str.CreateEnvironmentLimitJournal(&store.EnvironmentLimitJournal{
-							EnvironmentId: int(u.EnvironmentId),
-							RxBytes:       rxBytes,
-							TxBytes:       txBytes,
-							Action:        store.WarningAction,
-						}, trx)
-						if err != nil {
-							return err
-						}
-						env, err := a.str.GetEnvironment(int(u.EnvironmentId), trx)
-						if err != nil {
-							return err
-						}
-						// run environment warning actions
-						for _, action := range a.envWarningActions {
-							if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-								return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-							}
-						}
-						if err := trx.Commit(); err != nil {
-							return err
-						}
-					} else {
-						logrus.Debugf("already warned environment '#%d' at %v", u.EnvironmentId, warnedAt)
-					}
-
-				} else {
-					if enforce, warning, rxBytes, txBytes, err := a.checkShareLimit(u.ShareToken); err == nil {
-						if enforce {
-							shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
-							if err != nil {
-								return err
-							}
-
-							enforced := false
-							var enforcedAt time.Time
-							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
-								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
-									enforced = latest.Action == store.LimitAction
-									enforcedAt = latest.UpdatedAt
-								}
-							}
-
-							if !enforced {
-								_, err := a.str.CreateShareLimitJournal(&store.ShareLimitJournal{
-									ShareId: shr.Id,
-									RxBytes: rxBytes,
-									TxBytes: txBytes,
-									Action:  store.LimitAction,
-								}, trx)
-								if err != nil {
-									return err
-								}
-								// run share limit actions
-								for _, action := range a.shrLimitActions {
-									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-								if err := trx.Commit(); err != nil {
-									return err
-								}
-							} else {
-								logrus.Debugf("already enforced limit for share '%v' at %v", shr.Token, enforcedAt)
-							}
-
-						} else if warning {
-							shr, err := a.str.FindShareWithToken(u.ShareToken, trx)
-							if err != nil {
-								return err
-							}
-
-							warned := false
-							var warnedAt time.Time
-							if empty, err := a.str.IsShareLimitJournalEmpty(shr.Id, trx); err == nil && !empty {
-								if latest, err := a.str.FindLatestShareLimitJournal(shr.Id, trx); err == nil {
-									warned = latest.Action == store.WarningAction || latest.Action == store.LimitAction
-									warnedAt = latest.UpdatedAt
-								}
-							}
-
-							if !warned {
-								_, err := a.str.CreateShareLimitJournal(&store.ShareLimitJournal{
-									ShareId: shr.Id,
-									RxBytes: rxBytes,
-									TxBytes: txBytes,
-									Action:  store.WarningAction,
-								}, trx)
-								if err != nil {
-									return err
-								}
-								// run share warning actions
-								for _, action := range a.shrWarningActions {
-									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-								if err := trx.Commit(); err != nil {
-									return err
-								}
-							} else {
-								logrus.Debugf("already warned share '%v' at %v", shr.Token, warnedAt)
-							}
-						}
-					} else {
-						logrus.Error(err)
-					}
-				}
-			} else {
-				logrus.Error(err)
-			}
+	if exceededBwc != nil {
+		latestJe, err := a.isBandwidthClassLimitedForAccount(int(u.AccountId), exceededBwc, trx)
+		if err != nil {
+			return err
 		}
-	} else {
-		logrus.Error(err)
+		if latestJe == nil {
+			je := &store.BandwidthLimitJournalEntry{
+				AccountId: int(u.AccountId),
+				RxBytes:   rxBytes,
+				TxBytes:   txBytes,
+				Action:    exceededBwc.GetLimitAction(),
+			}
+			if !exceededBwc.IsGlobal() {
+				lcId := exceededBwc.GetLimitClassId()
+				je.LimitClassId = &lcId
+			}
+			if _, err := a.str.CreateBandwidthLimitJournalEntry(je, trx); err != nil {
+				return err
+			}
+			acct, err := a.str.GetAccount(int(u.AccountId), trx)
+			if err != nil {
+				return err
+			}
+			switch exceededBwc.GetLimitAction() {
+			case store.LimitLimitAction:
+				for _, limitAction := range a.limitActions {
+					if err := limitAction.HandleAccount(acct, rxBytes, txBytes, exceededBwc, ul, trx); err != nil {
+						return errors.Wrapf(err, "%v", reflect.TypeOf(limitAction).String())
+					}
+				}
+
+			case store.WarningLimitAction:
+				for _, warningAction := range a.warningActions {
+					if err := warningAction.HandleAccount(acct, rxBytes, txBytes, exceededBwc, ul, trx); err != nil {
+						return errors.Wrapf(err, "%v", reflect.TypeOf(warningAction).String())
+					}
+				}
+			}
+			if err := trx.Commit(); err != nil {
+				return err
+			}
+		} else {
+			logrus.Debugf("limit '%v' already applied for '%v' (at: %v)", exceededBwc, acct.Email, latestJe.CreatedAt)
+		}
 	}
 
 	return nil
@@ -506,108 +329,82 @@ func (a *Agent) relax() error {
 
 	commit := false
 
-	if sljs, err := a.str.FindAllLatestShareLimitJournal(trx); err == nil {
-		for _, slj := range sljs {
-			if shr, err := a.str.GetShare(slj.ShareId, trx); err == nil {
-				if slj.Action == store.WarningAction || slj.Action == store.LimitAction {
-					if enforce, warning, rxBytes, txBytes, err := a.checkShareLimit(shr.Token); err == nil {
-						if !enforce && !warning {
-							if slj.Action == store.LimitAction {
-								// run relax actions for share
-								for _, action := range a.shrRelaxActions {
-									if err := action.HandleShare(shr, rxBytes, txBytes, a.cfg.Bandwidth.PerShare, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-							} else {
-								logrus.Infof("relaxing warning for '%v'", shr.Token)
-							}
-							if err := a.str.DeleteShareLimitJournalForShare(shr.Id, trx); err == nil {
-								commit = true
-							} else {
-								logrus.Errorf("error deleting share_limit_journal for '%v'", shr.Token)
-							}
-						} else {
-							logrus.Infof("share '%v' still over limit", shr.Token)
-						}
-					} else {
-						logrus.Errorf("error checking share limit for '%v': %v", shr.Token, err)
-					}
-				}
-			} else {
-				logrus.Errorf("error getting share for '#%d': %v", slj.ShareId, err)
-			}
-		}
-	} else {
-		return err
-	}
+	if bwjes, err := a.str.FindAllBandwidthLimitJournal(trx); err == nil {
+		accounts := make(map[int]*store.Account)
+		uls := make(map[int]*userLimits)
+		accountPeriods := make(map[int]map[int]*periodBwValues)
 
-	if eljs, err := a.str.FindAllLatestEnvironmentLimitJournal(trx); err == nil {
-		for _, elj := range eljs {
-			if env, err := a.str.GetEnvironment(elj.EnvironmentId, trx); err == nil {
-				if elj.Action == store.WarningAction || elj.Action == store.LimitAction {
-					if enforce, warning, rxBytes, txBytes, err := a.checkEnvironmentLimit(int64(elj.EnvironmentId)); err == nil {
-						if !enforce && !warning {
-							if elj.Action == store.LimitAction {
-								// run relax actions for environment
-								for _, action := range a.envRelaxActions {
-									if err := action.HandleEnvironment(env, rxBytes, txBytes, a.cfg.Bandwidth.PerEnvironment, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-							} else {
-								logrus.Infof("relaxing warning for '%v'", env.ZId)
-							}
-							if err := a.str.DeleteEnvironmentLimitJournalForEnvironment(env.Id, trx); err == nil {
-								commit = true
-							} else {
-								logrus.Errorf("error deleteing environment_limit_journal for '%v': %v", env.ZId, err)
-							}
-						} else {
-							logrus.Infof("environment '%v' still over limit", env.ZId)
-						}
-					} else {
-						logrus.Errorf("error checking environment limit for '%v': %v", env.ZId, err)
+		for _, bwje := range bwjes {
+			if _, found := accounts[bwje.AccountId]; !found {
+				if acct, err := a.str.GetAccount(bwje.AccountId, trx); err == nil {
+					accounts[bwje.AccountId] = acct
+					ul, err := a.getUserLimits(acct.Id, trx)
+					if err != nil {
+						return errors.Wrapf(err, "error getting user limits for '%v'", acct.Email)
 					}
+					uls[bwje.AccountId] = ul
+					accountPeriods[bwje.AccountId] = make(map[int]*periodBwValues)
+				} else {
+					return err
 				}
-			} else {
-				logrus.Errorf("error getting environment for '#%d': %v", elj.EnvironmentId, err)
 			}
-		}
-	} else {
-		return err
-	}
 
-	if aljs, err := a.str.FindAllLatestAccountLimitJournal(trx); err == nil {
-		for _, alj := range aljs {
-			if acct, err := a.str.GetAccount(alj.AccountId, trx); err == nil {
-				if alj.Action == store.WarningAction || alj.Action == store.LimitAction {
-					if enforce, warning, rxBytes, txBytes, err := a.checkAccountLimit(int64(alj.AccountId)); err == nil {
-						if !enforce && !warning {
-							if alj.Action == store.LimitAction {
-								// run relax actions for account
-								for _, action := range a.acctRelaxActions {
-									if err := action.HandleAccount(acct, rxBytes, txBytes, a.cfg.Bandwidth.PerAccount, trx); err != nil {
-										return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
-									}
-								}
-							} else {
-								logrus.Infof("relaxing warning for '%v'", acct.Email)
-							}
-							if err := a.str.DeleteAccountLimitJournalForAccount(acct.Id, trx); err == nil {
-								commit = true
-							} else {
-								logrus.Errorf("error deleting account_limit_journal for '%v': %v", acct.Email, err)
-							}
-						} else {
-							logrus.Infof("account '%v' still over limit", acct.Email)
+			var bwc store.BandwidthClass
+			if bwje.LimitClassId == nil {
+				globalBwcs := newConfigBandwidthClasses(a.cfg.Bandwidth)
+				if bwje.Action == store.WarningLimitAction {
+					bwc = globalBwcs[0]
+				} else {
+					bwc = globalBwcs[1]
+				}
+			} else {
+				lc, err := a.str.GetLimitClass(*bwje.LimitClassId, trx)
+				if err != nil {
+					return err
+				}
+				bwc = lc
+			}
+
+			if periods, accountFound := accountPeriods[bwje.AccountId]; accountFound {
+				if _, periodFound := periods[bwc.GetPeriodMinutes()]; !periodFound {
+					rx, tx, err := a.ifx.totalRxTxForAccount(int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
+					if err != nil {
+						return err
+					}
+					periods[bwc.GetPeriodMinutes()] = &periodBwValues{rx: rx, tx: tx}
+					accountPeriods[bwje.AccountId] = periods
+				}
+			} else {
+				return errors.New("accountPeriods corrupted")
+			}
+
+			used := accountPeriods[bwje.AccountId][bwc.GetPeriodMinutes()]
+			if !a.transferBytesExceeded(used.rx, used.tx, bwc) {
+				if bwc.GetLimitAction() == store.LimitLimitAction {
+					logrus.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
+					for _, action := range a.relaxActions {
+						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, uls[bwje.AccountId], trx); err != nil {
+							return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 						}
+					}
+				} else {
+					logrus.Infof("relaxing warning '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
+				}
+				if bwc.IsGlobal() {
+					if err := a.str.DeleteBandwidthLimitJournalEntryForGlobal(bwje.AccountId, trx); err == nil {
+						commit = true
 					} else {
-						logrus.Errorf("error checking account limit for '%v': %v", acct.Email, err)
+						logrus.Errorf("error deleting global bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+					}
+				} else {
+					if err := a.str.DeleteBandwidthLimitJournalEntryForLimitClass(bwje.AccountId, *bwje.LimitClassId, trx); err == nil {
+						commit = true
+					} else {
+						logrus.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
 					}
 				}
 			} else {
-				logrus.Errorf("error getting account for '#%d': %v", alj.AccountId, err)
+				logrus.Infof("'%v' still over limit: '%v' with rx: %v, tx: %v, total: %v", accounts[bwje.AccountId].Email, bwc, util.BytesToSize(used.rx), util.BytesToSize(used.tx), util.BytesToSize(used.rx+used.tx))
 			}
 		}
 	} else {
@@ -623,110 +420,84 @@ func (a *Agent) relax() error {
 	return nil
 }
 
-func (a *Agent) checkAccountLimit(acctId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
-	period := 24 * time.Hour
-	limit := DefaultBandwidthPerPeriod()
-	if a.cfg.Bandwidth != nil && a.cfg.Bandwidth.PerAccount != nil {
-		limit = a.cfg.Bandwidth.PerAccount
+func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.BandwidthClass, trx *sqlx.Tx) (*store.BandwidthLimitJournalEntry, error) {
+	if bwc.IsGlobal() {
+		if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(acctId, trx); err == nil && !empty {
+			je, err := a.str.FindLatestBandwidthLimitJournalForGlobal(acctId, trx)
+			if err != nil {
+				return nil, err
+			}
+			if je.Action == store.LimitLimitAction {
+				logrus.Debugf("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
+				return je, nil
+			}
+		} else if err != nil {
+			return nil, err
+		}
+	} else {
+		if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(acctId, bwc.GetLimitClassId(), trx); err == nil && !empty {
+			je, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(acctId, bwc.GetLimitClassId(), trx)
+			if err != nil {
+				return nil, err
+			}
+			if je.Action == store.LimitLimitAction {
+				logrus.Debugf("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
+				return je, nil
+			}
+		} else if err != nil {
+			return nil, err
+		}
 	}
-	if limit.Period > 0 {
-		period = limit.Period
-	}
-	rx, tx, err := a.ifx.totalRxTxForAccount(acctId, period)
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	enforce, warning = a.checkLimit(limit, rx, tx)
-	return enforce, warning, rx, tx, nil
+	return nil, nil
 }
 
-func (a *Agent) checkEnvironmentLimit(envId int64) (enforce, warning bool, rxBytes, txBytes int64, err error) {
-	period := 24 * time.Hour
-	limit := DefaultBandwidthPerPeriod()
-	if a.cfg.Bandwidth != nil && a.cfg.Bandwidth.PerEnvironment != nil {
-		limit = a.cfg.Bandwidth.PerEnvironment
-	}
-	if limit.Period > 0 {
-		period = limit.Period
-	}
-	rx, tx, err := a.ifx.totalRxTxForEnvironment(envId, period)
-	if err != nil {
-		logrus.Error(err)
+func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
+	periodBw := make(map[int]periodBwValues)
+
+	var selectedLc store.BandwidthClass
+	var rxBytes int64
+	var txBytes int64
+
+	for _, bwc := range bwcs {
+		if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
+			rx, tx, err := a.ifx.totalRxTxForAccount(u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
+			if err != nil {
+				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
+			}
+			periodBw[bwc.GetPeriodMinutes()] = periodBwValues{rx: rx, tx: tx}
+		}
+		period := periodBw[bwc.GetPeriodMinutes()]
+
+		if a.transferBytesExceeded(period.rx, period.tx, bwc) {
+			selectedLc = bwc
+			rxBytes = period.rx
+			txBytes = period.tx
+		} else {
+			logrus.Debugf("'%v' limit ok '%v' with rx: %v, tx: %v, total: %v", acct.Email, bwc, util.BytesToSize(period.rx), util.BytesToSize(period.tx), util.BytesToSize(period.rx+period.tx))
+		}
 	}
 
-	enforce, warning = a.checkLimit(limit, rx, tx)
-	return enforce, warning, rx, tx, nil
+	if selectedLc != nil {
+		logrus.Infof("'%v' exceeded limit '%v' with rx: %v, tx: %v, total: %v", acct.Email, selectedLc, util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
+	}
+
+	return selectedLc, rxBytes, txBytes, nil
 }
 
-func (a *Agent) checkShareLimit(shrToken string) (enforce, warning bool, rxBytes, txBytes int64, err error) {
-	period := 24 * time.Hour
-	limit := DefaultBandwidthPerPeriod()
-	if a.cfg.Bandwidth != nil && a.cfg.Bandwidth.PerShare != nil {
-		limit = a.cfg.Bandwidth.PerShare
+func (a *Agent) transferBytesExceeded(rx, tx int64, bwc store.BandwidthClass) bool {
+	if bwc.GetTxBytes() != store.Unlimited && tx >= bwc.GetTxBytes() {
+		return true
 	}
-	if limit.Period > 0 {
-		period = limit.Period
+	if bwc.GetRxBytes() != store.Unlimited && rx >= bwc.GetRxBytes() {
+		return true
 	}
-	rx, tx, err := a.ifx.totalRxTxForShare(shrToken, period)
-	if err != nil {
-		logrus.Error(err)
+	if bwc.GetTotalBytes() != store.Unlimited && tx+rx >= bwc.GetTotalBytes() {
+		return true
 	}
-
-	enforce, warning = a.checkLimit(limit, rx, tx)
-	if enforce || warning {
-		logrus.Debugf("'%v': %v", shrToken, describeLimit(limit, rx, tx))
-	}
-
-	return enforce, warning, rx, tx, nil
+	return false
 }
 
-func (a *Agent) checkLimit(cfg *BandwidthPerPeriod, rx, tx int64) (enforce, warning bool) {
-	if cfg.Limit.Rx != Unlimited && rx > cfg.Limit.Rx {
-		return true, false
-	}
-	if cfg.Limit.Tx != Unlimited && tx > cfg.Limit.Tx {
-		return true, false
-	}
-	if cfg.Limit.Total != Unlimited && rx+tx > cfg.Limit.Total {
-		return true, false
-	}
-
-	if cfg.Warning.Rx != Unlimited && rx > cfg.Warning.Rx {
-		return false, true
-	}
-	if cfg.Warning.Tx != Unlimited && tx > cfg.Warning.Tx {
-		return false, true
-	}
-	if cfg.Warning.Total != Unlimited && rx+tx > cfg.Warning.Total {
-		return false, true
-	}
-
-	return false, false
-}
-
-func describeLimit(cfg *BandwidthPerPeriod, rx, tx int64) string {
-	out := ""
-
-	if cfg.Limit.Rx != Unlimited && rx > cfg.Limit.Rx {
-		out += fmt.Sprintf("['%v' over rx limit '%v']", util.BytesToSize(rx), util.BytesToSize(cfg.Limit.Rx))
-	}
-	if cfg.Limit.Tx != Unlimited && tx > cfg.Limit.Tx {
-		out += fmt.Sprintf("['%v' over tx limit '%v']", util.BytesToSize(tx), util.BytesToSize(cfg.Limit.Tx))
-	}
-	if cfg.Limit.Total != Unlimited && rx+tx > cfg.Limit.Total {
-		out += fmt.Sprintf("['%v' over total limit '%v']", util.BytesToSize(rx+tx), util.BytesToSize(cfg.Limit.Total))
-	}
-
-	if cfg.Warning.Rx != Unlimited && rx > cfg.Warning.Rx {
-		out += fmt.Sprintf("['%v' over rx warning '%v']", util.BytesToSize(rx), util.BytesToSize(cfg.Warning.Rx))
-	}
-	if cfg.Warning.Tx != Unlimited && tx > cfg.Warning.Tx {
-		out += fmt.Sprintf("['%v' over tx warning '%v']", util.BytesToSize(tx), util.BytesToSize(cfg.Warning.Tx))
-	}
-	if cfg.Warning.Total != Unlimited && rx+tx > cfg.Warning.Total {
-		out += fmt.Sprintf("['%v' over total warning '%v']", util.BytesToSize(rx+tx), util.BytesToSize(cfg.Warning.Total))
-	}
-
-	return out
+type periodBwValues struct {
+	rx int64
+	tx int64
 }

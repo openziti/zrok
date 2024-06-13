@@ -2,9 +2,15 @@
 
 ## v0.4.31
 
-FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching
+FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606). This new feature allows for extensive limits customization on a per-user basis, with fallback to the global defaults in the controller configuration.
 
-CHANGE: log messages that said "backend proxy endpoint" were clarified to say "backend target"
+CHANGE: The controller configuration version has been updated to version `4` (`v: 4`) to support the new limits global configuration changes (https://github.com/openziti/zrok/issues/606).
+
+CHANGE: A new `ZROK_CTRL_CONFIG_VERSION` environment variable now exists to temporarily force the controller to assume a specific controller configuration version, regardless of what version exists in the file. This allows two different config versions to potentially be co-mingled in the same controller configuration file. Use with care (https://github.com/openziti/zrok/issues/648)
+
+CHANGE: Log messages that said `backend proxy endpoint` were clarified to say `backend target`.
+
+FIX: Correct the syntax for the Docker and Linux zrok-share "frontdoor" service that broke OAuth email address pattern matching.
 
 ## v0.4.30
 
