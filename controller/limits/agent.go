@@ -146,7 +146,6 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 					logrus.Debugf("account '#%d', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
 					return false, nil
 				}
-				logrus.Infof("total = %d", total)
 			}
 		}
 	}
