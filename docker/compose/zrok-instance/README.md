@@ -90,9 +90,9 @@ ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
 
 # zrok version, e.g., 1.0.0
-ZROK_IMAGE_TAG=latest
+ZROK_CLI_TAG=latest
 # ziti version, e.g., 1.0.0
-ZITI_IMAGE_TAG=latest
+ZITI_CLI_TAG=latest
 ```
 
 ### Start the Docker Compose Project
