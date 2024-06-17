@@ -1,3 +1,3 @@
 -- +migrate Up
 
-alter table limit_classes add column frontends int not null default (-1);
+alter table limit_classes add column share_frontends int not null default (-1);

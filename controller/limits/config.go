@@ -10,7 +10,7 @@ type Config struct {
 	Shares         int
 	ReservedShares int
 	UniqueNames    int
-	Frontends      int
+	ShareFrontends int
 	Bandwidth      *BandwidthPerPeriod
 	Cycle          time.Duration
 	Enforcing      bool
@@ -50,7 +50,7 @@ func DefaultConfig() *Config {
 		Shares:         store.Unlimited,
 		ReservedShares: store.Unlimited,
 		UniqueNames:    store.Unlimited,
-		Frontends:      store.Unlimited,
+		ShareFrontends: store.Unlimited,
 		Bandwidth:      DefaultBandwidthPerPeriod(),
 		Enforcing:      false,
 		Cycle:          15 * time.Minute,

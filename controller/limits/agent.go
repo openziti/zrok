@@ -163,31 +163,42 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 			return false, err
 		}
 		if env.AccountId != nil {
+			if err := a.str.LimitCheckLock(*env.AccountId, trx); err != nil {
+				return false, err
+			}
+
 			ul, err := a.getUserLimits(*env.AccountId, trx)
 			if err != nil {
 				return false, err
 			}
 
-			if ul.resource.IsGlobal() {
-				if empty, err := a.str.IsBandwidthLimitJournalEmptyForGlobal(*env.AccountId, trx); err == nil && !empty {
-					lj, err := a.str.FindLatestBandwidthLimitJournalForGlobal(*env.AccountId, trx)
-					if err != nil {
-						return false, err
-					}
-					if lj.Action == store.LimitLimitAction {
-						return false, nil
-					}
+			if scopedBwc, found := ul.scopes[sdk.BackendMode(shr.BackendMode)]; found {
+				latestScopedJe, err := a.isBandwidthClassLimitedForAccount(*env.AccountId, scopedBwc, trx)
+				if err != nil {
+					return false, err
+				}
+				if latestScopedJe != nil {
+					return false, nil
 				}
 			} else {
-				if empty, err := a.str.IsBandwidthLimitJournalEmptyForLimitClass(*env.AccountId, ul.resource.GetLimitClassId(), trx); err == nil && !empty {
-					lj, err := a.str.FindLatestBandwidthLimitJournalForLimitClass(*env.AccountId, ul.resource.GetLimitClassId(), trx)
+				for _, bwc := range ul.bandwidth {
+					latestJe, err := a.isBandwidthClassLimitedForAccount(*env.AccountId, bwc, trx)
 					if err != nil {
 						return false, err
 					}
-					if lj.Action == store.LimitLimitAction {
+					if latestJe != nil {
 						return false, nil
 					}
 				}
+			}
+
+			rc := ul.resource
+			if scopeRc, found := ul.scopes[sdk.BackendMode(shr.BackendMode)]; found {
+				rc = scopeRc
+			}
+			if rc.GetShareFrontends() > store.Unlimited {
+				// TODO: Implement frontends+1 check
+				return true, nil
 			}
 		} else {
 			return false, nil

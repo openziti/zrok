@@ -37,8 +37,8 @@ func (rcc *configResourceCountClass) GetUniqueNames() int {
 	return rcc.cfg.UniqueNames
 }
 
-func (rcc *configResourceCountClass) GetFrontends() int {
-	return rcc.cfg.Frontends
+func (rcc *configResourceCountClass) GetShareFrontends() int {
+	return rcc.cfg.ShareFrontends
 }
 
 func (rcc *configResourceCountClass) String() string {
