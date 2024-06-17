@@ -37,6 +37,10 @@ func (rcc *configResourceCountClass) GetUniqueNames() int {
 	return rcc.cfg.UniqueNames
 }
 
+func (rcc *configResourceCountClass) GetFrontends() int {
+	return rcc.cfg.Frontends
+}
+
 func (rcc *configResourceCountClass) String() string {
 	return fmt.Sprintf("Config<environments: %d, shares: %d, reservedShares: %d, uniqueNames: %d>", rcc.cfg.Environments, rcc.cfg.Shares, rcc.cfg.ReservedShares, rcc.cfg.UniqueNames)
 }
