@@ -42,5 +42,5 @@ func (rcc *configResourceCountClass) GetShareFrontends() int {
 }
 
 func (rcc *configResourceCountClass) String() string {
-	return fmt.Sprintf("Config<environments: %d, shares: %d, reservedShares: %d, uniqueNames: %d>", rcc.cfg.Environments, rcc.cfg.Shares, rcc.cfg.ReservedShares, rcc.cfg.UniqueNames)
+	return fmt.Sprintf("Config<environments: %d, shares: %d, reservedShares: %d, uniqueNames: %d, share_frontends: %d>", rcc.cfg.Environments, rcc.cfg.Shares, rcc.cfg.ReservedShares, rcc.cfg.UniqueNames, rcc.cfg.ShareFrontends)
 }

@@ -83,6 +83,7 @@ limits:
   shares:           -1
   reserved_shares:  -1
   unique_names:     -1
+  share_frontends:  -1
   bandwidth:
     period:         5m
     warning:

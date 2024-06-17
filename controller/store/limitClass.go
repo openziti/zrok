@@ -128,7 +128,7 @@ func (lc LimitClass) String() string {
 		out += fmt.Sprintf(", uniqueNames: %d", lc.UniqueNames)
 	}
 	if lc.ShareFrontends > Unlimited {
-		out += fmt.Sprintf(", frontends: %d", lc.ShareFrontends)
+		out += fmt.Sprintf(", shareFrontends: %d", lc.ShareFrontends)
 	}
 	if lc.RxBytes > Unlimited || lc.TxBytes > Unlimited || lc.TotalBytes > Unlimited {
 		out += fmt.Sprintf(", periodMinutes: %d", lc.PeriodMinutes)

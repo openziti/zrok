@@ -197,8 +197,14 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 				rc = scopeRc
 			}
 			if rc.GetShareFrontends() > store.Unlimited {
-				// TODO: Implement frontends+1 check
-				return true, nil
+				fes, err := a.str.FindFrontendsForPrivateShare(shr.Id, trx)
+				if err != nil {
+					return false, err
+				}
+				if len(fes)+1 > rc.GetShareFrontends() {
+					logrus.Infof("account '#%d' over frontends per share limit '%d'", *env.AccountId, rc.GetReservedShares())
+					return false, nil
+				}
 			}
 		} else {
 			return false, nil
