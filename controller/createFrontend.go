@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
@@ -57,11 +56,12 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 	}
 
 	fe := &store.Frontend{
-		Token:       feToken,
-		ZId:         params.Body.ZID,
-		PublicName:  &params.Body.PublicName,
-		UrlTemplate: &params.Body.URLTemplate,
-		Reserved:    true,
+		Token:          feToken,
+		ZId:            params.Body.ZID,
+		PublicName:     &params.Body.PublicName,
+		UrlTemplate:    &params.Body.URLTemplate,
+		Reserved:       true,
+		PermissionMode: store.PermissionMode(params.Body.PermissionMode),
 	}
 	if _, err := str.CreateGlobalFrontend(fe, tx); err != nil {
 		perr := &pq.Error{}

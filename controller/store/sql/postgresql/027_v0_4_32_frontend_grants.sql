@@ -1,5 +1,7 @@
 -- +migrate Up
 
+alter table frontends add column permission_mode permission_mode_type not null default('open');
+
 create table frontend_grants (
     id                  serial                  primary key,
 
