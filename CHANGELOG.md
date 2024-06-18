@@ -2,6 +2,8 @@
 
 ## v0.4.32
 
+FEATURE: Resource count limits now include `share_frontends` to limit the number of frontends that are allowed to make connections to a share (https://github.com/openziti/zrok/issues/650)
+
 FIX: use controller config spec v4 in the Docker instance
 
 ## v0.4.31
