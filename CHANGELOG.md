@@ -2,7 +2,7 @@
 
 ## v0.4.32
 
-FEATURE: New `frontend_grants` table that can be used to control which accounts are allowed to create shares with specific frontend instances (https://github.com/openziti/zrok/issues/539)
+FEATURE: New permission mode support for public frontends. Open permission mode frontends are available to all users in the service instance. Closed permission mode frontends reference the new `frontend_grants` table that can be used to control which accounts are allowed to create shares using that frontend. `zrok admin create frontend` now supports `--closed` flag to create closed permission mode frontends (https://github.com/openziti/zrok/issues/539)
 
 FEATURE: Resource count limits now include `share_frontends` to limit the number of frontends that are allowed to make connections to a share (https://github.com/openziti/zrok/issues/650)
 
