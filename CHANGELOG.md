@@ -2,6 +2,8 @@
 
 ## v0.4.32
 
+FEATURE: New `frontend_grants` table that can be used to control which accounts are allowed to create shares with specific frontend instances (https://github.com/openziti/zrok/issues/539)
+
 FEATURE: Resource count limits now include `share_frontends` to limit the number of frontends that are allowed to make connections to a share (https://github.com/openziti/zrok/issues/650)
 
 FIX: use controller config spec v4 in the Docker instance
