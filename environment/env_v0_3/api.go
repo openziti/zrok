@@ -85,6 +85,24 @@ func (r *Root) ApiEndpoint() (string, string) {
 	return apiEndpoint, from
 }
 
+func (r *Root) DefaultFrontend() (string, string) {
+	defaultFrontend := "public"
+	from := "binary"
+
+	if r.Config() != nil && r.Config().DefaultFrontend != "" {
+		defaultFrontend = r.Config().DefaultFrontend
+		from = "config"
+	}
+
+	env := os.Getenv("ZROK_DEFAULT_FRONTEND")
+	if env != "" {
+		defaultFrontend = env
+		from = "ZROK_DEFAULT_FRONTEND"
+	}
+
+	return defaultFrontend, from
+}
+
 func (r *Root) Environment() *env_core.Environment {
 	return r.env
 }
