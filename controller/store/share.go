@@ -18,7 +18,6 @@ type Share struct {
 	Reserved             bool
 	UniqueName           bool
 	PermissionMode       PermissionMode
-	Deleted              bool
 }
 
 func (str *Store) CreateShare(envId int, shr *Share, tx *sqlx.Tx) (int, error) {
