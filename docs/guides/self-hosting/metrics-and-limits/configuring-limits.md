@@ -92,6 +92,7 @@ Limit classes are created by creating a record in the `limit_classes` table in t
 ```sql
 CREATE TABLE public.limit_classes (
     id integer NOT NULL,
+    label VARCHAR(32),
     backend_mode public.backend_mode,
     environments integer DEFAULT '-1'::integer NOT NULL,
     shares integer DEFAULT '-1'::integer NOT NULL,
