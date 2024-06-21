@@ -45,7 +45,12 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", []string{"public|<defaultFrontend>"}, "Selected frontends to use for the share")
+	defaultFrontends := []string{"public"}
+	if root, err := environment.LoadRoot(); err == nil {
+		defaultFrontend, _ := root.DefaultFrontend()
+		defaultFrontends = []string{defaultFrontend}
+	}
+	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
