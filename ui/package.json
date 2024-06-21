@@ -7,7 +7,7 @@
     "@emotion/styled": "^11.10.4",
     "@mdi/js": "^7.0.96",
     "@mdi/react": "^1.6.1",
-    "@mui/material": "^5.10.4",
+    "@mui/material": "^5.15.18",
     "bootstrap": "^5.2.3",
     "dagre": "^0.8.5",
     "eslint-config-react-app": "^7.0.1",
