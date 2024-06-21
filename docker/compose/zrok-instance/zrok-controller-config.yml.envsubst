@@ -4,7 +4,7 @@
 #   /___|_|  \___/|_|\_\
 # controller configuration
 
-v: 3
+v: 4
 admin:
   # generate these admin tokens from a source of randomness, e.g. 
   #  LC_ALL=C tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c32

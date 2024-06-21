@@ -7,15 +7,22 @@ package rest_model_zrok
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CreateFrontendRequest create frontend request
 //
 // swagger:model createFrontendRequest
 type CreateFrontendRequest struct {
+
+	// permission mode
+	// Enum: [open closed]
+	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name
 	PublicName string `json:"public_name,omitempty"`
@@ -29,6 +36,57 @@ type CreateFrontendRequest struct {
 
 // Validate validates this create frontend request
 func (m *CreateFrontendRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validatePermissionMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var createFrontendRequestTypePermissionModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["open","closed"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createFrontendRequestTypePermissionModePropEnum = append(createFrontendRequestTypePermissionModePropEnum, v)
+	}
+}
+
+const (
+
+	// CreateFrontendRequestPermissionModeOpen captures enum value "open"
+	CreateFrontendRequestPermissionModeOpen string = "open"
+
+	// CreateFrontendRequestPermissionModeClosed captures enum value "closed"
+	CreateFrontendRequestPermissionModeClosed string = "closed"
+)
+
+// prop value enum
+func (m *CreateFrontendRequest) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createFrontendRequestTypePermissionModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CreateFrontendRequest) validatePermissionMode(formats strfmt.Registry) error {
+	if swag.IsZero(m.PermissionMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validatePermissionModeEnum("permissionMode", "body", m.PermissionMode); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -14,7 +14,7 @@ const ActionsTab = (props) => {
 
     return (
         <div className={"actions-tab"}>
-            <div id={"change-password"} style={{"padding-top": "10px"}}>
+            <div id={"change-password"} style={{"paddingTop": "10px"}}>
                 <h3>Change Password?</h3>
                 <p>Change the password used to log into the zrok web console.</p>
                 <Button variant={"danger"} onClick={openChangePasswordModal}>Change Password</Button>

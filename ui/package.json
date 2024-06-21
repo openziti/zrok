@@ -14,7 +14,7 @@
     "humanize-duration": "^3.27.3",
     "moment": "^2.29.4",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.7.0",
+    "react-bootstrap": "^2.10.2",
     "react-data-table-component": "^7.5.2",
     "react-dom": "^18.2.0",
     "react-force-graph": "^1.43.0",

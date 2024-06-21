@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,7 +16,8 @@ func init() {
 }
 
 type adminCreateFrontendCommand struct {
-	cmd *cobra.Command
+	cmd    *cobra.Command
+	closed bool
 }
 
 func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
@@ -25,6 +27,7 @@ func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 		Args:  cobra.ExactArgs(3),
 	}
 	command := &adminCreateFrontendCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enabled closed permission mode")
 	cmd.Run = command.run
 	return command
 }
@@ -44,11 +47,16 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	permissionMode := sdk.OpenPermissionMode
+	if cmd.closed {
+		permissionMode = sdk.ClosedPermissionMode
+	}
 	req := admin.NewCreateFrontendParams()
 	req.Body = &rest_model_zrok.CreateFrontendRequest{
-		ZID:         zId,
-		PublicName:  publicName,
-		URLTemplate: urlTemplate,
+		ZID:            zId,
+		PublicName:     publicName,
+		URLTemplate:    urlTemplate,
+		PermissionMode: string(permissionMode),
 	}
 
 	resp, err := zrok.Admin.CreateFrontend(req, mustGetAdminAuth())
