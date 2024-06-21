@@ -10,6 +10,8 @@ CHANGE: Updated react and react-dom to version 18.3.1.
 
 CHANGE: Updated recharts to version 2.12.7.
 
+CHANGE: Updated react-router-dom to version 6.23.1.
+
 ## v0.4.32
 
 FEATURE: New permission mode support for public frontends. Open permission mode frontends are available to all users in the service instance. Closed permission mode frontends reference the new `frontend_grants` table that can be used to control which accounts are allowed to create shares using that frontend. `zrok admin create frontend` now supports `--closed` flag to create closed permission mode frontends (https://github.com/openziti/zrok/issues/539)
