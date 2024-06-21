@@ -766,6 +766,9 @@ definitions:
         type: string
       public_name:
         type: string
+      permissionMode:
+        type: string
+        enum: ["open", "closed"]
 
   createFrontendResponse:
     type: object

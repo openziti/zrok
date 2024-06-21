@@ -1200,6 +1200,13 @@ func init() {
     "createFrontendRequest": {
       "type": "object",
       "properties": {
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
         "public_name": {
           "type": "string"
         },
@@ -2956,6 +2963,13 @@ func init() {
     "createFrontendRequest": {
       "type": "object",
       "properties": {
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
         "public_name": {
           "type": "string"
         },

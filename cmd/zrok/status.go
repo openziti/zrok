@@ -48,8 +48,10 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
 	t.AppendHeader(table.Row{"Config", "Value", "Source"})
-	apiEndpoint, from := env.ApiEndpoint()
-	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, from})
+	apiEndpoint, apiEndpointFrom := env.ApiEndpoint()
+	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, apiEndpointFrom})
+	defaultFrontend, defaultFrontendFrom := env.DefaultFrontend()
+	t.AppendRow(table.Row{"defaultFrontend", defaultFrontend, defaultFrontendFrom})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 

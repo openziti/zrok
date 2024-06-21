@@ -13,6 +13,7 @@ type Root interface {
 
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
+	DefaultFrontend() (string, string)
 
 	IsEnabled() bool
 	Environment() *Environment
@@ -34,7 +35,8 @@ type Environment struct {
 }
 
 type Config struct {
-	ApiEndpoint string
+	ApiEndpoint     string
+	DefaultFrontend string
 }
 
 type Metadata struct {

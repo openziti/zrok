@@ -124,6 +124,7 @@ func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.Fi
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	_, err = io.Copy(f, stream)
 	if err != nil {
 		return err
