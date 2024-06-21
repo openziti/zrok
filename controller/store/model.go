@@ -7,14 +7,6 @@ const (
 	WarningLimitAction LimitAction = "warning"
 )
 
-type LimitScope string
-
-const (
-	AccountLimitScope     LimitScope = "account"
-	EnvironmentLimitScope LimitScope = "environment"
-	ShareLimitScope       LimitScope = "share"
-)
-
 type PermissionMode string
 
 const (

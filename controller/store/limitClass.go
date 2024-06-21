@@ -38,6 +38,7 @@ type BandwidthClass interface {
 
 type LimitClass struct {
 	Model
+	Label          *string
 	BackendMode    *sdk.BackendMode
 	Environments   int
 	Shares         int
@@ -111,7 +112,12 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 }
 
 func (lc LimitClass) String() string {
-	out := fmt.Sprintf("LimitClass<#%d", lc.Id)
+	out := "LimitClass<"
+	if lc.Label != nil && *lc.Label != "" {
+		out += "'" + *lc.Label + "'"
+	} else {
+		out += fmt.Sprintf("#%d", lc.Id)
+	}
 	if lc.BackendMode != nil {
 		out += fmt.Sprintf(", backendMode: '%s'", *lc.BackendMode)
 	}
@@ -149,12 +155,12 @@ func (lc LimitClass) String() string {
 var _ BandwidthClass = (*LimitClass)(nil)
 
 func (str *Store) CreateLimitClass(lc *LimitClass, trx *sqlx.Tx) (int, error) {
-	stmt, err := trx.Prepare("insert into limit_classes (backend_mode, environments, shares, reserved_shares, unique_names, share_frontends, period_minutes, rx_bytes, tx_bytes, total_bytes, limit_action) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
+	stmt, err := trx.Prepare("insert into limit_classes (label, backend_mode, environments, shares, reserved_shares, unique_names, share_frontends, period_minutes, rx_bytes, tx_bytes, total_bytes, limit_action) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing limit_classes insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(lc.BackendMode, lc.Environments, lc.Shares, lc.ReservedShares, lc.UniqueNames, lc.ShareFrontends, lc.PeriodMinutes, lc.RxBytes, lc.TxBytes, lc.TotalBytes, lc.LimitAction).Scan(&id); err != nil {
+	if err := stmt.QueryRow(lc.Label, lc.BackendMode, lc.Environments, lc.Shares, lc.ReservedShares, lc.UniqueNames, lc.ShareFrontends, lc.PeriodMinutes, lc.RxBytes, lc.TxBytes, lc.TotalBytes, lc.LimitAction).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing limit_classes insert statement")
 	}
 	return id, nil
