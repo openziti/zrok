@@ -108,6 +108,7 @@ let primitives = [
                  ];
 
 let enumsMap: {[index: string]: any} = {
+        "CreateFrontendRequest.PermissionModeEnum": CreateFrontendRequest.PermissionModeEnum,
         "ShareRequest.ShareModeEnum": ShareRequest.ShareModeEnum,
         "ShareRequest.BackendModeEnum": ShareRequest.BackendModeEnum,
         "ShareRequest.OauthProviderEnum": ShareRequest.OauthProviderEnum,

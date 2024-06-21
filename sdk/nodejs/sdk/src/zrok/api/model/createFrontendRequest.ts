@@ -16,6 +16,7 @@ export class CreateFrontendRequest {
     'zId'?: string;
     'urlTemplate'?: string;
     'publicName'?: string;
+    'permissionMode'?: CreateFrontendRequest.PermissionModeEnum;
 
     static discriminator: string | undefined = undefined;
 
@@ -34,6 +35,11 @@ export class CreateFrontendRequest {
             "name": "publicName",
             "baseName": "public_name",
             "type": "string"
+        },
+        {
+            "name": "permissionMode",
+            "baseName": "permissionMode",
+            "type": "CreateFrontendRequest.PermissionModeEnum"
         }    ];
 
     static getAttributeTypeMap() {
@@ -41,3 +47,9 @@ export class CreateFrontendRequest {
     }
 }
 
+export namespace CreateFrontendRequest {
+    export enum PermissionModeEnum {
+        Open = <any> 'open',
+        Closed = <any> 'closed'
+    }
+}
