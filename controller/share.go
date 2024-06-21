@@ -116,6 +116,17 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 				logrus.Error(err)
 				return share.NewShareNotFound()
 			}
+			if sfe.PermissionMode == store.ClosedPermissionMode {
+				granted, err := str.IsFrontendGrantedToAccount(int(principal.ID), sfe.Id, trx)
+				if err != nil {
+					logrus.Error(err)
+					return share.NewShareInternalServerError()
+				}
+				if !granted {
+					logrus.Errorf("'%v' is not granted access to frontend '%v'", principal.Email, frontendSelection)
+					return share.NewShareNotFound()
+				}
+			}
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)

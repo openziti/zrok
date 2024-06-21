@@ -20,7 +20,7 @@ The limits agent is responsible for controlling the number of resources in use (
 
 ### Types of Limits
 
-Limits can be specified that control the number of environments, shares, reserved shares, and unique names that can be created by an account. Limits that control the allowed number of resources are called _resource count limits_.
+Limits can be specified that control the number of environments, shares, reserved shares, unique names, and frontends per-share that can be created by an account. Limits that control the allowed number of resources are called _resource count limits_.
 
 Limits can be specified to control the amount of data that can be transferred within a time period. Limits that control the amount of data that can be transferred are called _bandwidth limits_.
 
@@ -40,6 +40,7 @@ limits:
   shares:           -1
   reserved_shares:  -1
   unique_names:     -1
+  share_frontends:  -1
   bandwidth:
     period:         5m
     warning:
@@ -64,7 +65,7 @@ The `cycle` value controls how frequently the limits agent will evaluate enforce
 
 ### Global Resouce Count Limits
 
-The `environments`, `shares`, `reserved_shares`, and `unique_names` specify the resource count limits, globally for the service instance. 
+The `environments`, `shares`, `reserved_shares`, `unique_names`, and `share_frontends` specify the resource count limits, globally for the service instance. 
 
 These resource counts will be applied to all users in the service instance by default.
 
@@ -91,11 +92,13 @@ Limit classes are created by creating a record in the `limit_classes` table in t
 ```sql
 CREATE TABLE public.limit_classes (
     id integer NOT NULL,
+    label VARCHAR(32),
     backend_mode public.backend_mode,
     environments integer DEFAULT '-1'::integer NOT NULL,
     shares integer DEFAULT '-1'::integer NOT NULL,
     reserved_shares integer DEFAULT '-1'::integer NOT NULL,
     unique_names integer DEFAULT '-1'::integer NOT NULL,
+    share_frontends integer DEFAULT '-1'::integer NOT NULL,
     period_minutes integer DEFAULT 1440 NOT NULL,
     rx_bytes bigint DEFAULT '-1'::integer NOT NULL,
     tx_bytes bigint DEFAULT '-1'::integer NOT NULL,
@@ -130,7 +133,7 @@ Create a row in this table linking the `account_id` to the `limit_class_id` to a
 To support overriding the resource count limits defined in the global limits configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
 
 ```sql
-insert into limit_classes (environments, shares, reserved_shares, unique_names) values (1, 1, 1, 1);
+insert into limit_classes (environments, shares, reserved_shares, unique_names, share_frontends) values (1, 1, 1, 1, 1);
 ```
 
 This creates a limit class that sets the `environments`, `shares`, `reserved_shares`, and `unique_names` all to `1`.

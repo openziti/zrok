@@ -42,7 +42,6 @@ func (ul *userLimits) ignoreBackends(bwc store.BandwidthClass) map[sdk.BackendMo
 		}
 		return ignoreBackends
 	}
-	return nil
 }
 
 func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
@@ -85,7 +84,7 @@ func (a *Agent) isResourceCountClass(alc *store.LimitClass) bool {
 	if alc.BackendMode != nil {
 		return false
 	}
-	if alc.Environments == store.Unlimited && alc.Shares == store.Unlimited && alc.ReservedShares == store.Unlimited && alc.UniqueNames == store.Unlimited {
+	if alc.Environments == store.Unlimited && alc.Shares == store.Unlimited && alc.ReservedShares == store.Unlimited && alc.UniqueNames == store.Unlimited && alc.ShareFrontends == store.Unlimited {
 		return false
 	}
 	return true
@@ -95,7 +94,7 @@ func (a *Agent) isUnscopedBandwidthClass(alc *store.LimitClass) bool {
 	if alc.BackendMode != nil {
 		return false
 	}
-	if alc.Environments > store.Unlimited || alc.Shares > store.Unlimited || alc.ReservedShares > store.Unlimited || alc.UniqueNames > store.Unlimited {
+	if alc.Environments > store.Unlimited || alc.Shares > store.Unlimited || alc.ReservedShares > store.Unlimited || alc.UniqueNames > store.Unlimited || alc.ShareFrontends > store.Unlimited {
 		return false
 	}
 	if alc.PeriodMinutes < 1 {
