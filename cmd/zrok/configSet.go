@@ -63,6 +63,20 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 			fmt.Printf("\n[%v]: because you have a %v-d environment, you won't see your config change until you run %v first!\n\n", tui.WarningLabel, tui.Code.Render("zrok enable"), tui.Code.Render("zrok disable"))
 		}
 
+	case "defaultFrontend":
+		if env.Config() == nil {
+			if err := env.SetConfig(&env_core.Config{DefaultFrontend: value}); err != nil {
+				tui.Error("unable to save config", err)
+			}
+		} else {
+			cfg := env.Config()
+			cfg.DefaultFrontend = value
+			if err := env.SetConfig(cfg); err != nil {
+				tui.Error("unable to save config", err)
+			}
+		}
+		fmt.Println("zrok configuration updated")
+
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)
 		os.Exit(1)

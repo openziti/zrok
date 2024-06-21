@@ -30,20 +30,23 @@ class CreateFrontendRequest(object):
     swagger_types = {
         'z_id': 'str',
         'url_template': 'str',
-        'public_name': 'str'
+        'public_name': 'str',
+        'permission_mode': 'str'
     }
 
     attribute_map = {
         'z_id': 'zId',
         'url_template': 'url_template',
-        'public_name': 'public_name'
+        'public_name': 'public_name',
+        'permission_mode': 'permissionMode'
     }
 
-    def __init__(self, z_id=None, url_template=None, public_name=None):  # noqa: E501
+    def __init__(self, z_id=None, url_template=None, public_name=None, permission_mode=None):  # noqa: E501
         """CreateFrontendRequest - a model defined in Swagger"""  # noqa: E501
         self._z_id = None
         self._url_template = None
         self._public_name = None
+        self._permission_mode = None
         self.discriminator = None
         if z_id is not None:
             self.z_id = z_id
@@ -51,6 +54,8 @@ class CreateFrontendRequest(object):
             self.url_template = url_template
         if public_name is not None:
             self.public_name = public_name
+        if permission_mode is not None:
+            self.permission_mode = permission_mode
 
     @property
     def z_id(self):
@@ -114,6 +119,33 @@ class CreateFrontendRequest(object):
         """
 
         self._public_name = public_name
+
+    @property
+    def permission_mode(self):
+        """Gets the permission_mode of this CreateFrontendRequest.  # noqa: E501
+
+
+        :return: The permission_mode of this CreateFrontendRequest.  # noqa: E501
+        :rtype: str
+        """
+        return self._permission_mode
+
+    @permission_mode.setter
+    def permission_mode(self, permission_mode):
+        """Sets the permission_mode of this CreateFrontendRequest.
+
+
+        :param permission_mode: The permission_mode of this CreateFrontendRequest.  # noqa: E501
+        :type: str
+        """
+        allowed_values = ["open", "closed"]  # noqa: E501
+        if permission_mode not in allowed_values:
+            raise ValueError(
+                "Invalid value for `permission_mode` ({0}), must be one of {1}"  # noqa: E501
+                .format(permission_mode, allowed_values)
+            )
+
+        self._permission_mode = permission_mode
 
     def to_dict(self):
         """Returns the model properties as a dict"""
