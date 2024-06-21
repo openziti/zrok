@@ -46,7 +46,7 @@ func newReserveCommand() *reserveCommand {
 		defaultFrontends = []string{defaultFrontend}
 	}
 	cmd.Flags().StringVarP(&command.uniqueName, "unique-name", "n", "", "A unique name for the reserved share (defaults to generated identifier)")
-	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", defaultFrontends, "Selected frontends to use for the share")
+	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel, socks, vpn)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
