@@ -14,6 +14,8 @@ CHANGE: Updated `react-router-dom` to version `6.23.1` (web console).
 
 CHANGE: Updated `axios` to version `1.7.2` for (node SDK).
 
+CHANGE: Updated `@openziti/ziti-sdk-nodejs` to version `0.17.0` (node SDK).
+
 ## v0.4.32
 
 FEATURE: New permission mode support for public frontends. Open permission mode frontends are available to all users in the service instance. Closed permission mode frontends reference the new `frontend_grants` table that can be used to control which accounts are allowed to create shares using that frontend. `zrok admin create frontend` now supports `--closed` flag to create closed permission mode frontends (https://github.com/openziti/zrok/issues/539)
