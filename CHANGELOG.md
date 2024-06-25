@@ -2,15 +2,17 @@
 
 ## v0.4.33
 
-CHANGE: Updated react-bootstrap to version 2.10.2.
+CHANGE: Updated `react-bootstrap` to version `2.10.2` (web console).
 
-CHANGE: Updated @mui/material to version 5.15.18.
+CHANGE: Updated `@mui/material` to version `5.15.18` (web console).
 
-CHANGE: Updated react and react-dom to version 18.3.1.
+CHANGE: Updated `react` and `react-dom` to version `18.3.1` (web console).
 
-CHANGE: Updated recharts to version 2.12.7.
+CHANGE: Updated `recharts` to version `2.12.7` (web console).
 
-CHANGE: Updated react-router-dom to version 6.23.1.
+CHANGE: Updated `react-router-dom` to version `6.23.1` (web console).
+
+CHANGE: Updated `axios` to version `1.7.2` for (node SDK).
 
 ## v0.4.32
 
