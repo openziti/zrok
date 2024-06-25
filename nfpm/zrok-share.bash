@@ -55,7 +55,7 @@ fi
 }
 
 # default mode is 'reserved-public', override modes are reserved-private, temp-public, temp-private.
-: "${ZROK_FRONTEND_MODE:-reserved-public}"
+: "${ZROK_FRONTEND_MODE:=reserved-public}"
 if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   ZROK_CMD="share public --headless ${ZROK_VERBOSE:-}"
 elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
@@ -121,13 +121,41 @@ case "${ZROK_BACKEND_MODE}" in
       echo "INFO: validated backend mode ${ZROK_BACKEND_MODE} and target ${ZROK_TARGET}"
     fi
     ;;
+  tcpTunnel|udpTunnel|socks|vpn)
+    if ! [[ "${ZROK_FRONTEND_MODE}" =~ -private$ ]]; then
+      echo "ERROR: ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}' is a private share backend mode and cannot be used with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
+      exit 1
+    else
+      case "${ZROK_BACKEND_MODE}" in
+        tcpTunnel|udpTunnel)
+          echo "INFO: ${ZROK_BACKEND_MODE} backend mode has target '${ZROK_TARGET}'"
+          ;;
+        vpn)
+          if [[ -n "${ZROK_TARGET}" ]]; then
+            ZROK_SVC_FILE=/etc/systemd/system/zrok-share.service.d/override.conf
+            if ! grep -qE '^AmbientCapabilities=CAP_NET_ADMIN' "${ZROK_SVC_FILE}"; then
+              echo "ERROR: you must uncomment 'AmbientCapabilities=CAP_NET_ADMIN' in '${ZROK_SVC_FILE}'"\
+                    "and run 'systemctl daemon-reload' to enable VPN mode" >&2
+              exit 1
+            fi
+          fi
+          ;;
+        socks)
+          if [[ -n "${ZROK_TARGET}" ]]; then
+            echo "WARNING: ZROK_TARGET='${ZROK_TARGET}' is ignored with ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}'" >&2
+            unset ZROK_TARGET
+          fi
+          ;;
+      esac
+    fi
+    ;;
   *)
     echo "WARNING: ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}' is not a recognized mode for a zrok public share."\
           " ZROK_TARGET value will not validated before running." >&2
     ;;
 esac
 
-[[ -n "${ZROK_UNIQUE_NAME:-}" ]] && {
+[[ "${ZROK_FRONTEND_MODE:-}" =~ ^reserved- && -n "${ZROK_UNIQUE_NAME:-}" ]] && {
   ZROK_CMD+=" --unique-name ${ZROK_UNIQUE_NAME}"
 }
 
