@@ -202,7 +202,7 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 					return false, err
 				}
 				if len(fes)+1 > rc.GetShareFrontends() {
-					logrus.Infof("account '#%d' over frontends per share limit '%d'", *env.AccountId, rc.GetReservedShares())
+					logrus.Infof("account '#%d' over frontends per share limit '%d'", *env.AccountId, rc.GetShareFrontends())
 					return false, nil
 				}
 			}

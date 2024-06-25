@@ -2,6 +2,10 @@
 
 ## v0.4.33
 
+FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
+
+FIX: Properly set `permission_mode` in `frontends` when createing a private frontend using `zrok access private` (https://github.com/openziti/zrok/issues/677)
+
 CHANGE: Updated `react-bootstrap` to version `2.10.2` (web console).
 
 CHANGE: Updated `@mui/material` to version `5.15.18` (web console).
