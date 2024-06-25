@@ -2,6 +2,8 @@
 
 ## v0.4.33
 
+FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
+
 CHANGE: Updated `react-bootstrap` to version `2.10.2` (web console).
 
 CHANGE: Updated `@mui/material` to version `5.15.18` (web console).
