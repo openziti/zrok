@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.34
+
+FIX: Fix for mixing limited and unlimited (-1) resource counts in the limits system (https://github.com/openziti/zrok/issues/680)
+
 ## v0.4.33
 
 FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
