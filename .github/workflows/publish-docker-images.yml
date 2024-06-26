@@ -36,17 +36,17 @@ jobs:
           done
 
       - name: Download Linux AMD64 Release Artifact
-        uses: dsaltares/fetch-gh-release-asset@master
+        uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok_${{ steps.semver.outputs.zrok_semver }}_linux_amd64.tar.gz
+          file: zrok*_${{ steps.semver.outputs.zrok_semver }}_linux_amd64.tar.gz
           target: dist/amd64/linux/zrok_${{ steps.semver.outputs.zrok_semver }}_linux_amd64.tar.gz
 
       - name: Download Linux ARM64 Release Artifact
-        uses: dsaltares/fetch-gh-release-asset@master
+        uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok_${{ steps.semver.outputs.zrok_semver }}_linux_arm64.tar.gz
+          file: zrok*_${{ steps.semver.outputs.zrok_semver }}_linux_arm64.tar.gz
           target: dist/arm64/linux/zrok_${{ steps.semver.outputs.zrok_semver }}_linux_arm64.tar.gz
 
       - name: Unpack the Release Artifacts
@@ -56,16 +56,16 @@ jobs:
           done
 
       - name: Set Up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: amd64,arm64
 
       - name: Set Up Docker BuildKit
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKER_HUB_API_USER || secrets.DOCKER_HUB_API_USER }}
           password: ${{ secrets.DOCKER_HUB_API_TOKEN }}

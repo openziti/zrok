@@ -349,7 +349,7 @@ jobs:
           ls -lAR ./automated-release-build/
           shasum ./automated-release-build/* > ./automated-release-build/checksums.txt
 
-      - uses: goreleaser/goreleaser-action@v3
+      - uses: goreleaser/goreleaser-action@v6
         with:
           args: release --config .goreleaser-release.yml
         env:
