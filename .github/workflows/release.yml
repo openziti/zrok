@@ -346,8 +346,7 @@ jobs:
           pattern: release-builds-*
 
       - run: |
-          mv ./automated-release-build/release-builds/* ./automated-release-build/
-          rm -rf ./automated-release-build/release-builds
+          ls -lAR ./automated-release-build/
           shasum ./automated-release-build/* > ./automated-release-build/checksums.txt
 
       - uses: goreleaser/goreleaser-action@v3
