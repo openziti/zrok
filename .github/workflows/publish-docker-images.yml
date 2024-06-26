@@ -27,7 +27,7 @@ jobs:
           echo "zrok_semver=${zrok_semver#v}" | tee -a $GITHUB_OUTPUT
 
       - name: Checkout Workspace
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create the Release Arch Dirs
         run: |

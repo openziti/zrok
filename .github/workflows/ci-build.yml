@@ -19,15 +19,15 @@ jobs:
     name: Build Linux AMD64 CLI
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: setup-go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
 
       - name: setup-node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -72,7 +72,7 @@ jobs:
           echo go_bin="$(go env GOPATH)/bin" >> $GITHUB_OUTPUT
 
       - name: upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-amd64
           path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
@@ -92,7 +92,7 @@ jobs:
           echo branch_tag=$(sed 's/[^a-z0-9_-]/__/gi' <<< "${GITHUB_REF#refs/heads/}") >> $GITHUB_OUTPUT
 
       - name: Checkout Workspace
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download Branch Build Artifact
         uses: actions/download-artifact@v3
