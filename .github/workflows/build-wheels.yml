@@ -14,7 +14,7 @@ jobs:
       matrix:
         spec:
           - { name: 'linux x86_64', runner: ubuntu-20.04, target: manylinux_2_27_x86_64 }
-          - { name: 'macOS x86_64', runner: macos-11, target: macosx_10_14_x86_64 }
+          - { name: 'macOS x86_64', runner: macos-12, target: macosx_10_14_x86_64 }
           - { name: 'Windows x86_64', runner: windows-2019, target: win_amd64 }
     name: building ${{ matrix.spec.name }}
     runs-on: ${{ matrix.spec.runner }}
