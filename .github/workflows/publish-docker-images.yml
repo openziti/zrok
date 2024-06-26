@@ -39,14 +39,16 @@ jobs:
         uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok*_linux_amd64.tar.gz
+          file: zrok.*_linux_amd64.tar.gz
+          regex: true
           target: dist/amd64/linux/zrok_linux_amd64.tar.gz
 
       - name: Download Linux ARM64 Release Artifact
         uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok*_linux_arm64.tar.gz
+          file: zrok.*_linux_arm64.tar.gz
+          regex: true
           target: dist/arm64/linux/zrok_linux_arm64.tar.gz
 
       - name: Unpack the Release Artifacts

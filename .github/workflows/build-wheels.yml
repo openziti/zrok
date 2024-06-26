@@ -62,7 +62,7 @@ jobs:
         run: |
           ls -lR ./download/
           mkdir dist
-          cp ./download/*/* ./dist/
+          cp ./download/* ./dist/
 
       - name: Publish wheels (TestPYPI)
         uses: pypa/gh-action-pypi-publish@release/v1
