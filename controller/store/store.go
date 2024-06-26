@@ -22,8 +22,9 @@ type Model struct {
 }
 
 type Config struct {
-	Path string `cf:"+secret"`
-	Type string
+	Path          string `cf:"+secret"`
+	Type          string
+	EnableLocking bool
 }
 
 type Store struct {

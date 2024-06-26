@@ -53,6 +53,7 @@
  * @property {string} zId 
  * @property {string} url_template 
  * @property {string} public_name 
+ * @property {string} permissionMode 
  */
 
 /**

@@ -49,7 +49,9 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	if err := h.checkLimits(envId, principal, trx); err != nil {
+	shareMode := sdk.ShareMode(params.Body.ShareMode)
+	backendMode := sdk.BackendMode(params.Body.BackendMode)
+	if err := h.checkLimits(envId, principal, params.Body.Reserved, params.Body.UniqueName != "", shareMode, backendMode, trx); err != nil {
 		logrus.Errorf("limits error: %v", err)
 		return share.NewShareUnauthorized()
 	}
@@ -114,6 +116,17 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 				logrus.Error(err)
 				return share.NewShareNotFound()
 			}
+			if sfe.PermissionMode == store.ClosedPermissionMode {
+				granted, err := str.IsFrontendGrantedToAccount(int(principal.ID), sfe.Id, trx)
+				if err != nil {
+					logrus.Error(err)
+					return share.NewShareInternalServerError()
+				}
+				if !granted {
+					logrus.Errorf("'%v' is not granted access to frontend '%v'", principal.Email, frontendSelection)
+					return share.NewShareNotFound()
+				}
+			}
 			if sfe != nil && sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
@@ -147,6 +160,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		BackendMode:          params.Body.BackendMode,
 		BackendProxyEndpoint: &params.Body.BackendProxyEndpoint,
 		Reserved:             reserved,
+		UniqueName:           reserved && uniqueName != "",
 		PermissionMode:       store.OpenPermissionMode,
 	}
 	if params.Body.PermissionMode != "" {
@@ -189,10 +203,10 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	})
 }
 
-func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
+func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Principal, reserved, uniqueName bool, shareMode sdk.ShareMode, backendMode sdk.BackendMode, trx *sqlx.Tx) error {
 	if !principal.Limitless {
 		if limitsAgent != nil {
-			ok, err := limitsAgent.CanCreateShare(int(principal.ID), envId, trx)
+			ok, err := limitsAgent.CanCreateShare(int(principal.ID), envId, reserved, uniqueName, shareMode, backendMode, trx)
 			if err != nil {
 				return errors.Wrapf(err, "error checking share limits for '%v'", principal.Email)
 			}

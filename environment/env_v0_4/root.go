@@ -223,13 +223,14 @@ func loadConfig() (*env_core.Config, error) {
 		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
 	}
 	out := &env_core.Config{
-		ApiEndpoint: cfg.ApiEndpoint,
+		ApiEndpoint:     cfg.ApiEndpoint,
+		DefaultFrontend: cfg.DefaultFrontend,
 	}
 	return out, nil
 }
 
 func saveConfig(cfg *env_core.Config) error {
-	in := &config{ApiEndpoint: cfg.ApiEndpoint}
+	in := &config{ApiEndpoint: cfg.ApiEndpoint, DefaultFrontend: cfg.DefaultFrontend}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "error marshaling config")
@@ -323,7 +324,8 @@ type metadata struct {
 }
 
 type config struct {
-	ApiEndpoint string `json:"api_endpoint"`
+	ApiEndpoint     string `json:"api_endpoint"`
+	DefaultFrontend string `json:"default_frontend"`
 }
 
 type environment struct {
