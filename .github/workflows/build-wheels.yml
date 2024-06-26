@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: startsWith(matrix.spec.name, 'linux')
         with:
-          name: zrok_sdk
+          name: zrok_sdk_${{ matrix.spec.target }}
           path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
 
   publish:
@@ -52,15 +52,17 @@ jobs:
           id-token: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          path: download
+          path: ./download
+          merge-multiple: true
+          pattern: zrok_sdk_*
 
       - name: check
         run: |
-          ls -lR download
+          ls -lR ./download/
           mkdir dist
-          cp download/*/* dist
+          cp ./download/*/* ./dist/
 
       - name: Publish wheels (TestPYPI)
         uses: pypa/gh-action-pypi-publish@release/v1
