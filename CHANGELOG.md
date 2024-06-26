@@ -4,6 +4,9 @@
 
 FIX: Fix for mixing limited and unlimited (-1) resource counts in the limits system (https://github.com/openziti/zrok/issues/680)
 
+CHANGE: bump many GitHub Actions that were using deprecated distributions of Node.js
+CHANGE: bump macOS runner for Node SDK from macos-11 to macos-12
+
 ## v0.4.33
 
 FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
