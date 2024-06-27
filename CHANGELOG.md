@@ -6,6 +6,8 @@ FEATURE: Linux service support for all private share modes (contribution from St
 
 FIX: Fix for mixing limited and unlimited (-1) resource counts in the limits system (https://github.com/openziti/zrok/issues/680)
 
+FIX: Fix for sending multiple warning emails when a warning is applied to an account (https://github.com/openziti/zrok/issues/685)
+
 CHANGE: add Docker compose example for multiple share containers using the same enabled environment in [compose.override.yml](./docker/compose/zrok-public-reserved/compose.override.yml)
 
 CHANGE: bump many GitHub Actions that were using deprecated distributions of Node.js
