@@ -14,18 +14,18 @@ jobs:
       matrix:
         spec:
           - { name: 'linux x86_64', runner: ubuntu-20.04, target: manylinux_2_27_x86_64 }
-          - { name: 'macOS x86_64', runner: macos-11, target: macosx_10_14_x86_64 }
+          - { name: 'macOS x86_64', runner: macos-12, target: macosx_10_14_x86_64 }
           - { name: 'Windows x86_64', runner: windows-2019, target: win_amd64 }
     name: building ${{ matrix.spec.name }}
     runs-on: ${{ matrix.spec.runner }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -39,10 +39,10 @@ jobs:
         run: |
           python setup.py sdist
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: startsWith(matrix.spec.name, 'linux')
         with:
-          name: zrok_sdk
+          name: zrok_sdk_${{ matrix.spec.target }}
           path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
 
   publish:
@@ -52,15 +52,17 @@ jobs:
           id-token: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          path: download
+          path: ./download
+          merge-multiple: true
+          pattern: zrok_sdk_*
 
       - name: check
         run: |
-          ls -lR download
+          ls -lR ./download/
           mkdir dist
-          cp download/*/* dist
+          cp ./download/* ./dist/
 
       - name: Publish wheels (TestPYPI)
         uses: pypa/gh-action-pypi-publish@release/v1
