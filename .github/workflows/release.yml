@@ -44,10 +44,10 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v5
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -117,7 +117,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux-arm64.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -187,7 +187,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux-armhf.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -261,7 +261,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -306,7 +306,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -351,6 +351,8 @@ jobs:
 
       - uses: goreleaser/goreleaser-action@v6
         with:
+          distribution: goreleaser
+          version: '~> v2'
           args: release --config .goreleaser-release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
