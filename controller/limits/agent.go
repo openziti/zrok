@@ -443,7 +443,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 			if err != nil {
 				return nil, err
 			}
-			if je.Action == store.LimitLimitAction {
+			if je.Action == bwc.GetLimitAction() {
 				logrus.Debugf("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
 				return je, nil
 			}
@@ -456,7 +456,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 			if err != nil {
 				return nil, err
 			}
-			if je.Action == store.LimitLimitAction {
+			if je.Action == bwc.GetLimitAction() {
 				logrus.Debugf("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
 				return je, nil
 			}
