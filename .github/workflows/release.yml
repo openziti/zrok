@@ -21,18 +21,18 @@ jobs:
       - run: sudo apt update
       - run: sudo apt-get install gcc-multilib g++-multilib
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git fetch --force --tags
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
           cache: true
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -44,21 +44,21 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v5
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-builds
+          name: release-builds-linux-amd64
           path: ./dist/*.gz
 
       - name: Configure jFrog CLI
-        uses: jfrog/setup-jfrog-cli@v3
+        uses: jfrog/setup-jfrog-cli@v4
         with:
           version: ${{ env.JFROG_CLI_VERSION }}
         env:
@@ -91,18 +91,18 @@ jobs:
       - run: sudo apt update
       - run: sudo apt-get install gcc-aarch64-linux-gnu
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git fetch --force --tags
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
           cache: true
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -114,21 +114,21 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux-arm64.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-builds
+          name: release-builds-linux-arm64
           path: ./dist/*.gz
 
       - name: Configure jFrog CLI
-        uses: jfrog/setup-jfrog-cli@v3
+        uses: jfrog/setup-jfrog-cli@v4
         with:
           version: ${{ env.JFROG_CLI_VERSION }}
         env:
@@ -161,18 +161,18 @@ jobs:
       - run: sudo apt update
       - run: sudo apt-get install gcc-arm-linux-gnueabi
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git fetch --force --tags
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
           cache: true
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -184,21 +184,21 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-linux-armhf.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-builds
+          name: release-builds-linux-arm
           path: ./dist/*.gz
 
       - name: Configure jFrog CLI
-        uses: jfrog/setup-jfrog-cli@v3
+        uses: jfrog/setup-jfrog-cli@v4
         with:
           version: ${{ env.JFROG_CLI_VERSION }}
         env:
@@ -235,18 +235,18 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git fetch --force --tags
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
           cache: true
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -258,19 +258,19 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-builds
+          name: release-builds-darwin
           path: ./dist/*.gz
 
   build-windows:
@@ -280,18 +280,18 @@ jobs:
       - run: sudo apt update
       - run: sudo apt-get install gcc-mingw-w64-x86-64
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: git fetch --force --tags
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.21.3'
+          go-version-file: ./go.mod
           cache: true
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -303,48 +303,56 @@ jobs:
         env:
           CI: "true"
 
-      - uses: goreleaser/goreleaser-action@v2
+      - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --config .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-builds
+          name: release-builds-windows
           path: ./dist/*.gz
 
   publish-release:
     # allow skipped but not failed
     if: ${{
           !cancelled()
-          && (needs.build-linux-amd64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
-          && (needs.build-linux-arm.result   == 'success' || needs.build-linux-amd.result   == 'skipped')
-          && (needs.build-linux-arm64.result == 'success' || needs.build-linux-amd64.result == 'skipped')
+          && (needs.build-linux-amd64.result == 'success')
+          && (needs.build-linux-arm.result   == 'success')
+          && (needs.build-linux-arm64.result == 'success')
           && (needs.build-darwin.result      == 'success' || needs.build-darwin.result      == 'skipped')
           && (needs.build-windows.result     == 'success' || needs.build-windows.result     == 'skipped')
       }}
-    needs: [build-linux-amd64, build-linux-arm, build-linux-arm64, build-darwin, build-windows]
+    needs:
+      - build-linux-amd64
+      - build-linux-arm
+      - build-linux-arm64
+      - build-darwin
+      - build-windows
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: |
           mkdir -p ./automated-release-build
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: ./automated-release-build
+          merge-multiple: true
+          pattern: release-builds-*
 
       - run: |
-          mv ./automated-release-build/release-builds/* ./automated-release-build/
-          rm -rf ./automated-release-build/release-builds
+          ls -lAR ./automated-release-build/
           shasum ./automated-release-build/* > ./automated-release-build/checksums.txt
 
-      - uses: goreleaser/goreleaser-action@v3
+      - uses: goreleaser/goreleaser-action@v6
         with:
+          distribution: goreleaser
+          version: '~> v2'
           args: release --config .goreleaser-release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

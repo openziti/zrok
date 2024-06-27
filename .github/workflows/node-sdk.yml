@@ -38,7 +38,7 @@ jobs:
 
     - name: Get current zrok repo tag
       id: tag
-      run: echo ::set-output name=TAG::$(git describe --tags --abbrev=0)
+      run: echo "TAG=$(git describe --tags --abbrev=0)" | tee -a $GITHUB_OUTPUT
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
       if: github.ref_type == 'tag'
@@ -49,7 +49,7 @@ jobs:
     - name: Setup .npmrc
       if: github.ref_type == 'tag'
       # Setup .npmrc file to prepare for possible publish to npm
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
