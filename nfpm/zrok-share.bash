@@ -54,9 +54,12 @@ fi
   exit 1
 }
 
-# default mode is reserved (public), override mode is temp-public, i.e., "share public" without a reserved subdomain
+# default mode is 'reserved-public', override modes are reserved-private, temp-public, temp-private.
+: "${ZROK_FRONTEND_MODE:=reserved-public}"
 if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   ZROK_CMD="share public --headless ${ZROK_VERBOSE:-}"
+elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
+  ZROK_CMD="share private --headless ${ZROK_VERBOSE:-}"
 elif [[ -s ~/.zrok/reserved.json ]]; then
   ZROK_RESERVED_TOKEN="$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)"
   if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
@@ -73,8 +76,13 @@ elif [[ -s ~/.zrok/reserved.json ]]; then
       exit 0
     fi
   fi
-else
+elif [[ "${ZROK_FRONTEND_MODE:-}" == reserved-public ]]; then
   ZROK_CMD="reserve public --json-output ${ZROK_VERBOSE:-}"
+elif [[ "${ZROK_FRONTEND_MODE:-}" == reserved-private ]]; then
+  ZROK_CMD="reserve private --json-output ${ZROK_VERBOSE:-}"
+else
+  echo "ERROR: invalid value for ZROK_FRONTEND_MODE '${ZROK_FRONTEND_MODE}'" >&2
+  exit 1
 fi
 
 [[ -n "${ZROK_BACKEND_MODE:-}" ]] || {
@@ -88,12 +96,12 @@ case "${ZROK_BACKEND_MODE}" in
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an HTTP URL" >&2
       exit 1
     else
-      echo "INFO: validated backend mode ${ZROK_BACKEND_MODE} and target ${ZROK_TARGET}"
+      echo "INFO: validated backend mode '${ZROK_BACKEND_MODE}' and target '${ZROK_TARGET}'"
     fi
     ;;
   caddy)
     if ! [[ "${ZROK_TARGET}" =~ ^/ ]]; then
-      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path." >&2
+      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path" >&2
       exit 1
     elif ! [[ -f "${ZROK_TARGET}" && -r "${ZROK_TARGET}" ]]; then
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not a readable regular file" >&2
@@ -104,7 +112,7 @@ case "${ZROK_BACKEND_MODE}" in
     ;;
   web|drive)
     if ! [[ "${ZROK_TARGET}" =~ ^/ ]]; then
-      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path." >&2
+      echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not an absolute filesystem path" >&2
       exit 1
     elif ! [[ -d "${ZROK_TARGET}" && -r "${ZROK_TARGET}" ]]; then
       echo "ERROR: ZROK_TARGET='${ZROK_TARGET}' is not a readable directory" >&2
@@ -113,13 +121,41 @@ case "${ZROK_BACKEND_MODE}" in
       echo "INFO: validated backend mode ${ZROK_BACKEND_MODE} and target ${ZROK_TARGET}"
     fi
     ;;
+  tcpTunnel|udpTunnel|socks|vpn)
+    if ! [[ "${ZROK_FRONTEND_MODE}" =~ -private$ ]]; then
+      echo "ERROR: ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}' is a private share backend mode and cannot be used with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
+      exit 1
+    else
+      case "${ZROK_BACKEND_MODE}" in
+        tcpTunnel|udpTunnel)
+          echo "INFO: ${ZROK_BACKEND_MODE} backend mode has target '${ZROK_TARGET}'"
+          ;;
+        vpn)
+          if [[ -n "${ZROK_TARGET}" ]]; then
+            ZROK_SVC_FILE=/etc/systemd/system/zrok-share.service.d/override.conf
+            if ! grep -qE '^AmbientCapabilities=CAP_NET_ADMIN' "${ZROK_SVC_FILE}"; then
+              echo "ERROR: you must uncomment 'AmbientCapabilities=CAP_NET_ADMIN' in '${ZROK_SVC_FILE}'"\
+                    "and run 'systemctl daemon-reload' to enable VPN mode" >&2
+              exit 1
+            fi
+          fi
+          ;;
+        socks)
+          if [[ -n "${ZROK_TARGET}" ]]; then
+            echo "WARNING: ZROK_TARGET='${ZROK_TARGET}' is ignored with ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}'" >&2
+            unset ZROK_TARGET
+          fi
+          ;;
+      esac
+    fi
+    ;;
   *)
     echo "WARNING: ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}' is not a recognized mode for a zrok public share."\
           " ZROK_TARGET value will not validated before running." >&2
     ;;
 esac
 
-[[ -n "${ZROK_UNIQUE_NAME:-}" ]] && {
+[[ "${ZROK_FRONTEND_MODE:-}" =~ ^reserved- && -n "${ZROK_UNIQUE_NAME:-}" ]] && {
   ZROK_CMD+=" --unique-name ${ZROK_UNIQUE_NAME}"
 }
 
@@ -142,8 +178,9 @@ fi
 
 echo "INFO: running: zrok ${ZROK_CMD}"
 
-if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
-  # share until exit
+if [[ "${ZROK_FRONTEND_MODE:-}" =~ ^temp- ]]; then
+  # frontend mode starts with 'temp-', so is temporary.
+  # share without reserving until exit.
   exec zrok ${ZROK_CMD}
 else
   # reserve and continue
