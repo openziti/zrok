@@ -4,6 +4,8 @@
 
 FIX: Fix for mixing limited and unlimited (-1) resource counts in the limits system (https://github.com/openziti/zrok/issues/680)
 
+CHANGE: add Docker compose example for multiple share containers using the same enabled environment in [compose.override.yml](./docker/compose/zrok-public-reserved/compose.override.yml)
+
 ## v0.4.33
 
 FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
