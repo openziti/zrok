@@ -120,7 +120,8 @@ export namespace ShareRequest {
         UdpTunnel = <any> 'udpTunnel',
         Caddy = <any> 'caddy',
         Drive = <any> 'drive',
-        Socks = <any> 'socks'
+        Socks = <any> 'socks',
+        Vpn = <any> 'vpn'
     }
     export enum OauthProviderEnum {
         Github = <any> 'github',

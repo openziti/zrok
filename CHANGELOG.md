@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## v0.4.34
+
+FIX: Fix for mixing limited and unlimited (-1) resource counts in the limits system (https://github.com/openziti/zrok/issues/680)
+
+## v0.4.33
+
+FIX: Fix for log message in `Agent.CanAccessShare` (`"account '#%d' over frontends per share limit '%d'"`), which was not returning the correct limit value.
+
+FIX: Properly set `permission_mode` in `frontends` when createing a private frontend using `zrok access private` (https://github.com/openziti/zrok/issues/677)
+
+CHANGE: Updated `react-bootstrap` to version `2.10.2` (web console).
+
+CHANGE: Updated `@mui/material` to version `5.15.18` (web console).
+
+CHANGE: Updated `react` and `react-dom` to version `18.3.1` (web console).
+
+CHANGE: Updated `recharts` to version `2.12.7` (web console).
+
+CHANGE: Updated `react-router-dom` to version `6.23.1` (web console).
+
+CHANGE: Updated `axios` to version `1.7.2` for (node SDK).
+
+CHANGE: Updated `@openziti/ziti-sdk-nodejs` to version `0.17.0` (node SDK).
+
+## v0.4.32
+
+FEATURE: New permission mode support for public frontends. Open permission mode frontends are available to all users in the service instance. Closed permission mode frontends reference the new `frontend_grants` table that can be used to control which accounts are allowed to create shares using that frontend. `zrok admin create frontend` now supports `--closed` flag to create closed permission mode frontends (https://github.com/openziti/zrok/issues/539)
+
+FEATURE: New config `defaultFrontend` that specifies the default frontend to be used for an environment. Provides the default `--frontend` for `zrok share public` and `zrok reserve public` (https://github.com/openziti/zrok/issues/663)
+
+FEATURE: Resource count limits now include `share_frontends` to limit the number of frontends that are allowed to make connections to a share (https://github.com/openziti/zrok/issues/650)
+
+CHANGE: The frontend selection flag used by `zrok share public` and `zrok reserve public` has been changed from `--frontends` to `--frontend`
+
+FIX: use controller config spec v4 in the Docker instance
+
 ## v0.4.31
 
 FEATURE: New "limits classes" limits implementation (https://github.com/openziti/zrok/issues/606). This new feature allows for extensive limits customization on a per-user basis, with fallback to the global defaults in the controller configuration.

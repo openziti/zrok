@@ -40,6 +40,12 @@ func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 		} else {
 			fmt.Println("apiEndpoint = <unset>")
 		}
+	case "defaultFrontend":
+		if env.Config() != nil && env.Config().DefaultFrontend != "" {
+			fmt.Printf("defaultFrontend = %v\n", env.Config().DefaultFrontend)
+		} else {
+			fmt.Println("defaultFrontend = <unset>")
+		}
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)
 	}
