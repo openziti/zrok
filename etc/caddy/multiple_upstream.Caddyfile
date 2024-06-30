@@ -29,5 +29,6 @@ http:// {
     # All other traffic goes to localhost:3000
     reverse_proxy /* 127.0.0.1:3000 {
         header_up Host localhost:3000
+        header_up X-Real-IP {http.request.header.x-forwarded-for}                                                          
     }
 }
