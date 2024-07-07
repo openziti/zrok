@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # bump the ziti CLI version that is built into the zrok CLI image
+  - package-ecosystem: docker
+    directory: "/docker/images/zrok"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 20
+    groups:
+      all:
+        applies-to: version-updates
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
