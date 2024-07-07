@@ -46,7 +46,7 @@ services:
 
       # least relevant options
       ZROK_VERBOSE:           # "--verbose"
-      ZROK_SHARE_OPTS:        # additional arguments to "zrok reserve public" command
+      ZROK_SHARE_OPTS:        # additional arguments to "zrok reserve private" command
       ZROK_FRONTEND_MODE: reserved-private
       PFXLOG_NO_JSON: "true"  # suppress JSON logging format
 
