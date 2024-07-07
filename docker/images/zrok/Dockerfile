@@ -13,7 +13,9 @@ LABEL name="openziti/zrok" \
       maintainer="support@zrok.io" \
       vendor="NetFoundry" \
       summary="Run the zrok CLI" \
-      description="Run the zrok CLI"
+      description="Run the zrok CLI" \
+      org.opencontainers.image.description="Run the zrok CLI" \
+      org.opencontainers.image.source="https://github.com/openziti/zrok"
 
 USER root
 
