@@ -23,7 +23,12 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # set HOME to the first colon-sep dir in STATE_DIRECTORY inherited from systemd (/var/lib/zrok-share) or docker (/mnt)
-export HOME="${STATE_DIRECTORY%:*}"
+if [[ -n "${STATE_DIRECTORY:-}" ]]; then
+  export HOME="${STATE_DIRECTORY%:*}"
+else
+  echo "WARNING: STATE_DIRECTORY is undefined. Using HOME=${HOME}" >&2
+fi
+echo "DEBUG: zrok state directory is ${HOME}/.zrok"
 
 : "${ZROK_SHARE_RESERVED:=true}"
 
@@ -155,9 +160,25 @@ case "${ZROK_BACKEND_MODE}" in
     ;;
 esac
 
-[[ "${ZROK_FRONTEND_MODE:-}" =~ ^reserved- && -n "${ZROK_UNIQUE_NAME:-}" ]] && {
+if [[ "${ZROK_FRONTEND_MODE:-}" =~ ^reserved- && -n "${ZROK_UNIQUE_NAME:-}" ]]; then
   ZROK_CMD+=" --unique-name ${ZROK_UNIQUE_NAME}"
-}
+elif [[ -n "${ZROK_UNIQUE_NAME:-}" ]]; then
+  echo "WARNING: ZROK_UNIQUE_NAME='${ZROK_UNIQUE_NAME}' is ignored with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
+fi
+
+if [[ "${ZROK_PERMISSION_MODE:-}" == closed ]]; then
+  ZROK_CMD+=" --closed"
+  if [[ -n "${ZROK_ACCESS_GRANTS:-}" ]]; then
+    for ACCESS_GRANT in ${ZROK_ACCESS_GRANTS}; do
+      ZROK_CMD+=" --access-grant ${ACCESS_GRANT}"
+    done
+  else
+    echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' and no additional ZROK_ACCESS_GRANTS; will be granted access" >&2
+    exit 1
+  fi
+elif [[ -n "${ZROK_PERMISSION_MODE:-}" && "${ZROK_PERMISSION_MODE}" != open ]]; then
+  echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' is not a recognized value'" >&2
+fi
 
 ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_TARGET}"
 
