@@ -166,7 +166,7 @@ elif [[ -n "${ZROK_UNIQUE_NAME:-}" ]]; then
   echo "WARNING: ZROK_UNIQUE_NAME='${ZROK_UNIQUE_NAME}' is ignored with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
 fi
 
-if [[ "${ZROK_PERMISSION_MODE:-}" == closed ]]; then
+if [[ "${ZROK_FRONTEND_MODE:-}" =~ -private$ && "${ZROK_PERMISSION_MODE:-}" == closed ]]; then
   ZROK_CMD+=" --closed"
   if [[ -n "${ZROK_ACCESS_GRANTS:-}" ]]; then
     for ACCESS_GRANT in ${ZROK_ACCESS_GRANTS}; do
@@ -176,8 +176,10 @@ if [[ "${ZROK_PERMISSION_MODE:-}" == closed ]]; then
     echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' and no additional ZROK_ACCESS_GRANTS; will be granted access" >&2
     exit 1
   fi
-elif [[ -n "${ZROK_PERMISSION_MODE:-}" && "${ZROK_PERMISSION_MODE}" != open ]]; then
+elif [[ "${ZROK_FRONTEND_MODE:-}" =~ -private$ && -n "${ZROK_PERMISSION_MODE:-}" && "${ZROK_PERMISSION_MODE}" != open ]]; then
   echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' is not a recognized value'" >&2
+elif [[ "${ZROK_FRONTEND_MODE:-}" =~ -public$ && -n "${ZROK_PERMISSION_MODE:-}" ]]; then
+  echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' is ignored with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
 fi
 
 ZROK_CMD+=" --backend-mode ${ZROK_BACKEND_MODE} ${ZROK_TARGET}"
