@@ -17,30 +17,38 @@ services:
     volumes:
       - zrok_env:/mnt
     environment:
-      STATE_DIRECTORY: /mnt
+      HOME: /mnt
       ZROK_ENABLE_TOKEN:
       ZROK_API_ENDPOINT:
       ZROK_ENVIRONMENT_NAME: docker-private-share
 
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
-    restart: no
-    entrypoint:
-    - bash
-    - -euxc
-    - |
-      echo "DEBUG: HOME=$${HOME}"
-      ls -lA /mnt/.zrok/
-      exec zrok $${@}
-    command: -- share private --headless --backend-mode proxy ${ZROK_TARGET:-http://zrok-test:9090/} 
+    restart: unless-stopped
+    entrypoint: zrok-share.bash
     depends_on:
       zrok-enable:
         condition: service_completed_successfully
     volumes:
       - zrok_env:/mnt
     environment:
-      HOME: /mnt
-      PFXLOG_NO_JSON: "true"
+      # internal configuration
+      HOME: /mnt            # zrok homedir in container
+
+      # most relevant options
+      ZROK_UNIQUE_NAME:     # name is used to construct frontend domain name, e.g. "myapp" in "myapp.share.zrok.io"
+      ZROK_BACKEND_MODE:    # web, caddy, drive, proxy
+      ZROK_TARGET:          # backend target, is a path in container filesystem unless proxy mode
+      ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate
+      ZROK_BASIC_AUTH:      # username:password
+      ZROK_PERMISSION_MODE: # if "closed" allow only your account and additional accounts in ZROK_ACCESS_GRANTS
+      ZROK_ACCESS_GRANTS:   # space-separated list of additional zrok account emails to grant access in closed permission mode
+
+      # least relevant options
+      ZROK_VERBOSE:           # "--verbose"
+      ZROK_SHARE_OPTS:        # additional arguments to "zrok reserve private" command
+      ZROK_FRONTEND_MODE: reserved-private
+      PFXLOG_NO_JSON: "true"  # suppress JSON logging format
 
   # demo server you can share with zrok
   zrok-test:

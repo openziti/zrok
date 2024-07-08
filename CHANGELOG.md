@@ -4,6 +4,10 @@
 
 CHANGE: add example in ./etc/caddy to set X-Real-IP header to public share client IP
 
+FEATURE: Closed permission mode for Docker and Linux private shares
+
+CHANGE: Docker examples set HOME to enable running CLI commands in the container
+
 ## v0.4.34
 
 FEATURE: Linux service support for all private share modes (contribution from Stefan Adelbert @stefanadelbert)

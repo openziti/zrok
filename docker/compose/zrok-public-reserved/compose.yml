@@ -18,7 +18,7 @@ services:
     volumes:
       - zrok_env:/mnt
     environment:
-      STATE_DIRECTORY: /mnt
+      HOME: /mnt
       ZROK_ENABLE_TOKEN:
       ZROK_API_ENDPOINT:
       ZROK_ENVIRONMENT_NAME:
@@ -35,7 +35,7 @@ services:
       - zrok_env:/mnt
     environment:
       # internal configuration
-      STATE_DIRECTORY: /mnt  # zrok homedir in container
+      HOME: /mnt  # zrok homedir in container
 
       # most relevant options
       ZROK_UNIQUE_NAME:     # name is used to construct frontend domain name, e.g. "myapp" in "myapp.share.zrok.io"

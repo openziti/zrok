@@ -25,10 +25,9 @@ fi
 if [[ -n "${STATE_DIRECTORY:-}" ]]; then
   export HOME="${STATE_DIRECTORY%:*}"
 else
-  echo "ERROR: STATE_DIRECTORY is undefined. This script must be run from systemd because it runs as a"\
-    "dynamically-allocated user and exclusively manages the files in STATE_DIRECTORY" >&2
-  exit 1
+  echo "WARNING: STATE_DIRECTORY is undefined. Using HOME=${HOME}" >&2
 fi
+echo "DEBUG: zrok state directory is ${HOME}/.zrok"
 
 if [[ -s ~/.zrok/environment.json ]]; then
   echo "INFO: zrok environment is already enabled. Delete '$(realpath ~/.zrok/environment.json)' if you want to create a"\

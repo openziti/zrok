@@ -30,7 +30,7 @@ When the project runs it will:
 
 ## Before You Begin
 
-To follow this guide you will need [Docker](https://docs.docker.com/get-docker/) and [the Docker Compose plugin](https://docs.docker.com/compose/install/) for running `docker compose` commands in your terminal.
+To follow this guide you will need [Docker](https://docs.docker.com/get-docker/).
 
 If you have installed Docker Desktop on macOS or Windows then you are all set.
 
@@ -98,6 +98,30 @@ Now that we have a private share we can access it with the zrok command or by ru
     ```
 
 1. Now your zrok private access proxy is ready on http://127.0.0.1:9191. You can visit the demo web server in your browser.
+
+## Closed Permission Mode
+
+Normally, you need only the share token to access a private share. You can further restrict access with "closed" permission mode.
+
+You must set the permission mode before you reserve the share.
+
+Only your own account can access the private share.
+
+```bash
+ZROK_PERMISSION_MODE=closed
+```
+
+Grant access to additional zrok accounts.
+
+```bash
+ZROK_ACCESS_GRANTS="bob@example.com alice@example.org"
+```
+
+You can adjust the access grants by running the CLI inside the `zrok-share` container.
+
+```bash
+docker compose exec zrok-share zrok modify ${ZROK_UNIQUE_NAME} --remove-access-grant bob@example.com
+```
 
 ## Going Further with Private Access
 
