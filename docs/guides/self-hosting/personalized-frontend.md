@@ -8,11 +8,15 @@ This guide describes an approach for self-hosting _only_ the components required
 
 This approach gives you complete control over the way that your shares are accessed publicly, and can be self-hosted on an extremely minimal VPS instance or through a container hosting service.
 
-We're going to explore this approach using a minimal VPS through this guide.
+This approach works for both HTTPS shares, and also for TCP and UDP ports, allowing you to put all of these things onto the public internet, while maintaining strong security for your protected resources.
+
+This guide isn't a detailed _how to_ with specific steps to follow. This is more of a description of the overall concept. You'll want to figure out your own specific steps to implement this style of deployment in your own environment.
 
 ## Overview
 
-This approach assumes you're using the shared zrok service instance at zrok.io, and it looks like this:
+You've got a handful of private resources that you want to share using zrok. Some of them are HTTP or HTTPS resources. Maybe you also have a couple of raw TCP or UDP ports that you want to expose to the internet.
+
+Let's assume you're using the shared zrok service instance at zrok.io. The deployed solution is going to look like this:
 
 ![personalized-frontend-1](../../images/personalized-frontend-1.png)
 
