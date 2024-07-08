@@ -15,4 +15,4 @@ services:
       ZROK_BACKEND_MODE:    caddy
       ZROK_TARGET:          /Caddyfile
       # internal configuration
-      STATE_DIRECTORY: /mnt  # zrok homedir in container
+      HOME: /mnt  # zrok homedir in container
