@@ -17,7 +17,7 @@ services:
     volumes:
       - zrok_env:/mnt
     environment:
-      STATE_DIRECTORY: /mnt
+      HOME: /mnt
       ZROK_ENABLE_TOKEN:
       ZROK_API_ENDPOINT:
       ZROK_ENVIRONMENT_NAME: docker-private-access
