@@ -4,41 +4,65 @@ sidebar_label: Personalized Frontend
 sidebar_position: 19
 ---
 
-This guide describes an approach for self-hosting _only_ the components required to manage a public frontend, complete with TLS and customized DNS, for one or many zrok private shares.
+This guide describes an approach that enables a zrok user to use a hosted, shared instance (zrok.io) and configure their own personalized frontend, which enables custom DNS and TLS for their shares.
 
-This approach gives you complete control over the way that your shares are accessed publicly, and can be self-hosted on an extremely minimal VPS instance or through a container hosting service.
+In order to accomplish this, the user will need to provide their own minimal VPS instance, or container hosting. The size and capacity of these resources will be entirely dependent on the workload that they will be used to service. But generally, for most modest workloads, the most inexpensive VPS option will suffice.
 
-This approach works for both HTTPS shares, and also for TCP and UDP ports, allowing you to put all of these things onto the public internet, while maintaining strong security for your protected resources.
+This approach gives you complete control over the way that your shares are exposed publicly. This approach works for HTTPS shares, and also for TCP and UDP ports, allowing you to put all of these things onto the public internet, while maintaining strong security for your protected resources.
 
 This guide isn't a detailed _how to_ with specific steps to follow. This is more of a description of the overall concept. You'll want to figure out your own specific steps to implement this style of deployment in your own environment.
 
 ## Overview
 
-You've got a handful of private resources that you want to share using zrok. Some of them are HTTP or HTTPS resources. Maybe you also have a couple of raw TCP or UDP ports that you want to expose to the internet.
+Let's imagine a hypothetical scenario where you've got 3 different resources shared using zrok. We'll refer to these as `A`, `B`, and `C`. Both `A` and `B` are shares using the `proxy` backend mode, which are used to share private HTTPS resources. Share `C` uses the `tcpTunnel` backend to expose a listening port from a private server (like a game server, or a message queue).
 
-Let's assume you're using the shared zrok service instance at zrok.io. The deployed solution is going to look like this:
+We're using the shared zrok instance at zrok.io to provide our secure sharing infrastructure.
+
+Our deployment will end up looking like this:
 
 ![personalized-frontend-1](../../images/personalized-frontend-1.png)
 
-In our example, we'll be using `zrok share private` to share an endpoint we'll call `A` and a second `zrok share private` to share an endpoint we'll call `B`. These two shares could both be from a single environment on a single system, or they might be distributed anywhere in the world. You could use a single share, or you could use hundreds.
+We're using `zrok share private` to create the `A`, `B`, and `C` shares. These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources.
 
-Because we're using `private` zrok shares, they'll need to be accessed using a corresponding `zrok access` private command. The `zrok access private` command creates a "network listener" where the share can be accessed. You can use `zrok access private` to access a `private` zrok share from as many places as you want (up to the limit configuration of the service).
+Because we're using `private` zrok shares, they'll need to be accessed using a corresponding `zrok access` private command. The `zrok access private` command binds a "network listener" where the share can be accessed on an address and port on the host where the command is executed. You can use `zrok access private` to bind a network listener for a share in as many places as you want (up to the limit configuration of the service).
 
-Imagine that both of our shares are HTTP shares. We want our `A` share to be accessed at the URL `a.example.com` and we want our `B` share to be accessed at the URL `b.example.com`. This assumes that we have control over `example.com` such that we can create the necessary DNS entries.
+:::note
+When you use `zrok share public`, you are allowing your shared resources to be accessed using the shared, public frontend provided by the service instance (zrok.io). `zrok share private` creates the same kind of share, but does not provision the shared public frontend, and you'll need to use `zrok access private` in order to _bind_ that share to a network address where it can be accessed.
+:::
 
-What we'll do is acquire a cheap VPS instance. Even a $5/month (or less!) VPS instance is very likely up to the job, depending on the amount of traffic that we want to send to our shares.
+Imagine that we own the domain `example.com`. In our example, we want to expose our HTTPS shares `A` and `B` as `a.example.com` and `b.example.com`. And maybe our `C` share represents a gaming server that we want to expose as `gaming.example.com:25565`. 
 
-On our VPS instance, we'll run a `zrok access private` for both share `A` and another for share `B`, binding both of those to a port on the `localhost` loopback interface.
+We can accomplish this easily with cheap VPS instance. You could also do it with containers through a container hosting service. The VPS will need an IP address exposed to the internet. You'll also need to be able to create DNS entries for the `example.com` domain.
 
-With those 2 `access` processes running and bound to loopback ports, we'll install a reverse proxy server like nginx or Caddy, and configure it to support both `a.example.com` and `b.example.com`, directing the traffic for each to the correct loopback port.
+To accomplish this, we're going to run 3 separate `zrok access private` commands on our VPS. One command each for shares `A`, `B`, and `C`. The `zrok access private` command works like this:
 
-Add DNS and TLS to the VPS and you've got a fully-featured public-facing frontend that you fully control, with a minimum amount of components to self host.
+```
+$ zrok access private
+Error: accepts 1 arg(s), received 0
+Usage:
+  zrok access private <shareToken> [flags]
 
-zrok in this case becomes the backbone, isolating your private resources from the public internet. There is no access to your protected infrastructure that does not flow through the zrok network.
+Flags:
+  -b, --bind string   The address to bind the private frontend (default "127.0.0.1:9191")
+      --headless      Disable TUI and run headless
+  -h, --help          help for private
 
-## TCP and UDP
+Global Flags:
+  -p, --panic     Panic instead of showing pretty errors
+  -v, --verbose   Enable verbose logging
+```
 
-This approach also works very well for TCP and UDP ports that you might want to publicly expose. Simply add additional `zrok access private` instances, binding those to the correct interface on your system. With the appropriate firewall rules, those ports will be fully exposed to the internet, while your protected resources are still fully private and unreachable from the public internet.
+Notice the `--bind` flag. That flag is used to bind a network listener to a specific IP address and port on the host we're accessing the shares from. In this case, imagine our VPS node has a public IP address of `1.2.3.4` and a loopback (`127.0.0.1`).
+
+To expose our HTTPS shares, we're going to use a reverse proxy like nginx. The reverse proxy will be exposed to the internet, terminating TLS and reverse proxying `a.example.com` and `b.example.com` to the network listeners for shares `A` and `B`.
+
+So, we'll configure our VPS to persistently launch a `zrok access private` for both of these shares. We'll use the `--bind` flag to bind `A` to `127.0.0.1:9191` and `B` to `127.0.0.1:9192`.
+
+We'll then configure nginx to have a virtual host for `a.example.com`, proxying that to `127.0.0.1:9191` and `b.example.com`, proxying that to `127.0.0.1:9192`.
+
+Exposing our TCP port for `gaming.example.com` is simply a matter of running a third `zrok access private` with a `--bind` flag configured to point to `1.2.3.4:25565`.
+
+Once you've created the appropriate DNS entries for `a.example.com`, `b.example.com`, and `gaming.example.com` and worked through the TLS configuration (letsencrypt is your friend here), you'll have a fully functional personalized frontend for your zrok shares that you control.
 
 ## Privacy
 
