@@ -68,7 +68,7 @@ func (a *Agent) CanCreateEnvironment(acctId int, trx *sqlx.Tx) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if len(envs)+1 > a.cfg.Environments {
+			if len(envs)+1 > ul.resource.GetEnvironments() {
 				return false, nil
 			}
 		}
