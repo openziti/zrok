@@ -22,7 +22,7 @@ Our deployment will end up looking like this:
 
 ![personalized-frontend-1](../../images/personalized-frontend-1.png)
 
-We're using `zrok reserve` to create the `A`, `B`, and `C` shares as reserved shares (using the `--unique-name` option to give them specific names). These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources.
+We're using `zrok reserve` to create the `A`, `B`, and `C` shares as reserved shares (using the `--unique-name` option to give them specific names). These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources. This implementation will scale up or down as needed.
 
 Because we're using `private` zrok shares, they'll need to be accessed using a corresponding `zrok access` private command. The `zrok access private` command binds a "network listener" where the share can be accessed on an address and port on the host where the command is executed. You can use `zrok access private` to bind a network listener for a share in as many places as you want (up to the limit configuration of the service).
 
