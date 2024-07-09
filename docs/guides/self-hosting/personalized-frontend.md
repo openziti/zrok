@@ -34,7 +34,7 @@ Imagine that we own the domain `example.com`. In our example, we want to expose 
 
 We can accomplish this easily with cheap VPS instance. You could also do it with containers through a container hosting service. The VPS will need an IP address exposed to the internet. You'll also need to be able to create DNS entries for the `example.com` domain.
 
-To accomplish this, we're going to run 3 separate `zrok access private` commands on our VPS. One command each for shares `A`, `B`, and `C`. The `zrok access private` command works like this:
+To accomplish this, we're going to run 3 separate `zrok access private` commands on our VPS (see the ![frontdoor](../../frontdoor/) guide for details on an approach for setting this up). One command each for shares `A`, `B`, and `C`. The `zrok access private` command works like this:
 
 ```
 $ zrok access private
@@ -63,6 +63,8 @@ We'll then configure nginx to have a virtual host for `a.example.com`, proxying 
 Exposing our TCP port for `gaming.example.com` is simply a matter of running a third `zrok access private` with a `--bind` flag configured to point to `1.2.3.4:25565`.
 
 Once you've created the appropriate DNS entries for `a.example.com`, `b.example.com`, and `gaming.example.com` and worked through the TLS configuration (letsencrypt is your friend here), you'll have a fully functional personalized frontend for your zrok shares that you control.
+
+Your protected resources remain disconnected from the internet and are only reachable through your personalized endpoint.
 
 ## Privacy
 
