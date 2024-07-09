@@ -34,7 +34,7 @@ Imagine that we own the domain `example.com`. In our example, we want to expose 
 
 We can accomplish this easily with cheap VPS instance. You could also do it with containers through a container hosting service. The VPS will need an IP address exposed to the internet. You'll also need to be able to create DNS entries for the `example.com` domain.
 
-To accomplish this, we're going to run 3 separate `zrok access private` commands on our VPS (see the ![frontdoor](../../frontdoor/) guide for details on an approach for setting this up). One command each for shares `A`, `B`, and `C`. The `zrok access private` command works like this:
+To accomplish this, we're going to run 3 separate `zrok access private` commands on our VPS (see the ![frontdoor](../frontdoor/) guide for details on an approach for setting this up). One command each for shares `A`, `B`, and `C`. The `zrok access private` command works like this:
 
 ```
 $ zrok access private
