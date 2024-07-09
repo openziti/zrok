@@ -22,12 +22,12 @@ Our deployment will end up looking like this:
 
 ![personalized-frontend-1](../../images/personalized-frontend-1.png)
 
-We're using `zrok reserve` to create the `A`, `B`, and `C` shares as reserved shares (using the `--unique-name` option to give them specific names). These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources. This implementation will scale up or down as needed.
+We're using `zrok reserve` to create the `A`, `B`, and `C` shares as reserved shares (using the `--unique-name` option to give them specific names). These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources. This implementation will scale up or down as needed (use multiple hosts behind a load balancer for really big workloads).
 
 Because we're using `private` zrok shares, they'll need to be accessed using a corresponding `zrok access` private command. The `zrok access private` command binds a "network listener" where the share can be accessed on an address and port on the host where the command is executed. You can use `zrok access private` to bind a network listener for a share in as many places as you want (up to the limit configuration of the service).
 
 :::note
-When you use `zrok share public`, you are allowing your shared resources to be accessed using the shared, public frontend provided by the service instance (zrok.io). `zrok share private` creates the same kind of share, but does not provision the shared public frontend, and you'll need to use `zrok access private` in order to _bind_ that share to a network address where it can be accessed.
+When you use `zrok share public`, you are allowing your shared resources to be accessed using the shared, public frontend provided by the service instance (zrok.io). `zrok share private` (or `zrok reserve`/`zrok share reserved`) creates the same kind of share, but does not provision the shared public frontend, and you'll need to use `zrok access private` in order to _bind_ that share to a network address where it can be accessed.
 :::
 
 Imagine that we own the domain `example.com`. In our example, we want to expose our HTTPS shares `A` and `B` as `a.example.com` and `b.example.com`. And maybe our `C` share represents a gaming server that we want to expose as `gaming.example.com:25565`. 
