@@ -10,6 +10,8 @@ CHANGE: auto-update the ziti CLI version that is built in to the openziti/zrok c
 
 CHANGE: Docker examples set HOME to enable running CLI commands in the container
 
+FIX: Fix for environment count inheritance when using a resource count class to override global environment count (https://github.com/openziti/zrok/issues/695)
+
 ## v0.4.34
 
 FEATURE: Linux service support for all private share modes (contribution from Stefan Adelbert @stefanadelbert)
