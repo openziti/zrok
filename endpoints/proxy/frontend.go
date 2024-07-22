@@ -68,7 +68,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	}
 	proxy.Transport = zTransport
 
-	handler := authHandler(cfg.ShrToken, util.NewProxyHandler(proxy), "zrok", cfg, zCtx)
+	handler := authHandler(cfg.ShrToken, util.NewRequestsWrapper(proxy), "zrok", cfg, zCtx)
 	return &Frontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
