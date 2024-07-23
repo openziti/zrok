@@ -9,6 +9,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
+	"github.com/openziti/zrok/endpoints/publicProxy/interstitialUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
 	"github.com/openziti/zrok/environment"
@@ -157,6 +158,15 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 		if shrToken != "" {
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
+
+					ignore := r.Header.Get("zrok_interstitial")
+					_, zrokOkErr := r.Cookie("zrok_interstitial")
+					if ignore == "" && zrokOkErr != nil {
+						logrus.Infof("forcing interstitial for: %v", r.URL)
+						interstitialUi.WriteInterstitialAnnounce(w)
+						return
+					}
+
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
 						case string(sdk.None):
