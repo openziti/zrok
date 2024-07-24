@@ -13,13 +13,11 @@ set -o xtrace
 
 resolveArch() {
     case ${1} in
-        amd64) echo amd64
-        ;;
         arm|armv7*|arm/v7*|armhf*) echo armhf
         ;;
-        arm64|armv8*|arm/v8*) echo arm64
+        armv8*|arm/v8*) echo arm64
         ;;
-        *) echo ${1}
+        *) echo "${1}"
         ;;
     esac
 }
