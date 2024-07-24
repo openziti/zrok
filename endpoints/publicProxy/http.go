@@ -159,13 +159,15 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
 					if pcfg.Interstitial {
-						if _, istlFound := cfg["interstitial"]; istlFound {
-							skip := r.Header.Get("skip_zrok_interstitial")
-							_, zrokOkErr := r.Cookie("zrok_interstitial")
-							if skip == "" && zrokOkErr != nil {
-								logrus.Debugf("forcing interstitial for '%v'", r.URL)
-								interstitialUi.WriteInterstitialAnnounce(w)
-								return
+						if v, istlFound := cfg["interstitial"]; istlFound {
+							if istlEnabled, ok := v.(bool); ok && istlEnabled {
+								skip := r.Header.Get("skip_zrok_interstitial")
+								_, zrokOkErr := r.Cookie("zrok_interstitial")
+								if skip == "" && zrokOkErr != nil {
+									logrus.Debugf("forcing interstitial for '%v'", r.URL)
+									interstitialUi.WriteInterstitialAnnounce(w)
+									return
+								}
 							}
 						}
 					}
