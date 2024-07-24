@@ -173,7 +173,8 @@
     </div>
     <script>
         function onClick() {
-            document.cookie = "zrok_interstitial = true";
+			let e=new Date; e.setTime(e.getTime()+6048e5);
+            document.cookie = 'zrok_interstitial = true; expires=${e}; path=/; SameSite=None';
             window.location.reload();
         }
     </script>
