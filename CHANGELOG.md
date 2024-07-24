@@ -4,6 +4,8 @@
 
 CHANGE: Enable `"declaration": true` in `tsconfig.json` for Node SDK.
 
+FIX: Statically link arm 32bit build for broader compatibility.
+
 ## v0.4.35
 
 FEATURE: Added import for `github.com/greenpau/caddy-security` to include that Caddy plugin to enable authentication, authorization, and credentials extensions for the `caddy` backend (https://github.com/openziti/zrok/issues/506)
