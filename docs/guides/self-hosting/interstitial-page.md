@@ -1,5 +1,5 @@
 ---
-title: Interstitial Page Configuration
+title: Interstitial Pages
 sidebar_label: Interstitial Pages
 sidebar_position: 18
 ---
