@@ -64,11 +64,9 @@ Download the binary distribution for your Linux distribution's architecture or r
 <Details>
 <summary>Script to install binary in `/usr/local/bin/zrok`</summary>
 
-This script auto-selects the correct architecture, and may be helpful for Raspberry Pi users.
+This script auto-selects the correct architecture and may be helpful for Raspberry Pi users.
 
 ```text
-(set -euo pipefail;
-
 cd $(mktemp -d);
 
 ZROK_VERSION=$(
@@ -77,11 +75,15 @@ ZROK_VERSION=$(
 );
 
 case $(uname -m) in
-  x86_64)          GOXARCH=amd64 ;;
-  aarch64|arm64)   GOXARCH=arm64 ;;
-  armv7|armhf|arm) GOXARCH=arm   ;;
-  *)               echo "ERROR: unknown arch '$(uname -m)'" >&2
-                   exit 1        ;;
+  x86_64)         GOXARCH=amd64
+  ;;
+  aarch64|arm64)  GOXARCH=arm64
+  ;;
+  arm*)           GOXARCH=arm
+  ;;
+  *)              echo "ERROR: unknown arch '$(uname -m)'" >&2
+                  exit 1
+  ;;
 esac;
 
 curl -sSfL \
@@ -89,8 +91,8 @@ curl -sSfL \
   | tar -xz -f -;
 
 sudo install -o root -g root ./zrok /usr/local/bin/;
+
 zrok version;
-)
 ```
 
 </Details>

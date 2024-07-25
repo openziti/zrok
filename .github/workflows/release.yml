@@ -48,7 +48,7 @@ jobs:
         with:
           distribution: goreleaser
           version: '~> v2'
-          args: release --skip=publish --config .goreleaser-linux.yml
+          args: release --skip=publish --config .goreleaser-linux-amd64.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - run: sudo apt update
-      - run: sudo apt-get install gcc-arm-linux-gnueabi
+      - run: sudo apt-get install gcc-arm-linux-gnueabihf
 
       - uses: actions/checkout@v4
         with:
@@ -230,7 +230,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: import distribution cert
-        uses: apple-actions/import-codesign-certs@v1
+        uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}

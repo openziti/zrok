@@ -1,21 +1,15 @@
-# this is the release build config for hard-float, arm/v7 platform (32bit ARM devices with a FPU)
 version: 2
 builds:
-- id: zrok-armhf
+- id: zrok-amd64
   main: ./cmd/zrok
   binary: zrok
-  ldflags: 
-    - "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
+  ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
   env:
-    - CC=arm-linux-gnueabihf-gcc
     - CGO_ENABLED=1
-    - CC_FOR_TARGET=gcc-arm-linux-gnueabihf
   goos:
     - linux
   goarch:
-    - arm
-  goarm:
-    - 7
+    - amd64
 
 nfpms:
   - package_name: zrok
@@ -30,7 +24,7 @@ nfpms:
 
     # Build IDs for the builds you want to create NFPM packages for.
     builds:
-      - zrok-armhf
+      - zrok-amd64
 
     # Formats to be generated.
     formats:

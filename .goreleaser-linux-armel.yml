@@ -1,14 +1,23 @@
+# this is a DiY build config for the soft-float, armel platform (32bit ARMv7 devices lacking an FPU) see
+# instructions to cross-build this binary in ./docker/images/cross-build/README.md or
+# https://github.com/openziti/zrok/tree/main/docker/images/cross-build#readme
+version: 2
 builds:
-- id: zrok-amd64
+- id: zrok-armel
   main: ./cmd/zrok
   binary: zrok
-  ldflags: "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
+  ldflags: 
+    - "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
   env:
+    - CC=arm-linux-gnueabi-gcc
     - CGO_ENABLED=1
+    - CC_FOR_TARGET=gcc-arm-linux-gnueabi
   goos:
     - linux
   goarch:
-    - amd64
+    - arm
+  goarm:
+    - 7
 
 nfpms:
   - package_name: zrok
@@ -23,7 +32,7 @@ nfpms:
 
     # Build IDs for the builds you want to create NFPM packages for.
     builds:
-      - zrok-amd64
+      - zrok-armel
 
     # Formats to be generated.
     formats:
