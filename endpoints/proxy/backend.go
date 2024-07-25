@@ -52,7 +52,7 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, err
 	}
 
-	handler := util.NewProxyHandler(proxy)
+	handler := util.NewRequestsWrapper(proxy)
 	return &Backend{
 		cfg:      cfg,
 		listener: listener,

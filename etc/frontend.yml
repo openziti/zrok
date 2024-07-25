@@ -10,6 +10,11 @@ v: 3
 #
 #host_match: zrok.io
 
+# Setting the `interstitial` setting to `true` will allow this frontend to offer interstitial pages if they are
+# configured on the share by the controller.
+#
+#interstitial: true
+
 # The OAuth configuration is used when enabling OAuth authentication with your public frontend.
 #
 #oauth:

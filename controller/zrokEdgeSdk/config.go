@@ -12,6 +12,7 @@ import (
 )
 
 type FrontendOptions struct {
+	Interstitial   bool
 	AuthScheme     sdk.AuthScheme
 	BasicAuthUsers []*sdk.AuthUserConfig
 	Oauth          *sdk.OauthConfig
@@ -19,7 +20,8 @@ type FrontendOptions struct {
 
 func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	cfg := &sdk.FrontendConfig{
-		AuthScheme: options.AuthScheme,
+		Interstitial: options.Interstitial,
+		AuthScheme:   options.AuthScheme,
 	}
 	if cfg.AuthScheme == sdk.Basic {
 		cfg.BasicAuth = &sdk.BasicAuthConfig{}
