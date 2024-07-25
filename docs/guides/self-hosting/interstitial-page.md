@@ -6,7 +6,7 @@ sidebar_position: 18
 
 On large zrok installations that support open registration and shared public frontends, abuse can become an issue. In order to mitigate phishing and other similar forms of abuse, zrok offers an interstitial page that announces to the visiting user that the share is hosted through zrok, and probably isn't their financial institution.
 
-Interstitial pages can be enabled on a per-frontend basis. This allows the interstitial to be enabled on open public frontends, but not closed public frontends (closed public frontends require a grant to use). 
+Interstitial pages can be enabled on a per-frontend basis. This allows the interstitial to be enabled on open public frontends but not closed public frontends (closed public frontends require a grant to use). 
 
 The interstitial page requirement can also be overridden on a per-account basis, allowing shares created by specific accounts to bypass the interstitial requirement on frontends that enable it. This facilitates building infrastructure that grants trusted users additional privileges.
 
@@ -48,6 +48,10 @@ Simply setting `interstitial: true` in the controller config will allow the conf
 
 ## Bypassing the Interstitial
 
+The interstitial page will be presented unless the client shows up with a `zrok_interstitial` cookie. When the user is presented with the interstitial page, there is a button they can click which sets the necessary cookie and allows them to visit the site. The cookie is set to expire in one week.
+
 End users can offer an HTTP header of `skip_zrok_interstitial`, set to any value to bypass the interstitial page. Setting this header means that the user most likely understands what a zrok share is and will hopefully not fall for a phishing attack.
 
-This header is especially useful for API clients (like `curl`).
+The `skip_zrok_interstitial` header is especially useful for API clients (like `curl`) and other types of non-interactive clients.
+
+The `drive` backend mode does not currently support `GET` requests and cannot be accessed with a conventional web browser, so it bypasses the interstitial page requirement.
