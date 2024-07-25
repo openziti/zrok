@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-# build the Linux artifacts for amd64, arm, arm64
+# build the Linux artifact for amd64, armhf, armel, or arm64
 #
-# runs one background job per desired architecture unless there are too few CPUs
-#
-# 
 
 set -o errexit
 set -o nounset
@@ -13,7 +10,7 @@ set -o xtrace
 
 resolveArch() {
     case ${1} in
-        arm|armv7*|arm/v7*|armhf*) echo armhf
+        arm|armv7*|arm/v7*) echo armhf
         ;;
         armv8*|arm/v8*) echo arm64
         ;;
@@ -22,11 +19,11 @@ resolveArch() {
     esac
 }
 
-# if no architectures supplied then default list of three
+# if no architectures supplied then default to amd64
 if (( ${#} )); then
     typeset -a JOBS=(${@})
 else
-    typeset -a JOBS=(amd64 arm arm64)
+    typeset -a JOBS=(amd64)
 fi
 
 (
@@ -43,7 +40,7 @@ for ARCH in "${JOBS[@]}"; do
     goreleaser build \
     --clean \
     --snapshot \
-    --output ./dist/ \
+    --output "./dist/" \
     --config "./.goreleaser-linux-$(resolveArch "${ARCH}").yml"
 done
 

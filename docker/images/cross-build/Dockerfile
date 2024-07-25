@@ -17,6 +17,7 @@ ARG go_cache=/usr/share/go
 RUN apt-get -y update \
     && apt-get -y install \
         gcc-arm-linux-gnueabi \
+        gcc-arm-linux-gnueabihf \
         gcc-aarch64-linux-gnu \
         wget \
         git \

@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - run: sudo apt update
-      - run: sudo apt-get install gcc-arm-linux-gnueabi
+      - run: sudo apt-get install gcc-arm-linux-gnueabihf
 
       - uses: actions/checkout@v4
         with:
