@@ -6,7 +6,9 @@ FEATURE: New interstitial pages that can be enabled per-frontend, and disabled p
 
 CHANGE: Enable `"declaration": true` in `tsconfig.json` for Node SDK.
 
-FIX: build 32bit build for armhf to fix [the FPE issue](https://github.com/openziti/zrok/issues/654) and [the missing link issue](https://github.com/openziti/zrok/issues/642); add [cross-build instructions](./BUILD.md) (add new snapshot build target `armel`)
+FIX: build 32bit build for armhf to fix [the FPE issue](https://github.com/openziti/zrok/issues/654) and [the missing link issue](https://github.com/openziti/zrok/issues/642)
+
+CHANGE: add [cross-build instructions](./BUILD.md) (includes new snapshot build target `armel`)
 
 ## v0.4.35
 
