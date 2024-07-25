@@ -44,7 +44,7 @@ The frontend configuration controls what the frontend will do with the share con
 #interstitial: true
 ```
 
-Simply setting `interstitial: true` in the controller config will allow the configured frontend to offer an interstitial page if the share config enables the interstitial page for that share.
+Simply setting `interstitial: true` in the frontend config will allow the configured frontend to offer an interstitial page if the share config enables the interstitial page for that share.
 
 ## Bypassing the Interstitial
 
