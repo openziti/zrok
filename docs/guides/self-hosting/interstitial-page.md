@@ -10,7 +10,7 @@ Interstitial pages can be enabled on a per-frontend basis. This allows the inter
 
 The interstitial page requirement can also be overridden on a per-account basis, allowing shares created by specific accounts to bypass the interstitial requirement on frontends that enable it. This facilitates building infrastructure that grants trusted users additional privileges.
 
-By default, if you do not specifically enable interstitial pages, then your self-hosted service instance will not offer them.
+By default, if you do not specifically enable interstitial pages on a public frontend, then your self-hosted service instance will not offer them.
 
 Let's take a look at how the interstitial pages mechanism works. The following diagram shows the share configuration rendezvous made between the zrok controller and a zrok frontend:
 
