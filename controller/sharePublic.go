@@ -13,7 +13,7 @@ func newPublicResourceAllocator() *publicResourceAllocator {
 	return &publicResourceAllocator{}
 }
 
-func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
+func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, interstitial bool, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
 	var authUsers []*sdk.AuthUserConfig
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
@@ -23,6 +23,7 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 		return "", nil, err
 	}
 	options := &zrokEdgeSdk.FrontendOptions{
+		Interstitial:   interstitial,
 		AuthScheme:     authScheme,
 		BasicAuthUsers: authUsers,
 		Oauth: &sdk.OauthConfig{

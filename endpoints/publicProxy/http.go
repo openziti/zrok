@@ -9,6 +9,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
+	"github.com/openziti/zrok/endpoints/publicProxy/interstitialUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
 	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
 	"github.com/openziti/zrok/environment"
@@ -73,7 +74,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	if err := configureOauthHandlers(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
-	handler := authHandler(util.NewProxyHandler(proxy), cfg, key, zCtx)
+	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, key, zCtx)
 	return &HttpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -151,12 +152,26 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func authHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
+func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		shrToken := resolveService(pcfg.HostMatch, r.Host)
 		if shrToken != "" {
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
+					if pcfg.Interstitial {
+						if v, istlFound := cfg["interstitial"]; istlFound {
+							if istlEnabled, ok := v.(bool); ok && istlEnabled {
+								skip := r.Header.Get("skip_zrok_interstitial")
+								_, zrokOkErr := r.Cookie("zrok_interstitial")
+								if skip == "" && zrokOkErr != nil {
+									logrus.Debugf("forcing interstitial for '%v'", r.URL)
+									interstitialUi.WriteInterstitialAnnounce(w)
+									return
+								}
+							}
+						}
+					}
+
 					if scheme, found := cfg["auth_scheme"]; found {
 						switch scheme {
 						case string(sdk.None):

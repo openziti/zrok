@@ -12,12 +12,13 @@ import (
 const V = 3
 
 type Config struct {
-	V         int
-	Identity  string
-	Address   string
-	HostMatch string
-	Oauth     *OauthConfig
-	Tls       *endpoints.TlsConfig
+	V            int
+	Identity     string
+	Address      string
+	HostMatch    string
+	Interstitial bool
+	Oauth        *OauthConfig
+	Tls          *endpoints.TlsConfig
 }
 
 type OauthConfig struct {
@@ -45,8 +46,9 @@ type OauthProviderConfig struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Identity: "public",
-		Address:  "0.0.0.0:8080",
+		Identity:     "public",
+		Address:      "0.0.0.0:8080",
+		Interstitial: false,
 	}
 }
 

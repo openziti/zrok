@@ -6,13 +6,13 @@ import (
 	"sync/atomic"
 )
 
-type proxyHandler struct {
+type requestsWrapper struct {
 	proxy    *httputil.ReverseProxy
 	requests int32
 }
 
-func NewProxyHandler(proxy *httputil.ReverseProxy) *proxyHandler {
-	handler := &proxyHandler{proxy: proxy}
+func NewRequestsWrapper(proxy *httputil.ReverseProxy) *requestsWrapper {
+	handler := &requestsWrapper{proxy: proxy}
 
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
@@ -23,10 +23,10 @@ func NewProxyHandler(proxy *httputil.ReverseProxy) *proxyHandler {
 	return handler
 }
 
-func (self *proxyHandler) Requests() int32 {
+func (self *requestsWrapper) Requests() int32 {
 	return atomic.LoadInt32(&self.requests)
 }
 
-func (self *proxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (self *requestsWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	self.proxy.ServeHTTP(w, r)
 }

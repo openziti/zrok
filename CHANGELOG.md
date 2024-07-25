@@ -2,6 +2,8 @@
 
 ## v0.4.36
 
+FEATURE: New interstitial pages that can be enabled per-frontend, and disabled per-account (https://github.com/openziti/zrok/issues/704)
+
 CHANGE: Enable `"declaration": true` in `tsconfig.json` for Node SDK.
 
 FIX: Statically link arm 32bit build for broader compatibility.

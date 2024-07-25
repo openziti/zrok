@@ -133,7 +133,17 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for share '%v'", frontendSelection, sfe.ZId, shrToken)
 			}
 		}
-		shrZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, edge)
+		var skipInterstitial bool
+		if backendMode != sdk.DriveBackendMode {
+			skipInterstitial, err = str.IsAccountGrantedSkipInterstitial(int(principal.ID), trx)
+			if err != nil {
+				logrus.Errorf("error checking skip interstitial for account '%v': %v", principal.Email, err)
+				return share.NewShareInternalServerError()
+			}
+		} else {
+			skipInterstitial = true
+		}
+		shrZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, !skipInterstitial, edge)
 		if err != nil {
 			logrus.Error(err)
 			return share.NewShareInternalServerError()
