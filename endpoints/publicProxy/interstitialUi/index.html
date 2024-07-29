@@ -108,8 +108,10 @@
 <body>
 	<script>
 		function onClick() {
-			let e=new Date; e.setTime(e.getTime()+6048e5);
-			document.cookie = 'zrok_interstitial = 1; expires=${e}; path=/; SameSite=None';
+			const d = new Date();
+			d.setTime(d.getTime() + (7 * 24 * 60 * 60 * 1000));
+			let expires = "expires=" + d.toUTCString();
+			document.cookie = "zrok_interstitial=1;" + expires + ";path=/;SameSite=None';domain=" + window.location.hostname;
 			window.location.reload();
 		}
 	</script>
