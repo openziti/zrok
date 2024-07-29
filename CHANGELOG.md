@@ -2,6 +2,8 @@
 
 ## v0.4.37
 
+FIX: Fix for setting the `zrok_interstitial` cookie on Chrome-based browsers.
+
 FIX: Fix for `store.IsAccountGrantedSkipInterstitial` to respect the `deleted` flag.
 
 FIX: When an error occurs connecting to the proxied endpoint, the `proxy` backend should return HTTP status `502` (https://github.com/openziti/zrok/issues/703)
