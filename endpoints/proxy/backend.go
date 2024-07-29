@@ -95,6 +95,7 @@ func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
+		w.WriteHeader(http.StatusBadGateway)
 	}
 
 	return proxy, nil
