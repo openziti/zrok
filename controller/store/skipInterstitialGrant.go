@@ -6,7 +6,7 @@ import (
 )
 
 func (str *Store) IsAccountGrantedSkipInterstitial(acctId int, trx *sqlx.Tx) (bool, error) {
-	stmt, err := trx.Prepare("select count(0) from skip_interstitial_grants where account_id = $1")
+	stmt, err := trx.Prepare("select count(0) from skip_interstitial_grants where account_id = $1 and not deleted")
 	if err != nil {
 		return false, errors.Wrap(err, "error preparing skip_interstitial_grants select statement")
 	}
