@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.37
+
+FIX: When an error occurs connecting to the proxied endpoint, the `proxy` backend should return HTTP status `502` (https://github.com/openziti/zrok/issues/703)
+
 ## v0.4.36
 
 FEATURE: New interstitial pages that can be enabled per-frontend, and disabled per-account (https://github.com/openziti/zrok/issues/704)
