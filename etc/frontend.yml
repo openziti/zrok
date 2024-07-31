@@ -10,10 +10,19 @@ v: 3
 #
 #host_match: zrok.io
 
-# Setting the `interstitial` setting to `true` will allow this frontend to offer interstitial pages if they are
-# configured on the share by the controller.
+# Configure interstitial pages for this frontend. The interstitial page presents a warning to internet users, alerting
+# them to the fact that they're visiting a zrok share.
 #
-#interstitial: true
+#interstitial:
+#  # Enable or disable interstitial pages on this frontend.
+#  #
+#  enabled: true
+#
+#  # Specify a list of User-Agent prefixes that should receive the interstitial page. If interstitial pages are enabled
+#  # and this list is not set, all user agents will receive an interstitial page.
+#  #
+#  user_agent_prefixes:
+#    - "Mozilla/5.0"
 
 # The OAuth configuration is used when enabling OAuth authentication with your public frontend.
 #

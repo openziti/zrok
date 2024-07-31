@@ -37,18 +37,28 @@ If an account has a row present in this table when creating a share, then the co
 The frontend configuration controls what the frontend will do with the share config it finds in OpenZiti. The new stanza looks like this:
 
 ```
-# Setting the `interstitial` setting to `true` will allow this frontend 
-# to offer interstitial pages if they are configured on the share by the 
-# controller.
+# Configure interstitial pages for this frontend. The interstitial page presents a warning to internet users, alerting
+# them to the fact that they're visiting a zrok share.
 #
-#interstitial: true
+#interstitial:
+#  # Enable or disable interstitial pages on this frontend.
+#  #
+#  enabled: true
+#
+#  # Specify a list of User-Agent prefixes that should receive the interstitial page. If interstitial pages are enabled
+#  # and this list is not set, all user agents will receive an interstitial page.
+#  #
+#  user_agent_prefixes:
+#    - "Mozilla/5.0"
 ```
 
-Simply setting `interstitial: true` in the frontend config will allow the configured frontend to offer an interstitial page if the share config enables the interstitial page for that share.
+Setting `enabled: true` in the `interstitial` stanza of the frontend config will allow the configured frontend to offer an interstitial page if the share config enables the interstitial page for that share. The `user_agent_prefixes` array can be used to specify which specific `User-Agent` types receive the interstitial. User agents that match a prefix in the list will receive the interstitial, while others will not. If the `user_agent_prefixes` list is omitted, _all_ user agents will receive the interstitial page.
 
 ## Bypassing the Interstitial
 
-The interstitial page will be presented unless the client shows up with a `zrok_interstitial` cookie. When the user is presented with the interstitial page, there is a button they can click which sets the necessary cookie and allows them to visit the site. The cookie is set to expire in one week.
+The interstitial page will be presented unless the client shows up with a `zrok_interstitial` cookie (depending on `user_agent_prefixes` configuration). When the user is presented with the interstitial page, there is a button they can click which sets the necessary cookie and allows them to visit the site. The cookie is set to expire in one week.
+
+Typically the `user_agent_prefixes` list contains `Mozilla/5.0`, which matches all typical interactive mobile and desktop browsers. Setting a non-standard `User-Agent` in an interactive browser will bypass the interstitial pages for frontends configured with the usual `Mozilla/5.0` prefix.
 
 End users can offer an HTTP header of `skip_zrok_interstitial`, set to any value to bypass the interstitial page. Setting this header means that the user most likely understands what a zrok share is and will hopefully not fall for a phishing attack.
 
