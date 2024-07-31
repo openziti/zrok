@@ -4,7 +4,7 @@ import * as metadata from "../api/metadata"
 import Success from "./Success";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import PasswordForm from "../components/password";
-import {Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel} from "@mui/material";
+import {Checkbox, FormControlLabel} from "@mui/material";
 
 const SetPasswordForm = (props) => {
     const [password, setPassword] = useState('');
