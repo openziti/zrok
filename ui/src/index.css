@@ -119,8 +119,13 @@ code, pre {
     margin-top: 25px;
 }
 
-#zrok-tou {
-    margin-top: 15px;
+.zrok-tou {
+    margin: 15px;
+    color: white;
+}
+
+.zrok-type {
+    font-family: 'Russo One', sans-serif;
 }
 
 #controls-row {
