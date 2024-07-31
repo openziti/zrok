@@ -2,9 +2,9 @@
 
 ## v0.4.38
 
-FEATURE: Conditionally enable interstitial page based on `User-Agent` prefix list. See the [template configuration](etc/frontend.yml) for details on the new configuration structure (https://github.com/openziti/zrok/issues/715) 
+FEATURE: Conditionally enable interstitial page based on `User-Agent` prefix list. See the [frontend template configuration](etc/frontend.yml) for details on the new configuration structure (https://github.com/openziti/zrok/issues/715) 
 
-CHANGE: The interstitial configuration has been modified from a simple `interstitial: <bool>` to a richer structure, but the config version has not been incremented; this feature has not been widely adopted yet.
+CHANGE: The interstitial configuration has been modified from a simple `interstitial: <bool>` to a richer structure, but the config version has not been incremented; this feature has not been widely adopted yet. See the [frontend configuration template](etc/frontend.yml) for details on the new structure.
 
 ## v0.4.37
 
