@@ -88,16 +88,13 @@ const SetPasswordForm = (props) => {
                                     <p>{tou}</p>
                                 </div>
                                 <div class={"zrok-tou"}>
-                                    <FormControlLabel control={<Checkbox iconStyle={{fill: 'white'}} required/>} label={<span class={"zrok-type"}>I have read and agree to the above</span>}/>
+                                    <FormControlLabel control={<Checkbox style={{color: 'white'}} required/>} label={<span class={"zrok-type"}>I have read and agree to the above</span>}/>
                                 </div>
                                 <Button variant={"light"} type={"submit"}>Register Account</Button>
                             </Form>
                         </Row>
-                        <Row>
+                        <Row id={"zrok-message-row"}>
                             {message}
-                        </Row>
-                        <Row>
-
                         </Row>
                     </Container>
                 </Row>

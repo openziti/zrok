@@ -136,3 +136,8 @@ code, pre {
 #navbar {
     background: linear-gradient(180deg, #0E0238 0%, #231069 100%);
 }
+
+#zrok-message-row {
+    padding: 10px;
+    height: 50px;
+}
