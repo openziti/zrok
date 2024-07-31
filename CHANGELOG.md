@@ -6,6 +6,10 @@ FEATURE: Conditionally enable interstitial page based on `User-Agent` prefix lis
 
 CHANGE: The interstitial configuration has been modified from a simple `interstitial: <bool>` to a richer structure, but the config version has not been incremented; this feature has not been widely adopted yet. See the [frontend configuration template](etc/frontend.yml) for details on the new structure.
 
+CHANGE: The registration page where a new user's password is set now includes a required checkbox, asking them to acknowledge the terms and conditions presented above the checkbox (https://github.com/openziti/zrok/issues/669)
+
+FIX: The registration page where a new user's password is set now includes better styling of the error message `<div/>` to prevent the entire page from jumping when the message changes.
+
 ## v0.4.37
 
 FIX: Fix for setting the `zrok_interstitial` cookie on Chrome-based browsers.
