@@ -4,13 +4,14 @@ import * as metadata from "../api/metadata"
 import Success from "./Success";
 import {Button, Container, Form, Row} from "react-bootstrap";
 import PasswordForm from "../components/password";
+import {Checkbox, FormControlLabel} from "@mui/material";
 
 const SetPasswordForm = (props) => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState();
     const [authToken, setAuthToken] = useState('');
     const [complete, setComplete] = useState(false);
-    const [tou, setTou] = useState();
+    const [tou, setTou] = useState(<span/>);
     const [passwordLength, setPasswordLength] = useState(10);
     const [passwordRequireCapital, setPasswordRequireCapital] = useState(true);
     const [passwordRequireNumeric, setPasswordRequireNumeric] = useState(true);
@@ -23,7 +24,7 @@ const SetPasswordForm = (props) => {
         metadata.configuration().then(resp => {
             if(!resp.error) {
                 if (resp.data.touLink !== undefined && resp.data.touLink.trim() !== "") {
-                    setTou(resp.data.touLink)
+                    setTou(<span dangerouslySetInnerHTML={{__html: resp.data.touLink}}/>)
                 }
                 setPasswordLength(resp.data.passwordRequirements.length)
                 setPasswordRequireCapital(resp.data.passwordRequirements.requireCapital)
@@ -73,22 +74,27 @@ const SetPasswordForm = (props) => {
                     <Container className={"fullscreen-form"}>
                         <Row>
                             <Form onSubmit={handleSubmit}>
-                                <PasswordForm
-                                    setMessage={setMessage}
-                                    passwordLength={passwordLength}
-                                    passwordRequireCapital={passwordRequireCapital}
-                                    passwordRequireNumeric={passwordRequireNumeric}
-                                    passwordRequireSpecial={passwordRequireSpecial}
-                                    passwordValidSpecialCharacters={passwordValidSpecialCharacters}
-                                    setParentPassword={setPassword}/>
+                                <div>
+                                    <PasswordForm
+                                        setMessage={setMessage}
+                                        passwordLength={passwordLength}
+                                        passwordRequireCapital={passwordRequireCapital}
+                                        passwordRequireNumeric={passwordRequireNumeric}
+                                        passwordRequireSpecial={passwordRequireSpecial}
+                                        passwordValidSpecialCharacters={passwordValidSpecialCharacters}
+                                        setParentPassword={setPassword}/>
+                                </div>
+                                <div class={"zrok-tou"}>
+                                    <p>{tou}</p>
+                                </div>
+                                <div class={"zrok-tou"}>
+                                    <FormControlLabel control={<Checkbox style={{color: 'white'}} required/>} label={<span class={"zrok-type"}>I have read and agree to the above</span>}/>
+                                </div>
                                 <Button variant={"light"} type={"submit"}>Register Account</Button>
                             </Form>
                         </Row>
-                        <Row>
+                        <Row id={"zrok-message-row"}>
                             {message}
-                        </Row>
-                        <Row>
-                            <div id={"zrok-tou"} dangerouslySetInnerHTML={{__html: tou}}></div>
                         </Row>
                     </Container>
                 </Row>
