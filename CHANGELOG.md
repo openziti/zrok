@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.39
+
+CHANGE: Update `github.com/openziti/sdk-golang` (and related dependencies) to version `v0.23.40`.
+
 ## v0.4.38
 
 FEATURE: Conditionally enable interstitial page based on `User-Agent` prefix list. See the [frontend configuration template](etc/frontend.yml) for details on the new configuration structure (https://github.com/openziti/zrok/issues/715) 
