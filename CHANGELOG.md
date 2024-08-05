@@ -4,7 +4,7 @@
 
 CHANGE: Update `github.com/openziti/sdk-golang` (and related dependencies) to version `v0.23.40`.
 
-CHANGE: upgrade ziti CLI in zrok container image
+CHANGE: upgrade to ziti v1.1.7 CLI in zrok container image
 
 ## v0.4.38
 
