@@ -180,7 +180,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 									_, zrokOkErr := r.Cookie("zrok_interstitial")
 									if skip == "" && zrokOkErr != nil {
 										logrus.Debugf("forcing interstitial for '%v'", r.URL)
-										interstitialUi.WriteInterstitialAnnounce(w)
+										interstitialUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
 										return
 									}
 								}
