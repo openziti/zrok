@@ -18,6 +18,11 @@ v: 3
 #  #
 #  enabled: true
 #
+#  # Specify a path to an external HTML file containing the interstitial page. 
+#  # See `endpoints/publicProxy/interstitialUi/index.html` for details on how the page works.
+#  #
+#  html_path: /some/path/to/interstitial.html
+# 
 #  # Specify a list of User-Agent prefixes that should receive the interstitial page. If interstitial pages are enabled
 #  # and this list is not set, all user agents will receive an interstitial page.
 #  #
