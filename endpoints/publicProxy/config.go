@@ -23,6 +23,7 @@ type Config struct {
 
 type InterstitialConfig struct {
 	Enabled           bool
+	HtmlPath          string
 	UserAgentPrefixes []string
 }
 
