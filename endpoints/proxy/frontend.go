@@ -15,15 +15,17 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 	"time"
 )
 
 type FrontendConfig struct {
-	IdentityName string
-	ShrToken     string
-	Address      string
-	Tls          *endpoints.TlsConfig
-	RequestsChan chan *endpoints.Request
+	IdentityName    string
+	ShrToken        string
+	Address         string
+	ResponseHeaders []string
+	Tls             *endpoints.TlsConfig
+	RequestsChan    chan *endpoints.Request
 }
 
 func DefaultFrontendConfig(identityName string) *FrontendConfig {
@@ -112,6 +114,14 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
+		for _, responseHeader := range cfg.ResponseHeaders {
+			tokens := strings.Split(responseHeader, ":")
+			if len(tokens) == 2 {
+				resp.Header.Set(strings.TrimSpace(tokens[0]), strings.TrimSpace(tokens[1]))
+			} else {
+				logrus.Errorf("invalid response header '%v' (expecting header:value", responseHeader)
+			}
+		}
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
