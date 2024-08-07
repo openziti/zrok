@@ -28,9 +28,10 @@ func init() {
 }
 
 type accessPrivateCommand struct {
-	bindAddress string
-	headless    bool
-	cmd         *cobra.Command
+	bindAddress     string
+	headless        bool
+	responseHeaders []string
+	cmd             *cobra.Command
 }
 
 func newAccessPrivateCommand() *accessPrivateCommand {
@@ -41,8 +42,9 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Run = command.run
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
+	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
+	cmd.Run = command.run
 	return command
 }
 
@@ -194,6 +196,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		cfg := proxy.DefaultFrontendConfig(env.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress
+		cfg.ResponseHeaders = cmd.responseHeaders
 		cfg.RequestsChan = requests
 		fe, err := proxy.NewFrontend(cfg)
 		if err != nil {
