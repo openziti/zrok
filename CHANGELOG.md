@@ -4,6 +4,8 @@
 
 FEATURE: Support `html_path` directive in `interstitial` stanza of public frontend configuration to support using an external HTML file for the interstitial page (https://github.com/openziti/zrok/issues/716)
 
+FEATURE: `zrok access private` now includes a `--response-header` flag to add headers to the response for HTTP-based backends. Add flag multiple times to add multiple headers to the response. Expects `key:value` header definitions in this format: `--response-header "Access-Control-Allow-Origin: *"` (https://github.com/openziti/zrok/issues/522)
+
 CHANGE: Update `github.com/openziti/sdk-golang` (and related dependencies) to version `v0.23.40`.
 
 CHANGE: upgrade to ziti v1.1.7 CLI in zrok container image
