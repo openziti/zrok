@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.0
+
+MAJOR RELEASE: zrok reaches version 1.0.0!
+
 ## v0.4.39
 
 FEATURE: Support `html_path` directive in `interstitial` stanza of public frontend configuration to support using an external HTML file for the interstitial page (https://github.com/openziti/zrok/issues/716)
