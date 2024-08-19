@@ -114,6 +114,8 @@ services:
     environment:
       ZROK_USER_PWD: ${ZROK_USER_PWD} # admin account password     (initial user account)
       ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # login email address (initial user account)
+      ZROK_ADMIN_TOKEN: ${ZROK_ADMIN_TOKEN} # zrok controller admin password
+      ZROK_API_ENDPOINT: http://zrok-controller:${ZROK_CTRL_PORT:-18080} # bridge address of the zrok controller
 
   zrok-frontend:
     depends_on:
