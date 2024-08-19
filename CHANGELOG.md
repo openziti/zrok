@@ -2,7 +2,7 @@
 
 ## v0.4.39
 
-FEATURE: New API endpoint allowing direct creation of accounts in the zrok database. Requires an admin token (specified in the controller configuration yaml) for authentication. See the OpenAPI spec for details (https://github.com/openziti/zrok/issues/734)
+FEATURE: New API endpoint allowing direct creation of accounts in the zrok database. Requires an admin token (specified in the controller configuration yaml) for authentication. See the OpenAPI spec for details of the API endpoint. The `zrok admin create account` CLI was also updated to call the API endpoint, rather than directly operating on the underlying database (https://github.com/openziti/zrok/issues/734)
 
 FEATURE: Support `html_path` directive in `interstitial` stanza of public frontend configuration to support using an external HTML file for the interstitial page (https://github.com/openziti/zrok/issues/716)
 
