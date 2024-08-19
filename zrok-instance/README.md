@@ -11,7 +11,7 @@ This Docker Compose project creates a zrok instance and includes a ziti controll
 
 #### Additional DNS Configuration for Caddy TLS
 
-The included Caddy container can automatically manage a wildcard certificate for your zrok instance. You can enable Caddy in this compose project by renaming `caddy.compose.override.yml` as `compose.override.yml`.
+The included Caddy container can automatically manage a wildcard certificate for your zrok instance. You can enable Caddy in this compose project by renaming `compose.caddy.yml` as `compose.override.yml`.
 
 1. Ensure A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc)).
 1. Designate A DNS zone for zrok, e.g. `example.com` or `share.example.com` and create the zone on your DNS provider's platform.
@@ -64,7 +64,7 @@ ZROK_ADMIN_TOKEN=zroktoken
 ```
 
 ```bash title=".env options"
-# Caddy TLS option: rename caddy.compose.override.yml to compose.override.yml and set these vars; allow 80,443 in firewall
+# Caddy TLS option: rename compose.caddy.yml to compose.override.yml and set these vars; allow 80,443 in firewall
 # plugin name for your DNS provider
 CADDY_DNS_PLUGIN=cloudflare
 # API token from your DNS provider
@@ -110,11 +110,11 @@ ZITI_CLI_TAG=latest
 This step creates a user account. You will log in to the zrok web console with the account password created in this step. The ZROK_USER_EMAIL and ZROK_USER_PWD variables are set in the `.env` file. You can create more user accounts the same way by substituting a different email and password.
 
 ```bash title="Create the first user account"
-docker compose exec zrok-controller bash -xc 'zrok admin create account /etc/zrok-controller/config.yml ${ZROK_USER_EMAIL} ${ZROK_USER_PWD}'
+docker compose exec zrok-controller bash -xc 'zrok admin create account ${ZROK_USER_EMAIL} ${ZROK_USER_PWD}'
 ```
 
 ```buttonless title="Example output"
-+ zrok admin create account /etc/zrok-controller/config.yml me@example.com zrokuserpw
++ zrok admin create account me@example.com zrokuserpw
 [   0.000]    INFO zrok/controller/store.Open: database connected
 [   0.002]    INFO zrok/controller/store.(*Store).migrate: applied 0 migrations
 heMqncCyxZcx
@@ -123,7 +123,7 @@ heMqncCyxZcx
 Create additional users by running the command again with a different email and password.
 
 ```bash title="Create another user"
-docker compose exec zrok-controller zrok admin create account /etc/zrok-controller/config.yml <email> <password>
+docker compose exec zrok-controller zrok admin create account <email> <password>
 ```
 
 ### Enable the User Environment
