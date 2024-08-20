@@ -214,14 +214,6 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
     dns.providers.cloudflare
     ```
 
-1. Verify certificates.
-
-    You can check the certificates that Caddy has obtained.
-
-    ```bash
-    docker compose exec caddy caddy list-certificates
-    ```
-
 1. Use the Caddy admin API.
 
     You can use the Caddy admin API to check the status of the Caddy instance. The admin API is available on port `2019/tcp` inside the Docker Compose project. You can modify `compose.override.yml` to publish the port if you want to access the admin API from the Docker host or elsewhere.
