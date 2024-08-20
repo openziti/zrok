@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/controller"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/spf13/cobra"
 )
 
@@ -18,9 +17,9 @@ type adminCreateAccount struct {
 
 func newAdminCreateAccount() *adminCreateAccount {
 	cmd := &cobra.Command{
-		Use:   "account <configPath}> <email> <password>",
+		Use:   "account <email> <password>",
 		Short: "Pre-populate an account in the database; returns an enable token for the account",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 	}
 	command := &adminCreateAccount{cmd: cmd}
 	cmd.Run = command.run
@@ -28,39 +27,24 @@ func newAdminCreateAccount() *adminCreateAccount {
 }
 
 func (cmd *adminCreateAccount) run(_ *cobra.Command, args []string) {
-	cfg, err := config.LoadConfig(args[0])
+	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
-	str, err := store.Open(cfg.Store)
+
+	zrok, err := env.Client()
 	if err != nil {
 		panic(err)
 	}
-	token, err := controller.CreateToken()
+
+	req := admin.NewCreateAccountParams()
+	req.Body.Email = args[0]
+	req.Body.Password = args[1]
+
+	resp, err := zrok.Admin.CreateAccount(req, mustGetAdminAuth())
 	if err != nil {
 		panic(err)
 	}
-	hpwd, err := controller.HashPassword(args[2])
-	if err != nil {
-		panic(err)
-	}
-	trx, err := str.Begin()
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		if err := trx.Commit(); err != nil {
-			panic(err)
-		}
-	}()
-	a := &store.Account{
-		Email:    args[1],
-		Salt:     hpwd.Salt,
-		Password: hpwd.Password,
-		Token:    token,
-	}
-	if _, err := str.CreateAccount(a, trx); err != nil {
-		panic(err)
-	}
-	fmt.Println(token)
+
+	fmt.Println(resp.GetPayload().Token)
 }

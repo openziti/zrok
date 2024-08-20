@@ -231,7 +231,7 @@ address:            0.0.0.0:8080
 
 This frontend config file has a `host_match` pattern that represents the DNS zone you're using with this instance of `zrok`. Incoming HTTP requests with a matching `Host` header will be handled by this frontend. You may also specify the interface address where the frontend will listen for public access requests.
 
-The frontend does not provide server TLS, but you may front the server with a reverse proxy. It is essential the reverse proxy forwards the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
+The frontend does not provide server TLS, but you may front the server with a reverse proxy. The reverse proxy must forward the `Host` header supplied by the viewer. This example will expose the non-TLS listener for the frontend.
 
 You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](/guides/self-hosting/oauth/configuring-oauth.md#configuring-your-public-frontend).
 
@@ -254,7 +254,7 @@ The `zrok` frontend uses the `public` identity created during the bootstrap proc
 With our `ZROK_ADMIN_TOKEN` and `ZROK_API_ENDPOINT` environment variables set, we can create our first user account.
 
 ```bash
-zrok admin create account etc/ctrl.yml <email> <password>
+zrok admin create account <email> <password>
 ```
 
 The output is the account token you will use to enable each device's zrok environment.
