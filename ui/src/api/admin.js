@@ -4,6 +4,21 @@ import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} created
+ */
+export function createAccount(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(createAccountOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
  * @param {module:types.createFrontendRequest} [options.body] 
  * @return {Promise<module:types.createFrontendResponse>} frontend created
  */
@@ -81,6 +96,17 @@ export function inviteTokenGenerate(options) {
     }
   }
   return gateway.request(inviteTokenGenerateOperation, parameters)
+}
+
+const createAccountOperation = {
+  path: '/account',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
 }
 
 const createFrontendOperation = {

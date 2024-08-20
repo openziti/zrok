@@ -6,6 +6,8 @@ MAJOR RELEASE: zrok reaches version 1.0.0!
 
 ## v0.4.39
 
+FEATURE: New API endpoint allowing direct creation of accounts in the zrok database. Requires an admin token (specified in the controller configuration yaml) for authentication. See the OpenAPI spec for details of the API endpoint. The `zrok admin create account` CLI was also updated to call the API endpoint, rather than directly operating on the underlying database (https://github.com/openziti/zrok/issues/734). The [Docker](https://github.com/openziti/zrok/pull/736) and [Kubernetes](https://github.com/openziti/helm-charts/pull/249) zrok instance deployments were adapted to the new CLI parameter shape.
+
 FEATURE: Support `html_path` directive in `interstitial` stanza of public frontend configuration to support using an external HTML file for the interstitial page (https://github.com/openziti/zrok/issues/716)
 
 FEATURE: `zrok access private` now includes a `--response-header` flag to add headers to the response for HTTP-based backends. Add flag multiple times to add multiple headers to the response. Expects `key:value` header definitions in this format: `--response-header "Access-Control-Allow-Origin: *"` (https://github.com/openziti/zrok/issues/522)
