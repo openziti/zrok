@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.40
+
+FIX: prune incorrect troubleshooting advice about listing Caddy's certificates
+
 ## v0.4.39
 
 FEATURE: New API endpoint allowing direct creation of accounts in the zrok database. Requires an admin token (specified in the controller configuration yaml) for authentication. See the OpenAPI spec for details of the API endpoint. The `zrok admin create account` CLI was also updated to call the API endpoint, rather than directly operating on the underlying database (https://github.com/openziti/zrok/issues/734). The [Docker](https://github.com/openziti/zrok/pull/736) and [Kubernetes](https://github.com/openziti/helm-charts/pull/249) zrok instance deployments were adapted to the new CLI parameter shape.
