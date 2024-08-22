@@ -1,4 +1,4 @@
-package daemon
+package agent
 
 type Daemon struct {
 	shares   map[string]*share

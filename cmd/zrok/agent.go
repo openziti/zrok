@@ -7,25 +7,25 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newDaemonCommand().cmd)
+	rootCmd.AddCommand(newAgentCommand().cmd)
 }
 
-type daemonCommand struct {
+type agentCommand struct {
 	cmd *cobra.Command
 }
 
-func newDaemonCommand() *daemonCommand {
+func newAgentCommand() *agentCommand {
 	cmd := &cobra.Command{
-		Use:   "daemon",
-		Short: "Launch a zrok daemon",
+		Use:   "agent",
+		Short: "Launch a zrok agent",
 		Args:  cobra.NoArgs,
 	}
-	command := &daemonCommand{cmd: cmd}
+	command := &agentCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *daemonCommand) run(_ *cobra.Command, _ []string) {
+func (cmd *agentCommand) run(_ *cobra.Command, _ []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("error loading zrokdir", err)

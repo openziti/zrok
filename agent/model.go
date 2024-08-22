@@ -1,4 +1,4 @@
-package daemon
+package agent
 
 import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
