@@ -174,6 +174,10 @@ func (r *Root) DeleteZitiIdentityNamed(name string) error {
 	return nil
 }
 
+func (r *Root) AgentSocket() (string, error) {
+	return agentSocket()
+}
+
 func (r *Root) Obliterate() error {
 	zrd, err := rootDir()
 	if err != nil {

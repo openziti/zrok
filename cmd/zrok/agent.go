@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/openziti/zrok/agent"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
@@ -33,5 +34,14 @@ func (cmd *agentCommand) run(_ *cobra.Command, _ []string) {
 
 	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	a, err := agent.NewAgent(root)
+	if err != nil {
+		tui.Error("error creating agent", err)
+	}
+
+	if err := a.Run(); err != nil {
+		tui.Error("agent aborted", err)
 	}
 }
