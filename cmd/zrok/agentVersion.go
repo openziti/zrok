@@ -42,10 +42,14 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error getting agent socket", err)
 	}
 
+	opts := []grpc.DialOption{
+		grpc.WithContextDialer(func(_ context.Context, addr string) (net.Conn, error) {
+			return net.Dial("unix", addr)
+		}),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
 	resolver.SetDefaultScheme("passthrough")
-	conn, err := grpc.NewClient("unix", grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
-		return net.Dial("unix", agentSocket)
-	}), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(agentSocket, opts...)
 	if err != nil {
 		tui.Error("error connecting to agent socket", err)
 	}
