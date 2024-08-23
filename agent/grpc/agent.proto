@@ -1,0 +1,12 @@
+option go_package = "github.com/openziti/zrok/agent/grpc";
+
+service Agent {
+	rpc Version(VersionRequest) returns (VersionReply) {}
+}
+
+message VersionRequest {
+}
+
+message VersionReply {
+	required string v = 1;
+}
