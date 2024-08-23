@@ -5,6 +5,9 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func init() {
@@ -41,7 +44,19 @@ func (cmd *agentStartCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error creating agent", err)
 	}
 
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		cmd.shutdown(a)
+		os.Exit(0)
+	}()
+
 	if err := a.Run(); err != nil {
 		tui.Error("agent aborted", err)
 	}
+}
+
+func (cmd *agentStartCommand) shutdown(a *agent.Agent) {
+	a.Shutdown()
 }

@@ -7,12 +7,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
+	"os"
 )
 
 type Agent struct {
-	root     env_core.Root
-	shares   map[string]*share
-	accesses map[string]*access
+	root        env_core.Root
+	agentSocket string
+	shares      map[string]*share
+	accesses    map[string]*access
 }
 
 func NewAgent(root env_core.Root) (*Agent, error) {
@@ -28,6 +30,7 @@ func NewAgent(root env_core.Root) (*Agent, error) {
 
 func (a *Agent) Run() error {
 	logrus.Infof("started")
+
 	agentSocket, err := a.root.AgentSocket()
 	if err != nil {
 		return err
@@ -36,10 +39,19 @@ func (a *Agent) Run() error {
 	if err != nil {
 		return err
 	}
+	a.agentSocket = agentSocket
+
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{})
 	if err := srv.Serve(l); err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func (a *Agent) Shutdown() {
+	if err := os.Remove(a.agentSocket); err != nil {
+		logrus.Warnf("unable to remove agent socket: %v", err)
+	}
 }
