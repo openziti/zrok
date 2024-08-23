@@ -18,7 +18,7 @@ type agentStartCommand struct {
 func newAgentStartCommand() *agentStartCommand {
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Launch a zrok agent",
+		Short: "Start a zrok agent",
 		Args:  cobra.NoArgs,
 	}
 	command := &agentStartCommand{cmd: cmd}

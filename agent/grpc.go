@@ -3,7 +3,7 @@ package agent
 import (
 	"context"
 	"github.com/openziti/zrok/agent/grpc"
-	"github.com/prometheus/common/version"
+	"github.com/openziti/zrok/build"
 	_ "google.golang.org/grpc"
 )
 
@@ -12,5 +12,6 @@ type agentGrpcImpl struct {
 }
 
 func (s *agentGrpcImpl) Version(ctx context.Context, req *grpc.VersionRequest) (*grpc.VersionReply, error) {
-	return &grpc.VersionReply{V: &version.Version}, nil
+	v := build.String()
+	return &grpc.VersionReply{V: &v}, nil
 }
