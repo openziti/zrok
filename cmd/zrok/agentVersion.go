@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	grpc2 "github.com/openziti/zrok/agent/grpc"
+	grpc2 "github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"

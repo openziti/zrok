@@ -2,16 +2,15 @@ package agent
 
 import (
 	"context"
-	"github.com/openziti/zrok/agent/grpc"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/build"
-	_ "google.golang.org/grpc"
 )
 
 type agentGrpcImpl struct {
-	grpc.UnimplementedAgentServer
+	agentGrpc.UnimplementedAgentServer
 }
 
-func (s *agentGrpcImpl) Version(ctx context.Context, req *grpc.VersionRequest) (*grpc.VersionReply, error) {
+func (s *agentGrpcImpl) Version(ctx context.Context, req *agentGrpc.VersionRequest) (*agentGrpc.VersionReply, error) {
 	v := build.String()
-	return &grpc.VersionReply{V: &v}, nil
+	return &agentGrpc.VersionReply{V: &v}, nil
 }

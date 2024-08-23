@@ -1,4 +1,4 @@
-option go_package = "github.com/openziti/zrok/agent/grpc";
+option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
 service Agent {
 	rpc Version(VersionRequest) returns (VersionReply) {}

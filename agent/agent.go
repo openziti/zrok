@@ -1,7 +1,7 @@
 package agent
 
 import (
-	agentGrpc "github.com/openziti/zrok/agent/grpc"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
