@@ -23,6 +23,7 @@ func init() {
 	adminCmd.AddCommand(adminDeleteCmd)
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
+	rootCmd.AddCommand(agentCmd)
 	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
@@ -73,6 +74,12 @@ var adminListCmd = &cobra.Command{
 var adminUpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update global resources",
+}
+
+var agentCmd = &cobra.Command{
+	Use:     "agent",
+	Short:   "zrok Agent commands",
+	Aliases: []string{"daemon"},
 }
 
 var configCmd = &cobra.Command{
