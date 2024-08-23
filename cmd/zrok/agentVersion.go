@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"path/filepath"
+	"strings"
 )
 
 func init() {
@@ -39,6 +41,7 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		tui.Error("error getting agent socket", err)
 	}
+	agentSocket = filepath.ToSlash(strings.Replace(agentSocket, ":", "", -1))
 
 	conn, err := grpc.NewClient("unix://"+agentSocket, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
