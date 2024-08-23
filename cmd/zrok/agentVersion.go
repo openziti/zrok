@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
-	grpc2 "github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"path/filepath"
-	"strings"
+	"google.golang.org/grpc/resolver"
+	"net"
 )
 
 func init() {
@@ -41,16 +41,18 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		tui.Error("error getting agent socket", err)
 	}
-	agentSocket = filepath.ToSlash(strings.Replace(agentSocket, ":", "", -1))
 
-	conn, err := grpc.NewClient("unix://"+agentSocket, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	resolver.SetDefaultScheme("passthrough")
+	conn, err := grpc.NewClient("unix", grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
+		return net.Dial("unix", agentSocket)
+	}), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		tui.Error("error connecting to agent socket", err)
 	}
 	defer conn.Close()
-	client := grpc2.NewAgentClient(conn)
+	client := agentGrpc.NewAgentClient(conn)
 
-	v, err := client.Version(context.Background(), &grpc2.VersionRequest{})
+	v, err := client.Version(context.Background(), &agentGrpc.VersionRequest{})
 	if err != nil {
 		tui.Error("error getting agent version", err)
 	}
