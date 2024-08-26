@@ -20,6 +20,282 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AccessDetail struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token           string   `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	BindAddress     string   `protobuf:"bytes,2,opt,name=bindAddress,proto3" json:"bindAddress,omitempty"`
+	ResponseHeaders []string `protobuf:"bytes,3,rep,name=responseHeaders,proto3" json:"responseHeaders,omitempty"`
+}
+
+func (x *AccessDetail) Reset() {
+	*x = AccessDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AccessDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AccessDetail) ProtoMessage() {}
+
+func (x *AccessDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AccessDetail.ProtoReflect.Descriptor instead.
+func (*AccessDetail) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AccessDetail) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *AccessDetail) GetBindAddress() string {
+	if x != nil {
+		return x.BindAddress
+	}
+	return ""
+}
+
+func (x *AccessDetail) GetResponseHeaders() []string {
+	if x != nil {
+		return x.ResponseHeaders
+	}
+	return nil
+}
+
+type ShareDetail struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token            string   `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	ShareMode        string   `protobuf:"bytes,2,opt,name=shareMode,proto3" json:"shareMode,omitempty"`
+	BackendMode      string   `protobuf:"bytes,3,opt,name=backendMode,proto3" json:"backendMode,omitempty"`
+	Reserved         bool     `protobuf:"varint,4,opt,name=reserved,proto3" json:"reserved,omitempty"`
+	UniqueName       string   `protobuf:"bytes,5,opt,name=uniqueName,proto3" json:"uniqueName,omitempty"`
+	FrontendEndpoint []string `protobuf:"bytes,6,rep,name=frontendEndpoint,proto3" json:"frontendEndpoint,omitempty"`
+	BackendEndpoint  string   `protobuf:"bytes,7,opt,name=backendEndpoint,proto3" json:"backendEndpoint,omitempty"`
+	Closed           bool     `protobuf:"varint,8,opt,name=closed,proto3" json:"closed,omitempty"`
+	Status           string   `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *ShareDetail) Reset() {
+	*x = ShareDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShareDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareDetail) ProtoMessage() {}
+
+func (x *ShareDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareDetail.ProtoReflect.Descriptor instead.
+func (*ShareDetail) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ShareDetail) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *ShareDetail) GetShareMode() string {
+	if x != nil {
+		return x.ShareMode
+	}
+	return ""
+}
+
+func (x *ShareDetail) GetBackendMode() string {
+	if x != nil {
+		return x.BackendMode
+	}
+	return ""
+}
+
+func (x *ShareDetail) GetReserved() bool {
+	if x != nil {
+		return x.Reserved
+	}
+	return false
+}
+
+func (x *ShareDetail) GetUniqueName() string {
+	if x != nil {
+		return x.UniqueName
+	}
+	return ""
+}
+
+func (x *ShareDetail) GetFrontendEndpoint() []string {
+	if x != nil {
+		return x.FrontendEndpoint
+	}
+	return nil
+}
+
+func (x *ShareDetail) GetBackendEndpoint() string {
+	if x != nil {
+		return x.BackendEndpoint
+	}
+	return ""
+}
+
+func (x *ShareDetail) GetClosed() bool {
+	if x != nil {
+		return x.Closed
+	}
+	return false
+}
+
+func (x *ShareDetail) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type StatusRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Accesses []*AccessDetail `protobuf:"bytes,1,rep,name=accesses,proto3" json:"accesses,omitempty"`
+	Shares   []*ShareDetail  `protobuf:"bytes,2,rep,name=shares,proto3" json:"shares,omitempty"`
+}
+
+func (x *StatusRequest) Reset() {
+	*x = StatusRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusRequest) ProtoMessage() {}
+
+func (x *StatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
+func (*StatusRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *StatusRequest) GetAccesses() []*AccessDetail {
+	if x != nil {
+		return x.Accesses
+	}
+	return nil
+}
+
+func (x *StatusRequest) GetShares() []*ShareDetail {
+	if x != nil {
+		return x.Shares
+	}
+	return nil
+}
+
+type StatusReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	V []string `protobuf:"bytes,1,rep,name=v,proto3" json:"v,omitempty"`
+}
+
+func (x *StatusReply) Reset() {
+	*x = StatusReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StatusReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusReply) ProtoMessage() {}
+
+func (x *StatusReply) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusReply.ProtoReflect.Descriptor instead.
+func (*StatusReply) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *StatusReply) GetV() []string {
+	if x != nil {
+		return x.V
+	}
+	return nil
+}
+
 type VersionRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -29,7 +305,7 @@ type VersionRequest struct {
 func (x *VersionRequest) Reset() {
 	*x = VersionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_agentGrpc_agent_proto_msgTypes[0]
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -42,7 +318,7 @@ func (x *VersionRequest) String() string {
 func (*VersionRequest) ProtoMessage() {}
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[0]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +331,7 @@ func (x *VersionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{0}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{4}
 }
 
 type VersionReply struct {
@@ -69,7 +345,7 @@ type VersionReply struct {
 func (x *VersionReply) Reset() {
 	*x = VersionReply{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_agentGrpc_agent_proto_msgTypes[1]
+		mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -82,7 +358,7 @@ func (x *VersionReply) String() string {
 func (*VersionReply) ProtoMessage() {}
 
 func (x *VersionReply) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[1]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -95,7 +371,7 @@ func (x *VersionReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionReply.ProtoReflect.Descriptor instead.
 func (*VersionReply) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{1}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *VersionReply) GetV() string {
@@ -109,17 +385,50 @@ var File_agent_agentGrpc_agent_proto protoreflect.FileDescriptor
 
 var file_agent_agentGrpc_agent_proto_rawDesc = []byte{
 	0x0a, 0x1b, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70,
-	0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x10, 0x0a,
-	0x0e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
-	0x1c, 0x0a, 0x0c, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12,
-	0x0c, 0x0a, 0x01, 0x76, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x01, 0x76, 0x32, 0x34, 0x0a,
-	0x05, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x12, 0x2b, 0x0a, 0x07, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
-	0x6e, 0x12, 0x0f, 0x2e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x0d, 0x2e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c,
-	0x79, 0x22, 0x00, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x6f, 0x70, 0x65, 0x6e, 0x7a, 0x69, 0x74, 0x69, 0x2f, 0x7a, 0x72, 0x6f, 0x6b, 0x2f,
-	0x61, 0x67, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x70, 0x0a,
+	0x0c, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x14, 0x0a,
+	0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f,
+	0x6b, 0x65, 0x6e, 0x12, 0x20, 0x0a, 0x0b, 0x62, 0x69, 0x6e, 0x64, 0x41, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x62, 0x69, 0x6e, 0x64, 0x41, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x28, 0x0a, 0x0f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0f,
+	0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x22,
+	0xa5, 0x02, 0x0a, 0x0b, 0x53, 0x68, 0x61, 0x72, 0x65, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12,
+	0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x68, 0x61, 0x72, 0x65, 0x4d, 0x6f,
+	0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x68, 0x61, 0x72, 0x65, 0x4d,
+	0x6f, 0x64, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x4d, 0x6f,
+	0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e,
+	0x64, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x4e, 0x61, 0x6d,
+	0x65, 0x12, 0x2a, 0x0a, 0x10, 0x66, 0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x45, 0x6e, 0x64,
+	0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x03, 0x28, 0x09, 0x52, 0x10, 0x66, 0x72, 0x6f,
+	0x6e, 0x74, 0x65, 0x6e, 0x64, 0x45, 0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x28, 0x0a,
+	0x0f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x45, 0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x45,
+	0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x63, 0x6c, 0x6f, 0x73, 0x65,
+	0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x63, 0x6c, 0x6f, 0x73, 0x65, 0x64, 0x12,
+	0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x60, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a, 0x08, 0x61, 0x63, 0x63, 0x65,
+	0x73, 0x73, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0d, 0x2e, 0x41, 0x63, 0x63,
+	0x65, 0x73, 0x73, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x08, 0x61, 0x63, 0x63, 0x65, 0x73,
+	0x73, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x18, 0x02, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x44, 0x65, 0x74, 0x61, 0x69,
+	0x6c, 0x52, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x22, 0x1b, 0x0a, 0x0b, 0x53, 0x74, 0x61,
+	0x74, 0x75, 0x73, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x0c, 0x0a, 0x01, 0x76, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x01, 0x76, 0x22, 0x10, 0x0a, 0x0e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x1c, 0x0a, 0x0c, 0x56, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x0c, 0x0a, 0x01, 0x76, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x01, 0x76, 0x32, 0x34, 0x0a, 0x05, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x12,
+	0x2b, 0x0a, 0x07, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x0f, 0x2e, 0x56, 0x65, 0x72,
+	0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0d, 0x2e, 0x56, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x42, 0x2a, 0x5a, 0x28,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6f, 0x70, 0x65, 0x6e, 0x7a,
+	0x69, 0x74, 0x69, 0x2f, 0x7a, 0x72, 0x6f, 0x6b, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2f, 0x61,
+	0x67, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -134,19 +443,25 @@ func file_agent_agentGrpc_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agentGrpc_agent_proto_rawDescData
 }
 
-var file_agent_agentGrpc_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_agent_agentGrpc_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_agent_agentGrpc_agent_proto_goTypes = []any{
-	(*VersionRequest)(nil), // 0: VersionRequest
-	(*VersionReply)(nil),   // 1: VersionReply
+	(*AccessDetail)(nil),   // 0: AccessDetail
+	(*ShareDetail)(nil),    // 1: ShareDetail
+	(*StatusRequest)(nil),  // 2: StatusRequest
+	(*StatusReply)(nil),    // 3: StatusReply
+	(*VersionRequest)(nil), // 4: VersionRequest
+	(*VersionReply)(nil),   // 5: VersionReply
 }
 var file_agent_agentGrpc_agent_proto_depIdxs = []int32{
-	0, // 0: Agent.Version:input_type -> VersionRequest
-	1, // 1: Agent.Version:output_type -> VersionReply
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: StatusRequest.accesses:type_name -> AccessDetail
+	1, // 1: StatusRequest.shares:type_name -> ShareDetail
+	4, // 2: Agent.Version:input_type -> VersionRequest
+	5, // 3: Agent.Version:output_type -> VersionReply
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_agent_agentGrpc_agent_proto_init() }
@@ -156,7 +471,7 @@ func file_agent_agentGrpc_agent_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_agent_agentGrpc_agent_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*VersionRequest); i {
+			switch v := v.(*AccessDetail); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -168,6 +483,54 @@ func file_agent_agentGrpc_agent_proto_init() {
 			}
 		}
 		file_agent_agentGrpc_agent_proto_msgTypes[1].Exporter = func(v any, i int) any {
+			switch v := v.(*ShareDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_agent_agentGrpc_agent_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*StatusRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_agent_agentGrpc_agent_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*StatusReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_agent_agentGrpc_agent_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*VersionRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_agent_agentGrpc_agent_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*VersionReply); i {
 			case 0:
 				return &v.state
@@ -186,7 +549,7 @@ func file_agent_agentGrpc_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_agent_agentGrpc_agent_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

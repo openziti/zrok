@@ -6,6 +6,33 @@ service Agent {
 	rpc Version(VersionRequest) returns (VersionReply) {}
 }
 
+message AccessDetail {
+	string token = 1;
+	string bindAddress = 2;
+	repeated string responseHeaders = 3;
+}
+
+message ShareDetail {
+	string token = 1;
+	string shareMode = 2;
+	string backendMode = 3;
+	bool reserved = 4;
+	string uniqueName = 5;
+	repeated string frontendEndpoint = 6;
+	string backendEndpoint = 7;
+	bool closed = 8;
+	string status = 9;
+}
+
+message StatusRequest {
+	repeated AccessDetail accesses = 1;
+	repeated ShareDetail shares = 2;
+}
+
+message StatusReply {
+	repeated string v = 1;
+}
+
 message VersionRequest {
 }
 
