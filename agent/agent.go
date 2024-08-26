@@ -42,7 +42,7 @@ func (a *Agent) Run() error {
 	a.agentSocket = agentSocket
 
 	srv := grpc.NewServer()
-	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{})
+	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{a: a})
 	if err := srv.Serve(l); err != nil {
 		return err
 	}

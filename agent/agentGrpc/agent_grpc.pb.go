@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Agent_Status_FullMethodName  = "/Agent/Status"
 	Agent_Version_FullMethodName = "/Agent/Version"
 )
 
@@ -26,6 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentClient interface {
+	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error)
 }
 
@@ -35,6 +37,16 @@ type agentClient struct {
 
 func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
 	return &agentClient{cc}
+}
+
+func (c *agentClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StatusReply)
+	err := c.cc.Invoke(ctx, Agent_Status_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *agentClient) Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error) {
@@ -51,6 +63,7 @@ func (c *agentClient) Version(ctx context.Context, in *VersionRequest, opts ...g
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility.
 type AgentServer interface {
+	Status(context.Context, *StatusRequest) (*StatusReply, error)
 	Version(context.Context, *VersionRequest) (*VersionReply, error)
 	mustEmbedUnimplementedAgentServer()
 }
@@ -62,6 +75,9 @@ type AgentServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAgentServer struct{}
 
+func (UnimplementedAgentServer) Status(context.Context, *StatusRequest) (*StatusReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
+}
 func (UnimplementedAgentServer) Version(context.Context, *VersionRequest) (*VersionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
@@ -84,6 +100,24 @@ func RegisterAgentServer(s grpc.ServiceRegistrar, srv AgentServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Agent_ServiceDesc, srv)
+}
+
+func _Agent_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).Status(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_Status_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).Status(ctx, req.(*StatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Agent_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -111,6 +145,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "Agent",
 	HandlerType: (*AgentServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Status",
+			Handler:    _Agent_Status_Handler,
+		},
 		{
 			MethodName: "Version",
 			Handler:    _Agent_Version_Handler,

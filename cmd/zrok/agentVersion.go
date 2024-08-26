@@ -36,7 +36,7 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 
 	client, conn, err := agentClient.NewClient(root)
 	if err != nil {
-		tui.Error("error getting agent client", err)
+		tui.Error("error connecting to agent", err)
 	}
 	defer conn.Close()
 

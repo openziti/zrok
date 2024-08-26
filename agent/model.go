@@ -1,16 +1,20 @@
 package agent
 
 import (
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"time"
 )
 
 type share struct {
-	token string
+	token  string
+	target string
 
 	basicAuth                 []string
 	frontendSelection         []string
+	shareMode                 sdk.ShareMode
 	backendMode               sdk.BackendMode
+	reserved                  bool
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
@@ -24,4 +28,9 @@ type access struct {
 
 	bindAddress     string
 	responseHeaders []string
+}
+
+type agentGrpcImpl struct {
+	agentGrpc.UnimplementedAgentServer
+	a *Agent
 }
