@@ -21,6 +21,8 @@ type share struct {
 	oauthCheckInterval        time.Duration
 	closed                    bool
 	accessGrants              []string
+
+	handler backendHandler
 }
 
 type access struct {
@@ -33,4 +35,8 @@ type access struct {
 type agentGrpcImpl struct {
 	agentGrpc.UnimplementedAgentServer
 	a *Agent
+}
+
+type backendHandler interface {
+	Run() error
 }

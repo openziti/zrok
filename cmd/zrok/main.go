@@ -24,6 +24,7 @@ func init() {
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
 	rootCmd.AddCommand(agentCmd)
+	agentCmd.AddCommand(agentShareCmd)
 	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
@@ -80,6 +81,11 @@ var agentCmd = &cobra.Command{
 	Use:     "agent",
 	Short:   "zrok Agent commands",
 	Aliases: []string{"daemon"},
+}
+
+var agentShareCmd = &cobra.Command{
+	Use:   "share",
+	Short: "zrok Agent sharing commands",
 }
 
 var configCmd = &cobra.Command{
