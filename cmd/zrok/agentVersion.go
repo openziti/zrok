@@ -61,5 +61,5 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error getting agent version", err)
 	}
 
-	println(*v.V)
+	println(v.GetV())
 }

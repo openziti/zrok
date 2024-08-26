@@ -14,5 +14,5 @@ type agentGrpcImpl struct {
 func (s *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) (*agentGrpc.VersionReply, error) {
 	v := build.String()
 	logrus.Infof("responding to version inquiry with '%v'", v)
-	return &agentGrpc.VersionReply{V: &v}, nil
+	return &agentGrpc.VersionReply{V: v}, nil
 }
