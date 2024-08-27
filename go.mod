@@ -36,7 +36,7 @@ require (
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
 	github.com/openziti/channel/v2 v2.0.136
-	github.com/openziti/cobra-to-md v0.0.0-20240827122906-40d67b475e7d
+	github.com/openziti/cobra-to-md v0.0.0-20240827152831-dab4eaadf278
 	github.com/openziti/edge-api v0.26.23
 	github.com/openziti/fabric v0.23.26
 	github.com/openziti/identity v1.0.81
