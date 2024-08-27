@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti/cobra-to-md"
 	"github.com/openziti/transport/v2"
 	"github.com/openziti/transport/v2/tcp"
 	"github.com/openziti/transport/v2/udp"
@@ -31,6 +32,7 @@ func init() {
 	rootCmd.AddCommand(modifyCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(gendoc.NewGendocCmd(rootCmd))
 	transport.AddAddressParser(tcp.AddressParser{})
 	transport.AddAddressParser(udp.AddressParser{})
 }
