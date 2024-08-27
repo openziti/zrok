@@ -36,6 +36,7 @@ require (
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
 	github.com/openziti/channel/v2 v2.0.136
+	github.com/openziti/cobra-to-md v0.0.0-20240827152831-dab4eaadf278
 	github.com/openziti/edge-api v0.26.23
 	github.com/openziti/fabric v0.23.26
 	github.com/openziti/identity v1.0.81
@@ -48,7 +49,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v2 v2.12.0
@@ -252,7 +253,7 @@ require (
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/term v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
