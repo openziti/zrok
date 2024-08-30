@@ -6,7 +6,44 @@ sidebar_position: 10
 
 import { AssetsProvider } from '@site/src/components/assets-context';
 import DownloadCard from '@site/src/components/download-card';
-import styles from '@site/src/css/download-card.module.css';
+import DownloadCardStyles from '@site/src/css/download-card.module.css';
+
+
+## Choose Your Path
+
+<Columns> 
+  <Column className='text--center'>
+    <Card shadow='tl'>
+      <CardHeader style={{textAlign: "center"}}>
+        <h3>Self-Hosted zrok</h3>
+      </CardHeader>
+      <CardBody style={{textAlign: "center"}}>
+        Run your own public zrok instance with Linux, Docker, or Kubernetes.
+      </CardBody>
+      <CardFooter style={{textAlign: "center"}}>
+        <a href="/docs/category/self-hosting/">
+        <button className='button button--secondary button--block'>Guides</button>
+        </a>
+      </CardFooter>
+    </Card>
+  </Column>
+  <Column className='text--justify'> 
+    <Card shadow='tl'>
+      <CardHeader style={{textAlign: "center"}}>
+        <h3>Hosted zrokNet</h3>
+      </CardHeader>
+      <CardBody style={{textAlign: "center"}}>
+        Use NetFoundry's public zrok instance.
+      </CardBody>
+      <CardFooter style={{textAlign: "center"}}>
+        <a href="https://myzrok.io/">
+        <button className='button button--secondary button--block'>Get an Account</button>
+        </a>
+      </CardFooter>
+    </Card>
+  </Column>
+</Columns>
+
 
 ## What's a zrok?
 
@@ -37,7 +74,7 @@ If [sharing privately](./concepts/sharing-private.md), only users with the share
 ## Installing the zrok Command
 
 <AssetsProvider>
-  <div className={styles.downloadContainer}>
+  <div className={DownloadCardStyles.downloadContainer}>
     <DownloadCard
       osName="Windows"
       osLogo="/img/logo-windows.svg"
@@ -103,6 +140,8 @@ After clicking the `Log In` button, you'll be brought into the `zrok` _web conso
 Congratulations! Your `zrok` account is ready to go!
 
 ## Enabling Your zrok Environment
+
+A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
 When your `zrok` account was created, the service generated a _secret token_ that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
 
