@@ -11,31 +11,31 @@ import DownloadCardStyles from '@site/src/css/download-card.module.css';
 
 ## Choose Your Path
 
-<Columns> 
-  <Column className='text--center'>
+<Columns className='text--center getting-started-cards'> 
+  <Column style={{paddingBottom: 20}}>
     <Card shadow='tl'>
-      <CardHeader style={{textAlign: "center"}}>
+      <CardHeader>
         <h3>Self-Hosted zrok</h3>
       </CardHeader>
-      <CardBody style={{textAlign: "center"}}>
-        Run your own public zrok instance with Linux, Docker, or Kubernetes.
+      <CardBody>
+        Run a zrok instance on Linux, Docker, or Kubernetes.
       </CardBody>
-      <CardFooter style={{textAlign: "center"}}>
+      <CardFooter>
         <a href="/docs/category/self-hosting/">
         <button className='button button--secondary button--block'>Guides</button>
         </a>
       </CardFooter>
     </Card>
   </Column>
-  <Column className='text--justify'> 
+  <Column style={{paddingBottom: 20}}>
     <Card shadow='tl'>
-      <CardHeader style={{textAlign: "center"}}>
+      <CardHeader>
         <h3>Hosted zrokNet</h3>
       </CardHeader>
-      <CardBody style={{textAlign: "center"}}>
+      <CardBody>
         Use NetFoundry's public zrok instance.
       </CardBody>
-      <CardFooter style={{textAlign: "center"}}>
+      <CardFooter>
         <a href="https://myzrok.io/">
         <button className='button button--secondary button--block'>Get an Account</button>
         </a>
