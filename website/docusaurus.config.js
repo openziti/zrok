@@ -113,20 +113,31 @@ const config = {
         },
         items: [
           {
-            type: 'doc',
-            docId: 'getting-started',
+            href: 'https://zrok.io/pricing/',
             position: 'right',
-            label: 'Docs',
+            label: 'pricing',
+          },
+          {
+            href: 'https://myzrok.io/',
+            position: 'right',
+            label: 'account',
           },
           {
             href: 'https://github.com/orgs/openziti/projects/16',
-            label: 'Roadmap',
+            label: 'roadmap',
             position: 'right',
           },
           {
             href: 'https://github.com/openziti/zrok',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            title: 'GitHub'
+          },
+          {
+            href: 'https://openziti.discourse.group/',
+            position: 'right',
+            className: 'header-discourse-link',
+            title: 'Discourse'
           },
         ],
       },

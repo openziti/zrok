@@ -118,9 +118,11 @@ With Caddy, you can balance the workload for websites or web services or share s
     ```yaml title="compose.override.yml"
     services:
       httpbin1:
-        image: mccutchen/go-httpbin  # 8080/tcp
+        image: mccutchen/go-httpbin
+        expose: 8080
       httpbin2:
-        image: mccutchen/go-httpbin  # 8080/tcp
+        image: mccutchen/go-httpbin
+        expose: 8080
       zrok-share:
         volumes:
           - ./Caddyfile:/mnt/.zrok/Caddyfile
