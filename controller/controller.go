@@ -2,23 +2,22 @@ package controller
 
 import (
 	"context"
+	"github.com/go-openapi/loads"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/jessevdk/go-flags"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
-	"github.com/sirupsen/logrus"
-	"log"
-	"net/http"
-	_ "net/http/pprof"
-
-	"github.com/go-openapi/loads"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_server_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 )
 
 var (
@@ -150,8 +149,4 @@ func Run(inCfg *config.Config) error {
 	}
 
 	return nil
-}
-
-func Store() *store.Store {
-	return str
 }
