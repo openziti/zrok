@@ -61,6 +61,31 @@ func (o *GrantsUnauthorized) WriteResponse(rw http.ResponseWriter, producer runt
 	rw.WriteHeader(401)
 }
 
+// GrantsNotFoundCode is the HTTP code returned for type GrantsNotFound
+const GrantsNotFoundCode int = 404
+
+/*
+GrantsNotFound not found
+
+swagger:response grantsNotFound
+*/
+type GrantsNotFound struct {
+}
+
+// NewGrantsNotFound creates GrantsNotFound with default headers values
+func NewGrantsNotFound() *GrantsNotFound {
+
+	return &GrantsNotFound{}
+}
+
+// WriteResponse to the client
+func (o *GrantsNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // GrantsInternalServerErrorCode is the HTTP code returned for type GrantsInternalServerError
 const GrantsInternalServerErrorCode int = 500
 

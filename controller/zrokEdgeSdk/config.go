@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
+	"reflect"
 	"time"
 )
 
@@ -53,6 +54,41 @@ func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions,
 	}
 	logrus.Infof("created config '%v' for environment '%v'", cfgResp.Payload.Data.ID, envZId)
 	return cfgResp.Payload.Data.ID, nil
+}
+
+func GetConfig(shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, *sdk.FrontendConfig, error) {
+	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &config.ListConfigsParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Config.ListConfigs(listReq, nil)
+	if err != nil {
+		return "", nil, err
+	}
+	if len(listResp.Payload.Data) != 1 {
+		return "", nil, fmt.Errorf("expected 1 configuration, found %v", len(listResp.Payload.Data))
+	}
+	if listResp.Payload.Data[0].ConfigType.Name != sdk.ZrokProxyConfig {
+		return "", nil, fmt.Errorf("expected '%v', found '%v'", sdk.ZrokProxyConfig, listResp.Payload.Data[0].ConfigType.Name)
+	}
+	if v, ok := listResp.Payload.Data[0].Data.(map[string]interface{}); ok {
+		fec, err := sdk.FrontendConfigFromMap(v)
+		if err != nil {
+			return "", nil, err
+		}
+		return *listResp.Payload.Data[0].ID, fec, nil
+	}
+	return "", nil, fmt.Errorf("unknown data type '%v' unmarshaling config for '%v'", reflect.TypeOf(listResp.Payload.Data[0].Data), shrToken)
+}
+
+func UpdateConfig(cfgZId string, cfg *sdk.FrontendConfig, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return nil
 }
 
 func DeleteConfig(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {

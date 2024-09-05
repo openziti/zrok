@@ -34,6 +34,12 @@ func (o *GrantsReader) ReadResponse(response runtime.ClientResponse, consumer ru
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewGrantsNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewGrantsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -153,6 +159,62 @@ func (o *GrantsUnauthorized) String() string {
 }
 
 func (o *GrantsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewGrantsNotFound creates a GrantsNotFound with default headers values
+func NewGrantsNotFound() *GrantsNotFound {
+	return &GrantsNotFound{}
+}
+
+/*
+GrantsNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type GrantsNotFound struct {
+}
+
+// IsSuccess returns true when this grants not found response has a 2xx status code
+func (o *GrantsNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this grants not found response has a 3xx status code
+func (o *GrantsNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this grants not found response has a 4xx status code
+func (o *GrantsNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this grants not found response has a 5xx status code
+func (o *GrantsNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this grants not found response a status code equal to that given
+func (o *GrantsNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the grants not found response
+func (o *GrantsNotFound) Code() int {
+	return 404
+}
+
+func (o *GrantsNotFound) Error() string {
+	return fmt.Sprintf("[POST /grants][%d] grantsNotFound ", 404)
+}
+
+func (o *GrantsNotFound) String() string {
+	return fmt.Sprintf("[POST /grants][%d] grantsNotFound ", 404)
+}
+
+func (o *GrantsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

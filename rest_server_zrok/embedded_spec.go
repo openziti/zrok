@@ -557,6 +557,9 @@ func init() {
           "401": {
             "description": "unauthorized"
           },
+          "404": {
+            "description": "not found"
+          },
           "500": {
             "description": "internal server error"
           }
@@ -2403,6 +2406,9 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"
