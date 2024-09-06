@@ -6,6 +6,8 @@ MAJOR RELEASE: zrok reaches version 1.0.0!
 
 ## v0.4.40
 
+FEATURE: New endpoint for synchronizing grants for an account (https://github.com/openziti/zrok/pull/744). Useful for updating the `zrok.proxy.v1` config objects containing interstitial setting when the `skip_interstitial_grants` table has been updated.
+
 FIX: prune incorrect troubleshooting advice about listing Caddy's certificates
 
 ## v0.4.39

@@ -27,9 +27,7 @@ func newAdminGenerateCommand() *adminGenerateCommand {
 	}
 	command := &adminGenerateCommand{cmd: cmd}
 	cmd.Run = command.run
-
 	cmd.Flags().IntVarP(&command.amount, "count", "n", 5, "Number of tokens to generate")
-
 	return command
 }
 
