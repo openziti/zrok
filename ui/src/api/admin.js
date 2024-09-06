@@ -71,6 +71,21 @@ export function listFrontends() {
 /**
  * @param {object} options Optional options
  * @param {object} [options.body] 
+ * @return {Promise<object>} ok
+ */
+export function grants(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(grantsOperation, parameters)
+}
+
+/**
+ * @param {object} options Optional options
+ * @param {object} [options.body] 
  * @return {Promise<object>} created
  */
 export function createIdentity(options) {
@@ -145,6 +160,17 @@ const deleteFrontendOperation = {
 const listFrontendsOperation = {
   path: '/frontends',
   method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const grantsOperation = {
+  path: '/grants',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
   security: [
     {
       id: 'key'

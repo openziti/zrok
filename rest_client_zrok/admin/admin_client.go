@@ -38,6 +38,8 @@ type ClientService interface {
 
 	DeleteFrontend(params *DeleteFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteFrontendOK, error)
 
+	Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantsOK, error)
+
 	InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteTokenGenerateCreated, error)
 
 	ListFrontends(params *ListFrontendsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendsOK, error)
@@ -200,6 +202,45 @@ func (a *Client) DeleteFrontend(params *DeleteFrontendParams, authInfo runtime.C
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteFrontend: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+Grants grants API
+*/
+func (a *Client) Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGrantsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "grants",
+		Method:             "POST",
+		PathPattern:        "/grants",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GrantsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GrantsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for grants: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

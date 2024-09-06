@@ -23,6 +23,7 @@ model/enableResponse.ts
 model/environment.ts
 model/environmentAndResources.ts
 model/frontend.ts
+model/grantsRequest.ts
 model/inviteRequest.ts
 model/inviteTokenGenerateRequest.ts
 model/loginRequest.ts
