@@ -17,6 +17,7 @@ export * from './enableResponse';
 export * from './environment';
 export * from './environmentAndResources';
 export * from './frontend';
+export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
 export * from './loginRequest';
@@ -72,6 +73,7 @@ import { EnableResponse } from './enableResponse';
 import { Environment } from './environment';
 import { EnvironmentAndResources } from './environmentAndResources';
 import { Frontend } from './frontend';
+import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
 import { LoginRequest } from './loginRequest';
@@ -135,6 +137,7 @@ let typeMap: {[index: string]: any} = {
     "Environment": Environment,
     "EnvironmentAndResources": EnvironmentAndResources,
     "Frontend": Frontend,
+    "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
     "LoginRequest": LoginRequest,

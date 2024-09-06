@@ -97,6 +97,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataGetShareMetricsHandler: metadata.GetShareMetricsHandlerFunc(func(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
+		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
+		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
 		}),
@@ -227,6 +230,8 @@ type ZrokAPI struct {
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
 	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
+	// AdminGrantsHandler sets the operation handler for the grants operation
+	AdminGrantsHandler admin.GrantsHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -387,6 +392,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataGetShareMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
+	}
+	if o.AdminGrantsHandler == nil {
+		unregistered = append(unregistered, "admin.GrantsHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -599,6 +607,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/metrics/share/{shrToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/grants"] = admin.NewGrants(o.context, o.AdminGrantsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
