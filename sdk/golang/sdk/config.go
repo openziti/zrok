@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -16,7 +15,6 @@ type FrontendConfig struct {
 }
 
 func FrontendConfigFromMap(m map[string]interface{}) (*FrontendConfig, error) {
-	logrus.Info(m)
 	out := &FrontendConfig{}
 	if v, found := m["interstitial"]; found {
 		out.Interstitial = v.(bool)
