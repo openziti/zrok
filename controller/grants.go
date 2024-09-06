@@ -67,8 +67,8 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 				}
 
 				if shrCfg.Interstitial != !acctSkipInterstitial {
-					logrus.Infof("updating config for '%v'", shr.Token)
-					err := zrokEdgeSdk.UpdateConfig(cfgZId, shrCfg, edge)
+					shrCfg.Interstitial = !acctSkipInterstitial
+					err := zrokEdgeSdk.UpdateConfig(shr.Token, cfgZId, shrCfg, edge)
 					if err != nil {
 						logrus.Errorf("error updating config for '%v': %v", shr.Token, err)
 						return admin.NewGrantsInternalServerError()

@@ -59,11 +59,11 @@ type BasicAuthConfig struct {
 
 func BasicAuthConfigFromMap(m map[string]interface{}) (*BasicAuthConfig, error) {
 	out := &BasicAuthConfig{}
-	if v, found := m["basic_auth"]; found {
-		if vArr, ok := v.([]interface{}); ok {
-			for _, vV := range vArr {
-				if v, ok := vV.(map[string]interface{}); ok {
-					if auc, err := AuthUserConfigFromMap(v); err == nil {
+	if v, found := m["users"]; found {
+		if subArr, ok := v.([]interface{}); ok {
+			for _, v := range subArr {
+				if subMap, ok := v.(map[string]interface{}); ok {
+					if auc, err := AuthUserConfigFromMap(subMap); err == nil {
 						out.Users = append(out.Users, auc)
 					} else {
 						return nil, err
@@ -75,9 +75,10 @@ func BasicAuthConfigFromMap(m map[string]interface{}) (*BasicAuthConfig, error) 
 		} else {
 			return nil, errors.Errorf("unexpected type '%v'", reflect.TypeOf(v))
 		}
-		return out, nil
+	} else {
+		return nil, errors.New("missing 'users' field")
 	}
-	return nil, nil
+	return out, nil
 }
 
 type AuthUserConfig struct {

@@ -87,7 +87,22 @@ func GetConfig(shrToken string, edge *rest_management_api_client.ZitiEdgeManagem
 	return "", nil, fmt.Errorf("unknown data type '%v' unmarshaling config for '%v'", reflect.TypeOf(listResp.Payload.Data[0].Data), shrToken)
 }
 
-func UpdateConfig(cfgZId string, cfg *sdk.FrontendConfig, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func UpdateConfig(shrToken, cfgZId string, cfg *sdk.FrontendConfig, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	logrus.Infof("updating config for '%v' (%v)", shrToken, cfgZId)
+	req := &config.UpdateConfigParams{
+		Config: &rest_model.ConfigUpdate{
+			Data: cfg,
+			Name: &shrToken,
+			Tags: ZrokShareTags(shrToken),
+		},
+		ID:      cfgZId,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	_, err := edge.Config.UpdateConfig(req, nil)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
