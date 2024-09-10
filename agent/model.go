@@ -39,4 +39,5 @@ type agentGrpcImpl struct {
 
 type backendHandler interface {
 	Run() error
+	Stop() error
 }
