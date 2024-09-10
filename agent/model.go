@@ -7,7 +7,7 @@ import (
 )
 
 type share struct {
-	token  string
+	shr    *sdk.Share
 	target string
 
 	basicAuth                 []string

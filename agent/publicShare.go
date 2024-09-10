@@ -66,7 +66,7 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 		}
 
 		agentShr := &share{
-			token:                     shr.Token,
+			shr:                       shr,
 			target:                    req.Target,
 			basicAuth:                 req.BasicAuth,
 			frontendSelection:         shr.FrontendEndpoints,
