@@ -87,6 +87,41 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 				logrus.Errorf("error running proxy backend: %v", err)
 			}
 		}()
+
+	case "web":
+		cfg := &proxy.CaddyWebBackendConfig{
+			IdentityPath: zif,
+			WebRoot:      req.Target,
+			ShrToken:     shr.Token,
+		}
+
+		be, err := proxy.NewCaddyWebBackend(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		agentShr := &share{
+			shr:                       shr,
+			target:                    req.Target,
+			basicAuth:                 req.BasicAuth,
+			frontendSelection:         shr.FrontendEndpoints,
+			shareMode:                 sdk.PublicShareMode,
+			backendMode:               sdk.BackendMode(req.BackendMode),
+			insecure:                  req.Insecure,
+			oauthProvider:             req.OauthProvider,
+			oauthEmailAddressPatterns: req.OauthEmailAddressPatterns,
+			oauthCheckInterval:        shrReq.OauthAuthorizationCheckInterval,
+			closed:                    req.Closed,
+			accessGrants:              req.AccessGrants,
+			handler:                   be,
+		}
+
+		i.a.shares[shr.Token] = agentShr
+		go func() {
+			if err := agentShr.handler.Run(); err != nil {
+				logrus.Errorf("error running web backend: %v", err)
+			}
+		}()
 	}
 
 	return &agentGrpc.PublicShareReply{Token: shr.Token}, nil
