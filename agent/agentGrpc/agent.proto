@@ -4,6 +4,7 @@ option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
 service Agent {
 	rpc PublicShare(PublicShareRequest) returns (PublicShareReply) {}
+	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareReply) {}
 	rpc Status(StatusRequest) returns (StatusReply) {}
 	rpc Version(VersionRequest) returns (VersionReply) {}
 }
@@ -29,6 +30,13 @@ message PublicShareRequest {
 	string oauthCheckInterval = 8;
 	bool closed = 9;
 	repeated string accessGrants = 10;
+}
+
+message ReleaseShareRequest {
+	string token = 1;
+}
+
+message ReleaseShareReply {
 }
 
 message ShareDetail {
