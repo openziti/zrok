@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
+	"path/filepath"
 	"time"
 )
 
@@ -70,6 +71,16 @@ func (cmd *agentSharePublicCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 		target = v
+
+	case "web":
+		var err error
+		target, err = filepath.Abs(args[0])
+		if err != nil {
+			panic(err)
+		}
+
+	default:
+		target = args[0]
 	}
 
 	root, err := environment.LoadRoot()

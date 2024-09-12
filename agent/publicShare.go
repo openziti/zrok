@@ -6,6 +6,7 @@ import (
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
 	"os"
 )
@@ -20,8 +21,12 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shr := &share{ready: make(chan struct{})}
 	shrCmd := []string{os.Args[0], "share", "public", "--agent", "-b", req.BackendMode}
+	shr := &share{
+		shareMode:   sdk.PublicShareMode,
+		backendMode: sdk.BackendMode(req.BackendMode),
+		ready:       make(chan struct{}),
+	}
 
 	for _, basicAuth := range req.BasicAuth {
 		shrCmd = append(shrCmd, "--basic-auth", basicAuth)
