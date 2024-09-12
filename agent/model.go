@@ -7,9 +7,8 @@ import (
 )
 
 type share struct {
-	shr    *sdk.Share
-	target string
-
+	token                     string
+	target                    string
 	basicAuth                 []string
 	frontendSelection         []string
 	shareMode                 sdk.ShareMode
