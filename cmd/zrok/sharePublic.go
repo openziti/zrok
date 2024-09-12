@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
@@ -29,6 +30,7 @@ type sharePublicCommand struct {
 	frontendSelection         []string
 	backendMode               string
 	headless                  bool
+	agent                     bool
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
@@ -53,10 +55,11 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
-
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
 	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domain globs to authenticate via OAuth")
@@ -150,7 +153,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
-	if !cmd.headless {
+	if !cmd.headless && !cmd.agent {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -264,6 +267,31 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			select {
 			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+			}
+		}
+
+	} else if cmd.agent {
+		data := make(map[string]interface{})
+		data["token"] = shr.Token
+		data["frontend_endpoints"] = shr.FrontendEndpoints
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
+
+		for {
+			select {
+			case req := <-requests:
+				data := make(map[string]interface{})
+				data["remote-address"] = req.RemoteAddr
+				data["method"] = req.Method
+				data["path"] = req.Path
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println(string(jsonData))
 			}
 		}
 

@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/agent/proctree"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -10,8 +11,13 @@ import (
 func (i *agentGrpcImpl) ReleaseShare(_ context.Context, req *agentGrpc.ReleaseShareRequest) (*agentGrpc.ReleaseShareReply, error) {
 	if shr, found := i.a.shares[req.Token]; found {
 		logrus.Infof("stopping share '%v'", shr.token)
-		if err := shr.handler.Stop(); err != nil {
-			logrus.Errorf("error stopping share '%v': %v", shr.token, err)
+
+		if err := proctree.StopChild(shr.process); err != nil {
+			logrus.Error(err)
+		}
+
+		if err := proctree.WaitChild(shr.process); err != nil {
+			logrus.Error(err)
 		}
 
 		delete(i.a.shares, shr.token)
