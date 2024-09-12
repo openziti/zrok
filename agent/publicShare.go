@@ -75,5 +75,8 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 	<-shr.ready
 	i.a.shares[shr.token] = shr
 
-	return &agentGrpc.PublicShareReply{Token: shr.token}, nil
+	return &agentGrpc.PublicShareReply{
+		Token:             shr.token,
+		FrontendEndpoints: shr.frontendEndpoints,
+	}, nil
 }

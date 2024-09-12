@@ -106,5 +106,5 @@ func (cmd *agentSharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("error creating share", err)
 	}
 
-	fmt.Println(shr.GetToken())
+	fmt.Println(shr)
 }

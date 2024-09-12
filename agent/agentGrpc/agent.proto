@@ -17,6 +17,7 @@ message AccessDetail {
 
 message PublicShareReply {
 	string token = 1;
+	repeated string frontendEndpoints = 2;
 }
 
 message PublicShareRequest {
