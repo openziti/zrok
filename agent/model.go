@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"strings"
 	"time"
 )
 
@@ -54,7 +55,14 @@ func (s *share) tail(data []byte) {
 			}
 			close(s.ready)
 		} else {
-			pfxlog.ChannelLogger(s.token).Info(string(line))
+			if strings.HasPrefix(line, "{") {
+				in := make(map[string]interface{})
+				if err := json.Unmarshal([]byte(line), &in); err == nil {
+					pfxlog.ChannelLogger(s.token).Info(in)
+				}
+			} else {
+				pfxlog.ChannelLogger(s.token).Info(strings.Trim(line, "\n"))
+			}
 		}
 	} else {
 		s.readBuffer.WriteString(line)
