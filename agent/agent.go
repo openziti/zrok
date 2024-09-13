@@ -14,7 +14,11 @@ type Agent struct {
 	root        env_core.Root
 	agentSocket string
 	shares      map[string]*share
+	inShares    chan *share
+	outShares   chan *share
 	accesses    map[string]*access
+	inAccesses  chan *access
+	outAccesses chan *access
 }
 
 func NewAgent(root env_core.Root) (*Agent, error) {
@@ -22,14 +26,20 @@ func NewAgent(root env_core.Root) (*Agent, error) {
 		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
 	}
 	return &Agent{
-		root:     root,
-		shares:   make(map[string]*share),
-		accesses: make(map[string]*access),
+		root:        root,
+		shares:      make(map[string]*share),
+		inShares:    make(chan *share),
+		outShares:   make(chan *share),
+		accesses:    make(map[string]*access),
+		inAccesses:  make(chan *access),
+		outAccesses: make(chan *access),
 	}, nil
 }
 
 func (a *Agent) Run() error {
 	logrus.Infof("started")
+
+	go a.manager()
 
 	agentSocket, err := a.root.AgentSocket()
 	if err != nil {
@@ -53,5 +63,22 @@ func (a *Agent) Run() error {
 func (a *Agent) Shutdown() {
 	if err := os.Remove(a.agentSocket); err != nil {
 		logrus.Warnf("unable to remove agent socket: %v", err)
+	}
+}
+
+func (a *Agent) manager() {
+	logrus.Info("started")
+	defer logrus.Warn("exited")
+
+	for {
+		select {
+		case inShare := <-a.inShares:
+			logrus.Infof("adding new share '%v'", inShare.token)
+			a.shares[inShare.token] = inShare
+
+		case outShare := <-a.outShares:
+			logrus.Infof("removing share '%v'", outShare.token)
+			delete(a.shares, outShare.token)
+		}
 	}
 }

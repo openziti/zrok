@@ -7,6 +7,7 @@ import (
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/pkg/errors"
 	"strings"
 	"time"
 )
@@ -27,15 +28,27 @@ type share struct {
 	closed                    bool
 	accessGrants              []string
 
-	process    *proctree.Child
-	readBuffer bytes.Buffer
-	ready      chan struct{}
+	process      *proctree.Child
+	readBuffer   bytes.Buffer
+	booted       bool
+	bootComplete chan struct{}
+	bootErr      error
+
+	a *Agent
+}
+
+func (s *share) monitor() {
+	if err := proctree.WaitChild(s.process); err != nil {
+		pfxlog.ChannelLogger(s.token).Error(err)
+	}
+	s.a.outShares <- s
 }
 
 func (s *share) tail(data []byte) {
 	s.readBuffer.Write(data)
 	if line, err := s.readBuffer.ReadString('\n'); err == nil {
-		if s.token == "" {
+		line = strings.Trim(line, "\n")
+		if !s.booted {
 			in := make(map[string]interface{})
 			if err := json.Unmarshal([]byte(line), &in); err == nil {
 				if v, found := in["token"]; found {
@@ -52,8 +65,12 @@ func (s *share) tail(data []byte) {
 						}
 					}
 				}
+				s.booted = true
+			} else {
+				s.bootErr = errors.New(line)
 			}
-			close(s.ready)
+			close(s.bootComplete)
+
 		} else {
 			if strings.HasPrefix(line, "{") {
 				in := make(map[string]interface{})

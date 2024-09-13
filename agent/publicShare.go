@@ -23,9 +23,10 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 
 	shrCmd := []string{os.Args[0], "share", "public", "--agent", "-b", req.BackendMode}
 	shr := &share{
-		shareMode:   sdk.PublicShareMode,
-		backendMode: sdk.BackendMode(req.BackendMode),
-		ready:       make(chan struct{}),
+		shareMode:    sdk.PublicShareMode,
+		backendMode:  sdk.BackendMode(req.BackendMode),
+		bootComplete: make(chan struct{}),
+		a:            i.a,
 	}
 
 	for _, basicAuth := range req.BasicAuth {
@@ -74,14 +75,18 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 
 	shr.process, err = proctree.StartChild(shr.tail, shrCmd...)
 	if err != nil {
-		return nil, err
+		return &agentGrpc.PublicShareReply{}, err
 	}
 
-	<-shr.ready
-	i.a.shares[shr.token] = shr
+	go shr.monitor()
+	<-shr.bootComplete
 
-	return &agentGrpc.PublicShareReply{
-		Token:             shr.token,
-		FrontendEndpoints: shr.frontendEndpoints,
-	}, nil
+	if shr.bootErr == nil {
+		i.a.inShares <- shr
+		return &agentGrpc.PublicShareReply{
+			Token:             shr.token,
+			FrontendEndpoints: shr.frontendEndpoints,
+		}, nil
+	}
+	return &agentGrpc.PublicShareReply{}, shr.bootErr
 }
