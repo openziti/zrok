@@ -3,11 +3,10 @@ package agent
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/michaelquigley/pfxlog"
-	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/pkg/errors"
 	"strings"
 	"time"
 )
@@ -84,18 +83,4 @@ func (s *share) tail(data []byte) {
 	} else {
 		s.readBuffer.WriteString(line)
 	}
-}
-
-type access struct {
-	token string
-
-	bindAddress     string
-	responseHeaders []string
-
-	process *proctree.Child
-}
-
-type agentGrpcImpl struct {
-	agentGrpc.UnimplementedAgentServer
-	a *Agent
 }
