@@ -73,14 +73,37 @@ func (cmd *agentSharePublicCommand) run(_ *cobra.Command, args []string) {
 		target = v
 
 	case "web":
-		var err error
-		target, err = filepath.Abs(args[0])
+		v, err := filepath.Abs(args[0])
 		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
 			panic(err)
 		}
+		target = v
+
+	case "caddy":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "drive":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
 
 	default:
-		target = args[0]
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
 	}
 
 	root, err := environment.LoadRoot()
