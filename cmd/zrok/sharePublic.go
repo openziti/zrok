@@ -152,6 +152,17 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	if cmd.agent {
+		data := make(map[string]interface{})
+		data["token"] = shr.Token
+		data["frontend_endpoints"] = shr.FrontendEndpoints
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
+	}
+
 	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
 	if !cmd.headless && !cmd.agent {
 		proxy.SetCaddyLoggingWriter(mdl)
@@ -271,15 +282,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 
 	} else if cmd.agent {
-		data := make(map[string]interface{})
-		data["token"] = shr.Token
-		data["frontend_endpoints"] = shr.FrontendEndpoints
-		jsonData, err := json.Marshal(data)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(string(jsonData))
-
 		for {
 			select {
 			case req := <-requests:
