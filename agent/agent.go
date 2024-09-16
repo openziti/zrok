@@ -2,6 +2,7 @@ package agent
 
 import (
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -61,8 +62,18 @@ func (a *Agent) Run() error {
 }
 
 func (a *Agent) Shutdown() {
+	logrus.Infof("stopping")
+
 	if err := os.Remove(a.agentSocket); err != nil {
 		logrus.Warnf("unable to remove agent socket: %v", err)
+	}
+	for _, shr := range a.shares {
+		logrus.Infof("stopping share '%v'", shr.token)
+		a.outShares <- shr
+	}
+	for _, acc := range a.accesses {
+		logrus.Infof("stopping access '%v'", acc.token)
+		a.outAccesses <- acc
 	}
 }
 
@@ -77,8 +88,18 @@ func (a *Agent) manager() {
 			a.shares[inShare.token] = inShare
 
 		case outShare := <-a.outShares:
-			logrus.Infof("removing share '%v'", outShare.token)
-			delete(a.shares, outShare.token)
+			if outShare.token != "" {
+				logrus.Infof("removing share '%v'", outShare.token)
+				if err := proctree.StopChild(outShare.process); err != nil {
+					logrus.Errorf("error stopping share '%v': %v", outShare.token, err)
+				}
+				if err := proctree.WaitChild(outShare.process); err != nil {
+					logrus.Errorf("error joining share '%v': %v", outShare.token, err)
+				}
+				delete(a.shares, outShare.token)
+			} else {
+				logrus.Debug("skipping unidentified (orphaned) share removal")
+			}
 		}
 	}
 }
