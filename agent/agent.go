@@ -40,6 +40,9 @@ func NewAgent(root env_core.Root) (*Agent, error) {
 func (a *Agent) Run() error {
 	logrus.Infof("started")
 
+	if err := proctree.Init("zrok Agent"); err != nil {
+		return err
+	}
 	go a.manager()
 
 	agentSocket, err := a.root.AgentSocket()
