@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Agent_PublicShare_FullMethodName  = "/Agent/PublicShare"
+	Agent_PrivateShare_FullMethodName = "/Agent/PrivateShare"
 	Agent_ReleaseShare_FullMethodName = "/Agent/ReleaseShare"
 	Agent_Status_FullMethodName       = "/Agent/Status"
 	Agent_Version_FullMethodName      = "/Agent/Version"
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentClient interface {
 	PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error)
+	PrivateShare(ctx context.Context, in *PrivateShareRequest, opts ...grpc.CallOption) (*PrivateShareReply, error)
 	ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareReply, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error)
@@ -47,6 +49,16 @@ func (c *agentClient) PublicShare(ctx context.Context, in *PublicShareRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PublicShareReply)
 	err := c.cc.Invoke(ctx, Agent_PublicShare_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentClient) PrivateShare(ctx context.Context, in *PrivateShareRequest, opts ...grpc.CallOption) (*PrivateShareReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PrivateShareReply)
+	err := c.cc.Invoke(ctx, Agent_PrivateShare_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +100,7 @@ func (c *agentClient) Version(ctx context.Context, in *VersionRequest, opts ...g
 // for forward compatibility.
 type AgentServer interface {
 	PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error)
+	PrivateShare(context.Context, *PrivateShareRequest) (*PrivateShareReply, error)
 	ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error)
 	Status(context.Context, *StatusRequest) (*StatusReply, error)
 	Version(context.Context, *VersionRequest) (*VersionReply, error)
@@ -103,6 +116,9 @@ type UnimplementedAgentServer struct{}
 
 func (UnimplementedAgentServer) PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublicShare not implemented")
+}
+func (UnimplementedAgentServer) PrivateShare(context.Context, *PrivateShareRequest) (*PrivateShareReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PrivateShare not implemented")
 }
 func (UnimplementedAgentServer) ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseShare not implemented")
@@ -148,6 +164,24 @@ func _Agent_PublicShare_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AgentServer).PublicShare(ctx, req.(*PublicShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Agent_PrivateShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PrivateShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).PrivateShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_PrivateShare_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).PrivateShare(ctx, req.(*PrivateShareRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -216,6 +250,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublicShare",
 			Handler:    _Agent_PublicShare_Handler,
+		},
+		{
+			MethodName: "PrivateShare",
+			Handler:    _Agent_PrivateShare_Handler,
 		},
 		{
 			MethodName: "ReleaseShare",
