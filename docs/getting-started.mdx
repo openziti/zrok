@@ -9,24 +9,9 @@ import DownloadCard from '@site/src/components/download-card';
 import DownloadCardStyles from '@site/src/css/download-card.module.css';
 
 
-## Choose Your Path
+## Get an Account
 
 <Columns className='text--center getting-started-cards'> 
-  <Column style={{paddingBottom: 20}}>
-    <Card shadow='tl'>
-      <CardHeader>
-        <h3>Self-Hosted zrok</h3>
-      </CardHeader>
-      <CardBody>
-        Run a zrok instance on Linux, Docker, or Kubernetes.
-      </CardBody>
-      <CardFooter>
-        <a href="/docs/category/self-hosting/">
-        <button className='button button--secondary button--block'>Guides</button>
-        </a>
-      </CardFooter>
-    </Card>
-  </Column>
   <Column style={{paddingBottom: 20}}>
     <Card shadow='tl'>
       <CardHeader>
@@ -38,6 +23,21 @@ import DownloadCardStyles from '@site/src/css/download-card.module.css';
       <CardFooter>
         <a href="https://myzrok.io/">
         <button className='button button--secondary button--block'>Get an Account</button>
+        </a>
+      </CardFooter>
+    </Card>
+  </Column>
+  <Column style={{paddingBottom: 20}}>
+    <Card shadow='tl'>
+      <CardHeader>
+        <h3>Self-Hosted zrok</h3>
+      </CardHeader>
+      <CardBody>
+        Run a zrok instance on Linux, Docker, or Kubernetes.
+      </CardBody>
+      <CardFooter>
+        <a href="/docs/category/self-hosting/">
+        <button className='button button--secondary button--block'>Guides</button>
         </a>
       </CardFooter>
     </Card>
@@ -97,6 +97,8 @@ If [sharing privately](./concepts/sharing-private.md), only users with the share
 </AssetsProvider>
 
 ## Enabling Your zrok Environment
+
+After you have [an account](#get-an-account), you can enable your `zrok` environment.
 
 A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
