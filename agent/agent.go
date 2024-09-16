@@ -68,11 +68,11 @@ func (a *Agent) Shutdown() {
 		logrus.Warnf("unable to remove agent socket: %v", err)
 	}
 	for _, shr := range a.shares {
-		logrus.Infof("stopping share '%v'", shr.token)
+		logrus.Debugf("stopping share '%v'", shr.token)
 		a.outShares <- shr
 	}
 	for _, acc := range a.accesses {
-		logrus.Infof("stopping access '%v'", acc.token)
+		logrus.Debugf("stopping access '%v'", acc.token)
 		a.outAccesses <- acc
 	}
 }
