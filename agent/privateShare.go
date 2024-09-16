@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShareRequest) (*agentGrpc.PublicShareReply, error) {
+func (i *agentGrpcImpl) PrivateShare(_ context.Context, req *agentGrpc.PrivateShareRequest) (*agentGrpc.PrivateShareReply, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -21,42 +21,18 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "public", "--agent", "-b", req.BackendMode}
+	shrCmd := []string{os.Args[0], "share", "private", "--agent", "-b", req.BackendMode}
 	shr := &share{
-		shareMode:    sdk.PublicShareMode,
+		shareMode:    sdk.PrivateShareMode,
 		backendMode:  sdk.BackendMode(req.BackendMode),
 		bootComplete: make(chan struct{}),
 		a:            i.a,
 	}
 
-	for _, basicAuth := range req.BasicAuth {
-		shrCmd = append(shrCmd, "--basic-auth", basicAuth)
-	}
-	shr.basicAuth = req.BasicAuth
-
-	for _, frontendSelection := range req.FrontendSelection {
-		shrCmd = append(shrCmd, "--frontend", frontendSelection)
-	}
-	shr.frontendSelection = req.FrontendSelection
-
 	if req.Insecure {
 		shrCmd = append(shrCmd, "--insecure")
 	}
 	shr.insecure = req.Insecure
-
-	if req.OauthProvider != "" {
-		shrCmd = append(shrCmd, "--oauth-provider", req.OauthProvider)
-	}
-	shr.oauthProvider = req.OauthProvider
-
-	for _, pattern := range req.OauthEmailAddressPatterns {
-		shrCmd = append(shrCmd, "--oauth-email-address-patterns", pattern)
-	}
-	shr.oauthEmailAddressPatterns = req.OauthEmailAddressPatterns
-
-	if req.OauthCheckInterval != "" {
-		shrCmd = append(shrCmd, "--oauth-check-interval", req.OauthCheckInterval)
-	}
 
 	if req.Closed {
 		shrCmd = append(shrCmd, "--closed")
@@ -83,10 +59,7 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 
 	if shr.bootErr == nil {
 		i.a.inShares <- shr
-		return &agentGrpc.PublicShareReply{
-			Token:             shr.token,
-			FrontendEndpoints: shr.frontendEndpoints,
-		}, nil
+		return &agentGrpc.PrivateShareReply{Token: shr.token}, nil
 	}
 
 	return nil, shr.bootErr

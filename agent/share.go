@@ -7,6 +7,7 @@ import (
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 )
@@ -44,6 +45,11 @@ func (s *share) monitor() {
 }
 
 func (s *share) tail(data []byte) {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorf("recovering: %v", r)
+		}
+	}()
 	s.readBuffer.Write(data)
 	if line, err := s.readBuffer.ReadString('\n'); err == nil {
 		line = strings.Trim(line, "\n")
