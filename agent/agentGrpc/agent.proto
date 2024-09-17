@@ -8,6 +8,7 @@ service Agent {
 	rpc PublicShare(PublicShareRequest) returns (PublicShareReply) {}
 	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessReply) {}
 	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareReply) {}
+	rpc ReservedShare(ReservedShareRequest) returns (ReservedShareReply) {}
 	rpc Status(StatusRequest) returns (StatusReply) {}
 	rpc Version(VersionRequest) returns (VersionReply) {}
 }
@@ -71,6 +72,15 @@ message ReleaseShareRequest {
 }
 
 message ReleaseShareReply {
+}
+
+message ReservedShareReply {
+}
+
+message ReservedShareRequest {
+	string token = 1;
+	string overrideEndpoint = 2;
+	bool insecure = 3;
 }
 
 message ShareDetail {

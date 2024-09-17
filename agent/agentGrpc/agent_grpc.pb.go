@@ -24,6 +24,7 @@ const (
 	Agent_PublicShare_FullMethodName   = "/Agent/PublicShare"
 	Agent_ReleaseAccess_FullMethodName = "/Agent/ReleaseAccess"
 	Agent_ReleaseShare_FullMethodName  = "/Agent/ReleaseShare"
+	Agent_ReservedShare_FullMethodName = "/Agent/ReservedShare"
 	Agent_Status_FullMethodName        = "/Agent/Status"
 	Agent_Version_FullMethodName       = "/Agent/Version"
 )
@@ -37,6 +38,7 @@ type AgentClient interface {
 	PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error)
 	ReleaseAccess(ctx context.Context, in *ReleaseAccessRequest, opts ...grpc.CallOption) (*ReleaseAccessReply, error)
 	ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareReply, error)
+	ReservedShare(ctx context.Context, in *ReservedShareRequest, opts ...grpc.CallOption) (*ReservedShareReply, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error)
 }
@@ -99,6 +101,16 @@ func (c *agentClient) ReleaseShare(ctx context.Context, in *ReleaseShareRequest,
 	return out, nil
 }
 
+func (c *agentClient) ReservedShare(ctx context.Context, in *ReservedShareRequest, opts ...grpc.CallOption) (*ReservedShareReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReservedShareReply)
+	err := c.cc.Invoke(ctx, Agent_ReservedShare_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *agentClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StatusReply)
@@ -128,6 +140,7 @@ type AgentServer interface {
 	PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error)
 	ReleaseAccess(context.Context, *ReleaseAccessRequest) (*ReleaseAccessReply, error)
 	ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error)
+	ReservedShare(context.Context, *ReservedShareRequest) (*ReservedShareReply, error)
 	Status(context.Context, *StatusRequest) (*StatusReply, error)
 	Version(context.Context, *VersionRequest) (*VersionReply, error)
 	mustEmbedUnimplementedAgentServer()
@@ -154,6 +167,9 @@ func (UnimplementedAgentServer) ReleaseAccess(context.Context, *ReleaseAccessReq
 }
 func (UnimplementedAgentServer) ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseShare not implemented")
+}
+func (UnimplementedAgentServer) ReservedShare(context.Context, *ReservedShareRequest) (*ReservedShareReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReservedShare not implemented")
 }
 func (UnimplementedAgentServer) Status(context.Context, *StatusRequest) (*StatusReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
@@ -272,6 +288,24 @@ func _Agent_ReleaseShare_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_ReservedShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReservedShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).ReservedShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_ReservedShare_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).ReservedShare(ctx, req.(*ReservedShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Agent_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusRequest)
 	if err := dec(in); err != nil {
@@ -334,6 +368,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReleaseShare",
 			Handler:    _Agent_ReleaseShare_Handler,
+		},
+		{
+			MethodName: "ReservedShare",
+			Handler:    _Agent_ReservedShare_Handler,
 		},
 		{
 			MethodName: "Status",
