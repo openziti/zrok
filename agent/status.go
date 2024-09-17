@@ -7,9 +7,10 @@ import (
 
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusReply, error) {
 	var accesses []*agentGrpc.AccessDetail
-	for token, acc := range i.a.accesses {
+	for feToken, acc := range i.a.accesses {
 		accesses = append(accesses, &agentGrpc.AccessDetail{
-			Token:           token,
+			FrontendToken:   feToken,
+			Token:           acc.token,
 			BindAddress:     acc.bindAddress,
 			ResponseHeaders: acc.responseHeaders,
 		})

@@ -12,9 +12,10 @@ service Agent {
 }
 
 message AccessDetail {
-	string token = 1;
-	string bindAddress = 2;
-	repeated string responseHeaders = 3;
+	string frontendToken = 1;
+	string token = 2;
+	string bindAddress = 3;
+	repeated string responseHeaders = 4;
 }
 
 message PrivateAccessReply{

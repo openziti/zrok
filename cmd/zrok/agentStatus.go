@@ -52,9 +52,9 @@ func (cmd *agentStatusCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
-	t.AppendHeader(table.Row{"Token", "Bind Address"})
+	t.AppendHeader(table.Row{"Frontend Token", "Token", "Bind Address"})
 	for _, access := range status.GetAccesses() {
-		t.AppendRow(table.Row{access.Token, access.BindAddress})
+		t.AppendRow(table.Row{access.FrontendToken, access.Token, access.BindAddress})
 	}
 	t.Render()
 	fmt.Printf("%d accesses in agent\n", len(status.GetAccesses()))
