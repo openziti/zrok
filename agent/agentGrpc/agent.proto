@@ -75,6 +75,11 @@ message ReleaseShareReply {
 }
 
 message ReservedShareReply {
+	string token = 1;
+	string backendMode = 2;
+	string shareMode = 3;
+	repeated string frontendEndpoints = 4;
+	string target = 5;
 }
 
 message ReservedShareRequest {

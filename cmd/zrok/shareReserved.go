@@ -131,6 +131,8 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	if cmd.agent {
 		data := make(map[string]interface{})
 		data["token"] = resp.Payload.Token
+		data["backend_mode"] = resp.Payload.BackendMode
+		data["share_mode"] = resp.Payload.ShareMode
 		if resp.Payload.FrontendEndpoint != "" {
 			data["frontend_endpoints"] = resp.Payload.FrontendEndpoint
 		}

@@ -61,6 +61,16 @@ func (s *share) tail(data []byte) {
 						s.token = str
 					}
 				}
+				if v, found := in["backend_mode"]; found {
+					if str, ok := v.(string); ok {
+						s.backendMode = sdk.BackendMode(str)
+					}
+				}
+				if v, found := in["share_mode"]; found {
+					if str, ok := v.(string); ok {
+						s.shareMode = sdk.ShareMode(str)
+					}
+				}
 				if v, found := in["frontend_endpoints"]; found {
 					if vArr, ok := v.([]interface{}); ok {
 						for _, v := range vArr {
@@ -68,6 +78,11 @@ func (s *share) tail(data []byte) {
 								s.frontendEndpoints = append(s.frontendEndpoints, str)
 							}
 						}
+					}
+				}
+				if v, found := in["target"]; found {
+					if str, ok := v.(string); ok {
+						s.target = str
 					}
 				}
 				s.booted = true
