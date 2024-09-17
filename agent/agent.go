@@ -103,6 +103,24 @@ func (a *Agent) manager() {
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) share removal")
 			}
+
+		case inAccess := <-a.inAccesses:
+			logrus.Infof("adding new access '%v'", inAccess.frontendToken)
+			a.accesses[inAccess.frontendToken] = inAccess
+
+		case outAccess := <-a.outAccesses:
+			if outAccess.frontendToken != "" {
+				logrus.Infof("removing access '%v'", outAccess.frontendToken)
+				if err := proctree.StopChild(outAccess.process); err != nil {
+					logrus.Errorf("error stopping access '%v': %v", outAccess.frontendToken, err)
+				}
+				if err := proctree.WaitChild(outAccess.process); err != nil {
+					logrus.Errorf("error joining access '%v': %v", outAccess.frontendToken, err)
+				}
+				delete(a.accesses, outAccess.frontendToken)
+			} else {
+				logrus.Debug("skipping unidentified (orphaned) access removal")
+			}
 		}
 	}
 }

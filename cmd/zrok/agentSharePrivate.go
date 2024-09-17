@@ -19,7 +19,6 @@ func init() {
 
 type agentSharePrivateCommand struct {
 	backendMode  string
-	headless     bool
 	insecure     bool
 	closed       bool
 	accessGrants []string
@@ -34,7 +33,6 @@ func newAgentSharePrivateCommand() *agentSharePrivateCommand {
 	}
 	command := &agentSharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
-	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")

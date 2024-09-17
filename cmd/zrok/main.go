@@ -25,6 +25,7 @@ func init() {
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
 	rootCmd.AddCommand(agentCmd)
+	agentCmd.AddCommand(agentAccessCmd)
 	agentCmd.AddCommand(agentShareCmd)
 	agentCmd.AddCommand(agentReleaseCmd)
 	testCmd.AddCommand(loopCmd)
@@ -78,6 +79,11 @@ var adminListCmd = &cobra.Command{
 var adminUpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update global resources",
+}
+
+var agentAccessCmd = &cobra.Command{
+	Use:   "access",
+	Short: "zrok Agent access commands",
 }
 
 var agentCmd = &cobra.Command{
