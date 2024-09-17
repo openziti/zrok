@@ -383,7 +383,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			select {
 			case req := <-requests:
 				data := make(map[string]interface{})
-				data["remote-address"] = req.RemoteAddr
+				data["remote_address"] = req.RemoteAddr
 				data["method"] = req.Method
 				data["path"] = req.Path
 				jsonData, err := json.Marshal(data)

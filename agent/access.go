@@ -44,9 +44,14 @@ func (a *access) tail(data []byte) {
 		if !a.booted {
 			in := make(map[string]interface{})
 			if err := json.Unmarshal([]byte(line), &in); err == nil {
-				if v, found := in["frontend-token"]; found {
+				if v, found := in["frontend_token"]; found {
 					if str, ok := v.(string); ok {
 						a.frontendToken = str
+					}
+				}
+				if v, found := in["bind_address"]; found {
+					if str, ok := v.(string); ok {
+						a.bindAddress = str
 					}
 				}
 				a.booted = true

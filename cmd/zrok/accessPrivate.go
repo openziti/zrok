@@ -89,8 +89,8 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 
 	if cmd.agent {
 		data := make(map[string]interface{})
-		data["frontend-token"] = accessResp.Payload.FrontendToken
-		data["bind-address"] = cmd.bindAddress
+		data["frontend_token"] = accessResp.Payload.FrontendToken
+		data["bind_address"] = cmd.bindAddress
 		jsonData, err := json.Marshal(data)
 		if err != nil {
 			panic(err)
