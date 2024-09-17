@@ -22,6 +22,7 @@ const (
 	Agent_PrivateAccess_FullMethodName = "/Agent/PrivateAccess"
 	Agent_PrivateShare_FullMethodName  = "/Agent/PrivateShare"
 	Agent_PublicShare_FullMethodName   = "/Agent/PublicShare"
+	Agent_ReleaseAccess_FullMethodName = "/Agent/ReleaseAccess"
 	Agent_ReleaseShare_FullMethodName  = "/Agent/ReleaseShare"
 	Agent_Status_FullMethodName        = "/Agent/Status"
 	Agent_Version_FullMethodName       = "/Agent/Version"
@@ -34,6 +35,7 @@ type AgentClient interface {
 	PrivateAccess(ctx context.Context, in *PrivateAccessRequest, opts ...grpc.CallOption) (*PrivateAccessReply, error)
 	PrivateShare(ctx context.Context, in *PrivateShareRequest, opts ...grpc.CallOption) (*PrivateShareReply, error)
 	PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error)
+	ReleaseAccess(ctx context.Context, in *ReleaseAccessRequest, opts ...grpc.CallOption) (*ReleaseAccessReply, error)
 	ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareReply, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error)
@@ -77,6 +79,16 @@ func (c *agentClient) PublicShare(ctx context.Context, in *PublicShareRequest, o
 	return out, nil
 }
 
+func (c *agentClient) ReleaseAccess(ctx context.Context, in *ReleaseAccessRequest, opts ...grpc.CallOption) (*ReleaseAccessReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReleaseAccessReply)
+	err := c.cc.Invoke(ctx, Agent_ReleaseAccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *agentClient) ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ReleaseShareReply)
@@ -114,6 +126,7 @@ type AgentServer interface {
 	PrivateAccess(context.Context, *PrivateAccessRequest) (*PrivateAccessReply, error)
 	PrivateShare(context.Context, *PrivateShareRequest) (*PrivateShareReply, error)
 	PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error)
+	ReleaseAccess(context.Context, *ReleaseAccessRequest) (*ReleaseAccessReply, error)
 	ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error)
 	Status(context.Context, *StatusRequest) (*StatusReply, error)
 	Version(context.Context, *VersionRequest) (*VersionReply, error)
@@ -135,6 +148,9 @@ func (UnimplementedAgentServer) PrivateShare(context.Context, *PrivateShareReque
 }
 func (UnimplementedAgentServer) PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublicShare not implemented")
+}
+func (UnimplementedAgentServer) ReleaseAccess(context.Context, *ReleaseAccessRequest) (*ReleaseAccessReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReleaseAccess not implemented")
 }
 func (UnimplementedAgentServer) ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseShare not implemented")
@@ -220,6 +236,24 @@ func _Agent_PublicShare_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_ReleaseAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).ReleaseAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_ReleaseAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).ReleaseAccess(ctx, req.(*ReleaseAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Agent_ReleaseShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReleaseShareRequest)
 	if err := dec(in); err != nil {
@@ -292,6 +326,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublicShare",
 			Handler:    _Agent_PublicShare_Handler,
+		},
+		{
+			MethodName: "ReleaseAccess",
+			Handler:    _Agent_ReleaseAccess_Handler,
 		},
 		{
 			MethodName: "ReleaseShare",
