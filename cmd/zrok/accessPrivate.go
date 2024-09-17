@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -30,6 +32,7 @@ func init() {
 type accessPrivateCommand struct {
 	bindAddress     string
 	headless        bool
+	agent           bool
 	responseHeaders []string
 	cmd             *cobra.Command
 }
@@ -42,6 +45,8 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
 	cmd.Run = command.run
@@ -81,7 +86,19 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
+
+	if cmd.agent {
+		data := make(map[string]interface{})
+		data["frontend-token"] = accessResp.Payload.FrontendToken
+		data["bind-address"] = cmd.bindAddress
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
+	} else {
+		logrus.Infof("allocated frontend '%v'", accessResp.Payload.FrontendToken)
+	}
 
 	protocol := "http://"
 	switch accessResp.Payload.BackendMode {
@@ -231,6 +248,21 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 
+	} else if cmd.agent {
+		for {
+			select {
+			case req := <-requests:
+				data := make(map[string]interface{})
+				data["remote-address"] = req.RemoteAddr
+				data["method"] = req.Method
+				data["path"] = req.Path
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println(string(jsonData))
+			}
+		}
 	} else {
 		mdl := newAccessModel(shrToken, endpointUrl.String())
 		logrus.SetOutput(mdl)
