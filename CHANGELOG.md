@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.41
+
+FIX: Fixed crash when invoking `zrok share reserved` with no arguments (https://github.com/openziti/zrok/issues/740)
+
 ## v0.4.40
 
 FEATURE: New endpoint for synchronizing grants for an account (https://github.com/openziti/zrok/pull/744). Useful for updating the `zrok.proxy.v1` config objects containing interstitial setting when the `skip_interstitial_grants` table has been updated.
