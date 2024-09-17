@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -28,6 +29,7 @@ func init() {
 type shareReservedCommand struct {
 	overrideEndpoint string
 	headless         bool
+	agent            bool
 	insecure         bool
 	cmd              *cobra.Command
 }
@@ -41,6 +43,8 @@ func newShareReservedCommand() *shareReservedCommand {
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation")
 	cmd.Run = command.run
 	return command
@@ -124,8 +128,24 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 	}
 
+	if cmd.agent {
+		data := make(map[string]interface{})
+		data["token"] = resp.Payload.Token
+		if resp.Payload.FrontendEndpoint != "" {
+			data["frontend_endpoints"] = resp.Payload.FrontendEndpoint
+		}
+		if resp.Payload.BackendProxyEndpoint != "" {
+			data["target"] = resp.Payload.BackendProxyEndpoint
+		}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
+	}
+
 	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
-	if !cmd.headless {
+	if !cmd.headless && !cmd.agent {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -324,6 +344,23 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
+
+	} else if cmd.agent {
+		for {
+			select {
+			case req := <-requests:
+				data := make(map[string]interface{})
+				data["remote-address"] = req.RemoteAddr
+				data["method"] = req.Method
+				data["path"] = req.Path
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println(string(jsonData))
+			}
+		}
+
 	} else {
 		logrus.SetOutput(mdl)
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
