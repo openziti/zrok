@@ -3,8 +3,9 @@ syntax = "proto3";
 option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
 service Agent {
-	rpc PublicShare(PublicShareRequest) returns (PublicShareReply) {}
+	rpc PrivateAccess(PrivateAccessRequest) returns (PrivateAccessReply) {}
 	rpc PrivateShare(PrivateShareRequest) returns (PrivateShareReply) {}
+	rpc PublicShare(PublicShareRequest) returns (PublicShareReply) {}
 	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareReply) {}
 	rpc Status(StatusRequest) returns (StatusReply) {}
 	rpc Version(VersionRequest) returns (VersionReply) {}
@@ -14,6 +15,28 @@ message AccessDetail {
 	string token = 1;
 	string bindAddress = 2;
 	repeated string responseHeaders = 3;
+}
+
+message PrivateAccessReply{
+	string frontendToken = 1;
+}
+
+message PrivateAccessRequest{
+	string token = 1;
+	string bindAddress = 2;
+	repeated string responseHeaders = 3;
+}
+
+message PrivateShareReply {
+	string token = 1;
+}
+
+message PrivateShareRequest {
+	string target = 1;
+	string backendMode = 2;
+	bool insecure = 3;
+	bool closed = 4;
+	repeated string accessGrants = 5;
 }
 
 message PublicShareReply {
@@ -32,18 +55,6 @@ message PublicShareRequest {
 	string oauthCheckInterval = 8;
 	bool closed = 9;
 	repeated string accessGrants = 10;
-}
-
-message PrivateShareReply {
-	string token = 1;
-}
-
-message PrivateShareRequest {
-	string target = 1;
-	string backendMode = 2;
-	bool insecure = 3;
-	bool closed = 4;
-	repeated string accessGrants = 5;
 }
 
 message ReleaseShareRequest {

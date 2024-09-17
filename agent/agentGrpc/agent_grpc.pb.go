@@ -19,19 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Agent_PublicShare_FullMethodName  = "/Agent/PublicShare"
-	Agent_PrivateShare_FullMethodName = "/Agent/PrivateShare"
-	Agent_ReleaseShare_FullMethodName = "/Agent/ReleaseShare"
-	Agent_Status_FullMethodName       = "/Agent/Status"
-	Agent_Version_FullMethodName      = "/Agent/Version"
+	Agent_PrivateAccess_FullMethodName = "/Agent/PrivateAccess"
+	Agent_PrivateShare_FullMethodName  = "/Agent/PrivateShare"
+	Agent_PublicShare_FullMethodName   = "/Agent/PublicShare"
+	Agent_ReleaseShare_FullMethodName  = "/Agent/ReleaseShare"
+	Agent_Status_FullMethodName        = "/Agent/Status"
+	Agent_Version_FullMethodName       = "/Agent/Version"
 )
 
 // AgentClient is the client API for Agent service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentClient interface {
-	PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error)
+	PrivateAccess(ctx context.Context, in *PrivateAccessRequest, opts ...grpc.CallOption) (*PrivateAccessReply, error)
 	PrivateShare(ctx context.Context, in *PrivateShareRequest, opts ...grpc.CallOption) (*PrivateShareReply, error)
+	PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error)
 	ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareReply, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusReply, error)
 	Version(ctx context.Context, in *VersionRequest, opts ...grpc.CallOption) (*VersionReply, error)
@@ -45,10 +47,10 @@ func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
 	return &agentClient{cc}
 }
 
-func (c *agentClient) PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error) {
+func (c *agentClient) PrivateAccess(ctx context.Context, in *PrivateAccessRequest, opts ...grpc.CallOption) (*PrivateAccessReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PublicShareReply)
-	err := c.cc.Invoke(ctx, Agent_PublicShare_FullMethodName, in, out, cOpts...)
+	out := new(PrivateAccessReply)
+	err := c.cc.Invoke(ctx, Agent_PrivateAccess_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +61,16 @@ func (c *agentClient) PrivateShare(ctx context.Context, in *PrivateShareRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PrivateShareReply)
 	err := c.cc.Invoke(ctx, Agent_PrivateShare_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentClient) PublicShare(ctx context.Context, in *PublicShareRequest, opts ...grpc.CallOption) (*PublicShareReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PublicShareReply)
+	err := c.cc.Invoke(ctx, Agent_PublicShare_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +111,9 @@ func (c *agentClient) Version(ctx context.Context, in *VersionRequest, opts ...g
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility.
 type AgentServer interface {
-	PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error)
+	PrivateAccess(context.Context, *PrivateAccessRequest) (*PrivateAccessReply, error)
 	PrivateShare(context.Context, *PrivateShareRequest) (*PrivateShareReply, error)
+	PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error)
 	ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error)
 	Status(context.Context, *StatusRequest) (*StatusReply, error)
 	Version(context.Context, *VersionRequest) (*VersionReply, error)
@@ -114,11 +127,14 @@ type AgentServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAgentServer struct{}
 
-func (UnimplementedAgentServer) PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PublicShare not implemented")
+func (UnimplementedAgentServer) PrivateAccess(context.Context, *PrivateAccessRequest) (*PrivateAccessReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PrivateAccess not implemented")
 }
 func (UnimplementedAgentServer) PrivateShare(context.Context, *PrivateShareRequest) (*PrivateShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PrivateShare not implemented")
+}
+func (UnimplementedAgentServer) PublicShare(context.Context, *PublicShareRequest) (*PublicShareReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PublicShare not implemented")
 }
 func (UnimplementedAgentServer) ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseShare not implemented")
@@ -150,20 +166,20 @@ func RegisterAgentServer(s grpc.ServiceRegistrar, srv AgentServer) {
 	s.RegisterService(&Agent_ServiceDesc, srv)
 }
 
-func _Agent_PublicShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PublicShareRequest)
+func _Agent_PrivateAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PrivateAccessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).PublicShare(ctx, in)
+		return srv.(AgentServer).PrivateAccess(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Agent_PublicShare_FullMethodName,
+		FullMethod: Agent_PrivateAccess_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).PublicShare(ctx, req.(*PublicShareRequest))
+		return srv.(AgentServer).PrivateAccess(ctx, req.(*PrivateAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -182,6 +198,24 @@ func _Agent_PrivateShare_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AgentServer).PrivateShare(ctx, req.(*PrivateShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Agent_PublicShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublicShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).PublicShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_PublicShare_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).PublicShare(ctx, req.(*PublicShareRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -248,12 +282,16 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AgentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PublicShare",
-			Handler:    _Agent_PublicShare_Handler,
+			MethodName: "PrivateAccess",
+			Handler:    _Agent_PrivateAccess_Handler,
 		},
 		{
 			MethodName: "PrivateShare",
 			Handler:    _Agent_PrivateShare_Handler,
+		},
+		{
+			MethodName: "PublicShare",
+			Handler:    _Agent_PublicShare_Handler,
 		},
 		{
 			MethodName: "ReleaseShare",

@@ -106,3 +106,8 @@ func (a *Agent) manager() {
 		}
 	}
 }
+
+type agentGrpcImpl struct {
+	agentGrpc.UnimplementedAgentServer
+	a *Agent
+}
