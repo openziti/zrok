@@ -36,6 +36,7 @@ func newShareReservedCommand() *shareReservedCommand {
 	cmd := &cobra.Command{
 		Use:   "reserved <shareToken>",
 		Short: "Start a backend for a reserved share",
+		Args:  cobra.ExactArgs(1),
 	}
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
