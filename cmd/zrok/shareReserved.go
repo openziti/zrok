@@ -100,7 +100,9 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if resp.Payload.BackendMode != "socks" {
-		logrus.Infof("sharing target: '%v'", target)
+		if !cmd.agent {
+			logrus.Infof("sharing target: '%v'", target)
+		}
 
 		if resp.Payload.BackendProxyEndpoint != target {
 			upReq := share.NewUpdateShareParams()
@@ -114,9 +116,13 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 				}
 				panic(err)
 			}
-			logrus.Infof("updated backend target to: %v", target)
+			if !cmd.agent {
+				logrus.Infof("updated backend target to: %v", target)
+			}
 		} else {
-			logrus.Infof("using existing backend target: %v", target)
+			if !cmd.agent {
+				logrus.Infof("using existing backend target: %v", target)
+			}
 		}
 	}
 
