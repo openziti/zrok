@@ -67,6 +67,10 @@ func (b *Backend) Run() error {
 	return nil
 }
 
+func (b *Backend) Stop() error {
+	return b.listener.Close()
+}
+
 func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
 	targetURL, err := url.Parse(cfg.EndpointAddress)
 	if err != nil {

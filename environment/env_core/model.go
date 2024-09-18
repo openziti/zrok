@@ -26,6 +26,8 @@ type Root interface {
 	ZitiIdentityNamed(name string) (string, error)
 	SaveZitiIdentityNamed(name, data string) error
 	DeleteZitiIdentityNamed(name string) error
+
+	AgentSocket() (string, error)
 }
 
 type Environment struct {

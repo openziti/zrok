@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/endpoints"
@@ -27,9 +28,9 @@ func init() {
 }
 
 type sharePrivateCommand struct {
-	basicAuth    []string
 	backendMode  string
 	headless     bool
+	agent        bool
 	insecure     bool
 	closed       bool
 	accessGrants []string
@@ -43,9 +44,10 @@ func newSharePrivateCommand() *sharePrivateCommand {
 		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
-	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
@@ -145,7 +147,6 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	req := &sdk.ShareRequest{
 		BackendMode: sdk.BackendMode(cmd.backendMode),
 		ShareMode:   sdk.PrivateShareMode,
-		BasicAuth:   cmd.basicAuth,
 		Target:      target,
 	}
 	if cmd.closed {
@@ -160,9 +161,20 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	if cmd.agent {
+		data := make(map[string]interface{})
+		data["token"] = shr.Token
+		data["frontend_endpoints"] = shr.FrontendEndpoints
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
+	}
+
 	shareDescription := fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shr.Token)))
 	mdl := newShareModel(shr.Token, []string{shareDescription}, sdk.PrivateShareMode, sdk.BackendMode(cmd.backendMode))
-	if !cmd.headless {
+	if !cmd.headless && !cmd.agent {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -363,6 +375,22 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			select {
 			case req := <-requests:
 				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+			}
+		}
+
+	} else if cmd.agent {
+		for {
+			select {
+			case req := <-requests:
+				data := make(map[string]interface{})
+				data["remote_address"] = req.RemoteAddr
+				data["method"] = req.Method
+				data["path"] = req.Path
+				jsonData, err := json.Marshal(data)
+				if err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println(string(jsonData))
 			}
 		}
 

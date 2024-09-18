@@ -4,6 +4,8 @@
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
 
+FEATURE: New "zrok Agent", a background manager process for your zrok environments, which allows you to easily manage and work with multiple `zrok share` and `zrok access` processes (https://github.com/openziti/zrok/issues/463)
+
 ## v0.4.41
 
 FIX: Fixed crash when invoking `zrok share reserved` with no arguments (https://github.com/openziti/zrok/issues/740)

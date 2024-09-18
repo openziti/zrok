@@ -174,6 +174,10 @@ func (r *Root) DeleteZitiIdentityNamed(name string) error {
 	return nil
 }
 
+func (r *Root) AgentSocket() (string, error) {
+	return "", errors.Errorf("this environment version does not support agent sockets; please 'zrok update' this environment")
+}
+
 func (r *Root) Obliterate() error {
 	zrd, err := rootDir()
 	if err != nil {
