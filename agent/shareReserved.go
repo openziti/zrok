@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) ReservedShare(_ context.Context, req *agentGrpc.ReservedShareRequest) (*agentGrpc.ReservedShareReply, error) {
+func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareReservedRequest) (*agentGrpc.ShareReservedResponse, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (i *agentGrpcImpl) ReservedShare(_ context.Context, req *agentGrpc.Reserved
 
 	if shr.bootErr == nil {
 		i.a.inShares <- shr
-		return &agentGrpc.ReservedShareReply{
+		return &agentGrpc.ShareReservedResponse{
 			Token:             shr.token,
 			BackendMode:       string(shr.backendMode),
 			ShareMode:         string(shr.shareMode),

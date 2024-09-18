@@ -7,8 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) (*agentGrpc.VersionReply, error) {
+func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) (*agentGrpc.VersionResponse, error) {
 	v := build.String()
 	logrus.Infof("responding to version inquiry with '%v'", v)
-	return &agentGrpc.VersionReply{V: v}, nil
+	return &agentGrpc.VersionResponse{V: v}, nil
 }

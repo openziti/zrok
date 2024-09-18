@@ -52,7 +52,7 @@ func (cmd *agentShareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 
-	shr, err := client.ReservedShare(context.Background(), &agentGrpc.ReservedShareRequest{
+	shr, err := client.ShareReserved(context.Background(), &agentGrpc.ShareReservedRequest{
 		Token:            args[0],
 		OverrideEndpoint: cmd.overrideEndpoint,
 		Insecure:         cmd.insecure,

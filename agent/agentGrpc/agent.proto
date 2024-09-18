@@ -3,14 +3,14 @@ syntax = "proto3";
 option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
 service Agent {
-	rpc PrivateAccess(PrivateAccessRequest) returns (PrivateAccessReply) {}
-	rpc PrivateShare(PrivateShareRequest) returns (PrivateShareReply) {}
-	rpc PublicShare(PublicShareRequest) returns (PublicShareReply) {}
-	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessReply) {}
-	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareReply) {}
-	rpc ReservedShare(ReservedShareRequest) returns (ReservedShareReply) {}
-	rpc Status(StatusRequest) returns (StatusReply) {}
-	rpc Version(VersionRequest) returns (VersionReply) {}
+	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {}
+	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {}
+	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareResponse) {}
+	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
+	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {}
+	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {}
+	rpc Status(StatusRequest) returns (StatusResponse) {}
+	rpc Version(VersionRequest) returns (VersionResponse) {}
 }
 
 message AccessDetail {
@@ -20,72 +20,28 @@ message AccessDetail {
 	repeated string responseHeaders = 4;
 }
 
-message PrivateAccessReply{
+message AccessPrivateResponse{
 	string frontendToken = 1;
 }
 
-message PrivateAccessRequest{
+message AccessPrivateRequest{
 	string token = 1;
 	string bindAddress = 2;
 	repeated string responseHeaders = 3;
-}
-
-message PrivateShareReply {
-	string token = 1;
-}
-
-message PrivateShareRequest {
-	string target = 1;
-	string backendMode = 2;
-	bool insecure = 3;
-	bool closed = 4;
-	repeated string accessGrants = 5;
-}
-
-message PublicShareReply {
-	string token = 1;
-	repeated string frontendEndpoints = 2;
-}
-
-message PublicShareRequest {
-	string target = 1;
-	repeated string basicAuth = 2;
-	repeated string frontendSelection = 3;
-	string backendMode = 4;
-	bool insecure = 5;
-	string oauthProvider = 6;
-	repeated string oauthEmailAddressPatterns = 7;
-	string oauthCheckInterval = 8;
-	bool closed = 9;
-	repeated string accessGrants = 10;
 }
 
 message ReleaseAccessRequest {
 	string frontendToken = 1;
 }
 
-message ReleaseAccessReply {
+message ReleaseAccessResponse {
 }
 
 message ReleaseShareRequest {
 	string token = 1;
 }
 
-message ReleaseShareReply {
-}
-
-message ReservedShareReply {
-	string token = 1;
-	string backendMode = 2;
-	string shareMode = 3;
-	repeated string frontendEndpoints = 4;
-	string target = 5;
-}
-
-message ReservedShareRequest {
-	string token = 1;
-	string overrideEndpoint = 2;
-	bool insecure = 3;
+message ReleaseShareResponse {
 }
 
 message ShareDetail {
@@ -99,10 +55,54 @@ message ShareDetail {
 	string status = 8;
 }
 
+message SharePrivateRequest {
+	string target = 1;
+	string backendMode = 2;
+	bool insecure = 3;
+	bool closed = 4;
+	repeated string accessGrants = 5;
+}
+
+message SharePrivateResponse {
+	string token = 1;
+}
+
+message SharePublicRequest {
+	string target = 1;
+	repeated string basicAuth = 2;
+	repeated string frontendSelection = 3;
+	string backendMode = 4;
+	bool insecure = 5;
+	string oauthProvider = 6;
+	repeated string oauthEmailAddressPatterns = 7;
+	string oauthCheckInterval = 8;
+	bool closed = 9;
+	repeated string accessGrants = 10;
+}
+
+message SharePublicResponse {
+	string token = 1;
+	repeated string frontendEndpoints = 2;
+}
+
+message ShareReservedRequest {
+	string token = 1;
+	string overrideEndpoint = 2;
+	bool insecure = 3;
+}
+
+message ShareReservedResponse {
+	string token = 1;
+	string backendMode = 2;
+	string shareMode = 3;
+	repeated string frontendEndpoints = 4;
+	string target = 5;
+}
+
 message StatusRequest {
 }
 
-message StatusReply {
+message StatusResponse {
 	repeated AccessDetail accesses = 1;
 	repeated ShareDetail shares = 2;
 }
@@ -110,6 +110,6 @@ message StatusReply {
 message VersionRequest {
 }
 
-message VersionReply {
+message VersionResponse {
 	string v = 1;
 }

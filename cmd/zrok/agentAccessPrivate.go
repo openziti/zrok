@@ -52,7 +52,7 @@ func (cmd *agentAccessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 
-	acc, err := client.PrivateAccess(context.Background(), &agentGrpc.PrivateAccessRequest{
+	acc, err := client.AccessPrivate(context.Background(), &agentGrpc.AccessPrivateRequest{
 		Token:           args[0],
 		BindAddress:     cmd.bindAddress,
 		ResponseHeaders: cmd.responseHeaders,

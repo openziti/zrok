@@ -5,7 +5,7 @@ import (
 	"github.com/openziti/zrok/agent/agentGrpc"
 )
 
-func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusReply, error) {
+func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
 	var accesses []*agentGrpc.AccessDetail
 	for feToken, acc := range i.a.accesses {
 		accesses = append(accesses, &agentGrpc.AccessDetail{
@@ -29,5 +29,5 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 		})
 	}
 
-	return &agentGrpc.StatusReply{Accesses: accesses, Shares: shares}, nil
+	return &agentGrpc.StatusResponse{Accesses: accesses, Shares: shares}, nil
 }

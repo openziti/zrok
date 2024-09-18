@@ -147,7 +147,7 @@ func (cmd *agentSharePrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 
-	shr, err := client.PrivateShare(context.Background(), &agentGrpc.PrivateShareRequest{
+	shr, err := client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{
 		Target:       target,
 		BackendMode:  cmd.backendMode,
 		Insecure:     cmd.insecure,

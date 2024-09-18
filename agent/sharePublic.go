@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShareRequest) (*agentGrpc.PublicShareReply, error) {
+func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (i *agentGrpcImpl) PublicShare(_ context.Context, req *agentGrpc.PublicShar
 
 	if shr.bootErr == nil {
 		i.a.inShares <- shr
-		return &agentGrpc.PublicShareReply{
+		return &agentGrpc.SharePublicResponse{
 			Token:             shr.token,
 			FrontendEndpoints: shr.frontendEndpoints,
 		}, nil

@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) PrivateAccess(_ context.Context, req *agentGrpc.PrivateAccessRequest) (*agentGrpc.PrivateAccessReply, error) {
+func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPrivateRequest) (*agentGrpc.AccessPrivateResponse, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (i *agentGrpcImpl) PrivateAccess(_ context.Context, req *agentGrpc.PrivateA
 
 	if acc.bootErr == nil {
 		i.a.inAccesses <- acc
-		return &agentGrpc.PrivateAccessReply{FrontendToken: acc.frontendToken}, nil
+		return &agentGrpc.AccessPrivateResponse{FrontendToken: acc.frontendToken}, nil
 	}
 
 	return nil, acc.bootErr

@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) PrivateShare(_ context.Context, req *agentGrpc.PrivateShareRequest) (*agentGrpc.PrivateShareReply, error) {
+func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (i *agentGrpcImpl) PrivateShare(_ context.Context, req *agentGrpc.PrivateSh
 
 	if shr.bootErr == nil {
 		i.a.inShares <- shr
-		return &agentGrpc.PrivateShareReply{Token: shr.token}, nil
+		return &agentGrpc.SharePrivateResponse{Token: shr.token}, nil
 	}
 
 	return nil, shr.bootErr

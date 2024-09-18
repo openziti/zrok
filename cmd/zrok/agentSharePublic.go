@@ -124,7 +124,7 @@ func (cmd *agentSharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 	defer conn.Close()
 
-	shr, err := client.PublicShare(context.Background(), &agentGrpc.PublicShareRequest{
+	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
 		Target:                    target,
 		BasicAuth:                 cmd.basicAuth,
 		FrontendSelection:         cmd.frontendSelection,
