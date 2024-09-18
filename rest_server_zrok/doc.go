@@ -7,7 +7,7 @@
 //	  http
 //	Host: localhost
 //	BasePath: /api/v1
-//	Version: 0.3.0
+//	Version: 1.0.0
 //
 //	Consumes:
 //	  - application/zrok.v1+json
