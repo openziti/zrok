@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -13,6 +16,7 @@ import (
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -51,9 +55,6 @@ func newShareReservedCommand() *shareReservedCommand {
 }
 
 func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
-	shrToken := args[0]
-	var target string
-
 	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
@@ -65,6 +66,25 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
+
+	if !cmd.agent {
+		agent, err := agentClient.IsAgentRunning(root)
+		if err != nil {
+			tui.Error("error checking if agent is running", err)
+		}
+		if agent {
+			cmd.agentShareReserved(args, root)
+		} else {
+			cmd.shareReserved(args, root)
+		}
+	} else {
+		cmd.shareReserved(args, root)
+	}
+}
+
+func (cmd *shareReservedCommand) shareReserved(args []string, root env_core.Root) {
+	shrToken := args[0]
+	var target string
 
 	zrok, err := root.Client()
 	if err != nil {
@@ -389,4 +409,25 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 		close(requests)
 	}
+}
+
+func (cmd *shareReservedCommand) agentShareReserved(args []string, root env_core.Root) {
+	logrus.Info("starting")
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer conn.Close()
+
+	shr, err := client.ShareReserved(context.Background(), &agentGrpc.ShareReservedRequest{
+		Token:            args[0],
+		OverrideEndpoint: cmd.overrideEndpoint,
+		Insecure:         cmd.insecure,
+	})
+	if err != nil {
+		tui.Error("error sharing reserved share", err)
+	}
+
+	fmt.Println(shr)
 }
