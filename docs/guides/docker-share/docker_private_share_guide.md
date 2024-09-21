@@ -108,7 +108,7 @@ You must set the permission mode before you reserve the share.
 Only your own account can access the private share.
 
 ```bash
-ZROK_PERMISSION_MODE=closed
+ZROK_PERMISSION_MODE="closed"
 ```
 
 Grant access to additional zrok accounts.
