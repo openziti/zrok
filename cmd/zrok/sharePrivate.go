@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -20,6 +23,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
@@ -56,6 +60,34 @@ func newSharePrivateCommand() *sharePrivateCommand {
 }
 
 func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
+	root, err := environment.LoadRoot()
+	if err != nil {
+		if !panicInstead {
+			tui.Error("error loading environment", err)
+		}
+		panic(err)
+	}
+
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	if cmd.agent {
+		cmd.shareLocal(args, root)
+	} else {
+		agent, err := agentClient.IsAgentRunning(root)
+		if err != nil {
+			tui.Error("error checking if agent is running", err)
+		}
+		if agent {
+			cmd.shareAgent(args, root)
+		} else {
+			cmd.shareLocal(args, root)
+		}
+	}
+}
+
+func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
 	switch cmd.backendMode {
@@ -423,4 +455,113 @@ func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share) {
 		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
 	logrus.Debugf("shutdown complete")
+}
+
+func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
+	var target string
+
+	switch cmd.backendMode {
+	case "proxy":
+		if len(args) != 1 {
+			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+		}
+		v, err := parseUrl(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "web":
+		if len(args) != 1 {
+			tui.Error("the 'web' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "tcpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+		}
+		target = args[0]
+
+	case "udpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+		}
+		target = args[0]
+
+	case "caddy":
+		if len(args) != 1 {
+			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "drive":
+		if len(args) != 1 {
+			tui.Error("the 'drive' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "socks":
+		if len(args) != 0 {
+			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+		}
+		target = "socks"
+
+	case "vpn":
+		if len(args) == 1 {
+			_, _, err := net.ParseCIDR(args[0])
+			if err != nil {
+				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
+			}
+			target = args[0]
+		} else {
+			target = vpn.DefaultTarget()
+		}
+
+	default:
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+	}
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	shr, err := client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{
+		Target:       target,
+		BackendMode:  cmd.backendMode,
+		Insecure:     cmd.insecure,
+		Closed:       cmd.closed,
+		AccessGrants: cmd.accessGrants,
+	})
+	if err != nil {
+		tui.Error("error creating share", err)
+	}
+
+	fmt.Println(shr)
 }

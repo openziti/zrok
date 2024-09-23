@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
-	drive "github.com/openziti/zrok/endpoints/drive"
+	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
@@ -16,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -71,6 +75,34 @@ func newSharePublicCommand() *sharePublicCommand {
 }
 
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
+	root, err := environment.LoadRoot()
+	if err != nil {
+		if !panicInstead {
+			tui.Error("error loading environment", err)
+		}
+		panic(err)
+	}
+
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	if cmd.agent {
+		cmd.shareLocal(args, root)
+	} else {
+		agent, err := agentClient.IsAgentRunning(root)
+		if err != nil {
+			tui.Error("error checking if agent is running", err)
+		}
+		if agent {
+			cmd.shareAgent(args, root)
+		} else {
+			cmd.shareLocal(args, root)
+		}
+	}
+}
+
+func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
 	switch cmd.backendMode {
@@ -96,18 +128,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, caddy, drive}", cmd.backendMode), nil)
-	}
-
-	root, err := environment.LoadRoot()
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to load environment", err)
-		}
-		panic(err)
-	}
-
-	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
@@ -326,4 +346,77 @@ func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
 		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
 	logrus.Debugf("shutdown complete")
+}
+
+func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
+	var target string
+
+	switch cmd.backendMode {
+	case "proxy":
+		v, err := parseUrl(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "web":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "caddy":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "drive":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	default:
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+	}
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
+		Target:                    target,
+		BasicAuth:                 cmd.basicAuth,
+		FrontendSelection:         cmd.frontendSelection,
+		BackendMode:               cmd.backendMode,
+		Insecure:                  cmd.insecure,
+		OauthProvider:             cmd.oauthProvider,
+		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
+		OauthCheckInterval:        cmd.oauthCheckInterval.String(),
+		Closed:                    cmd.closed,
+		AccessGrants:              cmd.accessGrants,
+	})
+	if err != nil {
+		tui.Error("error creating share", err)
+	}
+
+	fmt.Println(shr)
 }

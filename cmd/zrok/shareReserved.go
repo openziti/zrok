@@ -67,22 +67,22 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if !cmd.agent {
+	if cmd.agent {
+		cmd.shareLocal(args, root)
+	} else {
 		agent, err := agentClient.IsAgentRunning(root)
 		if err != nil {
 			tui.Error("error checking if agent is running", err)
 		}
 		if agent {
-			cmd.agentShareReserved(args, root)
+			cmd.shareAgent(args, root)
 		} else {
-			cmd.shareReserved(args, root)
+			cmd.shareLocal(args, root)
 		}
-	} else {
-		cmd.shareReserved(args, root)
 	}
 }
 
-func (cmd *shareReservedCommand) shareReserved(args []string, root env_core.Root) {
+func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	shrToken := args[0]
 	var target string
 
@@ -411,14 +411,14 @@ func (cmd *shareReservedCommand) shareReserved(args []string, root env_core.Root
 	}
 }
 
-func (cmd *shareReservedCommand) agentShareReserved(args []string, root env_core.Root) {
+func (cmd *shareReservedCommand) shareAgent(args []string, root env_core.Root) {
 	logrus.Info("starting")
 
 	client, conn, err := agentClient.NewClient(root)
 	if err != nil {
 		tui.Error("error connecting to agent", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	shr, err := client.ShareReserved(context.Background(), &agentGrpc.ShareReservedRequest{
 		Token:            args[0],
