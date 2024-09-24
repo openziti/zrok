@@ -5,6 +5,7 @@ package proctree
 import (
 	"os/exec"
 	"sync"
+	"syscall"
 )
 
 func Init(_ string) error {
@@ -52,7 +53,7 @@ func WaitChild(c *Child) error {
 }
 
 func StopChild(c *Child) error {
-	if err := c.cmd.Process.Kill(); err != nil {
+	if err := syscall.Kill(c.cmd.Process.Pid, syscall.SIGINT); err != nil {
 		return err
 	}
 	return nil
