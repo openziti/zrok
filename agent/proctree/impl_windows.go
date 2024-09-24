@@ -71,23 +71,7 @@ func WaitChild(c *Child) error {
 }
 
 func StopChild(c *Child) error {
-	if err := sendSigInt(c); err != nil {
-		return err
-	}
-	return nil
-}
-
-func sendSigInt(c *Child) error {
-	dll, err := syscall.LoadDLL("kernel32.dll")
-	if er != nil {
-		return err
-	}
-	proc, err := dll.FindProc("GenerateConsoleCtrlEvent")
-	if err != nil {
-		return err
-	}
-	r, _, err := proc.Call(syscall.CTRL_BREAK_EVENT, uintptr(c.cmd.Process.Pid))
-	if err != nil {
+	if err := c.cmd.Process.Kill(); err != nil {
 		return err
 	}
 	return nil
