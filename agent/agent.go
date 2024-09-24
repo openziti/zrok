@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -99,6 +100,11 @@ func (a *Agent) manager() {
 				if err := proctree.WaitChild(outShare.process); err != nil {
 					logrus.Errorf("error joining share '%v': %v", outShare.token, err)
 				}
+				if !outShare.reserved {
+					if err := a.deleteShare(outShare.token); err != nil {
+						logrus.Errorf("error deleting share '%v': %v", outShare.token, err)
+					}
+				}
 				delete(a.shares, outShare.token)
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) share removal")
@@ -117,12 +123,29 @@ func (a *Agent) manager() {
 				if err := proctree.WaitChild(outAccess.process); err != nil {
 					logrus.Errorf("error joining access '%v': %v", outAccess.frontendToken, err)
 				}
+				if err := a.deleteAccess(outAccess.token, outAccess.frontendToken); err != nil {
+					logrus.Errorf("error deleting access '%v': %v", outAccess.frontendToken, err)
+				}
 				delete(a.accesses, outAccess.frontendToken)
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) access removal")
 			}
 		}
 	}
+}
+
+func (a *Agent) deleteShare(token string) error {
+	if err := sdk.DeleteShare(a.root, &sdk.Share{Token: token}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *Agent) deleteAccess(token, frontendToken string) error {
+	if err := sdk.DeleteAccess(a.root, &sdk.Access{Token: frontendToken, ShareToken: token}); err != nil {
+		return err
+	}
+	return nil
 }
 
 type agentGrpcImpl struct {
