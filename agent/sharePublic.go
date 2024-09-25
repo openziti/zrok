@@ -21,12 +21,12 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "public", "--agent", "-b", req.BackendMode}
+	shrCmd := []string{os.Args[0], "share", "public", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:    sdk.PublicShareMode,
 		backendMode:  sdk.BackendMode(req.BackendMode),
 		bootComplete: make(chan struct{}),
-		a:            i.a,
+		agent:        i.agent,
 	}
 
 	for _, basicAuth := range req.BasicAuth {
@@ -82,7 +82,7 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 	<-shr.bootComplete
 
 	if shr.bootErr == nil {
-		i.a.inShares <- shr
+		i.agent.addShare <- shr
 		return &agentGrpc.SharePublicResponse{
 			Token:             shr.token,
 			FrontendEndpoints: shr.frontendEndpoints,

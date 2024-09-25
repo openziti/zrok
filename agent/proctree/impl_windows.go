@@ -3,7 +3,6 @@
 package proctree
 
 import (
-	"github.com/kolesnikovae/go-winjob"
 	"golang.org/x/sys/windows"
 	"os/exec"
 	"sync"

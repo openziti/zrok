@@ -1,17 +1,21 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -32,7 +36,9 @@ func init() {
 type accessPrivateCommand struct {
 	bindAddress     string
 	headless        bool
-	agent           bool
+	subordinate     bool
+	forceLocal      bool
+	forceAgent      bool
 	responseHeaders []string
 	cmd             *cobra.Command
 }
@@ -45,8 +51,11 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable subordinate mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
 	cmd.Run = command.run
@@ -54,18 +63,40 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 }
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
-	shrToken := args[0]
-
-	env, err := environment.LoadRoot()
+	root, err := environment.LoadRoot()
 	if err != nil {
-		tui.Error("error loading environment", err)
+		if !panicInstead {
+			tui.Error("error loading environment", err)
+		}
+		panic(err)
 	}
 
-	if !env.IsEnabled() {
+	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	zrok, err := env.Client()
+	if cmd.subordinate || cmd.forceLocal {
+		cmd.accessLocal(args, root)
+	} else {
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
+		}
+		if agent {
+			cmd.accessAgent(args, root)
+		} else {
+			cmd.accessLocal(args, root)
+		}
+	}
+}
+
+func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) {
+	shrToken := args[0]
+
+	zrok, err := root.Client()
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create zrok client", err)
@@ -73,11 +104,11 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := share.NewAccessParams()
 	req.Body = &rest_model_zrok.AccessRequest{
 		ShrToken: shrToken,
-		EnvZID:   env.Environment().ZitiIdentity,
+		EnvZID:   root.Environment().ZitiIdentity,
 	}
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
@@ -87,7 +118,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["frontend_token"] = accessResp.Payload.FrontendToken
 		data["bind_address"] = cmd.bindAddress
@@ -121,7 +152,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: env.EnvironmentIdentityName(),
+			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
@@ -143,7 +174,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "udpTunnel":
 		fe, err := udpTunnel.NewFrontend(&udpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: env.EnvironmentIdentityName(),
+			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 			IdleTime:     time.Minute,
@@ -166,7 +197,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	case "socks":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  cmd.bindAddress,
-			IdentityName: env.EnvironmentIdentityName(),
+			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
@@ -190,7 +221,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			Scheme: "VPN",
 		}
 		fe, err := vpn.NewFrontend(&vpn.FrontendConfig{
-			IdentityName: env.EnvironmentIdentityName(),
+			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
 		})
@@ -210,7 +241,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}()
 
 	default:
-		cfg := proxy.DefaultFrontendConfig(env.EnvironmentIdentityName())
+		cfg := proxy.DefaultFrontendConfig(root.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken
 		cfg.Address = cmd.bindAddress
 		cfg.ResponseHeaders = cmd.responseHeaders
@@ -232,10 +263,10 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -248,7 +279,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:
@@ -285,12 +316,12 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		}
 
 		close(requests)
-		cmd.destroy(accessResp.Payload.FrontendToken, env.Environment().ZitiIdentity, shrToken, zrok, auth)
+		cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 	}
 }
 
 func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Debugf("shutting down '%v'", shrToken)
+	logrus.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
 		FrontendToken: frontendName,
@@ -302,4 +333,23 @@ func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, 
 	} else {
 		logrus.Errorf("error shutting down: %v", err)
 	}
+}
+
+func (cmd *accessPrivateCommand) accessAgent(args []string, root env_core.Root) {
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	acc, err := client.AccessPrivate(context.Background(), &agentGrpc.AccessPrivateRequest{
+		Token:           args[0],
+		BindAddress:     cmd.bindAddress,
+		ResponseHeaders: cmd.responseHeaders,
+	})
+	if err != nil {
+		tui.Error("error creating access", err)
+	}
+
+	fmt.Println(acc)
 }

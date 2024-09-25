@@ -19,11 +19,11 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "reserved", "--agent"}
+	shrCmd := []string{os.Args[0], "share", "reserved", "--subordinate"}
 	shr := &share{
 		reserved:     true,
 		bootComplete: make(chan struct{}),
-		a:            i.a,
+		agent:        i.agent,
 	}
 
 	if req.OverrideEndpoint != "" {
@@ -47,7 +47,7 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 	<-shr.bootComplete
 
 	if shr.bootErr == nil {
-		i.a.inShares <- shr
+		i.agent.addShare <- shr
 		return &agentGrpc.ShareReservedResponse{
 			Token:             shr.token,
 			BackendMode:       string(shr.backendMode),

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
-	drive "github.com/openziti/zrok/endpoints/drive"
+	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
@@ -16,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -30,7 +34,9 @@ type sharePublicCommand struct {
 	frontendSelection         []string
 	backendMode               string
 	headless                  bool
-	agent                     bool
+	subordinate               bool
+	forceLocal                bool
+	forceAgent                bool
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
@@ -55,8 +61,11 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
@@ -71,6 +80,37 @@ func newSharePublicCommand() *sharePublicCommand {
 }
 
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
+	root, err := environment.LoadRoot()
+	if err != nil {
+		if !panicInstead {
+			tui.Error("error loading environment", err)
+		}
+		panic(err)
+	}
+
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	if cmd.subordinate || cmd.forceLocal {
+		cmd.shareLocal(args, root)
+	} else {
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
+		}
+		if agent {
+			cmd.shareAgent(args, root)
+		} else {
+			cmd.shareLocal(args, root)
+		}
+	}
+}
+
+func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
 	switch cmd.backendMode {
@@ -96,18 +136,6 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; expected {proxy, web, caddy, drive}", cmd.backendMode), nil)
-	}
-
-	root, err := environment.LoadRoot()
-	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to load environment", err)
-		}
-		panic(err)
-	}
-
-	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
@@ -152,7 +180,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["token"] = shr.Token
 		data["frontend_endpoints"] = shr.FrontendEndpoints
@@ -164,7 +192,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
-	if !cmd.headless && !cmd.agent {
+	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -281,7 +309,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:
@@ -326,4 +354,77 @@ func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
 		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
 	logrus.Debugf("shutdown complete")
+}
+
+func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
+	var target string
+
+	switch cmd.backendMode {
+	case "proxy":
+		v, err := parseUrl(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "web":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "caddy":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "drive":
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	default:
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+	}
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
+		Target:                    target,
+		BasicAuth:                 cmd.basicAuth,
+		FrontendSelection:         cmd.frontendSelection,
+		BackendMode:               cmd.backendMode,
+		Insecure:                  cmd.insecure,
+		OauthProvider:             cmd.oauthProvider,
+		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
+		OauthCheckInterval:        cmd.oauthCheckInterval.String(),
+		Closed:                    cmd.closed,
+		AccessGrants:              cmd.accessGrants,
+	})
+	if err != nil {
+		tui.Error("error creating share", err)
+	}
+
+	fmt.Println(shr)
 }

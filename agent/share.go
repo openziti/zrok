@@ -34,14 +34,14 @@ type share struct {
 	bootComplete chan struct{}
 	bootErr      error
 
-	a *Agent
+	agent *Agent
 }
 
 func (s *share) monitor() {
 	if err := proctree.WaitChild(s.process); err != nil {
 		pfxlog.ChannelLogger(s.token).Error(err)
 	}
-	s.a.outShares <- s
+	s.agent.rmShare <- s
 }
 
 func (s *share) tail(data []byte) {

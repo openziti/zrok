@@ -21,12 +21,12 @@ func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePriv
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "private", "--agent", "-b", req.BackendMode}
+	shrCmd := []string{os.Args[0], "share", "private", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:    sdk.PrivateShareMode,
 		backendMode:  sdk.BackendMode(req.BackendMode),
 		bootComplete: make(chan struct{}),
-		a:            i.a,
+		agent:        i.agent,
 	}
 
 	if req.Insecure {
@@ -58,7 +58,7 @@ func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePriv
 	<-shr.bootComplete
 
 	if shr.bootErr == nil {
-		i.a.inShares <- shr
+		i.agent.addShare <- shr
 		return &agentGrpc.SharePrivateResponse{Token: shr.token}, nil
 	}
 

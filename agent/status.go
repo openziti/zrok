@@ -7,7 +7,7 @@ import (
 
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
 	var accesses []*agentGrpc.AccessDetail
-	for feToken, acc := range i.a.accesses {
+	for feToken, acc := range i.agent.accesses {
 		accesses = append(accesses, &agentGrpc.AccessDetail{
 			FrontendToken:   feToken,
 			Token:           acc.token,
@@ -17,7 +17,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 	}
 
 	var shares []*agentGrpc.ShareDetail
-	for token, shr := range i.a.shares {
+	for token, shr := range i.agent.shares {
 		shares = append(shares, &agentGrpc.ShareDetail{
 			Token:            token,
 			ShareMode:        string(shr.shareMode),

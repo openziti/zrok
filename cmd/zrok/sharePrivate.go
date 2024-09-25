@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -20,6 +23,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
@@ -30,7 +34,9 @@ func init() {
 type sharePrivateCommand struct {
 	backendMode  string
 	headless     bool
-	agent        bool
+	subordinate  bool
+	forceLocal   bool
+	forceAgent   bool
 	insecure     bool
 	closed       bool
 	accessGrants []string
@@ -46,8 +52,11 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	command := &sharePrivateCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
@@ -56,6 +65,37 @@ func newSharePrivateCommand() *sharePrivateCommand {
 }
 
 func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
+	root, err := environment.LoadRoot()
+	if err != nil {
+		if !panicInstead {
+			tui.Error("error loading environment", err)
+		}
+		panic(err)
+	}
+
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
+	if cmd.subordinate || cmd.forceLocal {
+		cmd.shareLocal(args, root)
+	} else {
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
+		}
+		if agent {
+			cmd.shareAgent(args, root)
+		} else {
+			cmd.shareLocal(args, root)
+		}
+	}
+}
+
+func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
 	switch cmd.backendMode {
@@ -161,7 +201,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["token"] = shr.Token
 		data["frontend_endpoints"] = shr.FrontendEndpoints
@@ -174,7 +214,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 	shareDescription := fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shr.Token)))
 	mdl := newShareModel(shr.Token, []string{shareDescription}, sdk.PrivateShareMode, sdk.BackendMode(cmd.backendMode))
-	if !cmd.headless && !cmd.agent {
+	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -378,7 +418,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:
@@ -423,4 +463,113 @@ func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share) {
 		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
 	logrus.Debugf("shutdown complete")
+}
+
+func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
+	var target string
+
+	switch cmd.backendMode {
+	case "proxy":
+		if len(args) != 1 {
+			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+		}
+		v, err := parseUrl(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "web":
+		if len(args) != 1 {
+			tui.Error("the 'web' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "tcpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+		}
+		target = args[0]
+
+	case "udpTunnel":
+		if len(args) != 1 {
+			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+		}
+		target = args[0]
+
+	case "caddy":
+		if len(args) != 1 {
+			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "drive":
+		if len(args) != 1 {
+			tui.Error("the 'drive' backend mode expects a <target>", nil)
+		}
+		v, err := filepath.Abs(args[0])
+		if err != nil {
+			if !panicInstead {
+				tui.Error("invalid target endpoint URL", err)
+			}
+			panic(err)
+		}
+		target = v
+
+	case "socks":
+		if len(args) != 0 {
+			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+		}
+		target = "socks"
+
+	case "vpn":
+		if len(args) == 1 {
+			_, _, err := net.ParseCIDR(args[0])
+			if err != nil {
+				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
+			}
+			target = args[0]
+		} else {
+			target = vpn.DefaultTarget()
+		}
+
+	default:
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+	}
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	shr, err := client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{
+		Target:       target,
+		BackendMode:  cmd.backendMode,
+		Insecure:     cmd.insecure,
+		Closed:       cmd.closed,
+		AccessGrants: cmd.accessGrants,
+	})
+	if err != nil {
+		tui.Error("error creating share", err)
+	}
+
+	fmt.Println(shr)
 }

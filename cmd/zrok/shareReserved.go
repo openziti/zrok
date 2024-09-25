@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/agent/agentClient"
+	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -13,6 +16,7 @@ import (
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -29,7 +33,9 @@ func init() {
 type shareReservedCommand struct {
 	overrideEndpoint string
 	headless         bool
-	agent            bool
+	subordinate      bool
+	forceLocal       bool
+	forceAgent       bool
 	insecure         bool
 	cmd              *cobra.Command
 }
@@ -43,17 +49,17 @@ func newShareReservedCommand() *shareReservedCommand {
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation")
 	cmd.Run = command.run
 	return command
 }
 
 func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
-	shrToken := args[0]
-	var target string
-
 	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
@@ -65,6 +71,28 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	if !root.IsEnabled() {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
+
+	if cmd.subordinate || cmd.forceLocal {
+		cmd.shareLocal(args, root)
+	} else {
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
+		}
+		if agent {
+			cmd.shareAgent(args, root)
+		} else {
+			cmd.shareLocal(args, root)
+		}
+	}
+}
+
+func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
+	shrToken := args[0]
+	var target string
 
 	zrok, err := root.Client()
 	if err != nil {
@@ -100,7 +128,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if resp.Payload.BackendMode != "socks" {
-		if !cmd.agent {
+		if !cmd.subordinate {
 			logrus.Infof("sharing target: '%v'", target)
 		}
 
@@ -116,11 +144,11 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 				}
 				panic(err)
 			}
-			if !cmd.agent {
+			if !cmd.subordinate {
 				logrus.Infof("updated backend target to: %v", target)
 			}
 		} else {
-			if !cmd.agent {
+			if !cmd.subordinate {
 				logrus.Infof("using existing backend target: %v", target)
 			}
 		}
@@ -134,7 +162,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["token"] = resp.Payload.Token
 		data["backend_mode"] = resp.Payload.BackendMode
@@ -153,7 +181,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
-	if !cmd.headless && !cmd.agent {
+	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -353,7 +381,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:
@@ -389,4 +417,25 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 
 		close(requests)
 	}
+}
+
+func (cmd *shareReservedCommand) shareAgent(args []string, root env_core.Root) {
+	logrus.Info("starting")
+
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		tui.Error("error connecting to agent", err)
+	}
+	defer func() { _ = conn.Close() }()
+
+	shr, err := client.ShareReserved(context.Background(), &agentGrpc.ShareReservedRequest{
+		Token:            args[0],
+		OverrideEndpoint: cmd.overrideEndpoint,
+		Insecure:         cmd.insecure,
+	})
+	if err != nil {
+		tui.Error("error sharing reserved share", err)
+	}
+
+	fmt.Println(shr)
 }
