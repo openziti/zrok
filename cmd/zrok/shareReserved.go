@@ -34,6 +34,8 @@ type shareReservedCommand struct {
 	overrideEndpoint string
 	headless         bool
 	subordinate      bool
+	forceLocal       bool
+	forceAgent       bool
 	insecure         bool
 	cmd              *cobra.Command
 }
@@ -49,6 +51,9 @@ func newShareReservedCommand() *shareReservedCommand {
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation")
 	cmd.Run = command.run
 	return command
@@ -67,12 +72,15 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.subordinate {
+	if cmd.subordinate || cmd.forceLocal {
 		cmd.shareLocal(args, root)
 	} else {
-		agent, err := agentClient.IsAgentRunning(root)
-		if err != nil {
-			tui.Error("error checking if agent is running", err)
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
 		}
 		if agent {
 			cmd.shareAgent(args, root)

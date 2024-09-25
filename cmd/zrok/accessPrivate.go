@@ -37,6 +37,8 @@ type accessPrivateCommand struct {
 	bindAddress     string
 	headless        bool
 	subordinate     bool
+	forceLocal      bool
+	forceAgent      bool
 	responseHeaders []string
 	cmd             *cobra.Command
 }
@@ -51,6 +53,9 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable subordinate mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
+	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
+	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
+	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
 	cmd.Run = command.run
@@ -70,12 +75,15 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.subordinate {
+	if cmd.subordinate || cmd.forceLocal {
 		cmd.accessLocal(args, root)
 	} else {
-		agent, err := agentClient.IsAgentRunning(root)
-		if err != nil {
-			tui.Error("error checking if agent is running", err)
+		agent := cmd.forceAgent
+		if !cmd.forceAgent {
+			agent, err = agentClient.IsAgentRunning(root)
+			if err != nil {
+				tui.Error("error checking if agent is running", err)
+			}
 		}
 		if agent {
 			cmd.accessAgent(args, root)
