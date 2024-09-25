@@ -36,7 +36,7 @@ func init() {
 type accessPrivateCommand struct {
 	bindAddress     string
 	headless        bool
-	agent           bool
+	subordinate     bool
 	responseHeaders []string
 	cmd             *cobra.Command
 }
@@ -49,8 +49,8 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	}
 	command := &accessPrivateCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable subordinate mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
 	cmd.Run = command.run
@@ -70,7 +70,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		cmd.accessLocal(args, root)
 	} else {
 		agent, err := agentClient.IsAgentRunning(root)
@@ -110,7 +110,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		panic(err)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["frontend_token"] = accessResp.Payload.FrontendToken
 		data["bind_address"] = cmd.bindAddress
@@ -271,7 +271,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:

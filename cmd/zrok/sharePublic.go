@@ -34,7 +34,7 @@ type sharePublicCommand struct {
 	frontendSelection         []string
 	backendMode               string
 	headless                  bool
-	agent                     bool
+	subordinate               bool
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
@@ -59,8 +59,8 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
@@ -87,7 +87,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		cmd.shareLocal(args, root)
 	} else {
 		agent, err := agentClient.IsAgentRunning(root)
@@ -172,7 +172,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		panic(err)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["token"] = shr.Token
 		data["frontend_endpoints"] = shr.FrontendEndpoints
@@ -184,7 +184,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	mdl := newShareModel(shr.Token, shr.FrontendEndpoints, sdk.PublicShareMode, sdk.BackendMode(cmd.backendMode))
-	if !cmd.headless && !cmd.agent {
+	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -301,7 +301,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:

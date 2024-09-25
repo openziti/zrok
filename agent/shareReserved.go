@@ -19,7 +19,7 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "reserved", "--agent"}
+	shrCmd := []string{os.Args[0], "share", "reserved", "--subordinate"}
 	shr := &share{
 		reserved:     true,
 		bootComplete: make(chan struct{}),

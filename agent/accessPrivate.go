@@ -20,7 +20,7 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	accCmd := []string{os.Args[0], "access", "private", "--agent", "-b", req.BindAddress, req.Token}
+	accCmd := []string{os.Args[0], "access", "private", "--subordinate", "-b", req.BindAddress, req.Token}
 	acc := &access{
 		token:           req.Token,
 		bindAddress:     req.BindAddress,

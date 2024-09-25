@@ -33,7 +33,7 @@ func init() {
 type shareReservedCommand struct {
 	overrideEndpoint string
 	headless         bool
-	agent            bool
+	subordinate      bool
 	insecure         bool
 	cmd              *cobra.Command
 }
@@ -47,8 +47,8 @@ func newShareReservedCommand() *shareReservedCommand {
 	command := &shareReservedCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
 	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
-	cmd.Flags().BoolVar(&command.agent, "agent", false, "Enable agent mode")
-	cmd.MarkFlagsMutuallyExclusive("headless", "agent")
+	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation")
 	cmd.Run = command.run
 	return command
@@ -67,7 +67,7 @@ func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		cmd.shareLocal(args, root)
 	} else {
 		agent, err := agentClient.IsAgentRunning(root)
@@ -120,7 +120,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	if resp.Payload.BackendMode != "socks" {
-		if !cmd.agent {
+		if !cmd.subordinate {
 			logrus.Infof("sharing target: '%v'", target)
 		}
 
@@ -136,11 +136,11 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 				}
 				panic(err)
 			}
-			if !cmd.agent {
+			if !cmd.subordinate {
 				logrus.Infof("updated backend target to: %v", target)
 			}
 		} else {
-			if !cmd.agent {
+			if !cmd.subordinate {
 				logrus.Infof("using existing backend target: %v", target)
 			}
 		}
@@ -154,7 +154,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
 	}
 
-	if cmd.agent {
+	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["token"] = resp.Payload.Token
 		data["backend_mode"] = resp.Payload.BackendMode
@@ -173,7 +173,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
-	if !cmd.headless && !cmd.agent {
+	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
@@ -373,7 +373,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			}
 		}
 
-	} else if cmd.agent {
+	} else if cmd.subordinate {
 		for {
 			select {
 			case req := <-requests:
