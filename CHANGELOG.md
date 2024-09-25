@@ -4,7 +4,9 @@
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
 
-FEATURE: New "zrok Agent", a background manager process for your zrok environments, which allows you to easily manage and work with multiple `zrok share` and `zrok access` processes (https://github.com/openziti/zrok/issues/463)
+FEATURE: New "zrok Agent", a background manager process for your zrok environments, which allows you to easily manage and work with multiple `zrok share` and `zrok access` processes. New `--subordinate` flag added to `zrok share [public|private|reserved]` and `zrok access private` to operate in a mode that allows an Agent to manage shares and accesses (https://github.com/openziti/zrok/issues/463)
+
+FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
 
 ## v0.4.41
 
