@@ -26,7 +26,7 @@ func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePriv
 		shareMode:    sdk.PrivateShareMode,
 		backendMode:  sdk.BackendMode(req.BackendMode),
 		bootComplete: make(chan struct{}),
-		a:            i.a,
+		agent:        i.agent,
 	}
 
 	if req.Insecure {
@@ -58,7 +58,7 @@ func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePriv
 	<-shr.bootComplete
 
 	if shr.bootErr == nil {
-		i.a.inShares <- shr
+		i.agent.addShare <- shr
 		return &agentGrpc.SharePrivateResponse{Token: shr.token}, nil
 	}
 

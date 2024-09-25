@@ -8,8 +8,8 @@ import (
 )
 
 func (i *agentGrpcImpl) ReleaseAccess(_ context.Context, req *agentGrpc.ReleaseAccessRequest) (*agentGrpc.ReleaseAccessResponse, error) {
-	if acc, found := i.a.accesses[req.FrontendToken]; found {
-		i.a.outAccesses <- acc
+	if acc, found := i.agent.accesses[req.FrontendToken]; found {
+		i.agent.rmAccess <- acc
 		logrus.Infof("released access '%v'", acc.frontendToken)
 
 	} else {

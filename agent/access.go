@@ -22,14 +22,14 @@ type access struct {
 	bootComplete chan struct{}
 	bootErr      error
 
-	a *Agent
+	agent *Agent
 }
 
 func (a *access) monitor() {
 	if err := proctree.WaitChild(a.process); err != nil {
 		pfxlog.ChannelLogger(a.token).Error(err)
 	}
-	a.a.outAccesses <- a
+	a.agent.rmAccess <- a
 }
 
 func (a *access) tail(data []byte) {

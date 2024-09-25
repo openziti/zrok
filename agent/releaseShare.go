@@ -8,8 +8,8 @@ import (
 )
 
 func (i *agentGrpcImpl) ReleaseShare(_ context.Context, req *agentGrpc.ReleaseShareRequest) (*agentGrpc.ReleaseShareResponse, error) {
-	if shr, found := i.a.shares[req.Token]; found {
-		i.a.outShares <- shr
+	if shr, found := i.agent.shares[req.Token]; found {
+		i.agent.rmShare <- shr
 		logrus.Infof("released share '%v'", shr.token)
 
 	} else {

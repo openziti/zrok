@@ -16,11 +16,11 @@ type Agent struct {
 	root        env_core.Root
 	agentSocket string
 	shares      map[string]*share
-	inShares    chan *share
-	outShares   chan *share
+	addShare    chan *share
+	rmShare     chan *share
 	accesses    map[string]*access
-	inAccesses  chan *access
-	outAccesses chan *access
+	addAccess   chan *access
+	rmAccess    chan *access
 }
 
 func NewAgent(root env_core.Root) (*Agent, error) {
@@ -28,13 +28,13 @@ func NewAgent(root env_core.Root) (*Agent, error) {
 		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
 	}
 	return &Agent{
-		root:        root,
-		shares:      make(map[string]*share),
-		inShares:    make(chan *share),
-		outShares:   make(chan *share),
-		accesses:    make(map[string]*access),
-		inAccesses:  make(chan *access),
-		outAccesses: make(chan *access),
+		root:      root,
+		shares:    make(map[string]*share),
+		addShare:  make(chan *share),
+		rmShare:   make(chan *share),
+		accesses:  make(map[string]*access),
+		addAccess: make(chan *access),
+		rmAccess:  make(chan *access),
 	}, nil
 }
 
@@ -57,7 +57,7 @@ func (a *Agent) Run() error {
 	a.agentSocket = agentSocket
 
 	srv := grpc.NewServer()
-	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{a: a})
+	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
 	if err := srv.Serve(l); err != nil {
 		return err
 	}
@@ -73,11 +73,11 @@ func (a *Agent) Shutdown() {
 	}
 	for _, shr := range a.shares {
 		logrus.Debugf("stopping share '%v'", shr.token)
-		a.outShares <- shr
+		a.rmShare <- shr
 	}
 	for _, acc := range a.accesses {
 		logrus.Debugf("stopping access '%v'", acc.token)
-		a.outAccesses <- acc
+		a.rmAccess <- acc
 	}
 }
 
@@ -87,11 +87,11 @@ func (a *Agent) manager() {
 
 	for {
 		select {
-		case inShare := <-a.inShares:
+		case inShare := <-a.addShare:
 			logrus.Infof("adding new share '%v'", inShare.token)
 			a.shares[inShare.token] = inShare
 
-		case outShare := <-a.outShares:
+		case outShare := <-a.rmShare:
 			if shr, found := a.shares[outShare.token]; found {
 				logrus.Infof("removing share '%v'", shr.token)
 				if err := proctree.StopChild(shr.process); err != nil {
@@ -110,11 +110,11 @@ func (a *Agent) manager() {
 				logrus.Debug("skipping unidentified (orphaned) share removal")
 			}
 
-		case inAccess := <-a.inAccesses:
+		case inAccess := <-a.addAccess:
 			logrus.Infof("adding new access '%v'", inAccess.frontendToken)
 			a.accesses[inAccess.frontendToken] = inAccess
 
-		case outAccess := <-a.outAccesses:
+		case outAccess := <-a.rmAccess:
 			if acc, found := a.accesses[outAccess.frontendToken]; found {
 				logrus.Infof("removing access '%v'", acc.frontendToken)
 				if err := proctree.StopChild(acc.process); err != nil {
@@ -152,5 +152,5 @@ func (a *Agent) deleteAccess(token, frontendToken string) error {
 
 type agentGrpcImpl struct {
 	agentGrpc.UnimplementedAgentServer
-	a *Agent
+	agent *Agent
 }

@@ -26,7 +26,7 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 		bindAddress:     req.BindAddress,
 		responseHeaders: req.ResponseHeaders,
 		bootComplete:    make(chan struct{}),
-		a:               i.a,
+		agent:           i.agent,
 	}
 
 	logrus.Infof("executing '%v'", accCmd)
@@ -40,7 +40,7 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 	<-acc.bootComplete
 
 	if acc.bootErr == nil {
-		i.a.inAccesses <- acc
+		i.agent.addAccess <- acc
 		return &agentGrpc.AccessPrivateResponse{FrontendToken: acc.frontendToken}, nil
 	}
 
