@@ -92,20 +92,20 @@ func (a *Agent) manager() {
 			a.shares[inShare.token] = inShare
 
 		case outShare := <-a.outShares:
-			if outShare.token != "" {
-				logrus.Infof("removing share '%v'", outShare.token)
-				if err := proctree.StopChild(outShare.process); err != nil {
-					logrus.Errorf("error stopping share '%v': %v", outShare.token, err)
+			if shr, found := a.shares[outShare.token]; found {
+				logrus.Infof("removing share '%v'", shr.token)
+				if err := proctree.StopChild(shr.process); err != nil {
+					logrus.Errorf("error stopping share '%v': %v", shr.token, err)
 				}
-				if err := proctree.WaitChild(outShare.process); err != nil {
-					logrus.Errorf("error joining share '%v': %v", outShare.token, err)
+				if err := proctree.WaitChild(shr.process); err != nil {
+					logrus.Errorf("error joining share '%v': %v", shr.token, err)
 				}
-				if !outShare.reserved {
-					if err := a.deleteShare(outShare.token); err != nil {
-						logrus.Errorf("error deleting share '%v': %v", outShare.token, err)
+				if !shr.reserved {
+					if err := a.deleteShare(shr.token); err != nil {
+						logrus.Errorf("error deleting share '%v': %v", shr.token, err)
 					}
 				}
-				delete(a.shares, outShare.token)
+				delete(a.shares, shr.token)
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) share removal")
 			}
@@ -115,18 +115,18 @@ func (a *Agent) manager() {
 			a.accesses[inAccess.frontendToken] = inAccess
 
 		case outAccess := <-a.outAccesses:
-			if outAccess.frontendToken != "" {
-				logrus.Infof("removing access '%v'", outAccess.frontendToken)
-				if err := proctree.StopChild(outAccess.process); err != nil {
-					logrus.Errorf("error stopping access '%v': %v", outAccess.frontendToken, err)
+			if acc, found := a.accesses[outAccess.frontendToken]; found {
+				logrus.Infof("removing access '%v'", acc.frontendToken)
+				if err := proctree.StopChild(acc.process); err != nil {
+					logrus.Errorf("error stopping access '%v': %v", acc.frontendToken, err)
 				}
-				if err := proctree.WaitChild(outAccess.process); err != nil {
-					logrus.Errorf("error joining access '%v': %v", outAccess.frontendToken, err)
+				if err := proctree.WaitChild(acc.process); err != nil {
+					logrus.Errorf("error joining access '%v': %v", acc.frontendToken, err)
 				}
-				if err := a.deleteAccess(outAccess.token, outAccess.frontendToken); err != nil {
-					logrus.Errorf("error deleting access '%v': %v", outAccess.frontendToken, err)
+				if err := a.deleteAccess(acc.token, acc.frontendToken); err != nil {
+					logrus.Errorf("error deleting access '%v': %v", acc.frontendToken, err)
 				}
-				delete(a.accesses, outAccess.frontendToken)
+				delete(a.accesses, acc.frontendToken)
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) access removal")
 			}
@@ -135,6 +135,7 @@ func (a *Agent) manager() {
 }
 
 func (a *Agent) deleteShare(token string) error {
+	logrus.Debugf("deleting share '%v'", token)
 	if err := sdk.DeleteShare(a.root, &sdk.Share{Token: token}); err != nil {
 		return err
 	}
@@ -142,6 +143,7 @@ func (a *Agent) deleteShare(token string) error {
 }
 
 func (a *Agent) deleteAccess(token, frontendToken string) error {
+	logrus.Debugf("deleting access '%v'", frontendToken)
 	if err := sdk.DeleteAccess(a.root, &sdk.Access{Token: frontendToken, ShareToken: token}); err != nil {
 		return err
 	}
