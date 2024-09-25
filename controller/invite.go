@@ -77,7 +77,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil {
 		logrus.Warnf("found previous account request for '%v', removing", params.Body.Email)
 		if err := str.DeleteAccountRequest(oldAr.Id, tx); err != nil {
-			logrus.Errorf("error deleteing previous account request for '%v': %v", params.Body.Email, err)
+			logrus.Errorf("error deleting previous account request for '%v': %v", params.Body.Email, err)
 			return account.NewInviteInternalServerError()
 		}
 	} else {
