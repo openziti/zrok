@@ -47,8 +47,12 @@ func newShareReservedCommand() *shareReservedCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &shareReservedCommand{cmd: cmd}
+	headless := false
+	if root, err := environment.LoadRoot(); err == nil {
+		headless, _ = root.Headless()
+	}
 	cmd.Flags().StringVar(&command.overrideEndpoint, "override-endpoint", "", "Override the stored target endpoint with a replacement")
-	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
