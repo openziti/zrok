@@ -174,7 +174,6 @@ if [[ "${ZROK_FRONTEND_MODE:-}" =~ -private$ && "${ZROK_PERMISSION_MODE:-}" == c
     done
   else
     echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' and no additional ZROK_ACCESS_GRANTS; will be granted access" >&2
-    exit 1
   fi
 elif [[ "${ZROK_FRONTEND_MODE:-}" =~ -private$ && -n "${ZROK_PERMISSION_MODE:-}" && "${ZROK_PERMISSION_MODE}" != open ]]; then
   echo "WARNING: ZROK_PERMISSION_MODE='${ZROK_PERMISSION_MODE}' is not a recognized value'" >&2
