@@ -58,9 +58,13 @@ func newSharePublicCommand() *sharePublicCommand {
 		defaultFrontend, _ := root.DefaultFrontend()
 		defaultFrontends = []string{defaultFrontend}
 	}
+	headless := false
+	if root, err := environment.LoadRoot(); err == nil {
+		headless, _ = root.Headless()
+	}
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
-	cmd.Flags().BoolVar(&command.headless, "headless", false, "Disable TUI and run headless")
+	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")

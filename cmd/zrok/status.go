@@ -52,6 +52,8 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, apiEndpointFrom})
 	defaultFrontend, defaultFrontendFrom := env.DefaultFrontend()
 	t.AppendRow(table.Row{"defaultFrontend", defaultFrontend, defaultFrontendFrom})
+	headless, headlessFrom := env.Headless()
+	t.AppendRow(table.Row{"headless", headless, headlessFrom})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 

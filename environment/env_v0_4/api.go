@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 )
 
 func (r *Root) Metadata() *env_core.Metadata {
@@ -101,6 +102,26 @@ func (r *Root) DefaultFrontend() (string, string) {
 	}
 
 	return defaultFrontend, from
+}
+
+func (r *Root) Headless() (bool, string) {
+	headless := false
+	from := "binary"
+
+	if r.Config() != nil {
+		headless = r.Config().Headless
+		from = "config"
+	}
+
+	env := os.Getenv("ZROK_HEADLESS")
+	if env != "" {
+		if v, err := strconv.ParseBool(env); err == nil {
+			headless = v
+			from = "ZROK_HEADLESS"
+		}
+	}
+
+	return headless, from
 }
 
 func (r *Root) Environment() *env_core.Environment {
