@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
@@ -8,7 +10,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"net"
+	"net/http"
 	"os"
 )
 
@@ -44,7 +48,6 @@ func (a *Agent) Run() error {
 	if err := proctree.Init("zrok Agent"); err != nil {
 		return err
 	}
-	go a.manager()
 
 	agentSocket, err := a.root.AgentSocket()
 	if err != nil {
@@ -55,6 +58,9 @@ func (a *Agent) Run() error {
 		return err
 	}
 	a.agentSocket = agentSocket
+
+	go a.manager()
+	go a.gateway()
 
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
@@ -78,6 +84,23 @@ func (a *Agent) Shutdown() {
 	for _, acc := range a.accesses {
 		logrus.Debugf("stopping access '%v'", acc.token)
 		a.rmAccess <- acc
+	}
+}
+
+func (a *Agent) gateway() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	endpoint := "unix:" + a.agentSocket
+	logrus.Infof("endpoint: %v", endpoint)
+	if err := agentGrpc.RegisterAgentHandlerFromEndpoint(ctx, mux, "unix:"+a.agentSocket, opts); err != nil {
+		logrus.Fatalf("unable to register gateway: %v", err)
+	}
+
+	if err := http.ListenAndServe(":8888", mux); err != nil {
+		logrus.Error(err)
 	}
 }
 
