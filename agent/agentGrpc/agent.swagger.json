@@ -1,0 +1,232 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "agent/agentGrpc/agent.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Agent"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/agent/status": {
+      "get": {
+        "operationId": "Agent_Status",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/StatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/v1/agent/version": {
+      "get": {
+        "operationId": "Agent_Version",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/VersionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AccessDetail": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
+        "responseHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AccessPrivateResponse": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        }
+      }
+    },
+    "ReleaseAccessResponse": {
+      "type": "object"
+    },
+    "ReleaseShareResponse": {
+      "type": "object"
+    },
+    "ShareDetail": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "frontendEndpoint": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "backendEndpoint": {
+          "type": "string"
+        },
+        "closed": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "SharePrivateResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "SharePublicResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ShareReservedResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target": {
+          "type": "string"
+        }
+      }
+    },
+    "StatusResponse": {
+      "type": "object",
+      "properties": {
+        "accesses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/AccessDetail"
+          }
+        },
+        "shares": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ShareDetail"
+          }
+        }
+      }
+    },
+    "VersionResponse": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
+import "google/api/annotations.proto";
+
 service Agent {
 	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {}
 	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {}
@@ -9,8 +11,16 @@ service Agent {
 	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
 	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {}
 	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {}
-	rpc Status(StatusRequest) returns (StatusResponse) {}
-	rpc Version(VersionRequest) returns (VersionResponse) {}
+	rpc Status(StatusRequest) returns (StatusResponse) {
+		option(google.api.http) = {
+			get: "/v1/agent/status"
+		};
+	}
+	rpc Version(VersionRequest) returns (VersionResponse) {
+		option(google.api.http) = {
+			get: "/v1/agent/version"
+		};
+	}
 }
 
 message AccessDetail {
