@@ -9,14 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.13"
+    "superagent": "^10.1.0"
   },
   "devDependencies": {
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "eslint": "^8",
-    "eslint-config-next": "14.2.13"
-  }
+    "eslint-config-next": "14.2.13",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  },
+  "proxy": "http://127.0.0.1:8888"
 }

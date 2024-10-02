@@ -42,7 +42,7 @@ swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_serv
 echo "...generating zrok client"
 swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"
 
-echo "...generating js client"
+echo "...generating web console js client"
 openapi -s specs/zrok.yml -o ui/src/api -l js
 
 echo "...generating ts client"
@@ -52,3 +52,6 @@ echo "...generating python client"
 swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python
 
 git checkout rest_server_zrok/configure_zrok.go
+
+echo "...generating agent console js client"
+openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/agent-ui/src/api -g javascript

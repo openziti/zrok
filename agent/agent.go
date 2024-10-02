@@ -99,7 +99,7 @@ func (a *Agent) gateway() {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	if err := http.ListenAndServe(":8888", mux); err != nil {
+	if err := http.ListenAndServe(":8888", cors(mux)); err != nil {
 		logrus.Error(err)
 	}
 }
@@ -176,4 +176,16 @@ func (a *Agent) deleteAccess(token, frontendToken string) error {
 type agentGrpcImpl struct {
 	agentGrpc.UnimplementedAgentServer
 	agent *Agent
+}
+
+func cors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType, User-Agent")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
