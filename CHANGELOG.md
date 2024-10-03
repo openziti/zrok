@@ -6,6 +6,8 @@ FIX: Fixed crash when invoking `zrok share reserved` with no arguments (https://
 
 FIX: zrok-share.service on Linux failed to start with a private share in closed permission mode
 
+FIX: Update `gopkg.in/go-jose/go-jose.v2` to `v2.6.3` to fix vulnerability around compressed data (https://github.com/openziti/zrok/issues/761)
+
 ## v0.4.40
 
 FEATURE: New endpoint for synchronizing grants for an account (https://github.com/openziti/zrok/pull/744). Useful for updating the `zrok.proxy.v1` config objects containing interstitial setting when the `skip_interstitial_grants` table has been updated.
