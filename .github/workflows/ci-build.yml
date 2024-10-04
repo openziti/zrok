@@ -43,14 +43,14 @@ jobs:
         env:
           CI: "true"
 
-      - name: install vite
+      - name: install agent ui node modules
         shell: bash
-        run: npm install -g vite
+        run: npm install
         working-directory: agent/agentUi
 
       - name: build agent ui
         shell: bash
-        run: vite build
+        run: npm run build
         working-directory: agent/agentUi
           
       - name: go install
