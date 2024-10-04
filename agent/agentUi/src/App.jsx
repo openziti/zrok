@@ -59,7 +59,7 @@ function App() {
                setVersion(data.v);
            }
         });
-    }, [api]);
+    }, []);
 
     useEffect(() => {
         let mounted = true;
