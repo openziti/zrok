@@ -6,16 +6,48 @@ import DataTable from 'react-data-table-component';
 function App() {
     const [version, setVersion] = useState("");
     const [shares, setShares] = useState([]);
+    const [accesses, setAccesses] = useState([]);
 
     const shareColumns = [
+        {
+            name: 'Token',
+            selector: row => row.reserved ? row.token+' (reserved)' : row.token
+        },
+        {
+            name: 'Share Mode',
+            selector: row => row.shareMode
+        },
+        {
+            name: 'Backend Mode',
+            selector: row => row.backendMode
+        },
+        {
+            name: 'Frontend Endpoints',
+            selector: row => row.frontendEndpoint
+        },
+        {
+            name: 'Target',
+            selector: row => row.backendEndpoint,
+        },
+        {
+            name: 'Closed Permissions',
+            selector: row => ''+row.closed
+        }
+    ];
+
+    const accessColumns = [
+        {
+            name: 'Frontend Token',
+            selector: row => row.frontendToken
+        },
         {
             name: 'Token',
             selector: row => row.token
         },
         {
-            name: 'Share Mode',
-            selector: row => row.shareMode
-        }
+            name: 'Bind Address',
+            selector: row => row.bindAddress
+        },
     ];
 
     let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
@@ -35,6 +67,7 @@ function App() {
             api.agentStatus((err, data) => {
                 if(mounted) {
                     setShares(data.shares);
+                    setAccesses(data.accesses);
                 }
             });
         }, 1000);
@@ -54,6 +87,14 @@ function App() {
                 <DataTable
                     columns={shareColumns}
                     data={shares}
+                />
+            </div>
+
+            <div>
+                <h2>Accesses</h2>
+                <DataTable
+                    columns={accessColumns}
+                    data={accesses}
                 />
             </div>
         </>
