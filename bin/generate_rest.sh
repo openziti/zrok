@@ -54,4 +54,4 @@ swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConf
 git checkout rest_server_zrok/configure_zrok.go
 
 echo "...generating agent console js client"
-openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/agent-ui/src/api -g javascript
+openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/agentUi/src/api -g javascript
