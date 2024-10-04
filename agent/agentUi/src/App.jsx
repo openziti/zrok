@@ -1,7 +1,8 @@
-import './App.css'
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {useEffect, useState} from "react";
 import {AgentApi, ApiClient} from "./api/src/index.js";
-import DataTable from 'react-data-table-component';
+import DataTable from "react-data-table-component";
 
 function App() {
     const [version, setVersion] = useState("");
@@ -22,16 +23,13 @@ function App() {
             selector: row => row.backendMode
         },
         {
-            name: 'Frontend Endpoints',
-            selector: row => row.frontendEndpoint
-        },
-        {
             name: 'Target',
             selector: row => row.backendEndpoint,
         },
         {
-            name: 'Closed Permissions',
-            selector: row => ''+row.closed
+            name: 'Frontend Endpoints',
+            selector: row => <div>{row.shareMode === "public" ? row.frontendEndpoint.map((fe) => <a href={fe.toString()} target={"_"}>{fe}</a>) : "---"}</div>,
+            grow: 2
         }
     ];
 
@@ -80,21 +78,23 @@ function App() {
     return (
         <>
             <h1>zrok Agent</h1>
-            <code>{version}</code>
+            <code>Connected Version: {version}</code>
 
-            <div>
+            <div class={"info"}>
                 <h2>Shares</h2>
                 <DataTable
                     columns={shareColumns}
                     data={shares}
+                    noDataComponent={<div/>}
                 />
             </div>
 
-            <div>
+            <div class={"info"}>
                 <h2>Accesses</h2>
                 <DataTable
                     columns={accessColumns}
                     data={accesses}
+                    noDataComponent={<div/>}
                 />
             </div>
         </>

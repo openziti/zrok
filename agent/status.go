@@ -27,7 +27,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			ShareMode:        string(shr.shareMode),
 			BackendMode:      string(shr.backendMode),
 			Reserved:         shr.reserved,
-			FrontendEndpoint: shr.frontendSelection,
+			FrontendEndpoint: shr.frontendEndpoints,
 			BackendEndpoint:  shr.target,
 			Closed:           shr.closed,
 		})
