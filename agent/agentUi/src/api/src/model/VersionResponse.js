@@ -50,6 +50,9 @@ class VersionResponse {
             if (data.hasOwnProperty('v')) {
                 obj['v'] = ApiClient.convertToType(data['v'], 'String');
             }
+            if (data.hasOwnProperty('consoleEndpoint')) {
+                obj['consoleEndpoint'] = ApiClient.convertToType(data['consoleEndpoint'], 'String');
+            }
         }
         return obj;
     }
@@ -64,6 +67,10 @@ class VersionResponse {
         if (data['v'] && !(typeof data['v'] === 'string' || data['v'] instanceof String)) {
             throw new Error("Expected the field `v` to be a primitive type in the JSON string but got " + data['v']);
         }
+        // ensure the json data is a string
+        if (data['consoleEndpoint'] && !(typeof data['consoleEndpoint'] === 'string' || data['consoleEndpoint'] instanceof String)) {
+            throw new Error("Expected the field `consoleEndpoint` to be a primitive type in the JSON string but got " + data['consoleEndpoint']);
+        }
 
         return true;
     }
@@ -77,6 +84,11 @@ class VersionResponse {
  * @member {String} v
  */
 VersionResponse.prototype['v'] = undefined;
+
+/**
+ * @member {String} consoleEndpoint
+ */
+VersionResponse.prototype['consoleEndpoint'] = undefined;
 
 
 

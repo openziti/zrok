@@ -15,7 +15,8 @@ func init() {
 }
 
 type agentStartCommand struct {
-	cmd *cobra.Command
+	cmd             *cobra.Command
+	consoleEndpoint string
 }
 
 func newAgentStartCommand() *agentStartCommand {
@@ -26,6 +27,7 @@ func newAgentStartCommand() *agentStartCommand {
 	}
 	command := &agentStartCommand{cmd: cmd}
 	cmd.Run = command.run
+	cmd.Flags().StringVar(&command.consoleEndpoint, "console-endpoint", "127.0.0.1:8888", "gRPC gateway endpoint")
 	return command
 }
 
@@ -39,7 +41,9 @@ func (cmd *agentStartCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	a, err := agent.NewAgent(root)
+	cfg := agent.DefaultAgentConfig()
+	cfg.ConsoleEndpoint = cmd.consoleEndpoint
+	a, err := agent.NewAgent(cfg, root)
 	if err != nil {
 		tui.Error("error creating agent", err)
 	}

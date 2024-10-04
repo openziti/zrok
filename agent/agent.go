@@ -18,6 +18,7 @@ import (
 )
 
 type Agent struct {
+	cfg         *AgentConfig
 	root        env_core.Root
 	agentSocket string
 	shares      map[string]*share
@@ -28,11 +29,12 @@ type Agent struct {
 	rmAccess    chan *access
 }
 
-func NewAgent(root env_core.Root) (*Agent, error) {
+func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 	if !root.IsEnabled() {
 		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
 	}
 	return &Agent{
+		cfg:       cfg,
 		root:      root,
 		shares:    make(map[string]*share),
 		addShare:  make(chan *share),
@@ -61,7 +63,7 @@ func (a *Agent) Run() error {
 	a.agentSocket = agentSocket
 
 	go a.manager()
-	go a.gateway()
+	go a.gateway(a.cfg)
 
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
@@ -88,7 +90,11 @@ func (a *Agent) Shutdown() {
 	}
 }
 
-func (a *Agent) gateway() {
+func (a *Agent) Config() *AgentConfig {
+	return a.cfg
+}
+
+func (a *Agent) gateway(cfg *AgentConfig) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -100,7 +106,7 @@ func (a *Agent) gateway() {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	if err := http.ListenAndServe(":8888", agentUi.Middleware(mux)); err != nil {
+	if err := http.ListenAndServe(cfg.ConsoleEndpoint, agentUi.Middleware(mux)); err != nil {
 		logrus.Error(err)
 	}
 }

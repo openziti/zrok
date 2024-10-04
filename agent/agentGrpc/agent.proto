@@ -122,4 +122,5 @@ message VersionRequest {
 
 message VersionResponse {
 	string v = 1;
+	string consoleEndpoint = 2;
 }

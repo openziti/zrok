@@ -197,6 +197,9 @@
       "properties": {
         "v": {
           "type": "string"
+        },
+        "consoleEndpoint": {
+          "type": "string"
         }
       }
     },

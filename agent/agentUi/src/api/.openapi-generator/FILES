@@ -1,6 +1,5 @@
 .babelrc
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 README.md
 docs/AccessDetail.md
@@ -30,14 +29,3 @@ src/model/SharePublicResponse.js
 src/model/ShareReservedResponse.js
 src/model/StatusResponse.js
 src/model/VersionResponse.js
-test/api/AgentApi.spec.js
-test/model/AccessDetail.spec.js
-test/model/AccessPrivateResponse.spec.js
-test/model/ProtobufAny.spec.js
-test/model/RpcStatus.spec.js
-test/model/ShareDetail.spec.js
-test/model/SharePrivateResponse.spec.js
-test/model/SharePublicResponse.spec.js
-test/model/ShareReservedResponse.spec.js
-test/model/StatusResponse.spec.js
-test/model/VersionResponse.spec.js
