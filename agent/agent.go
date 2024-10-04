@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/agent/agentUi"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -99,7 +100,7 @@ func (a *Agent) gateway() {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	if err := http.ListenAndServe(":8888", cors(mux)); err != nil {
+	if err := http.ListenAndServe(":8888", agentUi.Middleware(mux)); err != nil {
 		logrus.Error(err)
 	}
 }

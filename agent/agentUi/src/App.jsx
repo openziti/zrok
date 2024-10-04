@@ -11,10 +11,14 @@ function App() {
         {
             name: 'Token',
             selector: row => row.token
+        },
+        {
+            name: 'Share Mode',
+            selector: row => row.shareMode
         }
     ];
 
-    let api = new AgentApi(new ApiClient("http://localhost:8888"));
+    let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
 
     useEffect(() => {
         let mounted = true;
