@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"sort"
 )
 
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
@@ -15,6 +16,9 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			ResponseHeaders: acc.responseHeaders,
 		})
 	}
+	sort.Slice(accesses, func(i, j int) bool {
+		return accesses[i].FrontendToken < accesses[j].FrontendToken
+	})
 
 	var shares []*agentGrpc.ShareDetail
 	for token, shr := range i.agent.shares {
@@ -28,6 +32,9 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			Closed:           shr.closed,
 		})
 	}
+	sort.Slice(shares, func(i, j int) bool {
+		return shares[i].Token < shares[j].Token
+	})
 
 	return &agentGrpc.StatusResponse{Accesses: accesses, Shares: shares}, nil
 }
