@@ -28,6 +28,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.4.3
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/kolesnikovae/go-winjob v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.18
 	github.com/michaelquigley/cf v0.0.13

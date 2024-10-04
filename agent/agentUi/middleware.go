@@ -1,12 +1,15 @@
 package agentUi
 
 import (
+	"github.com/sirupsen/logrus"
 	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+const staticPath = "dist"
 
 func Middleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -15,23 +18,13 @@ func Middleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		staticPath := "dist"
-		indexPath := "index.html"
+		path := filepath.ToSlash(filepath.Join(staticPath, r.URL.Path))
+		logrus.Debugf("path = %v", path)
 
-		// get the absolute path to prevent directory traversal
-		path, err := filepath.Abs(r.URL.Path)
-		if err != nil {
-			// if we failed to get the absolute path respond with a 400 bad request and stop
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		// prepend the path with the path to the static directory
-		path = filepath.Join(staticPath, path)
-
-		_, err = FS.Open(path)
+		f, err := FS.Open(path)
 		if os.IsNotExist(err) {
 			// file does not exist, serve index.gohtml
-			index, err := FS.ReadFile(filepath.Join(staticPath, indexPath))
+			index, err := FS.ReadFile(filepath.ToSlash(filepath.Join(staticPath, "index.html")))
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -47,6 +40,7 @@ func Middleware(handler http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer func() { _ = f.Close() }()
 
 		// get the subdirectory of the static dir
 		if statics, err := fs.Sub(FS, staticPath); err == nil {

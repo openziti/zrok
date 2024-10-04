@@ -2,6 +2,7 @@ package proctree
 
 import (
 	"fmt"
+	_ "github.com/kolesnikovae/go-winjob"
 	"io"
 	"os/exec"
 	"sync"
