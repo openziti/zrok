@@ -95,13 +95,16 @@ func (a *Agent) Config() *AgentConfig {
 }
 
 func (a *Agent) gateway(cfg *AgentConfig) {
+	logrus.Info("started")
+	defer logrus.Warn("exited")
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	endpoint := "unix:" + a.agentSocket
-	logrus.Infof("endpoint: %v", endpoint)
+	logrus.Debugf("endpoint: '%v'", endpoint)
 	if err := agentGrpc.RegisterAgentHandlerFromEndpoint(ctx, mux, "unix:"+a.agentSocket, opts); err != nil {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
@@ -183,16 +186,4 @@ func (a *Agent) deleteAccess(token, frontendToken string) error {
 type agentGrpcImpl struct {
 	agentGrpc.UnimplementedAgentServer
 	agent *Agent
-}
-
-func cors(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType, User-Agent")
-		if r.Method == "OPTIONS" {
-			return
-		}
-		h.ServeHTTP(w, r)
-	})
 }
