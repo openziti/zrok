@@ -11,7 +11,7 @@ const router = createBrowserRouter([
         element: <Overview />
     },
     {
-        path: "/share",
+        path: "/share/:token",
         element: <ShareDetail />
     }
 ]);
