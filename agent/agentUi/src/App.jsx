@@ -3,6 +3,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import {useEffect, useState} from "react";
 import {AgentApi, ApiClient} from "./api/src/index.js";
 import DataTable from "react-data-table-component";
+import ShareIcon from "@mui/icons-material/Share";
+import MenuIcon from "@mui/icons-material/Menu";
+import LanIcon from "@mui/icons-material/Lan";
+import ListIcon from "@mui/icons-material/List";
+import {AppBar, Button, IconButton, Toolbar, Typography} from "@mui/material";
 
 function App() {
     const [version, setVersion] = useState("");
@@ -77,8 +82,25 @@ function App() {
 
     return (
         <>
-            <h1>zrok Agent</h1>
-            <code>Connected Version: {version}</code>
+            <AppBar position={"static"}>
+                <Toolbar>
+                    <IconButton
+                        size={"large"}
+                        edge={"start"}
+                        color={"inherit"}
+                        aria-label={"menu"}
+                        sx={{mr: 2}}
+                    >
+                        <MenuIcon/>
+                    </IconButton>
+                    <Typography variant={"p"} component={"div"} sx={{flexGrow: 1}}>
+                        zrok Agent { version !== "" ? " | " + version : ""}
+                    </Typography>
+                    <Button color={"inherit"}><ListIcon /></Button>
+                    <Button color={"inherit"}><LanIcon /></Button>
+                    <Button color={"inherit"}><ShareIcon /></Button>
+                </Toolbar>
+            </AppBar>
 
             <div class={"info"}>
                 <h2>Shares</h2>
@@ -97,6 +119,8 @@ function App() {
                     noDataComponent={<div/>}
                 />
             </div>
+
+            <code>Connected Version: {version}</code>
         </>
     )
 }
