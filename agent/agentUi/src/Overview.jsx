@@ -1,17 +1,12 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import {useEffect, useState} from "react";
-import {AgentApi, ApiClient} from "./api/src/index.js";
 import DataTable from "react-data-table-component";
 import NavBar from "./NavBar.jsx";
 
 const Overview = (props) => {
-    const [shares, setShares] = useState([]);
-    const [accesses, setAccesses] = useState([]);
-
     const shareColumns = [
         {
             name: 'Token',
-            selector: row => row.reserved ? row.token+' (reserved)' : row.token
+            selector: row => <a href={"/share/"+row.token}>{row.token}</a>
         },
         {
             name: 'Share Mode',
@@ -47,42 +42,24 @@ const Overview = (props) => {
         },
     ];
 
-    let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
-
-    useEffect(() => {
-        let mounted = true;
-        let interval = setInterval(() => {
-            api.agentStatus((err, data) => {
-                if(mounted) {
-                    setShares(data.shares);
-                    setAccesses(data.accesses);
-                }
-            });
-        }, 1000);
-        return () => {
-            mounted = false;
-            clearInterval(interval);
-        }
-    });
-
     return (
         <>
             <NavBar version={props.version} />
 
-            <div class={"info"}>
+            <div className={"info"}>
                 <h2>Shares</h2>
                 <DataTable
                     columns={shareColumns}
-                    data={shares}
+                    data={props.shares}
                     noDataComponent={<div/>}
                 />
             </div>
 
-            <div class={"info"}>
+            <div className={"info"}>
                 <h2>Accesses</h2>
                 <DataTable
                     columns={accessColumns}
-                    data={accesses}
+                    data={props.accesses}
                     noDataComponent={<div/>}
                 />
             </div>
