@@ -4,7 +4,7 @@ import {AgentApi, ApiClient} from "./api/src/index.js";
 import DataTable from "react-data-table-component";
 import NavBar from "./NavBar.jsx";
 
-function Overview() {
+const Overview = (props) => {
     const [shares, setShares] = useState([]);
     const [accesses, setAccesses] = useState([]);
 
@@ -67,7 +67,7 @@ function Overview() {
 
     return (
         <>
-            <NavBar />
+            <NavBar version={props.version} />
 
             <div class={"info"}>
                 <h2>Shares</h2>
