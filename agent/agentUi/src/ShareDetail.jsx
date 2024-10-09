@@ -1,4 +1,3 @@
-import NavBar from "./NavBar.jsx";
 import {useParams} from "react-router-dom";
 
 const ShareDetail = (props) => {
@@ -6,8 +5,6 @@ const ShareDetail = (props) => {
 
     return (
         <>
-            <NavBar version={props.version} />
-
             <h1>Share {params.token}</h1>
         </>
     )

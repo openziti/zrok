@@ -54,3 +54,9 @@ button:focus-visible {
 .info {
   margin-top: 5em;
 }
+
+.card {
+  margin-top: 2em;
+  padding: 1em;
+  border: 0;
+}
