@@ -7,14 +7,19 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-share_reserved(){
+exec_with_common_opts(){
+    local zrok_cmd="$* --headless ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
+    echo "INFO: running: zrok ${zrok_cmd}"
+    exec zrok ${zrok_cmd}
+}
+
+exec_share_reserved(){
     local token="$1"
     local target="$2"
     shift 2
     local opts="${*:-}"
-    local zrok_cmd="share reserved ${token} --headless ${opts} --override-endpoint ${target}"
-    echo "INFO: running: zrok ${zrok_cmd}"
-    exec zrok ${zrok_cmd}
+    local zrok_cmd="share reserved ${token} ${opts} --override-endpoint ${target}"
+    exec_with_common_opts ${zrok_cmd}
 }
 
 if ! command -v jq &>/dev/null; then
@@ -62,9 +67,9 @@ fi
 # default mode is 'reserved-public', override modes are reserved-private, temp-public, temp-private.
 : "${ZROK_FRONTEND_MODE:=reserved-public}"
 if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
-  ZROK_CMD="share public --headless ${ZROK_VERBOSE:-}"
+  ZROK_CMD="share public"
 elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
-  ZROK_CMD="share private --headless ${ZROK_VERBOSE:-}"
+  ZROK_CMD="share private"
 elif [[ -s ~/.zrok/reserved.json ]]; then
   ZROK_RESERVED_TOKEN="$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)"
   if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
@@ -73,9 +78,8 @@ elif [[ -s ~/.zrok/reserved.json ]]; then
   else
     echo "INFO: zrok backend is already reserved: ${ZROK_RESERVED_TOKEN}"
     ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
-    ZROK_CMD+=" ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
     if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
-      share_reserved ${ZROK_CMD}
+      exec_share_reserved ${ZROK_CMD}
     else
       echo "INFO: finished reserving zrok backend, continuing without sharing"
       exit 0
@@ -198,12 +202,10 @@ elif [[ -n "${ZROK_BASIC_AUTH:-}" ]]; then
   ZROK_CMD+=" --basic-auth ${ZROK_BASIC_AUTH}"
 fi
 
-echo "INFO: running: zrok ${ZROK_CMD}"
-
 if [[ "${ZROK_FRONTEND_MODE:-}" =~ ^temp- ]]; then
   # frontend mode starts with 'temp-', so is temporary.
   # share without reserving until exit.
-  exec zrok ${ZROK_CMD}
+  exec_with_common_opts ${ZROK_CMD}
 else
   # reserve and continue
   zrok ${ZROK_CMD} > ~/.zrok/reserved.json
@@ -228,9 +230,8 @@ else
       exit 1
     fi
     ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
-    ZROK_CMD+=" ${ZROK_VERBOSE:-} ${ZROK_INSECURE:-}"
     if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
-      share_reserved ${ZROK_CMD}
+      exec_share_reserved ${ZROK_CMD}
     else
       echo "INFO: finished reserving zrok backend, continuing without sharing"
       exit 0
