@@ -7,10 +7,22 @@ import "google/api/annotations.proto";
 service Agent {
 	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {}
 	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {}
-	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareResponse) {}
+	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/releaseShare"
+		};
+	}
 	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
-	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {}
-	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {}
+	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/sharePrivate"
+		};
+	}
+	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/sharePublic"
+		};
+	}
 	rpc Status(StatusRequest) returns (StatusResponse) {
 		option(google.api.http) = {
 			get: "/v1/agent/status"

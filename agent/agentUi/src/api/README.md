@@ -103,6 +103,9 @@ var AgentAgentGrpcAgentProto = require('agent_agent_grpc_agent_proto');
 
 
 var api = new AgentAgentGrpcAgentProto.AgentApi()
+var opts = {
+  'token': "token_example" // {String} 
+};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -110,7 +113,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.agentStatus(callback);
+api.agentReleaseShare(opts, callback);
 
 ```
 
@@ -120,6 +123,9 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AgentAgentGrpcAgentProto.AgentApi* | [**agentReleaseShare**](docs/AgentApi.md#agentReleaseShare) | **POST** /v1/agent/releaseShare | 
+*AgentAgentGrpcAgentProto.AgentApi* | [**agentSharePrivate**](docs/AgentApi.md#agentSharePrivate) | **POST** /v1/agent/sharePrivate | 
+*AgentAgentGrpcAgentProto.AgentApi* | [**agentSharePublic**](docs/AgentApi.md#agentSharePublic) | **POST** /v1/agent/sharePublic | 
 *AgentAgentGrpcAgentProto.AgentApi* | [**agentStatus**](docs/AgentApi.md#agentStatus) | **GET** /v1/agent/status | 
 *AgentAgentGrpcAgentProto.AgentApi* | [**agentVersion**](docs/AgentApi.md#agentVersion) | **GET** /v1/agent/version | 
 

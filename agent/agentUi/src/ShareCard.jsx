@@ -1,10 +1,15 @@
 import ShareIcon from "@mui/icons-material/Share";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ShareCard = (props) => {
     let frontends = [];
     props.share.frontendEndpoint.map((fe) => {
         frontends.push(<a href={fe.toString()} target={"_"}>{fe}</a>);
     })
+
+    const releaseClicked = () => {
+        props.releaseShare({token: props.share.token}, (err, data) => { console.log("releaseClicked", data); });
+    }
 
     return (
         <div className={"card"}>
@@ -13,6 +18,7 @@ const ShareCard = (props) => {
             <p>
                 {props.share.backendEndpoint} &rarr; {frontends}
             </p>
+            <p><DeleteIcon onClick={releaseClicked}/></p>
         </div>
     );
 }

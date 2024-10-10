@@ -14,6 +14,8 @@
 
 import ApiClient from "../ApiClient";
 import RpcStatus from '../model/RpcStatus';
+import SharePrivateResponse from '../model/SharePrivateResponse';
+import SharePublicResponse from '../model/SharePublicResponse';
 import StatusResponse from '../model/StatusResponse';
 import VersionResponse from '../model/VersionResponse';
 
@@ -35,6 +37,149 @@ export default class AgentApi {
         this.apiClient = apiClient || ApiClient.instance;
     }
 
+
+    /**
+     * Callback function to receive the result of the agentReleaseShare operation.
+     * @callback module:api/AgentApi~agentReleaseShareCallback
+     * @param {String} error Error message, if any.
+     * @param {Object} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {String} [token] 
+     * @param {module:api/AgentApi~agentReleaseShareCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object}
+     */
+    agentReleaseShare(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'token': opts['token']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = Object;
+      return this.apiClient.callApi(
+        '/v1/agent/releaseShare', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the agentSharePrivate operation.
+     * @callback module:api/AgentApi~agentSharePrivateCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/SharePrivateResponse} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {String} [target] 
+     * @param {String} [backendMode] 
+     * @param {Boolean} [insecure] 
+     * @param {Boolean} [closed] 
+     * @param {Array.<String>} [accessGrants] 
+     * @param {module:api/AgentApi~agentSharePrivateCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/SharePrivateResponse}
+     */
+    agentSharePrivate(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'target': opts['target'],
+        'backendMode': opts['backendMode'],
+        'insecure': opts['insecure'],
+        'closed': opts['closed'],
+        'accessGrants': this.apiClient.buildCollectionParam(opts['accessGrants'], 'multi')
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = SharePrivateResponse;
+      return this.apiClient.callApi(
+        '/v1/agent/sharePrivate', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the agentSharePublic operation.
+     * @callback module:api/AgentApi~agentSharePublicCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/SharePublicResponse} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {String} [target] 
+     * @param {Array.<String>} [basicAuth] 
+     * @param {Array.<String>} [frontendSelection] 
+     * @param {String} [backendMode] 
+     * @param {Boolean} [insecure] 
+     * @param {String} [oauthProvider] 
+     * @param {Array.<String>} [oauthEmailAddressPatterns] 
+     * @param {String} [oauthCheckInterval] 
+     * @param {Boolean} [closed] 
+     * @param {Array.<String>} [accessGrants] 
+     * @param {module:api/AgentApi~agentSharePublicCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/SharePublicResponse}
+     */
+    agentSharePublic(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'target': opts['target'],
+        'basicAuth': this.apiClient.buildCollectionParam(opts['basicAuth'], 'multi'),
+        'frontendSelection': this.apiClient.buildCollectionParam(opts['frontendSelection'], 'multi'),
+        'backendMode': opts['backendMode'],
+        'insecure': opts['insecure'],
+        'oauthProvider': opts['oauthProvider'],
+        'oauthEmailAddressPatterns': this.apiClient.buildCollectionParam(opts['oauthEmailAddressPatterns'], 'multi'),
+        'oauthCheckInterval': opts['oauthCheckInterval'],
+        'closed': opts['closed'],
+        'accessGrants': this.apiClient.buildCollectionParam(opts['accessGrants'], 'multi')
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = SharePublicResponse;
+      return this.apiClient.callApi(
+        '/v1/agent/sharePublic', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the agentStatus operation.

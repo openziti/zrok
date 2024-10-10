@@ -5,12 +5,11 @@ import {useEffect, useState} from "react";
 import {AgentApi, ApiClient} from "./api/src/index.js";
 import buildOverview from "./model/overview.js";
 import NavBar from "./NavBar.jsx";
-import {Box, Modal} from "@mui/material";
+import {Box, Button, MenuItem, Modal, TextField} from "@mui/material";
+import {useFormik} from "formik";
 
 const AgentUi = () => {
     const [version, setVersion] = useState("");
-    const [shares, setShares] = useState([]);
-    const [accesses, setAccesses] = useState([]);
     const [overview, setOverview] = useState(new Map());
     const [newShare, setNewShare] = useState(false);
 
@@ -46,8 +45,6 @@ const AgentUi = () => {
         let interval = setInterval(() => {
             api.agentStatus((err, data) => {
                 if(mounted) {
-                    setShares(data.shares);
-                    setAccesses(data.accesses);
                     setOverview(buildOverview(data));
                 }
             });
@@ -58,16 +55,53 @@ const AgentUi = () => {
         }
     });
 
+    const releaseShare = (opts) => {
+        api.agentReleaseShare(opts, (err, data) => {
+            console.log(data);
+        })
+    }
+
     const router = createBrowserRouter([
         {
             path: "/",
-            element: <Overview version={version} overview={overview} />
+            element: <Overview releaseShare={releaseShare} version={version} overview={overview} shareClick={openNewShare} />
         },
         {
             path: "/share/:token",
-            element: <ShareDetail version={version} shares={shares} />
+            element: <ShareDetail version={version} />
         }
     ]);
+
+    const shareHandler = (values) => {
+        switch(values.shareMode) {
+            case "public":
+                api.agentSharePublic({
+                    target: values.target,
+                    backendMode: values.backendMode,
+                }, (err, data) => {
+                    closeNewShare();
+                });
+                break;
+
+            case "private":
+                api.agentSharePrivate({
+                    target: values.target,
+                    backendMode: values.backendMode,
+                }, (err, data) => {
+                    closeNewShare();
+                });
+                break;
+        }
+    }
+
+    const formik = useFormik({
+        initialValues: {
+            shareMode: "public",
+            backendMode: "proxy",
+            target: "",
+        },
+        onSubmit: shareHandler,
+    });
 
     return (
         <>
@@ -78,7 +112,51 @@ const AgentUi = () => {
                 onClose={closeNewShare}
             >
                 <Box sx={{ ...shareStyle }}>
-                    <h2>New Share</h2>
+                    <h2>Share...</h2>
+                    <form onSubmit={formik.handleSubmit}>
+                        <TextField
+                            fullWidth
+                            select
+                            id="shareMode"
+                            name="shareMode"
+                            label="Share Mode"
+                            value={formik.values.shareMode}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            sx={{ mt: 2 }}
+                        >
+                            <MenuItem value="public">public</MenuItem>
+                            <MenuItem value="private">private</MenuItem>
+                        </TextField>
+                        <TextField
+                            fullWidth select
+                            id="backendMode"
+                            name="backendMode"
+                            label="Backend Mode"
+                            value={formik.values.backendMode}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            sx={{ mt: 2 }}
+                        >
+                            <MenuItem value="proxy">proxy</MenuItem>
+                            <MenuItem value="web">web</MenuItem>
+                        </TextField>
+                        <TextField
+                            fullWidth
+                            id="target"
+                            name="target"
+                            label="Target"
+                            value={formik.values.target}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            sx={{ mt: 2 }}
+                        >
+
+                        </TextField>
+                        <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>
+                            Create Share
+                        </Button>
+                    </form>
                 </Box>
             </Modal>
         </>
