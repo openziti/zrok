@@ -13,6 +13,7 @@
 
 
 import ApiClient from "../ApiClient";
+import AccessPrivateResponse from '../model/AccessPrivateResponse';
 import RpcStatus from '../model/RpcStatus';
 import SharePrivateResponse from '../model/SharePrivateResponse';
 import SharePublicResponse from '../model/SharePublicResponse';
@@ -37,6 +38,88 @@ export default class AgentApi {
         this.apiClient = apiClient || ApiClient.instance;
     }
 
+
+    /**
+     * Callback function to receive the result of the agentAccessPrivate operation.
+     * @callback module:api/AgentApi~agentAccessPrivateCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/AccessPrivateResponse} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {String} [token] 
+     * @param {String} [bindAddress] 
+     * @param {Array.<String>} [responseHeaders] 
+     * @param {module:api/AgentApi~agentAccessPrivateCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/AccessPrivateResponse}
+     */
+    agentAccessPrivate(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'token': opts['token'],
+        'bindAddress': opts['bindAddress'],
+        'responseHeaders': this.apiClient.buildCollectionParam(opts['responseHeaders'], 'multi')
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = AccessPrivateResponse;
+      return this.apiClient.callApi(
+        '/v1/agent/accessPrivate', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the agentReleaseAccess operation.
+     * @callback module:api/AgentApi~agentReleaseAccessCallback
+     * @param {String} error Error message, if any.
+     * @param {Object} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * @param {Object} opts Optional parameters
+     * @param {String} [frontendToken] 
+     * @param {module:api/AgentApi~agentReleaseAccessCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object}
+     */
+    agentReleaseAccess(opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'frontendToken': opts['frontendToken']
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = Object;
+      return this.apiClient.callApi(
+        '/v1/agent/releaseAccess', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the agentReleaseShare operation.

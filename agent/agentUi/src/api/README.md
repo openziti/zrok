@@ -104,7 +104,9 @@ var AgentAgentGrpcAgentProto = require('agent_agent_grpc_agent_proto');
 
 var api = new AgentAgentGrpcAgentProto.AgentApi()
 var opts = {
-  'token': "token_example" // {String} 
+  'token': "token_example", // {String} 
+  'bindAddress': "bindAddress_example", // {String} 
+  'responseHeaders': ["null"] // {[String]} 
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -113,7 +115,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.agentReleaseShare(opts, callback);
+api.agentAccessPrivate(opts, callback);
 
 ```
 
@@ -123,6 +125,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AgentAgentGrpcAgentProto.AgentApi* | [**agentAccessPrivate**](docs/AgentApi.md#agentAccessPrivate) | **POST** /v1/agent/accessPrivate | 
+*AgentAgentGrpcAgentProto.AgentApi* | [**agentReleaseAccess**](docs/AgentApi.md#agentReleaseAccess) | **POST** /v1/agent/releaseAccess | 
 *AgentAgentGrpcAgentProto.AgentApi* | [**agentReleaseShare**](docs/AgentApi.md#agentReleaseShare) | **POST** /v1/agent/releaseShare | 
 *AgentAgentGrpcAgentProto.AgentApi* | [**agentSharePrivate**](docs/AgentApi.md#agentSharePrivate) | **POST** /v1/agent/sharePrivate | 
 *AgentAgentGrpcAgentProto.AgentApi* | [**agentSharePublic**](docs/AgentApi.md#agentSharePublic) | **POST** /v1/agent/sharePublic | 

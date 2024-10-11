@@ -10,17 +10,17 @@ const Overview = (props) => {
         props.overview.forEach((row) => {
             switch(row.type) {
                 case "share":
-                    cards.push(<ShareCard releaseShare={props.releaseShare} share={row.v} />);
+                    cards.push(<ShareCard releaseShare={props.releaseShare} share={row.v} key={row.v.token} />);
                     break;
 
                 case "access":
-                    cards.push(<AccessCard access={row.v} />);
+                    cards.push(<AccessCard releaseAccess={props.releaseAccess} access={row.v} key={row.v.frontendToken} />);
                     break;
             }
         });
     } else {
         cards.push(<div key="help" className={"card"}>
-            <h5>Your zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"}>access <LanIcon /></a> share to get started.</h5>
+            <h5>Your zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"} onClick={props.accessClick}>access <LanIcon /></a> share to get started.</h5>
         </div>);
     }
 

@@ -12,6 +12,7 @@ const AgentUi = () => {
     const [version, setVersion] = useState("");
     const [overview, setOverview] = useState(new Map());
     const [newShare, setNewShare] = useState(false);
+    const [newAccess, setNewAccess] = useState(false);
 
     let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
     const openNewShare = () => {
@@ -20,7 +21,13 @@ const AgentUi = () => {
     const closeNewShare = () => {
         setNewShare(false);
     }
-    const shareStyle = {
+    const openNewAccess = () => {
+        setNewAccess(true);
+    }
+    const closeNewAccess = () => {
+        setNewAccess(false);
+    }
+    const modalStyle = {
         position: 'absolute',
         top: '25%',
         left: '50%',
@@ -58,13 +65,27 @@ const AgentUi = () => {
     const releaseShare = (opts) => {
         api.agentReleaseShare(opts, (err, data) => {
             console.log(data);
-        })
+        });
+    }
+
+    const releaseAccess = (opts) => {
+        console.log("opts", opts);
+        api.agentReleaseAccess(opts, (err, data) => {
+            console.log(data);
+        });
     }
 
     const router = createBrowserRouter([
         {
             path: "/",
-            element: <Overview releaseShare={releaseShare} version={version} overview={overview} shareClick={openNewShare} />
+            element: <Overview
+                releaseShare={releaseShare}
+                releaseAccess={releaseAccess}
+                version={version}
+                overview={overview}
+                shareClick={openNewShare}
+                accessClick={openNewAccess}
+            />
         },
         {
             path: "/share/:token",
@@ -94,7 +115,16 @@ const AgentUi = () => {
         }
     }
 
-    const formik = useFormik({
+    const accessHandler = (values) => {
+        api.agentAccessPrivate({
+            token: values.token,
+            bindAddress: values.bindAddress,
+        }, (err, data) => {
+            closeNewAccess();
+        });
+    }
+
+    const newShareForm = useFormik({
         initialValues: {
             shareMode: "public",
             backendMode: "proxy",
@@ -103,26 +133,34 @@ const AgentUi = () => {
         onSubmit: shareHandler,
     });
 
+    const newAccessForm = useFormik({
+        initialValues: {
+            token: "",
+            bindAddress: "",
+        },
+        onSubmit: accessHandler,
+    })
+
     return (
         <>
-            <NavBar version={version} shareClick={openNewShare} />
+            <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
             <RouterProvider router={router} />
             <Modal
                 open={newShare}
                 onClose={closeNewShare}
             >
-                <Box sx={{ ...shareStyle }}>
+                <Box sx={{ ...modalStyle }}>
                     <h2>Share...</h2>
-                    <form onSubmit={formik.handleSubmit}>
+                    <form onSubmit={newShareForm.handleSubmit}>
                         <TextField
                             fullWidth
                             select
                             id="shareMode"
                             name="shareMode"
                             label="Share Mode"
-                            value={formik.values.shareMode}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
+                            value={newShareForm.values.shareMode}
+                            onChange={newShareForm.handleChange}
+                            onBlur={newShareForm.handleBlur}
                             sx={{ mt: 2 }}
                         >
                             <MenuItem value="public">public</MenuItem>
@@ -133,9 +171,9 @@ const AgentUi = () => {
                             id="backendMode"
                             name="backendMode"
                             label="Backend Mode"
-                            value={formik.values.backendMode}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
+                            value={newShareForm.values.backendMode}
+                            onChange={newShareForm.handleChange}
+                            onBlur={newShareForm.handleBlur}
                             sx={{ mt: 2 }}
                         >
                             <MenuItem value="proxy">proxy</MenuItem>
@@ -146,21 +184,48 @@ const AgentUi = () => {
                             id="target"
                             name="target"
                             label="Target"
-                            value={formik.values.target}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
+                            value={newShareForm.values.target}
+                            onChange={newShareForm.handleChange}
+                            onBlur={newShareForm.handleBlur}
                             sx={{ mt: 2 }}
-                        >
-
-                        </TextField>
-                        <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>
-                            Create Share
-                        </Button>
+                        />
+                        <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>Create Share</Button>
+                    </form>
+                </Box>
+            </Modal>
+            <Modal
+                open={newAccess}
+                onClose={closeNewAccess}
+            >
+                <Box sx={{...modalStyle}}>
+                    <h2>Access...</h2>
+                    <form onSubmit={newAccessForm.handleSubmit}>
+                        <TextField
+                            fullWidth
+                            id="token"
+                            name="token"
+                            label="Share Token"
+                            value={newAccessForm.values.token}
+                            onChange={newAccessForm.handleChange}
+                            onBlur={newAccessForm.handleBlur}
+                            sx={{ mt: 2 }}
+                        />
+                        <TextField
+                            fullWidth
+                            id="bindAddress"
+                            name="bindAddress"
+                            label="Bind Address"
+                            value={newAccessForm.values.bindAddress}
+                            onChange={newAccessForm.handleChange}
+                            onBlur={newAccessForm.handleBlur}
+                            sx={{ mt: 2 }}
+                        />
+                        <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>Create Access</Button>
                     </form>
                 </Box>
             </Modal>
         </>
-    );
+);
 }
 
 export default AgentUi;

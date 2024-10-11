@@ -19,8 +19,8 @@ const NavBar = (props) => {
                 <Typography variant="p" component={"div"} sx={{flexGrow: 1}}>
                     zrok Agent { props.version !== "" ? " | " + props.version : ""}
                 </Typography>
-                <Button color="inherit" onClick={props.shareClick}><LanIcon /></Button>
-                <Button color="inherit"><ShareIcon /></Button>
+                <Button color="inherit" onClick={props.shareClick}><ShareIcon /></Button>
+                <Button color="inherit" onClick={props.accessClick}><LanIcon /></Button>
             </Toolbar>
         </AppBar>
     )
