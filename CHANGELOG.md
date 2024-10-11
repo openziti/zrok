@@ -8,6 +8,10 @@ FEATURE: New "zrok Agent", a background manager process for your zrok environmen
 
 FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
 
+## v0.4.42
+
+FIX: always append common options like `--headless` and conditionally append `--verbose --insecure` if their respective env vars are set to when running in a service manager like systemd or Docker and wrapping the `zrok` command with the `zrok-share.bash` shell script (https://openziti.discourse.group/t/question-about-reserved-public-vs-temp-public-shares/3169)
+
 ## v0.4.41
 
 FIX: Fixed crash when invoking `zrok share reserved` with no arguments (https://github.com/openziti/zrok/issues/740)
