@@ -12,6 +12,8 @@ FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now au
 
 FIX: always append common options like `--headless` and conditionally append `--verbose --insecure` if their respective env vars are set to when running in a service manager like systemd or Docker and wrapping the `zrok` command with the `zrok-share.bash` shell script (https://openziti.discourse.group/t/question-about-reserved-public-vs-temp-public-shares/3169)
 
+FIX: Correct registration page CSS to ensure that the entire form is visible
+
 ## v0.4.41
 
 FIX: Fixed crash when invoking `zrok share reserved` with no arguments (https://github.com/openziti/zrok/issues/740)
