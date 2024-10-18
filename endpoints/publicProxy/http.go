@@ -95,7 +95,7 @@ type zitiDialContext struct {
 
 func (c *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
 	shrToken := strings.Split(addr, ":")[0] // ignore :port (we get passed 'host:port')
-	conn, err := c.ctx.Dial(shrToken)
+	conn, err := c.ctx.DialWithOptions(shrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 	if err != nil {
 		return conn, err
 	}

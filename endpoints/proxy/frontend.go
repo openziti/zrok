@@ -91,7 +91,7 @@ type zitiDialContext struct {
 }
 
 func (zdc *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Conn, error) {
-	conn, err := zdc.ctx.Dial(zdc.shrToken)
+	conn, err := zdc.ctx.DialWithOptions(zdc.shrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 	if err != nil {
 		return conn, err
 	}

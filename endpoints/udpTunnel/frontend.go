@@ -148,7 +148,7 @@ func (f *Frontend) Run() error {
 				_ = clt.zitiConn.Close()
 			}
 		} else {
-			zitiConn, err := f.zCtx.Dial(f.cfg.ShrToken)
+			zitiConn, err := f.zCtx.DialWithOptions(f.cfg.ShrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 			if err != nil {
 				logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
 				continue
