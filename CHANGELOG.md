@@ -2,6 +2,8 @@
 
 ## v0.4.42
 
+CHANGE: Switch all `Dial` operations made into the OpenZiti overlay to use `DialWithOptions(..., &ziti.DialOptions{ConnectTimeout: 30 * time.Second})`, switching to a 30 second timeout from a 5 second default (https://github.com/openziti/zrok/issues/772)
+
 FIX: always append common options like `--headless` and conditionally append `--verbose --insecure` if their respective env vars are set to when running in a service manager like systemd or Docker and wrapping the `zrok` command with the `zrok-share.bash` shell script (https://openziti.discourse.group/t/question-about-reserved-public-vs-temp-public-shares/3169)
 
 FIX: Correct registration page CSS to ensure that the entire form is visible
