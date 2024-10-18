@@ -69,7 +69,7 @@ func (f *Frontend) Run() error {
 }
 
 func (f *Frontend) accept(conn net.Conn) {
-	if zConn, err := f.zCtx.Dial(f.cfg.ShrToken); err == nil {
+	if zConn, err := f.zCtx.DialWithOptions(f.cfg.ShrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second}); err == nil {
 		go endpoints.TXer(conn, zConn)
 		go endpoints.TXer(zConn, conn)
 		if f.cfg.RequestsChan != nil {
