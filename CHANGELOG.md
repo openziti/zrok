@@ -2,6 +2,8 @@
 
 ## v0.4.42
 
+CHANGE: Switch all `Dial` operations made into the OpenZiti overlay to use `DialWithOptions(..., &ziti.DialOptions{ConnectTimeout: 30 * time.Second})`, switching to a 30 second timeout from a 5 second default (https://github.com/openziti/zrok/issues/772)
+
 FIX: Removed the `--basic-auth` flag from `zrok share private` as this was ignored... even if `zrok access private` honored the `ziti.proxy.v1` config to ask for basic auth, it would still be easy to write a custom SDK client that ignored the basic auth and accessed the share directly; better to remove the option than to allow confusing usage (https://github.com/openziti/zrok/issues/770)
 
 FIX: always append common options like `--headless` and conditionally append `--verbose --insecure` if their respective env vars are set to when running in a service manager like systemd or Docker and wrapping the `zrok` command with the `zrok-share.bash` shell script (https://openziti.discourse.group/t/question-about-reserved-public-vs-temp-public-shares/3169)

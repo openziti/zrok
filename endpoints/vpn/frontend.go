@@ -45,7 +45,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 
-	zConn, err := zCtx.Dial(cfg.ShrToken)
+	zConn, err := zCtx.DialWithOptions(cfg.ShrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 	if err != nil {
 		zCtx.Close()
 		return nil, errors.Wrap(err, "error connecting to ziti")

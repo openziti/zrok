@@ -76,7 +76,7 @@ func (cmd *testWebsocketCommand) run(_ *cobra.Command, args []string) {
 		}
 		dial := func(_ context.Context, _, addr string) (net.Conn, error) {
 			service := strings.Split(addr, ":")[0]
-			return zitiContext.Dial(service)
+			return zitiContext.DialWithOptions(service, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 		}
 
 		zitiTransport := http.DefaultTransport.(*http.Transport).Clone()

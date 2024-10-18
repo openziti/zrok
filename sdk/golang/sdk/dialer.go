@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/pkg/errors"
+	"time"
 )
 
 func NewDialer(shrToken string, root env_core.Root) (edge.Conn, error) {
@@ -23,7 +24,7 @@ func NewDialer(shrToken string, root env_core.Root) (edge.Conn, error) {
 		return nil, errors.Wrap(err, "error getting ziti context")
 	}
 
-	conn, err := zctx.Dial(shrToken)
+	conn, err := zctx.DialWithOptions(shrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 	if err != nil {
 		return nil, errors.Wrapf(err, "error dialing '%v'", shrToken)
 	}
