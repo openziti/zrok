@@ -8,6 +8,10 @@ FEATURE: New "zrok Agent", a background manager process for your zrok environmen
 
 FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
 
+## v0.4.43
+
+CHANGE: Update `github.com/openziti/sdk-golang` to version `v0.23.44`. Remove old `github.com/openziti/fabric` dependency, instead pulling in the modern `github.com/openziti/ziti` dependency.
+
 ## v0.4.42
 
 CHANGE: Switch all `Dial` operations made into the OpenZiti overlay to use `DialWithOptions(..., &ziti.DialOptions{ConnectTimeout: 30 * time.Second})`, switching to a 30 second timeout from a 5 second default (https://github.com/openziti/zrok/issues/772)
