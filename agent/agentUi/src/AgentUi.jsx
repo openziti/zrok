@@ -144,6 +144,7 @@ const AgentUi = () => {
         <>
             <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
             <RouterProvider router={router} />
+
             <Modal
                 open={newShare}
                 onClose={closeNewShare}
