@@ -1,5 +1,6 @@
 import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {Card} from "@mui/material";
 
 const ShareCard = (props) => {
     let frontends = [];
@@ -12,14 +13,14 @@ const ShareCard = (props) => {
     }
 
     return (
-        <div className={"card"}>
+        <Card sx={{ mt: 2, p: 2 }}>
             <h2>{props.share.token} [<ShareIcon />]</h2>
             <p>({props.share.shareMode}, {props.share.backendMode})</p>
             <p>
                 {props.share.backendEndpoint} &rarr; {frontends}
             </p>
             <p><DeleteIcon onClick={releaseClicked}/></p>
-        </div>
+        </Card>
     );
 }
 

@@ -3,6 +3,7 @@ import ShareCard from "./ShareCard.jsx";
 import AccessCard from "./AccessCard.jsx";
 import LanIcon from "@mui/icons-material/Lan";
 import ShareIcon from "@mui/icons-material/Share";
+import {Card} from "@mui/material";
 
 const Overview = (props) => {
     let cards = [];
@@ -19,9 +20,7 @@ const Overview = (props) => {
             }
         });
     } else {
-        cards.push(<div key="help" className={"card"}>
-            <h5>Your zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"} onClick={props.accessClick}>access <LanIcon /></a> share to get started.</h5>
-        </div>);
+        cards.push(<Card sx={{ mt: 2, p: 2}}><h5>zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"} onClick={props.accessClick}>access <LanIcon /></a> share to get started.</h5></Card>);
     }
 
     return <>{cards}</>;

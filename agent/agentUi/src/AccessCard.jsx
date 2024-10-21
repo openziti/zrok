@@ -1,5 +1,6 @@
 import LanIcon from "@mui/icons-material/Lan";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {Card} from "@mui/material";
 
 const AccessCard = (props) => {
     const releaseClicked = () => {
@@ -7,13 +8,13 @@ const AccessCard = (props) => {
     }
 
     return (
-        <div className={"card"}>
+        <Card sx={{ mt: 2, p: 2 }}>
             <h2>{props.access.frontendToken} [<LanIcon/>]</h2>
             <p>
                 {props.access.token} &rarr; {props.access.bindAddress}
             </p>
             <p><DeleteIcon onClick={releaseClicked}/></p>
-        </div>
+        </Card>
     );
 }
 
