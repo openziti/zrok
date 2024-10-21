@@ -2,9 +2,28 @@ import "./index.css";
 import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import AgentUi from "./AgentUi.jsx";
+import {createTheme, ThemeProvider} from "@mui/material";
+
+export const themeOptions = {
+    palette: {
+        mode: 'light',
+        primary: {
+            main: '#241775',
+        },
+        secondary: {
+            main: '#9bf316',
+        },
+    },
+    typography: {
+        fontFamily: 'Poppins',
+    },
+};
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-      <AgentUi />
+      <ThemeProvider theme={createTheme(themeOptions)}>
+          <AgentUi />
+      </ThemeProvider>
   </StrictMode>,
 )
