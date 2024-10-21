@@ -13,7 +13,7 @@ const ShareCard = (props) => {
     }
 
     return (
-        <Card sx={{ mt: 2, p: 2 }}>
+        <Card>
             <h2>{props.share.token} [<ShareIcon />]</h2>
             <p>({props.share.shareMode}, {props.share.backendMode})</p>
             <p>

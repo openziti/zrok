@@ -5,6 +5,16 @@ import AgentUi from "./AgentUi.jsx";
 import {createTheme, ThemeProvider} from "@mui/material";
 
 export const themeOptions = {
+    components: {
+        MuiCard: {
+            styleOverrides: {
+                root: ({theme}) => theme.unstable_sx({
+                    mt: 5,
+                    p: 2.5,
+                }),
+            }
+        },
+    },
     palette: {
         mode: 'light',
         primary: {
@@ -16,9 +26,8 @@ export const themeOptions = {
     },
     typography: {
         fontFamily: 'Poppins',
-    },
+    }
 };
-
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
