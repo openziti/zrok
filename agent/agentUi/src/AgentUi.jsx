@@ -69,7 +69,6 @@ const AgentUi = () => {
     }
 
     const releaseAccess = (opts) => {
-        console.log("opts", opts);
         api.agentReleaseAccess(opts, (err, data) => {
             console.log(data);
         });

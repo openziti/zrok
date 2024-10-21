@@ -11,9 +11,17 @@ export const themeOptions = {
                 root: ({theme}) => theme.unstable_sx({
                     mt: 5,
                     p: 2.5,
+                    borderRadius: 2,
                 }),
             }
         },
+        MuiAppBar: {
+            styleOverrides: {
+                root : ({theme}) => theme.unstable_sx({
+                    borderRadius: 2,
+                }),
+            }
+        }
     },
     palette: {
         mode: 'light',
