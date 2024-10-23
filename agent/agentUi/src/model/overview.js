@@ -1,18 +1,22 @@
 const buildOverview = (status) => {
-    let overview = new Map();
+    let overview = [];
     if(status) {
-        status.accesses.map(acc => {
-            overview.set(acc.frontendToken, {
-                type: "access",
-                v: acc
+        if(status.accesses) {
+            status.accesses.forEach(acc => {
+                overview.push({
+                    type: "access",
+                    v: structuredClone(acc)
+                });
             });
-        });
-        status.shares.map(shr => {
-            overview.set(shr.token, {
-                type: "share",
-                v: shr
-            })
-        });
+        }
+        if(status.shares) {
+            status.shares.forEach(shr => {
+                overview.push({
+                    type: "share",
+                    v: structuredClone(shr)
+                });
+            });
+        }
     }
     return overview;
 }

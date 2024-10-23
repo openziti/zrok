@@ -15,31 +15,29 @@
 import {ApiClient} from '../ApiClient';
 
 /**
- * The ProtobufAny model module.
- * @module model/ProtobufAny
+ * The ReleaseShareResponse model module.
+ * @module model/ReleaseShareResponse
  * @version version not set
  */
-export class ProtobufAny {
+export class ReleaseShareResponse {
   /**
-   * Constructs a new <code>ProtobufAny</code>.
-   * @alias module:model/ProtobufAny
+   * Constructs a new <code>ReleaseShareResponse</code>.
+   * @alias module:model/ReleaseShareResponse
    * @class
-   * @extends Object
    */
   constructor() {
   }
 
   /**
-   * Constructs a <code>ProtobufAny</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>ReleaseShareResponse</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/ProtobufAny} obj Optional instance to populate.
-   * @return {module:model/ProtobufAny} The populated <code>ProtobufAny</code> instance.
+   * @param {module:model/ReleaseShareResponse} obj Optional instance to populate.
+   * @return {module:model/ReleaseShareResponse} The populated <code>ReleaseShareResponse</code> instance.
    */
   static constructFromObject(data, obj) {
     if (data) {
-      obj = obj || new ProtobufAny();
-      ApiClient.constructFromObject(data, obj, 'Object');
+      obj = obj || new ReleaseShareResponse();
     }
     return obj;
   }

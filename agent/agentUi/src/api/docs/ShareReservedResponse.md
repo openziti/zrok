@@ -1,7 +1,6 @@
-# AgentAgentGrpcAgentProto.ShareReservedResponse
+# AgentagentGrpcagentproto.ShareReservedResponse
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **token** | **String** |  | [optional] 
@@ -9,5 +8,3 @@ Name | Type | Description | Notes
 **shareMode** | **String** |  | [optional] 
 **frontendEndpoints** | **[String]** |  | [optional] 
 **target** | **String** |  | [optional] 
-
-

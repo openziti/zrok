@@ -15,31 +15,29 @@
 import {ApiClient} from '../ApiClient';
 
 /**
- * The ProtobufAny model module.
- * @module model/ProtobufAny
+ * The ReleaseAccessResponse model module.
+ * @module model/ReleaseAccessResponse
  * @version version not set
  */
-export class ProtobufAny {
+export class ReleaseAccessResponse {
   /**
-   * Constructs a new <code>ProtobufAny</code>.
-   * @alias module:model/ProtobufAny
+   * Constructs a new <code>ReleaseAccessResponse</code>.
+   * @alias module:model/ReleaseAccessResponse
    * @class
-   * @extends Object
    */
   constructor() {
   }
 
   /**
-   * Constructs a <code>ProtobufAny</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>ReleaseAccessResponse</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/ProtobufAny} obj Optional instance to populate.
-   * @return {module:model/ProtobufAny} The populated <code>ProtobufAny</code> instance.
+   * @param {module:model/ReleaseAccessResponse} obj Optional instance to populate.
+   * @return {module:model/ReleaseAccessResponse} The populated <code>ReleaseAccessResponse</code> instance.
    */
   static constructFromObject(data, obj) {
     if (data) {
-      obj = obj || new ProtobufAny();
-      ApiClient.constructFromObject(data, obj, 'Object');
+      obj = obj || new ReleaseAccessResponse();
     }
     return obj;
   }

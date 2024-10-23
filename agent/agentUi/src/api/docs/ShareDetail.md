@@ -1,7 +1,6 @@
-# AgentAgentGrpcAgentProto.ShareDetail
+# AgentagentGrpcagentproto.ShareDetail
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **token** | **String** |  | [optional] 
@@ -12,5 +11,3 @@ Name | Type | Description | Notes
 **backendEndpoint** | **String** |  | [optional] 
 **closed** | **Boolean** |  | [optional] 
 **status** | **String** |  | [optional] 
-
-

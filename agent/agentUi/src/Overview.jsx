@@ -4,10 +4,11 @@ import AccessCard from "./AccessCard.jsx";
 import LanIcon from "@mui/icons-material/Lan";
 import ShareIcon from "@mui/icons-material/Share";
 import {Card} from "@mui/material";
+import buildOverview from "./model/overview.js";
 
 const Overview = (props) => {
     let cards = [];
-    if(props.overview.size > 0) {
+    if(props.overview.length > 0) {
         props.overview.forEach((row) => {
             switch(row.type) {
                 case "share":

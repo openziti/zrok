@@ -1,8 +1,11 @@
 import {AgentApi, ApiClient} from "../api/src/index.js";
 
-let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
+export const getAgentApi = () => {
+    return new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
+}
 
 export const shareHandler = (values) => {
+    let api = getAgentApi();
     switch(values.shareMode) {
         case "public":
             api.agentSharePublic({
@@ -25,7 +28,7 @@ export const shareHandler = (values) => {
 }
 
 export const accessHandler = (values) => {
-    api.agentAccessPrivate({
+    getAgentApi().agentAccessPrivate({
         token: values.token,
         bindAddress: values.bindAddress,
     }, (err, data) => {
@@ -34,13 +37,13 @@ export const accessHandler = (values) => {
 }
 
 export const releaseShare = (opts) => {
-    api.agentReleaseShare(opts, (err, data) => {
+    getAgentApi().agentReleaseShare(opts, (err, data) => {
         console.log(data);
     });
 }
 
 export const releaseAccess = (opts) => {
-    api.agentReleaseAccess(opts, (err, data) => {
+    getAgentApi().agentReleaseAccess(opts, (err, data) => {
         console.log(data);
     });
 }

@@ -29,14 +29,14 @@
   var instance;
 
   describe('(package)', function() {
-    describe('ProtobufAny', function() {
+    describe('ReleaseAccessResponse', function() {
       beforeEach(function() {
-        instance = new AgentagentGrpcagentproto.ProtobufAny();
+        instance = new AgentagentGrpcagentproto.ReleaseAccessResponse();
       });
 
-      it('should create an instance of ProtobufAny', function() {
-        // TODO: update the code to test ProtobufAny
-        expect(instance).to.be.a(AgentagentGrpcagentproto.ProtobufAny);
+      it('should create an instance of ReleaseAccessResponse', function() {
+        // TODO: update the code to test ReleaseAccessResponse
+        expect(instance).to.be.a(AgentagentGrpcagentproto.ReleaseAccessResponse);
       });
 
     });

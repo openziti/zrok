@@ -1,6 +1,6 @@
-# AgentAgentGrpcAgentProto.AgentApi
+# AgentagentGrpcagentproto.AgentApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to */*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -12,24 +12,21 @@ Method | HTTP request | Description
 [**agentStatus**](AgentApi.md#agentStatus) | **GET** /v1/agent/status | 
 [**agentVersion**](AgentApi.md#agentVersion) | **GET** /v1/agent/version | 
 
-
-
-## agentAccessPrivate
-
+<a name="agentAccessPrivate"></a>
+# **agentAccessPrivate**
 > AccessPrivateResponse agentAccessPrivate(opts)
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
-let opts = {
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
+let opts = { 
   'token': "token_example", // String | 
   'bindAddress': "bindAddress_example", // String | 
-  'responseHeaders': ["null"] // [String] | 
+  'responseHeaders': ["responseHeaders_example"] // [String] | 
 };
 apiInstance.agentAccessPrivate(opts, (error, data, response) => {
   if (error) {
@@ -41,7 +38,6 @@ apiInstance.agentAccessPrivate(opts, (error, data, response) => {
 ```
 
 ### Parameters
-
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -59,23 +55,21 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentReleaseAccess
-
-> Object agentReleaseAccess(opts)
+<a name="agentReleaseAccess"></a>
+# **agentReleaseAccess**
+> ReleaseAccessResponse agentReleaseAccess(opts)
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
-let opts = {
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
+let opts = { 
   'frontendToken': "frontendToken_example" // String | 
 };
 apiInstance.agentReleaseAccess(opts, (error, data, response) => {
@@ -89,14 +83,13 @@ apiInstance.agentReleaseAccess(opts, (error, data, response) => {
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **frontendToken** | **String**|  | [optional] 
 
 ### Return type
 
-**Object**
+[**ReleaseAccessResponse**](ReleaseAccessResponse.md)
 
 ### Authorization
 
@@ -104,23 +97,21 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentReleaseShare
-
-> Object agentReleaseShare(opts)
+<a name="agentReleaseShare"></a>
+# **agentReleaseShare**
+> ReleaseShareResponse agentReleaseShare(opts)
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
-let opts = {
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
+let opts = { 
   'token': "token_example" // String | 
 };
 apiInstance.agentReleaseShare(opts, (error, data, response) => {
@@ -134,14 +125,13 @@ apiInstance.agentReleaseShare(opts, (error, data, response) => {
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **token** | **String**|  | [optional] 
 
 ### Return type
 
-**Object**
+[**ReleaseShareResponse**](ReleaseShareResponse.md)
 
 ### Authorization
 
@@ -149,28 +139,26 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentSharePrivate
-
+<a name="agentSharePrivate"></a>
+# **agentSharePrivate**
 > SharePrivateResponse agentSharePrivate(opts)
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
-let opts = {
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
+let opts = { 
   'target': "target_example", // String | 
   'backendMode': "backendMode_example", // String | 
   'insecure': true, // Boolean | 
   'closed': true, // Boolean | 
-  'accessGrants': ["null"] // [String] | 
+  'accessGrants': ["accessGrants_example"] // [String] | 
 };
 apiInstance.agentSharePrivate(opts, (error, data, response) => {
   if (error) {
@@ -182,7 +170,6 @@ apiInstance.agentSharePrivate(opts, (error, data, response) => {
 ```
 
 ### Parameters
-
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -202,33 +189,31 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentSharePublic
-
+<a name="agentSharePublic"></a>
+# **agentSharePublic**
 > SharePublicResponse agentSharePublic(opts)
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
-let opts = {
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
+let opts = { 
   'target': "target_example", // String | 
-  'basicAuth': ["null"], // [String] | 
-  'frontendSelection': ["null"], // [String] | 
+  'basicAuth': ["basicAuth_example"], // [String] | 
+  'frontendSelection': ["frontendSelection_example"], // [String] | 
   'backendMode': "backendMode_example", // String | 
   'insecure': true, // Boolean | 
   'oauthProvider': "oauthProvider_example", // String | 
-  'oauthEmailAddressPatterns': ["null"], // [String] | 
+  'oauthEmailAddressPatterns': ["oauthEmailAddressPatterns_example"], // [String] | 
   'oauthCheckInterval': "oauthCheckInterval_example", // String | 
   'closed': true, // Boolean | 
-  'accessGrants': ["null"] // [String] | 
+  'accessGrants': ["accessGrants_example"] // [String] | 
 };
 apiInstance.agentSharePublic(opts, (error, data, response) => {
   if (error) {
@@ -240,7 +225,6 @@ apiInstance.agentSharePublic(opts, (error, data, response) => {
 ```
 
 ### Parameters
-
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -265,22 +249,20 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentStatus
-
+<a name="agentStatus"></a>
+# **agentStatus**
 > StatusResponse agentStatus()
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
 apiInstance.agentStatus((error, data, response) => {
   if (error) {
     console.error(error);
@@ -291,7 +273,6 @@ apiInstance.agentStatus((error, data, response) => {
 ```
 
 ### Parameters
-
 This endpoint does not need any parameter.
 
 ### Return type
@@ -304,22 +285,20 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-
-## agentVersion
-
+<a name="agentVersion"></a>
+# **agentVersion**
 > VersionResponse agentVersion()
 
 
 
 ### Example
-
 ```javascript
-import AgentAgentGrpcAgentProto from 'agent_agent_grpc_agent_proto';
+import {AgentagentGrpcagentproto} from 'agentagent_grpcagentproto';
 
-let apiInstance = new AgentAgentGrpcAgentProto.AgentApi();
+let apiInstance = new AgentagentGrpcagentproto.AgentApi();
 apiInstance.agentVersion((error, data, response) => {
   if (error) {
     console.error(error);
@@ -330,7 +309,6 @@ apiInstance.agentVersion((error, data, response) => {
 ```
 
 ### Parameters
-
 This endpoint does not need any parameter.
 
 ### Return type
@@ -343,6 +321,6 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 

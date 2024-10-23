@@ -2,16 +2,15 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Overview from "./Overview.jsx";
 import ShareDetail from "./ShareDetail.jsx";
 import {useEffect, useState} from "react";
-import {AgentApi, ApiClient} from "./api/src/index.js";
 import buildOverview from "./model/overview.js";
 import NavBar from "./NavBar.jsx";
 import NewShareModal from "./NewShareModal.jsx";
 import NewAccessModal from "./NewAccessModal.jsx";
-import {accessHandler, releaseAccess, releaseShare, shareHandler} from "./model/handler.js";
+import {accessHandler, getAgentApi, releaseAccess, releaseShare, shareHandler} from "./model/handler.js";
 
 const AgentUi = () => {
     const [version, setVersion] = useState("");
-    const [overview, setOverview] = useState(new Map());
+    const [overview, setOverview] = useState([]);
 
     const [newShare, setNewShare] = useState(false);
     const openNewShare = () => {
@@ -29,36 +28,33 @@ const AgentUi = () => {
         setNewAccess(false);
     }
 
-    let api = new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
-
     useEffect(() => {
-        let mounted = true;
-        api.agentVersion((err, data) => {
-            if(mounted) {
-                setVersion(data.v);
-            }
+        getAgentApi().agentVersion((err, data) => {
+            setVersion(data.v);
         });
+        return () => {
+            setVersion("");
+        }
     }, []);
 
+    const newStatus = (err, data) => {
+        if(err) {
+            console.log("newState", err);
+            setOverview([]);
+        } else {
+            setOverview(buildOverview(data));
+        }
+    }
+
     useEffect(() => {
-        let mounted = true;
-        api.agentStatus((err, data) => {
-            if(mounted) {
-                setOverview(buildOverview(data));
-            }
-        });
         let interval = setInterval(() => {
-            api.agentStatus((err, data) => {
-                if(mounted) {
-                    setOverview(buildOverview(data));
-                }
-            });
+            getAgentApi().agentStatus(newStatus);
         }, 1000);
         return () => {
-            mounted = false;
             clearInterval(interval);
+            setOverview([]);
         }
-    });
+    }, []);
 
     const router = createBrowserRouter([
         {
@@ -85,7 +81,7 @@ const AgentUi = () => {
             <NewShareModal show={newShare} close={closeNewShare} handler={shareHandler} />
             <NewAccessModal show={newAccess} close={closeNewAccess} handler={accessHandler} />
         </>
-);
+    );
 }
 
 export default AgentUi;
