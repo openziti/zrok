@@ -12,11 +12,11 @@ const Overview = (props) => {
         props.overview.forEach((row) => {
             switch(row.type) {
                 case "share":
-                    cards.push(<ShareCard releaseShare={props.releaseShare} share={row.v} />);
+                    cards.push(<ShareCard key={row.v.token} releaseShare={props.releaseShare} share={row.v} />);
                     break;
 
                 case "access":
-                    cards.push(<AccessCard releaseAccess={props.releaseAccess} access={row.v} />);
+                    cards.push(<AccessCard key={row.v.frontendToken} releaseAccess={props.releaseAccess} access={row.v} />);
                     break;
             }
         });

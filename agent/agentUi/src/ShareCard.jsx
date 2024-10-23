@@ -5,7 +5,7 @@ import {Card} from "@mui/material";
 const ShareCard = (props) => {
     let frontends = [];
     props.share.frontendEndpoint.map((fe) => {
-        frontends.push(<a href={fe.toString()} target={"_"}>{fe}</a>);
+        frontends.push(<a key={props.share.token} href={fe.toString()} target={"_"}>{fe}</a>);
     })
 
     const releaseClicked = () => {
@@ -15,11 +15,11 @@ const ShareCard = (props) => {
     return (
         <Card>
             <h2>{props.share.token} [<ShareIcon />]</h2>
-            <p>({props.share.shareMode}, {props.share.backendMode})</p>
             <p>
-                {props.share.backendEndpoint} &rarr; {frontends}
+                ({props.share.shareMode}, {props.share.backendMode}) <br/>
+                {props.share.backendEndpoint} &rarr; {frontends} <br/>
+                <DeleteIcon onClick={releaseClicked}/>
             </p>
-            <p><DeleteIcon onClick={releaseClicked}/></p>
         </Card>
     );
 }

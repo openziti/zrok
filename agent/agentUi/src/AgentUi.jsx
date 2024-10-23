@@ -37,18 +37,16 @@ const AgentUi = () => {
         }
     }, []);
 
-    const newStatus = (err, data) => {
-        if(err) {
-            console.log("newState", err);
-            setOverview([]);
-        } else {
-            setOverview(buildOverview(data));
-        }
-    }
-
     useEffect(() => {
         let interval = setInterval(() => {
-            getAgentApi().agentStatus(newStatus);
+            getAgentApi().agentStatus((err, data) => {
+                if(err) {
+                    console.log("agentStatus", err);
+                    setOverview([]);
+                } else {
+                    setOverview(structuredClone(buildOverview(data)));
+                }
+            });
         }, 1000);
         return () => {
             clearInterval(interval);
