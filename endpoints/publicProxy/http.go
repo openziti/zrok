@@ -158,7 +158,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 		if shrToken != "" {
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-					if pcfg.Interstitial != nil && pcfg.Interstitial.Enabled {
+					if r.Method != http.MethodOptions && (pcfg.Interstitial != nil && pcfg.Interstitial.Enabled) {
 						sendInterstitial := true
 						if len(pcfg.Interstitial.UserAgentPrefixes) > 0 {
 							ua := r.Header.Get("User-Agent")
