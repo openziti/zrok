@@ -4,6 +4,8 @@
 
 CHANGE: Update `github.com/openziti/sdk-golang` to version `v0.23.44`. Remove old `github.com/openziti/fabric` dependency, instead pulling in the modern `github.com/openziti/ziti` dependency.
 
+FIX: Bypass interstitial page for HTTP `OPTIONS` method (https://github.com/openziti/zrok/issues/777)
+
 ## v0.4.42
 
 CHANGE: Switch all `Dial` operations made into the OpenZiti overlay to use `DialWithOptions(..., &ziti.DialOptions{ConnectTimeout: 30 * time.Second})`, switching to a 30 second timeout from a 5 second default (https://github.com/openziti/zrok/issues/772)
