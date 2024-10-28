@@ -1,49 +1,39 @@
 import {AgentApi, ApiClient} from "../api/src/index.js";
 
 export const getAgentApi = () => {
-    return new AgentApi(new ApiClient(window.location.protocol+'//'+window.location.host));
+    return new AgentApi(new ApiClient("http://localhost:5173"));
 }
 
-export const shareHandler = (values) => {
-    let api = getAgentApi();
-    switch(values.shareMode) {
+export const createShare = (opts) => {
+    switch(opts.shareMode) {
         case "public":
-            api.agentSharePublic({
-                target: values.target,
-                backendMode: values.backendMode,
-            }, (err, data) => {
-                console.log(err, data);
+            getAgentApi().agentSharePublic(opts, (e, d) => {
+                console.log("createShare", e, d);
             });
             break;
 
         case "private":
-            api.agentSharePrivate({
-                target: values.target,
-                backendMode: values.backendMode,
-            }, (err, data) => {
-                console.log(err, data);
-            });
+            getAgentApi().agentSharePrivate(opts, (e, d) => {
+                console.log("createShare", e, d);
+            })
             break;
     }
 }
 
-export const accessHandler = (values) => {
-    getAgentApi().agentAccessPrivate({
-        token: values.token,
-        bindAddress: values.bindAddress,
-    }, (err, data) => {
-        console.log(err, data);
-    });
+export const releaseShare = (opts) => {
+    getAgentApi().agentReleaseShare(opts, (e, d) => {
+        console.log("releaseShare", e, d);
+    })
 }
 
-export const releaseShare = (opts) => {
-    getAgentApi().agentReleaseShare(opts, (err, data) => {
-        console.log(data);
-    });
+export const createAccess = (opts) => {
+    getAgentApi().agentAccessPrivate(opts, (e, d) => {
+        console.log("createAccess", e, d);
+    })
 }
 
 export const releaseAccess = (opts) => {
-    getAgentApi().agentReleaseAccess(opts, (err, data) => {
-        console.log(data);
-    });
+    getAgentApi().agentReleaseAccess(opts, (e, d) => {
+        console.log("releaseAccess", e, d);
+    })
 }

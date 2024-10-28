@@ -1,19 +1,20 @@
 import LanIcon from "@mui/icons-material/Lan";
+import {Button, Card, Chip} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {Card} from "@mui/material";
+import {releaseAccess} from "./model/handler.js";
 
 const AccessCard = (props) => {
-    const releaseClicked = () => {
-        props.releaseAccess({frontendToken: props.access.frontendToken}, (err, data) => { console.log("releaseClicked", data); });
+    const deleteHandler = () => {
+        releaseAccess({ frontendToken: props.access.frontendToken });
     }
 
     return (
         <Card>
-            <h2>{props.access.frontendToken} [<LanIcon/>]</h2>
+            <h2><LanIcon /> {props.access.frontendToken}</h2>
             <p>
                 {props.access.token} &rarr; {props.access.bindAddress}
             </p>
-            <p><DeleteIcon onClick={releaseClicked}/></p>
+            <Button variant="outlined" onClick={deleteHandler}><DeleteIcon /></Button>
         </Card>
     );
 }

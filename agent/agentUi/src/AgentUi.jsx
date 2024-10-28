@@ -1,36 +1,34 @@
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import Overview from "./Overview.jsx";
-import ShareDetail from "./ShareDetail.jsx";
 import {useEffect, useState} from "react";
-import buildOverview from "./model/overview.js";
 import NavBar from "./NavBar.jsx";
-import NewShareModal from "./NewShareModal.jsx";
+import {getAgentApi} from "./model/handler.js";
+import {buildOverview} from "./model/overview.js";
+import Overview from "./Overview.jsx";
 import NewAccessModal from "./NewAccessModal.jsx";
-import {accessHandler, getAgentApi, releaseAccess, releaseShare, shareHandler} from "./model/handler.js";
+import NewShareModal from "./NewShareModal.jsx";
 
 const AgentUi = () => {
     const [version, setVersion] = useState("");
     const [overview, setOverview] = useState([]);
+    const [newAccessOpen, setNewAccessOpen] = useState(false);
+    const [newShareOpen, setNewShareOpen] = useState(false);
 
-    const [newShare, setNewShare] = useState(false);
-    const openNewShare = () => {
-        setNewShare(true);
-    }
-    const closeNewShare = () => {
-        setNewShare(false);
-    }
-
-    const [newAccess, setNewAccess] = useState(false);
     const openNewAccess = () => {
-        setNewAccess(true);
+        setNewAccessOpen(true);
     }
     const closeNewAccess = () => {
-        setNewAccess(false);
+        setNewAccessOpen(false);
+    }
+
+    const openNewShare = () => {
+        setNewShareOpen(true);
+    }
+    const closeNewShare = () => {
+        setNewShareOpen(false);
     }
 
     useEffect(() => {
-        getAgentApi().agentVersion((err, data) => {
-            setVersion(data.v);
+        getAgentApi().agentVersion((e, d) => {
+            setVersion(d.v);
         });
         return () => {
             setVersion("");
@@ -39,12 +37,12 @@ const AgentUi = () => {
 
     useEffect(() => {
         let interval = setInterval(() => {
-            getAgentApi().agentStatus((err, data) => {
-                if(err) {
-                    console.log("agentStatus", err);
+            getAgentApi().agentStatus((e, d) => {
+                if(e) {
                     setOverview([]);
+                    console.log("agentStatus", e);
                 } else {
-                    setOverview(structuredClone(buildOverview(data)));
+                    setOverview(buildOverview(d));
                 }
             });
         }, 1000);
@@ -54,30 +52,13 @@ const AgentUi = () => {
         }
     }, []);
 
-    const router = createBrowserRouter([
-        {
-            path: "/",
-            element: <Overview
-                releaseShare={releaseShare}
-                releaseAccess={releaseAccess}
-                version={version}
-                overview={overview}
-                shareClick={openNewShare}
-                accessClick={openNewAccess}
-            />
-        },
-        {
-            path: "/share/:token",
-            element: <ShareDetail version={version} />
-        }
-    ]);
 
     return (
         <>
             <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
-            <RouterProvider router={router} />
-            <NewShareModal show={newShare} close={closeNewShare} handler={shareHandler} />
-            <NewAccessModal show={newAccess} close={closeNewAccess} handler={accessHandler} />
+            <Overview overview={overview} />
+            <NewAccessModal isOpen={newAccessOpen} close={closeNewAccess} />
+            <NewShareModal isOpen={newShareOpen} close={closeNewShare} />
         </>
     );
 }

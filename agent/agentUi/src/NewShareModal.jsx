@@ -1,6 +1,7 @@
 import {Box, Button, MenuItem, Modal, TextField} from "@mui/material";
 import {useFormik} from "formik";
 import {modalStyle} from "./model/theme.js";
+import {createShare} from "./model/handler.js";
 
 const NewShareModal = (props) => {
     const newShareForm = useFormik({
@@ -10,14 +11,14 @@ const NewShareModal = (props) => {
             target: "",
         },
         onSubmit: (v) => {
-            props.handler(v);
+            createShare(v);
             props.close();
         },
     });
 
     return (
         <Modal
-            open={props.show}
+            open={props.isOpen}
             onClose={props.close}
         >
             <Box sx={{ ...modalStyle }}>

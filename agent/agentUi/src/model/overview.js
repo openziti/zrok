@@ -1,24 +1,20 @@
-const buildOverview = (status) => {
+export const buildOverview = (status) => {
     let overview = [];
     if(status) {
         if(status.accesses) {
             status.accesses.forEach(acc => {
-                overview.push({
-                    type: "access",
-                    v: structuredClone(acc)
-                });
+                let o = structuredClone(acc);
+                o["type"] = "access";
+                overview.push(o);
             });
         }
         if(status.shares) {
             status.shares.forEach(shr => {
-                overview.push({
-                    type: "share",
-                    v: structuredClone(shr)
-                });
+                let o = structuredClone(shr);
+                o["type"] = "share";
+                overview.push(o);
             });
         }
     }
     return overview;
 }
-
-export default buildOverview;

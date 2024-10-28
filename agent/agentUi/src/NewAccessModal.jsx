@@ -1,6 +1,7 @@
 import {Box, Button, Modal, TextField} from "@mui/material";
 import {useFormik} from "formik";
 import {modalStyle} from "./model/theme.js";
+import {createAccess} from "./model/handler.js";
 
 const NewAccessModal = (props) => {
     const newAccessForm = useFormik({
@@ -9,14 +10,14 @@ const NewAccessModal = (props) => {
             bindAddress: "",
         },
         onSubmit: (v) => {
-            props.handler(v);
+            createAccess(v);
             props.close();
         },
     });
 
     return (
         <Modal
-            open={props.show}
+            open={props.isOpen}
             onClose={props.close}
         >
             <Box sx={{ ...modalStyle }}>

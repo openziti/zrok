@@ -1,6 +1,7 @@
 import ShareIcon from "@mui/icons-material/Share";
+import {Button, Card} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {Card} from "@mui/material";
+import {releaseShare} from "./model/handler.js";
 
 const ShareCard = (props) => {
     let frontends = [];
@@ -8,18 +9,18 @@ const ShareCard = (props) => {
         frontends.push(<a key={props.share.token} href={fe.toString()} target={"_"}>{fe}</a>);
     })
 
-    const releaseClicked = () => {
-        props.releaseShare({token: props.share.token}, (err, data) => { console.log("releaseClicked", data); });
+    const deleteHandler = () => {
+        releaseShare({ token: props.share.token });
     }
 
     return (
         <Card>
-            <h2>{props.share.token} [<ShareIcon />]</h2>
+            <h2><ShareIcon /> {props.share.token}</h2>
             <p>
                 ({props.share.shareMode}, {props.share.backendMode}) <br/>
                 {props.share.backendEndpoint} &rarr; {frontends} <br/>
-                <DeleteIcon onClick={releaseClicked}/>
             </p>
+            <Button variant="outlined" onClick={deleteHandler} ><DeleteIcon /></Button>
         </Card>
     );
 }
