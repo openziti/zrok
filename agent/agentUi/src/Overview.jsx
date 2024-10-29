@@ -5,6 +5,7 @@ import {Box, Card, Stack} from "@mui/material";
 import AccessCard from "./AccessCard.jsx";
 import ShareCard from "./ShareCard.jsx";
 import React from "react";
+import Grid from '@mui/material/Grid2';
 
 const Overview = (props) => {
     let cards = [];
@@ -12,26 +13,25 @@ const Overview = (props) => {
         props.overview.forEach((row) => {
             switch(row.type) {
                 case "access":
-                    cards.push(<AccessCard key={row.frontendToken} access={row} />);
+                    cards.push(<Grid size={{ xs: 12, md: 6 }}><AccessCard key={row.frontendToken} access={row} /></Grid>);
                     break;
 
                 case "share":
-                    cards.push(<ShareCard key={row.token} share={row} />);
+                    cards.push(<Grid size={{ xs: 12, md: 6 }}><ShareCard key={row.token} share={row} /></Grid>);
                     break;
             }
         });
     } else {
-        cards.push(<Card key="empty"><h5>zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"} onClick={props.accessClick}>access <LanIcon /></a> share to get started.</h5></Card>);
+        cards.push(<Grid size={{ xs: 12 }}>
+            <Card key="empty">
+                <h5>zrok Agent is empty! Add a <a href="#" onClick={props.shareClick}>share <ShareIcon /></a> or <a href={"#"} onClick={props.accessClick}>access <LanIcon /></a> share to get started.</h5>
+            </Card>
+        </Grid>);
     }
     return (
-        <Box sx={{ display: "flex",
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            flexGrow: 1
-        }}>
+        <Grid container spacing={2}>
             {cards}
-        </Box>
+        </Grid>
     );
 }
 
