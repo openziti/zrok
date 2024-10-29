@@ -14,7 +14,7 @@ const AccessCard = (props) => {
             <p>
                 {props.access.token} &rarr; {props.access.bindAddress}
             </p>
-            <Button variant="outlined" onClick={deleteHandler}><DeleteIcon /></Button>
+            <Button variant="contained" onClick={deleteHandler}><DeleteIcon /></Button>
         </Card>
     );
 }

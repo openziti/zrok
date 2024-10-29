@@ -20,7 +20,7 @@ const ShareCard = (props) => {
                 ({props.share.shareMode}, {props.share.backendMode}) <br/>
                 {props.share.backendEndpoint} &rarr; {frontends} <br/>
             </p>
-            <Button variant="outlined" onClick={deleteHandler} ><DeleteIcon /></Button>
+            <Button variant="contained" onClick={deleteHandler} ><DeleteIcon /></Button>
         </Card>
     );
 }
