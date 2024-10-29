@@ -17,8 +17,6 @@ const NewShareModal = (props) => {
         },
     });
 
-    const httpBackendModes = ["proxy", "web", "caddy", "drive"];
-
     return (
         <Modal
             open={props.isOpen}
@@ -89,7 +87,7 @@ const NewShareModal = (props) => {
                         onBlur={form.handleBlur}
                         sx={{ mt: 2 }}
                     />
-                    {httpBackendModes.includes(form.values.backendMode) && (
+                    {form.values.backendMode === "proxy" && (
                         <Box>
                             <FormControlLabel
                                 control={<Checkbox

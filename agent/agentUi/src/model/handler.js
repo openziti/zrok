@@ -1,7 +1,20 @@
 import {AgentApi, ApiClient} from "../api/src/index.js";
+import {buildOverview} from "./overview.js";
 
 export const getAgentApi = () => {
     return new AgentApi(new ApiClient(window.location.origin));
+}
+
+let ovw = [];
+export const getOverview = (o) => {
+    getAgentApi().agentStatus((e, d) => {
+        if(e) {
+            console.log("getOverview", e, d);
+        } else {
+            ovw = structuredClone(buildOverview(d));
+        }
+    });
+    return ovw;
 }
 
 export const createShare = (opts) => {

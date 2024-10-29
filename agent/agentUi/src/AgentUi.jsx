@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import NavBar from "./NavBar.jsx";
-import {getAgentApi} from "./model/handler.js";
-import {buildOverview} from "./model/overview.js";
+import {getAgentApi, getOverview} from "./model/handler.js";
 import Overview from "./Overview.jsx";
 import NewAccessModal from "./NewAccessModal.jsx";
 import NewShareModal from "./NewShareModal.jsx";
@@ -36,24 +35,8 @@ const AgentUi = () => {
     }, []);
 
     useEffect(() => {
-        getAgentApi().agentStatus((e, d) => {
-            if(e) {
-                setOverview([]);
-                console.log("agentStatus", e);
-            } else {
-                setOverview(buildOverview(d));
-            }
-        });
-
         let interval = setInterval(() => {
-            getAgentApi().agentStatus((e, d) => {
-                if(e) {
-                    setOverview([]);
-                    console.log("agentStatus", e);
-                } else {
-                    setOverview(buildOverview(d));
-                }
-            });
+            setOverview(getOverview());
         }, 1000);
         return () => {
             clearInterval(interval);

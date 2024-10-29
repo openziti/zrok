@@ -3,8 +3,7 @@ const componentOptions = {
         styleOverrides: {
             root: ({theme}) => theme.unstable_sx({
                 mt: 5,
-                p: 2.5,
-                pt: 3.25,
+                p: 1,
                 borderRadius: 2,
             }),
         }
