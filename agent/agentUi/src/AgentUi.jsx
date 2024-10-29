@@ -36,6 +36,15 @@ const AgentUi = () => {
     }, []);
 
     useEffect(() => {
+        getAgentApi().agentStatus((e, d) => {
+            if(e) {
+                setOverview([]);
+                console.log("agentStatus", e);
+            } else {
+                setOverview(buildOverview(d));
+            }
+        });
+
         let interval = setInterval(() => {
             getAgentApi().agentStatus((e, d) => {
                 if(e) {
@@ -56,7 +65,7 @@ const AgentUi = () => {
     return (
         <>
             <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
-            <Overview overview={overview} />
+            <Overview overview={overview} shareClick={openNewShare} accessClick={openNewAccess} />
             <NewAccessModal isOpen={newAccessOpen} close={closeNewAccess} />
             <NewShareModal isOpen={newShareOpen} close={closeNewShare} />
         </>
