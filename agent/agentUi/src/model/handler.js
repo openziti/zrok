@@ -41,9 +41,9 @@ export const createAccess = (opts) => {
 }
 
 export const releaseAccess = (opts) => {
-    if(e) {
-        getAgentApi().agentReleaseAccess(opts, (e, d) => {
+    getAgentApi().agentReleaseAccess(opts, (e, d) => {
+        if(e) {
             console.log("releaseAccess", e, d);
-        });
-    }
+        }
+    });
 }

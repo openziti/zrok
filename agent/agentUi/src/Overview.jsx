@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import LanIcon from "@mui/icons-material/Lan";
 import ShareIcon from "@mui/icons-material/Share";
-import {Box, Card, Stack} from "@mui/material";
+import {Card} from "@mui/material";
 import AccessCard from "./AccessCard.jsx";
 import ShareCard from "./ShareCard.jsx";
 import React from "react";
