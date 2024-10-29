@@ -16,7 +16,7 @@ const NavBar = (props) => {
                 >
                     <MenuIcon/>
                 </IconButton>
-                <Typography variant="p" component={"div"} sx={{ flexGrow: 1 }} display={{ xs: "none", sm: "block" }}>
+                <Typography variant="h5" sx={{ flexGrow: 1 }} display={{ xs: "none", sm: "none", md: "block" }}>
                     zrok Agent { props.version !== "" ? " | " + props.version : ""}
                 </Typography>
                 <Grid2 container sx={{ flexGrow: 1 }}>
