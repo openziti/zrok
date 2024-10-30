@@ -28,7 +28,7 @@ import (
 )
 
 func init() {
-	loopCmd.AddCommand(newTestLoopPublicCommand().cmd)
+	testLoopCmd.AddCommand(newTestLoopPublicCommand().cmd)
 }
 
 type testLoopPublicCommand struct {
@@ -50,22 +50,22 @@ func newTestLoopPublicCommand() *testLoopPublicCommand {
 	cmd := &cobra.Command{
 		Use:   "public",
 		Short: "Start a loop agent testing public proxy shares",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.NoArgs,
 	}
-	r := &testLoopPublicCommand{cmd: cmd}
-	cmd.Run = r.run
-	cmd.Flags().IntVarP(&r.loopers, "loopers", "l", 1, "Number of current loopers to start")
-	cmd.Flags().IntVarP(&r.iterations, "iterations", "i", 1, "Number of iterations per looper")
-	cmd.Flags().IntVarP(&r.statusEvery, "status-every", "E", 100, "Show status every # iterations")
-	cmd.Flags().IntVarP(&r.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
-	cmd.Flags().IntVar(&r.minPayload, "min-payload", 64, "Minimum payload size in bytes")
-	cmd.Flags().IntVar(&r.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
-	cmd.Flags().IntVar(&r.minDwellMs, "min-dwell-ms", 1000, "Minimum dwell time in milliseconds")
-	cmd.Flags().IntVar(&r.maxDwellMs, "max-dwell-ms", 1000, "Maximum dwell time in milliseconds")
-	cmd.Flags().IntVar(&r.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
-	cmd.Flags().IntVar(&r.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
-	cmd.Flags().StringArrayVar(&r.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
-	return r
+	command := &testLoopPublicCommand{cmd: cmd}
+	cmd.Run = command.run
+	cmd.Flags().IntVarP(&command.loopers, "loopers", "l", 1, "Number of current loopers to start")
+	cmd.Flags().IntVarP(&command.iterations, "iterations", "i", 1, "Number of iterations per looper")
+	cmd.Flags().IntVarP(&command.statusEvery, "status-every", "E", 100, "Show status every # iterations")
+	cmd.Flags().IntVarP(&command.timeoutSeconds, "timeout-seconds", "T", 30, "Time out after # seconds when sending http requests")
+	cmd.Flags().IntVar(&command.minPayload, "min-payload", 64, "Minimum payload size in bytes")
+	cmd.Flags().IntVar(&command.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
+	cmd.Flags().IntVar(&command.minDwellMs, "min-dwell-ms", 1000, "Minimum dwell time in milliseconds")
+	cmd.Flags().IntVar(&command.maxDwellMs, "max-dwell-ms", 1000, "Maximum dwell time in milliseconds")
+	cmd.Flags().IntVar(&command.minPacingMs, "min-pacing-ms", 0, "Minimum pacing in milliseconds")
+	cmd.Flags().IntVar(&command.maxPacingMs, "max-pacing-ms", 0, "Maximum pacing in milliseconds")
+	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontends", []string{"public"}, "Selected frontends to use for the share")
+	return command
 }
 
 func (cmd *testLoopPublicCommand) run(_ *cobra.Command, _ []string) {
