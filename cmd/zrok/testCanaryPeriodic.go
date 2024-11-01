@@ -88,6 +88,7 @@ func (cmd *testCanaryPeriodicCommand) run(_ *cobra.Command, _ []string) {
 			looper.Abort()
 		}
 	}()
+
 	for _, l := range loopers {
 		<-l.Done()
 	}

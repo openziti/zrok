@@ -25,7 +25,6 @@ func init() {
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
 	testCmd.AddCommand(testCanaryCmd)
-	testCmd.AddCommand(testLoopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
@@ -102,12 +101,6 @@ var testCmd = &cobra.Command{
 var testCanaryCmd = &cobra.Command{
 	Use:   "canary",
 	Short: "Utilities for performance management",
-}
-
-var testLoopCmd = &cobra.Command{
-	Use:     "loopback",
-	Aliases: []string{"loop"},
-	Short:   "Loopback testing utilities",
 }
 
 func main() {

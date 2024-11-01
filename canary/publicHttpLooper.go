@@ -42,12 +42,6 @@ func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_
 func (l *PublicHttpLooper) Run() {
 	defer close(l.done)
 	defer logrus.Infof("#%d stopping", l.id)
-	defer func() {
-		if r := recover(); r != nil {
-			logrus.Errorf("#%d: %v", l.id, r)
-			panic(r)
-		}
-	}()
 	logrus.Infof("#%d starting", l.id)
 
 	if err := l.startup(); err != nil {
@@ -122,7 +116,7 @@ func (l *PublicHttpLooper) bindListener() error {
 
 	go func() {
 		if err := http.Serve(l.listener, l); err != nil {
-			logrus.Errorf("#%d error starting http listener: %v", l.id, err)
+			logrus.Errorf("#%d error in http listener: %v", l.id, err)
 		}
 	}()
 

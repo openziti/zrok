@@ -28,20 +28,20 @@ type LooperResults struct {
 }
 
 func ReportLooperResults(results []*LooperResults) {
-	totalXfer := uint64(0)
+	totalBytes := uint64(0)
+	totalXferRate := uint64(0)
 	totalErrors := uint(0)
 	totalMismatches := uint(0)
 	totalLoops := uint(0)
 	for i, result := range results {
+		totalBytes += result.Bytes
 		deltaSeconds := result.StopTime.Sub(result.StartTime).Seconds()
-		xfer := uint64(float64(result.Bytes) / deltaSeconds)
-		totalXfer += xfer
+		xferRate := uint64(float64(result.Bytes) / deltaSeconds)
+		totalXferRate += xferRate
 		totalErrors += result.Errors
 		totalMismatches += result.Mismatches
-		xferSec := util.BytesToSize(int64(xfer))
 		totalLoops += result.Loops
-		logrus.Infof("looper #%d: %d loops, %d errors, %d mismatches, %s/sec", i, result.Loops, result.Errors, result.Mismatches, xferSec)
+		logrus.Infof("looper #%d: %d loops, %v, %d errors, %d mismatches, %s/sec", i, result.Loops, util.BytesToSize(int64(result.Bytes)), result.Errors, result.Mismatches, util.BytesToSize(int64(xferRate)))
 	}
-	totalXferSec := util.BytesToSize(int64(totalXfer))
-	logrus.Infof("total: %d loops, %d errors, %d mismatches, %s/sec", totalLoops, totalErrors, totalMismatches, totalXferSec)
+	logrus.Infof("total: %d loops, %v, %d errors, %d mismatches, %s/sec", totalLoops, util.BytesToSize(int64(totalBytes)), totalErrors, totalMismatches, util.BytesToSize(int64(totalXferRate)))
 }
