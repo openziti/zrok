@@ -4,6 +4,8 @@
 
 FIX: Document unique names
 
+FIX: reduce Docker image sizes (https://github.com/openziti/zrok/pull/783)
+
 ## v0.4.44
 
 FIX: Fix for goreleaser build action to align with changed ARM64 build path.
