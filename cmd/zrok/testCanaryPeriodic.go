@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,6 +24,8 @@ type testCanaryPeriodicCommand struct {
 	timeout           time.Duration
 	minPayload        uint64
 	maxPayload        uint64
+	minPreDelay       time.Duration
+	maxPreDelay       time.Duration
 	minDwell          time.Duration
 	maxDwell          time.Duration
 	minPacing         time.Duration
@@ -44,6 +47,8 @@ func newTestCanaryPeriodicCommand() *testCanaryPeriodicCommand {
 	cmd.Flags().DurationVarP(&command.timeout, "timeout", "T", 30*time.Second, "Timeout when sending HTTP requests")
 	cmd.Flags().Uint64Var(&command.minPayload, "min-payload", 64, "Minimum payload size in bytes")
 	cmd.Flags().Uint64Var(&command.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
+	cmd.Flags().DurationVar(&command.minPreDelay, "min-pre-delay", 0, "Minimum pre-delay before creating the next looper")
+	cmd.Flags().DurationVar(&command.maxPreDelay, "max-pre-delay", 0, "Maximum pre-delay before creating the next looper")
 	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 1*time.Second, "Minimum dwell time")
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
@@ -64,6 +69,13 @@ func (cmd *testCanaryPeriodicCommand) run(_ *cobra.Command, _ []string) {
 
 	var loopers []*canary.PublicHttpLooper
 	for i := uint(0); i < cmd.loopers; i++ {
+		preDelay := cmd.maxPreDelay.Milliseconds()
+		preDelayDelta := cmd.maxPreDelay.Milliseconds() - cmd.minPreDelay.Milliseconds()
+		if preDelayDelta > 0 {
+			preDelay = int64(rand.Intn(int(preDelayDelta))) + cmd.minPreDelay.Milliseconds()
+			time.Sleep(time.Duration(preDelay) * time.Millisecond)
+		}
+
 		looperOpts := &canary.LooperOptions{
 			Iterations:     cmd.iterations,
 			StatusInterval: cmd.statusInterval,
