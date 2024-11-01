@@ -166,7 +166,7 @@ func (l *PublicHttpLooper) iterate() {
 					l.results.Mismatches++
 				} else {
 					l.results.Bytes += uint64(len(outBase64))
-					logrus.Debugf("#%d: payload match")
+					logrus.Debugf("#%d: payload match", l.id)
 				}
 			} else {
 				logrus.Errorf("#%d: error: %v", l.id, err)
