@@ -32,6 +32,7 @@ func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_
 	return &PublicHttpLooper{
 		id:       id,
 		frontend: frontend,
+		opt:      opt,
 		root:     root,
 		done:     make(chan struct{}),
 		results:  &LooperResults{},
@@ -40,8 +41,14 @@ func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_
 
 func (l *PublicHttpLooper) Run() {
 	defer close(l.done)
-	defer logrus.Infof("stopping #%d", l.id)
-	logrus.Infof("starting #%d", l.id)
+	defer logrus.Infof("#%d stopping", l.id)
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorf("#%d: %v", l.id, r)
+			panic(r)
+		}
+	}()
+	logrus.Infof("#%d starting", l.id)
 
 	if err := l.startup(); err != nil {
 		logrus.Fatalf("#%d error starting: %v", l.id, err)
@@ -53,9 +60,12 @@ func (l *PublicHttpLooper) Run() {
 
 	l.dwell()
 
-	logrus.Infof("completed #%d", l.id)
+	l.iterate()
+
+	logrus.Infof("#%d completed", l.id)
+
 	if err := l.shutdown(); err != nil {
-		logrus.Fatalf("error shutting down #%d: %v", l.id, err)
+		logrus.Fatalf("#%d: error shutting down: %v", l.id, err)
 	}
 }
 
@@ -83,7 +93,7 @@ func (l *PublicHttpLooper) startup() error {
 		return err
 	}
 	l.shr = shr
-	logrus.Infof("#%d allocated share '%v'", l.id, l.shr)
+	logrus.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
 
 	return nil
 }
