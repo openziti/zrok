@@ -13,10 +13,10 @@ import (
 )
 
 func init() {
-	testCanaryCmd.AddCommand(newTestCanaryPeriodicCommand().cmd)
+	testCanaryCmd.AddCommand(newTestCanaryPublicProxy().cmd)
 }
 
-type testCanaryPeriodicCommand struct {
+type testCanaryPublicProxy struct {
 	cmd               *cobra.Command
 	loopers           uint
 	iterations        uint
@@ -33,13 +33,13 @@ type testCanaryPeriodicCommand struct {
 	frontendSelection string
 }
 
-func newTestCanaryPeriodicCommand() *testCanaryPeriodicCommand {
+func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd := &cobra.Command{
-		Use:   "periodic",
-		Short: "Run a periodic canary inspection",
+		Use:   "public-proxy",
+		Short: "Run a public `proxy` looper canary",
 		Args:  cobra.NoArgs,
 	}
-	command := &testCanaryPeriodicCommand{cmd: cmd}
+	command := &testCanaryPublicProxy{cmd: cmd}
 	cmd.Run = command.run
 	cmd.Flags().UintVarP(&command.loopers, "loopers", "l", 1, "Number of concurrent loopers to start")
 	cmd.Flags().UintVarP(&command.iterations, "iterations", "i", 1, "Number of iterations")
@@ -57,7 +57,7 @@ func newTestCanaryPeriodicCommand() *testCanaryPeriodicCommand {
 	return command
 }
 
-func (cmd *testCanaryPeriodicCommand) run(_ *cobra.Command, _ []string) {
+func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)

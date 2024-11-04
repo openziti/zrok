@@ -2,6 +2,7 @@ package canary
 
 import (
 	"bytes"
+	"context"
 	cryptorand "crypto/rand"
 	"encoding/base64"
 	"github.com/openziti/sdk-golang/ziti"
@@ -12,13 +13,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"math/rand"
+	"net"
 	"net/http"
 	"time"
 )
 
-type PublicHttpLooper struct {
+type PrivateHttpLooper struct {
 	id       uint
-	frontend string
+	acc      *sdk.Access
 	opt      *LooperOptions
 	root     env_core.Root
 	shr      *sdk.Share
@@ -28,18 +30,17 @@ type PublicHttpLooper struct {
 	results  *LooperResults
 }
 
-func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_core.Root) *PublicHttpLooper {
-	return &PublicHttpLooper{
-		id:       id,
-		frontend: frontend,
-		opt:      opt,
-		root:     root,
-		done:     make(chan struct{}),
-		results:  &LooperResults{},
+func NewPrivateHttpLooper(id uint, opt *LooperOptions, root env_core.Root) *PrivateHttpLooper {
+	return &PrivateHttpLooper{
+		id:      id,
+		opt:     opt,
+		root:    root,
+		done:    make(chan struct{}),
+		results: &LooperResults{},
 	}
 }
 
-func (l *PublicHttpLooper) Run() {
+func (l *PrivateHttpLooper) Run() {
 	defer close(l.done)
 	defer logrus.Infof("#%d stopping", l.id)
 	defer l.shutdown()
@@ -60,24 +61,23 @@ func (l *PublicHttpLooper) Run() {
 	logrus.Infof("#%d completed", l.id)
 }
 
-func (l *PublicHttpLooper) Abort() {
+func (l *PrivateHttpLooper) Abort() {
 	l.abort = true
 }
 
-func (l *PublicHttpLooper) Done() <-chan struct{} {
+func (l *PrivateHttpLooper) Done() <-chan struct{} {
 	return l.done
 }
 
-func (l *PublicHttpLooper) Results() *LooperResults {
+func (l *PrivateHttpLooper) Results() *LooperResults {
 	return l.results
 }
 
-func (l *PublicHttpLooper) startup() error {
+func (l *PrivateHttpLooper) startup() error {
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
-		ShareMode:      sdk.PublicShareMode,
+		ShareMode:      sdk.PrivateShareMode,
 		BackendMode:    sdk.ProxyBackendMode,
-		Target:         "canary.PublicHttpLooper",
-		Frontends:      []string{l.frontend},
+		Target:         "canary.PrivateHttpLooper",
 		PermissionMode: sdk.ClosedPermissionMode,
 	})
 	if err != nil {
@@ -85,12 +85,20 @@ func (l *PublicHttpLooper) startup() error {
 	}
 	l.shr = shr
 
-	logrus.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
+	acc, err := sdk.CreateAccess(l.root, &sdk.AccessRequest{
+		ShareToken: shr.Token,
+	})
+	if err != nil {
+		return err
+	}
+	l.acc = acc
+
+	logrus.Infof("#%d allocated share '%v', allocated frontend '%v'", l.id, shr.Token, acc.Token)
 
 	return nil
 }
 
-func (l *PublicHttpLooper) bind() error {
+func (l *PrivateHttpLooper) bind() error {
 	zif, err := l.root.ZitiIdentityNamed(l.root.EnvironmentIdentityName())
 	if err != nil {
 		return errors.Wrapf(err, "#%d error getting identity", l.id)
@@ -121,13 +129,13 @@ func (l *PublicHttpLooper) bind() error {
 	return nil
 }
 
-func (l *PublicHttpLooper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (l *PrivateHttpLooper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	buf := new(bytes.Buffer)
 	io.Copy(buf, r.Body)
 	w.Write(buf.Bytes())
 }
 
-func (l *PublicHttpLooper) dwell() {
+func (l *PrivateHttpLooper) dwell() {
 	dwell := l.opt.MinDwell.Milliseconds()
 	dwelta := l.opt.MaxDwell.Milliseconds() - l.opt.MinDwell.Milliseconds()
 	if dwelta > 0 {
@@ -136,13 +144,29 @@ func (l *PublicHttpLooper) dwell() {
 	time.Sleep(time.Duration(dwell) * time.Millisecond)
 }
 
-func (l *PublicHttpLooper) iterate() {
+type connDialer struct {
+	c net.Conn
+}
+
+func (cd connDialer) Dial(_ context.Context, network, addr string) (net.Conn, error) {
+	return cd.c, nil
+}
+
+func (l *PrivateHttpLooper) iterate() {
 	l.results.StartTime = time.Now()
 	defer func() { l.results.StopTime = time.Now() }()
 
-	for i := uint(0); i < l.opt.Iterations && !l.abort; i++ {
+	for i := uint(0); i < l.opt.Iterations; i++ {
 		if i > 0 && i%l.opt.StatusInterval == 0 {
 			logrus.Infof("#%d: iteration %d", l.id, i)
+		}
+
+		conn, err := sdk.NewDialer(l.shr.Token, l.root)
+		if err != nil {
+			logrus.Errorf("#%d: error dialing: %v", l.id, err)
+			l.results.Errors++
+			time.Sleep(1 * time.Second)
+			continue
 		}
 
 		payloadSize := l.opt.MaxPayload
@@ -154,8 +178,8 @@ func (l *PublicHttpLooper) iterate() {
 		cryptorand.Read(outPayload)
 		outBase64 := base64.StdEncoding.EncodeToString(outPayload)
 
-		if req, err := http.NewRequest("POST", l.shr.FrontendEndpoints[0], bytes.NewBufferString(outBase64)); err == nil {
-			client := &http.Client{Timeout: l.opt.Timeout}
+		if req, err := http.NewRequest("POST", "http://"+l.shr.Token, bytes.NewBufferString(outBase64)); err == nil {
+			client := &http.Client{Timeout: l.opt.Timeout, Transport: &http.Transport{DialContext: connDialer{conn}.Dial}}
 			if resp, err := client.Do(req); err == nil {
 				if resp.StatusCode != 200 {
 					logrus.Errorf("#%d: unexpected status code: %v", l.id, resp.StatusCode)
@@ -180,6 +204,10 @@ func (l *PublicHttpLooper) iterate() {
 			l.results.Errors++
 		}
 
+		if err := conn.Close(); err != nil {
+			logrus.Errorf("#%d: error closing connection: %v", l.id, err)
+		}
+
 		pacingMs := l.opt.MaxPacing.Milliseconds()
 		pacingDelta := l.opt.MaxPacing.Milliseconds() - l.opt.MinPacing.Milliseconds()
 		if pacingDelta > 0 {
@@ -191,11 +219,15 @@ func (l *PublicHttpLooper) iterate() {
 	}
 }
 
-func (l *PublicHttpLooper) shutdown() {
+func (l *PrivateHttpLooper) shutdown() {
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
 			logrus.Errorf("#%d error closing listener: %v", l.id, err)
 		}
+	}
+
+	if err := sdk.DeleteAccess(l.root, l.acc); err != nil {
+		logrus.Errorf("#%d error deleting access '%v': %v", l.id, l.acc.Token, err)
 	}
 
 	if err := sdk.DeleteShare(l.root, l.shr); err != nil {
