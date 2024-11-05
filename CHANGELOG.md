@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.45
+
+FIX: Document unique names
+
 ## v0.4.44
 
 FIX: Fix for goreleaser build action to align with changed ARM64 build path.
