@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.44
+
+FIX: Fix for goreleaser build action to align with changed ARM64 build path.
+
 ## v0.4.43
 
 CHANGE: Update `github.com/openziti/sdk-golang` to version `v0.23.44`. Remove old `github.com/openziti/fabric` dependency, instead pulling in the modern `github.com/openziti/ziti` dependency.
