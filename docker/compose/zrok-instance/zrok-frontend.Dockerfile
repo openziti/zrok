@@ -21,8 +21,7 @@ ARG ZROK_OAUTH_GITHUB_CLIENT_ID
 ARG ZROK_OAUTH_GITHUB_CLIENT_SECRET
 
 # render zrok frontend config.yml
-COPY ./envsubst.bash ./bootstrap-frontend.bash /usr/local/bin/
-RUN chmod 0755 /usr/local/bin/envsubst.bash /usr/local/bin/bootstrap-frontend.bash
+COPY --chmod=0755 ./envsubst.bash ./bootstrap-frontend.bash /usr/local/bin/
 COPY ./zrok-frontend-config.yml.envsubst /tmp/
 RUN mkdir -p /etc/zrok-frontend/
 RUN envsubst.bash \
