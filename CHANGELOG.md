@@ -4,6 +4,8 @@
 
 FIX: Document unique names
 
+FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
+
 ## v0.4.44
 
 FIX: Fix for goreleaser build action to align with changed ARM64 build path.
