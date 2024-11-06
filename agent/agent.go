@@ -18,15 +18,16 @@ import (
 )
 
 type Agent struct {
-	cfg         *AgentConfig
-	root        env_core.Root
-	agentSocket string
-	shares      map[string]*share
-	addShare    chan *share
-	rmShare     chan *share
-	accesses    map[string]*access
-	addAccess   chan *access
-	rmAccess    chan *access
+	cfg          *AgentConfig
+	httpEndpoint string
+	root         env_core.Root
+	agentSocket  string
+	shares       map[string]*share
+	addShare     chan *share
+	rmShare      chan *share
+	accesses     map[string]*access
+	addAccess    chan *access
+	rmAccess     chan *access
 }
 
 func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
@@ -109,7 +110,13 @@ func (a *Agent) gateway(cfg *AgentConfig) {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	if err := http.ListenAndServe(cfg.ConsoleEndpoint, agentUi.Middleware(mux)); err != nil {
+	listener, err := AutoListener(cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
+	if err != nil {
+		logrus.Fatalf("unable to create a listener: %v", err)
+	}
+	a.httpEndpoint = listener.Addr().String()
+
+	if err := http.Serve(listener, agentUi.Middleware(mux)); err != nil {
 		logrus.Error(err)
 	}
 }

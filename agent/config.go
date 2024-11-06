@@ -1,11 +1,15 @@
 package agent
 
 type AgentConfig struct {
-	ConsoleEndpoint string
+	ConsoleAddress   string
+	ConsoleStartPort uint16
+	ConsoleEndPort   uint16
 }
 
-func DefaultAgentConfig() *AgentConfig {
+func DefaultConfig() *AgentConfig {
 	return &AgentConfig{
-		ConsoleEndpoint: "127.0.0.1:8888",
+		ConsoleAddress:   "127.0.0.1",
+		ConsoleStartPort: 8080,
+		ConsoleEndPort:   8181,
 	}
 }

@@ -12,6 +12,6 @@ func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) 
 	logrus.Debugf("responding to version inquiry with '%v'", v)
 	return &agentGrpc.VersionResponse{
 		V:               v,
-		ConsoleEndpoint: i.agent.Config().ConsoleEndpoint,
+		ConsoleEndpoint: i.agent.httpEndpoint,
 	}, nil
 }
