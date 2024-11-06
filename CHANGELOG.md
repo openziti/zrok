@@ -8,6 +8,14 @@ FEATURE: New "zrok Agent", a background manager process for your zrok environmen
 
 FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
 
+## v0.4.45
+
+FIX: Document unique names
+
+FIX: reduce Docker image sizes (https://github.com/openziti/zrok/pull/783)
+
+FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
+
 ## v0.4.44
 
 FIX: Fix for goreleaser build action to align with changed ARM64 build path.
