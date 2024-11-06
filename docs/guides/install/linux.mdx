@@ -79,7 +79,7 @@ case $(uname -m) in
   ;;
   aarch64|arm64)  GOXARCH=arm64
   ;;
-  arm*)           GOXARCH=arm
+  arm*)           GOXARCH=armv7
   ;;
   *)              echo "ERROR: unknown arch '$(uname -m)'" >&2
                   exit 1
