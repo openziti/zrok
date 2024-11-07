@@ -47,6 +47,32 @@
             "type": "string"
           },
           {
+            "name": "autoMode",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "autoAddress",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "autoStartPort",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "autoEndPort",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
             "name": "responseHeaders",
             "in": "query",
             "required": false,

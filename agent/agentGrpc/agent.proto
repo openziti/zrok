@@ -57,7 +57,11 @@ message AccessPrivateResponse{
 message AccessPrivateRequest{
 	string token = 1;
 	string bindAddress = 2;
-	repeated string responseHeaders = 3;
+	bool autoMode = 3;
+	string autoAddress = 4;
+	uint32 autoStartPort = 5;
+	uint32 autoEndPort = 6;
+	repeated string responseHeaders = 7;
 }
 
 message ReleaseAccessRequest {

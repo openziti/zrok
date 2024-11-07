@@ -53,6 +53,10 @@ export class AgentApi {
      * @param {Object} opts Optional parameters
      * @param {String} opts.token 
      * @param {String} opts.bindAddress 
+     * @param {Boolean} opts.autoMode 
+     * @param {String} opts.autoAddress 
+     * @param {Number} opts.autoStartPort 
+     * @param {Number} opts.autoEndPort 
      * @param {Array.<String>} opts.responseHeaders 
      * @param {module:api/AgentApi~agentAccessPrivateCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
@@ -65,7 +69,7 @@ export class AgentApi {
         
       };
       let queryParams = {
-        'token': opts['token'],'bindAddress': opts['bindAddress'],'responseHeaders': this.apiClient.buildCollectionParam(opts['responseHeaders'], 'multi')
+        'token': opts['token'],'bindAddress': opts['bindAddress'],'autoMode': opts['autoMode'],'autoAddress': opts['autoAddress'],'autoStartPort': opts['autoStartPort'],'autoEndPort': opts['autoEndPort'],'responseHeaders': this.apiClient.buildCollectionParam(opts['responseHeaders'], 'multi')
       };
       let headerParams = {
         

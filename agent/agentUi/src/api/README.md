@@ -74,6 +74,10 @@ var api = new AgentagentGrpcagentproto.AgentApi()
 var opts = { 
   'token': "token_example", // {String} 
   'bindAddress': "bindAddress_example", // {String} 
+  'autoMode': true, // {Boolean} 
+  'autoAddress': "autoAddress_example", // {String} 
+  'autoStartPort': 789, // {Number} 
+  'autoEndPort': 789, // {Number} 
   'responseHeaders': ["responseHeaders_example"] // {[String]} 
 };
 var callback = function(error, data, response) {

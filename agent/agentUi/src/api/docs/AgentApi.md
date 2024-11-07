@@ -26,6 +26,10 @@ let apiInstance = new AgentagentGrpcagentproto.AgentApi();
 let opts = { 
   'token': "token_example", // String | 
   'bindAddress': "bindAddress_example", // String | 
+  'autoMode': true, // Boolean | 
+  'autoAddress': "autoAddress_example", // String | 
+  'autoStartPort': 789, // Number | 
+  'autoEndPort': 789, // Number | 
   'responseHeaders': ["responseHeaders_example"] // [String] | 
 };
 apiInstance.agentAccessPrivate(opts, (error, data, response) => {
@@ -43,6 +47,10 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **token** | **String**|  | [optional] 
  **bindAddress** | **String**|  | [optional] 
+ **autoMode** | **Boolean**|  | [optional] 
+ **autoAddress** | **String**|  | [optional] 
+ **autoStartPort** | **Number**|  | [optional] 
+ **autoEndPort** | **Number**|  | [optional] 
  **responseHeaders** | [**[String]**](String.md)|  | [optional] 
 
 ### Return type
