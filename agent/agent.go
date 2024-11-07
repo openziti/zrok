@@ -111,7 +111,7 @@ func (a *Agent) gateway(cfg *AgentConfig) {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	listener, err := util.AutoListener(cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
+	listener, err := util.AutoListener("tcp", cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
 	if err != nil {
 		logrus.Fatalf("unable to create a listener: %v", err)
 	}

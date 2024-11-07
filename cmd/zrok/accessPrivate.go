@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
@@ -20,6 +21,7 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/url"
@@ -35,6 +37,10 @@ func init() {
 
 type accessPrivateCommand struct {
 	bindAddress     string
+	autoMode        bool
+	autoAddress     string
+	autoStartPort   uint16
+	autoEndPort     uint16
 	headless        bool
 	subordinate     bool
 	forceLocal      bool
@@ -60,7 +66,11 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
 	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
 	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
-	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend")
+	cmd.Flags().StringVarP(&command.bindAddress, "bind", "b", "127.0.0.1:9191", "The address to bind the private frontend (ignored when using '--auto')")
+	cmd.Flags().BoolVar(&command.autoMode, "auto", false, "Enable automatic port detection")
+	cmd.Flags().StringVar(&command.autoAddress, "auto-address", "127.0.0.1", "The address to use for automatic port detection")
+	cmd.Flags().Uint16Var(&command.autoStartPort, "auto-start-port", 8080, "The starting port to use for automatic port detection")
+	cmd.Flags().Uint16Var(&command.autoEndPort, "auto-end-port", 8888, "The ending port to use for automatic port detection")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
 	cmd.Run = command.run
 	return command
@@ -122,10 +132,28 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		panic(err)
 	}
 
+	bindAddress := cmd.bindAddress
+	if cmd.autoMode {
+		if accessResp.Payload.BackendMode == "udpTunnel" {
+			cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
+			if !panicInstead {
+				tui.Error("auto-addressing is not compatible with the 'udpTunnel' backend mode", nil)
+			}
+			panic(errors.New("auto-addressing is not compatible with the 'udpTunnel' backend mode"))
+		}
+		autoAddress, err := util.AutoListenerAddress("tcp", cmd.autoAddress, cmd.autoStartPort, cmd.autoEndPort)
+		if err != nil {
+			if !panicInstead {
+				tui.Error("unable to automatically find a listener address: %v", err)
+			}
+		}
+		bindAddress = autoAddress
+	}
+
 	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data["frontend_token"] = accessResp.Payload.FrontendToken
-		data["bind_address"] = cmd.bindAddress
+		data["bind_address"] = bindAddress
 		jsonData, err := json.Marshal(data)
 		if err != nil {
 			panic(err)
@@ -143,7 +171,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		protocol = "udp://"
 	}
 
-	endpointUrl, err := url.Parse(protocol + cmd.bindAddress)
+	endpointUrl, err := url.Parse(protocol + bindAddress)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("invalid endpoint address", err)
@@ -155,7 +183,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	switch accessResp.Payload.BackendMode {
 	case "tcpTunnel":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
-			BindAddress:  cmd.bindAddress,
+			BindAddress:  bindAddress,
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
@@ -200,7 +228,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	case "socks":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
-			BindAddress:  cmd.bindAddress,
+			BindAddress:  bindAddress,
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
@@ -247,7 +275,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	default:
 		cfg := proxy.DefaultFrontendConfig(root.EnvironmentIdentityName())
 		cfg.ShrToken = shrToken
-		cfg.Address = cmd.bindAddress
+		cfg.Address = bindAddress
 		cfg.ResponseHeaders = cmd.responseHeaders
 		cfg.RequestsChan = requests
 		fe, err := proxy.NewFrontend(cfg)
