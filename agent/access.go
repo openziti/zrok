@@ -14,6 +14,10 @@ type access struct {
 	frontendToken   string
 	token           string
 	bindAddress     string
+	autoMode        bool
+	autoAddress     string
+	autoStartPort   uint16
+	autoEndPort     uint16
 	responseHeaders []string
 
 	process      *proctree.Child

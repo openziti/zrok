@@ -374,11 +374,19 @@ func (cmd *accessPrivateCommand) accessAgent(args []string, root env_core.Root) 
 	}
 	defer func() { _ = conn.Close() }()
 
-	acc, err := client.AccessPrivate(context.Background(), &agentGrpc.AccessPrivateRequest{
+	req := &agentGrpc.AccessPrivateRequest{
 		Token:           args[0],
 		BindAddress:     cmd.bindAddress,
 		ResponseHeaders: cmd.responseHeaders,
-	})
+	}
+	if cmd.autoMode {
+		req.AutoMode = true
+		req.AutoAddress = cmd.autoAddress
+		req.AutoStartPort = uint32(cmd.autoStartPort)
+		req.AutoEndPort = uint32(cmd.autoEndPort)
+	}
+
+	acc, err := client.AccessPrivate(context.Background(), req)
 	if err != nil {
 		tui.Error("error creating access", err)
 	}
