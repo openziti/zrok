@@ -1,6 +1,9 @@
 ---
 sidebar_position: 0
 ---
+
+import BackendHttp from '/../docs/concepts/_backend_http.mdx'
+
 # Private Shares
 
 `zrok` was built to share and access digital resources. A `private` share allows a resource to be 
@@ -12,7 +15,7 @@ Peer-to-peer private resource sharing is one of the things that makes `zrok` uni
 
 Here's how private sharing works:
 
-# Peer to Peer
+## Peer to Peer
 
 ![zrok_public_share](../images/zrok_private_share.png)
 
@@ -27,3 +30,21 @@ The shared resource can be a development web server to share with friends and co
 The peer-to-peer capabilities of `zrok` are an important property of the underlying [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) network that `zrok` uses to provide connectivity between users and resources.
 
 Creating `private` shares is easy and is accomplished using the `zrok share private` command. Run `zrok share private` to see the usage output and to further learn how to use the command.
+
+## Backend Modes
+
+The default backend mode is `proxy` which targets an HTTP URL that must be reachable by the backend.
+
+```bash title="proxy example"
+zrok share private 80
+```
+
+### HTTP Modes
+
+<BackendHttp/>
+
+### Networking Modes
+
+- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server
+- `socks` mode provides a SOCKS5 dynamic proxy on the private access bind port that tunnels TCP payloads to the share backend where they are forwarded to their destinations
+- `vpn` mode provides a network layer tunnel between the private access and the share backend
