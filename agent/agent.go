@@ -8,6 +8,7 @@ import (
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -110,7 +111,7 @@ func (a *Agent) gateway(cfg *AgentConfig) {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	listener, err := AutoListener(cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
+	listener, err := util.AutoListener(cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
 	if err != nil {
 		logrus.Fatalf("unable to create a listener: %v", err)
 	}
