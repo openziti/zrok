@@ -31,7 +31,7 @@ The peer-to-peer capabilities of `zrok` are an important property of the underly
 
 Creating `private` shares is easy and is accomplished using the `zrok share private` command. Run `zrok share private` to see the usage output and to further learn how to use the command.
 
-## Backend Modes
+## Private Backend Modes
 
 The default backend mode is `proxy` which targets an HTTP URL that must be reachable by the backend.
 
@@ -39,12 +39,7 @@ The default backend mode is `proxy` which targets an HTTP URL that must be reach
 zrok share private 80
 ```
 
-### HTTP Modes
-
 <BackendHttp/>
-
-### Networking Modes
-
-- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server
-- `socks` mode provides a SOCKS5 dynamic proxy on the private access bind port that tunnels TCP payloads to the share backend where they are forwarded to their destinations
-- `vpn` mode provides a network layer tunnel between the private access and the share backend
+- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server ([more](/concepts/tunnels.md))
+- `socks` mode provides a SOCKS5 dynamic proxy on the private access bind port that tunnels TCP payloads to the share backend where they are forwarded to their destinations ([blog](https://blog.openziti.io/the-zrok-socks-backend))
+- `vpn` mode provides a network layer tunnel between the private access and the share backend ([guide](guides/vpn/vpn.md))
