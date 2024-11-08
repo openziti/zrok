@@ -30,8 +30,8 @@ func newAgentStartCommand() *agentStartCommand {
 	command := &agentStartCommand{cmd: cmd}
 	cmd.Run = command.run
 	cmd.Flags().StringVar(&command.consoleAddress, "console-address", "127.0.0.1", "gRPC gateway address")
-	cmd.Flags().Uint16Var(&command.consoleStartPort, "console-start-port", 8080, "gRPC gateway starting port")
-	cmd.Flags().Uint16Var(&command.consoleEndPort, "console-end-port", 8181, "gRPC gateway ending port")
+	cmd.Flags().Uint16Var(&command.consoleStartPort, "console-start-port", 8888, "gRPC gateway starting port")
+	cmd.Flags().Uint16Var(&command.consoleEndPort, "console-end-port", 8988, "gRPC gateway ending port")
 	return command
 }
 

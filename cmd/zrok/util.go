@@ -45,3 +45,8 @@ func parseUrl(in string) (string, error) {
 
 	return targetEndpoint.String(), nil
 }
+
+func subordinateError(err error) {
+	fmt.Printf("{ \"error\": \"%v\" }\n", err.Error())
+	os.Exit(1)
+}
