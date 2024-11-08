@@ -79,13 +79,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
-		if cmd.subordinate {
-			subordinateError(err)
-		}
-		if !panicInstead {
-			tui.Error("error loading environment", err)
-		}
-		panic(err)
+		cmd.error(err)
 	}
 
 	if !root.IsEnabled() {
@@ -115,10 +109,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	zrok, err := root.Client()
 	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create zrok client", err)
-		}
-		panic(err)
+		cmd.error(err)
 	}
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
@@ -129,36 +120,17 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	}
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
-		if cmd.subordinate {
-			subordinateError(err)
-		}
-		if !panicInstead {
-			tui.Error("unable to access", err)
-		}
-		panic(err)
+		cmd.error(err)
 	}
 
 	bindAddress := cmd.bindAddress
 	if cmd.autoMode {
 		if accessResp.Payload.BackendMode == "udpTunnel" {
-			cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
-			if cmd.subordinate {
-				subordinateError(errors.New("auto-addressing is not compatible with the 'udpTunnel' backend mode"))
-			}
-			if !panicInstead {
-				tui.Error("auto-addressing is not compatible with the 'udpTunnel' backend mode", nil)
-			}
-			panic(errors.New("auto-addressing is not compatible with the 'udpTunnel' backend mode"))
+			cmd.error(errors.New("auto-addressing is not compatible with the 'udpTunnel' backend mode"))
 		}
 		autoAddress, err := util.AutoListenerAddress("tcp", cmd.autoAddress, cmd.autoStartPort, cmd.autoEndPort)
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to automatically find a listener address: %v", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		bindAddress = autoAddress
 	}
@@ -173,13 +145,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	endpointUrl, err := url.Parse(protocol + bindAddress)
 	if err != nil {
-		if cmd.subordinate {
-			subordinateError(err)
-		}
-		if !panicInstead {
-			tui.Error("invalid endpoint address", err)
-		}
-		panic(err)
+		cmd.error(err)
 	}
 
 	requests := make(chan *endpoints.Request, 1024)
@@ -192,23 +158,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to create private access", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
-				if cmd.subordinate {
-					subordinateError(err)
-				}
-				if !panicInstead {
-					tui.Error("error starting access", err)
-				}
-				panic(err)
+				cmd.error(err)
 			}
 		}()
 
@@ -221,23 +175,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			IdleTime:     time.Minute,
 		})
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to create private frontend", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
-				if cmd.subordinate {
-					subordinateError(err)
-				}
-				if !panicInstead {
-					tui.Error("error starting frontend", err)
-				}
-				panic(err)
+				cmd.error(err)
 			}
 		}()
 
@@ -249,23 +191,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to create private access", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
-				if cmd.subordinate {
-					subordinateError(err)
-				}
-				if !panicInstead {
-					tui.Error("error starting access", err)
-				}
-				panic(err)
+				cmd.error(err)
 			}
 		}()
 
@@ -279,23 +209,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to create private access", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
-				if cmd.subordinate {
-					subordinateError(err)
-				}
-				if !panicInstead {
-					tui.Error("error starting access", err)
-				}
-				panic(err)
+				cmd.error(err)
 			}
 		}()
 
@@ -307,22 +225,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		cfg.RequestsChan = requests
 		fe, err := proxy.NewFrontend(cfg)
 		if err != nil {
-			if cmd.subordinate {
-				subordinateError(err)
-			}
-			if !panicInstead {
-				tui.Error("unable to create private frontend", err)
-			}
-			panic(err)
+			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
-				if cmd.subordinate {
-					subordinateError(err)
-				}
-				if !panicInstead {
-					tui.Error("unable to run frontend", err)
-				}
+				cmd.error(err)
 			}
 		}()
 	}
@@ -393,6 +300,16 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		close(requests)
 		cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 	}
+}
+
+func (cmd *accessPrivateCommand) error(err error) {
+	if cmd.subordinate {
+		subordinateError(err)
+	}
+	if !panicInstead {
+		tui.Error("unable to create private access", err)
+	}
+	panic(err)
 }
 
 func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
