@@ -44,7 +44,6 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 
 	acc.process, err = proctree.StartChild(acc.tail, accCmd...)
 	if err != nil {
-		logrus.Errorf("child start '%v': %v", accCmd, err)
 		return nil, err
 	}
 
