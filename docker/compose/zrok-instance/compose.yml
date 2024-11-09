@@ -87,6 +87,8 @@ services:
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
+        ziti-quickstart:
+          condition: service_healthy
     build:
       context: .
       dockerfile: ./zrok-controller.Dockerfile
@@ -121,6 +123,8 @@ services:
     depends_on:
         zrok-permissions:
           condition: service_completed_successfully
+        ziti-quickstart:
+          condition: service_healthy
     build:
       context: .
       dockerfile: zrok-frontend.Dockerfile
