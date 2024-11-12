@@ -91,7 +91,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+		cmd.error("unable to create share", errors.New("unable to load environment; did you 'zrok enable'?"))
 	}
 
 	if cmd.subordinate || cmd.forceLocal {
