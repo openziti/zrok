@@ -238,7 +238,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	go func() {
 		<-c
-		cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
+		cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 		os.Exit(0)
 	}()
 
@@ -300,7 +300,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		}
 
 		close(requests)
-		cmd.destroy(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
+		cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 	}
 }
 
@@ -314,7 +314,7 @@ func (cmd *accessPrivateCommand) error(err error) {
 	panic(err)
 }
 
-func (cmd *accessPrivateCommand) destroy(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *accessPrivateCommand) shutdown(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body = &rest_model_zrok.UnaccessRequest{
