@@ -47,13 +47,12 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 		return nil, err
 	}
 
-	go acc.monitor()
 	<-acc.bootComplete
 
 	if acc.bootErr == nil {
+		go acc.monitor()
 		i.agent.addAccess <- acc
 		return &agentGrpc.AccessPrivateResponse{FrontendToken: acc.frontendToken}, nil
 	}
-
 	return nil, acc.bootErr
 }

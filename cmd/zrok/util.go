@@ -47,6 +47,6 @@ func parseUrl(in string) (string, error) {
 }
 
 func subordinateError(err error) {
-	fmt.Printf("{ \"error\": \"%v\" }\n", err.Error())
+	fmt.Printf("{ \"message\": \"error\", \"error\": \"%v\" }\n", err.Error())
 	os.Exit(1)
 }

@@ -244,6 +244,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	if cmd.subordinate {
 		data := make(map[string]interface{})
+		data["message"] = "boot"
 		data["frontend_token"] = accessResp.Payload.FrontendToken
 		data["bind_address"] = bindAddress
 		jsonData, err := json.Marshal(data)
@@ -266,6 +267,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			select {
 			case req := <-requests:
 				data := make(map[string]interface{})
+				data["message"] = "access"
 				data["remote-address"] = req.RemoteAddr
 				data["method"] = req.Method
 				data["path"] = req.Path
