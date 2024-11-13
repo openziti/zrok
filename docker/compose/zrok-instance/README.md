@@ -240,9 +240,9 @@ See "My internet connection can only send to common ports like 80 and 443" below
     AWS_SECRET_ACCESS_KEY=abcd1234
     ```
 
-1. My internet connection can only send traffic to common ports like 80 and 443.
+1. My internet connection can only send traffic to common ports like 80, 443, and 3389.
 
-    You can change the required ports in the `.env` file. I'll assume you still want to use 443 for zrok shares and API, and for this example your ISP allows you to additionally send traffic to ports 80 and 3389.
+    You can change the required ports in the `.env` file. Caddy will still use port 443 for zrok shares and API if you renamed `compose.caddy.yml` as `compose.override.yml` to enable Caddy.
 
     ```bash title=".env"
     ZITI_CTRL_ADVERTISED_PORT=80
