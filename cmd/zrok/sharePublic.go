@@ -85,6 +85,10 @@ func newSharePublicCommand() *sharePublicCommand {
 }
 
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
+	if cmd.subordinate {
+		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		cmd.error("error loading environment", err)

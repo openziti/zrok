@@ -77,6 +77,10 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 }
 
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
+	if cmd.subordinate {
+		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		cmd.error(err)

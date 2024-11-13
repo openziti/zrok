@@ -26,6 +26,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 func init() {
@@ -70,6 +71,10 @@ func newSharePrivateCommand() *sharePrivateCommand {
 }
 
 func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
+	if cmd.subordinate {
+		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		cmd.error("error loading environment", err)

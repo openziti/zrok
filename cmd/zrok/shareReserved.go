@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 func init() {
@@ -65,6 +66,10 @@ func newShareReservedCommand() *shareReservedCommand {
 }
 
 func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
+	if cmd.subordinate {
+		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		cmd.error("error loading environment", err)
