@@ -63,12 +63,14 @@ func (a *access) tail(data []byte) {
 									}
 								}
 								a.booted = true
+							} else {
+								a.bootErr = errors.New(line)
 							}
 						} else {
 							a.bootErr = errors.New(line)
 						}
 					} else {
-						logrus.Warn(line)
+						a.bootErr = errors.New(line)
 					}
 				} else {
 					a.bootErr = errors.New(line)

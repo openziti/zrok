@@ -54,43 +54,58 @@ func (s *share) tail(data []byte) {
 	if line, err := s.readBuffer.ReadString('\n'); err == nil {
 		line = strings.Trim(line, "\n")
 		if !s.booted {
-			in := make(map[string]interface{})
-			if err := json.Unmarshal([]byte(line), &in); err == nil {
-				if v, found := in["token"]; found {
-					if str, ok := v.(string); ok {
-						s.token = str
-					}
-				}
-				if v, found := in["backend_mode"]; found {
-					if str, ok := v.(string); ok {
-						s.backendMode = sdk.BackendMode(str)
-					}
-				}
-				if v, found := in["share_mode"]; found {
-					if str, ok := v.(string); ok {
-						s.shareMode = sdk.ShareMode(str)
-					}
-				}
-				if v, found := in["frontend_endpoints"]; found {
-					if vArr, ok := v.([]interface{}); ok {
-						for _, v := range vArr {
-							if str, ok := v.(string); ok {
-								s.frontendEndpoints = append(s.frontendEndpoints, str)
+			if strings.HasPrefix(line, "{") {
+				in := make(map[string]interface{})
+				if err := json.Unmarshal([]byte(line), &in); err == nil {
+					if v, found := in["message"]; found {
+						if str, ok := v.(string); ok {
+							if str == "boot" {
+								if v, found := in["token"]; found {
+									if str, ok := v.(string); ok {
+										s.token = str
+									}
+								}
+								if v, found := in["backend_mode"]; found {
+									if str, ok := v.(string); ok {
+										s.backendMode = sdk.BackendMode(str)
+									}
+								}
+								if v, found := in["share_mode"]; found {
+									if str, ok := v.(string); ok {
+										s.shareMode = sdk.ShareMode(str)
+									}
+								}
+								if v, found := in["frontend_endpoints"]; found {
+									if vArr, ok := v.([]interface{}); ok {
+										for _, v := range vArr {
+											if str, ok := v.(string); ok {
+												s.frontendEndpoints = append(s.frontendEndpoints, str)
+											}
+										}
+									}
+								}
+								if v, found := in["target"]; found {
+									if str, ok := v.(string); ok {
+										s.target = str
+									}
+								}
+								s.booted = true
+							} else {
+								s.bootErr = errors.New(line)
 							}
+						} else {
+							s.bootErr = errors.New(line)
 						}
+					} else {
+						s.bootErr = errors.New(line)
 					}
+				} else {
+					s.bootErr = errors.New(line)
 				}
-				if v, found := in["target"]; found {
-					if str, ok := v.(string); ok {
-						s.target = str
-					}
-				}
-				s.booted = true
+				close(s.bootComplete)
 			} else {
-				s.bootErr = errors.New(line)
+				logrus.Warn(line)
 			}
-			close(s.bootComplete)
-
 		} else {
 			if strings.HasPrefix(line, "{") {
 				in := make(map[string]interface{})
