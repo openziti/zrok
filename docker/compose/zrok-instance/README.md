@@ -162,7 +162,7 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
 
 <!-- 1. 443/udp used by Caddy for HTTP/3 QUIC protocol (published by container `caddy`) -->
 
-See "My internet connection can only send to common ports like 80 and 443" below about changing the required ports.
+See "My internet connection can only send traffic to common ports" below about changing the required ports.
 
 ### Troubleshooting
 
