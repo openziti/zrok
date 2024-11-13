@@ -21,6 +21,8 @@ FIX: Docker reserved private share startup error (https://github.com/openziti/zr
 FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
 
 
+CHANGE: Let the zrok instance for Docker use port 80 as an edge listener instead of HTTP redirect (https://github.com/openziti/zrok/issues/793)
+
 ## v0.4.44
 
 FIX: Fix for goreleaser build action to align with changed ARM64 build path.

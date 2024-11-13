@@ -17,12 +17,12 @@ services:
       ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
       ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
     expose:
-      - 80/tcp
+      # - 80/tcp
       - 443/tcp
       - 443/udp   # Caddy's HTTP/3 (QUIC) (not published)
       - 2019/tcp  # Caddy's admin API     (not published)
     ports:
-      - ${CADDY_INTERFACE:-0.0.0.0}:80:80
+      # - ${CADDY_INTERFACE:-0.0.0.0}:80:80
       - ${CADDY_INTERFACE:-0.0.0.0}:443:443
       # - ${CADDY_INTERFACE:-0.0.0.0}:443:443/udp"  # future: HTTP/3 (QUIC)
     volumes:
