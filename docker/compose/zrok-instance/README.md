@@ -79,7 +79,7 @@ ZROK_FRONTEND_PORT=8080
 ZROK_OAUTH_PORT=8081
 
 # ziti ports must be published to the internet and allowed by firewall
-ZITI_CTRL_ADVERTISED_PORT=1280
+ZITI_CTRL_ADVERTISED_PORT=80
 ZITI_ROUTER_PORT=3022
 
 # configure oauth for public shares
@@ -157,7 +157,7 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
 #### Required
 
 1. `443/tcp` - reverse proxy handles HTTPS requests for zrok API, OAuth, and public shares (published by container `caddy`)
-1. `1280/tcp` - ziti ctrl plane (published by container `ziti-quickstart`)
+1. `80/tcp` - ziti ctrl plane (published by container `ziti-quickstart`)
 1. `3022/tcp` - ziti data plane (published by container `ziti-quickstart`)
 
 <!-- 1. 443/udp used by Caddy for HTTP/3 QUIC protocol (published by container `caddy`) -->
