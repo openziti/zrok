@@ -4,9 +4,9 @@
 	admin 0.0.0.0:2019
 }
 
-http:// {
-	redir https://{host}{uri} permanent
-}
+# http:// {
+# 	redir https://{host}{uri} permanent
+# }
 
 *.{$ZROK_DNS_ZONE} {
 	tls {
