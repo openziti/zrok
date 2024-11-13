@@ -160,10 +160,9 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
 1. `1280/tcp` - ziti ctrl plane (published by container `ziti-quickstart`)
 1. `3022/tcp` - ziti data plane (published by container `ziti-quickstart`)
 
-#### Optional
-
-1. `80/tcp` - reverse proxy redirects non-HTTPS requests to `443/tcp` (published by container `caddy`)
 <!-- 1. 443/udp used by Caddy for HTTP/3 QUIC protocol (published by container `caddy`) -->
+
+See "My internet connection can only send to common ports like 80 and 443" below about changing the required ports.
 
 ### Troubleshooting
 
@@ -222,7 +221,7 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
     docker compose exec caddy curl http://localhost:2019/config/ | jq
     ```
 
-1. My provider, e.g., Route53 doesn't give me a single API token.
+1. My DNS provider credential is composed of several values, not a single API token.
 
     As long as your DNS provider is supported by Caddy then it will work. You can modify the Caddyfile to use a different set of properties than the example. Here's how the `tls` section should look for Route53.
 
@@ -239,4 +238,13 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
     CADDY_DNS_PLUGIN=route53
     AWS_ACCESS_KEY_ID=abcd1234
     AWS_SECRET_ACCESS_KEY=abcd1234
+    ```
+
+1. My internet connection can only send traffic to common ports like 80 and 443.
+
+    You can change the required ports in the `.env` file. I'll assume you still want to use 443 for zrok shares and API, and for this example your ISP allows you to additionally send traffic to ports 80 and 3389.
+
+    ```bash title=".env"
+    ZITI_CTRL_ADVERTISED_PORT=80
+    ZITI_ROUTER_PORT=3389
     ```
