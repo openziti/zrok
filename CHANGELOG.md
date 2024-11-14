@@ -10,6 +10,8 @@ FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now au
 
 ## v0.4.45
 
+FIX: Update indirect dependency `github.com/golang-jwt/jwt/v4` to version `v4.5.1` (https://github.com/openziti/zrok/issues/794)
+
 FIX: Document unique names
 
 FIX: reduce Docker image sizes (https://github.com/openziti/zrok/pull/783)
