@@ -1,0 +1,11 @@
+# global config must be first
+{
+    # no listen on 2019/tcp with admin API
+    admin off
+}
+
+# zrok site block
+http:// {
+	bind {{ .ZrokBindAddress }}
+	reverse_proxy 127.0.0.1:3000
+}
