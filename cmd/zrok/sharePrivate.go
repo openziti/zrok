@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -371,7 +372,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 	if cmd.subordinate {
 		data := make(map[string]interface{})
-		data["message"] = "boot"
+		data[subordinate.MessageKey] = subordinate.BootMessage
 		data["token"] = shr.Token
 		data["frontend_endpoints"] = shr.FrontendEndpoints
 		jsonData, err := json.Marshal(data)
@@ -395,7 +396,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			select {
 			case req := <-requests:
 				data := make(map[string]interface{})
-				data["message"] = "access"
+				data[subordinate.MessageKey] = "access"
 				data["remote_address"] = req.RemoteAddr
 				data["method"] = req.Method
 				data["path"] = req.Path

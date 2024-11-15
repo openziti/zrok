@@ -8,6 +8,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -321,7 +322,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 	if cmd.subordinate {
 		data := make(map[string]interface{})
-		data["message"] = "boot"
+		data[subordinate.MessageKey] = subordinate.BootMessage
 		data["token"] = resp.Payload.Token
 		data["backend_mode"] = resp.Payload.BackendMode
 		data["share_mode"] = resp.Payload.ShareMode
@@ -358,7 +359,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			select {
 			case req := <-requests:
 				data := make(map[string]interface{})
-				data["message"] = "access"
+				data[subordinate.MessageKey] = "access"
 				data["remote-address"] = req.RemoteAddr
 				data["method"] = req.Method
 				data["path"] = req.Path
