@@ -4,6 +4,6 @@ If you think you have found a bug in zrok, or you need help with a specific issu
 
 https://openziti.discourse.group/
 
-There is a zrok topic available there. The entire OpenZiti and zrok team are monitoring that forum. They're not monitoring this issue database. If you decide to open an issue here anyway, we're probably stil going to direct you to the Discourse forum. :-)
+There is a zrok topic available there. The entire OpenZiti and zrok team are monitoring that forum. They're not monitoring this issue database. If you decide to open an issue here anyway, we're probably still going to guide you to the Discourse forum to assist you. :-)
 
 This issue database is for vetted roadmap items and confirmed bugs within the core open-source portion of zrok.
