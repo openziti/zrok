@@ -10,14 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.7.7",
-    "fetch": "^1.1.0",
-    "isomorphic-fetch": "^3.0.0",
-    "node-fetch": "^3.3.2",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "request": "^2.88.2",
-    "url": "^0.11.4"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
