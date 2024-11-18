@@ -21,7 +21,13 @@ function App() {
 
     useEffect(() => {
         let api = new AgentApi(new Configuration({basePath: window.location.origin}));
-        api.agentAccessPrivate({token: "a", bindAddress: "127.0.0.1:9911"}).catch(e => {
+        api.agentAccessPrivate({token: "testing", bindAddress: "127.0.0.1:9911"}).then(v => {
+            if(v.frontendToken) {
+                setErrorMessage(v.frontendToken);
+            } else {
+                console.log(v);
+            }
+        }).catch(e => {
             console.log(e.response.json().then(eb => {
                 setErrorMessage(eb.message);
                 console.log(eb.message);
