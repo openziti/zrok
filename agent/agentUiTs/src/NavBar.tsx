@@ -6,9 +6,10 @@ import ShareIcon from "@mui/icons-material/Share";
 interface NavBarProps {
     version: string;
     shareClick: () => void;
+    accessClick: () => void;
 }
 
-function NavBar({ version, shareClick }: NavBarProps) {
+function NavBar({ version, shareClick, accessClick }: NavBarProps) {
     return (
         <Box ssx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -24,7 +25,7 @@ function NavBar({ version, shareClick }: NavBarProps) {
                             <Button color="inherit" onClick={shareClick}><ShareIcon /></Button>
                         </Grid2>
                         <Grid2 display="flex" justifyContent="right">
-                            <Button color="inherit" ><LanIcon /></Button>
+                            <Button color="inherit" onClick={accessClick}><LanIcon /></Button>
                         </Grid2>
                     </Grid2>
                 </Toolbar>

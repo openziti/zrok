@@ -4,17 +4,26 @@ import NavBar from "./NavBar.tsx";
 import {AgentObject, buildOverview} from "./model/overview.ts";
 import Overview from "./Overview.tsx";
 import NewShareModal from "./NewShareModal.tsx";
+import NewAccessModal from "./NewAccessModal.tsx";
 
 const AgentUi = () => {
     const [version, setVersion] = useState("unset");
     const [overview, setOverview] = useState(new Array<AgentObject>());
     const [newShareOpen, setNewShareOpen] = useState(false);
+    const [newAccessOpen, setNewAccessOpen] = useState(false);
 
     const openNewShare = () => {
         setNewShareOpen(true);
     }
     const closeNewShare = () => {
         setNewShareOpen(false);
+    }
+
+    const openNewAccess = () => {
+        setNewAccessOpen(true);
+    }
+    const closeNewAccess = () => {
+        setNewAccessOpen(false);
     }
 
     useEffect(() => {
@@ -49,9 +58,10 @@ const AgentUi = () => {
 
     return (
         <>
-            <NavBar version={version} shareClick={openNewShare} />
+            <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
             <Overview overview={overview} />
             <NewShareModal isOpen={newShareOpen} close={closeNewShare} />
+            <NewAccessModal isOpen={newAccessOpen} close={closeNewAccess} />
         </>
     );
 }
