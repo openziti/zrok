@@ -3,6 +3,7 @@ import {Card, Grid2} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import LanIcon from "@mui/icons-material/Lan";
 import ShareCard from "./ShareCard.tsx";
+import AccessCard from "./AccessCard.tsx";
 
 interface OverviewProps {
     overview: Array<AgentObject>;
@@ -14,7 +15,7 @@ function Overview({ overview }: OverviewProps) {
         overview.forEach(row => {
             switch(row.type) {
                 case "access":
-                    cards.push(<Grid2 size={{ xs: 12, md: 6 }}><h6>{row.id}</h6></Grid2>);
+                    cards.push(<Grid2 size={{ xs: 12, md: 6 }}><AccessCard accessObject={row} /></Grid2>);
                     break;
 
                 case "share":
@@ -30,7 +31,7 @@ function Overview({ overview }: OverviewProps) {
         </Grid2>);
     }
     return (
-        <Grid2 container spacing="2">
+        <Grid2 container spacing={2}>
             {cards}
         </Grid2>
     );
