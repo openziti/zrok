@@ -224,7 +224,7 @@ The `ziti-quickstart` and `caddy` containers publish ports to all devices that u
 
 1. My provider, e.g., Route53 doesn't give me a single API token.
 
-    As long as your DNS provider is supported by Caddy then it will work. You can modify the Caddyfile to use a different set of properties than the example. Here's how the `tls` section should look for Route53.
+    As long as your DNS provider is supported by Caddy then it will work. You can modify the Caddyfile to use a different set of properties than the example. Here's how the `tls` section should look for Route53. You must declare any environment variables introduced in the `.env` file in `docker.compose.override` on the `caddy` service to ensure they are passed through to the Caddy container.
 
     ```json
     tls {
