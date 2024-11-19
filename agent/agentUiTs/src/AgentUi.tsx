@@ -3,10 +3,19 @@ import {GetAgentApi} from "./model/api.ts";
 import NavBar from "./NavBar.tsx";
 import {AgentObject, buildOverview} from "./model/overview.ts";
 import Overview from "./Overview.tsx";
+import NewShareModal from "./NewShareModal.tsx";
 
 const AgentUi = () => {
     const [version, setVersion] = useState("unset");
     const [overview, setOverview] = useState(new Array<AgentObject>());
+    const [newShareOpen, setNewShareOpen] = useState(false);
+
+    const openNewShare = () => {
+        setNewShareOpen(true);
+    }
+    const closeNewShare = () => {
+        setNewShareOpen(false);
+    }
 
     useEffect(() => {
 		GetAgentApi().agentVersion()
@@ -40,8 +49,9 @@ const AgentUi = () => {
 
     return (
         <>
-            <NavBar version={version} />
+            <NavBar version={version} shareClick={openNewShare} />
             <Overview overview={overview} />
+            <NewShareModal isOpen={newShareOpen} close={closeNewShare} />
         </>
     );
 }

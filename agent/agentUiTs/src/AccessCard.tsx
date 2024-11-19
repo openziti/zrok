@@ -3,6 +3,7 @@ import {AppBar, Box, Button, Card, Chip, Grid2, Toolbar, Typography} from "@mui/
 import LanIcon from "@mui/icons-material/Lan";
 import {AccessDetail} from "./api";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {GetAgentApi} from "./model/api.ts";
 
 interface AccessCardProps {
     accessObject: AgentObject;
@@ -10,6 +11,14 @@ interface AccessCardProps {
 
 function AccessCard({ accessObject }: AccessCardProps) {
     let access = (accessObject.v as AccessDetail);
+
+    const releaseAccess = () => {
+        GetAgentApi().agentReleaseAccess({frontendToken: access.frontendToken})
+            .catch(e => {
+                console.log(e);
+            });
+    }
+
     return (
         <Card>
             <AppBar position="sticky">
@@ -34,7 +43,7 @@ function AccessCard({ accessObject }: AccessCardProps) {
             </Box>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex" justifyContent="right" size="grow">
-                    <Button variant="contained"><DeleteIcon /></Button>
+                    <Button variant="contained" onClick={releaseAccess}><DeleteIcon /></Button>
                 </Grid2>
             </Grid2>
         </Card>

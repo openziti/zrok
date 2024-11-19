@@ -4,6 +4,7 @@ import {ShareDetail} from "./api";
 import {AppBar, Box, Button, Card, Chip, Grid2, Toolbar, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {GetAgentApi} from "./model/api.ts";
 
 interface ShareCardProps {
     shareObject: AgentObject;
@@ -15,6 +16,13 @@ function ShareCard({ shareObject }: ShareCardProps) {
     share.frontendEndpoint!.map(fe => {
         frontends.push(<a key={share.token} href={fe} target="_">{fe}</a>);
     });
+
+    const releaseShare = () => {
+        GetAgentApi().agentReleaseShare({token: share.token})
+            .catch(e => {
+                console.log(e);
+            });
+    }
 
     return (
         <Card>
@@ -46,7 +54,7 @@ function ShareCard({ shareObject }: ShareCardProps) {
             </Box>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex" justifyContent="right" size="grow">
-                    <Button variant="contained"><DeleteIcon /></Button>
+                    <Button variant="contained" onClick={releaseShare}><DeleteIcon /></Button>
                 </Grid2>
             </Grid2>
         </Card>
