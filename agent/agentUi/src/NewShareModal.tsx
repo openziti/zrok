@@ -1,7 +1,7 @@
 import {useFormik} from "formik";
 import {GetAgentApi} from "./model/api.ts";
 import {useState} from "react";
-import {Box, Button, Checkbox, FormControlLabel, MenuItem, Modal, TextField} from "@mui/material";
+import {Box, Button, Checkbox, FormControlLabel, MenuItem, Modal, TextField, Typography} from "@mui/material";
 import {modalStyle} from "./model/theme.ts";
 
 interface NewShareModalProps {
@@ -54,7 +54,9 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
     return (
         <Modal open={isOpen} onClose={close}>
             <Box sx={{ ...modalStyle }}>
-                <h2>Share...</h2>
+                <Typography>
+                    <h2>Share...</h2>
+                </Typography>
                 {errorMessage}
                 <form onSubmit={form.handleSubmit}>
                     <TextField

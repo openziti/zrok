@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useFormik} from "formik";
 import {GetAgentApi} from "./model/api.ts";
-import {Box, Button, Modal, TextField} from "@mui/material";
+import {Box, Button, Modal, TextField, Typography} from "@mui/material";
 import {modalStyle} from "./model/theme.ts";
 
 interface NewAccessModalProps {
@@ -35,7 +35,9 @@ const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
     return (
           <Modal open={isOpen} onClose={close}>
               <Box sx={{...modalStyle}}>
-                  <h2>Access...</h2>
+                  <Typography>
+                      <h2>Access...</h2>
+                  </Typography>
                   {errorMessage}
                   <form onSubmit={newAccessForm.handleSubmit}>
                       <TextField

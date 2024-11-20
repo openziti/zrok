@@ -1,5 +1,5 @@
 import {AgentObject} from "./model/overview.ts";
-import {Card, Grid2} from "@mui/material";
+import {Box, Card, Grid2, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import LanIcon from "@mui/icons-material/Lan";
 import ShareCard from "./ShareCard.tsx";
@@ -7,9 +7,11 @@ import AccessCard from "./AccessCard.tsx";
 
 interface OverviewProps {
     overview: Array<AgentObject>;
+    shareClick: () => void;
+    accessClick: () => void;
 }
 
-const Overview = ({ overview }: OverviewProps) => {
+const Overview = ({ overview, shareClick, accessClick }: OverviewProps) => {
     let cards = [];
     if(overview.length > 0) {
         overview.forEach(row => {
@@ -26,7 +28,12 @@ const Overview = ({ overview }: OverviewProps) => {
     } else {
         cards.push(<Grid2 size={{ xs: 12 }}>
             <Card key="empty">
-                <h5>zrok Agent is empty! Add a <a href={"#"}>share <ShareIcon /></a> or <a href={"#"}>access <LanIcon /></a> share to get started.</h5>
+                <Box sx={{ p: 2, textAlign: "center" }}>
+                    <Typography variant="h6" component="div">
+                        zrok Agent is empty! Add a <a href={"#"} onClick={shareClick}>share <ShareIcon/></a> or <a
+                        href={"#"} onClick={accessClick}>access <LanIcon/></a> share to get started.
+                    </Typography>
+                </Box>
             </Card>
         </Grid2>);
     }

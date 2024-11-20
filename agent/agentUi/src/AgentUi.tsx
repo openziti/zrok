@@ -59,7 +59,7 @@ const AgentUi = () => {
     return (
         <>
             <NavBar version={version} shareClick={openNewShare} accessClick={openNewAccess} />
-            <Overview overview={overview} />
+            <Overview overview={overview} shareClick={openNewShare} accessClick={openNewAccess} />
             <NewShareModal isOpen={newShareOpen} close={closeNewShare} />
             <NewAccessModal isOpen={newAccessOpen} close={closeNewAccess} />
         </>
