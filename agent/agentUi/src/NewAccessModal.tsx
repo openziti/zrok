@@ -36,10 +36,8 @@ const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
     return (
           <Modal open={isOpen} onClose={close}>
               <Box sx={{...modalStyle}}>
-                  <Typography>
-                      <h2>Access...</h2>
-                  </Typography>
-                  <Typography color={"red"}><h3>{errorMessage}</h3></Typography>
+                  <Typography><h2>Access...</h2></Typography>
+                  <Typography color="red"><h3>{errorMessage}</h3></Typography>
                   <form onSubmit={newAccessForm.handleSubmit}>
                       <TextField
                           fullWidth

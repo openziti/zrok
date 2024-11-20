@@ -29,7 +29,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
                             close();
                         })
                         .catch(e => {
-                            e.response().json().then(ex => {
+                            e.response.json().then(ex => {
                                 setErrorMessage(<span>{ex.message}</span>);
                                 console.log(ex.message);
                             })
@@ -43,7 +43,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
                         })
                         .catch(e => {
                             e.response().json().then(ex => {
-                                setErrorMessage(<p>{ex.message}</p>);
+                                setErrorMessage(<span>{ex.message}</span>);
                                 console.log(ex.message);
                             })
                         });
@@ -55,10 +55,8 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
     return (
         <Modal open={isOpen} onClose={close}>
             <Box sx={{ ...modalStyle }}>
-                <Typography>
-                    <h2>Share...</h2>
-                </Typography>
-                {errorMessage}
+                <Typography><h2>Share...</h2></Typography>
+                <Typography color="red"><h3>{errorMessage}</h3></Typography>
                 <form onSubmit={form.handleSubmit}>
                     <TextField
                         fullWidth
