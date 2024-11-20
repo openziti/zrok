@@ -6,9 +6,9 @@ import {theme} from "./model/theme.ts";
 import AgentUi from "./AgentUi.tsx";
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
-      <AgentUi />
-    </ThemeProvider>
-  </StrictMode>
+    <StrictMode>
+        <ThemeProvider theme={theme}>
+            <AgentUi />
+        </ThemeProvider>
+    </StrictMode>
 )

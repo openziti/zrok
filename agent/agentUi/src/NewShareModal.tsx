@@ -9,7 +9,7 @@ interface NewShareModalProps {
     isOpen: boolean;
 }
 
-function NewShareModal({ close, isOpen }: NewShareModalProps) {
+const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
     const [errorMessage, setErrorMessage] = useState(<></>);
 
     const form = useFormik({

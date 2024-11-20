@@ -10,7 +10,7 @@ interface ShareCardProps {
     shareObject: AgentObject;
 }
 
-function ShareCard({ shareObject }: ShareCardProps) {
+const ShareCard = ({ shareObject }: ShareCardProps) => {
     let frontends = new Array<React.JSX.Element>();
     let share = (shareObject.v as ShareDetail);
     share.frontendEndpoint!.map(fe => {

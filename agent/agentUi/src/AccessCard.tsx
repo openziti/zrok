@@ -9,13 +9,13 @@ interface AccessCardProps {
     accessObject: AgentObject;
 }
 
-function AccessCard({ accessObject }: AccessCardProps) {
+const AccessCard = ({ accessObject }: AccessCardProps) => {
     let access = (accessObject.v as AccessDetail);
 
     const releaseAccess = () => {
         GetAgentApi().agentReleaseAccess({frontendToken: access.frontendToken})
             .catch(e => {
-                console.log(e);
+                console.log("error releasing access", e);
             });
     }
 

@@ -9,7 +9,7 @@ interface OverviewProps {
     overview: Array<AgentObject>;
 }
 
-function Overview({ overview }: OverviewProps) {
+const Overview = ({ overview }: OverviewProps) => {
     let cards = [];
     if(overview.length > 0) {
         overview.forEach(row => {

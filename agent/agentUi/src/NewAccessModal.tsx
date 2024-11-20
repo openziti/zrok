@@ -9,7 +9,7 @@ interface NewAccessModalProps {
     isOpen: boolean;
 }
 
-function NewAccessModal({ close, isOpen }: NewAccessModalProps) {
+const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
     const [errorMessage, setErrorMessage] = useState(<></>);
 
     const newAccessForm = useFormik({

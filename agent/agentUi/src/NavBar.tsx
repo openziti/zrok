@@ -9,7 +9,7 @@ interface NavBarProps {
     accessClick: () => void;
 }
 
-function NavBar({ version, shareClick, accessClick }: NavBarProps) {
+const NavBar = ({ version, shareClick, accessClick }: NavBarProps) => {
     return (
         <Box ssx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -31,7 +31,7 @@ function NavBar({ version, shareClick, accessClick }: NavBarProps) {
                 </Toolbar>
             </AppBar>
         </Box>
-    )
+    );
 }
 
 export default NavBar
