@@ -3,6 +3,7 @@ import {GetAgentApi} from "./model/api.ts";
 import {useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, MenuItem, Modal, TextField, Typography} from "@mui/material";
 import {modalStyle} from "./model/theme.ts";
+import * as React from "react";
 
 interface NewShareModalProps {
     close: () => void;
@@ -10,7 +11,7 @@ interface NewShareModalProps {
 }
 
 const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
-    const [errorMessage, setErrorMessage] = useState(<></>);
+    const [errorMessage, setErrorMessage] = useState(null as React.JSX.Element);
 
     const form = useFormik({
         initialValues: {
@@ -20,7 +21,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
             insecure: false,
         },
         onSubmit: v => {
-            setErrorMessage(<></>);
+            setErrorMessage(null as React.JSX.Element);
             switch(v.shareMode) {
                 case "public":
                     GetAgentApi().agentSharePublic(v)
@@ -29,7 +30,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
                         })
                         .catch(e => {
                             e.response().json().then(ex => {
-                                setErrorMessage(<p>{ex.message}</p>);
+                                setErrorMessage(<span>{ex.message}</span>);
                                 console.log(ex.message);
                             })
                         });

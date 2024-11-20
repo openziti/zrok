@@ -3,6 +3,7 @@ import {useFormik} from "formik";
 import {GetAgentApi} from "./model/api.ts";
 import {Box, Button, Modal, TextField, Typography} from "@mui/material";
 import {modalStyle} from "./model/theme.ts";
+import * as React from "react";
 
 interface NewAccessModalProps {
     close: () => void;
@@ -10,7 +11,7 @@ interface NewAccessModalProps {
 }
 
 const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
-    const [errorMessage, setErrorMessage] = useState(<></>);
+    const [errorMessage, setErrorMessage] = useState(null as React.JSX.Element);
 
     const newAccessForm = useFormik({
         initialValues: {
@@ -18,14 +19,14 @@ const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
             bindAddress: "",
         },
         onSubmit: v => {
-            setErrorMessage(<></>);
+            setErrorMessage(null as React.JSX.Element);
             GetAgentApi().agentAccessPrivate(v)
                 .then(r => {
                     close();
                 })
                 .catch(e => {
                     e.response.json().then(ex => {
-                        setErrorMessage(<p>{ex.message}</p>);
+                        setErrorMessage(<span>{ex.message}</span>);
                         console.log(ex.message);
                     })
                 });
@@ -38,7 +39,7 @@ const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
                   <Typography>
                       <h2>Access...</h2>
                   </Typography>
-                  {errorMessage}
+                  <Typography color={"red"}><h3>{errorMessage}</h3></Typography>
                   <form onSubmit={newAccessForm.handleSubmit}>
                       <TextField
                           fullWidth
