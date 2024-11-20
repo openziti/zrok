@@ -8,6 +8,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/drive"
 	"github.com/openziti/zrok/endpoints/proxy"
@@ -22,8 +23,10 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 func init() {
@@ -64,16 +67,17 @@ func newShareReservedCommand() *shareReservedCommand {
 }
 
 func (cmd *shareReservedCommand) run(_ *cobra.Command, args []string) {
+	if cmd.subordinate {
+		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
-		if !panicInstead {
-			tui.Error("error loading environment", err)
-		}
-		panic(err)
+		cmd.error("error loading environment", err)
 	}
 
 	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+		cmd.error("unable to create share", errors.New("unable to load environment; did you 'zrok enable'?"))
 	}
 
 	if cmd.subordinate || cmd.forceLocal {
@@ -100,20 +104,14 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 	zrok, err := root.Client()
 	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to create zrok client", err)
-		}
-		panic(err)
+		cmd.error("unable to create zrok client", err)
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
 	req.ShrToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
 	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to retrieve reserved share", err)
-		}
-		panic(err)
+		cmd.error("unable to retrieve reserved share", err)
 	}
 	target = cmd.overrideEndpoint
 	if target == "" {
@@ -125,10 +123,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
-		if !panicInstead {
-			tui.Error("unable to load ziti identity configuration", err)
-		}
-		panic(err)
+		cmd.error("unable to load ziti identity configuration", err)
 	}
 
 	if resp.Payload.BackendMode != "socks" {
@@ -143,10 +138,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 				BackendProxyEndpoint: target,
 			}
 			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
-				if !panicInstead {
-					tui.Error("unable to update backend target", err)
-				}
-				panic(err)
+				cmd.error("unable to update backend target", err)
 			}
 			if !cmd.subordinate {
 				logrus.Infof("updated backend target to: %v", target)
@@ -164,24 +156,6 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 		shareDescription = resp.Payload.FrontendEndpoint
 	case string(sdk.PrivateShareMode):
 		shareDescription = fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok access private %v", shrToken)))
-	}
-
-	if cmd.subordinate {
-		data := make(map[string]interface{})
-		data["token"] = resp.Payload.Token
-		data["backend_mode"] = resp.Payload.BackendMode
-		data["share_mode"] = resp.Payload.ShareMode
-		if resp.Payload.FrontendEndpoint != "" {
-			data["frontend_endpoints"] = resp.Payload.FrontendEndpoint
-		}
-		if resp.Payload.BackendProxyEndpoint != "" {
-			data["target"] = resp.Payload.BackendProxyEndpoint
-		}
-		jsonData, err := json.Marshal(data)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(string(jsonData))
 	}
 
 	mdl := newShareModel(shrToken, []string{shareDescription}, sdk.ShareMode(resp.Payload.ShareMode), sdk.BackendMode(resp.Payload.BackendMode))
@@ -202,10 +176,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := proxy.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("unable to create proxy backend handler", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'proxy' backend", err)
 		}
 
 		go func() {
@@ -224,10 +195,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating web backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'web' backend", err)
 		}
 
 		go func() {
@@ -246,10 +214,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := tcpTunnel.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating tcpTunnel backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'tcpTunnel' backend", err)
 		}
 
 		go func() {
@@ -268,10 +233,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := udpTunnel.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating udpTunnel backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'udpTunnel' backend", err)
 		}
 
 		go func() {
@@ -289,10 +251,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating caddy backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'caddy' backend", err)
 		}
 
 		go func() {
@@ -311,10 +270,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := drive.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating drive backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'drive' backend", err)
 		}
 
 		go func() {
@@ -332,10 +288,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := socks.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating socks backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'socks' backend", err)
 		}
 
 		go func() {
@@ -354,10 +307,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := vpn.NewBackend(cfg)
 		if err != nil {
-			if !panicInstead {
-				tui.Error("error creating VPN backend", err)
-			}
-			panic(err)
+			cmd.error("unable to create 'vpn' backend", err)
 		}
 
 		go func() {
@@ -367,10 +317,29 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 		}()
 
 	default:
-		tui.Error("invalid backend mode", nil)
+		cmd.error("unable to share", errors.New("invalid backend mode"))
 	}
 
-	if cmd.headless {
+	if cmd.subordinate {
+		data := make(map[string]interface{})
+		data[subordinate.MessageKey] = subordinate.BootMessage
+		data["token"] = resp.Payload.Token
+		data["backend_mode"] = resp.Payload.BackendMode
+		data["share_mode"] = resp.Payload.ShareMode
+		if resp.Payload.FrontendEndpoint != "" {
+			data["frontend_endpoints"] = resp.Payload.FrontendEndpoint
+		}
+		if resp.Payload.BackendProxyEndpoint != "" {
+			data["target"] = resp.Payload.BackendProxyEndpoint
+		}
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			cmd.error("unable to marshal", err)
+		}
+		fmt.Println(string(jsonData))
+	}
+
+	if cmd.headless && !cmd.subordinate {
 		switch resp.Payload.ShareMode {
 		case string(sdk.PublicShareMode):
 			logrus.Infof("access your zrok share: %v", resp.Payload.FrontendEndpoint)
@@ -390,6 +359,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			select {
 			case req := <-requests:
 				data := make(map[string]interface{})
+				data[subordinate.MessageKey] = "access"
 				data["remote-address"] = req.RemoteAddr
 				data["method"] = req.Method
 				data["path"] = req.Path
@@ -421,6 +391,16 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		close(requests)
 	}
+}
+
+func (cmd *shareReservedCommand) error(msg string, err error) {
+	if cmd.subordinate {
+		subordinateError(errors.Wrap(err, msg))
+	}
+	if !panicInstead {
+		tui.Error(msg, err)
+	}
+	panic(errors.Wrap(err, msg))
 }
 
 func (cmd *shareReservedCommand) shareAgent(args []string, root env_core.Root) {

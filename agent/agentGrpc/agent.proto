@@ -2,15 +2,45 @@ syntax = "proto3";
 
 option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
+import "google/api/annotations.proto";
+
 service Agent {
-	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {}
-	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {}
-	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareResponse) {}
+	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/accessPrivate"
+		};
+	}
+	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/releaseAccess"
+		};
+	}
+	rpc ReleaseShare(ReleaseShareRequest) returns (ReleaseShareResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/releaseShare"
+		};
+	}
 	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
-	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {}
-	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {}
-	rpc Status(StatusRequest) returns (StatusResponse) {}
-	rpc Version(VersionRequest) returns (VersionResponse) {}
+	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/sharePrivate"
+		};
+	}
+	rpc SharePublic(SharePublicRequest) returns (SharePublicResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/sharePublic"
+		};
+	}
+	rpc Status(StatusRequest) returns (StatusResponse) {
+		option(google.api.http) = {
+			get: "/v1/agent/status"
+		};
+	}
+	rpc Version(VersionRequest) returns (VersionResponse) {
+		option(google.api.http) = {
+			get: "/v1/agent/version"
+		};
+	}
 }
 
 message AccessDetail {
@@ -27,7 +57,11 @@ message AccessPrivateResponse{
 message AccessPrivateRequest{
 	string token = 1;
 	string bindAddress = 2;
-	repeated string responseHeaders = 3;
+	bool autoMode = 3;
+	string autoAddress = 4;
+	uint32 autoStartPort = 5;
+	uint32 autoEndPort = 6;
+	repeated string responseHeaders = 7;
 }
 
 message ReleaseAccessRequest {
@@ -112,4 +146,5 @@ message VersionRequest {
 
 message VersionResponse {
 	string v = 1;
+	string consoleEndpoint = 2;
 }

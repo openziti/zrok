@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/environment"
@@ -38,12 +39,12 @@ func (cmd *agentVersionCommand) run(_ *cobra.Command, _ []string) {
 	if err != nil {
 		tui.Error("error connecting to agent", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	v, err := client.Version(context.Background(), &agentGrpc.VersionRequest{})
 	if err != nil {
 		tui.Error("error getting agent version", err)
 	}
 
-	println(v.GetV())
+	fmt.Printf("%v\n%v\n", v.GetV(), v.GetConsoleEndpoint())
 }

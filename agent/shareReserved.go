@@ -3,9 +3,12 @@ package agent
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -21,9 +24,19 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 
 	shrCmd := []string{os.Args[0], "share", "reserved", "--subordinate"}
 	shr := &share{
-		reserved:     true,
-		bootComplete: make(chan struct{}),
-		agent:        i.agent,
+		reserved: true,
+		sub:      subordinate.NewMessageHandler(),
+		agent:    i.agent,
+	}
+	shr.sub.MessageHandler = func(msg subordinate.Message) {
+		logrus.Info(msg)
+	}
+	var bootErr error
+	shr.sub.BootHandler = func(msgType string, msg subordinate.Message) {
+		bootErr = shr.bootHandler(msgType, msg)
+	}
+	shr.sub.MalformedHandler = func(msg subordinate.Message) {
+		logrus.Error(msg)
 	}
 
 	if req.OverrideEndpoint != "" {
@@ -38,15 +51,15 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 	shrCmd = append(shrCmd, req.Token)
 	shr.token = req.Token
 
-	shr.process, err = proctree.StartChild(shr.tail, shrCmd...)
+	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
 		return nil, err
 	}
 
-	go shr.monitor()
-	<-shr.bootComplete
+	<-shr.sub.BootComplete
 
-	if shr.bootErr == nil {
+	if bootErr == nil {
+		go shr.monitor()
 		i.agent.addShare <- shr
 		return &agentGrpc.ShareReservedResponse{
 			Token:             shr.token,
@@ -55,7 +68,11 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 			FrontendEndpoints: shr.frontendEndpoints,
 			Target:            shr.target,
 		}, nil
-	}
 
-	return nil, shr.bootErr
+	} else {
+		if err := proctree.WaitChild(shr.process); err != nil {
+			logrus.Errorf("error joining: %v", err)
+		}
+		return nil, fmt.Errorf("unable to start share: %v", bootErr)
+	}
 }

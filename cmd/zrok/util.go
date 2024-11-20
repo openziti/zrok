@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/pkg/errors"
 	"math"
 	"net/url"
@@ -44,4 +46,16 @@ func parseUrl(in string) (string, error) {
 	}
 
 	return targetEndpoint.String(), nil
+}
+
+func subordinateError(err error) {
+	msg := make(map[string]interface{})
+	msg[subordinate.MessageKey] = subordinate.ErrorMessage
+	msg[subordinate.ErrorMessage] = err.Error()
+	if data, err := json.Marshal(msg); err == nil {
+		fmt.Println(string(data))
+	} else {
+		fmt.Println("{\"" + subordinate.MessageKey + "\":\"" + subordinate.ErrorMessage + "\",\"" + subordinate.ErrorMessage + "\":\"internal error\"}")
+	}
+	os.Exit(1)
 }

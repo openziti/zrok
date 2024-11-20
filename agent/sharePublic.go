@@ -3,8 +3,10 @@ package agent
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
@@ -23,10 +25,20 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 
 	shrCmd := []string{os.Args[0], "share", "public", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
-		shareMode:    sdk.PublicShareMode,
-		backendMode:  sdk.BackendMode(req.BackendMode),
-		bootComplete: make(chan struct{}),
-		agent:        i.agent,
+		shareMode:   sdk.PublicShareMode,
+		backendMode: sdk.BackendMode(req.BackendMode),
+		sub:         subordinate.NewMessageHandler(),
+		agent:       i.agent,
+	}
+	shr.sub.MessageHandler = func(msg subordinate.Message) {
+		logrus.Info(msg)
+	}
+	var bootErr error
+	shr.sub.BootHandler = func(msgType string, msg subordinate.Message) {
+		bootErr = shr.bootHandler(msgType, msg)
+	}
+	shr.sub.MalformedHandler = func(msg subordinate.Message) {
+		logrus.Error(msg)
 	}
 
 	for _, basicAuth := range req.BasicAuth {
@@ -73,21 +85,25 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 
 	logrus.Infof("executing '%v'", shrCmd)
 
-	shr.process, err = proctree.StartChild(shr.tail, shrCmd...)
+	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
 		return nil, err
 	}
 
-	go shr.monitor()
-	<-shr.bootComplete
+	<-shr.sub.BootComplete
 
-	if shr.bootErr == nil {
+	if bootErr == nil {
+		go shr.monitor()
 		i.agent.addShare <- shr
 		return &agentGrpc.SharePublicResponse{
 			Token:             shr.token,
 			FrontendEndpoints: shr.frontendEndpoints,
 		}, nil
-	}
 
-	return nil, shr.bootErr
+	} else {
+		if err := proctree.WaitChild(shr.process); err != nil {
+			logrus.Errorf("error joining: %v", err)
+		}
+		return nil, fmt.Errorf("unable to start share: %v", bootErr)
+	}
 }

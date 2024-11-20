@@ -1,33 +1,42 @@
 package agent
 
 import (
+	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/agent/agentUi"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"net"
+	"net/http"
 	"os"
 )
 
 type Agent struct {
-	root        env_core.Root
-	agentSocket string
-	shares      map[string]*share
-	addShare    chan *share
-	rmShare     chan *share
-	accesses    map[string]*access
-	addAccess   chan *access
-	rmAccess    chan *access
+	cfg          *AgentConfig
+	httpEndpoint string
+	root         env_core.Root
+	agentSocket  string
+	shares       map[string]*share
+	addShare     chan *share
+	rmShare      chan *share
+	accesses     map[string]*access
+	addAccess    chan *access
+	rmAccess     chan *access
 }
 
-func NewAgent(root env_core.Root) (*Agent, error) {
+func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 	if !root.IsEnabled() {
 		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
 	}
 	return &Agent{
+		cfg:       cfg,
 		root:      root,
 		shares:    make(map[string]*share),
 		addShare:  make(chan *share),
@@ -44,7 +53,6 @@ func (a *Agent) Run() error {
 	if err := proctree.Init("zrok Agent"); err != nil {
 		return err
 	}
-	go a.manager()
 
 	agentSocket, err := a.root.AgentSocket()
 	if err != nil {
@@ -55,6 +63,9 @@ func (a *Agent) Run() error {
 		return err
 	}
 	a.agentSocket = agentSocket
+
+	go a.manager()
+	go a.gateway(a.cfg)
 
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
@@ -78,6 +89,36 @@ func (a *Agent) Shutdown() {
 	for _, acc := range a.accesses {
 		logrus.Debugf("stopping access '%v'", acc.token)
 		a.rmAccess <- acc
+	}
+}
+
+func (a *Agent) Config() *AgentConfig {
+	return a.cfg
+}
+
+func (a *Agent) gateway(cfg *AgentConfig) {
+	logrus.Info("started")
+	defer logrus.Warn("exited")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	endpoint := "unix:" + a.agentSocket
+	logrus.Debugf("endpoint: '%v'", endpoint)
+	if err := agentGrpc.RegisterAgentHandlerFromEndpoint(ctx, mux, "unix:"+a.agentSocket, opts); err != nil {
+		logrus.Fatalf("unable to register gateway: %v", err)
+	}
+
+	listener, err := util.AutoListener("tcp", cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
+	if err != nil {
+		logrus.Fatalf("unable to create a listener: %v", err)
+	}
+	a.httpEndpoint = listener.Addr().String()
+
+	if err := http.Serve(listener, agentUi.Middleware(mux)); err != nil {
+		logrus.Error(err)
 	}
 }
 

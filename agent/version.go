@@ -10,5 +10,8 @@ import (
 func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) (*agentGrpc.VersionResponse, error) {
 	v := build.String()
 	logrus.Debugf("responding to version inquiry with '%v'", v)
-	return &agentGrpc.VersionResponse{V: v}, nil
+	return &agentGrpc.VersionResponse{
+		V:               v,
+		ConsoleEndpoint: i.agent.httpEndpoint,
+	}, nil
 }
