@@ -42,8 +42,11 @@ swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_serv
 echo "...generating zrok client"
 swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_client_zrok -t "$zrokDir" -m "rest_model_zrok"
 
-echo "...generating web console js client"
+echo "...generating api console js client"
 openapi -s specs/zrok.yml -o ui/src/api -l js
+
+echo "...generating ui100 api console ts client"
+openapi-generator-cli generate -i specs/zrok.yml -o ui100/src/api -g typescript-fetch
 
 echo "...generating agent console js client"
 openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/agentUi/src/api -g typescript-fetch
