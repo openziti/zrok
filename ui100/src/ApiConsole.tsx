@@ -2,7 +2,8 @@ import {useEffect, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
 import buildVisualizerGraph from "./model/visualizer.ts";
 import {GraphCanvas} from "reagraph";
-import {Box, Grid, Grid2} from "@mui/material";
+import {Box} from "@mui/material";
+import NavBar from "./NavBar.tsx";
 
 const ApiConsole = () => {
     const [version, setVersion] = useState("no version set");
@@ -48,8 +49,7 @@ const ApiConsole = () => {
 
     return (
         <div>
-            <h1>zrok</h1>
-            <h2>{version}</h2>
+            <NavBar version={version} />
             <Box>
                 <div style={{position: "relative", width: "100%", height: "500px"}}>
                     <GraphCanvas nodes={nodes} edges={edges}/>
