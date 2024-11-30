@@ -217,12 +217,14 @@ else
     echo "ERROR: invalid JSON in $(realpath ~/.zrok)/reserved.json" >&2
     exit 1
   else
-    ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' ~/.zrok/reserved.json 2>/dev/null)
-    if [[ -z "${ZROK_PUBLIC_URLS}" || "${ZROK_PUBLIC_URLS}" == null ]]; then
-      echo "ERROR: frontend endpoints not defined in $(realpath ~/.zrok)/reserved.json" >&2
-      exit 1
-    else
-      echo "INFO: zrok public URLs: ${ZROK_PUBLIC_URLS}"
+    if [[ "${ZROK_FRONTEND_MODE:-}" == reserved-public ]]; then
+      ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' ~/.zrok/reserved.json 2>/dev/null)
+      if [[ -z "${ZROK_PUBLIC_URLS}" || "${ZROK_PUBLIC_URLS}" == null ]]; then
+        echo "ERROR: frontend endpoints not defined in $(realpath ~/.zrok)/reserved.json" >&2
+        exit 1
+      else
+        echo "INFO: zrok public URLs: ${ZROK_PUBLIC_URLS}"
+      fi
     fi
     ZROK_RESERVED_TOKEN=$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)
     if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
