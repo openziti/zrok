@@ -20,6 +20,8 @@ FIX: Document unique names
 
 FIX: reduce Docker image sizes (https://github.com/openziti/zrok/pull/783)
 
+FIX: Docker reserved private share startup error (https://github.com/openziti/zrok/pull/801)
+
 FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
 
 CHANGE: briefly mention the backend modes that apply to public and private share concepts
