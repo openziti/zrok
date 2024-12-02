@@ -26,7 +26,7 @@ const ApiConsole = () => {
             let cfg = new Configuration({
                 headers: {
                     // ignorable token, local development environment
-                    "X-TOKEN": "q9bwDQqMQ6K6"
+                    "X-TOKEN": "8TPUmoBHMdA8"
                 }
             });
             let api = new MetadataApi(cfg);
