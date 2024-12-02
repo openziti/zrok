@@ -67,9 +67,9 @@ The best ways to engage are [Discourse](https://openziti.discourse.group/) for q
 
 Use `zrok` to share a running service, like a web server or a network socket, or to share a directory of static files.
 
-If [sharing publicly](./concepts/sharing-public.md), you can reserve a subdomain, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
+If [sharing publicly](./concepts/sharing-public.mdx), you can reserve a subdomain, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
 
-If [sharing privately](./concepts/sharing-private.md), only users with the share token can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
+If [sharing privately](./concepts/sharing-private.mdx), only users with the share token can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
 
 ## Installing the zrok Command
 
@@ -245,6 +245,8 @@ If we try to reload the frontend endpoint in our web browser, we'll see:
 
 ![Not Found](images/zrok_not_found.png)
 
+[More about public shares](/concepts/sharing-public.mdx)
+
 ### Private Shares
 
 `zrok` also provides a powerful _private_ sharing model. If I execute the following command:
@@ -262,6 +264,8 @@ access your share with: zrok access private wvszln4dyz9q
 Rather than allowing access to your service through a public frontend, a _private_ share is only exposed to the underlying OpenZiti network, and can only be accessed using the `zrok access` command.
 
 The `zrok access private wvszln4dyz9q` command can be run by any `zrok` user, allowing them to create and bind a local HTTP listener, that allows for private access to your shared resources.
+
+[More about private shares](/concepts/sharing-private.mdx)
 
 ### Proxy Backend Mode
 
@@ -319,6 +323,8 @@ When we're done with the reserved share, we can _release_ it using this command:
 $ zrok release mltwsinym1s2
 [   0.230]    INFO main.(*releaseCommand).run: reserved share 'mltwsinym1s2' released
 ```
+
+[More about reserved shares](/concepts/sharing-reserved.md)
 
 ## Concepts Review
 

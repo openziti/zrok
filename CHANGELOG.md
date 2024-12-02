@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## v0.4.45
+
+FIX: Update indirect dependency `github.com/golang-jwt/jwt/v4` to version `v4.5.1` (https://github.com/openziti/zrok/issues/794)
+
+FIX: Document unique names
+
+FIX: reduce Docker image sizes (https://github.com/openziti/zrok/pull/783)
+
+FIX: Docker reserved private share startup error (https://github.com/openziti/zrok/pull/801)
+
+FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
+
+CHANGE: briefly mention the backend modes that apply to public and private share concepts
+
+## v0.4.44
+
+FIX: Fix for goreleaser build action to align with changed ARM64 build path.
+
 ## v0.4.43
 
 CHANGE: Update `github.com/openziti/sdk-golang` to version `v0.23.44`. Remove old `github.com/openziti/fabric` dependency, instead pulling in the modern `github.com/openziti/ziti` dependency.
@@ -214,7 +232,7 @@ CHANGE: The OpenZiti SDK for golang (https://github.com/openziti/sdk-golang) has
 
 ## v0.4.23
 
-FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives/cli.md`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
+FEATURE: New CLI commands have been implemented for working with the `drive` share backend mode (part of the "zrok Drives" functionality). These commands include `zrok cp`, `zrok mkdir` `zrok mv`, `zrok ls`, and `zrok rm`. These are initial, minimal versions of these commands and very likely contain bugs and ergonomic annoyances. There is a guide available at (`docs/guides/drives.mdx`) that explains how to work with these tools in detail (https://github.com/openziti/zrok/issues/438)
 
 FEATURE: Python SDK now has a decorator for integrating with various server side frameworks. See the `http-server` example.
 

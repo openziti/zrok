@@ -31,7 +31,6 @@ RUN wget -qO- https://deb.nodesource.com/setup_18.x | bash \
 
 
 COPY --from=golang /usr/local/go /usr/local/go
-# RUN chmod -R go+rX ${go_path} ${go_cache}
 
 COPY --from=goreleaser /usr/bin/goreleaser /usr/local/bin/goreleaser
 
