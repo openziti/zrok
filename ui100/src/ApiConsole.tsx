@@ -56,12 +56,11 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
 
     return (
         <div>
-            <NavBar version={version} />
+            <NavBar logout={logout} version={version} />
             <Box>
                 <div style={{position: "relative", width: "100%", height: "500px"}}>
                     <GraphCanvas nodes={nodes} edges={edges} theme={reagraphTheme} labelFontUrl={"https://fonts.googleapis.com/css?family=Poppins"}/>
                 </div>
-                <Button onClick={logout}>Log Out</Button>
             </Box>
         </div>
     );

@@ -27,7 +27,7 @@ const Login = ({ onLogin }: LoginProps) => {
     }
 
     return (
-        <Typography>
+        <Typography component="div">
             <Container maxWidth="xs">
                 <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <h2>welcome to zrok...</h2>
@@ -59,7 +59,7 @@ const Login = ({ onLogin }: LoginProps) => {
                         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                             Log In
                         </Button>
-                        <Box component="h3">{message}</Box>
+                        <Box component="h3" style={{ color: "red" }}>{message}</Box>
                     </Box>
                 </Box>
             </Container>
