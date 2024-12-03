@@ -1,7 +1,9 @@
 import {Box, Button, Container, TextField, Typography} from "@mui/material";
 import {User} from "./model/user.ts";
-import {useState} from "react";
-import {AccountApi} from "./api";
+import {useEffect, useState} from "react";
+import {AccountApi, MetadataApi} from "./api";
+import {Link} from "react-router";
+import zroket from "../public/zrok-1.0.0-rocket.svg";
 
 interface LoginProps {
     onLogin: (user: User) => void;
@@ -11,10 +13,23 @@ const Login = ({ onLogin }: LoginProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [tou, setTou] = useState(null as string);
+
+    useEffect(() => {
+        let api = new MetadataApi();
+        api._configuration()
+            .then(d => {
+                if(d.touLink && d.touLink.trim() !== "") {
+                    setTou(d.touLink);
+                }
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }, []);
 
     const login = async e => {
         e.preventDefault();
-        console.log(email, password);
 
         let api = new AccountApi();
         api.login({body: {"email": email, "password": password}})
@@ -22,15 +37,17 @@ const Login = ({ onLogin }: LoginProps) => {
                 onLogin({email: email, token: d.toString()});
             })
             .catch(e => {
-                setMessage("login failed: " + e.toString());
+                console.log(e);
+                setMessage("login failed!")
             });
     }
 
     return (
         <Typography component="div">
             <Container maxWidth="xs">
-                <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <h2>welcome to zrok...</h2>
+                <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
+                    <img src={zroket} height="300"/>
+                    <h1 style={{ color: "#241775" }}>z r o k</h1>
                     <Box component="form" noValidate onSubmit={login}>
                         <TextField
                             margin="normal"
@@ -42,7 +59,10 @@ const Login = ({ onLogin }: LoginProps) => {
                             autoComplete="email"
                             autoFocus
                             value={email}
-                            onChange={v => { setMessage(""); setEmail(v.target.value) }}
+                            onChange={v => {
+                                setMessage("");
+                                setEmail(v.target.value)
+                            }}
                         />
                         <TextField
                             margin="normal"
@@ -54,12 +74,23 @@ const Login = ({ onLogin }: LoginProps) => {
                             id="password"
                             autoComplete="current-password"
                             value={password}
-                            onChange={v => { setMessage(""); setPassword(v.target.value) }}
+                            onChange={v => {
+                                setMessage("");
+                                setPassword(v.target.value)
+                            }}
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        <Button type="submit" fullWidth variant="contained" sx={{mt: 3, mb: 2}}>
                             Log In
                         </Button>
-                        <Box component="h3" style={{ color: "red" }}>{message}</Box>
+                        <Box component="div" style={{ textAlign: "center" }}>
+                            <Box component="h3" style={{color: "red"}}>{message}</Box>
+                        </Box>
+                        <Box component="div" style={{ textAlign: "center" }}>
+                            <Link to="/resetPassword">Forgot Password?</Link>
+                        </Box>
+                        <Box component="div" style={{ textAlign: "center" }}>
+                            <div dangerouslySetInnerHTML={{__html: tou}}></div>
+                        </Box>
                     </Box>
                 </Box>
             </Container>

@@ -10,7 +10,7 @@ const App = () => {
     useEffect(() => {
         const checkUser = () => {
             const user = localStorage.getItem("user");
-            if(user) {
+            if (user) {
                 console.log(user);
                 setUser(JSON.parse(user));
                 console.log("reloaded user", user);
@@ -21,6 +21,7 @@ const App = () => {
 
     const login = (user: User) => {
         setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
     }
 
     const logout = () => {
@@ -28,12 +29,12 @@ const App = () => {
         localStorage.clear();
     }
 
-    const consoleRoot = user ? <ApiConsole user={user} logout={logout} /> : <Login onLogin={login} />
+    const consoleRoot = user ? <ApiConsole user={user} logout={logout}/> : <Login onLogin={login}/>
 
     return (
         <BrowserRouter>
             <Routes>
-                <Route index element={consoleRoot} />
+                <Route index element={consoleRoot}/>
             </Routes>
         </BrowserRouter>
     );

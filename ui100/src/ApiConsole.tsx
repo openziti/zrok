@@ -39,9 +39,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             let api = new MetadataApi(cfg);
             api.overview()
                 .then(d => {
-                    console.log(d);
                     let graph = buildVisualizerGraph(d);
-
                     setNodes(graph.nodes);
                     setEdges(graph.edges);
                 })
@@ -59,7 +57,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             <NavBar logout={logout} version={version} />
             <Box>
                 <div style={{position: "relative", width: "100%", height: "500px"}}>
-                    <GraphCanvas nodes={nodes} edges={edges} theme={reagraphTheme} labelFontUrl={"https://fonts.googleapis.com/css?family=Poppins"}/>
+                    <GraphCanvas nodes={nodes} edges={edges} theme={reagraphTheme} />
                 </div>
             </Box>
         </div>
