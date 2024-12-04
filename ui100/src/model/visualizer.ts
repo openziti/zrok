@@ -1,18 +1,34 @@
 import {Overview} from "../api";
+import {Edge, Node} from "@xyflow/react";
 
-const buildVisualizerGraph = (overview: Overview) => {
-    let nodes = [
-        { id: "1", label: "michael@quigley.com" }
-    ]
-    let edges = [];
+export class VisualOverview {
+    nodes: Node[];
+    edges: Edge[];
+}
+
+const buildVisualizerGraph = (overview: Overview): VisualOverview => {
+    let out = new VisualOverview();
+    out.nodes = [
+        { id: "1", position: { x: 0, y: 0 }, data: { label: "michael@quigley.com" } }
+    ];
+    out.edges = [];
+
     overview.environments?.forEach((env, i) => {
-        nodes.push({ id: (i+2).toString(), label: env.environment?.description! });
-        edges.push({ source: (i+2).toString(), target: "1", id: (i+2)+"-1" });
+        out.nodes.push({
+            id: (i+2).toString(),
+            position: { x: 0, y: 0 },
+            data: { label: env.environment?.description! },
+        });
+        out.edges.push({
+            id: "e" + (i+2) + "-1",
+            source: "1",
+            target: (i+2).toString()
+        });
     })
-    return {
-        nodes: nodes,
-        edges: edges,
-    }
+
+    console.log(out);
+
+    return out;
 }
 
 export default buildVisualizerGraph;

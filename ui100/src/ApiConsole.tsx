@@ -1,11 +1,10 @@
 import {useEffect, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
-import buildVisualizerGraph from "./model/visualizer.ts";
-import {GraphCanvas} from "reagraph";
-import {Box, Button} from "@mui/material";
+import buildVisualizerGraph, {VisualOverview} from "./model/visualizer.ts";
+import {Box} from "@mui/material";
 import NavBar from "./NavBar.tsx";
-import {reagraphTheme} from "./model/theme.ts";
 import {User} from "./model/user.ts";
+import Visualizer from "./Visualizer.tsx";
 
 interface ApiConsoleProps {
     user: User;
@@ -14,8 +13,7 @@ interface ApiConsoleProps {
 
 const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
     const [version, setVersion] = useState("no version set");
-    const [nodes, setNodes] = useState([]);
-    const [edges, setEdges] = useState([]);
+    const [overview, setOverview] = useState(new VisualOverview());
 
     useEffect(() => {
         let api = new MetadataApi();
@@ -32,16 +30,13 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         let interval = setInterval(() => {
             let cfg = new Configuration({
                 headers: {
-                    // ignorable token, local development environment
                     "X-TOKEN": user.token
                 }
             });
             let api = new MetadataApi(cfg);
             api.overview()
                 .then(d => {
-                    let graph = buildVisualizerGraph(d);
-                    setNodes(graph.nodes);
-                    setEdges(graph.edges);
+                    setOverview(buildVisualizerGraph(d));
                 })
                 .catch(e => {
                     console.log(e);
@@ -54,11 +49,9 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
 
     return (
         <div>
-            <NavBar logout={logout} version={version} />
+            <NavBar logout={logout} />
             <Box>
-                <div style={{position: "relative", width: "100%", height: "500px"}}>
-                    <GraphCanvas nodes={nodes} edges={edges} theme={reagraphTheme} />
-                </div>
+                <Visualizer overview={overview} />
             </Box>
         </div>
     );

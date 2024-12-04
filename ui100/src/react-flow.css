@@ -1,0 +1,8 @@
+.react-flow__node {
+    font-family: "Poppins", sans-serif;
+    color: #241775;
+    border: 1px solid #241775;
+}
+.react-flow__attribution {
+    display: none;
+}

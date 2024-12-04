@@ -1,7 +1,7 @@
 import {AppBar, Box, Button, Grid2, IconButton, Toolbar, Typography} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
-import zroket from "../public/zrok-1.0.0-rocket-white.svg";
+import zroket from "./assets/zrok-1.0.0-rocket-white.svg";
 
 interface NavBarProps {
     logout: () => void;
@@ -15,7 +15,7 @@ const NavBar = ({ logout }: NavBarProps) => {
                     <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }} display={{ xs: "none", sm: "none", md: "block" }}>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         <Grid2 container sx={{ flexGrow: 1 }}>
                             <Grid2 display="flex" justifyContent="left">
                                 <img src={zroket} height="30" />

@@ -14,10 +14,11 @@
     "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.8",
     "@mui/material": "^6.1.8",
+    "@xyflow/react": "^12.3.5",
+    "d3-hierarchy": "^3.1.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router": "^7.0.1",
-    "reagraph": "^4.21.0"
+    "react-router": "^7.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
