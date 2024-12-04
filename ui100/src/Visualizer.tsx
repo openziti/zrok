@@ -48,6 +48,7 @@ const Visualizer = ({ overview }: VisualizerProps) => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             fitView
+            nodesDraggable={false}
         >
             <Background/>
             <Controls />
