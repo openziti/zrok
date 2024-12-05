@@ -1,6 +1,5 @@
 import {Overview} from "../api";
 import {Edge, Node} from "@xyflow/react";
-import ShareIcon from "@mui/icons-material/Share";
 
 export class VisualOverview {
     nodes: Node[];
@@ -10,7 +9,7 @@ export class VisualOverview {
 const buildVisualizerGraph = (overview: Overview): VisualOverview => {
     let out = new VisualOverview();
     out.nodes = [
-        { id: "0", position: { x: 0, y: 0 }, data: { label: "michael@quigley.com" }, type: "input" }
+        { id: "0", position: { x: 0, y: 0 }, data: { label: "michael@quigley.com" }, type: "account" }
     ];
     out.edges = [];
 
@@ -19,8 +18,8 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
             let envNode = {
                 id: env.environment.zId,
                 position: { x: 0, y: 0 },
-                data: { label: env.environment?.description! },
-                type: "output",
+                data: { label: env.environment?.description!, empty: true },
+                type: "environment",
             }
             out.nodes.push(envNode);
             out.edges.push({
@@ -29,13 +28,13 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
                 target: env.environment.zId
             });
             if(env.shares) {
-                envNode.type = "default";
+                envNode.data.empty = false;
                 env.shares.forEach(shr => {
                     out.nodes.push({
                         id: shr.token!,
                         position: { x: 0, y: 0 },
                         data: { label: shr.token! },
-                        type: "output",
+                        type: "share",
                     });
                     out.edges.push({
                         id: env.environment?.zId + "-" + shr.token!,

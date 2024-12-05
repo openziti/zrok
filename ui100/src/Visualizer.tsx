@@ -4,10 +4,15 @@ import {Background, Controls, ReactFlow, ReactFlowProvider, useEdgesState, useNo
 import {VisualOverview} from "./model/visualizer.ts";
 import {useEffect} from "react";
 import {stratify, tree} from "d3-hierarchy";
+import ShareNode from "./ShareNode.tsx";
+import EnvironmentNode from "./EnvironmentNode.tsx";
+import AccountNode from "../AccountNode.tsx";
 
 interface VisualizerProps {
     overview: VisualOverview;
 }
+
+const nodeTypes = { account: AccountNode, environment: EnvironmentNode, share: ShareNode };
 
 const Visualizer = ({ overview }: VisualizerProps) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -43,6 +48,7 @@ const Visualizer = ({ overview }: VisualizerProps) => {
 
     return (
         <ReactFlow
+            nodeTypes={nodeTypes}
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
