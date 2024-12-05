@@ -79,7 +79,7 @@ const Login = ({ onLogin }: LoginProps) => {
                                 setPassword(v.target.value)
                             }}
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{mt: 3, mb: 2}}>
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
                             Log In
                         </Button>
                         <Box component="div" style={{ textAlign: "center" }}>

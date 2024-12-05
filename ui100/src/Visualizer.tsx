@@ -30,7 +30,6 @@ const Visualizer = ({ overview }: VisualizerProps) => {
         }
         let g = tree();
         if(nodes.length === 0) return { nodes, edges };
-        // const { width, height } = document.querySelector(`[data-id="$nodes[0].id"]`).getBoundingClientRect();
         const width = 100;
         const height = 40;
         const hierarchy = stratify()
