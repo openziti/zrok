@@ -51,7 +51,7 @@ const Visualizer = ({ overview }: VisualizerProps) => {
             nodesDraggable={false}
         >
             <Background/>
-            <Controls />
+            <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
     );
 }
