@@ -43,6 +43,22 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
                     });
                 });
             }
+            if(env.frontends) {
+                envNode.data.empty = false;
+                env.frontends.forEach(acc => {
+                    out.nodes.push({
+                        id: acc.token!,
+                        position: { x: 0, y: 0 },
+                        data: { label: acc.token! },
+                        type: "access",
+                    });
+                    out.edges.push({
+                        id: env.environment?.zId + "-" + acc.token!,
+                        source: env.environment?.zId!,
+                        target: acc.token!
+                    });
+                });
+            }
         }
     });
 

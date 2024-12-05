@@ -7,12 +7,18 @@ import {stratify, tree} from "d3-hierarchy";
 import ShareNode from "./ShareNode.tsx";
 import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "../AccountNode.tsx";
+import AccessNode from "./AccessNode.tsx";
 
 interface VisualizerProps {
     overview: VisualOverview;
 }
 
-const nodeTypes = { account: AccountNode, environment: EnvironmentNode, share: ShareNode };
+const nodeTypes = {
+    access: AccessNode,
+    account: AccountNode,
+    environment: EnvironmentNode,
+    share: ShareNode
+};
 
 const Visualizer = ({ overview }: VisualizerProps) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
