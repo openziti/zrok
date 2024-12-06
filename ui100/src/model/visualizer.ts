@@ -6,7 +6,7 @@ export class VisualOverview {
     edges: Edge[];
 }
 
-const buildVisualizerGraph = (overview: Overview): VisualOverview => {
+export const buildVisualOverview = (overview: Overview): VisualOverview => {
     let out = new VisualOverview();
     out.nodes = [
         { id: "0", position: { x: 0, y: 0 }, data: { label: "michael@quigley.com" }, type: "account" }
@@ -90,4 +90,6 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
     return out;
 }
 
-export default buildVisualizerGraph;
+export const visualOverviewsEqual = (a: VisualOverview, b: VisualOverview): boolean => {
+    return false;
+}
