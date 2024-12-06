@@ -11,9 +11,7 @@ const App = () => {
         const checkUser = () => {
             const user = localStorage.getItem("user");
             if (user) {
-                console.log(user);
                 setUser(JSON.parse(user));
-                console.log("reloaded user", user);
             }
         }
         checkUser();

@@ -13,6 +13,9 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
     ];
     out.edges = [];
 
+    let ownedShares: { [key: string]: Node } = {};
+    let ownedAccesses: { [key: string]: Node } = {};
+
     overview.environments?.forEach(env => {
         if(env.environment && env.environment.zId) {
             let envNode = {
@@ -27,15 +30,18 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
                 source: "0",
                 target: env.environment.zId
             });
+
             if(env.shares) {
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
-                    out.nodes.push({
+                    let shareNode = {
                         id: shr.token!,
                         position: { x: 0, y: 0 },
-                        data: { label: shr.token! },
+                        data: { label: shr.token!, accessed: false },
                         type: "share",
-                    });
+                    };
+                    out.nodes.push(shareNode);
+                    ownedShares[shr.token!] = shareNode;
                     out.edges.push({
                         id: env.environment?.zId + "-" + shr.token!,
                         source: env.environment?.zId!,
@@ -46,21 +52,41 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
             if(env.frontends) {
                 envNode.data.empty = false;
                 env.frontends.forEach(acc => {
-                    out.nodes.push({
+                    let accNode = {
                         id: acc.token!,
                         position: { x: 0, y: 0 },
-                        data: { label: acc.token! },
+                        data: { label: acc.token!, ownedShare: false, shrToken: acc.shrToken },
                         type: "access",
-                    });
+                    }
+                    out.nodes.push(accNode);
                     out.edges.push({
                         id: env.environment?.zId + "-" + acc.token!,
                         source: env.environment?.zId!,
                         target: acc.token!
                     });
+                    let ownedShare = ownedShares[acc.shrToken];
+
                 });
             }
         }
     });
+    out.nodes.forEach(n => {
+        if(n.type == "access") {
+            let ownedShare = ownedShares[n.data.shrToken];
+            if(ownedShare) {
+                console.log("linking owned share", n)
+                n.data.ownedShare = true;
+                ownedShare.data.accessed = true;
+                out.edges.push({
+                    id: n.id + "-" + n.data.shrToken,
+                    source: n.id,
+                    target: n.data.shrToken as string,
+                    targetHandle: "access",
+                    animated: true
+                });
+            }
+        }
+    })
 
     return out;
 }
