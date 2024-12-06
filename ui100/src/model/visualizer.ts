@@ -14,7 +14,6 @@ const buildVisualizerGraph = (overview: Overview): VisualOverview => {
     out.edges = [];
 
     let ownedShares: { [key: string]: Node } = {};
-    let ownedAccesses: { [key: string]: Node } = {};
 
     overview.environments?.forEach(env => {
         if(env.environment && env.environment.zId) {
