@@ -790,7 +790,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async removeOrganizationMember (body?: GrantsRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async removeOrganizationMember (body?: AddOrganizationMemberRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/organization/remove';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -807,7 +807,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "GrantsRequest")
+            body: ObjectSerializer.serialize(body, "AddOrganizationMemberRequest")
         };
 
         let authenticationPromise = Promise.resolve();

@@ -61,6 +61,31 @@ func (o *RemoveOrganizationMemberUnauthorized) WriteResponse(rw http.ResponseWri
 	rw.WriteHeader(401)
 }
 
+// RemoveOrganizationMemberNotFoundCode is the HTTP code returned for type RemoveOrganizationMemberNotFound
+const RemoveOrganizationMemberNotFoundCode int = 404
+
+/*
+RemoveOrganizationMemberNotFound not found
+
+swagger:response removeOrganizationMemberNotFound
+*/
+type RemoveOrganizationMemberNotFound struct {
+}
+
+// NewRemoveOrganizationMemberNotFound creates RemoveOrganizationMemberNotFound with default headers values
+func NewRemoveOrganizationMemberNotFound() *RemoveOrganizationMemberNotFound {
+
+	return &RemoveOrganizationMemberNotFound{}
+}
+
+// WriteResponse to the client
+func (o *RemoveOrganizationMemberNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // RemoveOrganizationMemberInternalServerErrorCode is the HTTP code returned for type RemoveOrganizationMemberInternalServerError
 const RemoveOrganizationMemberInternalServerErrorCode int = 500
 

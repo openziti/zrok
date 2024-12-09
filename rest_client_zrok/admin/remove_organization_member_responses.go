@@ -34,6 +34,12 @@ func (o *RemoveOrganizationMemberReader) ReadResponse(response runtime.ClientRes
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewRemoveOrganizationMemberNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewRemoveOrganizationMemberInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -157,6 +163,62 @@ func (o *RemoveOrganizationMemberUnauthorized) readResponse(response runtime.Cli
 	return nil
 }
 
+// NewRemoveOrganizationMemberNotFound creates a RemoveOrganizationMemberNotFound with default headers values
+func NewRemoveOrganizationMemberNotFound() *RemoveOrganizationMemberNotFound {
+	return &RemoveOrganizationMemberNotFound{}
+}
+
+/*
+RemoveOrganizationMemberNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type RemoveOrganizationMemberNotFound struct {
+}
+
+// IsSuccess returns true when this remove organization member not found response has a 2xx status code
+func (o *RemoveOrganizationMemberNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this remove organization member not found response has a 3xx status code
+func (o *RemoveOrganizationMemberNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this remove organization member not found response has a 4xx status code
+func (o *RemoveOrganizationMemberNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this remove organization member not found response has a 5xx status code
+func (o *RemoveOrganizationMemberNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this remove organization member not found response a status code equal to that given
+func (o *RemoveOrganizationMemberNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the remove organization member not found response
+func (o *RemoveOrganizationMemberNotFound) Code() int {
+	return 404
+}
+
+func (o *RemoveOrganizationMemberNotFound) Error() string {
+	return fmt.Sprintf("[POST /organization/remove][%d] removeOrganizationMemberNotFound ", 404)
+}
+
+func (o *RemoveOrganizationMemberNotFound) String() string {
+	return fmt.Sprintf("[POST /organization/remove][%d] removeOrganizationMemberNotFound ", 404)
+}
+
+func (o *RemoveOrganizationMemberNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
 // NewRemoveOrganizationMemberInternalServerError creates a RemoveOrganizationMemberInternalServerError with default headers values
 func NewRemoveOrganizationMemberInternalServerError() *RemoveOrganizationMemberInternalServerError {
 	return &RemoveOrganizationMemberInternalServerError{}
@@ -221,6 +283,9 @@ type RemoveOrganizationMemberBody struct {
 
 	// email
 	Email string `json:"email,omitempty"`
+
+	// token
+	Token string `json:"token,omitempty"`
 }
 
 // Validate validates this remove organization member body
