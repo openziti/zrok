@@ -43,6 +43,8 @@ func (h *removeOrganizationMemberHandler) Handle(params admin.RemoveOrganization
 		return admin.NewRemoveOrganizationMemberInternalServerError()
 	}
 
+	logrus.Infof("removed '%v' from organization '%v'", acct.Email, org.Token)
+
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing transaction: %v", err)
 		return admin.NewRemoveOrganizationMemberInternalServerError()

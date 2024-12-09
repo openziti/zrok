@@ -46,7 +46,7 @@ func (str *Store) IsAccountAdminOfOrganization(acctId, orgId int, trx *sqlx.Tx) 
 }
 
 func (str *Store) RemoveAccountFromOrganization(acctId, orgId int, trx *sqlx.Tx) error {
-	stmt, err := trx.Prepare("delete from organization_members where organization_id = $1 and account_id = $2")
+	stmt, err := trx.Prepare("delete from organization_members where account_id = $1 and organization_id = $2")
 	if err != nil {
 		return errors.Wrap(err, "error preparing organization_members delete statement")
 	}
