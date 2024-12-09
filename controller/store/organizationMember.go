@@ -17,8 +17,25 @@ func (str *Store) AddAccountToOrganization(acctId, orgId int, admin bool, trx *s
 	return nil
 }
 
-func (str *Store) FindAccountsForOrganization(orgId int, trx *sqlx.Tx) ([]string, error) {
-	return nil, nil
+type OrganizationMember struct {
+	Email string
+	Admin bool
+}
+
+func (str *Store) FindAccountsForOrganization(orgId int, trx *sqlx.Tx) ([]*OrganizationMember, error) {
+	rows, err := trx.Queryx("select organization_members.admin, accounts.email from organization_members, accounts where organization_members.organization_id = $1 and organization_members.account_id = accounts.id", orgId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error querying organization members")
+	}
+	var members []*OrganizationMember
+	for rows.Next() {
+		om := &OrganizationMember{}
+		if err := rows.StructScan(&om); err != nil {
+			return nil, errors.Wrap(err, "error scanning account email")
+		}
+		members = append(members, om)
+	}
+	return members, nil
 }
 
 func (str *Store) IsAccountInOrganization(acctId, orgId int, trx *sqlx.Tx) (bool, error) {

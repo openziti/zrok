@@ -23,6 +23,7 @@ export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
 export * from './listOrganizationMembers200Response';
+export * from './listOrganizationMembers200ResponseMembersInner';
 export * from './loginRequest';
 export * from './metrics';
 export * from './metricsSample';
@@ -83,6 +84,7 @@ import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
 import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
+import { ListOrganizationMembers200ResponseMembersInner } from './listOrganizationMembers200ResponseMembersInner';
 import { LoginRequest } from './loginRequest';
 import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
@@ -151,6 +153,7 @@ let typeMap: {[index: string]: any} = {
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
     "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
+    "ListOrganizationMembers200ResponseMembersInner": ListOrganizationMembers200ResponseMembersInner,
     "LoginRequest": LoginRequest,
     "Metrics": Metrics,
     "MetricsSample": MetricsSample,

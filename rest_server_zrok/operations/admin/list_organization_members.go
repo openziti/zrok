@@ -223,6 +223,9 @@ func (o *ListOrganizationMembersOKBody) UnmarshalBinary(b []byte) error {
 // swagger:model ListOrganizationMembersOKBodyMembersItems0
 type ListOrganizationMembersOKBodyMembersItems0 struct {
 
+	// admin
+	Admin bool `json:"admin,omitempty"`
+
 	// email
 	Email string `json:"email,omitempty"`
 }

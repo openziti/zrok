@@ -11,22 +11,27 @@
  */
 
 import { RequestFile } from './models';
-import { ListOrganizationMembers200ResponseMembersInner } from './listOrganizationMembers200ResponseMembersInner';
 
-export class ListOrganizationMembers200Response {
-    'members'?: Array<ListOrganizationMembers200ResponseMembersInner>;
+export class ListOrganizationMembers200ResponseMembersInner {
+    'email'?: string;
+    'admin'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "members",
-            "baseName": "members",
-            "type": "Array<ListOrganizationMembers200ResponseMembersInner>"
+            "name": "email",
+            "baseName": "email",
+            "type": "string"
+        },
+        {
+            "name": "admin",
+            "baseName": "admin",
+            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {
-        return ListOrganizationMembers200Response.attributeTypeMap;
+        return ListOrganizationMembers200ResponseMembersInner.attributeTypeMap;
     }
 }
 

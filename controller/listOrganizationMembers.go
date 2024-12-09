@@ -29,22 +29,22 @@ func (h *listOrganizationMembersHandler) Handle(params admin.ListOrganizationMem
 	org, err := str.FindOrganizationByToken(params.Body.Token, trx)
 	if err != nil {
 		logrus.Errorf("error finding organization by token: %v", err)
-		return admin.NewListOrganizationMembersInternalServerError()
+		return admin.NewListOrganizationMembersNotFound()
 	}
 	if org == nil {
 		logrus.Errorf("organization '%v' not found", params.Body.Token)
 		return admin.NewListOrganizationMembersNotFound()
 	}
 
-	emails, err := str.FindAccountsForOrganization(org.Id, trx)
+	oms, err := str.FindAccountsForOrganization(org.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding accounts for organization: %v", err)
 		return admin.NewListOrganizationMembersInternalServerError()
 	}
 
 	var members []*admin.ListOrganizationMembersOKBodyMembersItems0
-	for _, email := range emails {
-		members = append(members, &admin.ListOrganizationMembersOKBodyMembersItems0{Email: email})
+	for _, om := range oms {
+		members = append(members, &admin.ListOrganizationMembersOKBodyMembersItems0{Email: om.Email, Admin: om.Admin})
 	}
 	return admin.NewListOrganizationMembersOK().WithPayload(&admin.ListOrganizationMembersOKBody{Members: members})
 }

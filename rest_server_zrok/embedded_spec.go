@@ -992,6 +992,9 @@ func init() {
                   "type": "array",
                   "items": {
                     "properties": {
+                      "admin": {
+                        "type": "boolean"
+                      },
                       "email": {
                         "type": "string"
                       }
@@ -3512,6 +3515,9 @@ func init() {
   "definitions": {
     "MembersItems0": {
       "properties": {
+        "admin": {
+          "type": "boolean"
+        },
         "email": {
           "type": "string"
         }

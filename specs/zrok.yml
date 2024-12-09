@@ -483,6 +483,8 @@ paths:
                   properties:
                     email:
                       type: string
+                    admin:
+                      type: boolean
         401:
           description: unauthorized
         404:
