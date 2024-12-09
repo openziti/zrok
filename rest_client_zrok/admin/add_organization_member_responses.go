@@ -34,6 +34,12 @@ func (o *AddOrganizationMemberReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewAddOrganizationMemberNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewAddOrganizationMemberInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -157,6 +163,62 @@ func (o *AddOrganizationMemberUnauthorized) readResponse(response runtime.Client
 	return nil
 }
 
+// NewAddOrganizationMemberNotFound creates a AddOrganizationMemberNotFound with default headers values
+func NewAddOrganizationMemberNotFound() *AddOrganizationMemberNotFound {
+	return &AddOrganizationMemberNotFound{}
+}
+
+/*
+AddOrganizationMemberNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type AddOrganizationMemberNotFound struct {
+}
+
+// IsSuccess returns true when this add organization member not found response has a 2xx status code
+func (o *AddOrganizationMemberNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this add organization member not found response has a 3xx status code
+func (o *AddOrganizationMemberNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this add organization member not found response has a 4xx status code
+func (o *AddOrganizationMemberNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this add organization member not found response has a 5xx status code
+func (o *AddOrganizationMemberNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this add organization member not found response a status code equal to that given
+func (o *AddOrganizationMemberNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the add organization member not found response
+func (o *AddOrganizationMemberNotFound) Code() int {
+	return 404
+}
+
+func (o *AddOrganizationMemberNotFound) Error() string {
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound ", 404)
+}
+
+func (o *AddOrganizationMemberNotFound) String() string {
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound ", 404)
+}
+
+func (o *AddOrganizationMemberNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
 // NewAddOrganizationMemberInternalServerError creates a AddOrganizationMemberInternalServerError with default headers values
 func NewAddOrganizationMemberInternalServerError() *AddOrganizationMemberInternalServerError {
 	return &AddOrganizationMemberInternalServerError{}
@@ -221,6 +283,9 @@ type AddOrganizationMemberBody struct {
 
 	// email
 	Email string `json:"email,omitempty"`
+
+	// token
+	Token string `json:"token,omitempty"`
 }
 
 // Validate validates this add organization member body

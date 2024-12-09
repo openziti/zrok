@@ -15,6 +15,7 @@ import localVarRequest from 'request';
 import http from 'http';
 
 /* tslint:disable:no-unused-locals */
+import { AddOrganizationMemberRequest } from '../model/addOrganizationMemberRequest';
 import { CreateAccountRequest } from '../model/createAccountRequest';
 import { CreateFrontendRequest } from '../model/createFrontendRequest';
 import { CreateFrontendResponse } from '../model/createFrontendResponse';
@@ -105,7 +106,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async addOrganizationMember (body?: GrantsRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async addOrganizationMember (body?: AddOrganizationMemberRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/organization/add';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -122,7 +123,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "GrantsRequest")
+            body: ObjectSerializer.serialize(body, "AddOrganizationMemberRequest")
         };
 
         let authenticationPromise = Promise.resolve();

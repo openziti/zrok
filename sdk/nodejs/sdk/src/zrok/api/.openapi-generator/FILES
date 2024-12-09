@@ -8,6 +8,7 @@ api/metadataApi.ts
 api/shareApi.ts
 model/accessRequest.ts
 model/accessResponse.ts
+model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts
 model/configuration.ts

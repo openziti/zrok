@@ -28,19 +28,45 @@ class OrganizationAddBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
+        'token': 'str',
         'email': 'str'
     }
 
     attribute_map = {
+        'token': 'token',
         'email': 'email'
     }
 
-    def __init__(self, email=None):  # noqa: E501
+    def __init__(self, token=None, email=None):  # noqa: E501
         """OrganizationAddBody - a model defined in Swagger"""  # noqa: E501
+        self._token = None
         self._email = None
         self.discriminator = None
+        if token is not None:
+            self.token = token
         if email is not None:
             self.email = email
+
+    @property
+    def token(self):
+        """Gets the token of this OrganizationAddBody.  # noqa: E501
+
+
+        :return: The token of this OrganizationAddBody.  # noqa: E501
+        :rtype: str
+        """
+        return self._token
+
+    @token.setter
+    def token(self, token):
+        """Sets the token of this OrganizationAddBody.
+
+
+        :param token: The token of this OrganizationAddBody.  # noqa: E501
+        :type: str
+        """
+
+        self._token = token
 
     @property
     def email(self):

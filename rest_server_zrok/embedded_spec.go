@@ -932,6 +932,9 @@ func init() {
               "properties": {
                 "email": {
                   "type": "string"
+                },
+                "token": {
+                  "type": "string"
                 }
               }
             }
@@ -943,6 +946,9 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"
@@ -2992,6 +2998,9 @@ func init() {
               "properties": {
                 "email": {
                   "type": "string"
+                },
+                "token": {
+                  "type": "string"
                 }
               }
             }
@@ -3003,6 +3012,9 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"

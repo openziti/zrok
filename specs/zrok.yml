@@ -442,6 +442,8 @@ paths:
           in: body
           schema:
             properties:
+              token:
+                type: string
               email:
                 type: string
       responses:
@@ -449,6 +451,8 @@ paths:
           description: member added
         401:
           description: unauthorized
+        404:
+          description: not found
         500:
           description: internal server error
 
