@@ -518,6 +518,31 @@ paths:
         500:
           description: internal server error
 
+  /organizations:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listOrganizations
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              organizations:
+                type: array
+                items:
+                  properties:
+                    token:
+                      type: string
+                    description:
+                      type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   #
   # environment
   #

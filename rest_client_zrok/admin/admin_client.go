@@ -52,6 +52,8 @@ type ClientService interface {
 
 	ListOrganizationMembers(params *ListOrganizationMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationMembersOK, error)
 
+	ListOrganizations(params *ListOrganizationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationsOK, error)
+
 	RemoveOrganizationMember(params *RemoveOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveOrganizationMemberOK, error)
 
 	UpdateFrontend(params *UpdateFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateFrontendOK, error)
@@ -485,6 +487,45 @@ func (a *Client) ListOrganizationMembers(params *ListOrganizationMembersParams, 
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listOrganizationMembers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListOrganizations list organizations API
+*/
+func (a *Client) ListOrganizations(params *ListOrganizationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListOrganizationsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listOrganizations",
+		Method:             "GET",
+		PathPattern:        "/organizations",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListOrganizationsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListOrganizationsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listOrganizations: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

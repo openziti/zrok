@@ -121,6 +121,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminListOrganizationMembersHandler: admin.ListOrganizationMembersHandlerFunc(func(params admin.ListOrganizationMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListOrganizationMembers has not yet been implemented")
 		}),
+		AdminListOrganizationsHandler: admin.ListOrganizationsHandlerFunc(func(params admin.ListOrganizationsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListOrganizations has not yet been implemented")
+		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
@@ -261,6 +264,8 @@ type ZrokAPI struct {
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// AdminListOrganizationMembersHandler sets the operation handler for the list organization members operation
 	AdminListOrganizationMembersHandler admin.ListOrganizationMembersHandler
+	// AdminListOrganizationsHandler sets the operation handler for the list organizations operation
+	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
@@ -441,6 +446,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminListOrganizationMembersHandler == nil {
 		unregistered = append(unregistered, "admin.ListOrganizationMembersHandler")
+	}
+	if o.AdminListOrganizationsHandler == nil {
+		unregistered = append(unregistered, "admin.ListOrganizationsHandler")
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
@@ -679,6 +687,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/organization/list"] = admin.NewListOrganizationMembers(o.context, o.AdminListOrganizationMembersHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/organizations"] = admin.NewListOrganizations(o.context, o.AdminListOrganizationsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -30,6 +30,8 @@ model/inviteRequest.ts
 model/inviteTokenGenerateRequest.ts
 model/listOrganizationMembers200Response.ts
 model/listOrganizationMembers200ResponseMembersInner.ts
+model/listOrganizations200Response.ts
+model/listOrganizations200ResponseOrganizationsInner.ts
 model/loginRequest.ts
 model/metrics.ts
 model/metricsSample.ts

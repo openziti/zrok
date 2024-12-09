@@ -1059,6 +1059,47 @@ func init() {
         }
       }
     },
+    "/organizations": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listOrganizations",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "organizations": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -3130,6 +3171,40 @@ func init() {
         }
       }
     },
+    "/organizations": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listOrganizations",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "organizations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/OrganizationsItems0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview": {
       "get": {
         "security": [
@@ -3519,6 +3594,16 @@ func init() {
           "type": "boolean"
         },
         "email": {
+          "type": "string"
+        }
+      }
+    },
+    "OrganizationsItems0": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         }
       }

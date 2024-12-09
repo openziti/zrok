@@ -188,6 +188,12 @@ export function removeOrganizationMember(options) {
   return gateway.request(removeOrganizationMemberOperation, parameters)
 }
 
+/**
+ */
+export function listOrganizations() {
+  return gateway.request(listOrganizationsOperation)
+}
+
 const createAccountOperation = {
   path: '/account',
   contentTypes: ['application/zrok.v1+json'],
@@ -323,6 +329,16 @@ const removeOrganizationMemberOperation = {
   path: '/organization/remove',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const listOrganizationsOperation = {
+  path: '/organizations',
+  method: 'get',
   security: [
     {
       id: 'key'
