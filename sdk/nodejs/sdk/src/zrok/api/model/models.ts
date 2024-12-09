@@ -10,6 +10,7 @@ export * from './createFrontendRequest';
 export * from './createFrontendResponse';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
+export * from './createOrganizationRequest';
 export * from './deleteFrontendRequest';
 export * from './disableRequest';
 export * from './enableRequest';
@@ -20,6 +21,7 @@ export * from './frontend';
 export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
+export * from './listOrganizationMembers200Response';
 export * from './loginRequest';
 export * from './metrics';
 export * from './metricsSample';
@@ -66,6 +68,7 @@ import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateFrontendResponse } from './createFrontendResponse';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
+import { CreateOrganizationRequest } from './createOrganizationRequest';
 import { DeleteFrontendRequest } from './deleteFrontendRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
@@ -76,6 +79,7 @@ import { Frontend } from './frontend';
 import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
+import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
 import { LoginRequest } from './loginRequest';
 import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
@@ -130,6 +134,7 @@ let typeMap: {[index: string]: any} = {
     "CreateFrontendResponse": CreateFrontendResponse,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
+    "CreateOrganizationRequest": CreateOrganizationRequest,
     "DeleteFrontendRequest": DeleteFrontendRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,
@@ -140,6 +145,7 @@ let typeMap: {[index: string]: any} = {
     "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
+    "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
     "LoginRequest": LoginRequest,
     "Metrics": Metrics,
     "MetricsSample": MetricsSample,

@@ -32,6 +32,95 @@ class AdminApi(object):
             api_client = ApiClient()
         self.api_client = api_client
 
+    def add_organization_member(self, **kwargs):  # noqa: E501
+        """add_organization_member  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.add_organization_member(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationAddBody body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.add_organization_member_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.add_organization_member_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def add_organization_member_with_http_info(self, **kwargs):  # noqa: E501
+        """add_organization_member  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.add_organization_member_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationAddBody body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method add_organization_member" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/organization/add', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type=None,  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def create_account(self, **kwargs):  # noqa: E501
         """create_account  # noqa: E501
 
@@ -311,6 +400,99 @@ class AdminApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def create_organization(self, **kwargs):  # noqa: E501
+        """create_organization  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_organization(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationBody body:
+        :return: InlineResponse200
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_organization_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.create_organization_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def create_organization_with_http_info(self, **kwargs):  # noqa: E501
+        """create_organization  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_organization_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationBody body:
+        :return: InlineResponse200
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_organization" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/organization', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='InlineResponse200',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def delete_frontend(self, **kwargs):  # noqa: E501
         """delete_frontend  # noqa: E501
 
@@ -386,6 +568,95 @@ class AdminApi(object):
 
         return self.api_client.call_api(
             '/frontend', 'DELETE',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type=None,  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def delete_organization(self, **kwargs):  # noqa: E501
+        """delete_organization  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_organization(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationBody1 body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.delete_organization_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.delete_organization_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def delete_organization_with_http_info(self, **kwargs):  # noqa: E501
+        """delete_organization  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_organization_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationBody1 body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method delete_organization" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/organization', 'DELETE',
             path_params,
             query_params,
             header_params,
@@ -656,6 +927,188 @@ class AdminApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='PublicFrontendList',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def list_organization_members(self, **kwargs):  # noqa: E501
+        """list_organization_members  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_organization_members(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationMembersBody body:
+        :return: InlineResponse2001
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_organization_members_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.list_organization_members_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def list_organization_members_with_http_info(self, **kwargs):  # noqa: E501
+        """list_organization_members  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_organization_members_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationMembersBody body:
+        :return: InlineResponse2001
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_organization_members" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/organization/members', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='InlineResponse2001',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def remove_organization_member(self, **kwargs):  # noqa: E501
+        """remove_organization_member  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.remove_organization_member(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationRemoveBody body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.remove_organization_member_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.remove_organization_member_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def remove_organization_member_with_http_info(self, **kwargs):  # noqa: E501
+        """remove_organization_member  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.remove_organization_member_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param OrganizationRemoveBody body:
+        :return: None
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method remove_organization_member" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/organization/remove', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type=None,  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
