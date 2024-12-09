@@ -81,6 +81,31 @@ func (o *ListOrganizationMembersUnauthorized) WriteResponse(rw http.ResponseWrit
 	rw.WriteHeader(401)
 }
 
+// ListOrganizationMembersNotFoundCode is the HTTP code returned for type ListOrganizationMembersNotFound
+const ListOrganizationMembersNotFoundCode int = 404
+
+/*
+ListOrganizationMembersNotFound not found
+
+swagger:response listOrganizationMembersNotFound
+*/
+type ListOrganizationMembersNotFound struct {
+}
+
+// NewListOrganizationMembersNotFound creates ListOrganizationMembersNotFound with default headers values
+func NewListOrganizationMembersNotFound() *ListOrganizationMembersNotFound {
+
+	return &ListOrganizationMembersNotFound{}
+}
+
+// WriteResponse to the client
+func (o *ListOrganizationMembersNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // ListOrganizationMembersInternalServerErrorCode is the HTTP code returned for type ListOrganizationMembersInternalServerError
 const ListOrganizationMembersInternalServerErrorCode int = 500
 

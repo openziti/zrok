@@ -943,7 +943,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param OrganizationMembersBody body:
+        :param OrganizationListBody body:
         :return: InlineResponse2001
                  If the method is called asynchronously,
                  returns the request thread.
@@ -964,7 +964,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param OrganizationMembersBody body:
+        :param OrganizationListBody body:
         :return: InlineResponse2001
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1012,7 +1012,7 @@ class AdminApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/organization/members', 'POST',
+            '/organization/list', 'POST',
             path_params,
             query_params,
             header_params,

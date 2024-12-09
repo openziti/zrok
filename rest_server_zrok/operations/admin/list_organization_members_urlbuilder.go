@@ -35,7 +35,7 @@ func (o *ListOrganizationMembersURL) SetBasePath(bp string) {
 func (o *ListOrganizationMembersURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/organization/members"
+	var _path = "/organization/list"
 
 	_basePath := o._basePath
 	if _basePath == "" {

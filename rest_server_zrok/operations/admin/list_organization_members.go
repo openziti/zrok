@@ -37,7 +37,7 @@ func NewListOrganizationMembers(ctx *middleware.Context, handler ListOrganizatio
 }
 
 /*
-	ListOrganizationMembers swagger:route POST /organization/members admin listOrganizationMembers
+	ListOrganizationMembers swagger:route POST /organization/list admin listOrganizationMembers
 
 ListOrganizationMembers list organization members API
 */

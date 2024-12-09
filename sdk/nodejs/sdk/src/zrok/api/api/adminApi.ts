@@ -724,7 +724,7 @@ export class AdminApi {
      * @param body 
      */
     public async listOrganizationMembers (body?: RegenerateToken200Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ListOrganizationMembers200Response;  }> {
-        const localVarPath = this.basePath + '/organization/members';
+        const localVarPath = this.basePath + '/organization/list';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
         const produces = ['application/zrok.v1+json'];

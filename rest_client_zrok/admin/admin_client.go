@@ -460,7 +460,7 @@ func (a *Client) ListOrganizationMembers(params *ListOrganizationMembersParams, 
 	op := &runtime.ClientOperation{
 		ID:                 "listOrganizationMembers",
 		Method:             "POST",
-		PathPattern:        "/organization/members",
+		PathPattern:        "/organization/list",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

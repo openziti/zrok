@@ -37,6 +37,12 @@ func (o *ListOrganizationMembersReader) ReadResponse(response runtime.ClientResp
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewListOrganizationMembersNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewListOrganizationMembersInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -44,7 +50,7 @@ func (o *ListOrganizationMembersReader) ReadResponse(response runtime.ClientResp
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("[POST /organization/members] listOrganizationMembers", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /organization/list] listOrganizationMembers", response, response.Code())
 	}
 }
 
@@ -93,11 +99,11 @@ func (o *ListOrganizationMembersOK) Code() int {
 }
 
 func (o *ListOrganizationMembersOK) Error() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
 }
 
 func (o *ListOrganizationMembersOK) String() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
 }
 
 func (o *ListOrganizationMembersOK) GetPayload() *ListOrganizationMembersOKBody {
@@ -160,14 +166,70 @@ func (o *ListOrganizationMembersUnauthorized) Code() int {
 }
 
 func (o *ListOrganizationMembersUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) String() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewListOrganizationMembersNotFound creates a ListOrganizationMembersNotFound with default headers values
+func NewListOrganizationMembersNotFound() *ListOrganizationMembersNotFound {
+	return &ListOrganizationMembersNotFound{}
+}
+
+/*
+ListOrganizationMembersNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type ListOrganizationMembersNotFound struct {
+}
+
+// IsSuccess returns true when this list organization members not found response has a 2xx status code
+func (o *ListOrganizationMembersNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this list organization members not found response has a 3xx status code
+func (o *ListOrganizationMembersNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this list organization members not found response has a 4xx status code
+func (o *ListOrganizationMembersNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this list organization members not found response has a 5xx status code
+func (o *ListOrganizationMembersNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this list organization members not found response a status code equal to that given
+func (o *ListOrganizationMembersNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the list organization members not found response
+func (o *ListOrganizationMembersNotFound) Code() int {
+	return 404
+}
+
+func (o *ListOrganizationMembersNotFound) Error() string {
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+}
+
+func (o *ListOrganizationMembersNotFound) String() string {
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+}
+
+func (o *ListOrganizationMembersNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }
@@ -216,11 +278,11 @@ func (o *ListOrganizationMembersInternalServerError) Code() int {
 }
 
 func (o *ListOrganizationMembersInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) String() string {
-	return fmt.Sprintf("[POST /organization/members][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

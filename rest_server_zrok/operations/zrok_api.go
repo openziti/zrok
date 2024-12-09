@@ -678,7 +678,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/organization/members"] = admin.NewListOrganizationMembers(o.context, o.AdminListOrganizationMembersHandler)
+	o.handlers["POST"]["/organization/list"] = admin.NewListOrganizationMembers(o.context, o.AdminListOrganizationMembersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

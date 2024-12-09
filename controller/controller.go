@@ -60,6 +60,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminGrantsHandler = newGrantsHandler()
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()
 	api.AdminListFrontendsHandler = newListFrontendsHandler()
+	api.AdminListOrganizationMembersHandler = newListOrganizationMembersHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()

@@ -309,7 +309,7 @@ const addOrganizationMemberOperation = {
 }
 
 const listOrganizationMembersOperation = {
-  path: '/organization/members',
+  path: '/organization/list',
   contentTypes: ['application/zrok.v1+json'],
   method: 'post',
   security: [

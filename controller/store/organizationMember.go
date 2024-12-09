@@ -17,6 +17,10 @@ func (str *Store) AddAccountToOrganization(acctId, orgId int, trx *sqlx.Tx) erro
 	return nil
 }
 
+func (str *Store) FindAccountsForOrganization(orgId int, trx *sqlx.Tx) ([]string, error) {
+	return nil, nil
+}
+
 func (str *Store) IsAccountInOrganization(acctId, orgId int, trx *sqlx.Tx) (bool, error) {
 	stmt, err := trx.Prepare("select count(0) from organization_members where organization_id = $1 and account_id = $2")
 	if err != nil {
