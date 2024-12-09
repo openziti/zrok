@@ -28,6 +28,7 @@ import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest'
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { PublicFrontend } from '../model/publicFrontend';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
+import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
@@ -790,7 +791,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async removeOrganizationMember (body?: AddOrganizationMemberRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async removeOrganizationMember (body?: RemoveOrganizationMemberRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/organization/remove';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -807,7 +808,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "AddOrganizationMemberRequest")
+            body: ObjectSerializer.serialize(body, "RemoveOrganizationMemberRequest")
         };
 
         let authenticationPromise = Promise.resolve();

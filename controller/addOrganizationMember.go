@@ -38,7 +38,7 @@ func (h *addOrganizationMemberHandler) Handle(params admin.AddOrganizationMember
 		return admin.NewAddOrganizationMemberNotFound()
 	}
 
-	if err := str.AddAccountToOrganization(acct.Id, org.Id, trx); err != nil {
+	if err := str.AddAccountToOrganization(acct.Id, org.Id, params.Body.Admin, trx); err != nil {
 		logrus.Errorf("error adding account '%v' to organization '%v': %v", acct.Email, org.Token, err)
 		return admin.NewAddOrganizationMemberInternalServerError()
 	}

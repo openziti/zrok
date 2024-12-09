@@ -281,6 +281,9 @@ swagger:model AddOrganizationMemberBody
 */
 type AddOrganizationMemberBody struct {
 
+	// admin
+	Admin bool `json:"admin,omitempty"`
+
 	// email
 	Email string `json:"email,omitempty"`
 

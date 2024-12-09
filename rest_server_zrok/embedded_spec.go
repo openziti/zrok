@@ -930,6 +930,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "admin": {
+                  "type": "boolean"
+                },
                 "email": {
                   "type": "string"
                 },
@@ -3002,6 +3005,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "admin": {
+                  "type": "boolean"
+                },
                 "email": {
                   "type": "string"
                 },

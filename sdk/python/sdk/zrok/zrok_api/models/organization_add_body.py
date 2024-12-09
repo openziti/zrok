@@ -29,23 +29,28 @@ class OrganizationAddBody(object):
     """
     swagger_types = {
         'token': 'str',
-        'email': 'str'
+        'email': 'str',
+        'admin': 'bool'
     }
 
     attribute_map = {
         'token': 'token',
-        'email': 'email'
+        'email': 'email',
+        'admin': 'admin'
     }
 
-    def __init__(self, token=None, email=None):  # noqa: E501
+    def __init__(self, token=None, email=None, admin=None):  # noqa: E501
         """OrganizationAddBody - a model defined in Swagger"""  # noqa: E501
         self._token = None
         self._email = None
+        self._admin = None
         self.discriminator = None
         if token is not None:
             self.token = token
         if email is not None:
             self.email = email
+        if admin is not None:
+            self.admin = admin
 
     @property
     def token(self):
@@ -88,6 +93,27 @@ class OrganizationAddBody(object):
         """
 
         self._email = email
+
+    @property
+    def admin(self):
+        """Gets the admin of this OrganizationAddBody.  # noqa: E501
+
+
+        :return: The admin of this OrganizationAddBody.  # noqa: E501
+        :rtype: bool
+        """
+        return self._admin
+
+    @admin.setter
+    def admin(self, admin):
+        """Sets the admin of this OrganizationAddBody.
+
+
+        :param admin: The admin of this OrganizationAddBody.  # noqa: E501
+        :type: bool
+        """
+
+        self._admin = admin
 
     def to_dict(self):
         """Returns the model properties as a dict"""

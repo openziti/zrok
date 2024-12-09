@@ -446,6 +446,8 @@ paths:
                 type: string
               email:
                 type: string
+              admin:
+                type: boolean
       responses:
         201:
           description: member added

@@ -5,12 +5,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (str *Store) AddAccountToOrganization(acctId, orgId int, trx *sqlx.Tx) error {
-	stmt, err := trx.Prepare("insert into organization_members (organization_id, account_id) values ($1, $2)")
+func (str *Store) AddAccountToOrganization(acctId, orgId int, admin bool, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("insert into organization_members (account_id, organization_id, admin) values ($1, $2, $3)")
 	if err != nil {
 		return errors.Wrap(err, "error preparing organization_members insert statement")
 	}
-	_, err = stmt.Exec(acctId, orgId)
+	_, err = stmt.Exec(acctId, orgId, admin)
 	if err != nil {
 		return errors.Wrap(err, "error executing organization_members insert statement")
 	}

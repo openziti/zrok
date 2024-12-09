@@ -78,6 +78,9 @@ func (o *AddOrganizationMember) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 // swagger:model AddOrganizationMemberBody
 type AddOrganizationMemberBody struct {
 
+	// admin
+	Admin bool `json:"admin,omitempty"`
+
 	// email
 	Email string `json:"email,omitempty"`
 

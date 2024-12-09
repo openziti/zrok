@@ -12,10 +12,9 @@
 
 import { RequestFile } from './models';
 
-export class AddOrganizationMemberRequest {
+export class RemoveOrganizationMemberRequest {
     'token'?: string;
     'email'?: string;
-    'admin'?: boolean;
 
     static discriminator: string | undefined = undefined;
 
@@ -29,15 +28,10 @@ export class AddOrganizationMemberRequest {
             "name": "email",
             "baseName": "email",
             "type": "string"
-        },
-        {
-            "name": "admin",
-            "baseName": "admin",
-            "type": "boolean"
         }    ];
 
     static getAttributeTypeMap() {
-        return AddOrganizationMemberRequest.attributeTypeMap;
+        return RemoveOrganizationMemberRequest.attributeTypeMap;
     }
 }
 
