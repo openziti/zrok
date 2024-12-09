@@ -34,6 +34,12 @@ func (o *DeleteOrganizationReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
+	case 404:
+		result := NewDeleteOrganizationNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewDeleteOrganizationInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -153,6 +159,62 @@ func (o *DeleteOrganizationUnauthorized) String() string {
 }
 
 func (o *DeleteOrganizationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewDeleteOrganizationNotFound creates a DeleteOrganizationNotFound with default headers values
+func NewDeleteOrganizationNotFound() *DeleteOrganizationNotFound {
+	return &DeleteOrganizationNotFound{}
+}
+
+/*
+DeleteOrganizationNotFound describes a response with status code 404, with default header values.
+
+organization not found
+*/
+type DeleteOrganizationNotFound struct {
+}
+
+// IsSuccess returns true when this delete organization not found response has a 2xx status code
+func (o *DeleteOrganizationNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete organization not found response has a 3xx status code
+func (o *DeleteOrganizationNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete organization not found response has a 4xx status code
+func (o *DeleteOrganizationNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete organization not found response has a 5xx status code
+func (o *DeleteOrganizationNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete organization not found response a status code equal to that given
+func (o *DeleteOrganizationNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the delete organization not found response
+func (o *DeleteOrganizationNotFound) Code() int {
+	return 404
+}
+
+func (o *DeleteOrganizationNotFound) Error() string {
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound ", 404)
+}
+
+func (o *DeleteOrganizationNotFound) String() string {
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound ", 404)
+}
+
+func (o *DeleteOrganizationNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

@@ -61,6 +61,31 @@ func (o *DeleteOrganizationUnauthorized) WriteResponse(rw http.ResponseWriter, p
 	rw.WriteHeader(401)
 }
 
+// DeleteOrganizationNotFoundCode is the HTTP code returned for type DeleteOrganizationNotFound
+const DeleteOrganizationNotFoundCode int = 404
+
+/*
+DeleteOrganizationNotFound organization not found
+
+swagger:response deleteOrganizationNotFound
+*/
+type DeleteOrganizationNotFound struct {
+}
+
+// NewDeleteOrganizationNotFound creates DeleteOrganizationNotFound with default headers values
+func NewDeleteOrganizationNotFound() *DeleteOrganizationNotFound {
+
+	return &DeleteOrganizationNotFound{}
+}
+
+// WriteResponse to the client
+func (o *DeleteOrganizationNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}
+
 // DeleteOrganizationInternalServerErrorCode is the HTTP code returned for type DeleteOrganizationInternalServerError
 const DeleteOrganizationInternalServerErrorCode int = 500
 

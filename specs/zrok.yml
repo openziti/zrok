@@ -425,6 +425,8 @@ paths:
             description: organization deleted
           401:
             description: unauthorized
+          404:
+            description: organization not found
           500:
             description: internal server error
 
