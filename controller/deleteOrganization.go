@@ -38,5 +38,10 @@ func (h *deleteOrganizationHandler) Handle(params admin.DeleteOrganizationParams
 		return admin.NewDeleteOrganizationInternalServerError()
 	}
 
+	if err := trx.Commit(); err != nil {
+		logrus.Errorf("error committing transaction: %v", err)
+		return admin.NewDeleteOrganizationInternalServerError()
+	}
+
 	return admin.NewDeleteOrganizationOK()
 }

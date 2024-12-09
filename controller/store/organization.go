@@ -25,7 +25,7 @@ func (str *Store) CreateOrganization(org *Organization, trx *sqlx.Tx) (int, erro
 
 func (str *Store) FindOrganizationByToken(token string, trx *sqlx.Tx) (*Organization, error) {
 	org := &Organization{}
-	if err := trx.QueryRowx("select * from organizations where token = $1", token).StructScan(org); err != nil {
+	if err := trx.QueryRowx("select * from organizations where token = $1 and not deleted", token).StructScan(org); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by token")
 	}
 	return org, nil
