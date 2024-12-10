@@ -656,6 +656,84 @@ export class MetadataApi {
     }
     /**
      * 
+     * @param organizationToken 
+     * @param accountEmail 
+     */
+    public async orgAccountOverview (organizationToken: string, accountEmail: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Overview;  }> {
+        const localVarPath = this.basePath + '/overview/{organizationToken}/{accountEmail}'
+            .replace('{' + 'organizationToken' + '}', encodeURIComponent(String(organizationToken)))
+            .replace('{' + 'accountEmail' + '}', encodeURIComponent(String(accountEmail)));
+        let localVarQueryParameters: any = {};
+        let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
+        const produces = ['application/zrok.v1+json'];
+        // give precedence to 'application/json'
+        if (produces.indexOf('application/json') >= 0) {
+            localVarHeaderParams.Accept = 'application/json';
+        } else {
+            localVarHeaderParams.Accept = produces.join(',');
+        }
+        let localVarFormParams: any = {};
+
+        // verify required parameter 'organizationToken' is not null or undefined
+        if (organizationToken === null || organizationToken === undefined) {
+            throw new Error('Required parameter organizationToken was null or undefined when calling orgAccountOverview.');
+        }
+
+        // verify required parameter 'accountEmail' is not null or undefined
+        if (accountEmail === null || accountEmail === undefined) {
+            throw new Error('Required parameter accountEmail was null or undefined when calling orgAccountOverview.');
+        }
+
+        (<any>Object).assign(localVarHeaderParams, options.headers);
+
+        let localVarUseFormData = false;
+
+        let localVarRequestOptions: localVarRequest.Options = {
+            method: 'GET',
+            qs: localVarQueryParameters,
+            headers: localVarHeaderParams,
+            uri: localVarPath,
+            useQuerystring: this._useQuerystring,
+            json: true,
+        };
+
+        let authenticationPromise = Promise.resolve();
+        if (this.authentications.key.apiKey) {
+            authenticationPromise = authenticationPromise.then(() => this.authentications.key.applyToRequest(localVarRequestOptions));
+        }
+        authenticationPromise = authenticationPromise.then(() => this.authentications.default.applyToRequest(localVarRequestOptions));
+
+        let interceptorPromise = authenticationPromise;
+        for (const interceptor of this.interceptors) {
+            interceptorPromise = interceptorPromise.then(() => interceptor(localVarRequestOptions));
+        }
+
+        return interceptorPromise.then(() => {
+            if (Object.keys(localVarFormParams).length) {
+                if (localVarUseFormData) {
+                    (<any>localVarRequestOptions).formData = localVarFormParams;
+                } else {
+                    localVarRequestOptions.form = localVarFormParams;
+                }
+            }
+            return new Promise<{ response: http.IncomingMessage; body: Overview;  }>((resolve, reject) => {
+                localVarRequest(localVarRequestOptions, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
+                            body = ObjectSerializer.deserialize(body, "Overview");
+                            resolve({ response: response, body: body });
+                        } else {
+                            reject(new HttpError(response, body, response.statusCode));
+                        }
+                    }
+                });
+            });
+        });
+    }
+    /**
+     * 
      */
     public async overview (options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Overview;  }> {
         const localVarPath = this.basePath + '/overview';

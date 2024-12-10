@@ -60,6 +60,21 @@ export function overview() {
 }
 
 /**
+ * @param {string} organizationToken 
+ * @param {string} accountEmail 
+ * @return {Promise<module:types.overview>} ok
+ */
+export function orgAccountOverview(organizationToken, accountEmail) {
+  const parameters = {
+    path: {
+      organizationToken,
+      accountEmail
+    }
+  }
+  return gateway.request(orgAccountOverviewOperation, parameters)
+}
+
+/**
  * @param {object} options Optional options
  * @param {string} [options.duration] 
  * @return {Promise<module:types.metrics>} account metrics
@@ -165,6 +180,16 @@ const getShareDetailOperation = {
 
 const overviewOperation = {
   path: '/overview',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const orgAccountOverviewOperation = {
+  path: '/overview/{organizationToken}/{accountEmail}',
   method: 'get',
   security: [
     {

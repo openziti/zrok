@@ -1127,6 +1127,47 @@ func init() {
         }
       }
     },
+    "/overview/{organizationToken}/{accountEmail}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "orgAccountOverview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "organizationToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "accountEmail",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/overview"
+            }
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/regenerateToken": {
       "post": {
         "security": [
@@ -3228,6 +3269,47 @@ func init() {
             "schema": {
               "$ref": "#/definitions/errorMessage"
             }
+          }
+        }
+      }
+    },
+    "/overview/{organizationToken}/{accountEmail}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "orgAccountOverview",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "organizationToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "accountEmail",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/overview"
+            }
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

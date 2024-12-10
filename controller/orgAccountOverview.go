@@ -9,32 +9,65 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type overviewHandler struct{}
+type orgAccountOverviewHandler struct{}
 
-func newOverviewHandler() *overviewHandler {
-	return &overviewHandler{}
+func newOrgAccountOverviewHandler() *orgAccountOverviewHandler {
+	return &orgAccountOverviewHandler{}
 }
 
-func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return metadata.NewOverviewInternalServerError()
+		return metadata.NewOrgAccountOverviewInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
+	org, err := str.FindOrganizationByToken(params.OrganizationToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
-		return metadata.NewOverviewInternalServerError()
+		logrus.Errorf("error finding organization by token: %v", err)
+		return metadata.NewOrgAccountOverviewNotFound()
 	}
 
-	accountLimited, err := h.isAccountLimited(principal, trx)
+	admin, err := str.IsAccountAdminOfOrganization(int(principal.ID), org.Id, trx)
 	if err != nil {
-		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
+		logrus.Errorf("error checking account admin: %v", err)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+	if !admin {
+		logrus.Errorf("requesting account '%v' is not admin of organization '%v'", principal.Email, org.Token)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+
+	acct, err := str.FindAccountWithEmail(params.AccountEmail, trx)
+	if err != nil {
+		logrus.Errorf("error finding account by email: %v", err)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+
+	inOrg, err := str.IsAccountInOrganization(acct.Id, org.Id, trx)
+	if err != nil {
+		logrus.Errorf("error checking account '%v' organization membership: %v", acct.Email, err)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+	if !inOrg {
+		logrus.Errorf("account '%v' is not a member of organization '%v'", acct.Email, org.Token)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+
+	envs, err := str.FindEnvironmentsForAccount(acct.Id, trx)
+	if err != nil {
+		logrus.Errorf("error finding environments for '%v': %v", acct.Email, err)
+		return metadata.NewOrgAccountOverviewNotFound()
+	}
+
+	accountLimited, err := h.isAccountLimited(acct.Id, trx)
+	if err != nil {
+		logrus.Errorf("error checking account '%v' limited: %v", acct.Email, err)
 	}
 
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
+
 	for _, env := range envs {
 		ear := &rest_model_zrok.EnvironmentAndResources{
 			Environment: &rest_model_zrok.Environment{
@@ -79,6 +112,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			}
 			ear.Shares = append(ear.Shares, envShr)
 		}
+
 		fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 		if err != nil {
 			logrus.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
@@ -106,17 +140,17 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		ovr.Environments = append(ovr.Environments, ear)
 	}
 
-	return metadata.NewOverviewOK().WithPayload(ovr)
+	return metadata.NewOrgAccountOverviewOK().WithPayload(ovr)
 }
 
-func (h *overviewHandler) isAccountLimited(principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
+func (h *orgAccountOverviewHandler) isAccountLimited(acctId int, trx *sqlx.Tx) (bool, error) {
 	var je *store.BandwidthLimitJournalEntry
-	jEmpty, err := str.IsBandwidthLimitJournalEmpty(int(principal.ID), trx)
+	jEmpty, err := str.IsBandwidthLimitJournalEmpty(acctId, trx)
 	if err != nil {
 		return false, err
 	}
 	if !jEmpty {
-		je, err = str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
+		je, err = str.FindLatestBandwidthLimitJournal(acctId, trx)
 		if err != nil {
 			return false, err
 		}

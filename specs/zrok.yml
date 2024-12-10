@@ -708,6 +708,32 @@ paths:
           schema:
             $ref: "#/definitions/errorMessage"
 
+  /overview/{organizationToken}/{accountEmail}:
+      get:
+        tags:
+          - metadata
+        security:
+          - key: []
+        operationId: orgAccountOverview
+        parameters:
+          - name: organizationToken
+            in: path
+            type: string
+            required: true
+          - name: accountEmail
+            in: path
+            type: string
+            required: true
+        responses:
+          200:
+            description: ok
+            schema:
+              $ref: "#/definitions/overview"
+          404:
+            description: not found
+          500:
+            description: internal server error
+
   /metrics/account:
     get:
       tags:

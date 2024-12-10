@@ -127,6 +127,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
+		MetadataOrgAccountOverviewHandler: metadata.OrgAccountOverviewHandlerFunc(func(params metadata.OrgAccountOverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.OrgAccountOverview has not yet been implemented")
+		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
@@ -268,6 +271,8 @@ type ZrokAPI struct {
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
+	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
+	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
 	// AccountRegenerateTokenHandler sets the operation handler for the regenerate token operation
@@ -452,6 +457,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
+	}
+	if o.MetadataOrgAccountOverviewHandler == nil {
+		unregistered = append(unregistered, "metadata.OrgAccountOverviewHandler")
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
@@ -695,6 +703,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/overview/{organizationToken}/{accountEmail}"] = metadata.NewOrgAccountOverview(o.context, o.MetadataOrgAccountOverviewHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
