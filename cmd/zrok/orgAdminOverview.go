@@ -11,26 +11,25 @@ import (
 )
 
 func init() {
-	organizationCmd.AddCommand(newOrgAccountOverviewCommand().cmd)
+	organizationAdminCmd.AddCommand(newOrgAdminOverviewCommand().cmd)
 }
 
-type orgAccountOverviewCommand struct {
+type orgAdminOverviewCommand struct {
 	cmd *cobra.Command
 }
 
-func newOrgAccountOverviewCommand() *orgAccountOverviewCommand {
+func newOrgAdminOverviewCommand() *orgAdminOverviewCommand {
 	cmd := &cobra.Command{
-		Use:     "account-overview <organizationToken> <accountEmail>",
-		Aliases: []string{"overview"},
-		Short:   "Retrieve account overview for organization account (requires admin)",
-		Args:    cobra.ExactArgs(2),
+		Use:   "overview <organizationToken> <accountEmail>",
+		Short: "Retrieve account overview for organization account (requires admin)",
+		Args:  cobra.ExactArgs(2),
 	}
-	command := &orgAccountOverviewCommand{cmd: cmd}
+	command := &orgAdminOverviewCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *orgAccountOverviewCommand) run(_ *cobra.Command, args []string) {
+func (cmd *orgAdminOverviewCommand) run(_ *cobra.Command, args []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {

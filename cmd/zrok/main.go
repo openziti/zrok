@@ -28,6 +28,7 @@ func init() {
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
+	organizationCmd.AddCommand(organizationAdminCmd)
 	rootCmd.AddCommand(organizationCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
@@ -95,10 +96,15 @@ var modifyCmd = &cobra.Command{
 	Short:   "Modify resources",
 }
 
+var organizationAdminCmd = &cobra.Command{
+	Use:   "admin",
+	Short: "Organization admin commands",
+}
+
 var organizationCmd = &cobra.Command{
 	Use:     "organization",
 	Aliases: []string{"org"},
-	Short:   "Organization admin commands",
+	Short:   "Organization commands",
 }
 
 var shareCmd = &cobra.Command{
