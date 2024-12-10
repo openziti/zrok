@@ -121,6 +121,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListMemberships has not yet been implemented")
 		}),
+		MetadataListOrgMembersHandler: metadata.ListOrgMembersHandlerFunc(func(params metadata.ListOrgMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListOrgMembers has not yet been implemented")
+		}),
 		AdminListOrganizationMembersHandler: admin.ListOrganizationMembersHandlerFunc(func(params admin.ListOrganizationMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListOrganizationMembers has not yet been implemented")
 		}),
@@ -270,6 +273,8 @@ type ZrokAPI struct {
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
 	MetadataListMembershipsHandler metadata.ListMembershipsHandler
+	// MetadataListOrgMembersHandler sets the operation handler for the list org members operation
+	MetadataListOrgMembersHandler metadata.ListOrgMembersHandler
 	// AdminListOrganizationMembersHandler sets the operation handler for the list organization members operation
 	AdminListOrganizationMembersHandler admin.ListOrganizationMembersHandler
 	// AdminListOrganizationsHandler sets the operation handler for the list organizations operation
@@ -456,6 +461,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListMembershipsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
+	}
+	if o.MetadataListOrgMembersHandler == nil {
+		unregistered = append(unregistered, "metadata.ListOrgMembersHandler")
 	}
 	if o.AdminListOrganizationMembersHandler == nil {
 		unregistered = append(unregistered, "admin.ListOrganizationMembersHandler")
@@ -703,6 +711,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/memberships"] = metadata.NewListMemberships(o.context, o.MetadataListMembershipsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/members/{organizationToken}"] = metadata.NewListOrgMembers(o.context, o.MetadataListOrgMembersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

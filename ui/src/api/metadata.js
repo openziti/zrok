@@ -54,6 +54,19 @@ export function getShareDetail(shrToken) {
 }
 
 /**
+ * @param {string} organizationToken 
+ * @return {Promise<object>} ok
+ */
+export function listOrgMembers(organizationToken) {
+  const parameters = {
+    path: {
+      organizationToken
+    }
+  }
+  return gateway.request(listOrgMembersOperation, parameters)
+}
+
+/**
  */
 export function listMemberships() {
   return gateway.request(listMembershipsOperation)
@@ -176,6 +189,16 @@ const getFrontendDetailOperation = {
 
 const getShareDetailOperation = {
   path: '/detail/share/{shrToken}',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const listOrgMembersOperation = {
+  path: '/members/{organizationToken}',
   method: 'get',
   security: [
     {

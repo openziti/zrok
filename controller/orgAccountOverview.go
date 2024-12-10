@@ -31,7 +31,7 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 
 	admin, err := str.IsAccountAdminOfOrganization(int(principal.ID), org.Id, trx)
 	if err != nil {
-		logrus.Errorf("error checking account admin: %v", err)
+		logrus.Errorf("error checking account '%v' admin: %v", principal.Email, err)
 		return metadata.NewOrgAccountOverviewNotFound()
 	}
 	if !admin {

@@ -691,6 +691,36 @@ paths:
         500:
           description: internal server error
 
+  /members/{organizationToken}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listOrgMembers
+      parameters:
+          - name: organizationToken
+            in: path
+            type: string
+            required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              members:
+                type: array
+                items:
+                  properties:
+                    email:
+                      type: string
+                    admin:
+                      type: boolean
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /memberships:
     get:
       tags:

@@ -711,6 +711,55 @@ func init() {
         }
       }
     },
+    "/members/{organizationToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listOrgMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "organizationToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "admin": {
+                        "type": "boolean"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/memberships": {
       "get": {
         "security": [
@@ -2908,6 +2957,48 @@ func init() {
           },
           "401": {
             "description": "invalid login"
+          }
+        }
+      }
+    },
+    "/members/{organizationToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listOrgMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "organizationToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MembersItems0"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
