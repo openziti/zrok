@@ -55,6 +55,12 @@ export function getShareDetail(shrToken) {
 
 /**
  */
+export function listMemberships() {
+  return gateway.request(listMembershipsOperation)
+}
+
+/**
+ */
 export function overview() {
   return gateway.request(overviewOperation)
 }
@@ -170,6 +176,16 @@ const getFrontendDetailOperation = {
 
 const getShareDetailOperation = {
   path: '/detail/share/{shrToken}',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const listMembershipsOperation = {
+  path: '/memberships',
   method: 'get',
   security: [
     {

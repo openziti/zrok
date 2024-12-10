@@ -691,6 +691,31 @@ paths:
         500:
           description: internal server error
 
+  /memberships:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listMemberships
+      responses:
+        200:
+          description: ok
+          schema:
+            properties: 
+              memberships:
+                type: array
+                items:
+                  properties:
+                    token:
+                      type: string
+                    description:
+                      type: string
+                    admin:
+                      type: boolean
+        500:
+          description: internal server error
+  
   /overview:
     get:
       tags:

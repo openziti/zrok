@@ -47,6 +47,31 @@ func (str *Store) FindOrganizationByToken(token string, trx *sqlx.Tx) (*Organiza
 	return org, nil
 }
 
+type OrganizationMembership struct {
+	Token       string
+	Description string
+	Admin       bool
+}
+
+func (str *Store) FindOrganizationsForAccount(acctId int, trx *sqlx.Tx) ([]*OrganizationMembership, error) {
+	sql := "select organizations.token, organizations.description, organization_members.admin from organizations, organization_members " +
+		"where organization_members.account_id = $1 and organization_members.organization_id = organizations.id and not organizations.deleted"
+	rows, err := trx.Queryx(sql, acctId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error querying organization memberships")
+	}
+	var oms []*OrganizationMembership
+	for rows.Next() {
+		om := &OrganizationMembership{}
+		if err := rows.StructScan(&om); err != nil {
+			return nil, errors.Wrap(err, "error scanning organization membership")
+		}
+		oms = append(oms, om)
+	}
+	return oms, nil
+
+}
+
 func (str *Store) DeleteOrganization(id int, trx *sqlx.Tx) error {
 	stmt, err := trx.Prepare("update organizations set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {

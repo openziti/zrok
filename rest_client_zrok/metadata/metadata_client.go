@@ -46,6 +46,8 @@ type ClientService interface {
 
 	GetShareMetrics(params *GetShareMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareMetricsOK, error)
 
+	ListMemberships(params *ListMembershipsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListMembershipsOK, error)
+
 	OrgAccountOverview(params *OrgAccountOverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OrgAccountOverviewOK, error)
 
 	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
@@ -363,6 +365,45 @@ func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getShareMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListMemberships list memberships API
+*/
+func (a *Client) ListMemberships(params *ListMembershipsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListMembershipsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListMembershipsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listMemberships",
+		Method:             "GET",
+		PathPattern:        "/memberships",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListMembershipsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListMembershipsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listMemberships: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

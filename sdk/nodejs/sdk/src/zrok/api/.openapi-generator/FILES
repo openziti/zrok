@@ -28,6 +28,8 @@ model/frontend.ts
 model/grantsRequest.ts
 model/inviteRequest.ts
 model/inviteTokenGenerateRequest.ts
+model/listMemberships200Response.ts
+model/listMemberships200ResponseMembershipsInner.ts
 model/listOrganizationMembers200Response.ts
 model/listOrganizationMembers200ResponseMembersInner.ts
 model/listOrganizations200Response.ts

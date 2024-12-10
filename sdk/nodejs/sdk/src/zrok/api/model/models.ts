@@ -22,6 +22,8 @@ export * from './frontend';
 export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
+export * from './listMemberships200Response';
+export * from './listMemberships200ResponseMembershipsInner';
 export * from './listOrganizationMembers200Response';
 export * from './listOrganizationMembers200ResponseMembersInner';
 export * from './listOrganizations200Response';
@@ -85,6 +87,8 @@ import { Frontend } from './frontend';
 import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
+import { ListMemberships200Response } from './listMemberships200Response';
+import { ListMemberships200ResponseMembershipsInner } from './listMemberships200ResponseMembershipsInner';
 import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
 import { ListOrganizationMembers200ResponseMembersInner } from './listOrganizationMembers200ResponseMembersInner';
 import { ListOrganizations200Response } from './listOrganizations200Response';
@@ -156,6 +160,8 @@ let typeMap: {[index: string]: any} = {
     "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
+    "ListMemberships200Response": ListMemberships200Response,
+    "ListMemberships200ResponseMembershipsInner": ListMemberships200ResponseMembershipsInner,
     "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
     "ListOrganizationMembers200ResponseMembersInner": ListOrganizationMembers200ResponseMembersInner,
     "ListOrganizations200Response": ListOrganizations200Response,

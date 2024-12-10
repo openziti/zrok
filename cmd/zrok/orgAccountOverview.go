@@ -22,6 +22,7 @@ func newOrgAccountOverviewCommand() *orgAccountOverviewCommand {
 	cmd := &cobra.Command{
 		Use:     "account-overview <organizationToken> <accountEmail>",
 		Aliases: []string{"overview"},
+		Short:   "Retrieve account overview for organization account (requires admin)",
 		Args:    cobra.ExactArgs(2),
 	}
 	command := &orgAccountOverviewCommand{cmd: cmd}

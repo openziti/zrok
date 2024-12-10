@@ -711,6 +711,47 @@ func init() {
         }
       }
     },
+    "/memberships": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listMemberships",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "memberships": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "admin": {
+                        "type": "boolean"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/metrics/account": {
       "get": {
         "security": [
@@ -2871,6 +2912,37 @@ func init() {
         }
       }
     },
+    "/memberships": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listMemberships",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "memberships": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MembershipsItems0"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/metrics/account": {
       "get": {
         "security": [
@@ -3676,6 +3748,19 @@ func init() {
           "type": "boolean"
         },
         "email": {
+          "type": "string"
+        }
+      }
+    },
+    "MembershipsItems0": {
+      "properties": {
+        "admin": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         }
       }
