@@ -2,6 +2,10 @@
 
 ## v0.4.45
 
+FEATURE: Minimal support for "organizations". Site admin API endpoints provided to create, list, and delete "organizations". Site admin API endpoints provided to add, list, and remove "organization members" (zrok accounts) with the ability to mark accounts as a "organization admin". API endpoints provided for organization admins to list the members of their organizations, and to also see the overview (environments, shares, and accesses) for any account in their organization. API endpoint for end users to see which organizations their account is a member of. (https://github.com/openziti/zrok/issues/593) 
+
+CHANGE: briefly mention the backend modes that apply to public and private share concepts
+
 FIX: Update indirect dependency `github.com/golang-jwt/jwt/v4` to version `v4.5.1` (https://github.com/openziti/zrok/issues/794)
 
 FIX: Document unique names
@@ -12,7 +16,6 @@ FIX: Docker reserved private share startup error (https://github.com/openziti/zr
 
 FIX: Correct the download URL for the armv7 Linux release (https://github.com/openziti/zrok/issues/782)
 
-CHANGE: briefly mention the backend modes that apply to public and private share concepts
 
 ## v0.4.44
 
