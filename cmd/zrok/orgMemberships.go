@@ -63,7 +63,7 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
-	t.AppendHeader(table.Row{"Token", "Description", "Admin?"})
+	t.AppendHeader(table.Row{"Organization Token", "Description", "Admin?"})
 	for _, i := range in.Payload.Memberships {
 		t.AppendRow(table.Row{i.Token, i.Description, i.Admin})
 	}
