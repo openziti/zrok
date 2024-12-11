@@ -1,7 +1,7 @@
 -- +migrate Up
 
 create table organizations (
-    id                  serial                  primary key,
+    id                  integer                 primary key,
 
     token               varchar(32)             not null,
     description         varchar(128),
@@ -14,7 +14,7 @@ create table organizations (
 create index organization_token_idx on organizations(token);
 
 create table organization_members (
-    id                  serial                  primary key,
+    id                  integer                 primary key,
 
     organization_id     integer                 references organizations(id) not null,
     account_id          integer                 references accounts(id) not null,
