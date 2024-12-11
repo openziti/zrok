@@ -17,7 +17,7 @@ type adminDeleteOrgMemberCommand struct {
 
 func newAdminDeleteOrgMemberCommand() *adminDeleteOrgMemberCommand {
 	cmd := &cobra.Command{
-		Use:     "org-member <accountEmail> <organizationToken>",
+		Use:     "org-member <organizationToken> <accountEmail>",
 		Aliases: []string{"member"},
 		Short:   "Remove an account from an organization",
 		Args:    cobra.ExactArgs(2),
@@ -39,8 +39,8 @@ func (cmd *adminDeleteOrgMemberCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewRemoveOrganizationMemberParams()
-	req.Body.Email = args[0]
-	req.Body.Token = args[1]
+	req.Body.Token = args[0]
+	req.Body.Email = args[1]
 
 	_, err = zrok.Admin.RemoveOrganizationMember(req, mustGetAdminAuth())
 	if err != nil {

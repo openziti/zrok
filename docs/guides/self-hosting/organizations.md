@@ -64,7 +64,7 @@ We use the `zrok admin create org-member` command to add members to organization
 $ zrok admin create org-member 
 Error: accepts 2 arg(s), received 0
 Usage:
-  zrok admin create org-member <accountEmail> <organizationToken> [flags]
+  zrok admin create org-member <organizationToken> <accountEmail> [flags]
 
 Aliases:
   org-member, member
@@ -81,7 +81,7 @@ Global Flags:
 Like this:
 
 ```
-$ zrok admin create org-member michael.quigley@netfoundry.io gK1XRvthq7ci
+$ zrok admin create org-member gK1XRvthq7ci michael.quigley@netfoundry.io
 [   0.006]    INFO main.(*adminCreateOrgMemberCommand).run: added 'michael.quigley@netfoundry.io' to organization 'gK1XRvthq7ci
 ```
 

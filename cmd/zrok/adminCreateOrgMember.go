@@ -18,7 +18,7 @@ type adminCreateOrgMemberCommand struct {
 
 func newAdminCreateOrgMemberCommand() *adminCreateOrgMemberCommand {
 	cmd := &cobra.Command{
-		Use:     "org-member <accountEmail> <organizationToken>",
+		Use:     "org-member <organizationToken> <accountEmail>",
 		Aliases: []string{"member"},
 		Short:   "Add an account to an organization",
 		Args:    cobra.ExactArgs(2),
@@ -41,8 +41,8 @@ func (cmd *adminCreateOrgMemberCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewAddOrganizationMemberParams()
-	req.Body.Email = args[0]
-	req.Body.Token = args[1]
+	req.Body.Token = args[0]
+	req.Body.Email = args[1]
 	req.Body.Admin = cmd.admin
 
 	_, err = zrok.Admin.AddOrganizationMember(req, mustGetAdminAuth())
