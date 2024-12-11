@@ -1,6 +1,6 @@
 ---
 sidebar_position: 21
-sidebar_label: Permission Modes
+sidebar_label: Organizations
 ---
 
 # Organizations
