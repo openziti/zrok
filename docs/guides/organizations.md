@@ -11,7 +11,7 @@ Future zrok releases will include additional organization features, including `-
 
 ## Configuring an Organization
 
-The API endpoints used to manage organizations and their members require a site-level `ZROK_ADMIN_TOKEN` to access. See the [self-hosting guide](self-hosting/linux/#configure-the-controller) for details on configuring admin tokens.
+The API endpoints used to manage organizations and their members require a site-level `ZROK_ADMIN_TOKEN` to access. See the [self-hosting guide](self-hosting/linux for details on configuring admin tokens.
 
 ### Create an Organization
 
