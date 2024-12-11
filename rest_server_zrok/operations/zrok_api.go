@@ -52,6 +52,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
+		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
+		}),
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
@@ -67,8 +70,14 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminCreateIdentityHandler: admin.CreateIdentityHandlerFunc(func(params admin.CreateIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateIdentity has not yet been implemented")
 		}),
+		AdminCreateOrganizationHandler: admin.CreateOrganizationHandlerFunc(func(params admin.CreateOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.CreateOrganization has not yet been implemented")
+		}),
 		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
+		}),
+		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
 		}),
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
@@ -109,8 +118,23 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminListFrontendsHandler: admin.ListFrontendsHandlerFunc(func(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
 		}),
+		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListMemberships has not yet been implemented")
+		}),
+		MetadataListOrgMembersHandler: metadata.ListOrgMembersHandlerFunc(func(params metadata.ListOrgMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListOrgMembers has not yet been implemented")
+		}),
+		AdminListOrganizationMembersHandler: admin.ListOrganizationMembersHandlerFunc(func(params admin.ListOrganizationMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListOrganizationMembers has not yet been implemented")
+		}),
+		AdminListOrganizationsHandler: admin.ListOrganizationsHandlerFunc(func(params admin.ListOrganizationsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListOrganizations has not yet been implemented")
+		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
+		}),
+		MetadataOrgAccountOverviewHandler: metadata.OrgAccountOverviewHandlerFunc(func(params metadata.OrgAccountOverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.OrgAccountOverview has not yet been implemented")
 		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
@@ -120,6 +144,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
+		}),
+		AdminRemoveOrganizationMemberHandler: admin.RemoveOrganizationMemberHandlerFunc(func(params admin.RemoveOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.RemoveOrganizationMember has not yet been implemented")
 		}),
 		AccountResetPasswordHandler: account.ResetPasswordHandlerFunc(func(params account.ResetPasswordParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPassword has not yet been implemented")
@@ -200,6 +227,8 @@ type ZrokAPI struct {
 
 	// ShareAccessHandler sets the operation handler for the access operation
 	ShareAccessHandler share.AccessHandler
+	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
+	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataConfigurationHandler sets the operation handler for the configuration operation
@@ -210,8 +239,12 @@ type ZrokAPI struct {
 	AdminCreateFrontendHandler admin.CreateFrontendHandler
 	// AdminCreateIdentityHandler sets the operation handler for the create identity operation
 	AdminCreateIdentityHandler admin.CreateIdentityHandler
+	// AdminCreateOrganizationHandler sets the operation handler for the create organization operation
+	AdminCreateOrganizationHandler admin.CreateOrganizationHandler
 	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
 	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
+	// AdminDeleteOrganizationHandler sets the operation handler for the delete organization operation
+	AdminDeleteOrganizationHandler admin.DeleteOrganizationHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
@@ -238,14 +271,26 @@ type ZrokAPI struct {
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
+	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
+	MetadataListMembershipsHandler metadata.ListMembershipsHandler
+	// MetadataListOrgMembersHandler sets the operation handler for the list org members operation
+	MetadataListOrgMembersHandler metadata.ListOrgMembersHandler
+	// AdminListOrganizationMembersHandler sets the operation handler for the list organization members operation
+	AdminListOrganizationMembersHandler admin.ListOrganizationMembersHandler
+	// AdminListOrganizationsHandler sets the operation handler for the list organizations operation
+	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
+	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
+	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
 	// AccountRegenerateTokenHandler sets the operation handler for the regenerate token operation
 	AccountRegenerateTokenHandler account.RegenerateTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
+	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
+	AdminRemoveOrganizationMemberHandler admin.RemoveOrganizationMemberHandler
 	// AccountResetPasswordHandler sets the operation handler for the reset password operation
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
@@ -348,6 +393,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.ShareAccessHandler == nil {
 		unregistered = append(unregistered, "share.AccessHandler")
 	}
+	if o.AdminAddOrganizationMemberHandler == nil {
+		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
+	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
 	}
@@ -363,8 +411,14 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminCreateIdentityHandler == nil {
 		unregistered = append(unregistered, "admin.CreateIdentityHandler")
 	}
+	if o.AdminCreateOrganizationHandler == nil {
+		unregistered = append(unregistered, "admin.CreateOrganizationHandler")
+	}
 	if o.AdminDeleteFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteFrontendHandler")
+	}
+	if o.AdminDeleteOrganizationHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteOrganizationHandler")
 	}
 	if o.EnvironmentDisableHandler == nil {
 		unregistered = append(unregistered, "environment.DisableHandler")
@@ -405,8 +459,23 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminListFrontendsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendsHandler")
 	}
+	if o.MetadataListMembershipsHandler == nil {
+		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
+	}
+	if o.MetadataListOrgMembersHandler == nil {
+		unregistered = append(unregistered, "metadata.ListOrgMembersHandler")
+	}
+	if o.AdminListOrganizationMembersHandler == nil {
+		unregistered = append(unregistered, "admin.ListOrganizationMembersHandler")
+	}
+	if o.AdminListOrganizationsHandler == nil {
+		unregistered = append(unregistered, "admin.ListOrganizationsHandler")
+	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
+	}
+	if o.MetadataOrgAccountOverviewHandler == nil {
+		unregistered = append(unregistered, "metadata.OrgAccountOverviewHandler")
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
@@ -416,6 +485,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
+	}
+	if o.AdminRemoveOrganizationMemberHandler == nil {
+		unregistered = append(unregistered, "admin.RemoveOrganizationMemberHandler")
 	}
 	if o.AccountResetPasswordHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordHandler")
@@ -550,6 +622,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/organization/add"] = admin.NewAddOrganizationMember(o.context, o.AdminAddOrganizationMemberHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -567,10 +643,18 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/identity"] = admin.NewCreateIdentity(o.context, o.AdminCreateIdentityHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/organization"] = admin.NewCreateOrganization(o.context, o.AdminCreateOrganizationHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/frontend"] = admin.NewDeleteFrontend(o.context, o.AdminDeleteFrontendHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/organization"] = admin.NewDeleteOrganization(o.context, o.AdminDeleteOrganizationHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -623,10 +707,30 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/frontends"] = admin.NewListFrontends(o.context, o.AdminListFrontendsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/memberships"] = metadata.NewListMemberships(o.context, o.MetadataListMembershipsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/members/{organizationToken}"] = metadata.NewListOrgMembers(o.context, o.MetadataListOrgMembersHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/organization/list"] = admin.NewListOrganizationMembers(o.context, o.AdminListOrganizationMembersHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/organizations"] = admin.NewListOrganizations(o.context, o.AdminListOrganizationsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/overview/{organizationToken}/{accountEmail}"] = metadata.NewOrgAccountOverview(o.context, o.MetadataOrgAccountOverviewHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -639,6 +743,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/organization/remove"] = admin.NewRemoveOrganizationMember(o.context, o.AdminRemoveOrganizationMemberHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

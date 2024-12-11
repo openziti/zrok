@@ -1,7 +1,7 @@
 ---
 title: Personalized Frontend
 sidebar_label: Personalized Frontend
-sidebar_position: 19
+sidebar_position: 22
 ---
 
 This guide describes an approach that enables a zrok user to use a hosted, shared instance (zrok.io) and configure their own personalized frontend, which enables custom DNS and TLS for their shares.

@@ -135,7 +135,6 @@ func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
 }
 
 func (str *Store) DeleteFrontend(id int, tx *sqlx.Tx) error {
-
 	stmt, err := tx.Prepare("update frontends set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends delete statement")

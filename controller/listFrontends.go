@@ -15,7 +15,7 @@ func newListFrontendsHandler() *listFrontendsHandler {
 
 func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		logrus.Error("invalid admin principal")
 		return admin.NewListFrontendsUnauthorized()
 	}
 

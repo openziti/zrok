@@ -22,18 +22,21 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		return metadata.NewOverviewInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
+
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
+
 	accountLimited, err := h.isAccountLimited(principal, trx)
 	if err != nil {
 		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
 	}
+
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
-		envRes := &rest_model_zrok.EnvironmentAndResources{
+		ear := &rest_model_zrok.EnvironmentAndResources{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
 				Description: env.Description,
@@ -43,6 +46,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				UpdatedAt:   env.UpdatedAt.UnixMilli(),
 			},
 		}
+
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
 			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
@@ -73,7 +77,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				CreatedAt:            shr.CreatedAt.UnixMilli(),
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			}
-			envRes.Shares = append(envRes.Shares, envShr)
+			ear.Shares = append(ear.Shares, envShr)
 		}
 		fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 		if err != nil {
@@ -96,10 +100,12 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				}
 				envFe.ShrToken = feShr.Token
 			}
-			envRes.Frontends = append(envRes.Frontends, envFe)
+			ear.Frontends = append(ear.Frontends, envFe)
 		}
-		ovr.Environments = append(ovr.Environments, envRes)
+
+		ovr.Environments = append(ovr.Environments, ear)
 	}
+
 	return metadata.NewOverviewOK().WithPayload(ovr)
 }
 

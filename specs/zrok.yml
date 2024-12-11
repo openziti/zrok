@@ -381,6 +381,168 @@ paths:
           description: unauthorized
         500:
           description: internal server error
+
+  /organization:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createOrganization
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              description:
+                type: string
+      responses:
+        201:
+          description: organization created
+          schema:
+            properties:
+              token:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+    delete:
+        tags:
+          - admin
+        security:
+          - key: []
+        operationId: deleteOrganization
+        parameters:
+          - name: body
+            in: body
+            schema:
+              properties:
+                token:
+                  type: string
+        responses:
+          200:
+            description: organization deleted
+          401:
+            description: unauthorized
+          404:
+            description: organization not found
+          500:
+            description: internal server error
+
+  /organization/add:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addOrganizationMember
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              token:
+                type: string
+              email:
+                type: string
+              admin:
+                type: boolean
+      responses:
+        201:
+          description: member added
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /organization/list:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listOrganizationMembers
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              token:
+                type: string
+      responses:
+        200:
+          description: list organization members
+          schema:
+            properties:
+              members:
+                type: array
+                items:
+                  properties:
+                    email:
+                      type: string
+                    admin:
+                      type: boolean
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /organization/remove:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: removeOrganizationMember
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              token:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: member removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /organizations:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listOrganizations
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              organizations:
+                type: array
+                items:
+                  properties:
+                    token:
+                      type: string
+                    description:
+                      type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   #
   # environment
   #
@@ -529,6 +691,61 @@ paths:
         500:
           description: internal server error
 
+  /members/{organizationToken}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listOrgMembers
+      parameters:
+          - name: organizationToken
+            in: path
+            type: string
+            required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              members:
+                type: array
+                items:
+                  properties:
+                    email:
+                      type: string
+                    admin:
+                      type: boolean
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /memberships:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listMemberships
+      responses:
+        200:
+          description: ok
+          schema:
+            properties: 
+              memberships:
+                type: array
+                items:
+                  properties:
+                    token:
+                      type: string
+                    description:
+                      type: string
+                    admin:
+                      type: boolean
+        500:
+          description: internal server error
+  
   /overview:
     get:
       tags:
@@ -545,6 +762,32 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
+  /overview/{organizationToken}/{accountEmail}:
+      get:
+        tags:
+          - metadata
+        security:
+          - key: []
+        operationId: orgAccountOverview
+        parameters:
+          - name: organizationToken
+            in: path
+            type: string
+            required: true
+          - name: accountEmail
+            in: path
+            type: string
+            required: true
+        responses:
+          200:
+            description: ok
+            schema:
+              $ref: "#/definitions/overview"
+          404:
+            description: not found
+          500:
+            description: internal server error
 
   /metrics/account:
     get:

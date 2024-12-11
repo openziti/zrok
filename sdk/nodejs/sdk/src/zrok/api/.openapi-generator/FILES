@@ -8,6 +8,7 @@ api/metadataApi.ts
 api/shareApi.ts
 model/accessRequest.ts
 model/accessResponse.ts
+model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts
 model/configuration.ts
@@ -16,6 +17,7 @@ model/createFrontendRequest.ts
 model/createFrontendResponse.ts
 model/createIdentity201Response.ts
 model/createIdentityRequest.ts
+model/createOrganizationRequest.ts
 model/deleteFrontendRequest.ts
 model/disableRequest.ts
 model/enableRequest.ts
@@ -26,6 +28,12 @@ model/frontend.ts
 model/grantsRequest.ts
 model/inviteRequest.ts
 model/inviteTokenGenerateRequest.ts
+model/listMemberships200Response.ts
+model/listMemberships200ResponseMembershipsInner.ts
+model/listOrganizationMembers200Response.ts
+model/listOrganizationMembers200ResponseMembersInner.ts
+model/listOrganizations200Response.ts
+model/listOrganizations200ResponseOrganizationsInner.ts
 model/loginRequest.ts
 model/metrics.ts
 model/metricsSample.ts
@@ -38,6 +46,7 @@ model/regenerateToken200Response.ts
 model/regenerateTokenRequest.ts
 model/registerRequest.ts
 model/registerResponse.ts
+model/removeOrganizationMemberRequest.ts
 model/resetPasswordRequest.ts
 model/share.ts
 model/shareRequest.ts

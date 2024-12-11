@@ -2,6 +2,7 @@ import localVarRequest from 'request';
 
 export * from './accessRequest';
 export * from './accessResponse';
+export * from './addOrganizationMemberRequest';
 export * from './authUser';
 export * from './changePasswordRequest';
 export * from './configuration';
@@ -10,6 +11,7 @@ export * from './createFrontendRequest';
 export * from './createFrontendResponse';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
+export * from './createOrganizationRequest';
 export * from './deleteFrontendRequest';
 export * from './disableRequest';
 export * from './enableRequest';
@@ -20,6 +22,12 @@ export * from './frontend';
 export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
+export * from './listMemberships200Response';
+export * from './listMemberships200ResponseMembershipsInner';
+export * from './listOrganizationMembers200Response';
+export * from './listOrganizationMembers200ResponseMembersInner';
+export * from './listOrganizations200Response';
+export * from './listOrganizations200ResponseOrganizationsInner';
 export * from './loginRequest';
 export * from './metrics';
 export * from './metricsSample';
@@ -31,6 +39,7 @@ export * from './regenerateToken200Response';
 export * from './regenerateTokenRequest';
 export * from './registerRequest';
 export * from './registerResponse';
+export * from './removeOrganizationMemberRequest';
 export * from './resetPasswordRequest';
 export * from './share';
 export * from './shareRequest';
@@ -58,6 +67,7 @@ export type RequestFile = string | Buffer | fs.ReadStream | RequestDetailedFile;
 
 import { AccessRequest } from './accessRequest';
 import { AccessResponse } from './accessResponse';
+import { AddOrganizationMemberRequest } from './addOrganizationMemberRequest';
 import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
 import { Configuration } from './configuration';
@@ -66,6 +76,7 @@ import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateFrontendResponse } from './createFrontendResponse';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
+import { CreateOrganizationRequest } from './createOrganizationRequest';
 import { DeleteFrontendRequest } from './deleteFrontendRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
@@ -76,6 +87,12 @@ import { Frontend } from './frontend';
 import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
+import { ListMemberships200Response } from './listMemberships200Response';
+import { ListMemberships200ResponseMembershipsInner } from './listMemberships200ResponseMembershipsInner';
+import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
+import { ListOrganizationMembers200ResponseMembersInner } from './listOrganizationMembers200ResponseMembersInner';
+import { ListOrganizations200Response } from './listOrganizations200Response';
+import { ListOrganizations200ResponseOrganizationsInner } from './listOrganizations200ResponseOrganizationsInner';
 import { LoginRequest } from './loginRequest';
 import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
@@ -87,6 +104,7 @@ import { RegenerateToken200Response } from './regenerateToken200Response';
 import { RegenerateTokenRequest } from './regenerateTokenRequest';
 import { RegisterRequest } from './registerRequest';
 import { RegisterResponse } from './registerResponse';
+import { RemoveOrganizationMemberRequest } from './removeOrganizationMemberRequest';
 import { ResetPasswordRequest } from './resetPasswordRequest';
 import { Share } from './share';
 import { ShareRequest } from './shareRequest';
@@ -122,6 +140,7 @@ let enumsMap: {[index: string]: any} = {
 let typeMap: {[index: string]: any} = {
     "AccessRequest": AccessRequest,
     "AccessResponse": AccessResponse,
+    "AddOrganizationMemberRequest": AddOrganizationMemberRequest,
     "AuthUser": AuthUser,
     "ChangePasswordRequest": ChangePasswordRequest,
     "Configuration": Configuration,
@@ -130,6 +149,7 @@ let typeMap: {[index: string]: any} = {
     "CreateFrontendResponse": CreateFrontendResponse,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
+    "CreateOrganizationRequest": CreateOrganizationRequest,
     "DeleteFrontendRequest": DeleteFrontendRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,
@@ -140,6 +160,12 @@ let typeMap: {[index: string]: any} = {
     "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
+    "ListMemberships200Response": ListMemberships200Response,
+    "ListMemberships200ResponseMembershipsInner": ListMemberships200ResponseMembershipsInner,
+    "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
+    "ListOrganizationMembers200ResponseMembersInner": ListOrganizationMembers200ResponseMembersInner,
+    "ListOrganizations200Response": ListOrganizations200Response,
+    "ListOrganizations200ResponseOrganizationsInner": ListOrganizations200ResponseOrganizationsInner,
     "LoginRequest": LoginRequest,
     "Metrics": Metrics,
     "MetricsSample": MetricsSample,
@@ -151,6 +177,7 @@ let typeMap: {[index: string]: any} = {
     "RegenerateTokenRequest": RegenerateTokenRequest,
     "RegisterRequest": RegisterRequest,
     "RegisterResponse": RegisterResponse,
+    "RemoveOrganizationMemberRequest": RemoveOrganizationMemberRequest,
     "ResetPasswordRequest": ResetPasswordRequest,
     "Share": Share,
     "ShareRequest": ShareRequest,
