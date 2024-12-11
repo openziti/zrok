@@ -59,14 +59,18 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	fmt.Println()
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
-	t.AppendHeader(table.Row{"Organization Token", "Description", "Admin?"})
-	for _, i := range in.Payload.Memberships {
-		t.AppendRow(table.Row{i.Token, i.Description, i.Admin})
+	if len(in.Payload.Memberships) > 0 {
+		fmt.Println()
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.SetStyle(table.StyleColoredDark)
+		t.AppendHeader(table.Row{"Organization Token", "Description", "Admin?"})
+		for _, i := range in.Payload.Memberships {
+			t.AppendRow(table.Row{i.Token, i.Description, i.Admin})
+		}
+		t.Render()
+		fmt.Println()
+	} else {
+		fmt.Println("no organization memberships.")
 	}
-	t.Render()
-	fmt.Println()
 }

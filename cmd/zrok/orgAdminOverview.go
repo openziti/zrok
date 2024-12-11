@@ -21,7 +21,7 @@ type orgAdminOverviewCommand struct {
 func newOrgAdminOverviewCommand() *orgAdminOverviewCommand {
 	cmd := &cobra.Command{
 		Use:   "overview <organizationToken> <accountEmail>",
-		Short: "Retrieve account overview for organization account (requires admin)",
+		Short: "Retrieve account overview for organization member account",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &orgAdminOverviewCommand{cmd: cmd}
