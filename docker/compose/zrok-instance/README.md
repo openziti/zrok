@@ -65,6 +65,10 @@ ZROK_ADMIN_TOKEN=zroktoken
 
 ```bash title=".env options"
 # Caddy TLS option: rename compose.caddy.yml to compose.override.yml and set these vars; allow 80,443 in firewall
+
+#
+## set these in .env for providers other than Route53
+#
 # plugin name for your DNS provider
 CADDY_DNS_PLUGIN=cloudflare
 # API token from your DNS provider
@@ -72,22 +76,34 @@ CADDY_DNS_PLUGIN_TOKEN=abcd1234
 # use the staging API until you're sure everything is working to avoid hitting the rate limit
 CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
 
-# no TLS option: publish the insecure ports to the internet and allow them in the firewall 
-ZROK_INSECURE_INTERFACE=0.0.0.0
+#
+## set these in .env for Route53
+#
+# AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+# AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+# AWS_REGION: ${AWS_REGION}
+# AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}  # if temporary credential, e.g., from STS
+
+#
+## if not using Caddy for TLS, uncomment to publish the insecure ports to the internet
+#
+#ZROK_INSECURE_INTERFACE=0.0.0.0
+
+# these insecure ports must be proxied with TLS for security
 ZROK_CTRL_PORT=18080
 ZROK_FRONTEND_PORT=8080
 ZROK_OAUTH_PORT=8081
 
-# ziti ports must be published to the internet and allowed by firewall
+# these secure ziti ports must be published to the internet
 ZITI_CTRL_ADVERTISED_PORT=80
 ZITI_ROUTER_PORT=3022
 
-# configure oauth for public shares
-ZROK_OAUTH_HASH_KEY=oauthhashkeysecret
-ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
-ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
-ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
-ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
+# optionally configure oauth for public shares
+#ZROK_OAUTH_HASH_KEY=oauthhashkeysecret
+#ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
+#ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
+#ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
+#ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
 
 # zrok version, e.g., 1.0.0
 ZROK_CLI_TAG=latest
@@ -223,22 +239,11 @@ See "My internet connection can only send traffic to common ports" below about c
 
 1. My DNS provider credential is composed of several values, not a single API token.
 
-    As long as your DNS provider is supported by Caddy then it will work. You can modify the Caddyfile to use a different set of properties than the example. Here's how the `tls` section should look for Route53. You must declare any environment variables introduced in the `.env` file in `docker.compose.override` on the `caddy` service to ensure they are passed through to the Caddy container.
+    As long as your DNS provider is supported by Caddy then it will work. Here's a checklist for DNS providers like Route53 with credentials expressed as multiple values, e.g., `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
 
-    ```json
-    tls {
-      dns {$CADDY_DNS_PLUGIN} {
-        access_key_id {$AWS_ACCESS_KEY_ID}
-        secret_access_key {$AWS_SECRET_ACCESS_KEY}
-      }
-    }
-    ```
-
-    ```bash title=".env"
-    CADDY_DNS_PLUGIN=route53
-    AWS_ACCESS_KEY_ID=abcd1234
-    AWS_SECRET_ACCESS_KEY=abcd1234
-    ```
+    1. Define env vars in `.env` file.
+    1. Declare env vars in `compose.override.yml` file on `caddy`'s `environment`.
+    1. Modify `Caddyfile` according to the DNS plugin author's instructions ([link to Route53 README](https://github.com/caddy-dns/route53)). This means modifying the `Caddyfile` to reference the env vars. The provided file `route53.Caddyfile` serves as an example.
 
 1. My internet connection can only send traffic to common ports like 80, 443, and 3389.
 

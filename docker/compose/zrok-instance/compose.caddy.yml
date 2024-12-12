@@ -8,8 +8,21 @@ services:
         CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN} # e.g., "digitalocean" (see github.com/caddy-dns)
     restart: unless-stopped
     environment:
+      #
+      ## set these in .env for providers other than Route53
+      #
       CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN}  # e.g., "digitalocean" (see github.com/caddy-dns)
       CADDY_DNS_PLUGIN_TOKEN: ${CADDY_DNS_PLUGIN_TOKEN}  # API token from DNS provider used by plugin to solve the ACME challenge
+
+      #
+      ## for DNS providers like Route53 with multiple credential variables, you must define in .env and declare
+      ## here before referencing them in the Caddyfile
+      #
+      # AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      # AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      # AWS_REGION: ${AWS_REGION}
+      # AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}  # if temporary credential, e.g., from STS
+
       ZROK_USER_EMAIL: ${ZROK_USER_EMAIL}  # email address sent to CA for ACME account and renewal notifications
       CADDY_ACME_API: ${CADDY_ACME_API:-https://acme-v02.api.letsencrypt.org/directory}  # ACME API endpoint
       ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
