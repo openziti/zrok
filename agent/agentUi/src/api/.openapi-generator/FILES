@@ -1,0 +1,15 @@
+apis/AgentApi.ts
+apis/index.ts
+index.ts
+models/AccessDetail.ts
+models/AccessPrivateResponse.ts
+models/ProtobufAny.ts
+models/RpcStatus.ts
+models/ShareDetail.ts
+models/SharePrivateResponse.ts
+models/SharePublicResponse.ts
+models/ShareReservedResponse.ts
+models/StatusResponse.ts
+models/VersionResponse.ts
+models/index.ts
+runtime.ts

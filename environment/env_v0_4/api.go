@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 )
 
 func (r *Root) Metadata() *env_core.Metadata {
@@ -103,6 +104,26 @@ func (r *Root) DefaultFrontend() (string, string) {
 	return defaultFrontend, from
 }
 
+func (r *Root) Headless() (bool, string) {
+	headless := false
+	from := "binary"
+
+	if r.Config() != nil {
+		headless = r.Config().Headless
+		from = "config"
+	}
+
+	env := os.Getenv("ZROK_HEADLESS")
+	if env != "" {
+		if v, err := strconv.ParseBool(env); err == nil {
+			headless = v
+			from = "ZROK_HEADLESS"
+		}
+	}
+
+	return headless, from
+}
+
 func (r *Root) Environment() *env_core.Environment {
 	return r.env
 }
@@ -172,6 +193,10 @@ func (r *Root) DeleteZitiIdentityNamed(name string) error {
 		return errors.Wrapf(err, "error removing ziti identity file '%v'", zif)
 	}
 	return nil
+}
+
+func (r *Root) AgentSocket() (string, error) {
+	return agentSocket()
 }
 
 func (r *Root) Obliterate() error {
