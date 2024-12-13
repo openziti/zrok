@@ -54,9 +54,43 @@ export function getShareDetail(shrToken) {
 }
 
 /**
+ * @param {string} organizationToken 
+ * @return {Promise<object>} ok
+ */
+export function listOrgMembers(organizationToken) {
+  const parameters = {
+    path: {
+      organizationToken
+    }
+  }
+  return gateway.request(listOrgMembersOperation, parameters)
+}
+
+/**
+ */
+export function listMemberships() {
+  return gateway.request(listMembershipsOperation)
+}
+
+/**
  */
 export function overview() {
   return gateway.request(overviewOperation)
+}
+
+/**
+ * @param {string} organizationToken 
+ * @param {string} accountEmail 
+ * @return {Promise<module:types.overview>} ok
+ */
+export function orgAccountOverview(organizationToken, accountEmail) {
+  const parameters = {
+    path: {
+      organizationToken,
+      accountEmail
+    }
+  }
+  return gateway.request(orgAccountOverviewOperation, parameters)
 }
 
 /**
@@ -163,8 +197,38 @@ const getShareDetailOperation = {
   ]
 }
 
+const listOrgMembersOperation = {
+  path: '/members/{organizationToken}',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const listMembershipsOperation = {
+  path: '/memberships',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
 const overviewOperation = {
   path: '/overview',
+  method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const orgAccountOverviewOperation = {
+  path: '/overview/{organizationToken}/{accountEmail}',
   method: 'get',
   security: [
     {
