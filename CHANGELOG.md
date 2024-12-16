@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.46
+
+FIX: Docker share examples had incorrect default path for zrok environment mountpoint
+
 ## v0.4.45
 
 FEATURE: Minimal support for "organizations". Site admin API endpoints provided to create, list, and delete "organizations". Site admin API endpoints provided to add, list, and remove "organization members" (zrok accounts) with the ability to mark accounts as a "organization admin". API endpoints provided for organization admins to list the members of their organizations, and to also see the overview (environments, shares, and accesses) for any account in their organization. API endpoint for end users to see which organizations their account is a member of (https://github.com/openziti/zrok/issues/537) 
