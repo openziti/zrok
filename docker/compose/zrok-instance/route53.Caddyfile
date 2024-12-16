@@ -10,7 +10,18 @@
 
 *.{$ZROK_DNS_ZONE} {
 	tls {
-		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+		dns route53 {
+			access_key_id {$AWS_ACCESS_KEY_ID}
+			secret_access_key {$AWS_SECRET_ACCESS_KEY}
+			session_token {$AWS_SESSION_TOKEN}
+			region {$AWS_REGION}
+			# profile {$AWS_PROFILE}
+			# max_retries 10
+			# max_wait_dur 60
+			# wait_for_propagation false
+			# hosted_zone_id {$AWS_HOSTED_ZONE_ID}
+
+		}
 		propagation_timeout 60m
 	}
 
