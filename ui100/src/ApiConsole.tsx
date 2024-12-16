@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
-import {buildVisualOverview, VisualOverview, visualOverviewsEqual} from "./model/visualizer.ts";
+import {buildVisualOverview, mergeVisualOverview, VisualOverview, visualOverviewsEqual} from "./model/visualizer.ts";
 import {Box} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import {User} from "./model/user.ts";
@@ -36,10 +36,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             let api = new MetadataApi(cfg);
             api.overview()
                 .then(d => {
-                    let vo = buildVisualOverview(d);
-                    if(!visualOverviewsEqual(vo, overview)) {
-                        setOverview(vo);
-                    }
+                    setOverview(mergeVisualOverview(overview, user, false, d));
                 })
                 .catch(e => {
                     console.log(e);
@@ -54,7 +51,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         <div>
             <NavBar logout={logout} />
             <Box>
-                <Visualizer overview={overview} />
+                <Visualizer vov={overview} />
             </Box>
         </div>
     );

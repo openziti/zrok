@@ -103,8 +103,40 @@ export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: bo
             }
         });
     }
+    newVov.nodes = sortNodes(newVov.nodes);
 
+    if(nodesEqual(oldVov.nodes, newVov.nodes)) {
+        // if the list of nodes is equal, the graph hasn't changed; we can just return the oldGraph and save the
+        // physics headaches in the visualizer.
+        return oldVov;
+    }
+
+    let outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id && newNode.data.limited == oldNode.data.limited && newNode.data.label === oldNode.data.label));
+    let outEdges = oldVov.edges.filter(oldEdge => newVov.edges.find(newEdge => newEdge.target === oldEdge.target && newEdge.source === oldEdge.source));
+
+    outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id && oldNode.data.limited === newNode.data.limited && oldNode.data.label === newNode.data.label)));
+    outEdges.push(...newVov.edges.filter(newEdge => !outEdges.find(oldEdge => oldEdge.target === newEdge.target && oldEdge.source === newEdge.source)));
+
+    newVov.nodes = outNodes;
+    newVov.edges = outEdges;
     return newVov;
+}
+
+const sortNodes = (nodes) => {
+    return nodes.sort((a, b) => {
+        if(a.id > b.id) {
+            return 1;
+        }
+        if(a.id < b.id) {
+            return -1;
+        }
+        return 0;
+    });
+}
+
+const nodesEqual = (a, b) => {
+    if(a.length !== b.length) return false;
+    return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
 }
 
 export const buildVisualOverview = (overview: Overview): VisualOverview => {

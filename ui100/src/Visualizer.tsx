@@ -10,7 +10,7 @@ import AccountNode from "../AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 
 interface VisualizerProps {
-    overview: VisualOverview;
+    vov: VisualOverview;
 }
 
 const nodeTypes = {
@@ -20,7 +20,7 @@ const nodeTypes = {
     share: ShareNode
 };
 
-const Visualizer = ({ overview }: VisualizerProps) => {
+const Visualizer = ({ vov }: VisualizerProps) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -46,10 +46,10 @@ const Visualizer = ({ overview }: VisualizerProps) => {
     }
 
     useEffect(() => {
-        let layouted = layout(overview.nodes, overview.edges);
+        let layouted = layout(vov.nodes, vov.edges);
         setNodes(layouted.nodes);
         setEdges(layouted.edges);
-    }, [overview]);
+    }, [vov]);
 
     return (
         <ReactFlow
@@ -67,11 +67,11 @@ const Visualizer = ({ overview }: VisualizerProps) => {
     );
 }
 
-export default ({ overview }: VisualizerProps) => {
+export default ({ vov }: VisualizerProps) => {
     return (
         <div style={{ height: "400px" }}>
             <ReactFlowProvider>
-                <Visualizer overview={overview}/>
+                <Visualizer vov={vov}/>
             </ReactFlowProvider>
         </div>
     );
