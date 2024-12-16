@@ -1,9 +1,110 @@
 import {Overview} from "../api";
 import {Edge, Node} from "@xyflow/react";
+import {User} from "./user.ts";
 
 export class VisualOverview {
     nodes: Node[];
     edges: Edge[];
+}
+
+export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: boolean, newOv: Overview): VisualOverview => {
+    let newVov = new VisualOverview();
+
+    let accountNode = {
+        id: u.token,
+        data: {
+            label: u.email,
+            limited: !!limited
+        },
+        type: "account",
+        position: { x: 0, y: 0 },
+    }
+    newVov.nodes = [ accountNode ];
+    newVov.edges = [];
+
+    if(newOv) {
+        let allShares = {};
+        let allFrontends = [];
+        newOv.environments?.forEach(env => {
+            let envNode = {
+                id: env.environment?.zId!,
+                data: {
+                    label: env.environment?.description,
+                    envZId: env.environment?.zId!,
+                    limited: !!limited,
+                    empty: true
+                },
+                type: "environment",
+                position: { x: 0, y: 0 },
+            };
+            newVov.nodes.push(envNode);
+            newVov.edges.push({
+                id: accountNode.id + "-" + envNode.id,
+                source: accountNode.id!,
+                target: envNode.id!
+            });
+            if(env.shares) {
+                env.shares.forEach(shr => {
+                    let shrLabel = shr.token!;
+                    if(shr.backendProxyEndpoint !== "") {
+                        shrLabel = shr.backendProxyEndpoint!;
+                    }
+                    let shrNode = {
+                        id: shr.token!,
+                        data: {
+                            label: shrLabel,
+                            shrToken: shr.token!,
+                            envZId: env.environment?.zId!,
+                            limited: !!limited,
+                            accessed: false,
+                        },
+                        type: "share",
+                        position: { x: 0, y: 0 }
+                    }
+                    allShares[shr.token!] = shrNode;
+                    newVov.nodes.push(shrNode);
+                    newVov.edges.push({
+                        id: envNode.id + "-" + shrNode.id,
+                        source: envNode.id!,
+                        target: shrNode.id!
+                    });
+                });
+            }
+            if(env.frontends) {
+                env.frontends.forEach(fe => {
+                    let feNode = {
+                        id: fe.token!,
+                        data: {
+                            label: fe.token!,
+                            feId: fe.id,
+                            target: fe.shrToken,
+                        },
+                        type: "access",
+                        position: { x: 0, y: 0 }
+                    }
+                    allFrontends.push(feNode);
+                    newVov.nodes.push(feNode);
+                    newVov.edges.push({
+                        id: envNode.id + "-" + feNode.id,
+                        source: envNode.id!,
+                        target: feNode.id!
+                    });
+                });
+            }
+        });
+        allFrontends.forEach(fe => {
+            let target = allShares[fe.data.target];
+            if(target) {
+                newVov.edges.push({
+                    id: target.id + "-" + fe.id,
+                    source: target.id!,
+                    target: fe.id!
+                });
+            }
+        });
+    }
+
+    return newVov;
 }
 
 export const buildVisualOverview = (overview: Overview): VisualOverview => {
