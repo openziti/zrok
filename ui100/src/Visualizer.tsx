@@ -82,7 +82,7 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
             fitView
         >
             <Background  />
-            <Controls position="bottom-left" orientation="horizontal" />
+            <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />
             <MiniMap />
         </ReactFlow>
     );
