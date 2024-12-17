@@ -113,7 +113,6 @@ export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: bo
         return oldVov;
     }
 
-    // preserve nodes that exist in the new overview and remove those that do not.
     let outNodes = [];
     if(oldVov.nodes) {
         outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id && newNode.data.limited == oldNode.data.limited && newNode.data.label === oldNode.data.label));

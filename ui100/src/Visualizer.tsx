@@ -1,6 +1,15 @@
 import "@xyflow/react/dist/style.css";
 import "./react-flow.css";
-import {Background, Controls, MiniMap, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState} from "@xyflow/react";
+import {
+    Background,
+    Controls,
+    MiniMap,
+    Node,
+    ReactFlow,
+    ReactFlowProvider,
+    useEdgesState,
+    useNodesState
+} from "@xyflow/react";
 import {VisualOverview} from "./model/visualizer.ts";
 import {useEffect} from "react";
 import {stratify, tree} from "d3-hierarchy";
@@ -11,6 +20,7 @@ import AccessNode from "./AccessNode.tsx";
 
 interface VisualizerProps {
     vov: VisualOverview;
+    onSelectionChanged: (node: Node) => void;
 }
 
 const nodeTypes = {
@@ -20,9 +30,17 @@ const nodeTypes = {
     share: ShareNode
 };
 
-const Visualizer = ({ vov }: VisualizerProps) => {
+const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+    const onSelectionChange = ({ nodes }) => {
+        if(nodes.length > 0) {
+            onSelectionChanged(nodes[0]);
+        } else {
+            onSelectionChanged(null as Node);
+        }
+    };
 
     const layout = (nodes, edges): VisualOverview => {
         if(!nodes) {
@@ -58,6 +76,7 @@ const Visualizer = ({ vov }: VisualizerProps) => {
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onSelectionChange={onSelectionChange}
             nodesDraggable={false}
             fitView
         >
@@ -68,11 +87,11 @@ const Visualizer = ({ vov }: VisualizerProps) => {
     );
 }
 
-export default ({ vov }: VisualizerProps) => {
+export default ({ vov, onSelectionChanged }: VisualizerProps) => {
     return (
-        <div style={{ height: "400px" }}>
+        <div style={{ height: "600px" }}>
             <ReactFlowProvider>
-                <Visualizer vov={vov}/>
+                <Visualizer vov={vov} onSelectionChanged={onSelectionChanged} />
             </ReactFlowProvider>
         </div>
     );

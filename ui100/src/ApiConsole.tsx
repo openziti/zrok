@@ -5,6 +5,7 @@ import {Box} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import {User} from "./model/user.ts";
 import Visualizer from "./Visualizer.tsx";
+import {Node} from "@xyflow/react";
 
 interface ApiConsoleProps {
     user: User;
@@ -14,6 +15,7 @@ interface ApiConsoleProps {
 const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
     const [version, setVersion] = useState("no version set");
     const [overview, setOverview] = useState(new VisualOverview());
+    const [selectedNode, setSelectedNode] = useState(null as Node);
     const oldVov = useRef<VisualOverview>(overview);
 
     useEffect(() => {
@@ -66,7 +68,11 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         <div>
             <NavBar logout={logout} />
             <Box>
-                <Visualizer vov={overview} />
+                <Visualizer vov={overview} onSelectionChanged={setSelectedNode} />
+                <div>
+                    <h1>Hello</h1>
+                    <h2><pre>{JSON.stringify(selectedNode)}</pre></h2>
+                </div>
             </Box>
         </div>
     );
