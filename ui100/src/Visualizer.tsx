@@ -1,6 +1,6 @@
 import "@xyflow/react/dist/style.css";
 import "./react-flow.css";
-import {Background, Controls, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState} from "@xyflow/react";
+import {Background, Controls, MiniMap, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState} from "@xyflow/react";
 import {VisualOverview} from "./model/visualizer.ts";
 import {useEffect} from "react";
 import {stratify, tree} from "d3-hierarchy";
@@ -8,6 +8,7 @@ import ShareNode from "./ShareNode.tsx";
 import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "../AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
+import {Minimize} from "@mui/icons-material";
 
 interface VisualizerProps {
     vov: VisualOverview;
@@ -72,6 +73,7 @@ export default ({ vov }: VisualizerProps) => {
         <div style={{ height: "400px" }}>
             <ReactFlowProvider>
                 <Visualizer vov={vov}/>
+                <MiniMap />
             </ReactFlowProvider>
         </div>
     );
