@@ -44,6 +44,7 @@ export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: bo
                 target: envNode.id!
             });
             if(env.shares) {
+                envNode.data.empty = false;
                 env.shares.forEach(shr => {
                     let shrLabel = shr.token!;
                     if(shr.backendProxyEndpoint !== "") {
@@ -71,6 +72,7 @@ export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: bo
                 });
             }
             if(env.frontends) {
+                envNode.data.empty = false;
                 env.frontends.forEach(fe => {
                     let feNode = {
                         id: fe.token!,
@@ -111,9 +113,17 @@ export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: bo
         return oldVov;
     }
 
-    let outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id && newNode.data.limited == oldNode.data.limited && newNode.data.label === oldNode.data.label));
-    let outEdges = oldVov.edges.filter(oldEdge => newVov.edges.find(newEdge => newEdge.target === oldEdge.target && newEdge.source === oldEdge.source));
+    // preserve nodes that exist in the new overview and remove those that do not.
+    let outNodes = [];
+    if(oldVov.nodes) {
+        outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id && newNode.data.limited == oldNode.data.limited && newNode.data.label === oldNode.data.label));
+    }
+    let outEdges = [];
+    if(oldVov.edges) {
+        outEdges = oldVov.edges.filter(oldEdge => newVov.edges.find(newEdge => newEdge.target === oldEdge.target && newEdge.source === oldEdge.source));
+    }
 
+    // and then do the opposite; add any nodes that are in the new overview, but missing from the old overview.
     outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id && oldNode.data.limited === newNode.data.limited && oldNode.data.label === newNode.data.label)));
     outEdges.push(...newVov.edges.filter(newEdge => !outEdges.find(oldEdge => oldEdge.target === newEdge.target && oldEdge.source === newEdge.source)));
 
@@ -134,7 +144,10 @@ const sortNodes = (nodes) => {
     });
 }
 
-const nodesEqual = (a, b) => {
+export const nodesEqual = (a: Node[], b: Node[]) => {
+    if(!a && !b) return true;
+    if(a && !b) return false;
+    if(b && !a) return false;
     if(a.length !== b.length) return false;
     return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
 }
