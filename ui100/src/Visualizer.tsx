@@ -73,7 +73,6 @@ export default ({ vov }: VisualizerProps) => {
         <div style={{ height: "400px" }}>
             <ReactFlowProvider>
                 <Visualizer vov={vov}/>
-                <MiniMap />
             </ReactFlowProvider>
         </div>
     );
