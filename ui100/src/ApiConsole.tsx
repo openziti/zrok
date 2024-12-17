@@ -1,12 +1,6 @@
 import {useEffect, useRef, useState} from "react";
-import {Configuration, MetadataApi, Overview} from "./api";
-import {
-    buildVisualOverview,
-    mergeVisualOverview,
-    nodesEqual,
-    VisualOverview,
-    visualOverviewsEqual
-} from "./model/visualizer.ts";
+import {Configuration, MetadataApi} from "./api";
+import {mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
 import {Box} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import {User} from "./model/user.ts";
