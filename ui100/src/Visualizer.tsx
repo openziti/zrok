@@ -8,7 +8,6 @@ import ShareNode from "./ShareNode.tsx";
 import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "../AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
-import {Minimize} from "@mui/icons-material";
 
 interface VisualizerProps {
     vov: VisualOverview;
@@ -59,11 +58,12 @@ const Visualizer = ({ vov }: VisualizerProps) => {
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
-            fitView
             nodesDraggable={false}
+            fitView
         >
-            <Background/>
-            <Controls position="bottom-right" orientation="horizontal" />
+            <Background  />
+            <Controls position="bottom-left" orientation="horizontal" />
+            <MiniMap />
         </ReactFlow>
     );
 }
