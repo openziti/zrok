@@ -15,8 +15,9 @@ import {useEffect} from "react";
 import {stratify, tree} from "d3-hierarchy";
 import ShareNode from "./ShareNode.tsx";
 import EnvironmentNode from "./EnvironmentNode.tsx";
-import AccountNode from "../AccountNode.tsx";
+import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
+import {Box} from "@mui/material";
 
 interface VisualizerProps {
     vov: VisualOverview;
@@ -89,10 +90,10 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
 
 export default ({ vov, onSelectionChanged }: VisualizerProps) => {
     return (
-        <div style={{ height: "600px" }}>
+        <Box sx={{ width: "100%" }} height={{ xs: 400, sm: 600, md: 800 }}>
             <ReactFlowProvider>
                 <Visualizer vov={vov} onSelectionChanged={onSelectionChanged} />
             </ReactFlowProvider>
-        </div>
+        </Box>
     );
 }

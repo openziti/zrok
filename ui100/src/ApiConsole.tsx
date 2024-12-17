@@ -1,11 +1,15 @@
 import {useEffect, useRef, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
 import {mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
-import {Box} from "@mui/material";
+import {Grid2} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import {User} from "./model/user.ts";
 import Visualizer from "./Visualizer.tsx";
 import {Node} from "@xyflow/react";
+import AccountPanel from "./AccountPanel.tsx";
+import EnvironmentPanel from "./EnvironmentPanel.tsx";
+import SharePanel from "./SharePanel.tsx";
+import AccessPanel from "./AccessPanel.tsx";
 
 interface ApiConsoleProps {
     user: User;
@@ -16,6 +20,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
     const [version, setVersion] = useState("no version set");
     const [overview, setOverview] = useState(new VisualOverview());
     const [selectedNode, setSelectedNode] = useState(null as Node);
+    const [sidePanel, setSidePanel] = useState(<></>);
     const oldVov = useRef<VisualOverview>(overview);
 
     useEffect(() => {
@@ -64,16 +69,41 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         }
     }, []);
 
+    useEffect(() => {
+        if(selectedNode) {
+            switch(selectedNode.type) {
+                case "account":
+                    setSidePanel(<AccountPanel account={selectedNode} />);
+                    break;
+
+                case "environment":
+                    setSidePanel(<EnvironmentPanel environment={selectedNode} />);
+                    break;
+
+                case "share":
+                    setSidePanel(<SharePanel share={selectedNode} />);
+                    break;
+
+                case "access":
+                    setSidePanel(<AccessPanel access={selectedNode} />);
+                    break;
+            }
+        } else {
+            setSidePanel(<></>);
+        }
+    }, [selectedNode]);
+
     return (
         <div>
             <NavBar logout={logout} />
-            <Box>
-                <Visualizer vov={overview} onSelectionChanged={setSelectedNode} />
-                <div>
-                    <h1>Hello</h1>
-                    <h2><pre>{JSON.stringify(selectedNode)}</pre></h2>
-                </div>
-            </Box>
+            <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
+                <Grid2 size="grow">
+                    <Visualizer vov={overview} onSelectionChanged={setSelectedNode} />
+                </Grid2>
+                <Grid2 size={4}>
+                    {sidePanel}
+                </Grid2>
+            </Grid2>
         </div>
     );
 }
