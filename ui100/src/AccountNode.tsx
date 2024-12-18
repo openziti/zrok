@@ -1,13 +1,13 @@
 import {Handle, Position} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import AccountIcon from "@mui/icons-material/Person4";
-import useMetricsStore from "./model/store.ts";
+import useStore from "./model/store.ts";
 import {SparkLineChart} from "@mui/x-charts";
 import {useEffect, useState} from "react";
 
 
 const AccountNode = ({ data }) => {
-    const environmentMetrics = useMetricsStore((state) => state.environments);
+    const environmentMetrics = useStore((state) => state.environments);
     const [sparkData, setSparkData] = useState<number[]>(Array<number>(31).fill(0));
     const hiddenSparkline = <></>;
     const visibleSparkline = (

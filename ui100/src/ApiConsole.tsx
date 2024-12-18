@@ -10,7 +10,7 @@ import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
-import useMetricsStore from "./model/store.ts";
+import useStore from "./model/store.ts";
 
 interface ApiConsoleProps {
     user: User;
@@ -18,12 +18,12 @@ interface ApiConsoleProps {
 }
 
 const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
-    const overview = useMetricsStore((state) => state.overview);
-    const updateOverview = useMetricsStore((state) => state.updateOverview);
+    const overview = useStore((state) => state.overview);
+    const updateOverview = useStore((state) => state.updateOverview);
     const oldVov = useRef<VisualOverview>(overview);
     const [selectedNode, setSelectedNode] = useState(null as Node);
     const [sidePanel, setSidePanel] = useState(<></>);
-    const updateEnvironments = useMetricsStore((state) => state.updateEnvironments);
+    const updateEnvironments = useStore((state) => state.updateEnvironments);
 
     const retrieveOverview = () => {
         let cfg = new Configuration({
@@ -36,7 +36,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             .then(d => {
                 let newVov = mergeVisualOverview(oldVov.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldVov.current.nodes, newVov.nodes)) {
-                    console.log("refreshed vov", oldVov.nodes, newVov.nodes);
+                    console.log("refreshed vov", oldVov.current.nodes, newVov.nodes);
                     updateOverview(newVov);
                     oldVov.current = newVov;
                 }
