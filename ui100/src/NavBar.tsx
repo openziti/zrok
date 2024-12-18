@@ -1,7 +1,7 @@
 import {AppBar, Box, Button, Grid2, IconButton, Toolbar, Typography} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
-import zroket from "./assets/zrok-1.0.0-rocket-white.svg";
+import zroket from "./assets/zrok-1.0.0-rocket-green.svg";
 
 interface NavBarProps {
     logout: () => void;
