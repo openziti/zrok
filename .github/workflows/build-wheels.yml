@@ -14,7 +14,7 @@ jobs:
       matrix:
         spec:
           - { name: 'linux x86_64', runner: ubuntu-20.04, target: manylinux_2_27_x86_64 }
-          - { name: 'macOS x86_64', runner: macos-12, target: macosx_10_14_x86_64 }
+          - { name: 'macOS x86_64', runner: macos-13, target: macosx_10_14_x86_64 }
           - { name: 'Windows x86_64', runner: windows-2019, target: win_amd64 }
     name: building ${{ matrix.spec.name }}
     runs-on: ${{ matrix.spec.runner }}
@@ -68,12 +68,12 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-          packages_dir: dist
-          skip_existing: true
+          packages-dir: dist
+          skip-existing: true
           verbose: true
 
       - name: Publish wheels (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages_dir: dist
+          packages-dir: dist
           verbose: true
