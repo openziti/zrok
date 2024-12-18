@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 
 
 const AccountNode = ({ data }) => {
-    const environmentMetrics = useStore((state) => state.environments);
+    const environments = useStore((state) => state.environments);
     const [sparkData, setSparkData] = useState<number[]>(Array<number>(31).fill(0));
     const hiddenSparkline = <></>;
     const visibleSparkline = (
@@ -18,18 +18,20 @@ const AccountNode = ({ data }) => {
 
     useEffect(() => {
         let s = new Array<number>(31);
-        if(environmentMetrics) {
-            environmentMetrics.forEach(env => {
+        if(environments) {
+            environments.forEach(env => {
                 if(env.activity) {
                     env.activity.forEach((sample, i) => {
-                        s[i] = s[i] + sample.rx ? sample.rx : 0;
-                        s[i] = s[i] + sample.tx ? sample.tx : 0;
+                        let v = s[i] ? s[i] : 0;
+                        v += sample.rx! ? sample.rx! : 0;
+                        v += sample.tx! ? sample.tx! : 0;
+                        s[i] = v;
                     });
                 }
             });
         }
         setSparkData(s);
-    }, [environmentMetrics]);
+    }, [environments]);
 
     return (
         <>
