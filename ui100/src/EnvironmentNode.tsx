@@ -7,7 +7,7 @@ const EnvironmentNode = ({ data }) => {
         <>
             <Handle type="target" position={Position.Top} />
             <Handle type="source" position={Position.Bottom} />
-            <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+            <Grid2 container sx={{ flexGrow: 1, p: 1 }}>
                 <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 15, mr: 0.5 }}/></Grid2>
                 <Grid2 display="flex">{data.label}</Grid2>
             </Grid2>

@@ -10,6 +10,7 @@ import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
+import useMetricsStore from "./model/store.ts";
 
 interface ApiConsoleProps {
     user: User;
@@ -22,6 +23,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
     const [selectedNode, setSelectedNode] = useState(null as Node);
     const [sidePanel, setSidePanel] = useState(<></>);
     const oldVov = useRef<VisualOverview>(overview);
+    const updateEnvironments = useMetricsStore((state) => state.updateEnvironments);
 
     useEffect(() => {
         let api = new MetadataApi();
@@ -65,6 +67,32 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         }, 1000);
         return () => {
             mounted = false;
+            clearInterval(interval);
+        }
+    }, []);
+
+    const retrieveEnvironmentDetail = () => {
+        let cfg = new Configuration({
+            headers: {
+                "X-TOKEN": user.token
+            }
+        });
+        let metadata = new MetadataApi(cfg);
+        metadata.getAccountDetail()
+            .then(d => {
+                updateEnvironments(d);
+            })
+            .catch(e => {
+                console.log("environmentDetail", e);
+            });
+    }
+
+    useEffect(() => {
+        retrieveEnvironmentDetail();
+        let interval = setInterval(() => {
+            retrieveEnvironmentDetail();
+        }, 5000);
+        return () => {
             clearInterval(interval);
         }
     }, []);

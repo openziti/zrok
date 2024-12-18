@@ -1,6 +1,7 @@
 import {Node} from "@xyflow/react";
 import {Grid2, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
+import {SparkLineChart} from "@mui/x-charts";
 
 interface EnvironmentPanelProps {
     environment: Node;
