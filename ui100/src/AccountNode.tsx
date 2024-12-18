@@ -9,6 +9,12 @@ import {useEffect, useState} from "react";
 const AccountNode = ({ data }) => {
     const environmentMetrics = useMetricsStore((state) => state.environments);
     const [sparkData, setSparkData] = useState<number[]>(Array<number>(31).fill(0));
+    const hiddenSparkline = <></>;
+    const visibleSparkline = (
+        <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
+            <SparkLineChart data={sparkData} height={30} width={100} colors={['#04adef']}  />
+        </Grid2>
+    );
 
     useEffect(() => {
         let s = new Array<number>(31);
@@ -32,9 +38,7 @@ const AccountNode = ({ data }) => {
                 <Grid2 display="flex"><AccountIcon sx={{ fontSize: 15, mr: 0.5 }}/></Grid2>
                 <Grid2 display="flex">{data.label}</Grid2>
             </Grid2>
-            <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
-                <SparkLineChart data={sparkData} height={30} width={100} colors={['#04adef']}  />
-            </Grid2>
+            {sparkData.find(x => x > 0) ? visibleSparkline : hiddenSparkline}
         </>
     );
 }
