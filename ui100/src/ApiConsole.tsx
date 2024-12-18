@@ -18,25 +18,14 @@ interface ApiConsoleProps {
 }
 
 const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
-    const [version, setVersion] = useState("no version set");
-    const [overview, setOverview] = useState(new VisualOverview());
+    const overview = useMetricsStore((state) => state.overview);
+    const updateOverview = useMetricsStore((state) => state.updateOverview);
+    const oldVov = useRef<VisualOverview>(overview);
     const [selectedNode, setSelectedNode] = useState(null as Node);
     const [sidePanel, setSidePanel] = useState(<></>);
-    const oldVov = useRef<VisualOverview>(overview);
     const updateEnvironments = useMetricsStore((state) => state.updateEnvironments);
 
-    useEffect(() => {
-        let api = new MetadataApi();
-        api.version()
-            .then(d => {
-                setVersion(d);
-            })
-            .catch(e => {
-                console.log(e);
-            });
-    }, []);
-
-    const update = () => {
+    const retrieveOverview = () => {
         let cfg = new Configuration({
             headers: {
                 "X-TOKEN": user.token
@@ -47,8 +36,8 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             .then(d => {
                 let newVov = mergeVisualOverview(oldVov.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldVov.current.nodes, newVov.nodes)) {
-                    console.log("refreshed vov", oldVov.current.nodes, newVov.nodes);
-                    setOverview(newVov);
+                    console.log("refreshed vov", oldVov.nodes, newVov.nodes);
+                    updateOverview(newVov);
                     oldVov.current = newVov;
                 }
             })
@@ -58,11 +47,11 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
     }
 
     useEffect(() => {
-        update();
+        retrieveOverview();
         let mounted = true;
         let interval = setInterval(() => {
             if(mounted) {
-                update();
+                retrieveOverview();
             }
         }, 1000);
         return () => {
