@@ -26,12 +26,12 @@ const AccessCard = ({ accessObject }: AccessCardProps) => {
                     <LanIcon />
                     <Grid2 container sx={{ flexGrow: 1 }}>
                         <Grid2 display="flex" justifyContent="center" size="grow">
-                            <Typography variant="h6" component="div">{access.frontendToken}</Typography>
+                            <Typography variant="h6" component="div" style={{ color: "#9bf316" }}>{access.frontendToken}</Typography>
                         </Grid2>
                     </Grid2>
                     <Grid2 container>
                         <Grid2 display="flex" justifyContent="right">
-                            <Chip label="private" size="small" color="warning" />
+                            <Chip label="private" size="small" style={{ backgroundColor: "#9bf316" }} />
                         </Grid2>
                     </Grid2>
                 </Toolbar>

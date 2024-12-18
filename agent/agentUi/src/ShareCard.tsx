@@ -31,18 +31,13 @@ const ShareCard = ({ shareObject }: ShareCardProps) => {
                     <ShareIcon />
                     <Grid2 container sx={{ flexGrow: 1 }}>
                         <Grid2 display="flex" justifyContent="center" size="grow">
-                            <Typography variant="h6" component="div">{share.token}</Typography>
+                            <Typography variant="h6" component="div" style={{ color: "#9bf316" }}>{share.token}</Typography>
                         </Grid2>
                     </Grid2>
                     <Grid2 container>
                         <Grid2 display="flex" justifyContent="right">
-                            {share.shareMode === "public" && (
-                                <Chip label={share.shareMode} size="small" color="success" />
-                            )}
-                            {share.shareMode === "private" && (
-                                <Chip label={share.shareMode} size="small" color="warning" />
-                            )}
-                            <Chip label={share.backendMode} size="small" color="info" />
+                            <Chip label={share.shareMode} size="small" style={{ backgroundColor: "#9bf316" }} sx={{ mr: 1}} />
+                            <Chip label={share.backendMode} size="small" style={{ backgroundColor: "#9bf316" }} />
                         </Grid2>
                     </Grid2>
                 </Toolbar>
