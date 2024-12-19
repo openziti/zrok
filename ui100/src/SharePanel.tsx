@@ -28,14 +28,12 @@ const SharePanel = ({ share, user }: SharePanelProps) => {
                 "X-TOKEN": user.token
             }
         });
-        console.log(share);
         let metadata = new MetadataApi(cfg);
         metadata.getShareDetail({ shrToken: share.data!.shrToken! as string })
             .then(d => {
                 delete d.activity;
                 delete d.limited;
                 delete d.reserved;
-                console.log("d", d);
                 setDetail(d);
             })
             .catch(e => {
