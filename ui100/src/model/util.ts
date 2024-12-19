@@ -8,6 +8,7 @@ export const objectToRows = (obj) => {
             value: obj[key]
         });
     }
+    rows.sort((a, b) => a.property.localeCompare(b.property));
     return rows;
 };
 

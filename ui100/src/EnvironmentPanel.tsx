@@ -1,21 +1,54 @@
 import {Node} from "@xyflow/react";
 import {Grid2, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
-import {SparkLineChart} from "@mui/x-charts";
+import {User} from "./model/user.ts";
+import {useEffect, useState} from "react";
+import {Configuration, Environment, MetadataApi} from "./api";
+import PropertyTable from "./PropertyTable.tsx";
+import SecretToggle from "./SecretToggle.tsx";
 
 interface EnvironmentPanelProps {
     environment: Node;
+    user: User;
 }
 
-const EnvironmentPanel = ({ environment }: EnvironmentPanelProps) => {
+const EnvironmentPanel = ({ environment, user }: EnvironmentPanelProps) => {
+    const [detail, setDetail] = useState<Environment>(null);
+
+    const customProperties = {
+        zId: row => <SecretToggle secret={row.value} />,
+        createdAt: row => new Date(row.value).toLocaleString(),
+        updatedAt: row => new Date(row.value).toLocaleString()
+    }
+
+    useEffect(() => {
+        let cfg = new Configuration({
+            headers: {
+                "X-TOKEN": user.token
+            }
+        });
+        let metadata = new MetadataApi(cfg);
+        metadata.getEnvironmentDetail({envZId: environment.data!.envZId! as string})
+            .then(d => {
+                let env = d.environment!;
+                delete env.activity;
+                delete env.limited;
+                setDetail(env);
+            })
+            .catch(e => {
+                console.log("EnvironmentPanel", e);
+            })
+    }, [environment]);
+
     return (
         <Typography component="div">
-            <Grid2 container spacing={2}>
-                <Grid2 >
-                    <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                        <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
-                        <Grid2 display="flex" component="h3">{String(environment.data.label)}</Grid2>
-                    </Grid2>
+            <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+                <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
+                <Grid2 display="flex" component="h3">{String(environment.data.label)}</Grid2>
+            </Grid2>
+            <Grid2 container sx={{ flexGrow: 1 }}>
+                <Grid2 display="flex">
+                    <PropertyTable object={detail} custom={customProperties} />
                 </Grid2>
             </Grid2>
         </Typography>

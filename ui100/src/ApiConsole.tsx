@@ -94,7 +94,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
                     break;
 
                 case "environment":
-                    setSidePanel(<EnvironmentPanel environment={selectedNode} />);
+                    setSidePanel(<EnvironmentPanel environment={selectedNode} user={user} />);
                     break;
 
                 case "share":

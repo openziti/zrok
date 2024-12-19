@@ -35,7 +35,7 @@ const PropertyTable = ({ object, custom }: PropertyTableProps) => {
                 <TableBody>
                     {data.map((row) => (
                         <TableRow key={row.id}>
-                            <TableCell>{camelToWords(row.property)}</TableCell>
+                            <TableCell sx={{ width: 100 }}>{camelToWords(row.property)}</TableCell>
                             <TableCell sx={{ width: 1000 }}>{value(row)}</TableCell>
                         </TableRow>
                     ))}
