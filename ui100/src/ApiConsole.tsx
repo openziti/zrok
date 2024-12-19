@@ -98,7 +98,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
                     break;
 
                 case "share":
-                    setSidePanel(<SharePanel share={selectedNode} />);
+                    setSidePanel(<SharePanel share={selectedNode} user={user} />);
                     break;
 
                 case "access":
