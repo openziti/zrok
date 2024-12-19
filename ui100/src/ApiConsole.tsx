@@ -90,7 +90,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         if(selectedNode) {
             switch(selectedNode.type) {
                 case "account":
-                    setSidePanel(<AccountPanel account={selectedNode} />);
+                    setSidePanel(<AccountPanel account={selectedNode} user={user} />);
                     break;
 
                 case "environment":
