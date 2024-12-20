@@ -3,16 +3,16 @@ import {Grid2, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import {Configuration, MetadataApi, Share} from "./api";
 import {useEffect, useState} from "react";
-import {User} from "./model/user.ts";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
+import useStore from "./model/store.ts";
 
 interface SharePanelProps {
     share: Node;
-    user: User;
 }
 
-const SharePanel = ({ share, user }: SharePanelProps) => {
+const SharePanel = ({ share }: SharePanelProps) => {
+    const user = useStore((state) => state.user);
     const [detail, setDetail] = useState<Share>(null);
 
     const customProperties = {

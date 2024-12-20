@@ -1,16 +1,17 @@
 import {Node} from "@xyflow/react";
-import {Grid2, Paper, TableBody, TableContainer, Typography} from "@mui/material";
+import {Grid2, Typography} from "@mui/material";
 import AccountIcon from "@mui/icons-material/Person4";
-import {User} from "./model/user.ts";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
+import useStore from "./model/store.ts";
 
 interface AccountPanelProps {
     account: Node;
-    user: User;
 }
 
-const AccountPanel = ({ account, user }: AccountPanelProps) => {
+const AccountPanel = ({ account}: AccountPanelProps) => {
+    const user = useStore((state) => state.user);
+
     const customProps = {
         token: row => <SecretToggle secret={row.value} />
     }

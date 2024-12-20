@@ -3,9 +3,7 @@ import {Configuration, MetadataApi} from "./api";
 import {mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
 import {Grid2} from "@mui/material";
 import NavBar from "./NavBar.tsx";
-import {User} from "./model/user.ts";
 import Visualizer from "./Visualizer.tsx";
-import {Node} from "@xyflow/react";
 import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
@@ -13,17 +11,18 @@ import AccessPanel from "./AccessPanel.tsx";
 import useStore from "./model/store.ts";
 
 interface ApiConsoleProps {
-    user: User;
     logout: () => void;
 }
 
-const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
+const ApiConsole = ({ logout }: ApiConsoleProps) => {
+    const user = useStore((state) => state.user);
     const overview = useStore((state) => state.overview);
     const updateOverview = useStore((state) => state.updateOverview);
     const oldVov = useRef<VisualOverview>(overview);
-    const [selectedNode, setSelectedNode] = useState(null as Node);
-    const [sidePanel, setSidePanel] = useState(<></>);
+    const selectedNode = useStore((state) => state.selectedNode);
+    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const updateEnvironments = useStore((state) => state.updateEnvironments);
+    const [sidePanel, setSidePanel] = useState(<></>);
 
     const retrieveOverview = () => {
         let cfg = new Configuration({
@@ -90,15 +89,15 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
         if(selectedNode) {
             switch(selectedNode.type) {
                 case "account":
-                    setSidePanel(<AccountPanel account={selectedNode} user={user} />);
+                    setSidePanel(<AccountPanel account={selectedNode} />);
                     break;
 
                 case "environment":
-                    setSidePanel(<EnvironmentPanel environment={selectedNode} user={user} />);
+                    setSidePanel(<EnvironmentPanel environment={selectedNode} />);
                     break;
 
                 case "share":
-                    setSidePanel(<SharePanel share={selectedNode} user={user} />);
+                    setSidePanel(<SharePanel share={selectedNode} />);
                     break;
 
                 case "access":
@@ -115,7 +114,7 @@ const ApiConsole = ({ user, logout }: ApiConsoleProps) => {
             <NavBar logout={logout} />
             <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                 <Grid2 size="grow">
-                    <Visualizer vov={overview} onSelectionChanged={setSelectedNode} />
+                    <Visualizer vov={overview} onSelectionChanged={updateSelectedNode} />
                 </Grid2>
                 <Grid2 size={4}>
                     {sidePanel}

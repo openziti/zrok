@@ -1,18 +1,18 @@
 import {Node} from "@xyflow/react";
 import {Grid2, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
-import {User} from "./model/user.ts";
 import {useEffect, useState} from "react";
 import {Configuration, Environment, MetadataApi} from "./api";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
+import useStore from "./model/store.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
-    user: User;
 }
 
-const EnvironmentPanel = ({ environment, user }: EnvironmentPanelProps) => {
+const EnvironmentPanel = ({ environment }: EnvironmentPanelProps) => {
+    const user = useStore((state) => state.user);
     const [detail, setDetail] = useState<Environment>(null);
 
     const customProperties = {

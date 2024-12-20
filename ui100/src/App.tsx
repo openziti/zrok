@@ -1,33 +1,35 @@
 import {BrowserRouter, Route, Routes} from "react-router";
 import ApiConsole from "./ApiConsole.tsx";
 import Login from "./Login.tsx";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {User} from "./model/user.ts";
+import useStore from "./model/store.ts";
 
 const App = () => {
-    const [user, setUser] = useState(null as User);
+    const user = useStore((state) => state.user);
+    const updateUser = useStore((state) => state.updateUser);
 
     useEffect(() => {
         const checkUser = () => {
             const user = localStorage.getItem("user");
             if (user) {
-                setUser(JSON.parse(user));
+                updateUser(JSON.parse(user));
             }
         }
         checkUser();
     }, []);
 
     const login = (user: User) => {
-        setUser(user);
+        updateUser(user);
         localStorage.setItem("user", JSON.stringify(user));
     }
 
     const logout = () => {
-        setUser(null);
+        updateUser(null as User);
         localStorage.clear();
     }
 
-    const consoleRoot = user ? <ApiConsole user={user} logout={logout}/> : <Login onLogin={login}/>
+    const consoleRoot = user ? <ApiConsole logout={logout}/> : <Login onLogin={login}/>
 
     return (
         <BrowserRouter>
