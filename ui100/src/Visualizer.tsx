@@ -64,6 +64,13 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
         } as VisualOverview
     }
 
+    const nodeColor = (node) => {
+        if(node.selected) {
+            return "#9bf316";
+        }
+        return "#241775";
+    }
+
     useEffect(() => {
         if(vov) {
             let laidOut = layout(vov.nodes, vov.edges);
@@ -85,7 +92,11 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
         >
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />
-            <MiniMap />
+            <MiniMap
+                nodeColor={nodeColor}
+                maskColor="rgb(36, 23, 117, 0.5)"
+                pannable={true}
+            />
         </ReactFlow>
     );
 }

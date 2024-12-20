@@ -12,6 +12,14 @@ const SecretToggle = ({ secret }: SecretToggleProps) => {
 
     const toggle = () => setShowSecret(!showSecret);
 
+    const secretString = (s): string => {
+        let out = "";
+        for(let i = 0; i < s.length; i++) {
+            out += " \u2022";
+        }
+        return out;
+    }
+
     if(showSecret) {
         return (
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
@@ -27,7 +35,7 @@ const SecretToggle = ({ secret }: SecretToggleProps) => {
         return (
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
-                    <span>XXXXXXXX</span>
+                    <span>{secretString(secret)}</span>
                 </Grid2>
                 <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
                     <ShowIcon onClick={toggle} sx={{ ml: 1 }} />
