@@ -49,7 +49,7 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
         }
         let g = tree();
         if(nodes.length === 0) return { nodes, edges };
-        const width = 125;
+        const width = 100;
         const height = 75;
         const hierarchy = stratify()
             .id((node) => node.id)

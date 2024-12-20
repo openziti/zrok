@@ -15,7 +15,7 @@ const SecretToggle = ({ secret }: SecretToggleProps) => {
     const secretString = (s): string => {
         let out = "";
         for(let i = 0; i < s.length; i++) {
-            out += " \u2022";
+            out += " \u2022"; // bullet
         }
         return out;
     }
