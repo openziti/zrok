@@ -49,8 +49,8 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
         }
         let g = tree();
         if(nodes.length === 0) return { nodes, edges };
-        const width = 100;
-        const height = 40;
+        const width = 125;
+        const height = 75;
         const hierarchy = stratify()
             .id((node) => node.id)
             .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
@@ -59,9 +59,9 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
         return {
             nodes: layout
                 .descendants()
-                .map((node) => ({ ...node.data, position: { x: node.x, y: node.y }})),
+                .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
             edges,
-        }
+        } as VisualOverview
     }
 
     useEffect(() => {
@@ -92,7 +92,7 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
 
 export default ({ vov, onSelectionChanged }: VisualizerProps) => {
     return (
-        <Box sx={{ width: "100%" }} height={{ xs: 400, sm: 600, md: 800 }}>
+        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
             <ReactFlowProvider>
                 <Visualizer vov={vov} onSelectionChanged={onSelectionChanged} />
             </ReactFlowProvider>
