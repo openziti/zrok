@@ -66,9 +66,9 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
 
     useEffect(() => {
         if(vov) {
-            let layouted = layout(vov.nodes, vov.edges);
-            setNodes(layouted.nodes);
-            setEdges(layouted.edges);
+            let laidOut = layout(vov.nodes, vov.edges);
+            setNodes(laidOut.nodes);
+            setEdges(laidOut.edges);
         }
     }, [vov]);
 
