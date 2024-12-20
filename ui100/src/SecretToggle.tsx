@@ -18,7 +18,7 @@ const SecretToggle = ({ secret }: SecretToggleProps) => {
                 <Grid2 display="flex" justifyContent="left">
                     <span>{secret}</span>
                 </Grid2>
-                <Grid2 display="flex" justifyContent="right">
+                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
                     <HideIcon onClick={toggle} sx={{ ml: 1 }}/>
                 </Grid2>
             </Grid2>
@@ -29,7 +29,7 @@ const SecretToggle = ({ secret }: SecretToggleProps) => {
                 <Grid2 display="flex" justifyContent="left">
                     <span>XXXXXXXX</span>
                 </Grid2>
-                <Grid2 display="flex" justifyContent="right">
+                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
                     <ShowIcon onClick={toggle} sx={{ ml: 1 }} />
                 </Grid2>
             </Grid2>
