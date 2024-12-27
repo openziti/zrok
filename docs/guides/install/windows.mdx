@@ -18,21 +18,14 @@ import styles from '@site/src/css/download-card.module.css';
   </div>
 </AssetsProvider>
 
-1. Unarchive the distribution in a temporary directory:
+1. Extract `zrok.exe` to `%USERPROFILE%\bin` and set search `%PATH%`.
 
     ```text
-    New-Item -Path "$env:TEMP\zrok" -ItemType Directory -ErrorAction Stop
-    tar -xf .\zrok*windows*.tar.gz -C "$env:TEMP\zrok"
-    ```
-
-1. Install the `zrok` executable and include HOME\bin in the search PATH.
-
-    ```text
-    $source = Join-Path -Path $env:TEMP -ChildPath "zrok\zrok.exe"
-    $destination = Join-Path -Path $env:USERPROFILE -ChildPath "bin\zrok.exe"
-    New-Item -Path $destination -ItemType Directory -ErrorAction SilentlyContinue
-    Copy-Item -Path $source -Destination $destination
-    $env:path += ";"+$destination
+    $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
+    New-Item -Path $binDir -ItemType Directory -ErrorAction SilentlyContinue
+    $latest = Get-ChildItem -Path .\zrok*windows*.tar.gz | Sort-Object LastWriteTime | Select-Object -Last 1
+    tar -xf $latest.FullName -C $binDir zrok.exe
+    $env:path += ";"+$binDir
     ```
 
 1. With the `zrok` executable in your path, you can then execute the `zrok` directly.
@@ -50,3 +43,16 @@ import styles from '@site/src/css/download-card.module.css';
 
     v0.4.0 [c889005]
     ```
+
+## Enable Your Environment
+
+Enable your environment without saving the account token in shell history, i.e., `zrok enable {token}`.
+
+```text
+$zrokAccountToken=Read-Host "Enter your zrok account token" -AsSecureString;
+zrok enable ([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($zrokAccountToken)))
+```
+
+## Wintun for zrok VPN
+
+On Windows, you must install Wintun to use zrok's VPN backend mode. See the [VPN guide](/guides/vpn/vpn.md) for more details.
