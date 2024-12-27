@@ -133,10 +133,9 @@ case "${ZROK_BACKEND_MODE}" in
           ;;
         vpn)
           if [[ -n "${ZROK_TARGET}" ]]; then
-            ZROK_SVC_FILE=/etc/systemd/system/zrok-share.service.d/override.conf
-            if ! grep -qE '^AmbientCapabilities=CAP_NET_ADMIN' "${ZROK_SVC_FILE}"; then
-              echo "ERROR: you must uncomment 'AmbientCapabilities=CAP_NET_ADMIN' in '${ZROK_SVC_FILE}'"\
-                    "and run 'systemctl daemon-reload' to enable VPN mode" >&2
+            if ! systemctl cat zrok-share.service | grep -qE '^AmbientCapabilities=.*CAP_NET_ADMIN' >/dev/null; then
+              echo "ERROR: you must 'systemctl edit zrok-share.service' and uncomment
+              'AmbientCapabilities=CAP_NET_ADMIN' to enable VPN mode" >&2
               exit 1
             fi
           fi
