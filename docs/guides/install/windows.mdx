@@ -18,14 +18,19 @@ import styles from '@site/src/css/download-card.module.css';
   </div>
 </AssetsProvider>
 
-1. Extract `zrok.exe` to `%USERPROFILE%\bin` and set search `%PATH%`.
+1. In PowerShell, install in `%USERPROFILE%\bin\zrok.exe` and set the search path.
 
     ```text
     $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
     New-Item -Path $binDir -ItemType Directory -ErrorAction SilentlyContinue
     $latest = Get-ChildItem -Path .\zrok*windows*.tar.gz | Sort-Object LastWriteTime | Select-Object -Last 1
     tar -xf $latest.FullName -C $binDir zrok.exe
-    $env:path += ";"+$binDir
+    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+    if ($currentPath -notlike "*$binDir*") {
+        $newPath = "$currentPath;$binDir"
+        [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+        $env:Path = $newPath
+    }
     ```
 
 1. With the `zrok` executable in your path, you can then execute the `zrok` directly.
@@ -43,15 +48,6 @@ import styles from '@site/src/css/download-card.module.css';
 
     v0.4.0 [c889005]
     ```
-
-## Enable Your Environment
-
-Enable your environment without saving the account token in shell history, i.e., `zrok enable {token}`.
-
-```text
-$zrokAccountToken=Read-Host "Enter your zrok account token" -AsSecureString;
-zrok enable ([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($zrokAccountToken)))
-```
 
 ## Wintun for zrok VPN
 
