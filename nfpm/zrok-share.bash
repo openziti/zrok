@@ -36,28 +36,20 @@ fi
 echo "DEBUG: zrok state directory is ${HOME}/.zrok"
 
 : "${ZROK_SHARE_RESERVED:=true}"
-
 echo "DEBUG: ZROK_SHARE_RESERVED=${ZROK_SHARE_RESERVED}"
 
-if (( $# )); then
-  if [[ -s "$1" ]]; then
+while (( $# )); do
+  if [[ "${1:0:1}" == @ ]]; then
+    ZROK_INSTANCE="${1:1}"
+    shift
+  elif [[ -s "$1" ]]; then
     echo "INFO: reading share configuration from $1"
     source "$1"
     shift
-  else
-    echo "ERROR: '$1' is empty or not readable" >&2
-    exit 1
   fi
-else
-  # TODO: consider defining a default environment file
-  # if [[ -s /opt/openziti/etc/zrok.env ]]; then
-  #   source /opt/openziti/etc/zrok.env
-  # else
-  #   echo "ERROR: need /opt/openziti/etc/zrok.env or filename argument to read share configuration" >&2
-  #   exit 1
-  # fi
-  echo "INFO: reading share configuration from environment variables"
-fi
+done
+
+ZROK_RESERVATION_FILE="${HOME}/.zrok/reserved${ZROK_INSTANCE:+@${ZROK_INSTANCE}}.json"
 
 [[ -n "${ZROK_TARGET:-}" ]] || {
   echo "ERROR: ZROK_TARGET is not defined." >&2
@@ -70,14 +62,14 @@ if [[ "${ZROK_FRONTEND_MODE:-}" == temp-public ]]; then
   ZROK_CMD="share public"
 elif [[ "${ZROK_FRONTEND_MODE:-}" == temp-private ]]; then
   ZROK_CMD="share private"
-elif [[ -s ~/.zrok/reserved.json ]]; then
-  ZROK_RESERVED_TOKEN="$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)"
-  if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
-    echo "ERROR: invalid reserved.json: '$(jq -c . ~/.zrok/reserved.json)'" >&2
+elif [[ -s "${ZROK_RESERVATION_FILE}" ]]; then
+  ZROK_RESERVATION_TOKEN="$(jq -r '.token' "${ZROK_RESERVATION_FILE}" 2>/dev/null)"
+  if [[ -z "${ZROK_RESERVATION_TOKEN}" || "${ZROK_RESERVATION_TOKEN}" == null ]]; then
+    echo "ERROR: invalid reservation file: '$(jq -c . "${ZROK_RESERVATION_FILE}")'" >&2
     exit 1
   else
-    echo "INFO: zrok backend is already reserved: ${ZROK_RESERVED_TOKEN}"
-    ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
+    echo "INFO: zrok backend is already reserved: ${ZROK_RESERVATION_TOKEN}"
+    ZROK_CMD="${ZROK_RESERVATION_TOKEN} ${ZROK_TARGET}"
     if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
       exec_share_reserved ${ZROK_CMD}
     else
@@ -208,30 +200,30 @@ if [[ "${ZROK_FRONTEND_MODE:-}" =~ ^temp- ]]; then
   exec_with_common_opts ${ZROK_CMD}
 else
   # reserve and continue
-  zrok ${ZROK_CMD} > ~/.zrok/reserved.json
+  zrok ${ZROK_CMD} > "${ZROK_RESERVATION_FILE}"
   # share the reserved backend target until exit
-  if ! [[ -s ~/.zrok/reserved.json ]]; then
-    echo "ERROR: empty or missing $(realpath ~/.zrok)/reserved.json" >&2
+  if ! [[ -s "${ZROK_RESERVATION_FILE}" ]]; then
+    echo "ERROR: empty or missing $(realpath "${ZROK_RESERVATION_FILE}")" >&2
     exit 1
-  elif ! jq . < ~/.zrok/reserved.json &>/dev/null; then
-    echo "ERROR: invalid JSON in $(realpath ~/.zrok)/reserved.json" >&2
+  elif ! jq . < "${ZROK_RESERVATION_FILE}" &>/dev/null; then
+    echo "ERROR: invalid JSON in $(realpath "${ZROK_RESERVATION_FILE}")" >&2
     exit 1
   else
     if [[ "${ZROK_FRONTEND_MODE:-}" == reserved-public ]]; then
-      ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' ~/.zrok/reserved.json 2>/dev/null)
+      ZROK_PUBLIC_URLS=$(jq -cr '.frontend_endpoints' "${ZROK_RESERVATION_FILE}" 2>/dev/null)
       if [[ -z "${ZROK_PUBLIC_URLS}" || "${ZROK_PUBLIC_URLS}" == null ]]; then
-        echo "ERROR: frontend endpoints not defined in $(realpath ~/.zrok)/reserved.json" >&2
+        echo "ERROR: frontend endpoints not defined in $(realpath "${ZROK_RESERVATION_FILE}")" >&2
         exit 1
       else
         echo "INFO: zrok public URLs: ${ZROK_PUBLIC_URLS}"
       fi
     fi
-    ZROK_RESERVED_TOKEN=$(jq -r '.token' ~/.zrok/reserved.json 2>/dev/null)
-    if [[ -z "${ZROK_RESERVED_TOKEN}" || "${ZROK_RESERVED_TOKEN}" == null ]]; then
-      echo "ERROR: zrok reservation token not defined in $(realpath ~/.zrok)/reserved.json" >&2
+    ZROK_RESERVATION_TOKEN=$(jq -r '.token' "${ZROK_RESERVATION_FILE}" 2>/dev/null)
+    if [[ -z "${ZROK_RESERVATION_TOKEN}" || "${ZROK_RESERVATION_TOKEN}" == null ]]; then
+      echo "ERROR: zrok reservation token not defined in $(realpath "${ZROK_RESERVATION_FILE}")" >&2
       exit 1
     fi
-    ZROK_CMD="${ZROK_RESERVED_TOKEN} ${ZROK_TARGET}"
+    ZROK_CMD="${ZROK_RESERVATION_TOKEN} ${ZROK_TARGET}"
     if [[ "${ZROK_SHARE_RESERVED}" == true ]]; then
       exec_share_reserved ${ZROK_CMD}
     else
