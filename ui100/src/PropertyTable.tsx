@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {camelToWords, objectToRows} from "./model/util.ts";
 import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 

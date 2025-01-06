@@ -18,11 +18,7 @@ import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
-
-interface VisualizerProps {
-    vov: VisualOverview;
-    onSelectionChanged: (node: Node) => void;
-}
+import useStore from "./model/store.ts";
 
 const nodeTypes = {
     access: AccessNode,
@@ -31,15 +27,17 @@ const nodeTypes = {
     share: ShareNode
 };
 
-const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
+const Visualizer = () => {
+    const overview = useStore((state) => state.overview);
+    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
     const onSelectionChange = ({ nodes }) => {
         if(nodes.length > 0) {
-            onSelectionChanged(nodes[0]);
+            updateSelectedNode(nodes[0]);
         } else {
-            onSelectionChanged(null as Node);
+            updateSelectedNode(null as Node);
         }
     };
 
@@ -72,12 +70,12 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
     }
 
     useEffect(() => {
-        if(vov) {
-            let laidOut = layout(vov.nodes, vov.edges);
+        if(overview) {
+            let laidOut = layout(overview.nodes, overview.edges);
             setNodes(laidOut.nodes);
             setEdges(laidOut.edges);
         }
-    }, [vov]);
+    }, [overview]);
 
     return (
         <ReactFlow
@@ -101,11 +99,11 @@ const Visualizer = ({ vov, onSelectionChanged }: VisualizerProps) => {
     );
 }
 
-export default ({ vov, onSelectionChanged }: VisualizerProps) => {
+export default () => {
     return (
         <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
             <ReactFlowProvider>
-                <Visualizer vov={vov} onSelectionChanged={onSelectionChanged} />
+                <Visualizer />
             </ReactFlowProvider>
         </Box>
     );

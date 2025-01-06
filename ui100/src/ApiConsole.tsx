@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
 import {mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
 import {Grid2} from "@mui/material";
@@ -9,6 +9,7 @@ import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
 import useStore from "./model/store.ts";
+import SearchPanel from "./SearchPanel.tsx";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -20,9 +21,28 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateOverview = useStore((state) => state.updateOverview);
     const oldVov = useRef<VisualOverview>(overview);
     const selectedNode = useStore((state) => state.selectedNode);
-    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const updateEnvironments = useStore((state) => state.updateEnvironments);
+    const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState(<></>);
+
+    let showVisualizer = true;
+    const handleKeyPress = useCallback((event) => {
+        if(event.ctrlKey === true && event.key === '`') {
+            showVisualizer = !showVisualizer;
+            if(showVisualizer) {
+                setMainPanel(<Visualizer />);
+            } else {
+                setMainPanel(<SearchPanel />);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [handleKeyPress]);
 
     const retrieveOverview = () => {
         let cfg = new Configuration({
@@ -114,7 +134,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             <NavBar logout={logout} />
             <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                 <Grid2 size="grow">
-                    <Visualizer vov={overview} onSelectionChanged={updateSelectedNode} />
+                    {mainPanel}
                 </Grid2>
                 <Grid2 size={4}>
                     {sidePanel}
