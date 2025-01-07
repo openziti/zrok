@@ -8,6 +8,8 @@ FIX: Clarify how to use DNS providers like Route53 with the zrok Docker instance
 
 CHANGE: Use port 80 for the default Ziti API endpoint in the zrok Docker instance sample (https://github.com/openziti/zrok/issues/793).
 
+CHANGE: Clarify OS requirements for zrok VPN
+
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
 
 ## v0.4.45

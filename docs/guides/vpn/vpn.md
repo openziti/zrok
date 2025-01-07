@@ -6,11 +6,27 @@ sidebar_label: VPN
 
 zrok VPN backend allows for simple host-to-host VPN setup.
 
-## Starting VPN server
+## Operating System Requirements
+
+zrok VPN requires elevated privileges to manage network devices.
+
+### Windows
+
+On Windows, you must run zrok VPN commands as an administrator and install Wintun by placing `wintun.dll` ([download link](https://www.wintun.net/)) in the same directory as the `zrok.exe` executable.
+
+### Linux
+
+On Linux, the simplest way to grant the necessary privileges is to run zrok VPN commands as root. You can enable a separate environment for root by also running `zrok enable` as the root user, or you can prefix the commands like `sudo -E` to allow zrok running as root to use the zrok environment owned by the current user. The minimum privilege is runing zrok VPN commands and the `ip` command with the `NET_ADMIN` kernel capability. The `zrok-share.service` unit has a commented example to grant `NET_ADMIN` as an Ambient Capability.
+
+### macOS
+
+On macOS, you must run zrok VPN commands as root. You can prefix the zrok command with `sudo -E` to allow zrok running as root to use the zrok environment owned by the current user.
+
+## Start the VPN Server
 
 VPN is shared through the `vpn` backend of `zrok` command.
 
-```
+```bash
 eugene@hermes $ sudo -E zrok share private --headless --backend-mode vpn
 [   0.542]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[589d443c-f59d-4fc8-8c48-76609b7fb402]} new service session
 [   0.705]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
@@ -25,8 +41,9 @@ zrok access private 3rq7torslq3n
 
 By default `vpn` backend uses subnet `10.122.0.0/16` and assigns `10.122.0.1` to the host that stared VPN share.
 
-```
-$ ifconfig
+Example output from `ifconfig`:
+
+```text
 tun0: flags=4305<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST>  mtu 16384
         inet 10.122.0.1  netmask 255.255.0.0  destination 10.122.0.1
         inet6 fe80::705f:24e4:dcfc:a6b2  prefixlen 64  scopeid 0x20<link>
@@ -39,16 +56,17 @@ tun0: flags=4305<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST>  mtu 16384
 ```
 
 Default IP/subnet setting can be overridden by adding `<target>` parameter:
-```
-$ sudo -E zrok share private --headless --backend-mode vpn 192.168.42.12/24
+
+```bash
+sudo -E zrok share private --headless --backend-mode vpn 192.168.42.12/24
 ```
 
-## VPN share reservation
+## Reserve a VPN Share Token
 
-Share reservation works the same as with other backend types:
+As with all backend modes, you can reserve a share token for a VPN share.
 
-```
-eugene@hermes $ zrok reserve private -b vpn
+```bash
+eugene@hermes $ zrok reserve private --backend-mode vpn
 [   0.297]    INFO main.(*reserveCommand).run: your reserved share token is 'k77y2cl7jmjl'
 
 eugene@hermes $ sudo -E zrok share reserved k77y2cl7jmjl --headless
@@ -57,14 +75,11 @@ eugene@hermes $ sudo -E zrok share reserved k77y2cl7jmjl --headless
 [   0.463]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[22c5708d-e2f2-41aa-a507-454055f8bfcc]} new service session
 [   0.641]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private k77y2cl7jmjl'
 [
-
 ```
 
-## Accessing VPN share
+## Access the VPN Share
 
-Accessing a VPN share works similar to other backends.
-
-```
+```bash
 eugene@calculon % sudo -E zrok access private --headless k77y2cl7jmjl
 [   0.201]    INFO main.(*accessPrivateCommand).run: allocated frontend '50B5hloP1s1X'
 [   0.662]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: VPN:
@@ -72,23 +87,22 @@ eugene@calculon % sudo -E zrok access private --headless k77y2cl7jmjl
 [   0.662]    INFO zrok/endpoints/vpn.(*Frontend).Run: connected:Welcome to zrok VPN
 ```
 
-Starting `zrok access` to a VPN share creates virtual network device/interface: 
+zrok creates a virtual network device, i.e., a "tun" interface, when you run `zrok access`.
 
-```
-eugene@calculon ~ % ifconfig 
-...
+Example output from `ifconfig` run on a VPN client device:
+
+```bash
 utun5: flags=8051<UP,POINTOPOINT,RUNNING,MULTICAST> mtu 1500
         inet 10.122.0.3 --> 10.122.0.1 netmask 0xff000000
         inet6 fe80::ce08:faff:fe8a:7b25%utun5 prefixlen 64 scopeid 0x14
         nd6 options=201<PERFORMNUD,DAD>
-...
 ```
 
-At this point a VPN tunnel is active between your server and client. 
-In the example above server is `hermes(10.122.0.1)` and client is `calculon(10.122.0.3)`. 
-You can access server from client by using assigned IP address.
+At this point a VPN tunnel is active between your server and client.
+In the example above server is `hermes(10.122.0.1)` and client is `calculon(10.122.0.3)`.
+All devices in the VPN can access one another by IP address.
 
-```
+```bash
 eugene@calculon ~ % ssh eugene@10.122.0.1
 Welcome to Ubuntu 23.10 (GNU/Linux 6.5.0-27-generic x86_64)
 
@@ -107,14 +121,11 @@ eugene@hermes:~$
 ```
 
 You can also make a reverse(server-to-client) connection:
-```
+
+```bash
 eugene@hermes:~$ ssh 10.122.0.3
-The authenticity of host '10.122.0.3 (10.122.0.3)' can't be established.
-<..snip..>
-Warning: Permanently added '10.122.0.3' (ED25519) to the list of known hosts.
-(eugene@10.122.0.3) Password:
 Last login: Tue Apr 16 09:57:28 2024
+
 eugene@calculon ~ % who am i
 eugene           ttys008      Apr 16 10:06 (10.122.0.1)
-eugene@calculon ~ %
 ```
