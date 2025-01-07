@@ -4,9 +4,11 @@
 
 FIX: Docker share examples had incorrect default path for zrok environment mountpoint
 
+FIX: Clarify how to use DNS providers like Route53 with the zrok Docker instance sample.
+
 CHANGE: Use port 80 for the default Ziti API endpoint in the zrok Docker instance sample (https://github.com/openziti/zrok/issues/793).
 
-FIX: Clarify how to use DNS providers like Route53 with the zrok Docker instance sample.
+FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
 
 ## v0.4.45
 

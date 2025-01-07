@@ -1,5 +1,5 @@
 [Unit]
-Description=zrok reserved public share service
+Description=zrok share service 
 After=network-online.target
 
 [Service]
@@ -7,8 +7,9 @@ Type=simple
 DynamicUser=yes
 StateDirectory=zrok-share
 UMask=0007
-ExecStartPre=/opt/openziti/bin/zrok-enable.bash /opt/openziti/etc/zrok/zrok-share.env
-ExecStart=/opt/openziti/bin/zrok-share.bash /opt/openziti/etc/zrok/zrok-share.env
+EnvironmentFile=/opt/openziti/etc/zrok/zrok-share.env
+ExecStartPre=/opt/openziti/bin/zrok-enable.bash
+ExecStart=/opt/openziti/bin/zrok-share.bash
 Restart=always
 RestartSec=3
 
