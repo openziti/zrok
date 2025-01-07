@@ -2,6 +2,8 @@
 
 ## v0.4.46
 
+FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
+
 FIX: Docker share examples had incorrect default path for zrok environment mountpoint
 
 FIX: Clarify how to use DNS providers like Route53 with the zrok Docker instance sample.
@@ -12,7 +14,7 @@ CHANGE: Clarify OS requirements for zrok VPN
 
 CHANGE: Set the Windows executable search path in the Windows install guide.
 
-FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
+CHANGE: bump macOS runner for Python module from macos-12 to macos-13
 
 ## v0.4.45
 
