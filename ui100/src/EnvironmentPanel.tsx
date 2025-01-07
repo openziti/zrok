@@ -21,6 +21,10 @@ const EnvironmentPanel = ({ environment }: EnvironmentPanelProps) => {
         updatedAt: row => new Date(row.value).toLocaleString()
     }
 
+    const labels = {
+        zId: "OpenZiti Service"
+    }
+
     useEffect(() => {
         let cfg = new Configuration({
             headers: {
@@ -48,7 +52,7 @@ const EnvironmentPanel = ({ environment }: EnvironmentPanelProps) => {
             </Grid2>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex">
-                    <PropertyTable object={detail} custom={customProperties} />
+                    <PropertyTable object={detail} custom={customProperties} labels={labels} />
                 </Grid2>
             </Grid2>
         </Typography>

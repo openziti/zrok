@@ -5,9 +5,10 @@ import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 type PropertyTableProps = {
     object: any;
     custom: any;
+    labels: any;
 }
 
-const PropertyTable = ({ object, custom }: PropertyTableProps) => {
+const PropertyTable = ({ object, custom, labels }: PropertyTableProps) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -23,13 +24,22 @@ const PropertyTable = ({ object, custom }: PropertyTableProps) => {
         return row.value;
     }
 
+    const renderLabel = (row) => {
+        if(labels) {
+            if(row.property in labels) {
+                return labels[row.property];
+            }
+        }
+        return camelToWords(row.property);
+    }
+
     return (
         <Paper>
             <Table>
                 <TableBody>
                     {data.map((row) => (
                         <TableRow key={row.id}>
-                            <TableCell sx={{ width: 100 }}><strong>{camelToWords(row.property)}</strong></TableCell>
+                            <TableCell sx={{ width: 100 }}><strong>{renderLabel(row)}</strong></TableCell>
                             <TableCell sx={{ width: 1000 }}>{value(row)}</TableCell>
                         </TableRow>
                     ))}

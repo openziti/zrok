@@ -16,6 +16,10 @@ const AccountPanel = ({ account}: AccountPanelProps) => {
         token: row => <SecretToggle secret={row.value} />
     }
 
+    const label = {
+        token: "Account Token"
+    }
+
     return (
         <Typography component="div">
             <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
@@ -24,7 +28,7 @@ const AccountPanel = ({ account}: AccountPanelProps) => {
             </Grid2>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex">
-                    <PropertyTable object={user} custom={customProps} />
+                    <PropertyTable object={user} custom={customProps} labels={label} />
                 </Grid2>
             </Grid2>
         </Typography>
