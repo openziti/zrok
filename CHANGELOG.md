@@ -10,6 +10,8 @@ CHANGE: Use port 80 for the default Ziti API endpoint in the zrok Docker instanc
 
 CHANGE: Clarify OS requirements for zrok VPN
 
+CHANGE: Set the Windows executable search path in the Windows install guide.
+
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
 
 ## v0.4.45
