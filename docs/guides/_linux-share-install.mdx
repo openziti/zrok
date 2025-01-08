@@ -1,0 +1,17 @@
+
+1. Set up `zrok`'s Linux package repository by following [the Linux install guide](/guides/install/linux.mdx#install-zrok-from-the-repository), or run this one-liner to complete the repo setup and install packages.
+
+    ```bash
+    curl -sSLf https://get.openziti.io/install.bash \
+    | sudo bash -s zrok-share
+    ```
+
+1. If you set up the repository by following the guide, then also install the `zrok-share` package. This package provides the systemd service.
+
+    ```bash title="Ubuntu, Debian"
+    sudo apt install zrok-share
+    ```
+
+    ```bash title="Fedora, Rocky"
+    sudo dnf install zrok-share
+    ```

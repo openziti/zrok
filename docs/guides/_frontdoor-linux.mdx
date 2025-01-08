@@ -1,42 +1,10 @@
+import LinuxShareInstall from './_linux-share-install.mdx'
 import AnsibleRepoSetup from './install/_ansible_repo_setup.yaml'
 import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
 
-## Goal
-
-Proxy a reserved public subdomain to a backend target with an always-on Linux system service.
-
-## How it Works
-
-The `zrok-share` package creates a `zrok-share.service` unit in systemd. The administrator edits the service's configuration file to specify the:
-
-1. zrok environment enable token
-1. target URL or files to be shared and backend mode, e.g. `proxy`
-1. authentication options, if wanted
-
-When the service starts it will:
-
-1. enable the zrok environment unless `/var/lib/zrok-share/.zrok/environment.json` exists
-1. reserve a public subdomain for the service unless `/var/lib/zrok-share/.zrok/reserved.json` exists
-1. start sharing the target specified as `ZROK_TARGET` in the environment file
-
 ## Installation
 
-1. Set up `zrok`'s Linux package repository by following [the Linux install guide](/guides/install/linux.mdx#install-zrok-from-the-repository), or run this one-liner to complete the repo setup and install packages.
-
-    ```bash
-    curl -sSLf https://get.openziti.io/install.bash \
-    | sudo bash -s zrok-share
-    ```
-
-1. If you set up the repository by following the guide, then also install the `zrok-share` package. This package provides the systemd service.
-
-    ```bash title="Ubuntu, Debian"
-    sudo apt install zrok-share
-    ```
-
-    ```bash title="Fedora, Rocky"
-    sudo dnf install zrok-share
-    ```
+<LinuxShareInstall />
 
 <Details>
 <summary>Ansible Playbook</summary>

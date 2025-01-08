@@ -94,7 +94,7 @@ Now that we have a private share we can access it with the zrok command or by ru
 1. Run your Compose project to start accessing the private share:
 
     ```bash
-    docker compose up zrok-private-access
+    docker compose up zrok-access
     ```
 
 1. Now your zrok private access proxy is ready on http://127.0.0.1:9191. You can visit the demo web server in your browser.
