@@ -1,15 +1,15 @@
 import "@xyflow/react/dist/style.css";
 import "./styling/react-flow.css";
 import {
+    applyNodeChanges,
     Background,
     Controls,
     MiniMap,
     Node,
     ReactFlow,
     ReactFlowProvider,
-    useEdgesState,
-    useNodesState,
-    useStore as xyStore
+    useOnViewportChange,
+    Viewport
 } from "@xyflow/react";
 import {VisualOverview} from "./model/visualizer.ts";
 import {useEffect} from "react";
@@ -30,16 +30,24 @@ const nodeTypes = {
 
 const Visualizer = () => {
     const overview = useStore((state) => state.overview);
+    const selectedNode = useStore((state) => state.selectedNode);
     const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const viewport = useStore((state) => state.viewport);
     const updateViewport = useStore((state) => state.updateViewport);
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const transform = xyStore((store) => store.transform);
+    const nodes = useStore((state) => state.nodes);
+    const updateNodes = useStore((state) => state.updateNodes);
+    const edges = useStore((state) => state.edges);
+    const updateEdges = useStore((state) => state.updateEdges);
 
-    useEffect(() => {
-        updateViewport(transform);
-    }, [transform]);
+    const onNodesChange = (changes) => {
+        updateNodes(applyNodeChanges(changes, nodes));
+    }
+
+    useOnViewportChange({
+        onEnd: (viewport: Viewport) => {
+            updateViewport(viewport);
+        }
+    });
 
     const onSelectionChange = ({ nodes }) => {
         if(nodes.length > 0) {
@@ -80,27 +88,30 @@ const Visualizer = () => {
     useEffect(() => {
         if(overview) {
             let laidOut = layout(overview.nodes, overview.edges);
-            setNodes(laidOut.nodes);
-            setEdges(laidOut.edges);
+            let selected = laidOut.nodes.map((n) => ({
+                ...n,
+                selected: selectedNode ? selectedNode.id === n.id : false,
+            }));
+            updateNodes(selected);
+            updateEdges(laidOut.edges);
         }
     }, [overview]);
 
-    const defaultViewport = {
-        x: viewport[0],
-        y: viewport[1],
-        zoom: viewport[2],
+    let fitView = false;
+    if(viewport.x === 0 && viewport.y === 0 && viewport.zoom === 1) {
+        fitView = true;
     }
 
     return (
         <ReactFlow
             nodeTypes={nodeTypes}
             nodes={nodes}
-            edges={edges}
             onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
+            edges={edges}
             onSelectionChange={onSelectionChange}
             nodesDraggable={false}
-            defaultViewport={defaultViewport}
+            defaultViewport={viewport}
+            fitView={fitView}
         >
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />

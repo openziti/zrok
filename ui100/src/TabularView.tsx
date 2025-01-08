@@ -1,13 +1,33 @@
 import {Box, Paper} from "@mui/material";
 import useStore from "./model/store.ts";
-import {MaterialReactTable, type MRT_ColumnDef, useMaterialReactTable} from "material-react-table";
-import {useMemo} from "react";
+import {
+    getMRT_RowSelectionHandler,
+    MaterialReactTable,
+    type MRT_ColumnDef,
+    MRT_RowSelectionState,
+    useMaterialReactTable
+} from "material-react-table";
+import {useEffect, useMemo, useState} from "react";
 import {Node} from "@xyflow/react";
 
-const data: Node[] = [];
-
 const TabularView = () => {
-    const overview = useStore((state) => state.overview);
+    const nodes = useStore((state) => state.nodes);
+    const selectedNode = useStore((state) => state.selectedNode);
+    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
+    const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+
+    useEffect(() => {
+        if(selectedNode) {
+            let selection = {};
+            selection[selectedNode.id] = true;
+            setRowSelection(selection);
+        }
+    }, []);
+
+    useEffect(() => {
+        let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
+        updateSelectedNode(sn);
+    }, [rowSelection]);
 
     const columns = useMemo<MRT_ColumnDef<Node>[]>(
         () => [
@@ -25,10 +45,23 @@ const TabularView = () => {
 
     const table = useMaterialReactTable({
         columns: columns,
-        data: overview.nodes,
+        data: nodes,
+        enableRowSelection: false,
+        enableMultiRowSelection: false,
+        getRowId: r => r.id,
+        onRowSelectionChange: setRowSelection,
+        state: { rowSelection },
+        muiTableBodyRowProps: ({ row }) => ({
+            onClick: () => {
+                setRowSelection({[row.id]: true})
+            },
+            selected: rowSelection[row.id],
+            sx: {
+                cursor: 'pointer',
+            },
+        }),
+        positionToolbarAlertBanner: "bottom",
     });
-
-    console.log(overview.nodes);
 
     return (
         <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>

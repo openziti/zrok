@@ -27,8 +27,6 @@ const EnvironmentNode = ({ data }) => {
                     s[i] = v;
                 });
                 setSparkData(s);
-            } else {
-                console.log("not found", data, environments);
             }
         }
     }, [environments]);

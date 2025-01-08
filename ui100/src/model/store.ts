@@ -1,15 +1,17 @@
 import {create} from "zustand";
 import {Environment} from "../api";
 import {VisualOverview} from "./visualizer.ts";
-import {Node} from "@xyflow/react";
+import {Edge, Node, Viewport} from "@xyflow/react";
 import {User} from "./user.ts";
 
 type StoreState = {
     user: User;
-    environments: Array<Environment>;
     overview: VisualOverview;
+    environments: Array<Environment>;
+    nodes: Node[];
+    edges: Edge[];
     selectedNode: Node;
-    viewport: Array<Number>;
+    viewport: Viewport;
 };
 
 type StoreAction = {
@@ -17,6 +19,8 @@ type StoreAction = {
     updateOverview: (vov: StoreState['overview']) => void,
     updateEnvironments: (environments: StoreState['environments']) => void,
     updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
+    updateNodes: (nodes: StoreState['nodes']) => void,
+    updateEdges: (edges: StoreState['edges']) => void,
     updateViewport: (viewport: StoreState['viewport']) => void,
 };
 
@@ -24,11 +28,15 @@ const useStore = create<StoreState & StoreAction>((set) => ({
     user: null,
     overview: new VisualOverview(),
     environments: new Array<Environment>(),
+    nodes: [],
+    edges: [],
     selectedNode: null,
-    viewport: [0, 0, 1.5],
+    viewport: {x: 0, y: 0, zoom: 1},
     updateUser: (user) => set({user: user}),
     updateOverview: (vov) => set({overview: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
+    updateNodes: (nodes) => set({nodes: nodes}),
+    updateEdges: (edges) => set({edges: edges}),
     updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode}),
     updateViewport: (viewport) => set({viewport: viewport})
 }));
