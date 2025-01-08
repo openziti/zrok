@@ -8,7 +8,8 @@ import {
     ReactFlow,
     ReactFlowProvider,
     useEdgesState,
-    useNodesState
+    useNodesState,
+    useStore as xyStore
 } from "@xyflow/react";
 import {VisualOverview} from "./model/visualizer.ts";
 import {useEffect} from "react";
@@ -30,8 +31,15 @@ const nodeTypes = {
 const Visualizer = () => {
     const overview = useStore((state) => state.overview);
     const updateSelectedNode = useStore((state) => state.updateSelectedNode);
+    const viewport = useStore((state) => state.viewport);
+    const updateViewport = useStore((state) => state.updateViewport);
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const transform = xyStore((store) => store.transform);
+
+    useEffect(() => {
+        updateViewport(transform);
+    }, [transform]);
 
     const onSelectionChange = ({ nodes }) => {
         if(nodes.length > 0) {
@@ -77,6 +85,12 @@ const Visualizer = () => {
         }
     }, [overview]);
 
+    const defaultViewport = {
+        x: viewport[0],
+        y: viewport[1],
+        zoom: viewport[2],
+    }
+
     return (
         <ReactFlow
             nodeTypes={nodeTypes}
@@ -86,7 +100,7 @@ const Visualizer = () => {
             onEdgesChange={onEdgesChange}
             onSelectionChange={onSelectionChange}
             nodesDraggable={false}
-            fitView
+            defaultViewport={defaultViewport}
         >
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />

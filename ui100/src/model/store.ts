@@ -9,13 +9,15 @@ type StoreState = {
     environments: Array<Environment>;
     overview: VisualOverview;
     selectedNode: Node;
+    viewport: Array<Number>;
 };
 
 type StoreAction = {
     updateUser: (user: StoreState['user']) => void,
     updateOverview: (vov: StoreState['overview']) => void,
     updateEnvironments: (environments: StoreState['environments']) => void,
-    updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void
+    updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
+    updateViewport: (viewport: StoreState['viewport']) => void,
 };
 
 const useStore = create<StoreState & StoreAction>((set) => ({
@@ -23,10 +25,12 @@ const useStore = create<StoreState & StoreAction>((set) => ({
     overview: new VisualOverview(),
     environments: new Array<Environment>(),
     selectedNode: null,
+    viewport: [0, 0, 1.5],
     updateUser: (user) => set({user: user}),
     updateOverview: (vov) => set({overview: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
-    updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode})
+    updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode}),
+    updateViewport: (viewport) => set({viewport: viewport})
 }));
 
 export default useStore;

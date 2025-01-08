@@ -9,7 +9,7 @@ import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
 import useStore from "./model/store.ts";
-import SearchPanel from "./SearchPanel.tsx";
+import TabularView from "./TabularView.tsx";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -32,7 +32,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             if(showVisualizer) {
                 setMainPanel(<Visualizer />);
             } else {
-                setMainPanel(<SearchPanel />);
+                setMainPanel(<TabularView />);
             }
         }
     }, []);
