@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from "react";
+import {JSX, useCallback, useEffect, useRef, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
 import {layout, mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
 import {Grid2} from "@mui/material";
@@ -25,7 +25,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const selectedNode = useStore((state) => state.selectedNode);
     const updateEnvironments = useStore((state) => state.updateEnvironments);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
-    const [sidePanel, setSidePanel] = useState(<></>);
+    const [sidePanel, setSidePanel] = useState<JSX>(null);
 
     let showVisualizer = true;
     const handleKeyPress = useCallback((event) => {
@@ -135,9 +135,11 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     break;
             }
         } else {
-            setSidePanel(<></>);
+            setSidePanel(null);
         }
     }, [selectedNode]);
+
+    let wrappedSidePanel = sidePanel ? <Grid2 size={4}>{sidePanel}</Grid2> : null;
 
     return (
         <div>
@@ -146,9 +148,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 <Grid2 size="grow">
                     {mainPanel}
                 </Grid2>
-                <Grid2 size={4}>
-                    {sidePanel}
-                </Grid2>
+                {wrappedSidePanel}
             </Grid2>
         </div>
     );

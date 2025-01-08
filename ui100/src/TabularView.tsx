@@ -11,6 +11,7 @@ import {Node} from "@xyflow/react";
 
 const TabularView = () => {
     const nodes = useStore((state) => state.nodes);
+    const updateNodes = useStore((state) => state.updateNodes);
     const selectedNode = useStore((state) => state.selectedNode);
     const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -25,7 +26,9 @@ const TabularView = () => {
 
     useEffect(() => {
         let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
+        console.log("sn", sn);
         updateSelectedNode(sn);
+        updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 
     const columns = useMemo<MRT_ColumnDef<Node>[]>(
@@ -52,7 +55,12 @@ const TabularView = () => {
         state: { rowSelection },
         muiTableBodyRowProps: ({ row }) => ({
             onClick: () => {
-                setRowSelection({[row.id]: true})
+                if(rowSelection[row.id]) {
+                    setRowSelection({});
+                } else {
+                    setRowSelection({[row.id]: true});
+                }
+
             },
             selected: rowSelection[row.id],
             sx: {
