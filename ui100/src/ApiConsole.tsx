@@ -139,8 +139,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         }
     }, [selectedNode]);
 
-    let wrappedSidePanel = sidePanel ? <Grid2 size={4}>{sidePanel}</Grid2> : null;
-
     return (
         <div>
             <NavBar logout={logout} />
@@ -148,7 +146,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 <Grid2 size="grow">
                     {mainPanel}
                 </Grid2>
-                {wrappedSidePanel}
+                {sidePanel ? <Grid2 size={4}>{sidePanel}</Grid2> : null}
             </Grid2>
         </div>
     );
