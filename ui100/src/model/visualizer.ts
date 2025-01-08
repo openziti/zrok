@@ -1,6 +1,7 @@
 import {Overview} from "../api";
 import {Edge, Node} from "@xyflow/react";
 import {User} from "./user.ts";
+import {stratify, tree} from "d3-hierarchy";
 
 export class VisualOverview {
     nodes: Node[];
@@ -149,4 +150,25 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
     if(b && !a) return false;
     if(a.length !== b.length) return false;
     return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
+}
+
+export const layout = (nodes, edges): VisualOverview => {
+    if(!nodes) {
+        return { nodes: [], edges: [] };
+    }
+    let g = tree();
+    if(nodes.length === 0) return { nodes, edges };
+    const width = 100;
+    const height = 75;
+    const hierarchy = stratify()
+        .id((node) => node.id)
+        .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
+    const root = hierarchy(nodes);
+    const layout = g.nodeSize([width * 2, height * 2])(root);
+    return {
+        nodes: layout
+            .descendants()
+            .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
+        edges,
+    } as VisualOverview
 }

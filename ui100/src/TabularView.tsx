@@ -1,7 +1,6 @@
 import {Box, Paper} from "@mui/material";
 import useStore from "./model/store.ts";
 import {
-    getMRT_RowSelectionHandler,
     MaterialReactTable,
     type MRT_ColumnDef,
     MRT_RowSelectionState,
@@ -60,6 +59,12 @@ const TabularView = () => {
                 cursor: 'pointer',
             },
         }),
+        muiToolbarAlertBannerProps: {
+            sx: {
+                color: "#241775",
+                backgroundColor: "#f5fde7",
+            }
+        },
         positionToolbarAlertBanner: "bottom",
     });
 

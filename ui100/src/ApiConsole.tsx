@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
-import {mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
+import {layout, mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
 import {Grid2} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import Visualizer from "./Visualizer.tsx";
@@ -20,6 +20,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const overview = useStore((state) => state.overview);
     const updateOverview = useStore((state) => state.updateOverview);
     const oldVov = useRef<VisualOverview>(overview);
+    const updateNodes = useStore((state) => state.updateNodes);
+    const updateEdges = useStore((state) => state.updateEdges);
     const selectedNode = useStore((state) => state.selectedNode);
     const updateEnvironments = useStore((state) => state.updateEnvironments);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
@@ -58,6 +60,14 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     console.log("refreshed vov", oldVov.current.nodes, newVov.nodes);
                     updateOverview(newVov);
                     oldVov.current = newVov;
+
+                    let laidOut = layout(newVov.nodes, newVov.edges);
+                    let selected = laidOut.nodes.map((n) => ({
+                        ...n,
+                        selected: selectedNode ? selectedNode.id === n.id : false,
+                    }));
+                    updateNodes(selected);
+                    updateEdges(laidOut.edges);
                 }
             })
             .catch(e => {

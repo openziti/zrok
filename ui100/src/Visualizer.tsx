@@ -11,9 +11,6 @@ import {
     useOnViewportChange,
     Viewport
 } from "@xyflow/react";
-import {VisualOverview} from "./model/visualizer.ts";
-import {useEffect} from "react";
-import {stratify, tree} from "d3-hierarchy";
 import ShareNode from "./ShareNode.tsx";
 import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
@@ -29,15 +26,12 @@ const nodeTypes = {
 };
 
 const Visualizer = () => {
-    const overview = useStore((state) => state.overview);
-    const selectedNode = useStore((state) => state.selectedNode);
     const updateSelectedNode = useStore((state) => state.updateSelectedNode);
     const viewport = useStore((state) => state.viewport);
     const updateViewport = useStore((state) => state.updateViewport);
     const nodes = useStore((state) => state.nodes);
     const updateNodes = useStore((state) => state.updateNodes);
     const edges = useStore((state) => state.edges);
-    const updateEdges = useStore((state) => state.updateEdges);
 
     const onNodesChange = (changes) => {
         updateNodes(applyNodeChanges(changes, nodes));
@@ -57,45 +51,12 @@ const Visualizer = () => {
         }
     };
 
-    const layout = (nodes, edges): VisualOverview => {
-        if(!nodes) {
-            return { nodes: [], edges: [] };
-        }
-        let g = tree();
-        if(nodes.length === 0) return { nodes, edges };
-        const width = 100;
-        const height = 75;
-        const hierarchy = stratify()
-            .id((node) => node.id)
-            .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
-        const root = hierarchy(nodes);
-        const layout = g.nodeSize([width * 2, height * 2])(root);
-        return {
-            nodes: layout
-                .descendants()
-                .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
-            edges,
-        } as VisualOverview
-    }
-
     const nodeColor = (node) => {
         if(node.selected) {
             return "#9bf316";
         }
         return "#241775";
     }
-
-    useEffect(() => {
-        if(overview) {
-            let laidOut = layout(overview.nodes, overview.edges);
-            let selected = laidOut.nodes.map((n) => ({
-                ...n,
-                selected: selectedNode ? selectedNode.id === n.id : false,
-            }));
-            updateNodes(selected);
-            updateEdges(laidOut.edges);
-        }
-    }, [overview]);
 
     let fitView = false;
     if(viewport.x === 0 && viewport.y === 0 && viewport.zoom === 1) {
