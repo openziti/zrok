@@ -18,21 +18,19 @@ import styles from '@site/src/css/download-card.module.css';
   </div>
 </AssetsProvider>
 
-1. Unarchive the distribution in a temporary directory:
+1. In PowerShell, install in `%USERPROFILE%\bin\zrok.exe` and set the search path.
 
     ```text
-    New-Item -Path "$env:TEMP\zrok" -ItemType Directory -ErrorAction Stop
-    tar -xf .\zrok*windows*.tar.gz -C "$env:TEMP\zrok"
-    ```
-
-1. Install the `zrok` executable and include HOME\bin in the search PATH.
-
-    ```text
-    $source = Join-Path -Path $env:TEMP -ChildPath "zrok\zrok.exe"
-    $destination = Join-Path -Path $env:USERPROFILE -ChildPath "bin\zrok.exe"
-    New-Item -Path $destination -ItemType Directory -ErrorAction SilentlyContinue
-    Copy-Item -Path $source -Destination $destination
-    $env:path += ";"+$destination
+    $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
+    New-Item -Path $binDir -ItemType Directory -ErrorAction SilentlyContinue
+    $latest = Get-ChildItem -Path .\zrok*windows*.tar.gz | Sort-Object LastWriteTime | Select-Object -Last 1
+    tar -xf $latest.FullName -C $binDir zrok.exe
+    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+    if ($currentPath -notlike "*$binDir*") {
+        $newPath = "$currentPath;$binDir"
+        [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+        $env:Path = $newPath
+    }
     ```
 
 1. With the `zrok` executable in your path, you can then execute the `zrok` directly.
@@ -50,3 +48,7 @@ import styles from '@site/src/css/download-card.module.css';
 
     v0.4.0 [c889005]
     ```
+
+## Wintun for zrok VPN
+
+On Windows, you must install Wintun to use zrok's VPN backend mode. See the [VPN guide](/guides/vpn/vpn.md) for more details.

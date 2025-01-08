@@ -26,7 +26,7 @@ Let's say you have a `compose.yml` file that defines a web app known within the 
         restart: unless-stopped
         user: "${UID}"
         volumes:
-          - ${HOME}/.zrok:/.zrok
+          - ${HOME}/.zrok:/home/ziggy/.zrok
         environment:
           PFXLOG_NO_JSON: "true"
         command: share reserved "myapp" --headless
@@ -42,8 +42,8 @@ Let's say you have a web server running on the host's private network at `https:
 docker run \
     --rm \
     --network=host \
-    --volume ~/.zrok:/.zrok \
-    --user "${UID}" \
+    --volume ~/.zrok:/home/ziggy/.zrok \
+    --user "${UID:-1000}:${GID:-1000}" \
     openziti/zrok share public \
         --headless \
         https://10.11.12.13:8080
@@ -89,8 +89,8 @@ docker.exe run ^
 docker run \
     --rm \
     --network "host" \
-    --volume "/mnt/c/Users/$(powershell.exe -Command 'Write-Output $env:USERNAME' | tr -d '\r')/.zrok:/.zrok" \
-    --user "$UID" \
+    --volume "/mnt/c/Users/$(powershell.exe -Command 'Write-Output $env:USERNAME' | tr -d '\r')/.zrok:/home/ziggy/.zrok" \
+    --user "${UID:-1000}:${GID:-1000}" \
     openziti/zrok share public \
         --headless \
         https://10.11.12.13:8080
@@ -104,8 +104,8 @@ Let's break down those options and arguments.
 
 1. `--rm` don't save this container because it's providing a temporary public share that's destroyed when the container stops
 1. `--network=host` shares the host's network with the container so that the container can reach the web server directly. This is always necessary when the web server is listening only on the host's loopback interface, e.g., `https://::1:8080`, and may not be strictly necessary if the target is routeable from the default Docker bridge.
-1. `--volume ~/.zrok:/.zrok` mounts the `zrok` configuration from the Docker host into the container.
-1. `--user "${UID}:${GID}"` sets the container's user to the current user on the Docker host to avoid permission issues with reading the mounted `zrok` configuration.
+1. `--volume ~/.zrok:/home/ziggy/.zrok` mounts the `zrok` configuration from the Docker host into the container.
+1. `--user "${UID:-1000}:${GID:-1000}"` sets the container's user to the current user on the Docker host to avoid permission issues with reading the mounted `zrok` configuration (defaults to `1000:1000`).
 1. `openziti/zrok` is the `zrok` Docker image.
 1. `share public` is the `zrok` command to share the target publicly until zrok exits.
 1. `--headless` runs the `zrok` command without the interactive terminal UI.

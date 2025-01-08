@@ -1,0 +1,51 @@
+{
+	email {$ZROK_USER_EMAIL}
+	acme_ca {$CADDY_ACME_API}
+	admin 0.0.0.0:2019
+}
+
+# http:// {
+# 	redir https://{host}{uri} permanent
+# }
+
+*.{$ZROK_DNS_ZONE} {
+	tls {
+		dns route53 {
+			access_key_id {$AWS_ACCESS_KEY_ID}
+			secret_access_key {$AWS_SECRET_ACCESS_KEY}
+			session_token {$AWS_SESSION_TOKEN}
+			region {$AWS_REGION}
+			# profile {$AWS_PROFILE}
+			# max_retries 10
+			# max_wait_dur 60
+			# wait_for_propagation false
+			# hosted_zone_id {$AWS_HOSTED_ZONE_ID}
+
+		}
+		propagation_timeout 60m
+	}
+
+	log {
+		output stdout
+		format console
+		level INFO
+	}
+
+	# ziti administration console uses :443 for the benefit of a web UI cert and accesses the ziti edge-management API
+	@ziti host ziti.{$ZROK_DNS_ZONE}
+	reverse_proxy @ziti ziti-quickstart:{$ZITI_CTRL_ADVERTISED_PORT:80} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+
+	@oauth host oauth.{$ZROK_DNS_ZONE}
+	reverse_proxy @oauth zrok-frontend:{$ZROK_OAUTH_PORT}
+
+	@ctrl host zrok.{$ZROK_DNS_ZONE}
+	reverse_proxy @ctrl zrok-controller:{$ZROK_CTRL_PORT}
+
+	reverse_proxy zrok-frontend:{$ZROK_FRONTEND_PORT} {
+		header_up Host {http.request.host}
+	}
+}
