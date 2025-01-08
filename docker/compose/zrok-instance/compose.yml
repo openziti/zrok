@@ -14,7 +14,7 @@ services:
       - -euc
       - |
         ZITI_CMD+=" --ctrl-address ziti.${ZROK_DNS_ZONE}"\
-        " --ctrl-port ${ZITI_CTRL_ADVERTISED_PORT:-1280}"\
+        " --ctrl-port ${ZITI_CTRL_ADVERTISED_PORT:-80}"\
         " --router-address ziti.${ZROK_DNS_ZONE}"\
         " --router-port ${ZITI_ROUTER_PORT:-3022}"\
         " --password ${ZITI_PWD:-admin}"
@@ -31,10 +31,10 @@ services:
       # directory, ZITI_HOME 
       - ${ZITI_HOME:-ziti_home}:/home/ziggy
     ports:
-      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_CTRL_ADVERTISED_PORT:-1280}:${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_CTRL_ADVERTISED_PORT:-80}:${ZITI_CTRL_ADVERTISED_PORT:-80}
       - ${ZITI_INTERFACE:-0.0.0.0}:${ZITI_ROUTER_PORT:-3022}:${ZITI_ROUTER_PORT:-3022}
     expose:
-      - ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      - ${ZITI_CTRL_ADVERTISED_PORT:-80}
       - ${ZITI_ROUTER_PORT:-3022}
     depends_on:
       ziti-quickstart-init:
@@ -94,7 +94,7 @@ services:
         ZROK_CLI_IMAGE: ${ZROK_CLI_IMAGE:-openziti/zrok}
         ZROK_CLI_TAG: ${ZROK_CLI_TAG:-latest}
         ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
-        ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+        ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-80}
         ZROK_ADMIN_TOKEN: ${ZROK_ADMIN_TOKEN} # zrok controller admin password
         ZROK_CTRL_PORT: ${ZROK_CTRL_PORT:-18080}
         ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
@@ -155,7 +155,7 @@ services:
       ZROK_API_ENDPOINT: http://zrok-controller:${ZROK_CTRL_PORT:-18080} # bridge address of the zrok controller
       ZROK_FRONTEND_SCHEME: http
       ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
-      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-1280}
+      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-80}
       ZITI_PWD: ${ZITI_PWD} # ziti controller admin password
 
 volumes:

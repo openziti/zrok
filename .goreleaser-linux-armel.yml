@@ -117,6 +117,9 @@ nfpms:
       - dst: /lib/systemd/system/
         src: ./nfpm/zrok-share.service
 
+      - dst: /usr/lib/systemd/user/
+        src: ./nfpm/zrok-share@.service
+
       - dst: /etc/systemd/system/zrok-share.service.d/override.conf
         src: ./nfpm/zrok-share.service.override.conf
 
