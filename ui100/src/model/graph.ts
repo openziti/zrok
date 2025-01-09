@@ -3,13 +3,13 @@ import {Edge, Node} from "@xyflow/react";
 import {User} from "./user.ts";
 import {stratify, tree} from "d3-hierarchy";
 
-export class VisualOverview {
+export class Graph {
     nodes: Node[];
     edges: Edge[];
 }
 
-export const mergeVisualOverview = (oldVov: VisualOverview, u: User, limited: boolean, newOv: Overview): VisualOverview => {
-    let newVov = new VisualOverview();
+export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
+    let newVov = new Graph();
 
     let accountNode = {
         id: u.token,
@@ -152,7 +152,7 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
     return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
 }
 
-export const layout = (nodes, edges): VisualOverview => {
+export const layout = (nodes, edges): Graph => {
     if(!nodes) {
         return { nodes: [], edges: [] };
     }
@@ -170,5 +170,5 @@ export const layout = (nodes, edges): VisualOverview => {
             .descendants()
             .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
         edges,
-    } as VisualOverview
+    } as Graph
 }

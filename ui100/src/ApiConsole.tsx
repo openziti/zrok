@@ -1,6 +1,6 @@
 import {JSX, useCallback, useEffect, useRef, useState} from "react";
 import {Configuration, MetadataApi} from "./api";
-import {layout, mergeVisualOverview, nodesEqual, VisualOverview} from "./model/visualizer.ts";
+import {Graph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
 import {Grid2} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import Visualizer from "./Visualizer.tsx";
@@ -17,9 +17,9 @@ interface ApiConsoleProps {
 
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useStore((state) => state.user);
-    const overview = useStore((state) => state.overview);
-    const updateOverview = useStore((state) => state.updateOverview);
-    const oldVov = useRef<VisualOverview>(overview);
+    const graph = useStore((state) => state.graph);
+    const updateGraph = useStore((state) => state.updateGraph);
+    const oldGraph = useRef<Graph>(graph);
     const updateNodes = useStore((state) => state.updateNodes);
     const updateEdges = useStore((state) => state.updateEdges);
     const selectedNode = useStore((state) => state.selectedNode);
@@ -55,11 +55,11 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         let api = new MetadataApi(cfg);
         api.overview()
             .then(d => {
-                let newVov = mergeVisualOverview(oldVov.current, user, d.accountLimited!, d);
-                if(!nodesEqual(oldVov.current.nodes, newVov.nodes)) {
-                    console.log("refreshed vov", oldVov.current.nodes, newVov.nodes);
-                    updateOverview(newVov);
-                    oldVov.current = newVov;
+                let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
+                if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
+                    console.log("refreshed vov", oldGraph.current.nodes, newVov.nodes);
+                    updateGraph(newVov);
+                    oldGraph.current = newVov;
 
                     let laidOut = layout(newVov.nodes, newVov.edges);
                     let selected = laidOut.nodes.map((n) => ({
