@@ -10,6 +10,7 @@ import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
 import useStore from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
+import {Node} from "@xyflow/react";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -20,10 +21,12 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const graph = useStore((state) => state.graph);
     const updateGraph = useStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
+    const nodes = useStore((state) => state.nodes);
+    const nodesRef = useRef<Node[]>();
+    nodesRef.current = nodes;
     const updateNodes = useStore((state) => state.updateNodes);
     const updateEdges = useStore((state) => state.updateEdges);
     const selectedNode = useStore((state) => state.selectedNode);
-    const updateEnvironments = useStore((state) => state.updateEnvironments);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
 
@@ -75,6 +78,66 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
     }
 
+    const retrieveSparklines = () => {
+        let environments: string[] = [];
+        let shares: string[] = [];
+        if(nodesRef.current) {
+            nodesRef.current.map(node => {
+                if(node.type === "environment") {
+                    environments.push(node.id);
+                }
+                if(node.type === "share") {
+                    shares.push(node.id);
+                }
+            });
+        }
+
+        let cfg = new Configuration({
+            headers: {
+                "X-TOKEN": user.token
+            }
+        });
+        let api = new MetadataApi(cfg);
+        api.getSparklines({body: {environments: environments, shares: shares}})
+            .then(d => {
+                if(d.sparklines) {
+                    let updatedNodes = nodesRef.current;
+                    updatedNodes.map((n) => {
+                        let spark = d.sparklines!.find(s => s.scope === n.type && s.id === n.id);
+                        if(spark) {
+                            let activity = new Array<Number>(31);
+                            if(spark.samples) {
+                                spark.samples?.forEach((sample, i) => {
+                                    let v = 0;
+                                    v += sample.rx! ? sample.rx! : 0;
+                                    v += sample.tx! ? sample.tx! : 0;
+                                    activity[i] = v;
+                                });
+                                n.data.activity = activity;
+                            }
+                        }
+                    });
+                    if(updatedNodes) {
+                        updateNodes(updatedNodes);
+                        console.log("updatedNodes", updatedNodes);
+                    }
+                }
+            })
+            .catch(e => {
+                console.log("getSparklines", e);
+            });
+    }
+
+    useEffect(() => {
+        retrieveSparklines();
+        let interval = setInterval(() => {
+            retrieveSparklines();
+        }, 5000);
+        return () => {
+            clearInterval(interval);
+        }
+    }, []);
+
     useEffect(() => {
         retrieveOverview();
         let mounted = true;
@@ -85,32 +148,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         }, 1000);
         return () => {
             mounted = false;
-            clearInterval(interval);
-        }
-    }, []);
-
-    const retrieveEnvironmentDetail = () => {
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-        let metadata = new MetadataApi(cfg);
-        metadata.getAccountDetail()
-            .then(d => {
-                updateEnvironments(d);
-            })
-            .catch(e => {
-                console.log("environmentDetail", e);
-            });
-    }
-
-    useEffect(() => {
-        retrieveEnvironmentDetail();
-        let interval = setInterval(() => {
-            retrieveEnvironmentDetail();
-        }, 5000);
-        return () => {
             clearInterval(interval);
         }
     }, []);
