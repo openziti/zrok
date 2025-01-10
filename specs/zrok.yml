@@ -865,6 +865,41 @@ paths:
         500:
           description: internal server error
 
+  /sparklines:
+    post:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getSparklines
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              account:
+                type: boolean
+              environments:
+                type: array
+                items:
+                  type: string
+              shares:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: sparklines data
+          schema:
+            properties:
+              sparklines:
+                type: array
+                items:
+                  $ref: "#/definitions/metrics"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
 
   /version:
     get:

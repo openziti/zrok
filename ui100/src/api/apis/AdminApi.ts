@@ -15,19 +15,26 @@
 
 import * as runtime from '../runtime';
 import type {
+  AddOrganizationMemberRequest,
   CreateAccountRequest,
   CreateFrontendRequest,
   CreateFrontendResponse,
   CreateIdentity201Response,
   CreateIdentityRequest,
+  CreateOrganizationRequest,
   DeleteFrontendRequest,
   GrantsRequest,
   InviteTokenGenerateRequest,
+  ListOrganizationMembers200Response,
+  ListOrganizations200Response,
   PublicFrontend,
   RegenerateToken200Response,
+  RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
 } from '../models/index';
 import {
+    AddOrganizationMemberRequestFromJSON,
+    AddOrganizationMemberRequestToJSON,
     CreateAccountRequestFromJSON,
     CreateAccountRequestToJSON,
     CreateFrontendRequestFromJSON,
@@ -38,19 +45,31 @@ import {
     CreateIdentity201ResponseToJSON,
     CreateIdentityRequestFromJSON,
     CreateIdentityRequestToJSON,
+    CreateOrganizationRequestFromJSON,
+    CreateOrganizationRequestToJSON,
     DeleteFrontendRequestFromJSON,
     DeleteFrontendRequestToJSON,
     GrantsRequestFromJSON,
     GrantsRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
+    ListOrganizationMembers200ResponseFromJSON,
+    ListOrganizationMembers200ResponseToJSON,
+    ListOrganizations200ResponseFromJSON,
+    ListOrganizations200ResponseToJSON,
     PublicFrontendFromJSON,
     PublicFrontendToJSON,
     RegenerateToken200ResponseFromJSON,
     RegenerateToken200ResponseToJSON,
+    RemoveOrganizationMemberRequestFromJSON,
+    RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
     UpdateFrontendRequestToJSON,
 } from '../models/index';
+
+export interface AddOrganizationMemberOperationRequest {
+    body?: AddOrganizationMemberRequest;
+}
 
 export interface CreateAccountOperationRequest {
     body?: CreateAccountRequest;
@@ -64,8 +83,16 @@ export interface CreateIdentityOperationRequest {
     body?: CreateIdentityRequest;
 }
 
+export interface CreateOrganizationOperationRequest {
+    body?: CreateOrganizationRequest;
+}
+
 export interface DeleteFrontendOperationRequest {
     body?: DeleteFrontendRequest;
+}
+
+export interface DeleteOrganizationRequest {
+    body?: RegenerateToken200Response;
 }
 
 export interface GrantsOperationRequest {
@@ -76,6 +103,14 @@ export interface InviteTokenGenerateOperationRequest {
     body?: InviteTokenGenerateRequest;
 }
 
+export interface ListOrganizationMembersRequest {
+    body?: RegenerateToken200Response;
+}
+
+export interface RemoveOrganizationMemberOperationRequest {
+    body?: RemoveOrganizationMemberRequest;
+}
+
 export interface UpdateFrontendOperationRequest {
     body?: UpdateFrontendRequest;
 }
@@ -84,6 +119,36 @@ export interface UpdateFrontendOperationRequest {
  * 
  */
 export class AdminApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async addOrganizationMemberRaw(requestParameters: AddOrganizationMemberOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organization/add`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddOrganizationMemberRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async addOrganizationMember(requestParameters: AddOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addOrganizationMemberRaw(requestParameters, initOverrides);
+    }
 
     /**
      */
@@ -180,6 +245,37 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organization`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateOrganizationRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateToken200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
+        const response = await this.createOrganizationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async deleteFrontendRaw(requestParameters: DeleteFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -206,6 +302,36 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteFrontend(requestParameters: DeleteFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteFrontendRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteOrganizationRaw(requestParameters: DeleteOrganizationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organization`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RegenerateToken200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteOrganization(requestParameters: DeleteOrganizationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteOrganizationRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -294,6 +420,95 @@ export class AdminApi extends runtime.BaseAPI {
     async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublicFrontend>> {
         const response = await this.listFrontendsRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async listOrganizationMembersRaw(requestParameters: ListOrganizationMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListOrganizationMembers200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organization/list`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RegenerateToken200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListOrganizationMembers200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listOrganizationMembers(requestParameters: ListOrganizationMembersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizationMembers200Response> {
+        const response = await this.listOrganizationMembersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listOrganizationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListOrganizations200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organizations`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListOrganizations200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listOrganizations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizations200Response> {
+        const response = await this.listOrganizationsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async removeOrganizationMemberRaw(requestParameters: RemoveOrganizationMemberOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/organization/remove`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RemoveOrganizationMemberRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async removeOrganizationMember(requestParameters: RemoveOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.removeOrganizationMemberRaw(requestParameters, initOverrides);
     }
 
     /**

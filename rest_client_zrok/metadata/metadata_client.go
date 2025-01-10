@@ -46,6 +46,8 @@ type ClientService interface {
 
 	GetShareMetrics(params *GetShareMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareMetricsOK, error)
 
+	GetSparklines(params *GetSparklinesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSparklinesOK, error)
+
 	ListMemberships(params *ListMembershipsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListMembershipsOK, error)
 
 	ListOrgMembers(params *ListOrgMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrgMembersOK, error)
@@ -367,6 +369,45 @@ func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getShareMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetSparklines get sparklines API
+*/
+func (a *Client) GetSparklines(params *GetSparklinesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSparklinesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetSparklinesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getSparklines",
+		Method:             "POST",
+		PathPattern:        "/sparklines",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetSparklinesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetSparklinesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getSparklines: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

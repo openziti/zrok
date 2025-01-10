@@ -1490,6 +1490,65 @@ func init() {
         }
       }
     },
+    "/sparklines": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getSparklines",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "account": {
+                  "type": "boolean"
+                },
+                "environments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sparklines data",
+            "schema": {
+              "properties": {
+                "sparklines": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/metrics"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/unaccess": {
       "delete": {
         "security": [
@@ -3702,6 +3761,65 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/sparklines": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getSparklines",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "account": {
+                  "type": "boolean"
+                },
+                "environments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sparklines data",
+            "schema": {
+              "properties": {
+                "sparklines": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/metrics"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"

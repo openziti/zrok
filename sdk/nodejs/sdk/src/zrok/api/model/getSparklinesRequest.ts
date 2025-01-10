@@ -12,26 +12,32 @@
 
 import { RequestFile } from './models';
 
-export class RemoveOrganizationMemberRequest {
-    'token'?: string;
-    'email'?: string;
+export class GetSparklinesRequest {
+    'account'?: boolean;
+    'environments'?: Array<string>;
+    'shares'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
-            "type": "string"
+            "name": "account",
+            "baseName": "account",
+            "type": "boolean"
         },
         {
-            "name": "email",
-            "baseName": "email",
-            "type": "string"
+            "name": "environments",
+            "baseName": "environments",
+            "type": "Array<string>"
+        },
+        {
+            "name": "shares",
+            "baseName": "shares",
+            "type": "Array<string>"
         }    ];
 
     static getAttributeTypeMap() {
-        return RemoveOrganizationMemberRequest.attributeTypeMap;
+        return GetSparklinesRequest.attributeTypeMap;
     }
 }
 

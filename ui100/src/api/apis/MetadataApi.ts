@@ -18,6 +18,10 @@ import type {
   Environment,
   EnvironmentAndResources,
   Frontend,
+  GetSparklines200Response,
+  GetSparklinesRequest,
+  ListMemberships200Response,
+  ListOrganizationMembers200Response,
   Metrics,
   ModelConfiguration,
   Overview,
@@ -30,6 +34,14 @@ import {
     EnvironmentAndResourcesToJSON,
     FrontendFromJSON,
     FrontendToJSON,
+    GetSparklines200ResponseFromJSON,
+    GetSparklines200ResponseToJSON,
+    GetSparklinesRequestFromJSON,
+    GetSparklinesRequestToJSON,
+    ListMemberships200ResponseFromJSON,
+    ListMemberships200ResponseToJSON,
+    ListOrganizationMembers200ResponseFromJSON,
+    ListOrganizationMembers200ResponseToJSON,
     MetricsFromJSON,
     MetricsToJSON,
     ModelConfigurationFromJSON,
@@ -64,6 +76,19 @@ export interface GetShareDetailRequest {
 export interface GetShareMetricsRequest {
     shrToken: string;
     duration?: string;
+}
+
+export interface GetSparklinesOperationRequest {
+    body?: GetSparklinesRequest;
+}
+
+export interface ListOrgMembersRequest {
+    organizationToken: string;
+}
+
+export interface OrgAccountOverviewRequest {
+    organizationToken: string;
+    accountEmail: string;
 }
 
 /**
@@ -335,6 +360,142 @@ export class MetadataApi extends runtime.BaseAPI {
      */
     async getShareMetrics(requestParameters: GetShareMetricsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Metrics> {
         const response = await this.getShareMetricsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getSparklinesRaw(requestParameters: GetSparklinesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetSparklines200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/sparklines`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: GetSparklinesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetSparklines200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getSparklines(requestParameters: GetSparklinesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSparklines200Response> {
+        const response = await this.getSparklinesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listMembershipsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListMemberships200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/memberships`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListMemberships200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listMemberships(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListMemberships200Response> {
+        const response = await this.listMembershipsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listOrgMembersRaw(requestParameters: ListOrgMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListOrganizationMembers200Response>> {
+        if (requestParameters['organizationToken'] == null) {
+            throw new runtime.RequiredError(
+                'organizationToken',
+                'Required parameter "organizationToken" was null or undefined when calling listOrgMembers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/members/{organizationToken}`.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListOrganizationMembers200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listOrgMembers(requestParameters: ListOrgMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizationMembers200Response> {
+        const response = await this.listOrgMembersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async orgAccountOverviewRaw(requestParameters: OrgAccountOverviewRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Overview>> {
+        if (requestParameters['organizationToken'] == null) {
+            throw new runtime.RequiredError(
+                'organizationToken',
+                'Required parameter "organizationToken" was null or undefined when calling orgAccountOverview().'
+            );
+        }
+
+        if (requestParameters['accountEmail'] == null) {
+            throw new runtime.RequiredError(
+                'accountEmail',
+                'Required parameter "accountEmail" was null or undefined when calling orgAccountOverview().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/overview/{organizationToken}/{accountEmail}`.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken']))).replace(`{${"accountEmail"}}`, encodeURIComponent(String(requestParameters['accountEmail']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OverviewFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async orgAccountOverview(requestParameters: OrgAccountOverviewRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Overview> {
+        const response = await this.orgAccountOverviewRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

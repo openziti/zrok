@@ -11,22 +11,22 @@
  */
 
 import { RequestFile } from './models';
-import { ListOrganizations200ResponseOrganizationsInner } from './listOrganizations200ResponseOrganizationsInner';
+import { Metrics } from './metrics';
 
-export class ListOrganizations200Response {
-    'organizations'?: Array<ListOrganizations200ResponseOrganizationsInner>;
+export class GetSparklines200Response {
+    'sparklines'?: Array<Metrics>;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "organizations",
-            "baseName": "organizations",
-            "type": "Array<ListOrganizations200ResponseOrganizationsInner>"
+            "name": "sparklines",
+            "baseName": "sparklines",
+            "type": "Array<Metrics>"
         }    ];
 
     static getAttributeTypeMap() {
-        return ListOrganizations200Response.attributeTypeMap;
+        return GetSparklines200Response.attributeTypeMap;
     }
 }
 

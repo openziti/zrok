@@ -147,6 +147,21 @@ export function getShareMetrics(shrToken, options) {
 }
 
 /**
+ * @param {object} options Optional options
+ * @param {object} [options.body] 
+ * @return {Promise<object>} sparklines data
+ */
+export function getSparklines(options) {
+  if (!options) options = {}
+  const parameters = {
+    body: {
+      body: options.body
+    }
+  }
+  return gateway.request(getSparklinesOperation, parameters)
+}
+
+/**
  */
 export function version() {
   return gateway.request(versionOperation)
@@ -260,6 +275,17 @@ const getEnvironmentMetricsOperation = {
 const getShareMetricsOperation = {
   path: '/metrics/share/{shrToken}',
   method: 'get',
+  security: [
+    {
+      id: 'key'
+    }
+  ]
+}
+
+const getSparklinesOperation = {
+  path: '/sparklines',
+  contentTypes: ['application/zrok.v1+json'],
+  method: 'post',
   security: [
     {
       id: 'key'

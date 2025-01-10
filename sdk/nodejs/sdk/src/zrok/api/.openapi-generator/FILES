@@ -25,6 +25,8 @@ model/enableResponse.ts
 model/environment.ts
 model/environmentAndResources.ts
 model/frontend.ts
+model/getSparklines200Response.ts
+model/getSparklinesRequest.ts
 model/grantsRequest.ts
 model/inviteRequest.ts
 model/inviteTokenGenerateRequest.ts

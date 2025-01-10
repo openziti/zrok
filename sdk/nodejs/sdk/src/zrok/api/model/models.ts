@@ -19,6 +19,8 @@ export * from './enableResponse';
 export * from './environment';
 export * from './environmentAndResources';
 export * from './frontend';
+export * from './getSparklines200Response';
+export * from './getSparklinesRequest';
 export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
@@ -84,6 +86,8 @@ import { EnableResponse } from './enableResponse';
 import { Environment } from './environment';
 import { EnvironmentAndResources } from './environmentAndResources';
 import { Frontend } from './frontend';
+import { GetSparklines200Response } from './getSparklines200Response';
+import { GetSparklinesRequest } from './getSparklinesRequest';
 import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
@@ -157,6 +161,8 @@ let typeMap: {[index: string]: any} = {
     "Environment": Environment,
     "EnvironmentAndResources": EnvironmentAndResources,
     "Frontend": Frontend,
+    "GetSparklines200Response": GetSparklines200Response,
+    "GetSparklinesRequest": GetSparklinesRequest,
     "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,

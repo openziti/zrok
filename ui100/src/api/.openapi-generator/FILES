@@ -7,6 +7,7 @@ apis/index.ts
 index.ts
 models/AccessRequest.ts
 models/AccessResponse.ts
+models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/CreateAccountRequest.ts
@@ -14,6 +15,7 @@ models/CreateFrontendRequest.ts
 models/CreateFrontendResponse.ts
 models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
+models/CreateOrganizationRequest.ts
 models/DeleteFrontendRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
@@ -21,9 +23,17 @@ models/EnableResponse.ts
 models/Environment.ts
 models/EnvironmentAndResources.ts
 models/Frontend.ts
+models/GetSparklines200Response.ts
+models/GetSparklinesRequest.ts
 models/GrantsRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
+models/ListMemberships200Response.ts
+models/ListMemberships200ResponseMembershipsInner.ts
+models/ListOrganizationMembers200Response.ts
+models/ListOrganizationMembers200ResponseMembersInner.ts
+models/ListOrganizations200Response.ts
+models/ListOrganizations200ResponseOrganizationsInner.ts
 models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
@@ -36,6 +46,7 @@ models/RegenerateToken200Response.ts
 models/RegenerateTokenRequest.ts
 models/RegisterRequest.ts
 models/RegisterResponse.ts
+models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
 models/Share.ts
 models/ShareRequest.ts
