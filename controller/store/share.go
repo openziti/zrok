@@ -56,6 +56,26 @@ func (str *Store) FindAllShares(tx *sqlx.Tx) ([]*Share, error) {
 	return shrs, nil
 }
 
+func (str *Store) FindAllSharesForAccount(accountId int, trx *sqlx.Tx) ([]*Share, error) {
+	sql := "select shares.* from shares, environments" +
+		" where shares.environment_id = environments.id" +
+		" and environments.account_id = $1" +
+		" and not shares.deleted"
+	rows, err := trx.Queryx(sql, accountId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting all shares for account")
+	}
+	var shrs []*Share
+	for rows.Next() {
+		shr := &Share{}
+		if err := rows.StructScan(shr); err != nil {
+			return nil, errors.Wrap(err, "error scanning share")
+		}
+		shrs = append(shrs, shr)
+	}
+	return shrs, nil
+}
+
 func (str *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
 	if err := tx.QueryRowx("select * from shares where token = $1 and not deleted", shrToken).StructScan(shr); err != nil {
