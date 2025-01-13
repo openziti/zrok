@@ -3,7 +3,9 @@ import useStore from "./model/store.ts";
 import {
     MaterialReactTable,
     type MRT_ColumnDef,
+    MRT_PaginationState,
     MRT_RowSelectionState,
+    MRT_SortingState,
     useMaterialReactTable
 } from "material-react-table";
 import {useEffect, useMemo, useRef, useState} from "react";
@@ -17,8 +19,14 @@ const TabularView = () => {
     const updateNodes = useStore((state) => state.updateNodes);
     const selectedNode = useStore((state) => state.selectedNode);
     const updateSelectedNode = useStore((state) => state.updateSelectedNode);
-    const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
     const sparkdata = useStore((state) => state.sparkdata);
+    const storedPagination = useStore((state) => state.pagination);
+    const updatePagination = useStore((state) => state.updatePagination);
+    const storedSorting = useStore((state) => state.sorting);
+    const updateSorting = useStore((state) => state.updateSorting);
+    const [pagination, setPagination] = useState<MRT_PaginationState>({} as MRT_PaginationState);
+    const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+    const [sorting, setSorting] = useState<MRT_SortingState>([{id: "data.label", desc: false}] as MRT_SortingState);
     const [combined, setCombined] = useState<Node[]>([]);
 
     useEffect(() => {
@@ -39,7 +47,18 @@ const TabularView = () => {
             selection[selectedNode.id] = true;
             setRowSelection(selection);
         }
+        setPagination(storedPagination);
+        setSorting(storedSorting);
     }, []);
+
+    useEffect(() => {
+        console.log("pagination", pagination);
+        updatePagination(pagination);
+    }, [pagination]);
+
+    useEffect(() => {
+        updateSorting(sorting);
+    }, [sorting]);
 
     useEffect(() => {
         let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
@@ -119,8 +138,10 @@ const TabularView = () => {
         enableRowSelection: false,
         enableMultiRowSelection: false,
         getRowId: r => r.id,
+        onPaginationChange: setPagination,
         onRowSelectionChange: setRowSelection,
-        state: { rowSelection },
+        onSortingChange: setSorting,
+        state: { pagination, rowSelection, sorting },
         muiTableBodyRowProps: ({ row }) => ({
             onClick: () => {
                 if(rowSelection[row.id]) {
