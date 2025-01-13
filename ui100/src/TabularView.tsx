@@ -52,7 +52,6 @@ const TabularView = () => {
     }, []);
 
     useEffect(() => {
-        console.log("pagination", pagination);
         updatePagination(pagination);
     }, [pagination]);
 
