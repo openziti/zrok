@@ -82,6 +82,20 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
     }
 
+    useEffect(() => {
+        retrieveOverview();
+        let mounted = true;
+        let interval = setInterval(() => {
+            if(mounted) {
+                retrieveOverview();
+            }
+        }, 1000);
+        return () => {
+            mounted = false;
+            clearInterval(interval);
+        }
+    }, []);
+
     const retrieveSparklines = () => {
         let environments: string[] = [];
         let shares: string[] = [];
@@ -128,25 +142,10 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }
 
     useEffect(() => {
-        retrieveSparklines();
         let interval = setInterval(() => {
             retrieveSparklines();
         }, 5000);
         return () => {
-            clearInterval(interval);
-        }
-    }, []);
-
-    useEffect(() => {
-        retrieveOverview();
-        let mounted = true;
-        let interval = setInterval(() => {
-            if(mounted) {
-                retrieveOverview();
-            }
-        }, 1000);
-        return () => {
-            mounted = false;
             clearInterval(interval);
         }
     }, []);

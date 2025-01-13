@@ -48,16 +48,36 @@ const TabularView = () => {
     }, [rowSelection]);
 
     const sparkdataTip = (row) => {
-        if(row.data.activity) {
-            let tip = row.data.activity[row.data.activity.length - 1];
-            if(tip > 0) {
-                return bytesToSize(tip);
-            }
-        } else {
-            console.log("no sparkdata", row);
+        if(row.data && row.data.activity) {
+            return row.data.activity[row.data.activity.length - 1];
+        }
+        return 0;
+    }
+
+    const sparkdataTipFmt = (row) => {
+        let tip = sparkdataTip(row);
+        if(tip > 0) {
+            return bytesToSize(tip);
         }
         return "";
     };
+
+    const sparkdataAverage = (row) => {
+        if(row.data && row.data.activity) {
+            let average = row.data.activity.reduce((acc, curr) => { return acc + curr }, 0);
+            average /= row.data.activity.length;
+            return average;
+        }
+        return 0;
+    }
+
+    const sparkdataAverageFmt = (row) => {
+        let average = sparkdataAverage(row);
+        if(average > 0) {
+            return bytesToSize(average);
+        }
+        return "";
+    }
 
     const columns = useMemo<MRT_ColumnDef<Node>[]>(
         () => [
@@ -70,8 +90,24 @@ const TabularView = () => {
                 header: 'Type',
             },
             {
-                accessorFn: sparkdataTip,
+                accessorFn: sparkdataTipFmt,
                 header: 'Activity',
+                sortingFn: (rowA, rowB) => {
+                    let tipA = sparkdataTip(rowA.original);
+                    let tipB = sparkdataTip(rowB.original);
+                    return tipA > tipB ? 1 : tipA < tipB ? -1 : 0;
+                },
+                sortDescFirst: true
+            },
+            {
+                accessorFn: sparkdataAverageFmt,
+                header: 'Activity 5m',
+                sortingFn: (rowA, rowB) => {
+                    let avgA = sparkdataAverage(rowA.original);
+                    let avgB = sparkdataAverage(rowB.original);
+                    return avgA > avgB ? 1 : avgA < avgB ? -1 : 0;
+                },
+                sortDescFirst: true
             }
         ],
         [],
