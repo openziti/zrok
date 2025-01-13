@@ -1,12 +1,24 @@
 import {Handle, Position} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
+import useStore from "./model/store.ts";
+import {SparkLineChart} from "@mui/x-charts";
 
 const ShareNode = ({ data }) => {
+    const sparkdata = useStore((state) => state.sparkdata);
+
     let shareHandle = <></>;
     if(data.accessed) {
         shareHandle = <Handle type="target" position={Position.Bottom} id="access"/>;
     }
+
+    const hiddenSparkline = <></>;
+    const visibleSparkline = (
+        <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
+            <SparkLineChart data={sparkdata.get(data.shrToken) ? sparkdata.get(data.shrToken)! : []} height={30} width={100} colors={['#04adef']}  />
+        </Grid2>
+    );
+
     return (
         <>
             <Handle type="target" position={Position.Top} />
@@ -15,6 +27,7 @@ const ShareNode = ({ data }) => {
                 <Grid2 display="flex"><ShareIcon sx={{ fontSize: 15, mr: 0.5 }}/></Grid2>
                 <Grid2 display="flex">{data.label}</Grid2>
             </Grid2>
+            {sparkdata.get(data.shrToken)?.find(x => x > 0) ? visibleSparkline : hiddenSparkline}
         </>
     );
 }

@@ -2,12 +2,15 @@ import {Handle, Position} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import {SparkLineChart} from "@mui/x-charts";
+import useStore from "./model/store.ts";
 
 const EnvironmentNode = ({ data }) => {
+    const sparkdata = useStore((state) => state.sparkdata);
+
     const hiddenSparkline = <></>;
     const visibleSparkline = (
         <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
-            <SparkLineChart data={data.activity ? data.activity : []} height={30} width={100} colors={['#04adef']}  />
+            <SparkLineChart data={sparkdata.get(data.envZId) ? sparkdata.get(data.envZId)! : []} height={30} width={100} colors={['#04adef']}  />
         </Grid2>
     );
 
@@ -19,7 +22,7 @@ const EnvironmentNode = ({ data }) => {
                 <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 15, mr: 0.5 }}/></Grid2>
                 <Grid2 display="flex">{data.label}</Grid2>
             </Grid2>
-            {data.activity?.find(x => x > 0) ? visibleSparkline : hiddenSparkline}
+            {sparkdata.get(data.envZId)?.find(x => x > 0) ? visibleSparkline : hiddenSparkline}
         </>
     );
 }

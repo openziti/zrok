@@ -8,7 +8,7 @@ import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
-import useStore from "./model/store.ts";
+import useStore, {Sparkdata} from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 
@@ -21,6 +21,10 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const graph = useStore((state) => state.graph);
     const updateGraph = useStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
+    const sparkdata = useStore((state) => state.sparkdata);
+    const sparkdataRef = useRef<Map<string, Sparkdata>>();
+    sparkdataRef.current = sparkdata;
+    const updateSparkdata = useStore((state) => state.updateSparkdata);
     const nodes = useStore((state) => state.nodes);
     const nodesRef = useRef<Node[]>();
     nodesRef.current = nodes;
@@ -97,30 +101,25 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 "X-TOKEN": user.token
             }
         });
+
         let api = new MetadataApi(cfg);
         api.getSparklines({body: {environments: environments, shares: shares}})
             .then(d => {
                 if(d.sparklines) {
-                    let updatedNodes = nodesRef.current;
-                    updatedNodes.map((n) => {
-                        let spark = d.sparklines!.find(s => s.scope === n.type && s.id === n.id);
-                        if(spark) {
-                            let activity = new Array<Number>(31);
-                            if(spark.samples) {
-                                spark.samples?.forEach((sample, i) => {
-                                    let v = 0;
-                                    v += sample.rx! ? sample.rx! : 0;
-                                    v += sample.tx! ? sample.tx! : 0;
-                                    activity[i] = v;
-                                });
-                                n.data.activity = activity;
-                            }
+                    let sparkdataIn = new Map<string, Number[]>();
+                    d.sparklines!.forEach(s => {
+                        let activity = new Array<Number>(31);
+                        if(s.samples) {
+                            s.samples?.forEach((sample, i) => {
+                                let v = 0;
+                                v += sample.rx! ? sample.rx! : 0;
+                                v += sample.tx! ? sample.tx! : 0;
+                                activity[i] = v;
+                            });
+                            sparkdataIn.set(s.id!, activity);
                         }
                     });
-                    if(updatedNodes) {
-                        updateNodes(updatedNodes);
-                        console.log("updatedNodes", updatedNodes);
-                    }
+                    updateSparkdata(sparkdataIn);
                 }
             })
             .catch(e => {

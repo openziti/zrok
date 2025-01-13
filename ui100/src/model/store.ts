@@ -8,6 +8,7 @@ type StoreState = {
     user: User;
     graph: Graph;
     environments: Array<Environment>;
+    sparkdata: Map<string, Number[]>;
     nodes: Node[];
     edges: Edge[];
     selectedNode: Node;
@@ -18,9 +19,10 @@ type StoreAction = {
     updateUser: (user: StoreState['user']) => void,
     updateGraph: (vov: StoreState['graph']) => void,
     updateEnvironments: (environments: StoreState['environments']) => void,
-    updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
+    updateSparkdata: (sparkdata: StoreState['sparkdata']) => void,
     updateNodes: (nodes: StoreState['nodes']) => void,
     updateEdges: (edges: StoreState['edges']) => void,
+    updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
     updateViewport: (viewport: StoreState['viewport']) => void,
 };
 
@@ -28,6 +30,7 @@ const useStore = create<StoreState & StoreAction>((set) => ({
     user: null,
     graph: new Graph(),
     environments: new Array<Environment>(),
+    sparkdata: new Map<string, Sparkdata>(),
     nodes: [],
     edges: [],
     selectedNode: null,
@@ -35,6 +38,7 @@ const useStore = create<StoreState & StoreAction>((set) => ({
     updateUser: (user) => set({user: user}),
     updateGraph: (vov) => set({overview: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
+    updateSparkdata: (sparkdata) => set({sparkdata: sparkdata}),
     updateNodes: (nodes) => set({nodes: nodes}),
     updateEdges: (edges) => set({edges: edges}),
     updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode}),
