@@ -8,7 +8,7 @@ import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
-import useStore, {Sparkdata} from "./model/store.ts";
+import useStore from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 
@@ -22,7 +22,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateGraph = useStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
     const sparkdata = useStore((state) => state.sparkdata);
-    const sparkdataRef = useRef<Map<string, Sparkdata>>();
+    const sparkdataRef = useRef<Map<string, Number[]>>();
     sparkdataRef.current = sparkdata;
     const updateSparkdata = useStore((state) => state.updateSparkdata);
     const nodes = useStore((state) => state.nodes);
@@ -33,18 +33,29 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const selectedNode = useStore((state) => state.selectedNode);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
+    const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);
 
-    let showVisualizer = true;
+    let visualizer = true;
     const handleKeyPress = useCallback((event) => {
         if(event.ctrlKey === true && event.key === '`') {
-            showVisualizer = !showVisualizer;
-            if(showVisualizer) {
+            setVisualizerEnabled(!visualizer);
+            visualizer = !visualizer;
+            if(visualizer) {
                 setMainPanel(<Visualizer />);
             } else {
                 setMainPanel(<TabularView />);
             }
         }
     }, []);
+
+    useEffect(() => {
+        visualizer = visualizerEnabled;
+        if(visualizer) {
+            setMainPanel(<Visualizer />);
+        } else {
+            setMainPanel(<TabularView />);
+        }
+    }, [visualizerEnabled]);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress);
@@ -176,7 +187,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
 
     return (
         <div>
-            <NavBar logout={logout} />
+            <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
             <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                 <Grid2 size="grow">
                     {mainPanel}

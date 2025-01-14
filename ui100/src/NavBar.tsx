@@ -1,20 +1,24 @@
-import {AppBar, Box, Button, Grid2, IconButton, Toolbar, Typography} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import {AppBar, Box, Button, Grid2, Toolbar, Tooltip, Typography} from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
+import VisualizerIcon from "@mui/icons-material/Hub";
+import TabularIcon from "@mui/icons-material/TableRows";
 import zroket from "./assets/zrok-1.0.0-rocket-green.svg";
 
 interface NavBarProps {
     logout: () => void;
+    visualizer: boolean;
+    toggleMode: (boolean) => void;
 }
 
-const NavBar = ({ logout }: NavBarProps) => {
+const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
+    const handleClick = () => {
+        toggleMode(!visualizer);
+    }
+
     return (
         <Box ssx={{ flexGrow: 1 }}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-                        <MenuIcon />
-                    </IconButton>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         <Grid2 container sx={{ flexGrow: 1 }}>
                             <Grid2 display="flex" justifyContent="left">
@@ -27,7 +31,14 @@ const NavBar = ({ logout }: NavBarProps) => {
                     </Typography>
                     <Grid2 container sx={{ flexGrow: 1 }}>
                         <Grid2 display="flex" justifyContent="right" size="grow">
-                            <Button color="inherit" onClick={logout}><LogoutIcon /></Button>
+                            <Tooltip title="Toggle Interface Mode (Ctrl-`)">
+                                <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
+                            </Tooltip>
+                        </Grid2>
+                        <Grid2 display="flex" justifyContent="right">
+                            <Tooltip title="Logout">
+                                <Button color="inherit" onClick={logout}><LogoutIcon /></Button>
+                            </Tooltip>
                         </Grid2>
                     </Grid2>
                 </Toolbar>
