@@ -31,6 +31,9 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                     </Typography>
                     <Grid2 container sx={{ flexGrow: 1 }}>
                         <Grid2 display="flex" justifyContent="right" size="grow">
+                            <Button variant="outline" color="inherit">CLICK HERE TO GET STARTED!</Button>
+                        </Grid2>
+                        <Grid2 display="flex" justifyContent="right">
                             <Tooltip title="Toggle Interface Mode (Ctrl-`)">
                                 <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
                             </Tooltip>
