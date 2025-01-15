@@ -1,11 +1,12 @@
 import {Node} from "@xyflow/react";
-import {Grid2, Typography} from "@mui/material";
+import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import {useEffect, useState} from "react";
 import {Configuration, Environment, MetadataApi} from "./api";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
 import useStore from "./model/store.ts";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -49,6 +50,11 @@ const EnvironmentPanel = ({ environment }: EnvironmentPanelProps) => {
             <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                 <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
                 <Grid2 display="flex" component="h3">{String(environment.data.label)}</Grid2>
+            </Grid2>
+            <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
+                <Tooltip title="Release Environment">
+                    <Button variant="contained" color="error"><DeleteIcon /></Button>
+                </Tooltip>
             </Grid2>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex">
