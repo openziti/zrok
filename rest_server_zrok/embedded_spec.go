@@ -31,7 +31,7 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "0.3.0"
+    "version": "1.0.0"
   },
   "basePath": "/api/v1",
   "paths": {
@@ -2281,7 +2281,7 @@ func init() {
   "info": {
     "description": "zrok client access",
     "title": "zrok",
-    "version": "0.3.0"
+    "version": "1.0.0"
   },
   "basePath": "/api/v1",
   "paths": {
