@@ -12,7 +12,7 @@ import DownloadCardStyles from '@site/src/css/download-card.module.css';
 
 Easily share private network resources with public internet users, securely, without having to alter any of your local network configuration.
 You can share resource using [NetFoundry's cloud-hosted zrok](https://myzrok.io/),
-or follow our [self-hosted guide](/docs/category/self-hosting/) to manage your own installation.
+or follow our [self-hosted guide](/docs/category/self-hosting/) to manage your own instance.
 
 * Download the binary for your platform [here](https://github.com/openziti/zrok/releases/latest)
 * Sign up for a myzrok.io account [here](https://myzrok.io/) to enable your personal share token
@@ -37,13 +37,13 @@ $ curl -s https://dslno640nct4.share.zrok.io | head
 
 zrok provides several different share types, including:
 
-* [public shares](docs/concepts/sharing-public/) for [web services](docs/concepts/http/) or [files](docs/concepts/files/)
-* [private shares for web services or files](docs/concepts/sharing-private/)
-* [reserved shares](docs/concepts/sharing-reserved/)
-* [tcpTunnel shares](docs/concepts/tunnels/)
-* [udpTunnel shares](docs/concepts/tunnels/)
-* [drives](docs/guides/drives/)
-* [vpn](docs/guides/vpn/)
+* [public shares](./concepts/sharing-public.mdx) for [web services](./concepts/http.md) or [files](./concepts/files.md)
+* [private shares for web services or files](./concepts/sharing-private.mdx)
+* [reserved shares](./concepts/sharing-reserved.md)
+* [tcpTunnel shares](./concepts/tunnels.md)
+* [udpTunnel shares](./concepts/tunnels.md)
+* [drives](./guides/drives.mdx)
+* [vpn](./guides/vpn/vpn.md)
 
 
 ## Open Source
@@ -95,7 +95,7 @@ If [sharing privately](./concepts/sharing-private.mdx), only users with the shar
 
 ## Enabling Your zrok Environment
 
-After you have [an account](#get-an-account), you can enable your `zrok` environment.
+After you have [an account](https://myzrok.io/), you can enable your `zrok` environment.
 
 A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
