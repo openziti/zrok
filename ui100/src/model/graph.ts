@@ -126,16 +126,26 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
 
     let outNodes = [];
     if(oldVov.nodes) {
-        outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id && newNode.data.limited == oldNode.data.limited && newNode.data.label === oldNode.data.label));
+        outNodes = oldVov.nodes.filter(oldNode => newVov.nodes.find(newNode => newNode.id === oldNode.id
+            && newNode.data.accessed === oldNode.data.accessed
+            && newNode.data.ownedShare === oldNode.data.ownedShare
+            && newNode.data.limited === oldNode.data.limited
+            && newNode.data.label === oldNode.data.label));
     }
     let outEdges = [];
     if(oldVov.edges) {
-        outEdges = oldVov.edges.filter(oldEdge => newVov.edges.find(newEdge => newEdge.target === oldEdge.target && newEdge.source === oldEdge.source));
+        outEdges = oldVov.edges.filter(oldEdge => newVov.edges.find(newEdge => newEdge.target === oldEdge.target
+            && newEdge.source === oldEdge.source));
     }
 
     // and then do the opposite; add any nodes that are in the new overview, but missing from the old overview.
-    outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id && oldNode.data.limited === newNode.data.limited && oldNode.data.label === newNode.data.label)));
-    outEdges.push(...newVov.edges.filter(newEdge => !outEdges.find(oldEdge => oldEdge.target === newEdge.target && oldEdge.source === newEdge.source)));
+    outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id
+        && oldNode.data.accessed == newNode.data.accessed
+        && oldNode.data.ownedShare === newNode.data.ownedShare
+        && oldNode.data.limited === newNode.data.limited
+        && oldNode.data.label === newNode.data.label)));
+    outEdges.push(...newVov.edges.filter(newEdge => !outEdges.find(oldEdge => oldEdge.target === newEdge.target
+        && oldEdge.source === newEdge.source)));
 
     newVov.nodes = outNodes;
     newVov.edges = outEdges;
