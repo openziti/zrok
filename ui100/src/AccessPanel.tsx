@@ -1,12 +1,49 @@
 import {Node} from "@xyflow/react";
-import {Grid2, Typography} from "@mui/material";
+import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
+import useStore from "./model/store.ts";
+import {useEffect, useState} from "react";
+import {Configuration, Frontend, MetadataApi} from "./api";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PropertyTable from "./PropertyTable.tsx";
 
 interface AccessPanelProps {
     access: Node;
 }
 
 const AccessPanel = ({ access }: AccessPanelProps) => {
+    const user = useStore((state) => state.user);
+    const [detail, setDetail] = useState<Frontend>(null);
+
+    useEffect(() => {
+        let cfg = new Configuration({
+            headers: {
+                "X-TOKEN": user.token
+            }
+        });
+        let metadataApi = new MetadataApi(cfg);
+        metadataApi.getFrontendDetail({feId: access.data.feId as number})
+            .then(d => {
+                delete d.id;
+                setDetail(d);
+            })
+            .catch(e => {
+                console.log("AccessPanel", e);
+            })
+    }, [access]);
+
+    const customProperties = {
+        createdAt: row => new Date(row.value).toLocaleString(),
+        updatedAt: row => new Date(row.value).toLocaleString()
+    }
+
+    const labels = {
+        createdAt: "Created",
+        shrToken: "Share Token",
+        token: "Frontend Token",
+        updatedAt: "Updated",
+    }
+
     return (
         <Typography component="div">
             <Grid2 container spacing={2}>
@@ -14,6 +51,16 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                     <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                         <Grid2 display="flex"><AccessIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
                         <Grid2 display="flex" component="h3">{String(access.data.label)}</Grid2>
+                    </Grid2>
+                    <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
+                        <Tooltip title="Release Access">
+                            <Button variant="contained" color="error"><DeleteIcon /></Button>
+                        </Tooltip>
+                    </Grid2>
+                    <Grid2 container sx={{ flexGrow: 1 }}>
+                        <Grid2 display="flex">
+                            <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                        </Grid2>
                     </Grid2>
                 </Grid2>
             </Grid2>

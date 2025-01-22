@@ -17,6 +17,11 @@ import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
 import useStore from "./model/store.ts";
+import AccessEdge from "./AccessEdge.tsx";
+
+const edgeTypes = {
+    access: AccessEdge
+};
 
 const nodeTypes = {
     access: AccessNode,
@@ -65,6 +70,7 @@ const Visualizer = () => {
 
     return (
         <ReactFlow
+            edgeTypes={edgeTypes}
             nodeTypes={nodeTypes}
             nodes={nodes}
             onNodesChange={onNodesChange}

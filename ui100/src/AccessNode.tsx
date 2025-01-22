@@ -1,12 +1,16 @@
-import {Handle, Position} from "@xyflow/react";
+import {Handle, Position, useUpdateNodeInternals} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
 
 const AccessNode = ({ data }) => {
+    const updateNodeInternals = useUpdateNodeInternals();
+
     let shareHandle = <></>;
     if(data.ownedShare) {
-        shareHandle = <Handle type="source" position={Position.Bottom} />;
+        shareHandle = <Handle type="source" position={Position.Bottom} id="share" />;
+        updateNodeInternals(data.id);
     }
+
     return (
         <>
             <Handle type="target" position={Position.Top} />

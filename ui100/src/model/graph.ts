@@ -43,7 +43,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 id: accountNode.id + "-" + envNode.id,
                 source: accountNode.id!,
                 target: envNode.id!,
-                type: "smoothstep"
+                type: "straight"
             });
             if(env.shares) {
                 envNode.data.empty = false;
@@ -70,7 +70,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         id: envNode.id + "-" + shrNode.id,
                         source: envNode.id!,
                         target: shrNode.id!,
-                        type: "smoothstep"
+                        type: "straight"
                     });
                 });
             }
@@ -93,7 +93,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         id: envNode.id + "-" + feNode.id,
                         source: envNode.id!,
                         target: feNode.id!,
-                        type: "smoothstep"
+                        type: "straight"
                     });
                 });
             }
@@ -101,12 +101,18 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
         allFrontends.forEach(fe => {
             let target = allShares[fe.data.target];
             if(target) {
-                newVov.edges.push({
+                target.data.accessed = true;
+                fe.data.ownedShare = true;
+                let edge: Edge = {
                     id: target.id + "-" + fe.id,
-                    source: target.id!,
-                    target: fe.id!,
-                    type: "smoothstep",
-                });
+                    source: fe.id!,
+                    sourceHandle: "share",
+                    target: target.id!,
+                    targetHandle: "access",
+                    type: "access",
+                    animated: true
+                }
+                newVov.edges.push(edge);
             }
         });
     }
