@@ -42,7 +42,8 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             newVov.edges.push({
                 id: accountNode.id + "-" + envNode.id,
                 source: accountNode.id!,
-                target: envNode.id!
+                target: envNode.id!,
+                type: "smoothstep"
             });
             if(env.shares) {
                 envNode.data.empty = false;
@@ -68,7 +69,8 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                     newVov.edges.push({
                         id: envNode.id + "-" + shrNode.id,
                         source: envNode.id!,
-                        target: shrNode.id!
+                        target: shrNode.id!,
+                        type: "smoothstep"
                     });
                 });
             }
@@ -90,7 +92,8 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                     newVov.edges.push({
                         id: envNode.id + "-" + feNode.id,
                         source: envNode.id!,
-                        target: feNode.id!
+                        target: feNode.id!,
+                        type: "smoothstep"
                     });
                 });
             }
@@ -101,7 +104,8 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 newVov.edges.push({
                     id: target.id + "-" + fe.id,
                     source: target.id!,
-                    target: fe.id!
+                    target: fe.id!,
+                    type: "smoothstep",
                 });
             }
         });
