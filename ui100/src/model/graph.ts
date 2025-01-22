@@ -83,6 +83,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                             label: fe.token!,
                             feId: fe.id,
                             target: fe.shrToken,
+                            envZId: fe.zId,
                         },
                         type: "access",
                         position: { x: 0, y: 0 }

@@ -79,7 +79,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                 }
             });
             let shareApi = new ShareApi(cfg);
-            shareApi.unaccess({body: {frontendToken: detail.token, envZId: detail.zId, shrToken: detail.shrToken}})
+            shareApi.unaccess({body: {frontendToken: detail.token, envZId: access.data.envZId as string, shrToken: detail.shrToken}})
                 .then(d => {
                     setReleaseAccessOpen(false);
                 })
@@ -99,6 +99,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
         metadataApi.getFrontendDetail({feId: access.data.feId as number})
             .then(d => {
                 delete d.id;
+                delete d.zId;
                 setDetail(d);
             })
             .catch(e => {
@@ -108,7 +109,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
 
     const customProperties = {
         createdAt: row => new Date(row.value).toLocaleString(),
-        updatedAt: row => new Date(row.value).toLocaleString()
+        updatedAt: row => new Date(row.value).toLocaleString(),
     }
 
     const labels = {
