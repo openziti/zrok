@@ -83,7 +83,8 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     const labels = {
-        zId: "OpenZiti Service"
+        createdAt: "Created",
+        updatedAt: "Updated"
     }
 
     useEffect(() => {
@@ -98,6 +99,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 let env = d.environment!;
                 delete env.activity;
                 delete env.limited;
+                delete env.zId;
                 setDetail(env);
             })
             .catch(e => {

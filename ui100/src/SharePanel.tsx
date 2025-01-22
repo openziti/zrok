@@ -4,7 +4,6 @@ import ShareIcon from "@mui/icons-material/Share";
 import {Configuration, MetadataApi, Share} from "./api";
 import {useEffect, useState} from "react";
 import PropertyTable from "./PropertyTable.tsx";
-import SecretToggle from "./SecretToggle.tsx";
 import useStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -17,10 +16,17 @@ const SharePanel = ({ share }: SharePanelProps) => {
     const [detail, setDetail] = useState<Share>(null);
 
     const customProperties = {
-        zId: row => <SecretToggle secret={row.value} />,
         createdAt: row => new Date(row.value).toLocaleString(),
         updatedAt: row => new Date(row.value).toLocaleString(),
-        frontendEndpoint: row => <a href={row.value} target="_">{row.value}</a>
+        frontendEndpoint: row => <a href={row.value} target="_">{row.value}</a>,
+        reserved: row => row.value ? "reserved" : "ephemeral"
+    }
+
+    const labels = {
+        backendProxyEndpoint: "Target",
+        createdAt: "Created",
+        reserved: "Reservation",
+        updatedAt: "Updated"
     }
 
     useEffect(() => {
@@ -34,7 +40,11 @@ const SharePanel = ({ share }: SharePanelProps) => {
             .then(d => {
                 delete d.activity;
                 delete d.limited;
-                delete d.reserved;
+                delete d.zId;
+                if(d.shareMode === "private") {
+                    delete d.frontendEndpoint;
+                    delete d.frontendSelection;
+                }
                 setDetail(d);
             })
             .catch(e => {
@@ -55,7 +65,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
             </Grid2>
             <Grid2 container sx={{ flexGrow: 1 }}>
                 <Grid2 display="flex">
-                    <PropertyTable object={detail} custom={customProperties}/>
+                    <PropertyTable object={detail} custom={customProperties} labels={labels} />
                 </Grid2>
             </Grid2>
         </Typography>
