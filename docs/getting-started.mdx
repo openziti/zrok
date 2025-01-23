@@ -11,35 +11,53 @@ import DownloadCardStyles from '@site/src/css/download-card.module.css';
 ## Share your network resources within minutes
 
 Easily share private network resources with public internet users, securely, without having to alter any of your local network configuration.
-You can share resource using [NetFoundry's cloud-hosted zrok](https://myzrok.io/),
-or follow our [self-hosted guide](/docs/category/self-hosting/) to manage your own instance.
 
+<Columns className='text--center getting-started-cards'>
+    <Column style={{paddingBottom: 20}}>
+        <Card shadow='tl'>
+            <CardHeader>
+                <h3>Hosted zrok</h3>
+            </CardHeader>
+            <CardBody>
+                Use NetFoundry's public zrok instance.
+            </CardBody>
+            <CardFooter>
+                <a href="https://myzrok.io/">
+                    <button className='button button--secondary button--block'>Get an Account</button>
+                </a>
+            </CardFooter>
+        </Card>
+    </Column>
+    <Column style={{paddingBottom: 20}}>
+        <Card shadow='tl'>
+            <CardHeader>
+                <h3>Self-Hosted zrok</h3>
+            </CardHeader>
+            <CardBody>
+                Run a zrok instance on Linux, Docker, or Kubernetes.
+            </CardBody>
+            <CardFooter>
+                <a href="/docs/category/self-hosting/">
+                    <button className='button button--secondary button--block'>Guides</button>
+                </a>
+            </CardFooter>
+        </Card>
+    </Column>
+</Columns>
+
+* Sign up for a hosted zrok account in the link above to enable your personal share token
 * Download the binary for your platform [here](https://github.com/openziti/zrok/releases/latest)
-* Sign up for a myzrok.io account [here](https://myzrok.io/) to enable your personal share token
 * Run `zrok enable <your_token>` to enable your shell environment for sharing
 * Run `zrok share public localhost:8080` to start your first share!
 
 ![zrok share public](images/zrok_share_public.png)
 
-Access your share from anywhere!
-
-```
-$ curl -s https://dslno640nct4.share.zrok.io | head
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="theme-color" content="#000000"/>
-    <meta name="description" content="zrok ui"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-```
+The zrok public share is accessible from anywhere!
 
 zrok provides several different share types, including:
 
 * [public shares](./concepts/sharing-public.mdx) for [web services](./concepts/http.md) or [files](./concepts/files.md)
 * [private shares for web services or files](./concepts/sharing-private.mdx)
-* [reserved shares](./concepts/sharing-reserved.md)
 * [tcpTunnel shares](./concepts/tunnels.md)
 * [udpTunnel shares](./concepts/tunnels.md)
 * [drives](./guides/drives.mdx)
