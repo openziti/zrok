@@ -162,6 +162,9 @@ const TabularView = () => {
             }
         },
         positionToolbarAlertBanner: "bottom",
+        mrtTheme: (theme) => ({
+            matchHighlightColor: 'rgba(155, 243, 22, 1)'
+        }),
     });
 
     return (
