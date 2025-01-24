@@ -1,22 +1,25 @@
-import {Environment} from "./api";
+import {Configuration, Environment, EnvironmentApi} from "./api";
 import {useEffect, useRef, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
+import {User} from "./model/user.ts";
+import {Node} from "@xyflow/react";
 
 interface ReleaseEnvironmentProps {
     close: () => void;
     isOpen: boolean;
+    user: User;
+    environment: Node;
     detail: Environment;
-    action: () => void;
 }
 
-const ReleaseEnvironmentModal = ({ close, isOpen, detail, action }: ReleaseEnvironmentProps) => {
+const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: ReleaseEnvironmentProps) => {
     const [description, setDescription] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;
 
-    const toggleChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const toggleChecked = () => {
         setChecked(!checkedRef.current);
     }
 
@@ -29,6 +32,27 @@ const ReleaseEnvironmentModal = ({ close, isOpen, detail, action }: ReleaseEnvir
             setDescription(detail.description);
         }
     }, [detail]);
+
+    const releaseEnvironment = () => {
+        if(environment.data && environment.data.envZId) {
+            console.log("releasing");
+            let cfg = new Configuration({
+                headers: {
+                    "X-TOKEN": user.token
+                }
+            });
+            let environmentApi = new EnvironmentApi(cfg);
+            environmentApi.disable({body: {identity: environment.data.envZId as string}})
+                .then(d => {
+                    close();
+                })
+                .catch(e => {
+                    e.response.json().then(ex => {
+                        console.log("releaseEnvironment", ex.message);
+                    })
+                });
+        }
+    }
 
     return (
         <Modal open={isOpen} onClose={close}>
@@ -46,7 +70,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, detail, action }: ReleaseEnvir
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{description}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                    <Button color="error" variant="contained" disabled={!checked} onClick={action}>Release</Button>
+                    <Button color="error" variant="contained" disabled={!checked} onClick={releaseEnvironment}>Release</Button>
                 </Grid2>
             </Box>
         </Modal>

@@ -57,25 +57,6 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
             })
     }, [environment]);
 
-    const releaseEnvironment = () => {
-        if(environment.data && environment.data.envZId) {
-            console.log("releasing");
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let environmentApi = new EnvironmentApi(cfg);
-            environmentApi.disable({body: {identity: environment.data.envZId as string}})
-                .then(d => {
-                    setReleaseEnvironmentOpen(false);
-                })
-                .catch(e => {
-                    console.log("releaseEnvironment", e);
-                });
-        }
-    }
-
     return (
         <>
             <Typography component="div">
@@ -97,7 +78,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                     </Grid2>
                 </Grid2>
             </Typography>
-            <ReleaseEnvironmentModal close={closeReleaseEnvironment} isOpen={releaseEnvironmentOpen} detail={detail} action={releaseEnvironment} />
+            <ReleaseEnvironmentModal close={closeReleaseEnvironment} isOpen={releaseEnvironmentOpen} user={user} environment={environment} detail={detail} />
         </>
     );
 }
