@@ -22,6 +22,10 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
         setChecked(!checkedRef.current);
     }
 
+    const reload = () => {
+        window.location.reload();
+    }
+
     useEffect(() => {
         setChecked(false);
         setSuccessMessage(null);
@@ -38,9 +42,12 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                 updateUser(newUser);
                 localStorage.setItem("user", JSON.stringify(newUser));
                 document.dispatchEvent(new Event("userUpdated"));
-                setSuccessMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                setSuccessMessage(<><Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                     <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.token}</code></Typography>
-                </Grid2>);
+                </Grid2>
+                <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+                    <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>
+                </Grid2></>);
             })
             .catch(e => {
                 e.response.json().then(ex => {

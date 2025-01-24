@@ -11,6 +11,7 @@ import useApiConsoleStore from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 import {getMetadataApi} from "./model/api.ts";
+import {User} from "./model/user.ts";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -18,6 +19,7 @@ interface ApiConsoleProps {
 
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const userRef = useRef<User>(user);
     const graph = useApiConsoleStore((state) => state.graph);
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
@@ -65,7 +67,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, [handleKeyPress]);
 
     const retrieveOverview = () => {
-        getMetadataApi(user).overview()
+        getMetadataApi(userRef.current).overview()
             .then(d => {
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
