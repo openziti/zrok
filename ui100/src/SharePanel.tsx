@@ -7,6 +7,7 @@ import PropertyTable from "./PropertyTable.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReleaseShareModal from "./ReleaseShareModal.tsx";
+import {getMetadataApi} from "./model/api.ts";
 
 interface SharePanelProps {
     share: Node;
@@ -40,13 +41,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-        let metadata = new MetadataApi(cfg);
-        metadata.getShareDetail({ shrToken: share.data!.shrToken! as string })
+        getMetadataApi(user).getShareDetail({ shrToken: share.data!.shrToken! as string })
             .then(d => {
                 delete d.activity;
                 delete d.limited;

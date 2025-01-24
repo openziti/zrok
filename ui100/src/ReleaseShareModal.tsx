@@ -1,9 +1,10 @@
-import {Configuration, Share, ShareApi} from "./api";
+import {Share} from "./api";
 import {useEffect, useRef, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
+import {getShareApi} from "./model/api.ts";
 
 interface ReleaseShareProps {
     close: () => void;
@@ -35,13 +36,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
 
     const releaseShare = () => {
         if(detail) {
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let shareApi = new ShareApi(cfg);
-            shareApi.unshare({body: {envZId: share.data.envZId as string, shrToken: detail.token, reserved: detail.reserved}})
+            getShareApi(user).unshare({body: {envZId: share.data.envZId as string, shrToken: detail.token, reserved: detail.reserved}})
                 .then(d => {
                     close();
                 })

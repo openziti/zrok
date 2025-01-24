@@ -3,10 +3,11 @@ import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
 import useApiConsoleStore from "./model/store.ts";
 import {useEffect, useState} from "react";
-import {Configuration, Frontend, MetadataApi, ShareApi} from "./api";
+import {Frontend} from "./api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropertyTable from "./PropertyTable.tsx";
 import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
+import {getMetadataApi} from "./model/api.ts";
 
 interface AccessPanelProps {
     access: Node;
@@ -26,13 +27,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
 
     useEffect(() => {
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-        let metadataApi = new MetadataApi(cfg);
-        metadataApi.getFrontendDetail({feId: access.data.feId as number})
+        getMetadataApi(user).getFrontendDetail({feId: access.data.feId as number})
             .then(d => {
                 delete d.id;
                 delete d.zId;

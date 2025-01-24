@@ -16,8 +16,7 @@ const Login = ({ onLogin }: LoginProps) => {
     const [tou, setTou] = useState(null as string);
 
     useEffect(() => {
-        let api = new MetadataApi();
-        api._configuration()
+        new MetadataApi()._configuration()
             .then(d => {
                 if(d.touLink && d.touLink.trim() !== "") {
                     setTou(d.touLink);
@@ -31,8 +30,7 @@ const Login = ({ onLogin }: LoginProps) => {
     const login = async e => {
         e.preventDefault();
 
-        let api = new AccountApi();
-        api.login({body: {"email": email, "password": password}})
+        new AccountApi().login({body: {"email": email, "password": password}})
             .then(d => {
                 onLogin({email: email, token: d.toString()});
             })

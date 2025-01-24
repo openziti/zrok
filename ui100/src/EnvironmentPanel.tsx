@@ -2,12 +2,13 @@ import {Node} from "@xyflow/react";
 import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import {useEffect, useState} from "react";
-import {Configuration, Environment, EnvironmentApi, MetadataApi} from "./api";
+import {Environment} from "./api";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReleaseEnvironmentModal from "./ReleaseEnvironmentModal.tsx";
+import {getMetadataApi} from "./model/api.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -38,13 +39,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     useEffect(() => {
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-        let metadata = new MetadataApi(cfg);
-        metadata.getEnvironmentDetail({envZId: environment.data!.envZId! as string})
+        getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string})
             .then(d => {
                 let env = d.environment!;
                 delete env.activity;

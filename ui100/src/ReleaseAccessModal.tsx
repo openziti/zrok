@@ -1,9 +1,10 @@
-import {Configuration, Frontend, ShareApi} from "./api";
+import {Frontend} from "./api";
 import {useEffect, useRef, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
+import {getShareApi} from "./model/api.ts";
 
 interface ReleaseAccessProps {
     close: () => void;
@@ -34,13 +35,12 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
 
     const releaseAccess = () => {
         if(detail && detail.token) {
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let shareApi = new ShareApi(cfg);
-            shareApi.unaccess({body: {frontendToken: detail.token, envZId: access.data.envZId as string, shrToken: detail.shrToken}})
+            getShareApi(user).unaccess({
+                body: {
+                    frontendToken: detail.token,
+                    envZId: access.data.envZId as string,
+                    shrToken: detail.shrToken}
+                })
                 .then(d => {
                     close();
                 })

@@ -1,5 +1,4 @@
 import {JSX, useCallback, useEffect, useRef, useState} from "react";
-import {Configuration, MetadataApi} from "./api";
 import {Graph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
 import {Grid2} from "@mui/material";
 import NavBar from "./NavBar.tsx";
@@ -11,6 +10,7 @@ import AccessPanel from "./AccessPanel.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
+import {getMetadataApi} from "./model/api.ts";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -65,13 +65,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, [handleKeyPress]);
 
     const retrieveOverview = () => {
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-        let api = new MetadataApi(cfg);
-        api.overview()
+        getMetadataApi(user).overview()
             .then(d => {
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
@@ -121,14 +115,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
         }
 
-        let cfg = new Configuration({
-            headers: {
-                "X-TOKEN": user.token
-            }
-        });
-
-        let api = new MetadataApi(cfg);
-        api.getSparklines({body: {environments: environments, shares: shares}})
+        getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}})
             .then(d => {
                 if(d.sparklines) {
                     let sparkdataIn = new Map<string, Number[]>();

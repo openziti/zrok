@@ -1,9 +1,10 @@
-import {Configuration, Environment, EnvironmentApi} from "./api";
+import {Environment} from "./api";
 import {useEffect, useRef, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
+import {getEnvironmentApi} from "./model/api.ts";
 
 interface ReleaseEnvironmentProps {
     close: () => void;
@@ -35,14 +36,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
 
     const releaseEnvironment = () => {
         if(environment.data && environment.data.envZId) {
-            console.log("releasing");
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let environmentApi = new EnvironmentApi(cfg);
-            environmentApi.disable({body: {identity: environment.data.envZId as string}})
+            getEnvironmentApi(user).disable({body: {identity: environment.data.envZId as string}})
                 .then(d => {
                     close();
                 })
