@@ -3,11 +3,11 @@ import ApiConsole from "./ApiConsole.tsx";
 import Login from "./Login.tsx";
 import {useEffect} from "react";
 import {User} from "./model/user.ts";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 
 const App = () => {
-    const user = useStore((state) => state.user);
-    const updateUser = useStore((state) => state.updateUser);
+    const user = useApiConsoleStore((state) => state.user);
+    const updateUser = useApiConsoleStore((state) => state.updateUser);
 
     useEffect(() => {
         const checkUser = () => {

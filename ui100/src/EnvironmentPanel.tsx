@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {Configuration, Environment, EnvironmentApi, MetadataApi} from "./api";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReleaseEnvironmentModal from "./ReleaseEnvironmentModal.tsx";
 
@@ -14,7 +14,7 @@ interface EnvironmentPanelProps {
 }
 
 const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
-    const user = useStore((state) => state.user);
+    const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Environment>(null);
     const [releaseEnvironmentOpen, setReleaseEnvironmentOpen] = useState(false);
 

@@ -3,7 +3,7 @@ import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccountIcon from "@mui/icons-material/Person4";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import PasswordIcon from "@mui/icons-material/Password";
 import TokenIcon from "@mui/icons-material/Key";
 
@@ -12,7 +12,7 @@ interface AccountPanelProps {
 }
 
 const AccountPanel = ({ account }: AccountPanelProps) => {
-    const user = useStore((state) => state.user);
+    const user = useApiConsoleStore((state) => state.user);
 
     const customProps = {
         token: row => <SecretToggle secret={row.value} />

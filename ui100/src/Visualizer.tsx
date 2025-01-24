@@ -16,7 +16,7 @@ import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import AccessEdge from "./AccessEdge.tsx";
 
 const edgeTypes = {
@@ -31,12 +31,12 @@ const nodeTypes = {
 };
 
 const Visualizer = () => {
-    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
-    const viewport = useStore((state) => state.viewport);
-    const updateViewport = useStore((state) => state.updateViewport);
-    const nodes = useStore((state) => state.nodes);
-    const updateNodes = useStore((state) => state.updateNodes);
-    const edges = useStore((state) => state.edges);
+    const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
+    const viewport = useApiConsoleStore((state) => state.viewport);
+    const updateViewport = useApiConsoleStore((state) => state.updateViewport);
+    const nodes = useApiConsoleStore((state) => state.nodes);
+    const updateNodes = useApiConsoleStore((state) => state.updateNodes);
+    const edges = useApiConsoleStore((state) => state.edges);
 
     const onNodesChange = (changes) => {
         updateNodes(applyNodeChanges(changes, nodes));

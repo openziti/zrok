@@ -4,7 +4,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import {Configuration, MetadataApi, Share} from "./api";
 import {useEffect, useState} from "react";
 import PropertyTable from "./PropertyTable.tsx";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReleaseShareModal from "./ReleaseShareModal.tsx";
 
@@ -13,7 +13,7 @@ interface SharePanelProps {
 }
 
 const SharePanel = ({ share }: SharePanelProps) => {
-    const user = useStore((state) => state.user);
+    const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Share>(null);
     const [releaseShareOpen, setReleaseShareOpen] = useState(false);
 

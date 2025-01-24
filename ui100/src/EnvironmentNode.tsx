@@ -2,10 +2,10 @@ import {Handle, Position} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import {SparkLineChart} from "@mui/x-charts";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 
 const EnvironmentNode = ({ data }) => {
-    const sparkdata = useStore((state) => state.sparkdata);
+    const sparkdata = useApiConsoleStore((state) => state.sparkdata);
 
     const hiddenSparkline = <></>;
     const visibleSparkline = (

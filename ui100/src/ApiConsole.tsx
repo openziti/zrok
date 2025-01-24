@@ -8,7 +8,7 @@ import AccountPanel from "./AccountPanel.tsx";
 import EnvironmentPanel from "./EnvironmentPanel.tsx";
 import SharePanel from "./SharePanel.tsx";
 import AccessPanel from "./AccessPanel.tsx";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 
@@ -17,20 +17,20 @@ interface ApiConsoleProps {
 }
 
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
-    const user = useStore((state) => state.user);
-    const graph = useStore((state) => state.graph);
-    const updateGraph = useStore((state) => state.updateGraph);
+    const user = useApiConsoleStore((state) => state.user);
+    const graph = useApiConsoleStore((state) => state.graph);
+    const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
-    const sparkdata = useStore((state) => state.sparkdata);
+    const sparkdata = useApiConsoleStore((state) => state.sparkdata);
     const sparkdataRef = useRef<Map<string, Number[]>>();
     sparkdataRef.current = sparkdata;
-    const updateSparkdata = useStore((state) => state.updateSparkdata);
-    const nodes = useStore((state) => state.nodes);
+    const updateSparkdata = useApiConsoleStore((state) => state.updateSparkdata);
+    const nodes = useApiConsoleStore((state) => state.nodes);
     const nodesRef = useRef<Node[]>();
     nodesRef.current = nodes;
-    const updateNodes = useStore((state) => state.updateNodes);
-    const updateEdges = useStore((state) => state.updateEdges);
-    const selectedNode = useStore((state) => state.selectedNode);
+    const updateNodes = useApiConsoleStore((state) => state.updateNodes);
+    const updateEdges = useApiConsoleStore((state) => state.updateEdges);
+    const selectedNode = useApiConsoleStore((state) => state.selectedNode);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
     const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);

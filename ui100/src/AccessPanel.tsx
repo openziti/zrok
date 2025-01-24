@@ -1,7 +1,7 @@
 import {Node} from "@xyflow/react";
 import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import {useEffect, useState} from "react";
 import {Configuration, Frontend, MetadataApi, ShareApi} from "./api";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,7 +13,7 @@ interface AccessPanelProps {
 }
 
 const AccessPanel = ({ access }: AccessPanelProps) => {
-    const user = useStore((state) => state.user);
+    const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Frontend>(null);
     const [releaseAccessOpen, setReleaseAccessOpen] = useState(false);
 

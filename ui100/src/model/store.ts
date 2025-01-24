@@ -31,7 +31,7 @@ type StoreAction = {
     updateSorting: (sorting: StoreState['sorting']) => void,
  };
 
-const useStore = create<StoreState & StoreAction>((set) => ({
+const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     user: null,
     graph: new Graph(),
     environments: new Array<Environment>(),
@@ -54,4 +54,4 @@ const useStore = create<StoreState & StoreAction>((set) => ({
     updateSorting: (sorting) => set({sorting: sorting})
 }));
 
-export default useStore;
+export default useApiConsoleStore;

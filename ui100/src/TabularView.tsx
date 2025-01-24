@@ -1,5 +1,5 @@
 import {Box, Paper} from "@mui/material";
-import useStore from "./model/store.ts";
+import useApiConsoleStore from "./model/store.ts";
 import {
     MaterialReactTable,
     type MRT_ColumnDef,
@@ -13,17 +13,17 @@ import {Node} from "@xyflow/react";
 import {bytesToSize} from "./model/util.ts";
 
 const TabularView = () => {
-    const nodes = useStore((state) => state.nodes);
+    const nodes = useApiConsoleStore((state) => state.nodes);
     const nodesRef = useRef<Node[]>();
     nodesRef.current = nodes;
-    const updateNodes = useStore((state) => state.updateNodes);
-    const selectedNode = useStore((state) => state.selectedNode);
-    const updateSelectedNode = useStore((state) => state.updateSelectedNode);
-    const sparkdata = useStore((state) => state.sparkdata);
-    const storedPagination = useStore((state) => state.pagination);
-    const updatePagination = useStore((state) => state.updatePagination);
-    const storedSorting = useStore((state) => state.sorting);
-    const updateSorting = useStore((state) => state.updateSorting);
+    const updateNodes = useApiConsoleStore((state) => state.updateNodes);
+    const selectedNode = useApiConsoleStore((state) => state.selectedNode);
+    const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
+    const sparkdata = useApiConsoleStore((state) => state.sparkdata);
+    const storedPagination = useApiConsoleStore((state) => state.pagination);
+    const updatePagination = useApiConsoleStore((state) => state.updatePagination);
+    const storedSorting = useApiConsoleStore((state) => state.sorting);
+    const updateSorting = useApiConsoleStore((state) => state.updateSorting);
     const [pagination, setPagination] = useState<MRT_PaginationState>({} as MRT_PaginationState);
     const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
     const [sorting, setSorting] = useState<MRT_SortingState>([{id: "data.label", desc: false}] as MRT_SortingState);
