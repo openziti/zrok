@@ -69,7 +69,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     <Grid2 display="flex"><ShareIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
                     <Grid2 display="flex" component="h4">{String(share.data.label)}</Grid2>
                 </Grid2>
-                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
+                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
                     <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} share with the token <code>{share.id}</code></h5>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
