@@ -11,12 +11,19 @@ const App = () => {
 
     useEffect(() => {
         const checkUser = () => {
+            console.log("checkUser");
             const user = localStorage.getItem("user");
             if (user) {
                 updateUser(JSON.parse(user));
             }
         }
         checkUser();
+
+        document.addEventListener("userUpdated", checkUser);
+
+        return () => {
+            document.removeEventListener("userUpdated", checkUser);
+        }
     }, []);
 
     const login = (user: User) => {
