@@ -49,7 +49,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                 .catch(e => {
                     e.response.json().then(ex => {
                         console.log("releaseEnvironment", ex.message);
-                    })
+                    });
                 });
         }
     }

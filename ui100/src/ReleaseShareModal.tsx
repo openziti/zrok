@@ -46,7 +46,9 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     close();
                 })
                 .catch(e => {
-                    console.log("releaseShare", e);
+                    e.response.json().then(ex => {
+                        console.log("releaseShare", ex.message);
+                    });
                 });
         }
     }

@@ -25,24 +25,6 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
         setReleaseAccessOpen(false);
     }
 
-    const releaseAccess = () => {
-        if(detail && detail.token) {
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let shareApi = new ShareApi(cfg);
-            shareApi.unaccess({body: {frontendToken: detail.token, envZId: access.data.envZId as string, shrToken: detail.shrToken}})
-                .then(d => {
-                    setReleaseAccessOpen(false);
-                })
-                .catch(e => {
-                    console.log("releaseAccess", e);
-                });
-        }
-    }
-
     useEffect(() => {
         let cfg = new Configuration({
             headers: {
@@ -98,7 +80,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                     </Grid2>
                 </Grid2>
             </Typography>
-            <ReleaseAccessModal close={closeReleaseAccess} isOpen={releaseAccessOpen} detail={detail} action={releaseAccess} />
+            <ReleaseAccessModal close={closeReleaseAccess} isOpen={releaseAccessOpen} user={user} access={access} detail={detail} />
         </>
     );
 }
