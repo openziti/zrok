@@ -8,9 +8,7 @@ import { AssetsProvider } from '@site/src/components/assets-context';
 import DownloadCard from '@site/src/components/download-card';
 import DownloadCardStyles from '@site/src/css/download-card.module.css';
 
-## Share your network resources within minutes
-
-Secure resource sharing made easy.
+## Secure resource sharing made easy
 
 <Columns className='text--center getting-started-cards'>
     <Column style={{paddingBottom: 20}}>
@@ -45,9 +43,9 @@ Secure resource sharing made easy.
     </Column>
 </Columns>
 
-* Sign up for a hosted zrok account in the link above to enable your personal share token
-* Download the binary for your platform [here](https://github.com/openziti/zrok/releases/latest)
-* Run `zrok enable <your_token>` to enable your shell environment for sharing
+* Sign up for a hosted zrok account in the link above to enable your account token
+* Download the zrok binary for your platform [here](#installing-the-zrok-command)
+* Run `zrok enable <your_account_token>` to enable your shell environment for sharing
 * Run `zrok share public localhost:8080` to start your first share!
 
 ![zrok share public](images/zrok_share_public.png)
@@ -113,7 +111,7 @@ If [sharing privately](./concepts/sharing-private.mdx), only users with the shar
 
 ## Enabling Your zrok Environment
 
-After you have [an account](#share-your-network-resources-within-minutes), you can enable your `zrok` environment.
+After you have [an account](#secure-resource-sharing-made-easy), you can enable your `zrok` environment.
 
 A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
