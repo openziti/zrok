@@ -17,6 +17,7 @@
     "@mui/x-charts": "^7.23.2",
     "@xyflow/react": "^12.3.5",
     "d3-hierarchy": "^3.1.2",
+    "formik": "^2.4.6",
     "material-react-table": "^3.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

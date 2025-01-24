@@ -14,13 +14,6 @@ export const objectToRows = (obj) => {
 
 export const camelToWords = (s) => s.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
 
-export const rowToValue = (row) => {
-    if(row.property.endsWith("At")) {
-        return new Date(row.value).toLocaleString();
-    }
-    return row.value.toString();
-};
-
 export const bytesToSize = (bytes: number): string => {
     let i = -1;
     const byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -32,9 +25,7 @@ export const bytesToSize = (bytes: number): string => {
 }
 
 function getReadableFileSizeString(fileSizeInBytes) {
-    var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
-
-
+    let i = -1;
+    let byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
 }

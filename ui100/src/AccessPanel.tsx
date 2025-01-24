@@ -16,12 +16,11 @@ interface AccessPanelProps {
 const AccessPanel = ({ access }: AccessPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Frontend>(null);
-    const [releaseAccessOpen, setReleaseAccessOpen] = useState(false);
+    const [releaseAccessOpen, setReleaseAccessOpen] = useState<boolean>(false);
 
     const openReleaseAccess = () => {
         setReleaseAccessOpen(true);
     }
-
     const closeReleaseAccess = () => {
         setReleaseAccessOpen(false);
     }
