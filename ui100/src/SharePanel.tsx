@@ -1,7 +1,7 @@
 import {Node} from "@xyflow/react";
 import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
-import {Configuration, MetadataApi, Share, ShareApi} from "./api";
+import {Configuration, MetadataApi, Share} from "./api";
 import {useEffect, useState} from "react";
 import PropertyTable from "./PropertyTable.tsx";
 import useStore from "./model/store.ts";
@@ -62,24 +62,6 @@ const SharePanel = ({ share }: SharePanelProps) => {
             })
     }, [share]);
 
-    const releaseShare = () => {
-        if(detail) {
-            let cfg = new Configuration({
-                headers: {
-                    "X-TOKEN": user.token
-                }
-            });
-            let shareApi = new ShareApi(cfg);
-            shareApi.unshare({body: {envZId: share.data.envZId as string, shrToken: detail.token, reserved: detail.reserved}})
-                .then(d => {
-                    setReleaseShareOpen(false);
-                })
-                .catch(e => {
-                    console.log("releaseShare", e);
-                });
-        }
-    }
-
     return (
         <>
             <Typography component="div">
@@ -101,7 +83,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     </Grid2>
                 </Grid2>
             </Typography>
-            <ReleaseShareModal close={closeReleaseShare} isOpen={releaseShareOpen} detail={detail} action={releaseShare} />
+            <ReleaseShareModal close={closeReleaseShare} isOpen={releaseShareOpen} user={user} share={share} detail={detail} />
         </>
     );
 }

@@ -1,16 +1,19 @@
-import {Share} from "./api";
+import {Configuration, Share, ShareApi} from "./api";
 import {useEffect, useRef, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
+import {User} from "./model/user.ts";
+import {Node} from "@xyflow/react";
 
 interface ReleaseShareProps {
     close: () => void;
     isOpen: boolean;
+    user: User;
+    share: Node;
     detail: Share;
-    action: () => void;
 }
 
-const ReleaseShareModal = ({ close, isOpen, detail, action }: ReleaseShareProps) => {
+const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareProps) => {
     const [token, setToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
@@ -30,6 +33,24 @@ const ReleaseShareModal = ({ close, isOpen, detail, action }: ReleaseShareProps)
         }
     }, [detail]);
 
+    const releaseShare = () => {
+        if(detail) {
+            let cfg = new Configuration({
+                headers: {
+                    "X-TOKEN": user.token
+                }
+            });
+            let shareApi = new ShareApi(cfg);
+            shareApi.unshare({body: {envZId: share.data.envZId as string, shrToken: detail.token, reserved: detail.reserved}})
+                .then(d => {
+                    close();
+                })
+                .catch(e => {
+                    console.log("releaseShare", e);
+                });
+        }
+    }
+
     return (
         <Modal open={isOpen} onClose={close}>
             <Box sx={{ ...modalStyle }}>
@@ -43,7 +64,7 @@ const ReleaseShareModal = ({ close, isOpen, detail, action }: ReleaseShareProps)
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{token}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                    <Button color="error" variant="contained" disabled={!checked} onClick={action}>Release</Button>
+                    <Button color="error" variant="contained" disabled={!checked} onClick={releaseShare}>Release</Button>
                 </Grid2>
             </Box>
         </Modal>
