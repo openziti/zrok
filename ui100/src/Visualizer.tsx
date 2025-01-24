@@ -86,6 +86,7 @@ const Visualizer = () => {
                 nodeColor={nodeColor}
                 maskColor="rgb(36, 23, 117, 0.5)"
                 pannable={true}
+                position="bottom-right"
             />
         </ReactFlow>
     );
