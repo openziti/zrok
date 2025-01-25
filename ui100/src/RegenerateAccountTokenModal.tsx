@@ -2,7 +2,7 @@ import {User} from "./model/user.ts";
 import {useEffect, useRef, useState} from "react";
 import {modalStyle} from "./styling/theme.ts";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
-import {getAccountApi, getMetadataApi} from "./model/api.ts";
+import {getAccountApi} from "./model/api.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ClipboardText from "./ClipboardText.tsx";
 

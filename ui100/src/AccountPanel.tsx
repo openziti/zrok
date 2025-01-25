@@ -32,7 +32,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
         setRegenerateOpen(false);
     }
 
-    const customProps = {
+    const customProperties = {
         token: row => <Grid2 container><SecretToggle secret={row.value} /><ClipboardText text={row.value} /></Grid2>
     }
 
@@ -60,7 +60,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }}>
                     <Grid2 display="flex">
-                        <PropertyTable object={user} custom={customProps} labels={label} />
+                        <PropertyTable object={user} custom={customProperties} labels={label} />
                     </Grid2>
                 </Grid2>
             </Typography>
