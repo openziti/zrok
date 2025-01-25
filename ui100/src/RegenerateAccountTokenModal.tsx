@@ -4,6 +4,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {getAccountApi, getMetadataApi} from "./model/api.ts";
 import useApiConsoleStore from "./model/store.ts";
+import ClipboardText from "./ClipboardText.tsx";
 
 interface RegenerateAccountTokenModalProps {
     close: () => void;
@@ -43,7 +44,7 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                 localStorage.setItem("user", JSON.stringify(newUser));
                 document.dispatchEvent(new Event("userUpdated"));
                 setSuccessMessage(<><Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                    <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.token}</code></Typography>
+                    <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.token}</code> <ClipboardText text={String(d.token)} /></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>

@@ -1,6 +1,6 @@
 import {useState} from "react";
-import ShowIcon from "@mui/icons-material/Visibility";
-import HideIcon from "@mui/icons-material/VisibilityOff";
+import HideIcon from "@mui/icons-material/Visibility";
+import ShowIcon from "@mui/icons-material/VisibilityOff";
 import {Grid2} from "@mui/material";
 
 interface SecretToggleProps {

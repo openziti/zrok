@@ -6,9 +6,10 @@ import SecretToggle from "./SecretToggle.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import PasswordIcon from "@mui/icons-material/Password";
 import TokenIcon from "@mui/icons-material/Key";
-import {useState} from "react";
+import React, {useState} from "react";
 import AccountPasswordChangeModal from "./AccountPasswordChangeModal.tsx";
 import RegenerateAccountTokenModal from "./RegenerateAccountTokenModal.tsx";
+import ClipboardText from "./ClipboardText.tsx";
 
 interface AccountPanelProps {
     account: Node;
@@ -32,7 +33,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
     }
 
     const customProps = {
-        token: row => <SecretToggle secret={row.value} />
+        token: row => <Grid2 container><SecretToggle secret={row.value} /><ClipboardText text={row.value} /></Grid2>
     }
 
     const label = {
