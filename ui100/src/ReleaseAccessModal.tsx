@@ -15,6 +15,7 @@ interface ReleaseAccessProps {
 }
 
 const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAccessProps) => {
+    const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
     const [feToken, setFeToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>(checked);
@@ -34,20 +35,24 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
     }, [detail]);
 
     const releaseAccess = () => {
+        setErrorMessage(null);
         if(detail && detail.token) {
             getShareApi(user).unaccess({
                 body: {
                     frontendToken: detail.token,
                     envZId: access.data.envZId as string,
-                    shrToken: detail.shrToken}
-                })
-                .then(d => {
+                    shrToken: detail.shrToken
+                }
+            })
+                .then(() => {
                     close();
                 })
                 .catch(e => {
                     e.response.json().then(ex => {
                         console.log("releaseAccess", ex.message);
                     });
+                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.token}</code>!</Typography>);
+                    setTimeout(() => { setErrorMessage(null); }, 2000);
                 });
         }
     }
@@ -64,6 +69,7 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{feToken}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
+                { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                     <Button color="error" variant="contained" disabled={!checked} onClick={releaseAccess}>Release</Button>
                 </Grid2>
