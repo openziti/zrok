@@ -10,6 +10,9 @@ export default defineConfig({
         target: 'http://localhost:18080',
         changeOrigin: true,
       }
-    }
+    },
+    allowedHosts: [
+      ".share.zrok.io"
+    ]
   }
 })
