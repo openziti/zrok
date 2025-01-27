@@ -33,6 +33,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const updateEdges = useApiConsoleStore((state) => state.updateEdges);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
+    const updatePasswordRequirements = useApiConsoleStore((state) => state.updatePasswordRequirements);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
     const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);
@@ -49,22 +50,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             }
         }
     }, []);
-
-    useEffect(() => {
-        visualizer = visualizerEnabled;
-        if(visualizer) {
-            setMainPanel(<Visualizer />);
-        } else {
-            setMainPanel(<TabularView />);
-        }
-    }, [visualizerEnabled]);
-
-    useEffect(() => {
-        document.addEventListener('keydown', handleKeyPress);
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [handleKeyPress]);
 
     const retrieveOverview = () => {
         getMetadataApi(userRef.current).overview()
@@ -88,20 +73,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 console.log(e);
             });
     }
-
-    useEffect(() => {
-        retrieveOverview();
-        let mounted = true;
-        let interval = setInterval(() => {
-            if(mounted) {
-                retrieveOverview();
-            }
-        }, 1000);
-        return () => {
-            mounted = false;
-            clearInterval(interval);
-        }
-    }, []);
 
     const retrieveSparklines = () => {
         let environments: string[] = [];
@@ -140,6 +111,36 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 console.log("getSparklines", e);
             });
     }
+
+    useEffect(() => {
+        visualizer = visualizerEnabled;
+        if(visualizer) {
+            setMainPanel(<Visualizer />);
+        } else {
+            setMainPanel(<TabularView />);
+        }
+    }, [visualizerEnabled]);
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [handleKeyPress]);
+
+    useEffect(() => {
+        retrieveOverview();
+        let mounted = true;
+        let interval = setInterval(() => {
+            if(mounted) {
+                retrieveOverview();
+            }
+        }, 1000);
+        return () => {
+            mounted = false;
+            clearInterval(interval);
+        }
+    }, []);
 
     useEffect(() => {
         let interval = setInterval(() => {
