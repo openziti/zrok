@@ -67,7 +67,8 @@ const TabularView = () => {
 
     const sparkdataTip = (row) => {
         if(row.data && row.data.activity) {
-            return row.data.activity[row.data.activity.length - 1];
+            // - 2; - 1 is sometimes undefined?
+            return row.data.activity[row.data.activity.length - 2];
         }
         return 0;
     }

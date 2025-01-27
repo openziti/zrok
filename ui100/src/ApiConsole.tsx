@@ -181,7 +181,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 <Grid2 size="grow">
                     {mainPanel}
                 </Grid2>
-                {sidePanel ? <Grid2 size={5}>{sidePanel}</Grid2> : null}
+                {sidePanel ? <Grid2 container size={5}><Grid2 >{sidePanel}</Grid2></Grid2> : null}
             </Grid2>
         </div>
     );
