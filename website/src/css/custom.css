@@ -241,6 +241,7 @@ a code {
   border: 1px var(--container-border);
   color: var(--ifm-link-color);
   transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  font-family: var(--font-family-monospace);
 }
 
 .getting-started-cards .button:hover {
