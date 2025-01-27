@@ -15,6 +15,7 @@ interface ReleaseEnvironmentProps {
 }
 
 const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: ReleaseEnvironmentProps) => {
+    const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
     const [description, setDescription] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
@@ -26,6 +27,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
 
     useEffect(() => {
         setChecked(false);
+        setErrorMessage(null);
     }, [isOpen]);
 
     useEffect(() => {
@@ -36,14 +38,23 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
 
     const releaseEnvironment = () => {
         if(environment.data && environment.data.envZId) {
-            getEnvironmentApi(user).disable({body: {identity: environment.data.envZId as string}})
-                .then(d => {
+            getEnvironmentApi(user).disable({
+                body: {
+                    identity: environment.data.envZId as string
+                }
+            })
+                .then(() => {
                     close();
                 })
                 .catch(e => {
                     e.response.json().then(ex => {
                         console.log("releaseEnvironment", ex.message);
                     });
+                    setErrorMessage(<Typography color="red">An error occurred releasing your environment <code>{environment.id}</code>!</Typography>);
+                    setTimeout(() => {
+                        setErrorMessage(null);
+                        setChecked(false);
+                    }, 2000);
                 });
         }
     }
@@ -63,6 +74,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{description}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
+                { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                     <Button color="error" variant="contained" disabled={!checked} onClick={releaseEnvironment}>Release</Button>
                 </Grid2>

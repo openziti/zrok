@@ -26,6 +26,7 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
 
     useEffect(() => {
         setChecked(false);
+        setErrorMessage(null);
     }, [isOpen]);
 
     useEffect(() => {
@@ -51,8 +52,11 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                     e.response.json().then(ex => {
                         console.log("releaseAccess", ex.message);
                     });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.token}</code>!</Typography>);
-                    setTimeout(() => { setErrorMessage(null); }, 2000);
+                    setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.token}</code>!</Typography>);
+                    setTimeout(() => {
+                        setErrorMessage(null);
+                        setChecked(false);
+                    }, 2000);
                 });
         }
     }

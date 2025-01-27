@@ -15,6 +15,7 @@ interface ReleaseShareProps {
 }
 
 const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareProps) => {
+    const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
     const [token, setToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
@@ -26,6 +27,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
 
     useEffect(() => {
         setChecked(false);
+        setErrorMessage(null);
     }, [isOpen]);
 
     useEffect(() => {
@@ -36,7 +38,13 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
 
     const releaseShare = () => {
         if(detail) {
-            getShareApi(user).unshare({body: {envZId: share.data.envZId as string, shrToken: detail.token, reserved: detail.reserved}})
+            getShareApi(user).unshare({
+                body: {
+                    envZId: share.data.envZId as string,
+                    shrToken: detail.token,
+                    reserved: detail.reserved
+                }
+            })
                 .then(d => {
                     close();
                 })
@@ -44,6 +52,11 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     e.response.json().then(ex => {
                         console.log("releaseShare", ex.message);
                     });
+                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.token}</code>!</Typography>);
+                    setTimeout(() => {
+                        setErrorMessage(null);
+                        setChecked(false);
+                    }, 2000);
                 });
         }
     }
@@ -60,6 +73,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{token}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
+                { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                     <Button color="error" variant="contained" disabled={!checked} onClick={releaseShare}>Release</Button>
                 </Grid2>
