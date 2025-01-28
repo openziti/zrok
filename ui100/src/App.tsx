@@ -4,6 +4,7 @@ import Login from "./Login.tsx";
 import {useEffect} from "react";
 import {User} from "./model/user.ts";
 import useApiConsoleStore from "./model/store.ts";
+import ForgotPassword from "./ForgotPassword.tsx";
 
 const App = () => {
     const user = useApiConsoleStore((state) => state.user);
@@ -42,6 +43,7 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route index element={consoleRoot}/>
+                <Route path="/forgotPassword" element={<ForgotPassword />}/>
             </Routes>
         </BrowserRouter>
     );

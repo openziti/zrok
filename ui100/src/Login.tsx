@@ -84,7 +84,7 @@ const Login = ({ onLogin }: LoginProps) => {
                             <Box component="h3" style={{color: "red"}}>{message}</Box>
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
-                            <Link to="/resetPassword">Forgot Password?</Link>
+                            <Link to="/forgotPassword">Forgot Password?</Link>
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
                             <div dangerouslySetInnerHTML={{__html: tou}}></div>
