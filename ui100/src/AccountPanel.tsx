@@ -10,6 +10,8 @@ import React, {useState} from "react";
 import AccountPasswordChangeModal from "./AccountPasswordChangeModal.tsx";
 import RegenerateAccountTokenModal from "./RegenerateAccountTokenModal.tsx";
 import ClipboardText from "./ClipboardText.tsx";
+import AccountMetricsModal from "./AccountMetricsModal.tsx";
+import MetricsIcon from "@mui/icons-material/QueryStats";
 
 interface AccountPanelProps {
     account: Node;
@@ -17,6 +19,13 @@ interface AccountPanelProps {
 
 const AccountPanel = ({ account }: AccountPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const [accountMetricsOpen, setAccountMetricsOpen] = useState<boolean>(false);
+    const openAccountMetrics = () => {
+        setAccountMetricsOpen(true);
+    }
+    const closeAccountMetrics = () => {
+        setAccountMetricsOpen(false);
+    }
     const [changePasswordOpen, setChangePasswordOpen] = useState<boolean>(false);
     const openChangePassword = () => {
         setChangePasswordOpen(true);
@@ -51,7 +60,10 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                     <h5 style={{ margin: 0 }}>Your zrok account, <code>{user.email}</code></h5>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
-                    <Tooltip title="Change Password">
+                    <Tooltip title="Account Metrics">
+                        <Button variant="contained" onClick={openAccountMetrics}><MetricsIcon /></Button>
+                    </Tooltip>
+                    <Tooltip title="Change Password" sx={{ ml: 1 }}>
                         <Button variant="contained" color="error" onClick={openChangePassword}><PasswordIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Regenerate Account Token" sx={{ ml: 1 }}>
@@ -64,6 +76,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                     </Grid2>
                 </Grid2>
             </Typography>
+            <AccountMetricsModal close={closeAccountMetrics} isOpen={accountMetricsOpen} user={user} />
             <AccountPasswordChangeModal close={closeChangePassword} isOpen={changePasswordOpen} user={user} />
             <RegenerateAccountTokenModal close={closeRegenerate} isOpen={regenerateOpen} user={user} />
         </>

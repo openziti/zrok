@@ -24,8 +24,17 @@ export const bytesToSize = (bytes: number): string => {
     return Math.max(bytes, 0.1).toFixed(1) + byteUnits[i];
 }
 
-function getReadableFileSizeString(fileSizeInBytes) {
-    let i = -1;
-    let byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
-    return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+export const buildMetrics = (m) => {
+    let metrics = {
+        data: m.samples,
+        rx: 0,
+        tx: 0
+    }
+    if(m.samples) {
+        m.samples.forEach(s => {
+            metrics.rx += s.rx ? s.rx : 0;
+            metrics.tx += s.tx ? s.tx : 0;
+        });
+    }
+    return metrics;
 }
