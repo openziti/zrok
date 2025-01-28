@@ -4,7 +4,7 @@ This `http-server` example is a minimal zrok application that surfaces a basic H
 
 ## Implementation
 
-```go
+```python
 root = zrok.environment.root.Load()
 ```
 
