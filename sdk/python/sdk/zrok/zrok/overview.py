@@ -8,7 +8,6 @@ from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.models.frontends import Frontends
 from zrok_api.models.share import Share
-from zrok_api.models.shares import Shares
 
 
 @dataclass
@@ -48,7 +47,7 @@ class Overview:
                 created_at=env_dict.get('createdAt'),
                 updated_at=env_dict.get('updatedAt')
             )
-            
+
             # Create Shares object from share data
             share_list = []
             for share_data in env_data.get('shares', []):
