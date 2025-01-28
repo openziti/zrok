@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.47
+
+CHANGE: Document solving the DNS propagation timeout for Docker instances that are using Caddy to manage the wildcard certificate.
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
