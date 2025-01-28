@@ -190,7 +190,7 @@ See "My internet connection can only send traffic to common ports" below about c
     docker compose logs zrok-controller
     ```
 
-1. Check the caddy logs.
+1. Check the Caddy logs.
 
     It can take a few minutes for Caddy to obtain the wildcard certificate. You can check the logs to see if there were any errors completing the DNS challenge which involves using the Caddy DNS plugin to create a TXT record in your DNS zone. This leverages the API token you provided in the `.env` file, which must have permission to create DNS records in the zrok DNS zone.
 
@@ -198,6 +198,23 @@ See "My internet connection can only send traffic to common ports" below about c
     docker compose logs caddy
     ```
 
+1. Caddy keeps failing to obtain a wildcard certificate because it timed out waiting for DNS.
+
+    Symptom: the Caddy log contains "timed out waiting for record to fully propagate." This means that Caddy added a DNS record with your DNS provider's API to prove to the CA it controls the zrok DNS zone, but it wasn't able to verify the record was created successfully with a DNS query.
+
+    Solutions:
+
+    - Add `propagation_delay` in your `Caddyfile` to delay the first DNS verification query. This avoids caching a verification query failure by waiting a few minutes for the record to become available so the verification query will succeed on the first attempt. Caddy will be unable to verify the DNS record if the failure remains in the cache too long.
+    - If the prior solution fails, you can override the default resolves/nameservers with `resolvers`, a space-separated list of DNS servers. This gives you more control over if and where the verification query result is cached.
+
+    ```
+    tls {
+        dns {CADDY_DNS_PLUGIN} {CADDY_DNS_PLUGIN_TOKEN}
+		propagation_timeout 60m  # default 2m
+        propagation_delay   5m   # default 0m
+    }
+    ```
+    
 1. `zrok enable` fails certificate verification: ensure you are not using the staging API for Let's Encrypt.
 
     If you are using the staging API, you will see an error about the API certificate when you use the zrok CLI. You can switch to the production API by removing the overriding assignment of the `CADDY_ACME_API` variable.
