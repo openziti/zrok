@@ -2,13 +2,15 @@ import {Node} from "@xyflow/react";
 import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import {Share} from "./api";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import PropertyTable from "./PropertyTable.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReleaseShareModal from "./ReleaseShareModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
+import MetricsIcon from "@mui/icons-material/QueryStats";
+import ShareMetricsModal from "./ShareMetricsModal.tsx";
 
 interface SharePanelProps {
     share: Node;
@@ -17,12 +19,17 @@ interface SharePanelProps {
 const SharePanel = ({ share }: SharePanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Share>(null);
-    const [releaseShareOpen, setReleaseShareOpen] = useState(false);
-
+    const [shareMetricsOpen, setShareMetricsOpen] = useState<boolean>(false);
+    const openShareMetrics = () => {
+        setShareMetricsOpen(true);
+    }
+    const closeShareMetrics = () => {
+        setShareMetricsOpen(false);
+    }
+    const [releaseShareOpen, setReleaseShareOpen] = useState<boolean>(false);
     const openReleaseShare = () => {
         setReleaseShareOpen(true);
     }
-
     const closeReleaseShare = () => {
         setReleaseShareOpen(false);
     }
@@ -88,7 +95,10 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} share with the token <code>{share.id}</code></h5>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
-                    <Tooltip title="Release Share">
+                    <Tooltip title="Share Metrics">
+                        <Button variant="contained" onClick={openShareMetrics}><MetricsIcon /></Button>
+                    </Tooltip>
+                    <Tooltip title="Release Share" sx={{ ml: 1 }}>
                         <Button variant="contained" color="error" onClick={openReleaseShare}><DeleteIcon /></Button>
                     </Tooltip>
                 </Grid2>
@@ -98,6 +108,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     </Grid2>
                 </Grid2>
             </Typography>
+            <ShareMetricsModal close={closeShareMetrics} isOpen={shareMetricsOpen} user={user} share={share} />
             <ReleaseShareModal close={closeReleaseShare} isOpen={releaseShareOpen} user={user} share={share} detail={detail} />
         </>
     );
