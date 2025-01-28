@@ -4,20 +4,16 @@ from typing import List
 
 import urllib3
 from zrok.environment.root import Root
-
 from zrok_api.models.environment import Environment
+from zrok_api.models.environment_and_resources import EnvironmentAndResources
+from zrok_api.models.frontends import Frontends
 from zrok_api.models.share import Share
-
-
-@dataclass
-class EnvironmentAndShares:
-    environment: Environment
-    shares: List[Share] = field(default_factory=list)
+from zrok_api.models.shares import Shares
 
 
 @dataclass
 class Overview:
-    environments: List[EnvironmentAndShares] = field(default_factory=list)
+    environments: List[EnvironmentAndResources] = field(default_factory=list)
 
     @classmethod
     def create(cls, root: Root) -> 'Overview':
@@ -52,8 +48,9 @@ class Overview:
                 created_at=env_dict.get('createdAt'),
                 updated_at=env_dict.get('updatedAt')
             )
-            # Map the JSON keys to the Share class parameters
-            shares = []
+            
+            # Create Shares object from share data
+            share_list = []
             for share_data in env_data.get('shares', []):
                 share = Share(
                     token=share_data.get('token'),
@@ -69,7 +66,14 @@ class Overview:
                     created_at=share_data.get('createdAt'),
                     updated_at=share_data.get('updatedAt')
                 )
-                shares.append(share)
-            overview.environments.append(EnvironmentAndShares(environment=environment, shares=shares))
+                share_list.append(share)
+
+            # Create EnvironmentAndResources object
+            env_resources = EnvironmentAndResources(
+                environment=environment,
+                shares=share_list,
+                frontends=Frontends()  # Empty frontends for now as it's not in the input data
+            )
+            overview.environments.append(env_resources)
 
         return overview
