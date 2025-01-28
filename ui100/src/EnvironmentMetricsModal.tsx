@@ -1,25 +1,27 @@
-import {Box, Grid2, Modal, Typography} from "@mui/material";
 import {User} from "./model/user.ts";
-import {modalStyle} from "./styling/theme.ts";
 import {useEffect, useState} from "react";
 import {buildMetrics} from "./model/util.ts";
 import {getMetadataApi} from "./model/api.ts";
+import {Node} from "@xyflow/react";
+import {Box, Grid2, Modal, Typography} from "@mui/material";
+import {modalStyle} from "./styling/theme.ts";
 import MetricsGraph from "./MetricsGraph.tsx";
 
-interface AccountMetricsModalProps {
+interface EnvironmentMetricsModalProps {
     close: () => void;
     isOpen: boolean;
     user: User;
+    environment: Node;
 }
 
-const AccountMetricsModal = ({ close, isOpen, user}: AccountMetricsModalProps) => {
+const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: EnvironmentMetricsModalProps) => {
     const [metrics30, setMetrics30] = useState(buildMetrics([]));
     const [metrics7, setMetrics7] = useState(buildMetrics([]));
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
     useEffect(() => {
         let metadataApi = getMetadataApi(user);
-        metadataApi.getAccountMetrics()
+        metadataApi.getEnvironmentMetrics({envId: String(environment.data.envZId) })
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
@@ -28,7 +30,7 @@ const AccountMetricsModal = ({ close, isOpen, user}: AccountMetricsModalProps) =
                     console.log("accountMetricsModal", ex.message);
                 });
             });
-        metadataApi.getAccountMetrics({duration: "168h"})
+        metadataApi.getAccountMetrics({envId: String(environment.data.envZId), duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
@@ -37,7 +39,7 @@ const AccountMetricsModal = ({ close, isOpen, user}: AccountMetricsModalProps) =
                     console.log("accountMetricsModal", ex.message);
                 });
             });
-        metadataApi.getAccountMetrics({duration: "24h"})
+        metadataApi.getAccountMetrics({envId: String(environment.data.envZId), duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
@@ -52,7 +54,7 @@ const AccountMetricsModal = ({ close, isOpen, user}: AccountMetricsModalProps) =
         <Modal open={isOpen} onClose={close}>
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Account Metrics</strong></Typography>
+                    <Typography variant="h5"><strong>Environment Metrics</strong></Typography>
                 </Grid2>
                 <MetricsGraph title="30 Days" data={metrics30.data} />
                 <MetricsGraph title="7 Days" data={metrics7.data} />
@@ -62,4 +64,4 @@ const AccountMetricsModal = ({ close, isOpen, user}: AccountMetricsModalProps) =
     );
 }
 
-export default AccountMetricsModal;
+export default EnvironmentMetricsModal;
