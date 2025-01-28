@@ -40,7 +40,7 @@ def main():
         target=args.target_url,
         unique_name=args.unique_name
     )
-    
+
     # Log access information and start the proxy
     logger.info(f"Access proxy at: {', '.join(proxy_share.endpoints)}")
     proxy_share.run()

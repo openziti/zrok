@@ -128,13 +128,13 @@ class ProxyShare:
         def proxy(path):
             # Construct the target URL
             url = urllib.parse.urljoin(self.target, path)
-            
+
             # Forward the request
             resp = requests.request(
                 method=request.method,
                 url=url,
-                headers={key: value for (key, value) in request.headers 
-                        if key.lower() not in HOP_BY_HOP_HEADERS},
+                headers={key: value for (key, value) in request.headers
+                         if key.lower() not in HOP_BY_HOP_HEADERS},
                 data=request.get_data(),
                 cookies=request.cookies,
                 allow_redirects=False,
@@ -144,7 +144,7 @@ class ProxyShare:
             # Create the response
             excluded_headers = HOP_BY_HOP_HEADERS.union({'host'})
             headers = [(name, value) for (name, value) in resp.raw.headers.items()
-                      if name.lower() not in excluded_headers]
+                       if name.lower() not in excluded_headers]
 
             return Response(
                 resp.iter_content(chunk_size=10*1024),
