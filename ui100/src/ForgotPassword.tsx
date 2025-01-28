@@ -12,6 +12,7 @@ const ForgotPassword = () => {
                     <img src={zroket} height="300"/>
                     <h1 style={{ color: "#241775" }}>z r o k</h1>
                     <Box component="form" noValidate>
+                        <Typography component="div" align="center"><h2>Forgot Your Password?</h2></Typography>
                         <TextField
                             margin="normal"
                             required
