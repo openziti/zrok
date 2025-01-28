@@ -17,7 +17,7 @@ type configGetCommand struct {
 func newConfigGetCommand() *configGetCommand {
 	cmd := &cobra.Command{
 		Use:   "get <configName>",
-		Short: "Get a value from the environment config",
+		Short: "Get a value from the environment config. Run 'zrok status' to list valid config names and their current values.",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &configGetCommand{cmd: cmd}

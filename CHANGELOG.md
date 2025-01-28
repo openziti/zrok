@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.47
+
+CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all valid `configName` and their current values by running `zrok status`.
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
