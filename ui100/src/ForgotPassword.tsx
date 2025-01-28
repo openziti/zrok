@@ -1,6 +1,7 @@
 import {Box, Button, Container, TextField, Typography} from "@mui/material";
 import {useState} from "react";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
+import {Link} from "react-router";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -28,6 +29,9 @@ const ForgotPassword = () => {
                         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
                             Send Password Reset Email
                         </Button>
+                        <Box component="div" style={{ textAlign: "center" }}>
+                            <Link to="/">Return to Login</Link>
+                        </Box>
                     </Box>
                 </Box>
             </Container>
