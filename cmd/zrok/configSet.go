@@ -22,7 +22,7 @@ func newConfigSetCommand() *configSetCommand {
 	cmd := &cobra.Command{
 		Use:   "set <configName> <value>",
 		Short: "Set a value into the environment config",
-		Long:  "Set a value into the environment config. Use 'zrok status' to list available configuration names and current values",
+		Long:  "Set a value into the environment config. Use 'zrok status' to list available configuration names and current values.",
 		Args:  cobra.ExactArgs(2),
 	}
 	command := &configSetCommand{cmd: cmd}

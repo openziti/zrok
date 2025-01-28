@@ -18,7 +18,7 @@ func newConfigGetCommand() *configGetCommand {
 	cmd := &cobra.Command{
 		Use:   "get <configName>",
 		Short: "Get a value from the environment config",
-		Long:  "Get a value from the environment config. Use 'zrok status' to list available configuration names and current values",
+		Long:  "Get a value from the environment config. Use 'zrok status' to list available configuration names and current values.",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &configGetCommand{cmd: cmd}
