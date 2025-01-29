@@ -45,7 +45,7 @@ jobs:
           name: zrok_sdk_${{ matrix.spec.target }}
           path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
 
-  publish:
+  publish-testpypi:
     runs-on: ubuntu-20.04
     needs: [ build_wheels ]
     permissions:
@@ -71,6 +71,19 @@ jobs:
           packages-dir: dist
           skip-existing: true
           verbose: true
+
+  publish-pypi:
+    runs-on: ubuntu-20.04
+    needs: [ publish-testpypi ]
+    permissions:
+          id-token: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./download
+          merge-multiple: true
+          pattern: zrok_sdk_*
 
       - name: Publish wheels (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1
