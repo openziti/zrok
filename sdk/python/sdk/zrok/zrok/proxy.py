@@ -12,7 +12,7 @@ import requests
 from flask import Flask, Response, request
 from waitress import serve
 from zrok.environment.root import Root
-from zrok.model import (PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, Share,
+from zrok.model import (PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, PRIVATE_SHARE_MODE, Share,
                         ShareRequest)
 from zrok.overview import Overview
 from zrok.share import CreateShare, ReleaseReservedShare
@@ -50,7 +50,7 @@ class ProxyShare:
     verify_ssl: bool = True
 
     @classmethod
-    def create(cls, root: Root, target: str, unique_name: Optional[str] = None,
+    def create(cls, root: Root, target: str, share_mode: str = PUBLIC_SHARE_MODE, unique_name: Optional[str] = None,
                frontends: Optional[List[str]] = None, verify_ssl: bool = True) -> 'ProxyShare':
         """
         Create a new proxy share, handling reservation and cleanup logic based on unique_name.
@@ -79,16 +79,18 @@ class ProxyShare:
                 )
 
         # Compose the share request
-        if frontends:
-            share_frontends = frontends
-        elif root.cfg and root.cfg.DefaultFrontend:
-            share_frontends = [root.cfg.DefaultFrontend]
-        else:
-            share_frontends = ['public']
+        share_frontends = []
+        if share_mode == PUBLIC_SHARE_MODE:
+            if frontends:
+                share_frontends = frontends
+            elif root.cfg and root.cfg.DefaultFrontend:
+                share_frontends = [root.cfg.DefaultFrontend]
+            else:
+                share_frontends = ['public']
 
         share_request = ShareRequest(
             BackendMode=PROXY_BACKEND_MODE,
-            ShareMode=PUBLIC_SHARE_MODE,
+            ShareMode=share_mode,
             Target=target,
             Frontends=share_frontends,
             Reserved=True
@@ -98,7 +100,10 @@ class ProxyShare:
 
         # Create the share
         share = CreateShare(root=root, request=share_request)
-        logger.debug(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints)}")
+        if share_mode == PUBLIC_SHARE_MODE:
+            logger.debug(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints)}")
+        elif share_mode == PRIVATE_SHARE_MODE:
+            logger.debug(f"Created new private share with token: {share.Token}")
 
         # Create class instance and setup cleanup-at-exit if we reserved a random share token
         instance = cls(
