@@ -48,7 +48,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                     console.log("shareMetricsModal", ex.message);
                 });
             });
-    }, []);
+    }, [isOpen, share]);
 
     return (
         <Modal open={isOpen} onClose={close}>
@@ -56,9 +56,9 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="h5"><strong>Share Metrics</strong></Typography>
                 </Grid2>
-                <MetricsGraph title="30 Days" data={metrics30.data} />
-                <MetricsGraph title="7 Days" data={metrics7.data} />
-                <MetricsGraph title="24 Hours" data={metrics1.data} />
+                <MetricsGraph title="Last 30 Days" data={metrics30.data} />
+                <MetricsGraph title="Last 7 Days" data={metrics7.data} showTime />
+                <MetricsGraph title="Last 24 Hours" data={metrics1.data} showTime />
             </Box>
         </Modal>
     );
