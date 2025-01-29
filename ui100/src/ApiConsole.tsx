@@ -33,7 +33,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const updateEdges = useApiConsoleStore((state) => state.updateEdges);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
-    const updatePasswordRequirements = useApiConsoleStore((state) => state.updatePasswordRequirements);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
     const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);
@@ -105,6 +104,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         }
                     });
                     updateSparkdata(sparkdataIn);
+                } else {
+                    updateSparkdata(new Map<string, Number[]>());
                 }
             })
             .catch(e => {
