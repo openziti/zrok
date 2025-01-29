@@ -28,6 +28,9 @@ def main():
     parser = argparse.ArgumentParser(description='Start a zrok proxy server')
     parser.add_argument('target_url', help='Target URL to proxy requests to')
     parser.add_argument('-n', '--unique-name', help='Unique name for the proxy instance')
+    parser.add_argument('-f', '--frontends', nargs='+', help='One or more space-separated frontends to use')
+    parser.add_argument('-k', '--insecure', action='store_false', dest='verify_ssl', default=True,
+                        help='Skip SSL verification')
     args = parser.parse_args()
 
     logger.info("=== Starting proxy server ===")
@@ -38,7 +41,9 @@ def main():
     proxy_share = ProxyShare.create(
         root=root,
         target=args.target_url,
-        unique_name=args.unique_name
+        unique_name=args.unique_name,
+        frontends=args.frontends,
+        verify_ssl=args.verify_ssl
     )
 
     # Log access information and start the proxy

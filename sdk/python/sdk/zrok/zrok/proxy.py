@@ -47,9 +47,11 @@ class ProxyShare:
     unique_name: Optional[str] = None
     _cleanup_registered: bool = False
     _app: Optional[Flask] = None
+    verify_ssl: bool = True
 
     @classmethod
-    def create(cls, root: Root, target: str, unique_name: Optional[str] = None) -> 'ProxyShare':
+    def create(cls, root: Root, target: str, unique_name: Optional[str] = None,
+               frontends: Optional[List[str]] = None, verify_ssl: bool = True) -> 'ProxyShare':
         """
         Create a new proxy share, handling reservation and cleanup logic based on unique_name.
 
@@ -57,6 +59,8 @@ class ProxyShare:
             root: The zrok root environment
             target: Target URL or service to proxy to
             unique_name: Optional unique name for a reserved share
+            frontends: Optional list of frontends to use, takes precedence over root's default_frontend
+            verify_ssl: Whether to verify SSL certificates when forwarding requests.
 
         Returns:
             ProxyShare instance configured with the created share
@@ -70,30 +74,39 @@ class ProxyShare:
                     root=root,
                     share=existing_share,
                     target=target,
-                    unique_name=unique_name
+                    unique_name=unique_name,
+                    verify_ssl=verify_ssl
                 )
 
-        # Create new share request
+        # Compose the share request
+        if frontends:
+            share_frontends = frontends
+        elif root.cfg and root.cfg.DefaultFrontend:
+            share_frontends = [root.cfg.DefaultFrontend]
+        else:
+            share_frontends = ['public']
+
         share_request = ShareRequest(
             BackendMode=PROXY_BACKEND_MODE,
             ShareMode=PUBLIC_SHARE_MODE,
-            Target="http-proxy",
-            Frontends=['public'],
-            Reserved=bool(unique_name)
+            Target=target,
+            Frontends=share_frontends,
+            Reserved=True
         )
         if unique_name:
             share_request.UniqueName = unique_name
 
         # Create the share
         share = CreateShare(root=root, request=share_request)
-        logger.info(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints)}")
+        logger.debug(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints)}")
 
-        # Create instance and setup cleanup if needed
+        # Create class instance and setup cleanup-at-exit if we reserved a random share token
         instance = cls(
             root=root,
             share=share,
             target=target,
-            unique_name=unique_name
+            unique_name=unique_name,
+            verify_ssl=verify_ssl
         )
         if not unique_name:
             instance.register_cleanup()
@@ -111,13 +124,19 @@ class ProxyShare:
         return None
 
     def register_cleanup(self):
-        """Register cleanup handler to release the share on exit."""
+        """Register cleanup handler to release randomly generated shares on exit."""
         if not self._cleanup_registered:
             def cleanup():
-                ReleaseReservedShare(root=self.root, shr=self.share)
-                logger.info(f"Share {self.share.Token} released")
+                try:
+                    ReleaseReservedShare(root=self.root, shr=self.share)
+                    logger.info(f"Share {self.share.Token} released")
+                except Exception as e:
+                    logger.error(f"Error during cleanup: {e}")
+
+            # Register for normal exit only
             atexit.register(cleanup)
             self._cleanup_registered = True
+            return cleanup  # Return the cleanup function for reuse
 
     def _create_app(self) -> Flask:
         """Create and configure the Flask app for proxying."""
@@ -138,7 +157,8 @@ class ProxyShare:
                 data=request.get_data(),
                 cookies=request.cookies,
                 allow_redirects=False,
-                stream=True
+                stream=True,
+                verify=self.verify_ssl
             )
 
             # Create the response
@@ -154,17 +174,17 @@ class ProxyShare:
         return app
 
     def run(self):
-        """Start the proxy server."""
-        if self._app is None:
+        """Run the proxy server."""
+        if not self._app:
             self._app = self._create_app()
 
-        # Create options dictionary for zrok decorator
         zrok_opts: Dict[str, Any] = {}
         zrok_opts['cfg'] = zrok.decor.Opts(root=self.root, shrToken=self.token, bindPort=DUMMY_PORT)
 
         @zrok.decor.zrok(opts=zrok_opts)
         def run_server():
-            serve(self._app, port=DUMMY_PORT)
+            serve(self._app, port=DUMMY_PORT, _quiet=True)
+
         run_server()
 
     @property
