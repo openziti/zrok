@@ -18,7 +18,13 @@ import styles from '@site/src/css/download-card.module.css';
   </div>
 </AssetsProvider>
 
-1. In PowerShell, install in `%USERPROFILE%\bin\zrok.exe` and set the search path.
+1. In PowerShell, change to the directory where you downloaded zrok.
+
+    ```text
+    cd "$env:USERPROFILE\Downloads"
+    ```
+
+1. In PowerShell, install zrok in your home directory (`bin\zrok.exe`), and permanently set the executable search path.
 
     ```text
     $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
