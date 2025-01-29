@@ -9,6 +9,8 @@ CHANGE: The Python SDK's `Overview()` function was refactored as a class method 
 FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
          Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
 
+FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
