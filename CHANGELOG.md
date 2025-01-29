@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.47
+
+CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
