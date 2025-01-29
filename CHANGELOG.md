@@ -2,6 +2,8 @@
 
 ## v0.4.47
 
+CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)
+
 CHANGE: Document solving the DNS propagation timeout for Docker instances that are using Caddy to manage the wildcard certificate.
 
 CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all valid `configName` and their current values by running `zrok status`.
