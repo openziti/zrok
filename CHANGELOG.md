@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.47
+
+FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)
