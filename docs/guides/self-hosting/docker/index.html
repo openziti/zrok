@@ -9,7 +9,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Zrok" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.bb90e80b.css">
-<script src="/assets/js/runtime~main.0f9b92c3.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.8a1caa1d.js" defer="defer"></script>
 <script src="/assets/js/main.9e5a9d8c.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -101,9 +101,19 @@
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose logs zrok-controller</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 </li>
 <li>
-<p>Check the caddy logs.</p>
+<p>Check the Caddy logs.</p>
 <p>It can take a few minutes for Caddy to obtain the wildcard certificate. You can check the logs to see if there were any errors completing the DNS challenge which involves using the Caddy DNS plugin to create a TXT record in your DNS zone. This leverages the API token you provided in the <code>.env</code> file, which must have permission to create DNS records in the zrok DNS zone.</p>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose logs caddy</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+</li>
+<li>
+<p>Caddy keeps failing to obtain a wildcard certificate because it timed out waiting for DNS.</p>
+<p>Symptom: the Caddy log contains &quot;timed out waiting for record to fully propagate.&quot; This means that Caddy added a DNS record with your DNS provider&#x27;s API to prove to the CA it controls the zrok DNS zone, but it wasn&#x27;t able to verify the record was created successfully with a DNS query.</p>
+<p>Solutions:</p>
+<ul>
+<li>Add <code>propagation_delay</code> in your <code>Caddyfile</code> to delay the first DNS verification query. This avoids caching a verification query failure by waiting a few minutes for the record to become available so the verification query will succeed on the first attempt. Caddy will be unable to verify the DNS record if the failure remains in the cache too long.</li>
+<li>If the prior solution fails, you can override the default resolves/nameservers with <code>resolvers</code>, a space-separated list of DNS servers. This gives you more control over if and where the verification query result is cached.</li>
+</ul>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">tls {</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    dns {CADDY_DNS_PLUGIN} {CADDY_DNS_PLUGIN_TOKEN}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	propagation_timeout 60m  # default 2m</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    propagation_delay   5m   # default 0m</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 </li>
 <li>
 <p><code>zrok enable</code> fails certificate verification: ensure you are not using the staging API for Let&#x27;s Encrypt.</p>
