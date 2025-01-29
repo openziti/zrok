@@ -4,7 +4,7 @@ This `http-server` example is a minimal zrok application that surfaces a basic H
 
 ## Implementation
 
-```go
+```python
 root = zrok.environment.root.Load()
 ```
 
@@ -46,6 +46,6 @@ Next, we run the server which ends up calling the following:
 @zrok.decor.zrok(opts=zrok_opts)
 def runApp():
     from waitress import serve
-    # the port is only used to integrate Zrok with frameworks that expect a "hostname:port" combo
+    # the port is only used to integrate zrok with frameworks that expect a "hostname:port" combo
     serve(app, port=bindPort)
 ```
