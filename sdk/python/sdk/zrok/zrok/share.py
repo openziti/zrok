@@ -104,3 +104,19 @@ def DeleteShare(root: Root, shr: model.Share):
         ShareApi(zrok).unshare(body=req)
     except Exception as e:
         raise Exception("error deleting share", e)
+
+
+def ReleaseReservedShare(root: Root, shr: model.Share):
+    req = UnshareRequest(env_zid=root.env.ZitiIdentity,
+                         shr_token=shr.Token,
+                         reserved=True)
+
+    try:
+        zrok = root.Client()
+    except Exception as e:
+        raise Exception("error getting zrok client", e)
+
+    try:
+        ShareApi(zrok).unshare(body=req)
+    except Exception as e:
+        raise Exception("error releasing share", e)

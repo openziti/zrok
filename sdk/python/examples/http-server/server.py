@@ -13,7 +13,7 @@ bindPort = 18081
 @zrok.decor.zrok(opts=zrok_opts)
 def runApp():
     from waitress import serve
-    # the port is only used to integrate Zrok with frameworks that expect a "hostname:port" combo
+    # the port is only used to integrate zrok with frameworks that expect a "hostname:port" combo
     serve(app, port=bindPort)
 
 

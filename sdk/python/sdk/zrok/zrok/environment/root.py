@@ -19,6 +19,7 @@ class Metadata:
 @dataclass
 class Config:
     ApiEndpoint: str = ""
+    DefaultFrontend: str = ""
 
 
 @dataclass
@@ -137,7 +138,10 @@ def __loadConfig() -> Config:
     cf = configFile()
     with open(cf) as f:
         data = json.load(f)
-        return Config(ApiEndpoint=data["api_endpoint"])
+        return Config(
+            ApiEndpoint=data["api_endpoint"],
+            DefaultFrontend=data["default_frontend"]
+        )
 
 
 def isEnabled() -> bool:

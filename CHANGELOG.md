@@ -2,6 +2,13 @@
 
 ## v0.4.47
 
+CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all valid `configName` and their current values by running `zrok status`.
+
+CHANGE: The Python SDK's `Overview()` function was refactored as a class method (https://github.com/openziti/zrok/pull/846).
+
+FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
+         Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
+
 FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
 
 ## v0.4.46
