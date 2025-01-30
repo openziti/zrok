@@ -24,14 +24,13 @@ Expected output:
 from zrok.proxy import ProxyShare
 import zrok
 
-# Load the environment
-root = zrok.environment.root.Load()
+# Load the user's zrok environment from ~/.zrok
+zrok_env = zrok.environment.root.Load()
 
 # Create a temporary proxy share (will be cleaned up on exit)
-proxy = ProxyShare.create(root=root, target="http://my-target-service")
+proxy = ProxyShare.create(root=zrok_env, target="http://127.0.0.1:3000")
 
-# Access the proxy's endpoints and token
-print(f"Access proxy at: {proxy.endpoints}")
+print(f"Public URL: {proxy.endpoints}")
 proxy.run()
 ```
 
@@ -43,6 +42,6 @@ To create a share token that persists and can be reused, run the example `proxy.
 proxy = ProxyShare.create(
     root=root,
     target="http://127.0.0.1:3000",
-    unique_name="my-persistent-proxy"
+    unique_name="myuniquename"
 )
 ```
