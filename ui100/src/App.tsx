@@ -6,6 +6,7 @@ import {User} from "./model/user.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ForgotPassword from "./ForgotPassword.tsx";
 import Register from "./Register.tsx";
+import ResetPassword from "./ResetPassword.tsx";
 
 const App = () => {
     const user = useApiConsoleStore((state) => state.user);
@@ -46,6 +47,7 @@ const App = () => {
                 <Route index element={consoleRoot}/>
                 <Route path="/forgotPassword" element={<ForgotPassword />} />
                 <Route path="/register/:regToken" element={<Register />} />
+                <Route path="/resetPassword/:resetToken" element={<ResetPassword />} />
             </Routes>
         </BrowserRouter>
     );

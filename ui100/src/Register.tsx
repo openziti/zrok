@@ -1,5 +1,5 @@
 import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, TextField, Typography} from "@mui/material";
-import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
+import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {useParams} from "react-router";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
@@ -235,7 +235,7 @@ const Register = () => {
         <Typography component="div">
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zroket} height="300"/>
+                    <img src={zrokLogo} height="300"/>
                     <h1 style={{ color: "#241775" }}>z r o k</h1>
                     {component}
                 </Box>
