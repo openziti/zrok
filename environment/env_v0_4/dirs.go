@@ -53,3 +53,11 @@ func identityFile(name string) (string, error) {
 	}
 	return filepath.Join(idd, fmt.Sprintf("%v.json", name)), nil
 }
+
+func agentSocket() (string, error) {
+	zrd, err := rootDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "agent.socket"), nil
+}
