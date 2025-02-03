@@ -17,16 +17,15 @@ import http from 'http';
 /* tslint:disable:no-unused-locals */
 import { AddOrganizationMemberRequest } from '../model/addOrganizationMemberRequest';
 import { CreateFrontendRequest } from '../model/createFrontendRequest';
-import { CreateFrontendResponse } from '../model/createFrontendResponse';
 import { CreateIdentity201Response } from '../model/createIdentity201Response';
 import { CreateIdentityRequest } from '../model/createIdentityRequest';
 import { CreateOrganizationRequest } from '../model/createOrganizationRequest';
 import { DeleteFrontendRequest } from '../model/deleteFrontendRequest';
 import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest';
+import { ListFrontends200ResponseInner } from '../model/listFrontends200ResponseInner';
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { ListOrganizations200Response } from '../model/listOrganizations200Response';
 import { LoginRequest } from '../model/loginRequest';
-import { PublicFrontend } from '../model/publicFrontend';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
@@ -232,7 +231,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: CreateFrontendResponse;  }> {
+    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }> {
         const localVarPath = this.basePath + '/frontend';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -278,13 +277,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: CreateFrontendResponse;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "CreateFrontendResponse");
+                            body = ObjectSerializer.deserialize(body, "RegenerateToken200Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -661,7 +660,7 @@ export class AdminApi {
     /**
      * 
      */
-    public async listFrontends (options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Array<PublicFrontend>;  }> {
+    public async listFrontends (options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Array<ListFrontends200ResponseInner>;  }> {
         const localVarPath = this.basePath + '/frontends';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -706,13 +705,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: Array<PublicFrontend>;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: Array<ListFrontends200ResponseInner>;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "Array<PublicFrontend>");
+                            body = ObjectSerializer.deserialize(body, "Array<ListFrontends200ResponseInner>");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));

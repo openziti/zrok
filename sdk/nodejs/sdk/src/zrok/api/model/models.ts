@@ -7,7 +7,6 @@ export * from './authUser';
 export * from './changePasswordRequest';
 export * from './configuration';
 export * from './createFrontendRequest';
-export * from './createFrontendResponse';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
 export * from './createOrganizationRequest';
@@ -22,6 +21,7 @@ export * from './getSparklines200Response';
 export * from './getSparklinesRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
+export * from './listFrontends200ResponseInner';
 export * from './listMemberships200Response';
 export * from './listMemberships200ResponseMembershipsInner';
 export * from './listOrganizationMembers200Response';
@@ -34,7 +34,6 @@ export * from './metricsSample';
 export * from './overview';
 export * from './passwordRequirements';
 export * from './principal';
-export * from './publicFrontend';
 export * from './regenerateToken200Response';
 export * from './regenerateTokenRequest';
 export * from './registerRequest';
@@ -69,7 +68,6 @@ import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
 import { Configuration } from './configuration';
 import { CreateFrontendRequest } from './createFrontendRequest';
-import { CreateFrontendResponse } from './createFrontendResponse';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
 import { CreateOrganizationRequest } from './createOrganizationRequest';
@@ -84,6 +82,7 @@ import { GetSparklines200Response } from './getSparklines200Response';
 import { GetSparklinesRequest } from './getSparklinesRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
+import { ListFrontends200ResponseInner } from './listFrontends200ResponseInner';
 import { ListMemberships200Response } from './listMemberships200Response';
 import { ListMemberships200ResponseMembershipsInner } from './listMemberships200ResponseMembershipsInner';
 import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
@@ -96,7 +95,6 @@ import { MetricsSample } from './metricsSample';
 import { Overview } from './overview';
 import { PasswordRequirements } from './passwordRequirements';
 import { Principal } from './principal';
-import { PublicFrontend } from './publicFrontend';
 import { RegenerateToken200Response } from './regenerateToken200Response';
 import { RegenerateTokenRequest } from './regenerateTokenRequest';
 import { RegisterRequest } from './registerRequest';
@@ -139,7 +137,6 @@ let typeMap: {[index: string]: any} = {
     "ChangePasswordRequest": ChangePasswordRequest,
     "Configuration": Configuration,
     "CreateFrontendRequest": CreateFrontendRequest,
-    "CreateFrontendResponse": CreateFrontendResponse,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
     "CreateOrganizationRequest": CreateOrganizationRequest,
@@ -154,6 +151,7 @@ let typeMap: {[index: string]: any} = {
     "GetSparklinesRequest": GetSparklinesRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
+    "ListFrontends200ResponseInner": ListFrontends200ResponseInner,
     "ListMemberships200Response": ListMemberships200Response,
     "ListMemberships200ResponseMembershipsInner": ListMemberships200ResponseMembershipsInner,
     "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
@@ -166,7 +164,6 @@ let typeMap: {[index: string]: any} = {
     "Overview": Overview,
     "PasswordRequirements": PasswordRequirements,
     "Principal": Principal,
-    "PublicFrontend": PublicFrontend,
     "RegenerateToken200Response": RegenerateToken200Response,
     "RegenerateTokenRequest": RegenerateTokenRequest,
     "RegisterRequest": RegisterRequest,

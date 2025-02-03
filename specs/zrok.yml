@@ -263,12 +263,25 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/createFrontendRequest"
+            type: object
+            properties:
+              zId:
+                type: string
+              url_template:
+                type: string
+              public_name:
+                type: string
+              permissionMode:
+                type: string
+                enum: [ "open", "closed" ]
       responses:
         201:
           description: frontend created
           schema:
-            $ref: "#/definitions/createFrontendResponse"
+            type: object
+            properties:
+              token:
+                type: string
         400:
           description: bad request
         401:
@@ -287,7 +300,14 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/updateFrontendRequest"
+            type: object
+            properties:
+              frontendToken:
+                type: string
+              publicName:
+                type: string
+              urlTemplate:
+                type: string
       responses:
         200:
           description: frontend updated
@@ -307,7 +327,10 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/deleteFrontendRequest"
+            type: object
+            properties:
+              frontendToken:
+                type: string
       responses:
         200:
           description: frontend deleted
@@ -329,7 +352,22 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/publicFrontendList"
+            type: array
+            items:
+              type: object
+              properties:
+                token:
+                  type: string
+                zId:
+                  type: string
+                urlTemplate:
+                  type: string
+                publicName:
+                  type: string
+                createdAt:
+                  type: integer
+                updatedAt:
+                  type: integer
         401:
           description: unauthorized
         500:
@@ -1106,31 +1144,6 @@ definitions:
       passwordRequirements:
         $ref: "#/definitions/passwordRequirements"
 
-  createFrontendRequest:
-    type: object
-    properties:
-      zId:
-        type: string
-      url_template:
-        type: string
-      public_name:
-        type: string
-      permissionMode:
-        type: string
-        enum: ["open", "closed"]
-
-  createFrontendResponse:
-    type: object
-    properties:
-      token:
-        type: string
-
-  deleteFrontendRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-
   disableRequest:
     type: object
     properties:
@@ -1282,27 +1295,6 @@ definitions:
       admin:
         type: boolean
 
-  publicFrontend:
-    type: object
-    properties:
-      token:
-        type: string
-      zId:
-        type: string
-      urlTemplate:
-        type: string
-      publicName:
-        type: string
-      createdAt:
-        type: integer
-      updatedAt:
-        type: integer
-
-  publicFrontendList:
-    type: array
-    items:
-      $ref: "#/definitions/publicFrontend"
-
   share:
     type: object
     properties:
@@ -1422,16 +1414,6 @@ definitions:
         type: string
       reserved:
         type: boolean
-
-  updateFrontendRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      publicName:
-        type: string
-      urlTemplate:
-        type: string
 
   updateShareRequest:
     type: object

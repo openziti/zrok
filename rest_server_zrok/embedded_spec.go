@@ -415,7 +415,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createFrontendRequest"
+              "type": "object",
+              "properties": {
+                "permissionMode": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "public_name": {
+                  "type": "string"
+                },
+                "url_template": {
+                  "type": "string"
+                },
+                "zId": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -423,7 +441,12 @@ func init() {
           "201": {
             "description": "frontend created",
             "schema": {
-              "$ref": "#/definitions/createFrontendResponse"
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           },
           "400": {
@@ -455,7 +478,12 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/deleteFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -489,7 +517,18 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                },
+                "publicName": {
+                  "type": "string"
+                },
+                "urlTemplate": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -524,7 +563,30 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/publicFrontendList"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "integer"
+                  },
+                  "publicName": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "integer"
+                  },
+                  "urlTemplate": {
+                    "type": "string"
+                  },
+                  "zId": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           },
           "401": {
@@ -1779,43 +1841,6 @@ func init() {
         }
       }
     },
-    "createFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "permissionMode": {
-          "type": "string",
-          "enum": [
-            "open",
-            "closed"
-          ]
-        },
-        "public_name": {
-          "type": "string"
-        },
-        "url_template": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "deleteFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        }
-      }
-    },
     "disableRequest": {
       "type": "object",
       "properties": {
@@ -2026,35 +2051,6 @@ func init() {
         }
       }
     },
-    "publicFrontend": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "urlTemplate": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontendList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/publicFrontend"
-      }
-    },
     "share": {
       "type": "object",
       "properties": {
@@ -2238,20 +2234,6 @@ func init() {
           "type": "boolean"
         },
         "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "urlTemplate": {
           "type": "string"
         }
       }
@@ -2689,7 +2671,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createFrontendRequest"
+              "type": "object",
+              "properties": {
+                "permissionMode": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "public_name": {
+                  "type": "string"
+                },
+                "url_template": {
+                  "type": "string"
+                },
+                "zId": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2697,7 +2697,12 @@ func init() {
           "201": {
             "description": "frontend created",
             "schema": {
-              "$ref": "#/definitions/createFrontendResponse"
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           },
           "400": {
@@ -2729,7 +2734,12 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/deleteFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2763,7 +2773,18 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                },
+                "publicName": {
+                  "type": "string"
+                },
+                "urlTemplate": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2798,7 +2819,10 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/publicFrontendList"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListFrontendsOKBodyItems0"
+              }
             }
           },
           "401": {
@@ -3966,6 +3990,29 @@ func init() {
     }
   },
   "definitions": {
+    "ListFrontendsOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "urlTemplate": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "MembersItems0": {
       "properties": {
         "admin": {
@@ -4051,43 +4098,6 @@ func init() {
           "type": "string"
         },
         "version": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "permissionMode": {
-          "type": "string",
-          "enum": [
-            "open",
-            "closed"
-          ]
-        },
-        "public_name": {
-          "type": "string"
-        },
-        "url_template": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "deleteFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
           "type": "string"
         }
       }
@@ -4302,35 +4312,6 @@ func init() {
         }
       }
     },
-    "publicFrontend": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "urlTemplate": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontendList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/publicFrontend"
-      }
-    },
     "share": {
       "type": "object",
       "properties": {
@@ -4514,20 +4495,6 @@ func init() {
           "type": "boolean"
         },
         "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "urlTemplate": {
           "type": "string"
         }
       }

@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +40,7 @@ func (cmd *adminDeleteFrontendCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewDeleteFrontendParams()
-	req.Body = &rest_model_zrok.DeleteFrontendRequest{FrontendToken: feToken}
+	req.Body.FrontendToken = feToken
 
 	_, err = zrok.Admin.DeleteFrontend(req, mustGetAdminAuth())
 	if err != nil {

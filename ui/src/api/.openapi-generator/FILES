@@ -11,7 +11,6 @@ models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/CreateFrontendRequest.ts
-models/CreateFrontendResponse.ts
 models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
 models/CreateOrganizationRequest.ts
@@ -26,6 +25,7 @@ models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
+models/ListFrontends200ResponseInner.ts
 models/ListMemberships200Response.ts
 models/ListMemberships200ResponseMembershipsInner.ts
 models/ListOrganizationMembers200Response.ts
@@ -39,7 +39,6 @@ models/ModelConfiguration.ts
 models/Overview.ts
 models/PasswordRequirements.ts
 models/Principal.ts
-models/PublicFrontend.ts
 models/RegenerateToken200Response.ts
 models/RegenerateTokenRequest.ts
 models/RegisterRequest.ts

@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewCreateFrontendParams creates a new CreateFrontendParams object,
@@ -64,7 +62,7 @@ CreateFrontendParams contains all the parameters to send to the API endpoint
 type CreateFrontendParams struct {
 
 	// Body.
-	Body *rest_model_zrok.CreateFrontendRequest
+	Body CreateFrontendBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *CreateFrontendParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the create frontend params
-func (o *CreateFrontendParams) WithBody(body *rest_model_zrok.CreateFrontendRequest) *CreateFrontendParams {
+func (o *CreateFrontendParams) WithBody(body CreateFrontendBody) *CreateFrontendParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the create frontend params
-func (o *CreateFrontendParams) SetBody(body *rest_model_zrok.CreateFrontendRequest) {
+func (o *CreateFrontendParams) SetBody(body CreateFrontendBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *CreateFrontendParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

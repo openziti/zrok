@@ -17,16 +17,15 @@ import * as runtime from '../runtime';
 import type {
   AddOrganizationMemberRequest,
   CreateFrontendRequest,
-  CreateFrontendResponse,
   CreateIdentity201Response,
   CreateIdentityRequest,
   CreateOrganizationRequest,
   DeleteFrontendRequest,
   InviteTokenGenerateRequest,
+  ListFrontends200ResponseInner,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
   LoginRequest,
-  PublicFrontend,
   RegenerateToken200Response,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
@@ -37,8 +36,6 @@ import {
     AddOrganizationMemberRequestToJSON,
     CreateFrontendRequestFromJSON,
     CreateFrontendRequestToJSON,
-    CreateFrontendResponseFromJSON,
-    CreateFrontendResponseToJSON,
     CreateIdentity201ResponseFromJSON,
     CreateIdentity201ResponseToJSON,
     CreateIdentityRequestFromJSON,
@@ -49,14 +46,14 @@ import {
     DeleteFrontendRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
+    ListFrontends200ResponseInnerFromJSON,
+    ListFrontends200ResponseInnerToJSON,
     ListOrganizationMembers200ResponseFromJSON,
     ListOrganizationMembers200ResponseToJSON,
     ListOrganizations200ResponseFromJSON,
     ListOrganizations200ResponseToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
-    PublicFrontendFromJSON,
-    PublicFrontendToJSON,
     RegenerateToken200ResponseFromJSON,
     RegenerateToken200ResponseToJSON,
     RemoveOrganizationMemberRequestFromJSON,
@@ -183,7 +180,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateFrontendResponse>> {
+    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -202,12 +199,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: CreateFrontendRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateFrontendResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateToken200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateFrontendResponse> {
+    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
         const response = await this.createFrontendRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -396,7 +393,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async listFrontendsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublicFrontend>>> {
+    async listFrontendsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListFrontends200ResponseInner>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -412,12 +409,12 @@ export class AdminApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PublicFrontendFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListFrontends200ResponseInnerFromJSON));
     }
 
     /**
      */
-    async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublicFrontend>> {
+    async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontends200ResponseInner>> {
         const response = await this.listFrontendsRaw(initOverrides);
         return await response.value();
     }
