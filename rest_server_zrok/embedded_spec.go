@@ -343,7 +343,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/disableRequest"
+              "properties": {
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1862,14 +1866,6 @@ func init() {
         }
       }
     },
-    "disableRequest": {
-      "type": "object",
-      "properties": {
-        "identity": {
-          "type": "string"
-        }
-      }
-    },
     "environment": {
       "type": "object",
       "properties": {
@@ -2587,7 +2583,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/disableRequest"
+              "properties": {
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4107,14 +4107,6 @@ func init() {
           "type": "string"
         },
         "version": {
-          "type": "string"
-        }
-      }
-    },
-    "disableRequest": {
-      "type": "object",
-      "properties": {
-        "identity": {
           "type": "string"
         }
       }

@@ -659,7 +659,9 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/disableRequest"
+            properties:
+              identity:
+                type: string
       responses:
         200:
           description: environment disabled
@@ -1155,12 +1157,6 @@ definitions:
         type: string
       passwordRequirements:
         $ref: "#/definitions/passwordRequirements"
-
-  disableRequest:
-    type: object
-    properties:
-      identity:
-        type: string
 
   environment:
     type: object

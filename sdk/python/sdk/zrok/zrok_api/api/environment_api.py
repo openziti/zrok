@@ -41,7 +41,7 @@ class EnvironmentApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param DisableRequest body:
+        :param DisableBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -62,7 +62,7 @@ class EnvironmentApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param DisableRequest body:
+        :param DisableBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

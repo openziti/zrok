@@ -30,7 +30,7 @@ from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody
 from zrok_api.models.configuration import Configuration
-from zrok_api.models.disable_request import DisableRequest
+from zrok_api.models.disable_body import DisableBody
 from zrok_api.models.enable_body import EnableBody
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
