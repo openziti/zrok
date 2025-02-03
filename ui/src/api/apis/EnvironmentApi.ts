@@ -15,17 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateIdentity201Response,
   DisableRequest,
   EnableRequest,
-  EnableResponse,
 } from '../models/index';
 import {
+    CreateIdentity201ResponseFromJSON,
+    CreateIdentity201ResponseToJSON,
     DisableRequestFromJSON,
     DisableRequestToJSON,
     EnableRequestFromJSON,
     EnableRequestToJSON,
-    EnableResponseFromJSON,
-    EnableResponseToJSON,
 } from '../models/index';
 
 export interface DisableOperationRequest {
@@ -73,7 +73,7 @@ export class EnvironmentApi extends runtime.BaseAPI {
 
     /**
      */
-    async enableRaw(requestParameters: EnableOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnableResponse>> {
+    async enableRaw(requestParameters: EnableOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateIdentity201Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -92,12 +92,12 @@ export class EnvironmentApi extends runtime.BaseAPI {
             body: EnableRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => EnableResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateIdentity201ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async enable(requestParameters: EnableOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnableResponse> {
+    async enable(requestParameters: EnableOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateIdentity201Response> {
         const response = await this.enableRaw(requestParameters, initOverrides);
         return await response.value();
     }

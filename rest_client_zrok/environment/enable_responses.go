@@ -6,13 +6,13 @@ package environment
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/go-openapi/swag"
 )
 
 // EnableReader is a Reader for the Enable structure.
@@ -63,7 +63,7 @@ EnableCreated describes a response with status code 201, with default header val
 environment enabled
 */
 type EnableCreated struct {
-	Payload *rest_model_zrok.EnableResponse
+	Payload *EnableCreatedBody
 }
 
 // IsSuccess returns true when this enable created response has a 2xx status code
@@ -104,13 +104,13 @@ func (o *EnableCreated) String() string {
 	return fmt.Sprintf("[POST /enable][%d] enableCreated  %+v", 201, o.Payload)
 }
 
-func (o *EnableCreated) GetPayload() *rest_model_zrok.EnableResponse {
+func (o *EnableCreated) GetPayload() *EnableCreatedBody {
 	return o.Payload
 }
 
 func (o *EnableCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.EnableResponse)
+	o.Payload = new(EnableCreatedBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -285,5 +285,87 @@ func (o *EnableInternalServerError) String() string {
 
 func (o *EnableInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+EnableBody enable body
+swagger:model EnableBody
+*/
+type EnableBody struct {
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// host
+	Host string `json:"host,omitempty"`
+}
+
+// Validate validates this enable body
+func (o *EnableBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this enable body based on context it is used
+func (o *EnableBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *EnableBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *EnableBody) UnmarshalBinary(b []byte) error {
+	var res EnableBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+EnableCreatedBody enable created body
+swagger:model EnableCreatedBody
+*/
+type EnableCreatedBody struct {
+
+	// cfg
+	Cfg string `json:"cfg,omitempty"`
+
+	// identity
+	Identity string `json:"identity,omitempty"`
+}
+
+// Validate validates this enable created body
+func (o *EnableCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this enable created body based on context it is used
+func (o *EnableCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *EnableCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *EnableCreatedBody) UnmarshalBinary(b []byte) error {
+	var res EnableCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

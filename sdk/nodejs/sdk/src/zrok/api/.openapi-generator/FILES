@@ -19,7 +19,6 @@ model/createOrganizationRequest.ts
 model/deleteFrontendRequest.ts
 model/disableRequest.ts
 model/enableRequest.ts
-model/enableResponse.ts
 model/environment.ts
 model/environmentAndResources.ts
 model/frontend.ts

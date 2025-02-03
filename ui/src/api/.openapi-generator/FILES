@@ -17,7 +17,6 @@ models/CreateOrganizationRequest.ts
 models/DeleteFrontendRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
-models/EnableResponse.ts
 models/Environment.ts
 models/EnvironmentAndResources.ts
 models/Frontend.ts

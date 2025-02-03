@@ -12,7 +12,6 @@ export * from './CreateOrganizationRequest';
 export * from './DeleteFrontendRequest';
 export * from './DisableRequest';
 export * from './EnableRequest';
-export * from './EnableResponse';
 export * from './Environment';
 export * from './EnvironmentAndResources';
 export * from './Frontend';

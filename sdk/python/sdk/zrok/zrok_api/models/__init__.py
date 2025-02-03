@@ -21,8 +21,7 @@ from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody
 from zrok_api.models.configuration import Configuration
 from zrok_api.models.disable_request import DisableRequest
-from zrok_api.models.enable_request import EnableRequest
-from zrok_api.models.enable_response import EnableResponse
+from zrok_api.models.enable_body import EnableBody
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.models.environments import Environments

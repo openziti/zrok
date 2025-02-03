@@ -13,7 +13,6 @@ export * from './createOrganizationRequest';
 export * from './deleteFrontendRequest';
 export * from './disableRequest';
 export * from './enableRequest';
-export * from './enableResponse';
 export * from './environment';
 export * from './environmentAndResources';
 export * from './frontend';
@@ -74,7 +73,6 @@ import { CreateOrganizationRequest } from './createOrganizationRequest';
 import { DeleteFrontendRequest } from './deleteFrontendRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
-import { EnableResponse } from './enableResponse';
 import { Environment } from './environment';
 import { EnvironmentAndResources } from './environmentAndResources';
 import { Frontend } from './frontend';
@@ -143,7 +141,6 @@ let typeMap: {[index: string]: any} = {
     "DeleteFrontendRequest": DeleteFrontendRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,
-    "EnableResponse": EnableResponse,
     "Environment": Environment,
     "EnvironmentAndResources": EnvironmentAndResources,
     "Frontend": Frontend,

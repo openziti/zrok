@@ -376,7 +376,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/enableRequest"
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -384,7 +391,14 @@ func init() {
           "201": {
             "description": "environment enabled",
             "schema": {
-              "$ref": "#/definitions/enableResponse"
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -1856,28 +1870,6 @@ func init() {
         }
       }
     },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "host": {
-          "type": "string"
-        }
-      }
-    },
-    "enableResponse": {
-      "type": "object",
-      "properties": {
-        "cfg": {
-          "type": "string"
-        },
-        "identity": {
-          "type": "string"
-        }
-      }
-    },
     "environment": {
       "type": "object",
       "properties": {
@@ -2628,7 +2620,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/enableRequest"
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2636,7 +2635,14 @@ func init() {
           "201": {
             "description": "environment enabled",
             "schema": {
-              "$ref": "#/definitions/enableResponse"
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -4108,28 +4114,6 @@ func init() {
     "disableRequest": {
       "type": "object",
       "properties": {
-        "identity": {
-          "type": "string"
-        }
-      }
-    },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "host": {
-          "type": "string"
-        }
-      }
-    },
-    "enableResponse": {
-      "type": "object",
-      "properties": {
-        "cfg": {
-          "type": "string"
-        },
         "identity": {
           "type": "string"
         }

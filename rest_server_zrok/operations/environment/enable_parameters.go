@@ -12,8 +12,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewEnableParams creates a new EnableParams object
@@ -36,7 +34,7 @@ type EnableParams struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.EnableRequest
+	Body EnableBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +48,7 @@ func (o *EnableParams) BindRequest(r *http.Request, route *middleware.MatchedRou
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.EnableRequest
+		var body EnableBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -65,7 +63,7 @@ func (o *EnableParams) BindRequest(r *http.Request, route *middleware.MatchedRou
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}
