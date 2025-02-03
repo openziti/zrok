@@ -14,7 +14,7 @@ If you don't already have an account, you can sign up for one [here](https://myz
 [myzrok.io](https://myzrok.io) provides a guided setup with just a few easy steps!
 
 1. Bring your own custom domain name
-2. Create DNS validation records and a CNAME record
+2. Create DNS records for certificate validation and traffic routing
 3. Wait for zrok to validate your records and finalize configuration
 4. Start sharing!
 
@@ -25,17 +25,16 @@ Detailed setup instructions are documented below.
 In order to create a custom domain in zrok, **you must already own the domain you want to use.**
 :::
 
-During the setup process you will need to create DNS records to validate ownership and to allow a certiicate to be issued
+During the setup process you will need to create DNS records to validate ownership and to allow a certificate to be issued
 on behalf of your domain. Once you have your domain registered, you can begin the process of setting up your custom
-domain with zrok!
+domain with zrok.
 
 ### Create Your Custom Domain
 
-Log into the myzrok Console and access the domains page by clicking on the globe icon in the left navigation menu.
+Log into the myzrok console and access the domains page by clicking on the globe icon in the left navigation menu.
 
 ![myzrok_domains_page](images/myzrok_domains_page.png)
 
-Custom domains require a Pro subscription in [myzrok.io](https://myzrok.io)
 
 Click the CREATE button on the top right of the page to get started.
 When you click the create button you’ll be presented with a form to allow you to enable your custom domain.
@@ -64,12 +63,26 @@ After you’ve created your records, you can verify that they are configured pro
 
 ![myzrok_verify_dns](images/myzrok_verify_dns.png)
 
+If the `nslookup` command returns the IP addresses supplied for the A-record entry, then DNS for your domain is resolving properly.
+
+```
+nslookup test.foo.example.io
+Server:		192.168.86.194
+Address:	192.168.86.194#53
+
+Non-authoritative answer:
+Name:	test.foo.example.io
+Address: 99.83.220.186
+Name:	test.foo.example.io
+Address: 52.223.6.108
+```
+
 Once you have created your DNS records, it will take zrok a few minutes to validate that they exist.
 You can safely close the form until your certificate has been issued.
 
 ### Finalizing Your Custom Domain
 
-After your records have been validated and your certificate has been issued, click the Finalize button within 72 hours to complete your custom domain setup.
+After your records have been validated and your certificate has been issued, click the FINALIZE button within 72 hours to complete your custom domain setup.
 
 ![myzrok_finalize](images/myzrok_finalize.png)
 
@@ -77,7 +90,7 @@ From here, myzrok.io will complete the last few steps of creating your custom do
 This should only take a minute, but if you need to close the form you can find the instructions on how to share your frontend when you return.
 
 ### Start Sharing!
-Once the Finalize stage has completed, you can start sharing with your custom DNS!
+Once the Finalize stage has completed, you can start sharing with your custom DNS.
 
 In order to create shares that utilize your custom DNS, you will need to specify the `--frontend` flag when creating a share,
 or update your environment configuration to use this new frontend by default.
