@@ -26,7 +26,13 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: '#/definitions/changePasswordRequest'
+            properties:
+              email:
+                type: string
+              oldPassword:
+                type: string
+              newPassword:
+                type: string
       responses:
         200:
           description: changed password
@@ -1061,16 +1067,6 @@ definitions:
         type: string
       password:
         type: string
-
-  changePasswordRequest:
-    type: object
-    properties:
-      email:
-        type: string
-      oldPassword:
-        type: string
-      newPassword:
-         type: string
 
   configuration:
     type: object

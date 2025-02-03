@@ -137,7 +137,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/changePasswordRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "newPassword": {
+                  "type": "string"
+                },
+                "oldPassword": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1706,20 +1716,6 @@ func init() {
         }
       }
     },
-    "changePasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "newPassword": {
-          "type": "string"
-        },
-        "oldPassword": {
-          "type": "string"
-        }
-      }
-    },
     "configuration": {
       "type": "object",
       "properties": {
@@ -2446,7 +2442,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/changePasswordRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "newPassword": {
+                  "type": "string"
+                },
+                "oldPassword": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4013,20 +4019,6 @@ func init() {
           "type": "string"
         },
         "username": {
-          "type": "string"
-        }
-      }
-    },
-    "changePasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "newPassword": {
-          "type": "string"
-        },
-        "oldPassword": {
           "type": "string"
         }
       }

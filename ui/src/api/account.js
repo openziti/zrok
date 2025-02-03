@@ -4,7 +4,7 @@ import * as gateway from './gateway'
 
 /**
  * @param {object} options Optional options
- * @param {module:types.changePasswordRequest} [options.body] 
+ * @param {object} [options.body] 
  * @return {Promise<object>} changed password
  */
 export function changePassword(options) {

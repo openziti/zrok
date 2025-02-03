@@ -28,7 +28,7 @@ from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.access_response import AccessResponse
 from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
-from zrok_api.models.change_password_request import ChangePasswordRequest
+from zrok_api.models.change_password_body import ChangePasswordBody
 from zrok_api.models.configuration import Configuration
 from zrok_api.models.create_frontend_request import CreateFrontendRequest
 from zrok_api.models.create_frontend_response import CreateFrontendResponse

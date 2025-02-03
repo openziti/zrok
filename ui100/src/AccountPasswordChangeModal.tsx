@@ -32,8 +32,9 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                     newPassword: v.newPassword,
                 }
             })
-                .then(d => {
+                .then(() => {
                     setBottomControl(<Typography>Your password has been changed!</Typography>);
+                    setTimeout(() => { close() }, 3000);
                 })
                 .catch(e => {
                     setErrorMessage(<Typography color="red">Password change failed! Check your current password!</Typography>);

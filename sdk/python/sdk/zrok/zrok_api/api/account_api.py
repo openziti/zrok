@@ -41,7 +41,7 @@ class AccountApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param ChangePasswordRequest body:
+        :param ChangePasswordBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -62,7 +62,7 @@ class AccountApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param ChangePasswordRequest body:
+        :param ChangePasswordBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
