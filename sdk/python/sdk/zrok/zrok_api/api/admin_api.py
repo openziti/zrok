@@ -769,7 +769,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param InviteTokenGenerateRequest body:
+        :param TokenGenerateBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -790,7 +790,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param InviteTokenGenerateRequest body:
+        :param TokenGenerateBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

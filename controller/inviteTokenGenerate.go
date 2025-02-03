@@ -22,7 +22,7 @@ func (handler *inviteTokenGenerateHandler) Handle(params admin.InviteTokenGenera
 		return admin.NewInviteTokenGenerateUnauthorized()
 	}
 
-	if params.Body == nil || len(params.Body.Tokens) == 0 {
+	if len(params.Body.Tokens) == 0 {
 		logrus.Error("missing tokens")
 		return admin.NewInviteTokenGenerateBadRequest()
 	}

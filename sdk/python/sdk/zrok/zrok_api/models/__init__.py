@@ -46,7 +46,6 @@ from zrok_api.models.inline_response2005_memberships import InlineResponse2005Me
 from zrok_api.models.inline_response2006 import InlineResponse2006
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.invite_body import InviteBody
-from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
 from zrok_api.models.login_body import LoginBody
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
@@ -69,6 +68,7 @@ from zrok_api.models.shares import Shares
 from zrok_api.models.spark_data import SparkData
 from zrok_api.models.spark_data_sample import SparkDataSample
 from zrok_api.models.sparklines_body import SparklinesBody
+from zrok_api.models.token_generate_body import TokenGenerateBody
 from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.models.update_share_request import UpdateShareRequest

@@ -742,7 +742,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteTokenGenerateRequest"
+              "properties": {
+                "tokens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
@@ -1952,17 +1959,6 @@ func init() {
         "$ref": "#/definitions/frontend"
       }
     },
-    "inviteTokenGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "metrics": {
       "type": "object",
       "properties": {
@@ -2978,7 +2974,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteTokenGenerateRequest"
+              "properties": {
+                "tokens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
@@ -4211,17 +4214,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/frontend"
-      }
-    },
-    "inviteTokenGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
       }
     },
     "metrics": {

@@ -437,7 +437,11 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/inviteTokenGenerateRequest"
+            properties:
+              tokens:
+                type: array
+                items:
+                  type: string
       responses:
         201:
           description: invitation tokens created
@@ -1224,14 +1228,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/frontend"
-
-  inviteTokenGenerateRequest:
-    type: object
-    properties:
-      tokens:
-        type: array
-        items:
-          type: string
 
   metrics:
     type: object
