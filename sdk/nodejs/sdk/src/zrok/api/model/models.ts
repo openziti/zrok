@@ -20,7 +20,6 @@ export * from './environmentAndResources';
 export * from './frontend';
 export * from './getSparklines200Response';
 export * from './getSparklinesRequest';
-export * from './grantsRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
 export * from './listMemberships200Response';
@@ -48,8 +47,7 @@ export * from './unaccessRequest';
 export * from './unshareRequest';
 export * from './updateFrontendRequest';
 export * from './updateShareRequest';
-export * from './verifyRequest';
-export * from './verifyResponse';
+export * from './verify200Response';
 
 import * as fs from 'fs';
 
@@ -84,7 +82,6 @@ import { EnvironmentAndResources } from './environmentAndResources';
 import { Frontend } from './frontend';
 import { GetSparklines200Response } from './getSparklines200Response';
 import { GetSparklinesRequest } from './getSparklinesRequest';
-import { GrantsRequest } from './grantsRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
 import { ListMemberships200Response } from './listMemberships200Response';
@@ -112,8 +109,7 @@ import { UnaccessRequest } from './unaccessRequest';
 import { UnshareRequest } from './unshareRequest';
 import { UpdateFrontendRequest } from './updateFrontendRequest';
 import { UpdateShareRequest } from './updateShareRequest';
-import { VerifyRequest } from './verifyRequest';
-import { VerifyResponse } from './verifyResponse';
+import { Verify200Response } from './verify200Response';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -156,7 +152,6 @@ let typeMap: {[index: string]: any} = {
     "Frontend": Frontend,
     "GetSparklines200Response": GetSparklines200Response,
     "GetSparklinesRequest": GetSparklinesRequest,
-    "GrantsRequest": GrantsRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
     "ListMemberships200Response": ListMemberships200Response,
@@ -184,8 +179,7 @@ let typeMap: {[index: string]: any} = {
     "UnshareRequest": UnshareRequest,
     "UpdateFrontendRequest": UpdateFrontendRequest,
     "UpdateShareRequest": UpdateShareRequest,
-    "VerifyRequest": VerifyRequest,
-    "VerifyResponse": VerifyResponse,
+    "Verify200Response": Verify200Response,
 }
 
 export class ObjectSerializer {

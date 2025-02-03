@@ -22,7 +22,6 @@ import type {
   CreateIdentityRequest,
   CreateOrganizationRequest,
   DeleteFrontendRequest,
-  GrantsRequest,
   InviteTokenGenerateRequest,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
@@ -31,6 +30,7 @@ import type {
   RegenerateToken200Response,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
+  Verify200Response,
 } from '../models/index';
 import {
     AddOrganizationMemberRequestFromJSON,
@@ -47,8 +47,6 @@ import {
     CreateOrganizationRequestToJSON,
     DeleteFrontendRequestFromJSON,
     DeleteFrontendRequestToJSON,
-    GrantsRequestFromJSON,
-    GrantsRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
     ListOrganizationMembers200ResponseFromJSON,
@@ -65,6 +63,8 @@ import {
     RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
     UpdateFrontendRequestToJSON,
+    Verify200ResponseFromJSON,
+    Verify200ResponseToJSON,
 } from '../models/index';
 
 export interface AddOrganizationMemberOperationRequest {
@@ -95,8 +95,8 @@ export interface DeleteOrganizationRequest {
     body?: RegenerateToken200Response;
 }
 
-export interface GrantsOperationRequest {
-    body?: GrantsRequest;
+export interface GrantsRequest {
+    body?: Verify200Response;
 }
 
 export interface InviteTokenGenerateOperationRequest {
@@ -336,7 +336,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async grantsRaw(requestParameters: GrantsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async grantsRaw(requestParameters: GrantsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -352,7 +352,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: GrantsRequestToJSON(requestParameters['body']),
+            body: Verify200ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -360,7 +360,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async grants(requestParameters: GrantsOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async grants(requestParameters: GrantsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.grantsRaw(requestParameters, initOverrides);
     }
 

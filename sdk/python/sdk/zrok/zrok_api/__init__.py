@@ -46,12 +46,13 @@ from zrok_api.models.grants_body import GrantsBody
 from zrok_api.models.identity_body import IdentityBody
 from zrok_api.models.inline_response200 import InlineResponse200
 from zrok_api.models.inline_response2001 import InlineResponse2001
-from zrok_api.models.inline_response2001_members import InlineResponse2001Members
 from zrok_api.models.inline_response2002 import InlineResponse2002
-from zrok_api.models.inline_response2002_organizations import InlineResponse2002Organizations
+from zrok_api.models.inline_response2002_members import InlineResponse2002Members
 from zrok_api.models.inline_response2003 import InlineResponse2003
-from zrok_api.models.inline_response2003_memberships import InlineResponse2003Memberships
+from zrok_api.models.inline_response2003_organizations import InlineResponse2003Organizations
 from zrok_api.models.inline_response2004 import InlineResponse2004
+from zrok_api.models.inline_response2004_memberships import InlineResponse2004Memberships
+from zrok_api.models.inline_response2005 import InlineResponse2005
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.invite_body import InviteBody
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
@@ -83,6 +84,5 @@ from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest
 from zrok_api.models.update_share_request import UpdateShareRequest
-from zrok_api.models.verify_request import VerifyRequest
-from zrok_api.models.verify_response import VerifyResponse
+from zrok_api.models.verify_body import VerifyBody
 from zrok_api.models.version import Version

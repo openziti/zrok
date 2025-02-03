@@ -28,40 +28,40 @@ class InlineResponse2002(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'organizations': 'list[InlineResponse2002Organizations]'
+        'members': 'list[InlineResponse2002Members]'
     }
 
     attribute_map = {
-        'organizations': 'organizations'
+        'members': 'members'
     }
 
-    def __init__(self, organizations=None):  # noqa: E501
+    def __init__(self, members=None):  # noqa: E501
         """InlineResponse2002 - a model defined in Swagger"""  # noqa: E501
-        self._organizations = None
+        self._members = None
         self.discriminator = None
-        if organizations is not None:
-            self.organizations = organizations
+        if members is not None:
+            self.members = members
 
     @property
-    def organizations(self):
-        """Gets the organizations of this InlineResponse2002.  # noqa: E501
+    def members(self):
+        """Gets the members of this InlineResponse2002.  # noqa: E501
 
 
-        :return: The organizations of this InlineResponse2002.  # noqa: E501
-        :rtype: list[InlineResponse2002Organizations]
+        :return: The members of this InlineResponse2002.  # noqa: E501
+        :rtype: list[InlineResponse2002Members]
         """
-        return self._organizations
+        return self._members
 
-    @organizations.setter
-    def organizations(self, organizations):
-        """Sets the organizations of this InlineResponse2002.
+    @members.setter
+    def members(self, members):
+        """Sets the members of this InlineResponse2002.
 
 
-        :param organizations: The organizations of this InlineResponse2002.  # noqa: E501
-        :type: list[InlineResponse2002Organizations]
+        :param members: The members of this InlineResponse2002.  # noqa: E501
+        :type: list[InlineResponse2002Members]
         """
 
-        self._organizations = organizations
+        self._members = members
 
     def to_dict(self):
         """Returns the model properties as a dict"""

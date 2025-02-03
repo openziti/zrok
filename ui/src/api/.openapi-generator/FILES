@@ -24,7 +24,6 @@ models/EnvironmentAndResources.ts
 models/Frontend.ts
 models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
-models/GrantsRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
 models/ListMemberships200Response.ts
@@ -53,7 +52,6 @@ models/UnaccessRequest.ts
 models/UnshareRequest.ts
 models/UpdateFrontendRequest.ts
 models/UpdateShareRequest.ts
-models/VerifyRequest.ts
-models/VerifyResponse.ts
+models/Verify200Response.ts
 models/index.ts
 runtime.ts

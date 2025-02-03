@@ -21,8 +21,7 @@ import type {
   RegenerateToken200Response,
   RegenerateTokenRequest,
   RegisterRequest,
-  VerifyRequest,
-  VerifyResponse,
+  Verify200Response,
 } from '../models/index';
 import {
     ChangePasswordRequestFromJSON,
@@ -37,10 +36,8 @@ import {
     RegenerateTokenRequestToJSON,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
-    VerifyRequestFromJSON,
-    VerifyRequestToJSON,
-    VerifyResponseFromJSON,
-    VerifyResponseToJSON,
+    Verify200ResponseFromJSON,
+    Verify200ResponseToJSON,
 } from '../models/index';
 
 export interface ChangePasswordOperationRequest {
@@ -71,8 +68,8 @@ export interface ResetPasswordRequestRequest {
     body?: RegenerateTokenRequest;
 }
 
-export interface VerifyOperationRequest {
-    body?: VerifyRequest;
+export interface VerifyRequest {
+    body?: RegenerateToken200Response;
 }
 
 /**
@@ -279,7 +276,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async verifyRaw(requestParameters: VerifyOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyResponse>> {
+    async verifyRaw(requestParameters: VerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Verify200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -291,15 +288,15 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: VerifyRequestToJSON(requestParameters['body']),
+            body: RegenerateToken200ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => Verify200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async verify(requestParameters: VerifyOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyResponse> {
+    async verify(requestParameters: VerifyRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Verify200Response> {
         const response = await this.verifyRaw(requestParameters, initOverrides);
         return await response.value();
     }

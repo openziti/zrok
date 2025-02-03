@@ -2,20 +2,18 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
 
-type verifyHandler struct {
-}
+type verifyHandler struct{}
 
 func newVerifyHandler() *verifyHandler {
 	return &verifyHandler{}
 }
 
-func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Responder {
-	if params.Body != nil {
+func (h *verifyHandler) Handle(params account.VerifyParams) middleware.Responder {
+	if params.Body.Token != "" {
 		logrus.Debugf("received verify request for token '%v'", params.Body.Token)
 		tx, err := str.Begin()
 		if err != nil {
@@ -30,7 +28,7 @@ func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Respon
 			return account.NewVerifyNotFound()
 		}
 
-		return account.NewVerifyOK().WithPayload(&rest_model_zrok.VerifyResponse{Email: ar.Email})
+		return account.NewVerifyOK().WithPayload(&account.VerifyOKBody{Email: ar.Email})
 	}
 	logrus.Error("empty verification request")
 	return account.NewVerifyInternalServerError()

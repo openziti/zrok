@@ -22,7 +22,6 @@ import { CreateIdentity201Response } from '../model/createIdentity201Response';
 import { CreateIdentityRequest } from '../model/createIdentityRequest';
 import { CreateOrganizationRequest } from '../model/createOrganizationRequest';
 import { DeleteFrontendRequest } from '../model/deleteFrontendRequest';
-import { GrantsRequest } from '../model/grantsRequest';
 import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest';
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { ListOrganizations200Response } from '../model/listOrganizations200Response';
@@ -31,6 +30,7 @@ import { PublicFrontend } from '../model/publicFrontend';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
+import { Verify200Response } from '../model/verify200Response';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
 import { HttpBasicAuth, HttpBearerAuth, ApiKeyAuth, OAuth } from '../model/models';
@@ -546,7 +546,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async grants (body?: GrantsRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async grants (body?: Verify200Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/grants';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -563,7 +563,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "GrantsRequest")
+            body: ObjectSerializer.serialize(body, "Verify200Response")
         };
 
         let authenticationPromise = Promise.resolve();

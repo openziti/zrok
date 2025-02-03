@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // VerifyOKCode is the HTTP code returned for type VerifyOK
@@ -26,7 +24,7 @@ type VerifyOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.VerifyResponse `json:"body,omitempty"`
+	Payload *VerifyOKBody `json:"body,omitempty"`
 }
 
 // NewVerifyOK creates VerifyOK with default headers values
@@ -36,13 +34,13 @@ func NewVerifyOK() *VerifyOK {
 }
 
 // WithPayload adds the payload to the verify o k response
-func (o *VerifyOK) WithPayload(payload *rest_model_zrok.VerifyResponse) *VerifyOK {
+func (o *VerifyOK) WithPayload(payload *VerifyOKBody) *VerifyOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the verify o k response
-func (o *VerifyOK) SetPayload(payload *rest_model_zrok.VerifyResponse) {
+func (o *VerifyOK) SetPayload(payload *VerifyOKBody) {
 	o.Payload = payload
 }
 

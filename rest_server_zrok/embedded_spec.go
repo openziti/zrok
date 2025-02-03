@@ -1677,7 +1677,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/verifyRequest"
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1685,7 +1689,11 @@ func init() {
           "200": {
             "description": "token ready",
             "schema": {
-              "$ref": "#/definitions/verifyResponse"
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -2267,22 +2275,6 @@ func init() {
           }
         },
         "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyResponse": {
-      "type": "object",
-      "properties": {
-        "email": {
           "type": "string"
         }
       }
@@ -3928,7 +3920,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/verifyRequest"
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3936,7 +3932,11 @@ func init() {
           "200": {
             "description": "token ready",
             "schema": {
-              "$ref": "#/definitions/verifyResponse"
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -4551,22 +4551,6 @@ func init() {
           }
         },
         "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyResponse": {
-      "type": "object",
-      "properties": {
-        "email": {
           "type": "string"
         }
       }
