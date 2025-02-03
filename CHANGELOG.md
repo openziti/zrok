@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.48
+
+FIX: the Python SDK erroneously assumed the enabled zrok environment contained a config.json file, and was changed to only load it if the file was present (https://github.com/openziti/zrok/pull/853/).
+
 ## v0.4.47
 
 CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)

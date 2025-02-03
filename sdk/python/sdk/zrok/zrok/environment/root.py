@@ -136,12 +136,15 @@ def __loadMetadata() -> Metadata:
 
 def __loadConfig() -> Config:
     cf = configFile()
-    with open(cf) as f:
-        data = json.load(f)
-        return Config(
-            ApiEndpoint=data["api_endpoint"],
-            DefaultFrontend=data["default_frontend"]
-        )
+    try:
+        with open(cf) as f:
+            data = json.load(f)
+            return Config(
+                ApiEndpoint=data.get("api_endpoint", ""),
+                DefaultFrontend=data.get("default_frontend", "")
+            )
+    except (FileNotFoundError, json.JSONDecodeError):
+        return Config(ApiEndpoint="", DefaultFrontend="")
 
 
 def isEnabled() -> bool:
