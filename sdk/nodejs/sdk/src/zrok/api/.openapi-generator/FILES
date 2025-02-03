@@ -46,7 +46,6 @@ model/publicFrontend.ts
 model/regenerateToken200Response.ts
 model/regenerateTokenRequest.ts
 model/registerRequest.ts
-model/registerResponse.ts
 model/removeOrganizationMemberRequest.ts
 model/resetPasswordRequest.ts
 model/share.ts

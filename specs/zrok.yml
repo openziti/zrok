@@ -130,12 +130,18 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/registerRequest"
+            properties:
+              token:
+                type: string
+              password:
+                type: string
       responses:
         200:
           description: account created
           schema:
-            $ref: "#/definitions/registerResponse"
+            properties:
+              token:
+                type: string
         404:
           description: request not found
         422:
@@ -1288,20 +1294,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/publicFrontend"
-
-  registerRequest:
-    type: object
-    properties:
-      token:
-        type: string
-      password:
-        type: string
-
-  registerResponse:
-    type: object
-    properties:
-      token:
-        type: string
 
   resetPasswordRequest:
     type: object

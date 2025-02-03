@@ -19,7 +19,7 @@ func newRegisterHandler(cfg *config.Config) *registerHandler {
 	}
 }
 func (h *registerHandler) Handle(params account.RegisterParams) middleware.Responder {
-	if params.Body == nil || params.Body.Token == "" || params.Body.Password == "" {
+	if params.Body.Token == "" || params.Body.Password == "" {
 		logrus.Error("missing token or password")
 		return account.NewRegisterNotFound()
 	}
@@ -77,5 +77,5 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 
 	logrus.Infof("created account '%v'", a.Email)
 
-	return account.NewRegisterOK().WithPayload(&rest_model_zrok.RegisterResponse{Token: a.Token})
+	return account.NewRegisterOK().WithPayload(&account.RegisterOKBody{Token: a.Token})
 }

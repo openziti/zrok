@@ -1337,7 +1337,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/registerRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1345,7 +1352,11 @@ func init() {
           "200": {
             "description": "account created",
             "schema": {
-              "$ref": "#/definitions/registerResponse"
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -2027,25 +2038,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "registerRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "registerResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
       }
     },
     "resetPasswordRequest": {
@@ -3600,7 +3592,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/registerRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3608,7 +3607,11 @@ func init() {
           "200": {
             "description": "account created",
             "schema": {
-              "$ref": "#/definitions/registerResponse"
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -4323,25 +4326,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "registerRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "registerResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
       }
     },
     "resetPasswordRequest": {

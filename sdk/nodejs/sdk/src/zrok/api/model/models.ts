@@ -39,7 +39,6 @@ export * from './publicFrontend';
 export * from './regenerateToken200Response';
 export * from './regenerateTokenRequest';
 export * from './registerRequest';
-export * from './registerResponse';
 export * from './removeOrganizationMemberRequest';
 export * from './resetPasswordRequest';
 export * from './share';
@@ -105,7 +104,6 @@ import { PublicFrontend } from './publicFrontend';
 import { RegenerateToken200Response } from './regenerateToken200Response';
 import { RegenerateTokenRequest } from './regenerateTokenRequest';
 import { RegisterRequest } from './registerRequest';
-import { RegisterResponse } from './registerResponse';
 import { RemoveOrganizationMemberRequest } from './removeOrganizationMemberRequest';
 import { ResetPasswordRequest } from './resetPasswordRequest';
 import { Share } from './share';
@@ -179,7 +177,6 @@ let typeMap: {[index: string]: any} = {
     "RegenerateToken200Response": RegenerateToken200Response,
     "RegenerateTokenRequest": RegenerateTokenRequest,
     "RegisterRequest": RegisterRequest,
-    "RegisterResponse": RegisterResponse,
     "RemoveOrganizationMemberRequest": RemoveOrganizationMemberRequest,
     "ResetPasswordRequest": ResetPasswordRequest,
     "Share": Share,

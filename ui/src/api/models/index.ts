@@ -39,7 +39,6 @@ export * from './PublicFrontend';
 export * from './RegenerateToken200Response';
 export * from './RegenerateTokenRequest';
 export * from './RegisterRequest';
-export * from './RegisterResponse';
 export * from './RemoveOrganizationMemberRequest';
 export * from './ResetPasswordRequest';
 export * from './Share';

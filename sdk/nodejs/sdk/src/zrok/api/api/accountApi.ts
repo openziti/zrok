@@ -21,7 +21,6 @@ import { LoginRequest } from '../model/loginRequest';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
 import { RegenerateTokenRequest } from '../model/regenerateTokenRequest';
 import { RegisterRequest } from '../model/registerRequest';
-import { RegisterResponse } from '../model/registerResponse';
 import { ResetPasswordRequest } from '../model/resetPasswordRequest';
 import { VerifyRequest } from '../model/verifyRequest';
 import { VerifyResponse } from '../model/verifyResponse';
@@ -358,7 +357,7 @@ export class AccountApi {
      * 
      * @param body 
      */
-    public async register (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegisterResponse;  }> {
+    public async register (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }> {
         const localVarPath = this.basePath + '/register';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -401,13 +400,13 @@ export class AccountApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: RegisterResponse;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "RegisterResponse");
+                            body = ObjectSerializer.deserialize(body, "RegenerateToken200Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
