@@ -134,7 +134,7 @@ class AccountApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param InviteRequest body:
+        :param InviteBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -155,7 +155,7 @@ class AccountApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param InviteRequest body:
+        :param InviteBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

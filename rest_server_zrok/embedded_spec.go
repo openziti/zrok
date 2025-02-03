@@ -634,7 +634,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1887,17 +1894,6 @@ func init() {
         "$ref": "#/definitions/frontend"
       }
     },
-    "inviteRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "inviteTokenGenerateRequest": {
       "type": "object",
       "properties": {
@@ -2939,7 +2935,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4192,17 +4195,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/frontend"
-      }
-    },
-    "inviteRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
       }
     },
     "inviteTokenGenerateRequest": {

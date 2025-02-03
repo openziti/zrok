@@ -24,7 +24,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Warnf("not accepting invites; attempt from '%v'", params.Body.Email)
 		return account.NewInviteBadRequest()
 	}
-	if params.Body == nil || params.Body.Email == "" {
+	if params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return account.NewInviteBadRequest()
 	}

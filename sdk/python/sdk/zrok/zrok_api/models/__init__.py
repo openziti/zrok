@@ -43,7 +43,7 @@ from zrok_api.models.inline_response2003 import InlineResponse2003
 from zrok_api.models.inline_response2003_memberships import InlineResponse2003Memberships
 from zrok_api.models.inline_response2004 import InlineResponse2004
 from zrok_api.models.inline_response201 import InlineResponse201
-from zrok_api.models.invite_request import InviteRequest
+from zrok_api.models.invite_body import InviteBody
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
 from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.login_response import LoginResponse

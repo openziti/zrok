@@ -56,7 +56,11 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/inviteRequest"
+            properties:
+              email:
+                type: string
+              token:
+                type: string
       responses:
         201:
           description: invitation created
@@ -1197,14 +1201,6 @@ definitions:
         type: array
         items:
           type: string
-
-  inviteRequest:
-    type: object
-    properties:
-      email:
-        type: string
-      token:
-        type: string
 
   loginRequest:
     type: object
