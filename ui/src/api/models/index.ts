@@ -40,7 +40,6 @@ export * from './RegenerateToken200Response';
 export * from './RegenerateTokenRequest';
 export * from './RegisterRequest';
 export * from './RemoveOrganizationMemberRequest';
-export * from './ResetPasswordRequest';
 export * from './Share';
 export * from './ShareRequest';
 export * from './ShareResponse';

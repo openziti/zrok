@@ -19,7 +19,7 @@ func newResetPasswordHandler(cfg *config.Config) *resetPasswordHandler {
 }
 
 func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) middleware.Responder {
-	if params.Body == nil || params.Body.Token == "" || params.Body.Password == "" {
+	if params.Body.Token == "" || params.Body.Password == "" {
 		logrus.Error("missing token or password")
 		return account.NewResetPasswordNotFound()
 	}

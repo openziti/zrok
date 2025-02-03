@@ -45,7 +45,6 @@ models/RegenerateToken200Response.ts
 models/RegenerateTokenRequest.ts
 models/RegisterRequest.ts
 models/RemoveOrganizationMemberRequest.ts
-models/ResetPasswordRequest.ts
 models/Share.ts
 models/ShareRequest.ts
 models/ShareResponse.ts

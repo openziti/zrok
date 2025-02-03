@@ -21,7 +21,6 @@ import type {
   RegenerateToken200Response,
   RegenerateTokenRequest,
   RegisterRequest,
-  ResetPasswordRequest,
   VerifyRequest,
   VerifyResponse,
 } from '../models/index';
@@ -38,8 +37,6 @@ import {
     RegenerateTokenRequestToJSON,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
-    ResetPasswordRequestFromJSON,
-    ResetPasswordRequestToJSON,
     VerifyRequestFromJSON,
     VerifyRequestToJSON,
     VerifyResponseFromJSON,
@@ -66,8 +63,8 @@ export interface RegisterOperationRequest {
     body?: RegisterRequest;
 }
 
-export interface ResetPasswordOperationRequest {
-    body?: ResetPasswordRequest;
+export interface ResetPasswordRequest {
+    body?: RegisterRequest;
 }
 
 export interface ResetPasswordRequestRequest {
@@ -230,7 +227,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async resetPasswordRaw(requestParameters: ResetPasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async resetPasswordRaw(requestParameters: ResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -242,7 +239,7 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ResetPasswordRequestToJSON(requestParameters['body']),
+            body: RegisterRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -250,7 +247,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async resetPassword(requestParameters: ResetPasswordOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async resetPassword(requestParameters: ResetPasswordRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resetPasswordRaw(requestParameters, initOverrides);
     }
 

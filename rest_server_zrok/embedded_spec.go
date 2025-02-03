@@ -1385,7 +1385,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/resetPasswordRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2038,17 +2045,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "resetPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
       }
     },
     "share": {
@@ -3640,7 +3636,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/resetPasswordRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4326,17 +4329,6 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "resetPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
       }
     },
     "share": {

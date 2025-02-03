@@ -160,7 +160,11 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/resetPasswordRequest"
+            properties:
+              token:
+                type: string
+              password:
+                type: string
       responses:
         200:
           description: password reset
@@ -1294,14 +1298,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/publicFrontend"
-
-  resetPasswordRequest:
-    type: object
-    properties:
-      token:
-        type: string
-      password:
-        type: string
 
   share:
     type: object

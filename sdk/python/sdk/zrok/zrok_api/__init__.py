@@ -70,7 +70,7 @@ from zrok_api.models.public_frontend import PublicFrontend
 from zrok_api.models.public_frontend_list import PublicFrontendList
 from zrok_api.models.regenerate_token_body import RegenerateTokenBody
 from zrok_api.models.register_body import RegisterBody
-from zrok_api.models.reset_password_request import ResetPasswordRequest
+from zrok_api.models.reset_password_body import ResetPasswordBody
 from zrok_api.models.reset_password_request_body import ResetPasswordRequestBody
 from zrok_api.models.share import Share
 from zrok_api.models.share_request import ShareRequest

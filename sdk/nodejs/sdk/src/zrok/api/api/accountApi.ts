@@ -21,7 +21,6 @@ import { LoginRequest } from '../model/loginRequest';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
 import { RegenerateTokenRequest } from '../model/regenerateTokenRequest';
 import { RegisterRequest } from '../model/registerRequest';
-import { ResetPasswordRequest } from '../model/resetPasswordRequest';
 import { VerifyRequest } from '../model/verifyRequest';
 import { VerifyResponse } from '../model/verifyResponse';
 
@@ -420,7 +419,7 @@ export class AccountApi {
      * 
      * @param body 
      */
-    public async resetPassword (body?: ResetPasswordRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async resetPassword (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/resetPassword';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -444,7 +443,7 @@ export class AccountApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "ResetPasswordRequest")
+            body: ObjectSerializer.serialize(body, "RegisterRequest")
         };
 
         let authenticationPromise = Promise.resolve();
