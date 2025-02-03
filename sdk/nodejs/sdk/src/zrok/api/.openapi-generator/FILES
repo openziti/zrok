@@ -12,7 +12,6 @@ model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts
 model/configuration.ts
-model/createAccountRequest.ts
 model/createFrontendRequest.ts
 model/createFrontendResponse.ts
 model/createIdentity201Response.ts

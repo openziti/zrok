@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/AccountApi.ts
 apis/AdminApi.ts
 apis/EnvironmentApi.ts
@@ -11,7 +10,6 @@ models/AccessResponse.ts
 models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
-models/CreateAccountRequest.ts
 models/CreateFrontendRequest.ts
 models/CreateFrontendResponse.ts
 models/CreateIdentity201Response.ts

@@ -6,7 +6,6 @@ export * from './addOrganizationMemberRequest';
 export * from './authUser';
 export * from './changePasswordRequest';
 export * from './configuration';
-export * from './createAccountRequest';
 export * from './createFrontendRequest';
 export * from './createFrontendResponse';
 export * from './createIdentity201Response';
@@ -73,7 +72,6 @@ import { AddOrganizationMemberRequest } from './addOrganizationMemberRequest';
 import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
 import { Configuration } from './configuration';
-import { CreateAccountRequest } from './createAccountRequest';
 import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateFrontendResponse } from './createFrontendResponse';
 import { CreateIdentity201Response } from './createIdentity201Response';
@@ -148,7 +146,6 @@ let typeMap: {[index: string]: any} = {
     "AuthUser": AuthUser,
     "ChangePasswordRequest": ChangePasswordRequest,
     "Configuration": Configuration,
-    "CreateAccountRequest": CreateAccountRequest,
     "CreateFrontendRequest": CreateFrontendRequest,
     "CreateFrontendResponse": CreateFrontendResponse,
     "CreateIdentity201Response": CreateIdentity201Response,

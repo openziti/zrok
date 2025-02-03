@@ -16,7 +16,6 @@ import http from 'http';
 
 /* tslint:disable:no-unused-locals */
 import { AddOrganizationMemberRequest } from '../model/addOrganizationMemberRequest';
-import { CreateAccountRequest } from '../model/createAccountRequest';
 import { CreateFrontendRequest } from '../model/createFrontendRequest';
 import { CreateFrontendResponse } from '../model/createFrontendResponse';
 import { CreateIdentity201Response } from '../model/createIdentity201Response';
@@ -27,6 +26,7 @@ import { GrantsRequest } from '../model/grantsRequest';
 import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest';
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { ListOrganizations200Response } from '../model/listOrganizations200Response';
+import { LoginRequest } from '../model/loginRequest';
 import { PublicFrontend } from '../model/publicFrontend';
 import { RegenerateToken200Response } from '../model/regenerateToken200Response';
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
@@ -166,7 +166,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createAccount (body?: CreateAccountRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }> {
+    public async createAccount (body?: LoginRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateToken200Response;  }> {
         const localVarPath = this.basePath + '/account';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -190,7 +190,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "CreateAccountRequest")
+            body: ObjectSerializer.serialize(body, "LoginRequest")
         };
 
         let authenticationPromise = Promise.resolve();

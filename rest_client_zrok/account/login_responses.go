@@ -6,13 +6,13 @@ package account
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/go-openapi/swag"
 )
 
 // LoginReader is a Reader for the Login structure.
@@ -51,7 +51,7 @@ LoginOK describes a response with status code 200, with default header values.
 login successful
 */
 type LoginOK struct {
-	Payload rest_model_zrok.LoginResponse
+	Payload string
 }
 
 // IsSuccess returns true when this login o k response has a 2xx status code
@@ -92,7 +92,7 @@ func (o *LoginOK) String() string {
 	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
 }
 
-func (o *LoginOK) GetPayload() rest_model_zrok.LoginResponse {
+func (o *LoginOK) GetPayload() string {
 	return o.Payload
 }
 
@@ -159,5 +159,46 @@ func (o *LoginUnauthorized) String() string {
 
 func (o *LoginUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+LoginBody login body
+swagger:model LoginBody
+*/
+type LoginBody struct {
+
+	// email
+	Email string `json:"email,omitempty"`
+
+	// password
+	Password string `json:"password,omitempty"`
+}
+
+// Validate validates this login body
+func (o *LoginBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this login body based on context it is used
+func (o *LoginBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *LoginBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *LoginBody) UnmarshalBinary(b []byte) error {
+	var res LoginBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

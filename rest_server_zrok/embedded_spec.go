@@ -711,7 +711,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/loginRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -719,7 +726,7 @@ func init() {
           "200": {
             "description": "login successful",
             "schema": {
-              "$ref": "#/definitions/loginResponse"
+              "type": "string"
             }
           },
           "401": {
@@ -1905,20 +1912,6 @@ func init() {
         }
       }
     },
-    "loginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "loginResponse": {
-      "type": "string"
-    },
     "metrics": {
       "type": "object",
       "properties": {
@@ -3012,7 +3005,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/loginRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3020,7 +3020,7 @@ func init() {
           "200": {
             "description": "login successful",
             "schema": {
-              "$ref": "#/definitions/loginResponse"
+              "type": "string"
             }
           },
           "401": {
@@ -4207,20 +4207,6 @@ func init() {
           }
         }
       }
-    },
-    "loginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "loginResponse": {
-      "type": "string"
     },
     "metrics": {
       "type": "object",

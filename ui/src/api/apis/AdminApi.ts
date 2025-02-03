@@ -16,7 +16,6 @@
 import * as runtime from '../runtime';
 import type {
   AddOrganizationMemberRequest,
-  CreateAccountRequest,
   CreateFrontendRequest,
   CreateFrontendResponse,
   CreateIdentity201Response,
@@ -27,6 +26,7 @@ import type {
   InviteTokenGenerateRequest,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
+  LoginRequest,
   PublicFrontend,
   RegenerateToken200Response,
   RemoveOrganizationMemberRequest,
@@ -35,8 +35,6 @@ import type {
 import {
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
-    CreateAccountRequestFromJSON,
-    CreateAccountRequestToJSON,
     CreateFrontendRequestFromJSON,
     CreateFrontendRequestToJSON,
     CreateFrontendResponseFromJSON,
@@ -57,6 +55,8 @@ import {
     ListOrganizationMembers200ResponseToJSON,
     ListOrganizations200ResponseFromJSON,
     ListOrganizations200ResponseToJSON,
+    LoginRequestFromJSON,
+    LoginRequestToJSON,
     PublicFrontendFromJSON,
     PublicFrontendToJSON,
     RegenerateToken200ResponseFromJSON,
@@ -71,8 +71,8 @@ export interface AddOrganizationMemberOperationRequest {
     body?: AddOrganizationMemberRequest;
 }
 
-export interface CreateAccountOperationRequest {
-    body?: CreateAccountRequest;
+export interface CreateAccountRequest {
+    body?: LoginRequest;
 }
 
 export interface CreateFrontendOperationRequest {
@@ -152,7 +152,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createAccountRaw(requestParameters: CreateAccountOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
+    async createAccountRaw(requestParameters: CreateAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -168,7 +168,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateAccountRequestToJSON(requestParameters['body']),
+            body: LoginRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateToken200ResponseFromJSON(jsonValue));
@@ -176,7 +176,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createAccount(requestParameters: CreateAccountOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
+    async createAccount(requestParameters: CreateAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
         const response = await this.createAccountRaw(requestParameters, initOverrides);
         return await response.value();
     }

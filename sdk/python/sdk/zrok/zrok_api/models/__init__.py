@@ -45,8 +45,7 @@ from zrok_api.models.inline_response2004 import InlineResponse2004
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.invite_body import InviteBody
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
-from zrok_api.models.login_request import LoginRequest
-from zrok_api.models.login_response import LoginResponse
+from zrok_api.models.login_body import LoginBody
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
 from zrok_api.models.organization_add_body import OrganizationAddBody
