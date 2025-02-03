@@ -51,7 +51,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -59,7 +66,14 @@ func init() {
           "201": {
             "description": "access created",
             "schema": {
-              "$ref": "#/definitions/accessResponse"
+              "properties": {
+                "backendMode": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -1810,28 +1824,6 @@ func init() {
     }
   },
   "definitions": {
-    "accessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "accessResponse": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        }
-      }
-    },
     "authUser": {
       "type": "object",
       "properties": {
@@ -2291,7 +2283,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2299,7 +2298,14 @@ func init() {
           "201": {
             "description": "access created",
             "schema": {
-              "$ref": "#/definitions/accessResponse"
+              "properties": {
+                "backendMode": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -4051,28 +4057,6 @@ func init() {
           "type": "string"
         },
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "accessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "accessResponse": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "frontendToken": {
           "type": "string"
         }
       }

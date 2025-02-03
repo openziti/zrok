@@ -6,8 +6,8 @@ api/apis.ts
 api/environmentApi.ts
 api/metadataApi.ts
 api/shareApi.ts
+model/access201Response.ts
 model/accessRequest.ts
-model/accessResponse.ts
 model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts

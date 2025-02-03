@@ -1,7 +1,7 @@
 import localVarRequest from 'request';
 
+export * from './access201Response';
 export * from './accessRequest';
-export * from './accessResponse';
 export * from './addOrganizationMemberRequest';
 export * from './authUser';
 export * from './changePasswordRequest';
@@ -60,8 +60,8 @@ export interface RequestDetailedFile {
 export type RequestFile = string | Buffer | fs.ReadStream | RequestDetailedFile;
 
 
+import { Access201Response } from './access201Response';
 import { AccessRequest } from './accessRequest';
-import { AccessResponse } from './accessResponse';
 import { AddOrganizationMemberRequest } from './addOrganizationMemberRequest';
 import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
@@ -128,8 +128,8 @@ let enumsMap: {[index: string]: any} = {
 }
 
 let typeMap: {[index: string]: any} = {
+    "Access201Response": Access201Response,
     "AccessRequest": AccessRequest,
-    "AccessResponse": AccessResponse,
     "AddOrganizationMemberRequest": AddOrganizationMemberRequest,
     "AuthUser": AuthUser,
     "ChangePasswordRequest": ChangePasswordRequest,

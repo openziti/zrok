@@ -15,8 +15,8 @@ import localVarRequest from 'request';
 import http from 'http';
 
 /* tslint:disable:no-unused-locals */
+import { Access201Response } from '../model/access201Response';
 import { AccessRequest } from '../model/accessRequest';
-import { AccessResponse } from '../model/accessResponse';
 import { ShareRequest } from '../model/shareRequest';
 import { ShareResponse } from '../model/shareResponse';
 import { UnaccessRequest } from '../model/unaccessRequest';
@@ -99,7 +99,7 @@ export class ShareApi {
      * 
      * @param body 
      */
-    public async access (body?: AccessRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: AccessResponse;  }> {
+    public async access (body?: AccessRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Access201Response;  }> {
         const localVarPath = this.basePath + '/access';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -145,13 +145,13 @@ export class ShareApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: AccessResponse;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: Access201Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "AccessResponse");
+                            body = ObjectSerializer.deserialize(body, "Access201Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));

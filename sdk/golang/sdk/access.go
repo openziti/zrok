@@ -14,10 +14,8 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	}
 
 	out := share.NewAccessParams()
-	out.Body = &rest_model_zrok.AccessRequest{
-		ShrToken: request.ShareToken,
-		EnvZID:   root.Environment().ZitiIdentity,
-	}
+	out.Body.ShrToken = request.ShareToken
+	out.Body.EnvZID = root.Environment().ZitiIdentity
 
 	zrok, err := root.Client()
 	if err != nil {

@@ -24,8 +24,7 @@ from zrok_api.api.share_api import ShareApi
 from zrok_api.api_client import ApiClient
 from zrok_api.configuration import Configuration
 # import models into sdk package
-from zrok_api.models.access_request import AccessRequest
-from zrok_api.models.access_response import AccessResponse
+from zrok_api.models.access_body import AccessBody
 from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody
@@ -54,6 +53,7 @@ from zrok_api.models.inline_response2005 import InlineResponse2005
 from zrok_api.models.inline_response2005_memberships import InlineResponse2005Memberships
 from zrok_api.models.inline_response2006 import InlineResponse2006
 from zrok_api.models.inline_response201 import InlineResponse201
+from zrok_api.models.inline_response2011 import InlineResponse2011
 from zrok_api.models.invite_body import InviteBody
 from zrok_api.models.login_body import LoginBody
 from zrok_api.models.metrics import Metrics

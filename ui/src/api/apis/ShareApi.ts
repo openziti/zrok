@@ -15,8 +15,8 @@
 
 import * as runtime from '../runtime';
 import type {
+  Access201Response,
   AccessRequest,
-  AccessResponse,
   ShareRequest,
   ShareResponse,
   UnaccessRequest,
@@ -24,10 +24,10 @@ import type {
   UpdateShareRequest,
 } from '../models/index';
 import {
+    Access201ResponseFromJSON,
+    Access201ResponseToJSON,
     AccessRequestFromJSON,
     AccessRequestToJSON,
-    AccessResponseFromJSON,
-    AccessResponseToJSON,
     ShareRequestFromJSON,
     ShareRequestToJSON,
     ShareResponseFromJSON,
@@ -67,7 +67,7 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async accessRaw(requestParameters: AccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccessResponse>> {
+    async accessRaw(requestParameters: AccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Access201Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -86,12 +86,12 @@ export class ShareApi extends runtime.BaseAPI {
             body: AccessRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccessResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => Access201ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async access(requestParameters: AccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccessResponse> {
+    async access(requestParameters: AccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Access201Response> {
         const response = await this.accessRaw(requestParameters, initOverrides);
         return await response.value();
     }

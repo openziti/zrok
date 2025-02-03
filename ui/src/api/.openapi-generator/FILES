@@ -5,8 +5,8 @@ apis/MetadataApi.ts
 apis/ShareApi.ts
 apis/index.ts
 index.ts
+models/Access201Response.ts
 models/AccessRequest.ts
-models/AccessResponse.ts
 models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts

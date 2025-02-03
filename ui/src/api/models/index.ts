@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './Access201Response';
 export * from './AccessRequest';
-export * from './AccessResponse';
 export * from './AddOrganizationMemberRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';

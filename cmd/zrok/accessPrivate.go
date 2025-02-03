@@ -119,10 +119,9 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := share.NewAccessParams()
-	req.Body = &rest_model_zrok.AccessRequest{
-		ShrToken: shrToken,
-		EnvZID:   root.Environment().ZitiIdentity,
-	}
+	req.Body.ShrToken = shrToken
+	req.Body.EnvZID = root.Environment().ZitiIdentity
+	
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
 		cmd.error(err)

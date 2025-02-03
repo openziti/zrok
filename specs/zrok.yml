@@ -1006,12 +1006,20 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/accessRequest"
+            properties:
+              envZId:
+                type: string
+              shrToken:
+                type: string
       responses:
         201:
           description: access created
           schema:
-            $ref: "#/definitions/accessResponse"
+            properties:
+              frontendToken:
+                type: string
+              backendMode:
+                type: string
         401:
           description: unauthorized
         404:
@@ -1118,21 +1126,6 @@ paths:
             $ref: "#/definitions/errorMessage"
 
 definitions:
-  accessRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      shrToken:
-        type: string
-
-  accessResponse:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      backendMode:
-        type: string
 
   authUser:
     type: object
