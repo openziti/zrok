@@ -4,6 +4,8 @@
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
 
+FEATURE: Completely redesigned web interface ("API Console"). New implementation provides a dual-mode interface supporting an improved visual network navigator and also a "tabular" view, which provides a more traditional "data" view. New stack built using vite, React, and TypeScript (https://github.com/openziti/zrok/issues/724)
+
 FEATURE: New "zrok Agent", a background manager process for your zrok environments, which allows you to easily manage and work with multiple `zrok share` and `zrok access` processes. New `--subordinate` flag added to `zrok share [public|private|reserved]` and `zrok access private` to operate in a mode that allows an Agent to manage shares and accesses (https://github.com/openziti/zrok/issues/463)
 
 FEATURE: New "zrok Agent UI" a web-based user interface for the zrok Agent, which allows creating and releasing shares and accesses through a web browser. This is just an initial chunk of the new Agent UI, and is considered a "minimum viable" version of this interface (https://github.com/openziti/zrok/issues/221)
@@ -11,6 +13,8 @@ FEATURE: New "zrok Agent UI" a web-based user interface for the zrok Agent, whic
 FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
 
 FEATURE `zrok access private` supports a new `--auto` mode, which can automatically find an available open address/port to bind the frontend listener on. Also includes `--auto-address`, `--auto-start-port`, and `--auto-end-port` features with sensible defaults. Supported by both the agent and local operating modes (https://github.com/openziti/zrok/issues/780)
+
+CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
 
 ## v0.4.47
 
