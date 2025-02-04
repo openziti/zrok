@@ -64,6 +64,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
         backendProxyEndpoint: "Target",
         createdAt: "Created",
         reserved: "Reservation",
+        token: "Share Token",
         updatedAt: "Updated"
     }
 
