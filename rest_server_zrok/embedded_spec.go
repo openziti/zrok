@@ -1727,7 +1727,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unaccessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1763,7 +1773,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unshareRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2202,34 +2222,6 @@ func init() {
         },
         "tx": {
           "type": "number"
-        }
-      }
-    },
-    "unaccessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "unshareRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "reserved": {
-          "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
         }
       }
     },
@@ -3904,7 +3896,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unaccessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3940,7 +3942,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unshareRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4435,34 +4447,6 @@ func init() {
         },
         "tx": {
           "type": "number"
-        }
-      }
-    },
-    "unaccessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "unshareRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "reserved": {
-          "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
         }
       }
     },

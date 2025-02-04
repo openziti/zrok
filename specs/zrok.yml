@@ -1102,7 +1102,13 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/unaccessRequest"
+            properties:
+              frontendToken:
+                type: string
+              envZId:
+                type: string
+              shrToken:
+                type: string
       responses:
         200:
           description: access removed
@@ -1124,7 +1130,13 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/unshareRequest"
+            properties:
+              envZId:
+                type: string
+              shrToken:
+                type: string
+              reserved:
+                type: boolean
       responses:
         200:
           description: share removed
@@ -1138,7 +1150,6 @@ paths:
             $ref: "#/definitions/errorMessage"
 
 definitions:
-
   authUser:
     type: object
     properties:
@@ -1383,26 +1394,6 @@ definitions:
         type: number
       tx:
         type: number
-
-  unaccessRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      envZId:
-        type: string
-      shrToken:
-        type: string
-
-  unshareRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      shrToken:
-        type: string
-      reserved:
-        type: boolean
 
   version:
     type: string

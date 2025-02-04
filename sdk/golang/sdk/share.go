@@ -97,10 +97,8 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 
 func DeleteShare(root env_core.Root, shr *Share) error {
 	req := share.NewUnshareParams()
-	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   root.Environment().ZitiIdentity,
-		ShrToken: shr.Token,
-	}
+	req.Body.EnvZID = root.Environment().ZitiIdentity
+	req.Body.ShrToken = shr.Token
 
 	zrok, err := root.Client()
 	if err != nil {

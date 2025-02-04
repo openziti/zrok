@@ -20,7 +20,6 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
@@ -121,7 +120,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	req := share.NewAccessParams()
 	req.Body.ShrToken = shrToken
 	req.Body.EnvZID = root.Environment().ZitiIdentity
-	
+
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
 		cmd.error(err)
@@ -321,11 +320,9 @@ func (cmd *accessPrivateCommand) error(err error) {
 func (cmd *accessPrivateCommand) shutdown(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
-	req.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendToken: frontendName,
-		ShrToken:      shrToken,
-		EnvZID:        envZId,
-	}
+	req.Body.FrontendToken = frontendName
+	req.Body.ShrToken = shrToken
+	req.Body.EnvZID = envZId
 	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
 	} else {

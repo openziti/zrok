@@ -69,7 +69,7 @@ from zrok_api.models.spark_data import SparkData
 from zrok_api.models.spark_data_sample import SparkDataSample
 from zrok_api.models.sparklines_body import SparklinesBody
 from zrok_api.models.token_generate_body import TokenGenerateBody
-from zrok_api.models.unaccess_request import UnaccessRequest
-from zrok_api.models.unshare_request import UnshareRequest
+from zrok_api.models.unaccess_body import UnaccessBody
+from zrok_api.models.unshare_body import UnshareBody
 from zrok_api.models.verify_body import VerifyBody
 from zrok_api.models.version import Version
