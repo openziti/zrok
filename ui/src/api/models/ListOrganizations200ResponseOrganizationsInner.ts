@@ -24,7 +24,7 @@ export interface ListOrganizations200ResponseOrganizationsInner {
      * @type {string}
      * @memberof ListOrganizations200ResponseOrganizationsInner
      */
-    token?: string;
+    organizationToken?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +50,7 @@ export function ListOrganizations200ResponseOrganizationsInnerFromJSONTyped(json
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'organizationToken': json['organizationToken'] == null ? undefined : json['organizationToken'],
         'description': json['description'] == null ? undefined : json['description'],
     };
 }
@@ -61,7 +61,7 @@ export function ListOrganizations200ResponseOrganizationsInnerToJSON(value?: Lis
     }
     return {
         
-        'token': value['token'],
+        'organizationToken': value['organizationToken'],
         'description': value['description'],
     };
 }

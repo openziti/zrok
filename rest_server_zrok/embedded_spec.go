@@ -1075,7 +1075,7 @@ func init() {
             "description": "organization created",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1105,7 +1105,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1151,7 +1151,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1251,7 +1251,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1297,7 +1297,7 @@ func init() {
                       "description": {
                         "type": "string"
                       },
-                      "token": {
+                      "organizationToken": {
                         "type": "string"
                       }
                     }
@@ -3235,7 +3235,7 @@ func init() {
             "description": "organization created",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3265,7 +3265,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3311,7 +3311,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3404,7 +3404,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -4060,7 +4060,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "token": {
+        "organizationToken": {
           "type": "string"
         }
       }

@@ -28,66 +28,40 @@ class InlineResponse2012(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'frontend_token': 'str',
-        'backend_mode': 'str'
+        'organization_token': 'str'
     }
 
     attribute_map = {
-        'frontend_token': 'frontendToken',
-        'backend_mode': 'backendMode'
+        'organization_token': 'organizationToken'
     }
 
-    def __init__(self, frontend_token=None, backend_mode=None):  # noqa: E501
+    def __init__(self, organization_token=None):  # noqa: E501
         """InlineResponse2012 - a model defined in Swagger"""  # noqa: E501
-        self._frontend_token = None
-        self._backend_mode = None
+        self._organization_token = None
         self.discriminator = None
-        if frontend_token is not None:
-            self.frontend_token = frontend_token
-        if backend_mode is not None:
-            self.backend_mode = backend_mode
+        if organization_token is not None:
+            self.organization_token = organization_token
 
     @property
-    def frontend_token(self):
-        """Gets the frontend_token of this InlineResponse2012.  # noqa: E501
+    def organization_token(self):
+        """Gets the organization_token of this InlineResponse2012.  # noqa: E501
 
 
-        :return: The frontend_token of this InlineResponse2012.  # noqa: E501
+        :return: The organization_token of this InlineResponse2012.  # noqa: E501
         :rtype: str
         """
-        return self._frontend_token
+        return self._organization_token
 
-    @frontend_token.setter
-    def frontend_token(self, frontend_token):
-        """Sets the frontend_token of this InlineResponse2012.
+    @organization_token.setter
+    def organization_token(self, organization_token):
+        """Sets the organization_token of this InlineResponse2012.
 
 
-        :param frontend_token: The frontend_token of this InlineResponse2012.  # noqa: E501
+        :param organization_token: The organization_token of this InlineResponse2012.  # noqa: E501
         :type: str
         """
 
-        self._frontend_token = frontend_token
-
-    @property
-    def backend_mode(self):
-        """Gets the backend_mode of this InlineResponse2012.  # noqa: E501
-
-
-        :return: The backend_mode of this InlineResponse2012.  # noqa: E501
-        :rtype: str
-        """
-        return self._backend_mode
-
-    @backend_mode.setter
-    def backend_mode(self, backend_mode):
-        """Sets the backend_mode of this InlineResponse2012.
-
-
-        :param backend_mode: The backend_mode of this InlineResponse2012.  # noqa: E501
-        :type: str
-        """
-
-        self._backend_mode = backend_mode
+        self._organization_token = organization_token
 
     def to_dict(self):
         """Returns the model properties as a dict"""

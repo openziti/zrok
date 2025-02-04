@@ -9,6 +9,7 @@ export * from './CreateFrontend201Response';
 export * from './CreateFrontendRequest';
 export * from './CreateIdentity201Response';
 export * from './CreateIdentityRequest';
+export * from './CreateOrganization201Response';
 export * from './CreateOrganizationRequest';
 export * from './DisableRequest';
 export * from './EnableRequest';

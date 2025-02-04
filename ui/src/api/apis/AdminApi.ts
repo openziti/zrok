@@ -20,6 +20,7 @@ import type {
   CreateFrontendRequest,
   CreateIdentity201Response,
   CreateIdentityRequest,
+  CreateOrganization201Response,
   CreateOrganizationRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
@@ -43,6 +44,8 @@ import {
     CreateIdentity201ResponseToJSON,
     CreateIdentityRequestFromJSON,
     CreateIdentityRequestToJSON,
+    CreateOrganization201ResponseFromJSON,
+    CreateOrganization201ResponseToJSON,
     CreateOrganizationRequestFromJSON,
     CreateOrganizationRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
@@ -92,7 +95,7 @@ export interface DeleteFrontendRequest {
 }
 
 export interface DeleteOrganizationRequest {
-    body?: VerifyRequest;
+    body?: CreateOrganization201Response;
 }
 
 export interface GrantsRequest {
@@ -245,7 +248,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
+    async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateOrganization201Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -264,12 +267,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: CreateOrganizationRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateOrganization201ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
+    async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateOrganization201Response> {
         const response = await this.createOrganizationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -322,7 +325,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: VerifyRequestToJSON(requestParameters['body']),
+            body: CreateOrganization201ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

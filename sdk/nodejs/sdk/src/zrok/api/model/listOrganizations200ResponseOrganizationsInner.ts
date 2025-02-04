@@ -13,15 +13,15 @@
 import { RequestFile } from './models';
 
 export class ListOrganizations200ResponseOrganizationsInner {
-    'token'?: string;
+    'organizationToken'?: string;
     'description'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "organizationToken",
+            "baseName": "organizationToken",
             "type": "string"
         },
         {

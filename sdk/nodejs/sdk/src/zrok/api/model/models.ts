@@ -10,6 +10,7 @@ export * from './createFrontend201Response';
 export * from './createFrontendRequest';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
+export * from './createOrganization201Response';
 export * from './createOrganizationRequest';
 export * from './disableRequest';
 export * from './enableRequest';
@@ -71,6 +72,7 @@ import { CreateFrontend201Response } from './createFrontend201Response';
 import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
+import { CreateOrganization201Response } from './createOrganization201Response';
 import { CreateOrganizationRequest } from './createOrganizationRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
@@ -140,6 +142,7 @@ let typeMap: {[index: string]: any} = {
     "CreateFrontendRequest": CreateFrontendRequest,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
+    "CreateOrganization201Response": CreateOrganization201Response,
     "CreateOrganizationRequest": CreateOrganizationRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,

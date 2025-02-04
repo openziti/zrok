@@ -223,6 +223,7 @@ Class | Method | HTTP request | Description
  - [InlineResponse201](docs/InlineResponse201.md)
  - [InlineResponse2011](docs/InlineResponse2011.md)
  - [InlineResponse2012](docs/InlineResponse2012.md)
+ - [InlineResponse2013](docs/InlineResponse2013.md)
  - [InviteBody](docs/InviteBody.md)
  - [LoginBody](docs/LoginBody.md)
  - [Metrics](docs/Metrics.md)

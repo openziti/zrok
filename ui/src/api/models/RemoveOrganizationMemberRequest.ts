@@ -24,7 +24,7 @@ export interface RemoveOrganizationMemberRequest {
      * @type {string}
      * @memberof RemoveOrganizationMemberRequest
      */
-    token?: string;
+    organizationToken?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +50,7 @@ export function RemoveOrganizationMemberRequestFromJSONTyped(json: any, ignoreDi
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'organizationToken': json['organizationToken'] == null ? undefined : json['organizationToken'],
         'email': json['email'] == null ? undefined : json['email'],
     };
 }
@@ -61,7 +61,7 @@ export function RemoveOrganizationMemberRequestToJSON(value?: RemoveOrganization
     }
     return {
         
-        'token': value['token'],
+        'organizationToken': value['organizationToken'],
         'email': value['email'],
     };
 }

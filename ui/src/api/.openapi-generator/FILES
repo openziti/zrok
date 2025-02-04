@@ -14,6 +14,7 @@ models/CreateFrontend201Response.ts
 models/CreateFrontendRequest.ts
 models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
+models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts

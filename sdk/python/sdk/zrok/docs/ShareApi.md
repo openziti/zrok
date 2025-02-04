@@ -11,7 +11,7 @@ Method | HTTP request | Description
 [**update_share**](ShareApi.md#update_share) | **PATCH** /share | 
 
 # **access**
-> InlineResponse2012 access(body=body)
+> InlineResponse2013 access(body=body)
 
 
 
@@ -48,7 +48,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2012**](InlineResponse2012.md)
+[**InlineResponse2013**](InlineResponse2013.md)
 
 ### Authorization
 

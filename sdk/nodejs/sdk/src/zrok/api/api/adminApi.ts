@@ -20,6 +20,7 @@ import { CreateFrontend201Response } from '../model/createFrontend201Response';
 import { CreateFrontendRequest } from '../model/createFrontendRequest';
 import { CreateIdentity201Response } from '../model/createIdentity201Response';
 import { CreateIdentityRequest } from '../model/createIdentityRequest';
+import { CreateOrganization201Response } from '../model/createOrganization201Response';
 import { CreateOrganizationRequest } from '../model/createOrganizationRequest';
 import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest';
 import { ListFrontends200ResponseInner } from '../model/listFrontends200ResponseInner';
@@ -364,7 +365,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createOrganization (body?: CreateOrganizationRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
+    public async createOrganization (body?: CreateOrganizationRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: CreateOrganization201Response;  }> {
         const localVarPath = this.basePath + '/organization';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -410,13 +411,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: CreateOrganization201Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
+                            body = ObjectSerializer.deserialize(body, "CreateOrganization201Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -488,7 +489,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async deleteOrganization (body?: VerifyRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async deleteOrganization (body?: CreateOrganization201Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/organization';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -505,7 +506,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "VerifyRequest")
+            body: ObjectSerializer.serialize(body, "CreateOrganization201Response")
         };
 
         let authenticationPromise = Promise.resolve();

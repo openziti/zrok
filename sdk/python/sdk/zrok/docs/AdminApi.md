@@ -223,7 +223,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_organization**
-> VerifyBody create_organization(body=body)
+> InlineResponse2012 create_organization(body=body)
 
 
 
@@ -260,7 +260,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**VerifyBody**](VerifyBody.md)
+[**InlineResponse2012**](InlineResponse2012.md)
 
 ### Authorization
 

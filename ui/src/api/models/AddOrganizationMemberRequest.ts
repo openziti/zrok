@@ -24,7 +24,7 @@ export interface AddOrganizationMemberRequest {
      * @type {string}
      * @memberof AddOrganizationMemberRequest
      */
-    token?: string;
+    organizationToken?: string;
     /**
      * 
      * @type {string}
@@ -56,7 +56,7 @@ export function AddOrganizationMemberRequestFromJSONTyped(json: any, ignoreDiscr
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'organizationToken': json['organizationToken'] == null ? undefined : json['organizationToken'],
         'email': json['email'] == null ? undefined : json['email'],
         'admin': json['admin'] == null ? undefined : json['admin'],
     };
@@ -68,7 +68,7 @@ export function AddOrganizationMemberRequestToJSON(value?: AddOrganizationMember
     }
     return {
         
-        'token': value['token'],
+        'organizationToken': value['organizationToken'],
         'email': value['email'],
         'admin': value['admin'],
     };
