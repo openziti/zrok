@@ -28,45 +28,45 @@ class RegisterBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'token': 'str',
+        'reg_token': 'str',
         'password': 'str'
     }
 
     attribute_map = {
-        'token': 'token',
+        'reg_token': 'regToken',
         'password': 'password'
     }
 
-    def __init__(self, token=None, password=None):  # noqa: E501
+    def __init__(self, reg_token=None, password=None):  # noqa: E501
         """RegisterBody - a model defined in Swagger"""  # noqa: E501
-        self._token = None
+        self._reg_token = None
         self._password = None
         self.discriminator = None
-        if token is not None:
-            self.token = token
+        if reg_token is not None:
+            self.reg_token = reg_token
         if password is not None:
             self.password = password
 
     @property
-    def token(self):
-        """Gets the token of this RegisterBody.  # noqa: E501
+    def reg_token(self):
+        """Gets the reg_token of this RegisterBody.  # noqa: E501
 
 
-        :return: The token of this RegisterBody.  # noqa: E501
+        :return: The reg_token of this RegisterBody.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._reg_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this RegisterBody.
+    @reg_token.setter
+    def reg_token(self, reg_token):
+        """Sets the reg_token of this RegisterBody.
 
 
-        :param token: The token of this RegisterBody.  # noqa: E501
+        :param reg_token: The reg_token of this RegisterBody.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._reg_token = reg_token
 
     @property
     def password(self):

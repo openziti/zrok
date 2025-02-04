@@ -26,10 +26,10 @@ import { ListFrontends200ResponseInner } from '../model/listFrontends200Response
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { ListOrganizations200Response } from '../model/listOrganizations200Response';
 import { LoginRequest } from '../model/loginRequest';
-import { Register200Response } from '../model/register200Response';
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
 import { Verify200Response } from '../model/verify200Response';
+import { VerifyRequest } from '../model/verifyRequest';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
 import { HttpBasicAuth, HttpBearerAuth, ApiKeyAuth, OAuth } from '../model/models';
@@ -165,7 +165,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createAccount (body?: LoginRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Register200Response;  }> {
+    public async createAccount (body?: LoginRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
         const localVarPath = this.basePath + '/account';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -211,13 +211,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: Register200Response;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "Register200Response");
+                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -231,7 +231,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Register200Response;  }> {
+    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
         const localVarPath = this.basePath + '/frontend';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -277,13 +277,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: Register200Response;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "Register200Response");
+                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -363,7 +363,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createOrganization (body?: CreateOrganizationRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Register200Response;  }> {
+    public async createOrganization (body?: CreateOrganizationRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
         const localVarPath = this.basePath + '/organization';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -409,13 +409,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: Register200Response;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "Register200Response");
+                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -487,7 +487,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async deleteOrganization (body?: Register200Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async deleteOrganization (body?: VerifyRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/organization';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -504,7 +504,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "Register200Response")
+            body: ObjectSerializer.serialize(body, "VerifyRequest")
         };
 
         let authenticationPromise = Promise.resolve();
@@ -725,7 +725,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async listOrganizationMembers (body?: Register200Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ListOrganizationMembers200Response;  }> {
+    public async listOrganizationMembers (body?: VerifyRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ListOrganizationMembers200Response;  }> {
         const localVarPath = this.basePath + '/organization/list';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -749,7 +749,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "Register200Response")
+            body: ObjectSerializer.serialize(body, "VerifyRequest")
         };
 
         let authenticationPromise = Promise.resolve();

@@ -1442,7 +1442,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "token": {
+                "regToken": {
                   "type": "string"
                 }
               }
@@ -1454,7 +1454,7 @@ func init() {
             "description": "account created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -3588,7 +3588,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "token": {
+                "regToken": {
                   "type": "string"
                 }
               }
@@ -3600,7 +3600,7 @@ func init() {
             "description": "account created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }

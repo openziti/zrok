@@ -28,40 +28,40 @@ class InlineResponse2006(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'memberships': 'list[InlineResponse2006Memberships]'
+        'sparklines': 'list[Metrics]'
     }
 
     attribute_map = {
-        'memberships': 'memberships'
+        'sparklines': 'sparklines'
     }
 
-    def __init__(self, memberships=None):  # noqa: E501
+    def __init__(self, sparklines=None):  # noqa: E501
         """InlineResponse2006 - a model defined in Swagger"""  # noqa: E501
-        self._memberships = None
+        self._sparklines = None
         self.discriminator = None
-        if memberships is not None:
-            self.memberships = memberships
+        if sparklines is not None:
+            self.sparklines = sparklines
 
     @property
-    def memberships(self):
-        """Gets the memberships of this InlineResponse2006.  # noqa: E501
+    def sparklines(self):
+        """Gets the sparklines of this InlineResponse2006.  # noqa: E501
 
 
-        :return: The memberships of this InlineResponse2006.  # noqa: E501
-        :rtype: list[InlineResponse2006Memberships]
+        :return: The sparklines of this InlineResponse2006.  # noqa: E501
+        :rtype: list[Metrics]
         """
-        return self._memberships
+        return self._sparklines
 
-    @memberships.setter
-    def memberships(self, memberships):
-        """Sets the memberships of this InlineResponse2006.
+    @sparklines.setter
+    def sparklines(self, sparklines):
+        """Sets the sparklines of this InlineResponse2006.
 
 
-        :param memberships: The memberships of this InlineResponse2006.  # noqa: E501
-        :type: list[InlineResponse2006Memberships]
+        :param sparklines: The sparklines of this InlineResponse2006.  # noqa: E501
+        :type: list[Metrics]
         """
 
-        self._memberships = memberships
+        self._sparklines = sparklines
 
     def to_dict(self):
         """Returns the model properties as a dict"""

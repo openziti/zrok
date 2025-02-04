@@ -12,16 +12,16 @@
 
 import { RequestFile } from './models';
 
-export class RegisterRequest {
-    'regToken'?: string;
+export class ResetPasswordRequest {
+    'token'?: string;
     'password'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "regToken",
-            "baseName": "regToken",
+            "name": "token",
+            "baseName": "token",
             "type": "string"
         },
         {
@@ -31,7 +31,7 @@ export class RegisterRequest {
         }    ];
 
     static getAttributeTypeMap() {
-        return RegisterRequest.attributeTypeMap;
+        return ResetPasswordRequest.attributeTypeMap;
     }
 }
 

@@ -20,9 +20,10 @@ import { InviteRequest } from '../model/inviteRequest';
 import { LoginRequest } from '../model/loginRequest';
 import { RegenerateAccountToken200Response } from '../model/regenerateAccountToken200Response';
 import { RegenerateAccountTokenRequest } from '../model/regenerateAccountTokenRequest';
-import { Register200Response } from '../model/register200Response';
 import { RegisterRequest } from '../model/registerRequest';
+import { ResetPasswordRequest } from '../model/resetPasswordRequest';
 import { Verify200Response } from '../model/verify200Response';
+import { VerifyRequest } from '../model/verifyRequest';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
 import { HttpBasicAuth, HttpBearerAuth, ApiKeyAuth, OAuth } from '../model/models';
@@ -356,7 +357,7 @@ export class AccountApi {
      * 
      * @param body 
      */
-    public async register (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Register200Response;  }> {
+    public async register (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateAccountToken200Response;  }> {
         const localVarPath = this.basePath + '/register';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -399,13 +400,13 @@ export class AccountApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: Register200Response;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: RegenerateAccountToken200Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "Register200Response");
+                            body = ObjectSerializer.deserialize(body, "RegenerateAccountToken200Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -419,7 +420,7 @@ export class AccountApi {
      * 
      * @param body 
      */
-    public async resetPassword (body?: RegisterRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async resetPassword (body?: ResetPasswordRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/resetPassword';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -443,7 +444,7 @@ export class AccountApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "RegisterRequest")
+            body: ObjectSerializer.serialize(body, "ResetPasswordRequest")
         };
 
         let authenticationPromise = Promise.resolve();
@@ -536,7 +537,7 @@ export class AccountApi {
      * 
      * @param body 
      */
-    public async verify (body?: Register200Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Verify200Response;  }> {
+    public async verify (body?: VerifyRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Verify200Response;  }> {
         const localVarPath = this.basePath + '/verify';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -560,7 +561,7 @@ export class AccountApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "Register200Response")
+            body: ObjectSerializer.serialize(body, "VerifyRequest")
         };
 
         let authenticationPromise = Promise.resolve();

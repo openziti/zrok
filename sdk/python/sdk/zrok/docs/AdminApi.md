@@ -474,7 +474,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_frontends**
-> list[InlineResponse2003] list_frontends()
+> list[InlineResponse2002] list_frontends()
 
 
 
@@ -507,7 +507,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**list[InlineResponse2003]**](InlineResponse2003.md)
+[**list[InlineResponse2002]**](InlineResponse2002.md)
 
 ### Authorization
 
@@ -521,7 +521,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_organization_members**
-> InlineResponse2004 list_organization_members(body=body)
+> InlineResponse2003 list_organization_members(body=body)
 
 
 
@@ -558,7 +558,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2004**](InlineResponse2004.md)
+[**InlineResponse2003**](InlineResponse2003.md)
 
 ### Authorization
 
@@ -572,7 +572,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_organizations**
-> InlineResponse2005 list_organizations()
+> InlineResponse2004 list_organizations()
 
 
 
@@ -605,7 +605,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2005**](InlineResponse2005.md)
+[**InlineResponse2004**](InlineResponse2004.md)
 
 ### Authorization
 

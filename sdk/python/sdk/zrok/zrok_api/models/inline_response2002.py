@@ -28,40 +28,170 @@ class InlineResponse2002(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'email': 'str'
+        'token': 'str',
+        'z_id': 'str',
+        'url_template': 'str',
+        'public_name': 'str',
+        'created_at': 'int',
+        'updated_at': 'int'
     }
 
     attribute_map = {
-        'email': 'email'
+        'token': 'token',
+        'z_id': 'zId',
+        'url_template': 'urlTemplate',
+        'public_name': 'publicName',
+        'created_at': 'createdAt',
+        'updated_at': 'updatedAt'
     }
 
-    def __init__(self, email=None):  # noqa: E501
+    def __init__(self, token=None, z_id=None, url_template=None, public_name=None, created_at=None, updated_at=None):  # noqa: E501
         """InlineResponse2002 - a model defined in Swagger"""  # noqa: E501
-        self._email = None
+        self._token = None
+        self._z_id = None
+        self._url_template = None
+        self._public_name = None
+        self._created_at = None
+        self._updated_at = None
         self.discriminator = None
-        if email is not None:
-            self.email = email
+        if token is not None:
+            self.token = token
+        if z_id is not None:
+            self.z_id = z_id
+        if url_template is not None:
+            self.url_template = url_template
+        if public_name is not None:
+            self.public_name = public_name
+        if created_at is not None:
+            self.created_at = created_at
+        if updated_at is not None:
+            self.updated_at = updated_at
 
     @property
-    def email(self):
-        """Gets the email of this InlineResponse2002.  # noqa: E501
+    def token(self):
+        """Gets the token of this InlineResponse2002.  # noqa: E501
 
 
-        :return: The email of this InlineResponse2002.  # noqa: E501
+        :return: The token of this InlineResponse2002.  # noqa: E501
         :rtype: str
         """
-        return self._email
+        return self._token
 
-    @email.setter
-    def email(self, email):
-        """Sets the email of this InlineResponse2002.
+    @token.setter
+    def token(self, token):
+        """Sets the token of this InlineResponse2002.
 
 
-        :param email: The email of this InlineResponse2002.  # noqa: E501
+        :param token: The token of this InlineResponse2002.  # noqa: E501
         :type: str
         """
 
-        self._email = email
+        self._token = token
+
+    @property
+    def z_id(self):
+        """Gets the z_id of this InlineResponse2002.  # noqa: E501
+
+
+        :return: The z_id of this InlineResponse2002.  # noqa: E501
+        :rtype: str
+        """
+        return self._z_id
+
+    @z_id.setter
+    def z_id(self, z_id):
+        """Sets the z_id of this InlineResponse2002.
+
+
+        :param z_id: The z_id of this InlineResponse2002.  # noqa: E501
+        :type: str
+        """
+
+        self._z_id = z_id
+
+    @property
+    def url_template(self):
+        """Gets the url_template of this InlineResponse2002.  # noqa: E501
+
+
+        :return: The url_template of this InlineResponse2002.  # noqa: E501
+        :rtype: str
+        """
+        return self._url_template
+
+    @url_template.setter
+    def url_template(self, url_template):
+        """Sets the url_template of this InlineResponse2002.
+
+
+        :param url_template: The url_template of this InlineResponse2002.  # noqa: E501
+        :type: str
+        """
+
+        self._url_template = url_template
+
+    @property
+    def public_name(self):
+        """Gets the public_name of this InlineResponse2002.  # noqa: E501
+
+
+        :return: The public_name of this InlineResponse2002.  # noqa: E501
+        :rtype: str
+        """
+        return self._public_name
+
+    @public_name.setter
+    def public_name(self, public_name):
+        """Sets the public_name of this InlineResponse2002.
+
+
+        :param public_name: The public_name of this InlineResponse2002.  # noqa: E501
+        :type: str
+        """
+
+        self._public_name = public_name
+
+    @property
+    def created_at(self):
+        """Gets the created_at of this InlineResponse2002.  # noqa: E501
+
+
+        :return: The created_at of this InlineResponse2002.  # noqa: E501
+        :rtype: int
+        """
+        return self._created_at
+
+    @created_at.setter
+    def created_at(self, created_at):
+        """Sets the created_at of this InlineResponse2002.
+
+
+        :param created_at: The created_at of this InlineResponse2002.  # noqa: E501
+        :type: int
+        """
+
+        self._created_at = created_at
+
+    @property
+    def updated_at(self):
+        """Gets the updated_at of this InlineResponse2002.  # noqa: E501
+
+
+        :return: The updated_at of this InlineResponse2002.  # noqa: E501
+        :rtype: int
+        """
+        return self._updated_at
+
+    @updated_at.setter
+    def updated_at(self, updated_at):
+        """Sets the updated_at of this InlineResponse2002.
+
+
+        :param updated_at: The updated_at of this InlineResponse2002.  # noqa: E501
+        :type: int
+        """
+
+        self._updated_at = updated_at
 
     def to_dict(self):
         """Returns the model properties as a dict"""

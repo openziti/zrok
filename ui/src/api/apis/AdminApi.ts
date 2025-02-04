@@ -26,10 +26,10 @@ import type {
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
   LoginRequest,
-  Register200Response,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
   Verify200Response,
+  VerifyRequest,
 } from '../models/index';
 import {
     AddOrganizationMemberRequestFromJSON,
@@ -54,14 +54,14 @@ import {
     ListOrganizations200ResponseToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
-    Register200ResponseFromJSON,
-    Register200ResponseToJSON,
     RemoveOrganizationMemberRequestFromJSON,
     RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
     UpdateFrontendRequestToJSON,
     Verify200ResponseFromJSON,
     Verify200ResponseToJSON,
+    VerifyRequestFromJSON,
+    VerifyRequestToJSON,
 } from '../models/index';
 
 export interface AddOrganizationMemberOperationRequest {
@@ -89,7 +89,7 @@ export interface DeleteFrontendOperationRequest {
 }
 
 export interface DeleteOrganizationRequest {
-    body?: Register200Response;
+    body?: VerifyRequest;
 }
 
 export interface GrantsRequest {
@@ -101,7 +101,7 @@ export interface InviteTokenGenerateOperationRequest {
 }
 
 export interface ListOrganizationMembersRequest {
-    body?: Register200Response;
+    body?: VerifyRequest;
 }
 
 export interface RemoveOrganizationMemberOperationRequest {
@@ -149,7 +149,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createAccountRaw(requestParameters: CreateAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Register200Response>> {
+    async createAccountRaw(requestParameters: CreateAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -168,19 +168,19 @@ export class AdminApi extends runtime.BaseAPI {
             body: LoginRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Register200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
     }
 
     /**
      */
-    async createAccount(requestParameters: CreateAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Register200Response> {
+    async createAccount(requestParameters: CreateAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
         const response = await this.createAccountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Register200Response>> {
+    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -199,12 +199,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: CreateFrontendRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Register200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
     }
 
     /**
      */
-    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Register200Response> {
+    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
         const response = await this.createFrontendRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -242,7 +242,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Register200Response>> {
+    async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -261,12 +261,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: CreateOrganizationRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Register200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
     }
 
     /**
      */
-    async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Register200Response> {
+    async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
         const response = await this.createOrganizationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -319,7 +319,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: Register200ResponseToJSON(requestParameters['body']),
+            body: VerifyRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -437,7 +437,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: Register200ResponseToJSON(requestParameters['body']),
+            body: VerifyRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ListOrganizationMembers200ResponseFromJSON(jsonValue));

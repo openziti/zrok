@@ -20,9 +20,10 @@ import type {
   LoginRequest,
   RegenerateAccountToken200Response,
   RegenerateAccountTokenRequest,
-  Register200Response,
   RegisterRequest,
+  ResetPasswordRequest,
   Verify200Response,
+  VerifyRequest,
 } from '../models/index';
 import {
     ChangePasswordRequestFromJSON,
@@ -35,12 +36,14 @@ import {
     RegenerateAccountToken200ResponseToJSON,
     RegenerateAccountTokenRequestFromJSON,
     RegenerateAccountTokenRequestToJSON,
-    Register200ResponseFromJSON,
-    Register200ResponseToJSON,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
+    ResetPasswordRequestFromJSON,
+    ResetPasswordRequestToJSON,
     Verify200ResponseFromJSON,
     Verify200ResponseToJSON,
+    VerifyRequestFromJSON,
+    VerifyRequestToJSON,
 } from '../models/index';
 
 export interface ChangePasswordOperationRequest {
@@ -63,16 +66,16 @@ export interface RegisterOperationRequest {
     body?: RegisterRequest;
 }
 
-export interface ResetPasswordRequest {
-    body?: RegisterRequest;
+export interface ResetPasswordOperationRequest {
+    body?: ResetPasswordRequest;
 }
 
 export interface ResetPasswordRequestRequest {
     body?: RegenerateAccountTokenRequest;
 }
 
-export interface VerifyRequest {
-    body?: Register200Response;
+export interface VerifyOperationRequest {
+    body?: VerifyRequest;
 }
 
 /**
@@ -200,7 +203,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async registerRaw(requestParameters: RegisterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Register200Response>> {
+    async registerRaw(requestParameters: RegisterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateAccountToken200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -215,19 +218,19 @@ export class AccountApi extends runtime.BaseAPI {
             body: RegisterRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => Register200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateAccountToken200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async register(requestParameters: RegisterOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Register200Response> {
+    async register(requestParameters: RegisterOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateAccountToken200Response> {
         const response = await this.registerRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async resetPasswordRaw(requestParameters: ResetPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async resetPasswordRaw(requestParameters: ResetPasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -239,7 +242,7 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RegisterRequestToJSON(requestParameters['body']),
+            body: ResetPasswordRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -247,7 +250,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async resetPassword(requestParameters: ResetPasswordRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async resetPassword(requestParameters: ResetPasswordOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resetPasswordRaw(requestParameters, initOverrides);
     }
 
@@ -279,7 +282,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async verifyRaw(requestParameters: VerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Verify200Response>> {
+    async verifyRaw(requestParameters: VerifyOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Verify200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -291,7 +294,7 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: Register200ResponseToJSON(requestParameters['body']),
+            body: VerifyRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => Verify200ResponseFromJSON(jsonValue));
@@ -299,7 +302,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async verify(requestParameters: VerifyRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Verify200Response> {
+    async verify(requestParameters: VerifyOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Verify200Response> {
         const response = await this.verifyRaw(requestParameters, initOverrides);
         return await response.value();
     }

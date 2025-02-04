@@ -28,40 +28,40 @@ class InlineResponse2005(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'organizations': 'list[InlineResponse2005Organizations]'
+        'memberships': 'list[InlineResponse2005Memberships]'
     }
 
     attribute_map = {
-        'organizations': 'organizations'
+        'memberships': 'memberships'
     }
 
-    def __init__(self, organizations=None):  # noqa: E501
+    def __init__(self, memberships=None):  # noqa: E501
         """InlineResponse2005 - a model defined in Swagger"""  # noqa: E501
-        self._organizations = None
+        self._memberships = None
         self.discriminator = None
-        if organizations is not None:
-            self.organizations = organizations
+        if memberships is not None:
+            self.memberships = memberships
 
     @property
-    def organizations(self):
-        """Gets the organizations of this InlineResponse2005.  # noqa: E501
+    def memberships(self):
+        """Gets the memberships of this InlineResponse2005.  # noqa: E501
 
 
-        :return: The organizations of this InlineResponse2005.  # noqa: E501
-        :rtype: list[InlineResponse2005Organizations]
+        :return: The memberships of this InlineResponse2005.  # noqa: E501
+        :rtype: list[InlineResponse2005Memberships]
         """
-        return self._organizations
+        return self._memberships
 
-    @organizations.setter
-    def organizations(self, organizations):
-        """Sets the organizations of this InlineResponse2005.
+    @memberships.setter
+    def memberships(self, memberships):
+        """Sets the memberships of this InlineResponse2005.
 
 
-        :param organizations: The organizations of this InlineResponse2005.  # noqa: E501
-        :type: list[InlineResponse2005Organizations]
+        :param memberships: The memberships of this InlineResponse2005.  # noqa: E501
+        :type: list[InlineResponse2005Memberships]
         """
 
-        self._organizations = organizations
+        self._memberships = memberships
 
     def to_dict(self):
         """Returns the model properties as a dict"""

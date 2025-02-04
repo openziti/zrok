@@ -42,9 +42,9 @@ model/overview.ts
 model/principal.ts
 model/regenerateAccountToken200Response.ts
 model/regenerateAccountTokenRequest.ts
-model/register200Response.ts
 model/registerRequest.ts
 model/removeOrganizationMemberRequest.ts
+model/resetPasswordRequest.ts
 model/share.ts
 model/shareRequest.ts
 model/shareResponse.ts
@@ -54,3 +54,4 @@ model/unshareRequest.ts
 model/updateFrontendRequest.ts
 model/updateShareRequest.ts
 model/verify200Response.ts
+model/verifyRequest.ts

@@ -858,7 +858,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: list[InlineResponse2003]
+        :return: list[InlineResponse2002]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -878,7 +878,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: list[InlineResponse2003]
+        :return: list[InlineResponse2002]
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -926,7 +926,7 @@ class AdminApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='list[InlineResponse2003]',  # noqa: E501
+            response_type='list[InlineResponse2002]',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -944,7 +944,7 @@ class AdminApi(object):
 
         :param async_req bool
         :param OrganizationListBody body:
-        :return: InlineResponse2004
+        :return: InlineResponse2003
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -965,7 +965,7 @@ class AdminApi(object):
 
         :param async_req bool
         :param OrganizationListBody body:
-        :return: InlineResponse2004
+        :return: InlineResponse2003
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -1019,7 +1019,7 @@ class AdminApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse2004',  # noqa: E501
+            response_type='InlineResponse2003',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -1036,7 +1036,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: InlineResponse2005
+        :return: InlineResponse2004
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -1056,7 +1056,7 @@ class AdminApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: InlineResponse2005
+        :return: InlineResponse2004
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -1104,7 +1104,7 @@ class AdminApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse2005',  # noqa: E501
+            response_type='InlineResponse2004',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

@@ -309,8 +309,8 @@ type RegisterBody struct {
 	// password
 	Password string `json:"password,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// reg token
+	RegToken string `json:"regToken,omitempty"`
 }
 
 // Validate validates this register body
@@ -347,8 +347,8 @@ swagger:model RegisterOKBody
 */
 type RegisterOKBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// account token
+	AccountToken string `json:"accountToken,omitempty"`
 }
 
 // Validate validates this register o k body

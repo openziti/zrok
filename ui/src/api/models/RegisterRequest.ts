@@ -24,7 +24,7 @@ export interface RegisterRequest {
      * @type {string}
      * @memberof RegisterRequest
      */
-    token?: string;
+    regToken?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +50,7 @@ export function RegisterRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'regToken': json['regToken'] == null ? undefined : json['regToken'],
         'password': json['password'] == null ? undefined : json['password'],
     };
 }
@@ -61,7 +61,7 @@ export function RegisterRequestToJSON(value?: RegisterRequest | null): any {
     }
     return {
         
-        'token': value['token'],
+        'regToken': value['regToken'],
         'password': value['password'],
     };
 }

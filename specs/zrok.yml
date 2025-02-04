@@ -131,7 +131,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              regToken:
                 type: string
               password:
                 type: string
@@ -140,7 +140,7 @@ paths:
           description: account created
           schema:
             properties:
-              token:
+              accountToken:
                 type: string
         404:
           description: request not found

@@ -34,9 +34,9 @@ export * from './overview';
 export * from './principal';
 export * from './regenerateAccountToken200Response';
 export * from './regenerateAccountTokenRequest';
-export * from './register200Response';
 export * from './registerRequest';
 export * from './removeOrganizationMemberRequest';
+export * from './resetPasswordRequest';
 export * from './share';
 export * from './shareRequest';
 export * from './shareResponse';
@@ -46,6 +46,7 @@ export * from './unshareRequest';
 export * from './updateFrontendRequest';
 export * from './updateShareRequest';
 export * from './verify200Response';
+export * from './verifyRequest';
 
 import * as fs from 'fs';
 
@@ -94,9 +95,9 @@ import { Overview } from './overview';
 import { Principal } from './principal';
 import { RegenerateAccountToken200Response } from './regenerateAccountToken200Response';
 import { RegenerateAccountTokenRequest } from './regenerateAccountTokenRequest';
-import { Register200Response } from './register200Response';
 import { RegisterRequest } from './registerRequest';
 import { RemoveOrganizationMemberRequest } from './removeOrganizationMemberRequest';
+import { ResetPasswordRequest } from './resetPasswordRequest';
 import { Share } from './share';
 import { ShareRequest } from './shareRequest';
 import { ShareResponse } from './shareResponse';
@@ -106,6 +107,7 @@ import { UnshareRequest } from './unshareRequest';
 import { UpdateFrontendRequest } from './updateFrontendRequest';
 import { UpdateShareRequest } from './updateShareRequest';
 import { Verify200Response } from './verify200Response';
+import { VerifyRequest } from './verifyRequest';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -162,9 +164,9 @@ let typeMap: {[index: string]: any} = {
     "Principal": Principal,
     "RegenerateAccountToken200Response": RegenerateAccountToken200Response,
     "RegenerateAccountTokenRequest": RegenerateAccountTokenRequest,
-    "Register200Response": Register200Response,
     "RegisterRequest": RegisterRequest,
     "RemoveOrganizationMemberRequest": RemoveOrganizationMemberRequest,
+    "ResetPasswordRequest": ResetPasswordRequest,
     "Share": Share,
     "ShareRequest": ShareRequest,
     "ShareResponse": ShareResponse,
@@ -174,6 +176,7 @@ let typeMap: {[index: string]: any} = {
     "UpdateFrontendRequest": UpdateFrontendRequest,
     "UpdateShareRequest": UpdateShareRequest,
     "Verify200Response": Verify200Response,
+    "VerifyRequest": VerifyRequest,
 }
 
 export class ObjectSerializer {
