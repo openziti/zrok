@@ -29,23 +29,23 @@ class InviteBody(object):
     """
     swagger_types = {
         'email': 'str',
-        'token': 'str'
+        'inv_token': 'str'
     }
 
     attribute_map = {
         'email': 'email',
-        'token': 'token'
+        'inv_token': 'invToken'
     }
 
-    def __init__(self, email=None, token=None):  # noqa: E501
+    def __init__(self, email=None, inv_token=None):  # noqa: E501
         """InviteBody - a model defined in Swagger"""  # noqa: E501
         self._email = None
-        self._token = None
+        self._inv_token = None
         self.discriminator = None
         if email is not None:
             self.email = email
-        if token is not None:
-            self.token = token
+        if inv_token is not None:
+            self.inv_token = inv_token
 
     @property
     def email(self):
@@ -69,25 +69,25 @@ class InviteBody(object):
         self._email = email
 
     @property
-    def token(self):
-        """Gets the token of this InviteBody.  # noqa: E501
+    def inv_token(self):
+        """Gets the inv_token of this InviteBody.  # noqa: E501
 
 
-        :return: The token of this InviteBody.  # noqa: E501
+        :return: The inv_token of this InviteBody.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._inv_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this InviteBody.
+    @inv_token.setter
+    def inv_token(self, inv_token):
+        """Sets the inv_token of this InviteBody.
 
 
-        :param token: The token of this InviteBody.  # noqa: E501
+        :param inv_token: The inv_token of this InviteBody.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._inv_token = inv_token
 
     def to_dict(self):
         """Returns the model properties as a dict"""

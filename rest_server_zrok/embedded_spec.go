@@ -732,7 +732,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "invToken": {
                   "type": "string"
                 }
               }
@@ -2909,7 +2909,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "invToken": {
                   "type": "string"
                 }
               }

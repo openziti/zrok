@@ -43,9 +43,9 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	defer func() { _ = tx.Rollback() }()
 
 	if h.cfg.Invites != nil && h.cfg.Invites.TokenStrategy == "store" {
-		inviteToken, err := str.FindInviteTokenByToken(params.Body.Token, tx)
+		inviteToken, err := str.FindInviteTokenByToken(params.Body.InvToken, tx)
 		if err != nil {
-			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
+			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.InvToken, params.Body.Email, err)
 			return account.NewInviteBadRequest().WithPayload("missing invite token")
 		}
 		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {

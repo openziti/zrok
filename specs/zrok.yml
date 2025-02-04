@@ -59,7 +59,7 @@ paths:
             properties:
               email:
                 type: string
-              token:
+              invToken:
                 type: string
       responses:
         201:

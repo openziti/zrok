@@ -66,8 +66,8 @@ type InviteBody struct {
 	// email
 	Email string `json:"email,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// inv token
+	InvToken string `json:"invToken,omitempty"`
 }
 
 // Validate validates this invite body
