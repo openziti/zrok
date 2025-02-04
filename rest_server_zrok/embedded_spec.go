@@ -1952,13 +1952,13 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
+        "feToken": {
+          "type": "string"
+        },
         "id": {
           "type": "integer"
         },
         "shrToken": {
-          "type": "string"
-        },
-        "token": {
           "type": "string"
         },
         "updatedAt": {
@@ -4154,13 +4154,13 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
+        "feToken": {
+          "type": "string"
+        },
         "id": {
           "type": "integer"
         },
         "shrToken": {
-          "type": "string"
-        },
-        "token": {
           "type": "string"
         },
         "updatedAt": {

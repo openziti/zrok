@@ -29,7 +29,7 @@ class Frontend(object):
     """
     swagger_types = {
         'id': 'int',
-        'token': 'str',
+        'fe_token': 'str',
         'shr_token': 'str',
         'z_id': 'str',
         'created_at': 'int',
@@ -38,17 +38,17 @@ class Frontend(object):
 
     attribute_map = {
         'id': 'id',
-        'token': 'token',
+        'fe_token': 'feToken',
         'shr_token': 'shrToken',
         'z_id': 'zId',
         'created_at': 'createdAt',
         'updated_at': 'updatedAt'
     }
 
-    def __init__(self, id=None, token=None, shr_token=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, id=None, fe_token=None, shr_token=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
         """Frontend - a model defined in Swagger"""  # noqa: E501
         self._id = None
-        self._token = None
+        self._fe_token = None
         self._shr_token = None
         self._z_id = None
         self._created_at = None
@@ -56,8 +56,8 @@ class Frontend(object):
         self.discriminator = None
         if id is not None:
             self.id = id
-        if token is not None:
-            self.token = token
+        if fe_token is not None:
+            self.fe_token = fe_token
         if shr_token is not None:
             self.shr_token = shr_token
         if z_id is not None:
@@ -89,25 +89,25 @@ class Frontend(object):
         self._id = id
 
     @property
-    def token(self):
-        """Gets the token of this Frontend.  # noqa: E501
+    def fe_token(self):
+        """Gets the fe_token of this Frontend.  # noqa: E501
 
 
-        :return: The token of this Frontend.  # noqa: E501
+        :return: The fe_token of this Frontend.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._fe_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this Frontend.
+    @fe_token.setter
+    def fe_token(self, fe_token):
+        """Sets the fe_token of this Frontend.
 
 
-        :param token: The token of this Frontend.  # noqa: E501
+        :param fe_token: The fe_token of this Frontend.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._fe_token = fe_token
 
     @property
     def shr_token(self):

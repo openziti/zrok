@@ -121,7 +121,7 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 		for _, fe := range fes {
 			envFe := &rest_model_zrok.Frontend{
 				ID:        int64(fe.Id),
-				Token:     fe.Token,
+				FeToken:   fe.Token,
 				ZID:       fe.ZId,
 				CreatedAt: fe.CreatedAt.UnixMilli(),
 				UpdatedAt: fe.UpdatedAt.UnixMilli(),

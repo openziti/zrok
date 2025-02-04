@@ -30,7 +30,7 @@ export interface Frontend {
      * @type {string}
      * @memberof Frontend
      */
-    token?: string;
+    feToken?: string;
     /**
      * 
      * @type {string}
@@ -75,7 +75,7 @@ export function FrontendFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'token': json['token'] == null ? undefined : json['token'],
+        'feToken': json['feToken'] == null ? undefined : json['feToken'],
         'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
         'zId': json['zId'] == null ? undefined : json['zId'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
@@ -90,7 +90,7 @@ export function FrontendToJSON(value?: Frontend | null): any {
     return {
         
         'id': value['id'],
-        'token': value['token'],
+        'feToken': value['feToken'],
         'shrToken': value['shrToken'],
         'zId': value['zId'],
         'createdAt': value['createdAt'],

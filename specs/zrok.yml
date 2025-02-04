@@ -1215,7 +1215,7 @@ definitions:
     properties:
       id:
         type: integer
-      token:
+      feToken:
         type: string
       shrToken:
         type: string
