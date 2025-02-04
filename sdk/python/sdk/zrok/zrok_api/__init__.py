@@ -71,6 +71,7 @@ from zrok_api.models.register_body import RegisterBody
 from zrok_api.models.reset_password_body import ResetPasswordBody
 from zrok_api.models.reset_password_request_body import ResetPasswordRequestBody
 from zrok_api.models.share import Share
+from zrok_api.models.share_body import ShareBody
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.shares import Shares
@@ -80,6 +81,5 @@ from zrok_api.models.sparklines_body import SparklinesBody
 from zrok_api.models.token_generate_body import TokenGenerateBody
 from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest
-from zrok_api.models.update_share_request import UpdateShareRequest
 from zrok_api.models.verify_body import VerifyBody
 from zrok_api.models.version import Version

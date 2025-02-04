@@ -409,7 +409,7 @@ class ShareApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param UpdateShareRequest body:
+        :param ShareBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
@@ -430,7 +430,7 @@ class ShareApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param UpdateShareRequest body:
+        :param ShareBody body:
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.

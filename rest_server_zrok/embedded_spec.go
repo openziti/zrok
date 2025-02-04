@@ -1610,7 +1610,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateShareRequest"
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendProxyEndpoint": {
+                  "type": "string"
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2208,29 +2227,6 @@ func init() {
         },
         "reserved": {
           "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateShareRequest": {
-      "type": "object",
-      "properties": {
-        "addAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "removeAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         },
         "shrToken": {
           "type": "string"
@@ -3791,7 +3787,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateShareRequest"
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendProxyEndpoint": {
+                  "type": "string"
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shrToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -4445,29 +4460,6 @@ func init() {
         },
         "reserved": {
           "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateShareRequest": {
-      "type": "object",
-      "properties": {
-        "addAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "removeAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         },
         "shrToken": {
           "type": "string"

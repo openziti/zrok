@@ -1066,7 +1066,19 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/updateShareRequest"
+            properties:
+              shrToken:
+                type: string
+              backendProxyEndpoint:
+                type: string
+              addAccessGrants:
+                type: array
+                items:
+                  type: string
+              removeAccessGrants:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: share updated
@@ -1391,22 +1403,6 @@ definitions:
         type: string
       reserved:
         type: boolean
-
-  updateShareRequest:
-    type: object
-    properties:
-      shrToken:
-        type: string
-      backendProxyEndpoint:
-        type: string
-      addAccessGrants:
-        type: array
-        items:
-          type: string
-      removeAccessGrants:
-        type: array
-        items:
-          type: string
 
   version:
     type: string

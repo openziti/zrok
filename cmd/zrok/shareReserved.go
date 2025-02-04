@@ -20,7 +20,6 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
@@ -133,10 +132,8 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		if resp.Payload.BackendProxyEndpoint != target {
 			upReq := share.NewUpdateShareParams()
-			upReq.Body = &rest_model_zrok.UpdateShareRequest{
-				ShrToken:             shrToken,
-				BackendProxyEndpoint: target,
-			}
+			upReq.Body.ShrToken = shrToken
+			upReq.Body.BackendProxyEndpoint = target
 			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
 				cmd.error("unable to update backend target", err)
 			}
