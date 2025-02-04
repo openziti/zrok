@@ -1883,9 +1883,6 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
-        "passwordRequirements": {
-          "$ref": "#/definitions/passwordRequirements"
-        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -2023,26 +2020,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/environmentAndResources"
           }
-        }
-      }
-    },
-    "passwordRequirements": {
-      "type": "object",
-      "properties": {
-        "length": {
-          "type": "integer"
-        },
-        "requireCapital": {
-          "type": "boolean"
-        },
-        "requireNumeric": {
-          "type": "boolean"
-        },
-        "requireSpecial": {
-          "type": "boolean"
-        },
-        "validSpecialCharacters": {
-          "type": "string"
         }
       }
     },
@@ -4108,9 +4085,6 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
-        "passwordRequirements": {
-          "$ref": "#/definitions/passwordRequirements"
-        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -4248,26 +4222,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/environmentAndResources"
           }
-        }
-      }
-    },
-    "passwordRequirements": {
-      "type": "object",
-      "properties": {
-        "length": {
-          "type": "integer"
-        },
-        "requireCapital": {
-          "type": "boolean"
-        },
-        "requireNumeric": {
-          "type": "boolean"
-        },
-        "requireSpecial": {
-          "type": "boolean"
-        },
-        "validSpecialCharacters": {
-          "type": "string"
         }
       }
     },

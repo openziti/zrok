@@ -6,6 +6,7 @@ api/apis.ts
 api/environmentApi.ts
 api/metadataApi.ts
 api/shareApi.ts
+git_push.sh
 model/access201Response.ts
 model/accessRequest.ts
 model/addOrganizationMemberRequest.ts
@@ -38,7 +39,6 @@ model/metrics.ts
 model/metricsSample.ts
 model/models.ts
 model/overview.ts
-model/passwordRequirements.ts
 model/principal.ts
 model/regenerateToken200Response.ts
 model/regenerateTokenRequest.ts

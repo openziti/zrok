@@ -31,7 +31,6 @@ export * from './Metrics';
 export * from './MetricsSample';
 export * from './ModelConfiguration';
 export * from './Overview';
-export * from './PasswordRequirements';
 export * from './Principal';
 export * from './RegenerateToken200Response';
 export * from './RegenerateTokenRequest';

@@ -31,7 +31,6 @@ export * from './loginRequest';
 export * from './metrics';
 export * from './metricsSample';
 export * from './overview';
-export * from './passwordRequirements';
 export * from './principal';
 export * from './regenerateToken200Response';
 export * from './regenerateTokenRequest';
@@ -91,7 +90,6 @@ import { LoginRequest } from './loginRequest';
 import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
 import { Overview } from './overview';
-import { PasswordRequirements } from './passwordRequirements';
 import { Principal } from './principal';
 import { RegenerateToken200Response } from './regenerateToken200Response';
 import { RegenerateTokenRequest } from './regenerateTokenRequest';
@@ -159,7 +157,6 @@ let typeMap: {[index: string]: any} = {
     "Metrics": Metrics,
     "MetricsSample": MetricsSample,
     "Overview": Overview,
-    "PasswordRequirements": PasswordRequirements,
     "Principal": Principal,
     "RegenerateToken200Response": RegenerateToken200Response,
     "RegenerateTokenRequest": RegenerateTokenRequest,

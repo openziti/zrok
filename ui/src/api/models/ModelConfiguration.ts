@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { PasswordRequirements } from './PasswordRequirements';
-import {
-    PasswordRequirementsFromJSON,
-    PasswordRequirementsFromJSONTyped,
-    PasswordRequirementsToJSON,
-} from './PasswordRequirements';
-
 /**
  * 
  * @export
@@ -56,12 +49,6 @@ export interface ModelConfiguration {
      * @memberof ModelConfiguration
      */
     inviteTokenContact?: string;
-    /**
-     * 
-     * @type {PasswordRequirements}
-     * @memberof ModelConfiguration
-     */
-    passwordRequirements?: PasswordRequirements;
 }
 
 /**
@@ -86,7 +73,6 @@ export function ModelConfigurationFromJSONTyped(json: any, ignoreDiscriminator: 
         'invitesOpen': json['invitesOpen'] == null ? undefined : json['invitesOpen'],
         'requiresInviteToken': json['requiresInviteToken'] == null ? undefined : json['requiresInviteToken'],
         'inviteTokenContact': json['inviteTokenContact'] == null ? undefined : json['inviteTokenContact'],
-        'passwordRequirements': json['passwordRequirements'] == null ? undefined : PasswordRequirementsFromJSON(json['passwordRequirements']),
     };
 }
 
@@ -101,7 +87,6 @@ export function ModelConfigurationToJSON(value?: ModelConfiguration | null): any
         'invitesOpen': value['invitesOpen'],
         'requiresInviteToken': value['requiresInviteToken'],
         'inviteTokenContact': value['inviteTokenContact'],
-        'passwordRequirements': PasswordRequirementsToJSON(value['passwordRequirements']),
     };
 }
 

@@ -16,6 +16,8 @@ FEATURE `zrok access private` supports a new `--auto` mode, which can automatica
 
 CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
 
+CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
+
 ## v0.4.47
 
 CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)

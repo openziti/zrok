@@ -36,7 +36,6 @@ models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
 models/Overview.ts
-models/PasswordRequirements.ts
 models/Principal.ts
 models/RegenerateToken200Response.ts
 models/RegenerateTokenRequest.ts

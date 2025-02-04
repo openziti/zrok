@@ -64,7 +64,6 @@ from zrok_api.models.organization_body1 import OrganizationBody1
 from zrok_api.models.organization_list_body import OrganizationListBody
 from zrok_api.models.organization_remove_body import OrganizationRemoveBody
 from zrok_api.models.overview import Overview
-from zrok_api.models.password_requirements import PasswordRequirements
 from zrok_api.models.principal import Principal
 from zrok_api.models.regenerate_token_body import RegenerateTokenBody
 from zrok_api.models.register_body import RegisterBody

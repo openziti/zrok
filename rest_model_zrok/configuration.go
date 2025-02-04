@@ -8,7 +8,6 @@ package rest_model_zrok
 import (
 	"context"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -24,9 +23,6 @@ type Configuration struct {
 	// invites open
 	InvitesOpen bool `json:"invitesOpen,omitempty"`
 
-	// password requirements
-	PasswordRequirements *PasswordRequirements `json:"passwordRequirements,omitempty"`
-
 	// requires invite token
 	RequiresInviteToken bool `json:"requiresInviteToken,omitempty"`
 
@@ -39,69 +35,11 @@ type Configuration struct {
 
 // Validate validates this configuration
 func (m *Configuration) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validatePasswordRequirements(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
 	return nil
 }
 
-func (m *Configuration) validatePasswordRequirements(formats strfmt.Registry) error {
-	if swag.IsZero(m.PasswordRequirements) { // not required
-		return nil
-	}
-
-	if m.PasswordRequirements != nil {
-		if err := m.PasswordRequirements.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("passwordRequirements")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("passwordRequirements")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-// ContextValidate validate this configuration based on the context it is used
+// ContextValidate validates this configuration based on context it is used
 func (m *Configuration) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidatePasswordRequirements(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Configuration) contextValidatePasswordRequirements(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.PasswordRequirements != nil {
-
-		if swag.IsZero(m.PasswordRequirements) { // not required
-			return nil
-		}
-
-		if err := m.PasswordRequirements.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("passwordRequirements")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("passwordRequirements")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
