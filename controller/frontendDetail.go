@@ -20,9 +20,9 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 		return metadata.NewGetFrontendDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
-	fe, err := str.GetFrontend(int(params.FeID), trx)
+	fe, err := str.GetFrontend(int(params.FrontendID), trx)
 	if err != nil {
-		logrus.Errorf("error finding share '%d': %v", params.FeID, err)
+		logrus.Errorf("error finding share '%d': %v", params.FrontendID, err)
 		return metadata.NewGetFrontendDetailNotFound()
 	}
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)

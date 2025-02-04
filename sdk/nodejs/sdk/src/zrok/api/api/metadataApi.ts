@@ -442,11 +442,11 @@ export class MetadataApi {
     }
     /**
      * 
-     * @param feId 
+     * @param frontendId 
      */
-    public async getFrontendDetail (feId: number, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Frontend;  }> {
-        const localVarPath = this.basePath + '/detail/frontend/{feId}'
-            .replace('{' + 'feId' + '}', encodeURIComponent(String(feId)));
+    public async getFrontendDetail (frontendId: number, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Frontend;  }> {
+        const localVarPath = this.basePath + '/detail/frontend/{frontendId}'
+            .replace('{' + 'frontendId' + '}', encodeURIComponent(String(frontendId)));
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
         const produces = ['application/zrok.v1+json'];
@@ -458,9 +458,9 @@ export class MetadataApi {
         }
         let localVarFormParams: any = {};
 
-        // verify required parameter 'feId' is not null or undefined
-        if (feId === null || feId === undefined) {
-            throw new Error('Required parameter feId was null or undefined when calling getFrontendDetail.');
+        // verify required parameter 'frontendId' is not null or undefined
+        if (frontendId === null || frontendId === undefined) {
+            throw new Error('Required parameter frontendId was null or undefined when calling getFrontendDetail.');
         }
 
         (<any>Object).assign(localVarHeaderParams, options.headers);

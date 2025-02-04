@@ -66,7 +66,7 @@ export interface GetEnvironmentMetricsRequest {
 }
 
 export interface GetFrontendDetailRequest {
-    feId: number;
+    frontendId: number;
 }
 
 export interface GetShareDetailRequest {
@@ -257,10 +257,10 @@ export class MetadataApi extends runtime.BaseAPI {
     /**
      */
     async getFrontendDetailRaw(requestParameters: GetFrontendDetailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Frontend>> {
-        if (requestParameters['feId'] == null) {
+        if (requestParameters['frontendId'] == null) {
             throw new runtime.RequiredError(
-                'feId',
-                'Required parameter "feId" was null or undefined when calling getFrontendDetail().'
+                'frontendId',
+                'Required parameter "frontendId" was null or undefined when calling getFrontendDetail().'
             );
         }
 
@@ -273,7 +273,7 @@ export class MetadataApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/detail/frontend/{feId}`.replace(`{${"feId"}}`, encodeURIComponent(String(requestParameters['feId']))),
+            path: `/detail/frontend/{frontendId}`.replace(`{${"frontendId"}}`, encodeURIComponent(String(requestParameters['frontendId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

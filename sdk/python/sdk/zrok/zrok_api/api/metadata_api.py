@@ -481,43 +481,43 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_frontend_detail(self, fe_id, **kwargs):  # noqa: E501
+    def get_frontend_detail(self, frontend_id, **kwargs):  # noqa: E501
         """get_frontend_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_frontend_detail(fe_id, async_req=True)
+        >>> thread = api.get_frontend_detail(frontend_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int fe_id: (required)
+        :param int frontend_id: (required)
         :return: Frontend
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_frontend_detail_with_http_info(fe_id, **kwargs)  # noqa: E501
+            return self.get_frontend_detail_with_http_info(frontend_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_frontend_detail_with_http_info(fe_id, **kwargs)  # noqa: E501
+            (data) = self.get_frontend_detail_with_http_info(frontend_id, **kwargs)  # noqa: E501
             return data
 
-    def get_frontend_detail_with_http_info(self, fe_id, **kwargs):  # noqa: E501
+    def get_frontend_detail_with_http_info(self, frontend_id, **kwargs):  # noqa: E501
         """get_frontend_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_frontend_detail_with_http_info(fe_id, async_req=True)
+        >>> thread = api.get_frontend_detail_with_http_info(frontend_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int fe_id: (required)
+        :param int frontend_id: (required)
         :return: Frontend
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['fe_id']  # noqa: E501
+        all_params = ['frontend_id']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -532,16 +532,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'fe_id' is set
-        if ('fe_id' not in params or
-                params['fe_id'] is None):
-            raise ValueError("Missing the required parameter `fe_id` when calling `get_frontend_detail`")  # noqa: E501
+        # verify the required parameter 'frontend_id' is set
+        if ('frontend_id' not in params or
+                params['frontend_id'] is None):
+            raise ValueError("Missing the required parameter `frontend_id` when calling `get_frontend_detail`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'fe_id' in params:
-            path_params['feId'] = params['fe_id']  # noqa: E501
+        if 'frontend_id' in params:
+            path_params['frontendId'] = params['frontend_id']  # noqa: E501
 
         query_params = []
 
@@ -559,7 +559,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/detail/frontend/{feId}', 'GET',
+            '/detail/frontend/{frontendId}', 'GET',
             path_params,
             query_params,
             header_params,

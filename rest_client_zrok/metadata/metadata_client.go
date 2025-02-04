@@ -266,7 +266,7 @@ func (a *Client) GetFrontendDetail(params *GetFrontendDetailParams, authInfo run
 	op := &runtime.ClientOperation{
 		ID:                 "getFrontendDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/frontend/{feId}",
+		PathPattern:        "/detail/frontend/{frontendId}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

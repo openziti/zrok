@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**get_account_metrics**](MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
 [**get_environment_detail**](MetadataApi.md#get_environment_detail) | **GET** /detail/environment/{envZId} | 
 [**get_environment_metrics**](MetadataApi.md#get_environment_metrics) | **GET** /metrics/environment/{envId} | 
-[**get_frontend_detail**](MetadataApi.md#get_frontend_detail) | **GET** /detail/frontend/{feId} | 
+[**get_frontend_detail**](MetadataApi.md#get_frontend_detail) | **GET** /detail/frontend/{frontendId} | 
 [**get_share_detail**](MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 [**get_share_metrics**](MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 [**get_sparklines**](MetadataApi.md#get_sparklines) | **POST** /sparklines | 
@@ -263,7 +263,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_frontend_detail**
-> Frontend get_frontend_detail(fe_id)
+> Frontend get_frontend_detail(frontend_id)
 
 
 
@@ -283,10 +283,10 @@ configuration.api_key['x-token'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-fe_id = 56 # int | 
+frontend_id = 56 # int | 
 
 try:
-    api_response = api_instance.get_frontend_detail(fe_id)
+    api_response = api_instance.get_frontend_detail(frontend_id)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling MetadataApi->get_frontend_detail: %s\n" % e)
@@ -296,7 +296,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **fe_id** | **int**|  | 
+ **frontend_id** | **int**|  | 
 
 ### Return type
 

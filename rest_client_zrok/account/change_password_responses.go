@@ -68,7 +68,7 @@ func NewChangePasswordOK() *ChangePasswordOK {
 /*
 ChangePasswordOK describes a response with status code 200, with default header values.
 
-changed password
+password changed
 */
 type ChangePasswordOK struct {
 }

@@ -167,7 +167,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "changed password"
+            "description": "password changed"
           },
           "400": {
             "description": "password not changed"
@@ -265,7 +265,7 @@ func init() {
         }
       }
     },
-    "/detail/frontend/{feId}": {
+    "/detail/frontend/{frontendId}": {
       "get": {
         "security": [
           {
@@ -279,7 +279,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "name": "feId",
+            "name": "frontendId",
             "in": "path",
             "required": true
           }
@@ -1537,10 +1537,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "forgot password request created"
+            "description": "reset password request created"
           },
           "400": {
-            "description": "forgot password request not created"
+            "description": "reset password request not created"
           },
           "500": {
             "description": "internal server error"
@@ -2364,7 +2364,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "changed password"
+            "description": "password changed"
           },
           "400": {
             "description": "password not changed"
@@ -2462,7 +2462,7 @@ func init() {
         }
       }
     },
-    "/detail/frontend/{feId}": {
+    "/detail/frontend/{frontendId}": {
       "get": {
         "security": [
           {
@@ -2476,7 +2476,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "name": "feId",
+            "name": "frontendId",
             "in": "path",
             "required": true
           }
@@ -3683,10 +3683,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "forgot password request created"
+            "description": "reset password request created"
           },
           "400": {
-            "description": "forgot password request not created"
+            "description": "reset password request not created"
           },
           "500": {
             "description": "internal server error"

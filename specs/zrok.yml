@@ -35,7 +35,7 @@ paths:
                 type: string
       responses:
         200:
-          description: changed password
+          description: password changed
         400:
           description: password not changed
         401:
@@ -191,9 +191,9 @@ paths:
                 type: string
       responses:
         201:
-          description: forgot password request created
+          description: reset password request created
         400:
-          description: forgot password request not created
+          description: reset password request not created
         500:
           description: internal server error
 
@@ -723,7 +723,7 @@ paths:
         500:
           description: internal server error
 
-  /detail/frontend/{feId}:
+  /detail/frontend/{frontendId}:
     get:
       tags:
         - metadata
@@ -731,7 +731,7 @@ paths:
         - key: []
       operationId: getFrontendDetail
       parameters:
-        - name: feId
+        - name: frontendId
           in: path
           type: integer
           required: true

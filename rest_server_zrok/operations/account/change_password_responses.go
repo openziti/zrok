@@ -17,7 +17,7 @@ import (
 const ChangePasswordOKCode int = 200
 
 /*
-ChangePasswordOK changed password
+ChangePasswordOK password changed
 
 swagger:response changePasswordOK
 */

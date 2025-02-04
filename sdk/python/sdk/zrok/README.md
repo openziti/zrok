@@ -175,7 +175,7 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**get_account_metrics**](docs/MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
 *MetadataApi* | [**get_environment_detail**](docs/MetadataApi.md#get_environment_detail) | **GET** /detail/environment/{envZId} | 
 *MetadataApi* | [**get_environment_metrics**](docs/MetadataApi.md#get_environment_metrics) | **GET** /metrics/environment/{envId} | 
-*MetadataApi* | [**get_frontend_detail**](docs/MetadataApi.md#get_frontend_detail) | **GET** /detail/frontend/{feId} | 
+*MetadataApi* | [**get_frontend_detail**](docs/MetadataApi.md#get_frontend_detail) | **GET** /detail/frontend/{frontendId} | 
 *MetadataApi* | [**get_share_detail**](docs/MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 *MetadataApi* | [**get_share_metrics**](docs/MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 *MetadataApi* | [**get_sparklines**](docs/MetadataApi.md#get_sparklines) | **POST** /sparklines | 

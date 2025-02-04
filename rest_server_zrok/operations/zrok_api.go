@@ -690,7 +690,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/detail/frontend/{feId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
+	o.handlers["GET"]["/detail/frontend/{frontendId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
