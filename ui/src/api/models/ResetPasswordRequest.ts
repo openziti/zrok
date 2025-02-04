@@ -24,7 +24,7 @@ export interface ResetPasswordRequest {
      * @type {string}
      * @memberof ResetPasswordRequest
      */
-    token?: string;
+    resetToken?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +50,7 @@ export function ResetPasswordRequestFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'resetToken': json['resetToken'] == null ? undefined : json['resetToken'],
         'password': json['password'] == null ? undefined : json['password'],
     };
 }
@@ -61,7 +61,7 @@ export function ResetPasswordRequestToJSON(value?: ResetPasswordRequest | null):
     }
     return {
         
-        'token': value['token'],
+        'resetToken': value['resetToken'],
         'password': value['password'],
     };
 }

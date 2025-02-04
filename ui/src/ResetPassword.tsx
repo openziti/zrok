@@ -140,7 +140,7 @@ const ResetPassword = () => {
     const [component, setComponent] = useState<React.JSX.Element>();
 
     const doReset = (v) => {
-        new AccountApi().resetPassword({body: {token: resetToken, password: v.password}})
+        new AccountApi().resetPassword({body: {resetToken: resetToken, password: v.password}})
             .then(() => {
                 setComponent(<ResetComplete />);
             })

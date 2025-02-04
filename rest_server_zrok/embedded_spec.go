@@ -1490,7 +1490,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "token": {
+                "resetToken": {
                   "type": "string"
                 }
               }
@@ -3636,7 +3636,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "token": {
+                "resetToken": {
                   "type": "string"
                 }
               }

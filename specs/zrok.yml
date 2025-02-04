@@ -161,7 +161,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              resetToken:
                 type: string
               password:
                 type: string

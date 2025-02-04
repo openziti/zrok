@@ -66,8 +66,8 @@ type ResetPasswordBody struct {
 	// password
 	Password string `json:"password,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// reset token
+	ResetToken string `json:"resetToken,omitempty"`
 }
 
 // Validate validates this reset password body

@@ -28,45 +28,45 @@ class ResetPasswordBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'token': 'str',
+        'reset_token': 'str',
         'password': 'str'
     }
 
     attribute_map = {
-        'token': 'token',
+        'reset_token': 'resetToken',
         'password': 'password'
     }
 
-    def __init__(self, token=None, password=None):  # noqa: E501
+    def __init__(self, reset_token=None, password=None):  # noqa: E501
         """ResetPasswordBody - a model defined in Swagger"""  # noqa: E501
-        self._token = None
+        self._reset_token = None
         self._password = None
         self.discriminator = None
-        if token is not None:
-            self.token = token
+        if reset_token is not None:
+            self.reset_token = reset_token
         if password is not None:
             self.password = password
 
     @property
-    def token(self):
-        """Gets the token of this ResetPasswordBody.  # noqa: E501
+    def reset_token(self):
+        """Gets the reset_token of this ResetPasswordBody.  # noqa: E501
 
 
-        :return: The token of this ResetPasswordBody.  # noqa: E501
+        :return: The reset_token of this ResetPasswordBody.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._reset_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this ResetPasswordBody.
+    @reset_token.setter
+    def reset_token(self, reset_token):
+        """Sets the reset_token of this ResetPasswordBody.
 
 
-        :param token: The token of this ResetPasswordBody.  # noqa: E501
+        :param reset_token: The reset_token of this ResetPasswordBody.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._reset_token = reset_token
 
     @property
     def password(self):
