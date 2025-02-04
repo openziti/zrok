@@ -40,8 +40,9 @@ model/metricsSample.ts
 model/models.ts
 model/overview.ts
 model/principal.ts
-model/regenerateToken200Response.ts
-model/regenerateTokenRequest.ts
+model/regenerateAccountToken200Response.ts
+model/regenerateAccountTokenRequest.ts
+model/register200Response.ts
 model/registerRequest.ts
 model/removeOrganizationMemberRequest.ts
 model/share.ts

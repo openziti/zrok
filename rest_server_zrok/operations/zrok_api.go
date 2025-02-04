@@ -142,8 +142,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
-		AccountRegenerateTokenHandler: account.RegenerateTokenHandlerFunc(func(params account.RegenerateTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation account.RegenerateToken has not yet been implemented")
+		AccountRegenerateAccountTokenHandler: account.RegenerateAccountTokenHandlerFunc(func(params account.RegenerateAccountTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.RegenerateAccountToken has not yet been implemented")
 		}),
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
@@ -290,8 +290,8 @@ type ZrokAPI struct {
 	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
-	// AccountRegenerateTokenHandler sets the operation handler for the regenerate token operation
-	AccountRegenerateTokenHandler account.RegenerateTokenHandler
+	// AccountRegenerateAccountTokenHandler sets the operation handler for the regenerate account token operation
+	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
@@ -488,8 +488,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
-	if o.AccountRegenerateTokenHandler == nil {
-		unregistered = append(unregistered, "account.RegenerateTokenHandler")
+	if o.AccountRegenerateAccountTokenHandler == nil {
+		unregistered = append(unregistered, "account.RegenerateAccountTokenHandler")
 	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
@@ -750,7 +750,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/regenerateToken"] = account.NewRegenerateToken(o.context, o.AccountRegenerateTokenHandler)
+	o.handlers["POST"]["/regenerateAccountToken"] = account.NewRegenerateAccountToken(o.context, o.AccountRegenerateAccountTokenHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -93,13 +93,13 @@ configuration.api_key['x-token'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = zrok_api.AccountApi(zrok_api.ApiClient(configuration))
-body = zrok_api.RegenerateTokenBody() # RegenerateTokenBody |  (optional)
+body = zrok_api.RegenerateAccountTokenBody() # RegenerateAccountTokenBody |  (optional)
 
 try:
-    api_response = api_instance.regenerate_token(body=body)
+    api_response = api_instance.regenerate_account_token(body=body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling AccountApi->regenerate_token: %s\n" % e)
+    print("Exception when calling AccountApi->regenerate_account_token: %s\n" % e)
 
 # create an instance of the API class
 api_instance = zrok_api.AccountApi(zrok_api.ApiClient(configuration))
@@ -149,7 +149,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**change_password**](docs/AccountApi.md#change_password) | **POST** /changePassword | 
 *AccountApi* | [**invite**](docs/AccountApi.md#invite) | **POST** /invite | 
 *AccountApi* | [**login**](docs/AccountApi.md#login) | **POST** /login | 
-*AccountApi* | [**regenerate_token**](docs/AccountApi.md#regenerate_token) | **POST** /regenerateToken | 
+*AccountApi* | [**regenerate_account_token**](docs/AccountApi.md#regenerate_account_token) | **POST** /regenerateAccountToken | 
 *AccountApi* | [**register**](docs/AccountApi.md#register) | **POST** /register | 
 *AccountApi* | [**reset_password**](docs/AccountApi.md#reset_password) | **POST** /resetPassword | 
 *AccountApi* | [**reset_password_request**](docs/AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
@@ -214,12 +214,13 @@ Class | Method | HTTP request | Description
  - [InlineResponse2001](docs/InlineResponse2001.md)
  - [InlineResponse2002](docs/InlineResponse2002.md)
  - [InlineResponse2003](docs/InlineResponse2003.md)
- - [InlineResponse2003Members](docs/InlineResponse2003Members.md)
  - [InlineResponse2004](docs/InlineResponse2004.md)
- - [InlineResponse2004Organizations](docs/InlineResponse2004Organizations.md)
+ - [InlineResponse2004Members](docs/InlineResponse2004Members.md)
  - [InlineResponse2005](docs/InlineResponse2005.md)
- - [InlineResponse2005Memberships](docs/InlineResponse2005Memberships.md)
+ - [InlineResponse2005Organizations](docs/InlineResponse2005Organizations.md)
  - [InlineResponse2006](docs/InlineResponse2006.md)
+ - [InlineResponse2006Memberships](docs/InlineResponse2006Memberships.md)
+ - [InlineResponse2007](docs/InlineResponse2007.md)
  - [InlineResponse201](docs/InlineResponse201.md)
  - [InlineResponse2011](docs/InlineResponse2011.md)
  - [InviteBody](docs/InviteBody.md)
@@ -233,7 +234,7 @@ Class | Method | HTTP request | Description
  - [OrganizationRemoveBody](docs/OrganizationRemoveBody.md)
  - [Overview](docs/Overview.md)
  - [Principal](docs/Principal.md)
- - [RegenerateTokenBody](docs/RegenerateTokenBody.md)
+ - [RegenerateAccountTokenBody](docs/RegenerateAccountTokenBody.md)
  - [RegisterBody](docs/RegisterBody.md)
  - [ResetPasswordBody](docs/ResetPasswordBody.md)
  - [ResetPasswordRequestBody](docs/ResetPasswordRequestBody.md)

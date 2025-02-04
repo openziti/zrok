@@ -18,8 +18,9 @@ import type {
   ChangePasswordRequest,
   InviteRequest,
   LoginRequest,
-  RegenerateToken200Response,
-  RegenerateTokenRequest,
+  RegenerateAccountToken200Response,
+  RegenerateAccountTokenRequest,
+  Register200Response,
   RegisterRequest,
   Verify200Response,
 } from '../models/index';
@@ -30,10 +31,12 @@ import {
     InviteRequestToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
-    RegenerateToken200ResponseFromJSON,
-    RegenerateToken200ResponseToJSON,
-    RegenerateTokenRequestFromJSON,
-    RegenerateTokenRequestToJSON,
+    RegenerateAccountToken200ResponseFromJSON,
+    RegenerateAccountToken200ResponseToJSON,
+    RegenerateAccountTokenRequestFromJSON,
+    RegenerateAccountTokenRequestToJSON,
+    Register200ResponseFromJSON,
+    Register200ResponseToJSON,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
     Verify200ResponseFromJSON,
@@ -52,8 +55,8 @@ export interface LoginOperationRequest {
     body?: LoginRequest;
 }
 
-export interface RegenerateTokenOperationRequest {
-    body?: RegenerateTokenRequest;
+export interface RegenerateAccountTokenOperationRequest {
+    body?: RegenerateAccountTokenRequest;
 }
 
 export interface RegisterOperationRequest {
@@ -65,11 +68,11 @@ export interface ResetPasswordRequest {
 }
 
 export interface ResetPasswordRequestRequest {
-    body?: RegenerateTokenRequest;
+    body?: RegenerateAccountTokenRequest;
 }
 
 export interface VerifyRequest {
-    body?: RegenerateToken200Response;
+    body?: Register200Response;
 }
 
 /**
@@ -166,7 +169,7 @@ export class AccountApi extends runtime.BaseAPI {
 
     /**
      */
-    async regenerateTokenRaw(requestParameters: RegenerateTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
+    async regenerateAccountTokenRaw(requestParameters: RegenerateAccountTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateAccountToken200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -178,26 +181,26 @@ export class AccountApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/regenerateToken`,
+            path: `/regenerateAccountToken`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RegenerateTokenRequestToJSON(requestParameters['body']),
+            body: RegenerateAccountTokenRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateToken200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateAccountToken200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async regenerateToken(requestParameters: RegenerateTokenOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
-        const response = await this.regenerateTokenRaw(requestParameters, initOverrides);
+    async regenerateAccountToken(requestParameters: RegenerateAccountTokenOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateAccountToken200Response> {
+        const response = await this.regenerateAccountTokenRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async registerRaw(requestParameters: RegisterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateToken200Response>> {
+    async registerRaw(requestParameters: RegisterOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Register200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -212,12 +215,12 @@ export class AccountApi extends runtime.BaseAPI {
             body: RegisterRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateToken200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => Register200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async register(requestParameters: RegisterOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateToken200Response> {
+    async register(requestParameters: RegisterOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Register200Response> {
         const response = await this.registerRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -262,7 +265,7 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RegenerateTokenRequestToJSON(requestParameters['body']),
+            body: RegenerateAccountTokenRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -288,7 +291,7 @@ export class AccountApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RegenerateToken200ResponseToJSON(requestParameters['body']),
+            body: Register200ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => Verify200ResponseFromJSON(jsonValue));

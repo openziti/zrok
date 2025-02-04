@@ -1383,7 +1383,7 @@ func init() {
         }
       }
     },
-    "/regenerateToken": {
+    "/regenerateAccountToken": {
       "post": {
         "security": [
           {
@@ -1393,7 +1393,7 @@ func init() {
         "tags": [
           "account"
         ],
-        "operationId": "regenerateToken",
+        "operationId": "regenerateAccountToken",
         "parameters": [
           {
             "name": "body",
@@ -1412,7 +1412,7 @@ func init() {
             "description": "regenerate account token",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -3529,7 +3529,7 @@ func init() {
         }
       }
     },
-    "/regenerateToken": {
+    "/regenerateAccountToken": {
       "post": {
         "security": [
           {
@@ -3539,7 +3539,7 @@ func init() {
         "tags": [
           "account"
         ],
-        "operationId": "regenerateToken",
+        "operationId": "regenerateAccountToken",
         "parameters": [
           {
             "name": "body",
@@ -3558,7 +3558,7 @@ func init() {
             "description": "regenerate account token",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }

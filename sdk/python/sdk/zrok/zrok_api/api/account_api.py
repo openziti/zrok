@@ -311,37 +311,37 @@ class AccountApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def regenerate_token(self, **kwargs):  # noqa: E501
-        """regenerate_token  # noqa: E501
+    def regenerate_account_token(self, **kwargs):  # noqa: E501
+        """regenerate_account_token  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.regenerate_token(async_req=True)
+        >>> thread = api.regenerate_account_token(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param RegenerateTokenBody body:
+        :param RegenerateAccountTokenBody body:
         :return: InlineResponse200
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.regenerate_token_with_http_info(**kwargs)  # noqa: E501
+            return self.regenerate_account_token_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.regenerate_token_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.regenerate_account_token_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def regenerate_token_with_http_info(self, **kwargs):  # noqa: E501
-        """regenerate_token  # noqa: E501
+    def regenerate_account_token_with_http_info(self, **kwargs):  # noqa: E501
+        """regenerate_account_token  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.regenerate_token_with_http_info(async_req=True)
+        >>> thread = api.regenerate_account_token_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param RegenerateTokenBody body:
+        :param RegenerateAccountTokenBody body:
         :return: InlineResponse200
                  If the method is called asynchronously,
                  returns the request thread.
@@ -358,7 +358,7 @@ class AccountApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method regenerate_token" % key
+                    " to method regenerate_account_token" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -389,7 +389,7 @@ class AccountApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/regenerateToken', 'POST',
+            '/regenerateAccountToken', 'POST',
             path_params,
             query_params,
             header_params,
@@ -414,7 +414,7 @@ class AccountApi(object):
 
         :param async_req bool
         :param RegisterBody body:
-        :return: InlineResponse200
+        :return: InlineResponse2001
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -435,7 +435,7 @@ class AccountApi(object):
 
         :param async_req bool
         :param RegisterBody body:
-        :return: InlineResponse200
+        :return: InlineResponse2001
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -489,7 +489,7 @@ class AccountApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse200',  # noqa: E501
+            response_type='InlineResponse2001',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -689,7 +689,7 @@ class AccountApi(object):
 
         :param async_req bool
         :param VerifyBody body:
-        :return: InlineResponse2001
+        :return: InlineResponse2002
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -710,7 +710,7 @@ class AccountApi(object):
 
         :param async_req bool
         :param VerifyBody body:
-        :return: InlineResponse2001
+        :return: InlineResponse2002
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -764,7 +764,7 @@ class AccountApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse2001',  # noqa: E501
+            response_type='InlineResponse2002',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

@@ -46,7 +46,7 @@ func Run(inCfg *config.Config) error {
 	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
-	api.AccountRegenerateTokenHandler = newRegenerateTokenHandler()
+	api.AccountRegenerateAccountTokenHandler = newRegenerateAccountTokenHandler()
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()

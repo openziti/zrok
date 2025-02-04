@@ -7,7 +7,7 @@ Method | HTTP request | Description
 [**change_password**](AccountApi.md#change_password) | **POST** /changePassword | 
 [**invite**](AccountApi.md#invite) | **POST** /invite | 
 [**login**](AccountApi.md#login) | **POST** /login | 
-[**regenerate_token**](AccountApi.md#regenerate_token) | **POST** /regenerateToken | 
+[**regenerate_account_token**](AccountApi.md#regenerate_account_token) | **POST** /regenerateAccountToken | 
 [**register**](AccountApi.md#register) | **POST** /register | 
 [**reset_password**](AccountApi.md#reset_password) | **POST** /resetPassword | 
 [**reset_password_request**](AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
@@ -152,8 +152,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **regenerate_token**
-> InlineResponse200 regenerate_token(body=body)
+# **regenerate_account_token**
+> InlineResponse200 regenerate_account_token(body=body)
 
 
 
@@ -173,20 +173,20 @@ configuration.api_key['x-token'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = zrok_api.AccountApi(zrok_api.ApiClient(configuration))
-body = zrok_api.RegenerateTokenBody() # RegenerateTokenBody |  (optional)
+body = zrok_api.RegenerateAccountTokenBody() # RegenerateAccountTokenBody |  (optional)
 
 try:
-    api_response = api_instance.regenerate_token(body=body)
+    api_response = api_instance.regenerate_account_token(body=body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling AccountApi->regenerate_token: %s\n" % e)
+    print("Exception when calling AccountApi->regenerate_account_token: %s\n" % e)
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**RegenerateTokenBody**](RegenerateTokenBody.md)|  | [optional] 
+ **body** | [**RegenerateAccountTokenBody**](RegenerateAccountTokenBody.md)|  | [optional] 
 
 ### Return type
 
@@ -204,7 +204,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **register**
-> InlineResponse200 register(body=body)
+> InlineResponse2001 register(body=body)
 
 
 
@@ -235,7 +235,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**InlineResponse2001**](InlineResponse2001.md)
 
 ### Authorization
 
@@ -337,7 +337,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **verify**
-> InlineResponse2001 verify(body=body)
+> InlineResponse2002 verify(body=body)
 
 
 
@@ -368,7 +368,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**InlineResponse2002**](InlineResponse2002.md)
 
 ### Authorization
 

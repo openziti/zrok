@@ -95,13 +95,13 @@ paths:
         401:
           description: invalid login
 
-  /regenerateToken:
+  /regenerateAccountToken:
     post:
       tags:
         - account
       security:
         - key: []
-      operationId: regenerateToken
+      operationId: regenerateAccountToken
       parameters:
         - name: body
           in: body
@@ -114,7 +114,7 @@ paths:
           description: regenerate account token
           schema:
             properties:
-              token:
+              accountToken:
                 type: string
         404:
           description: account not found

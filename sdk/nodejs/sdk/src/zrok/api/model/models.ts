@@ -32,8 +32,9 @@ export * from './metrics';
 export * from './metricsSample';
 export * from './overview';
 export * from './principal';
-export * from './regenerateToken200Response';
-export * from './regenerateTokenRequest';
+export * from './regenerateAccountToken200Response';
+export * from './regenerateAccountTokenRequest';
+export * from './register200Response';
 export * from './registerRequest';
 export * from './removeOrganizationMemberRequest';
 export * from './share';
@@ -91,8 +92,9 @@ import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
 import { Overview } from './overview';
 import { Principal } from './principal';
-import { RegenerateToken200Response } from './regenerateToken200Response';
-import { RegenerateTokenRequest } from './regenerateTokenRequest';
+import { RegenerateAccountToken200Response } from './regenerateAccountToken200Response';
+import { RegenerateAccountTokenRequest } from './regenerateAccountTokenRequest';
+import { Register200Response } from './register200Response';
 import { RegisterRequest } from './registerRequest';
 import { RemoveOrganizationMemberRequest } from './removeOrganizationMemberRequest';
 import { Share } from './share';
@@ -158,8 +160,9 @@ let typeMap: {[index: string]: any} = {
     "MetricsSample": MetricsSample,
     "Overview": Overview,
     "Principal": Principal,
-    "RegenerateToken200Response": RegenerateToken200Response,
-    "RegenerateTokenRequest": RegenerateTokenRequest,
+    "RegenerateAccountToken200Response": RegenerateAccountToken200Response,
+    "RegenerateAccountTokenRequest": RegenerateAccountTokenRequest,
+    "Register200Response": Register200Response,
     "RegisterRequest": RegisterRequest,
     "RemoveOrganizationMemberRequest": RemoveOrganizationMemberRequest,
     "Share": Share,

@@ -33,18 +33,18 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
     }, [isOpen]);
 
     const regenerateToken = () => {
-        getAccountApi(user).regenerateToken({body: {emailAddress: user.email}})
+        getAccountApi(user).regenerateAccountToken({body: {emailAddress: user.email}})
             .then(d => {
                 let newUser = {
                     email: user.email!,
-                    token: d.token!,
+                    token: d.accountToken!,
                 }
                 console.log(user, newUser);
                 updateUser(newUser);
                 localStorage.setItem("user", JSON.stringify(newUser));
                 document.dispatchEvent(new Event("userUpdated"));
                 setSuccessMessage(<><Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                    <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.token}</code> <ClipboardText text={String(d.token)} /></Typography>
+                    <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.accountToken}</code> <ClipboardText text={String(d.accountToken)} /></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>

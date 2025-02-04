@@ -36,7 +36,7 @@ type ClientService interface {
 
 	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
 
-	RegenerateToken(params *RegenerateTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateTokenOK, error)
+	RegenerateAccountToken(params *RegenerateAccountTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateAccountTokenOK, error)
 
 	Register(params *RegisterParams, opts ...ClientOption) (*RegisterOK, error)
 
@@ -165,22 +165,22 @@ func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, err
 }
 
 /*
-RegenerateToken regenerate token API
+RegenerateAccountToken regenerate account token API
 */
-func (a *Client) RegenerateToken(params *RegenerateTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateTokenOK, error) {
+func (a *Client) RegenerateAccountToken(params *RegenerateAccountTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateAccountTokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewRegenerateTokenParams()
+		params = NewRegenerateAccountTokenParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "regenerateToken",
+		ID:                 "regenerateAccountToken",
 		Method:             "POST",
-		PathPattern:        "/regenerateToken",
+		PathPattern:        "/regenerateAccountToken",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &RegenerateTokenReader{formats: a.formats},
+		Reader:             &RegenerateAccountTokenReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -193,13 +193,13 @@ func (a *Client) RegenerateToken(params *RegenerateTokenParams, authInfo runtime
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*RegenerateTokenOK)
+	success, ok := result.(*RegenerateAccountTokenOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for regenerateToken: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for regenerateAccountToken: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
