@@ -28,40 +28,40 @@ class TokenGenerateBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'tokens': 'list[str]'
+        'invite_tokens': 'list[str]'
     }
 
     attribute_map = {
-        'tokens': 'tokens'
+        'invite_tokens': 'inviteTokens'
     }
 
-    def __init__(self, tokens=None):  # noqa: E501
+    def __init__(self, invite_tokens=None):  # noqa: E501
         """TokenGenerateBody - a model defined in Swagger"""  # noqa: E501
-        self._tokens = None
+        self._invite_tokens = None
         self.discriminator = None
-        if tokens is not None:
-            self.tokens = tokens
+        if invite_tokens is not None:
+            self.invite_tokens = invite_tokens
 
     @property
-    def tokens(self):
-        """Gets the tokens of this TokenGenerateBody.  # noqa: E501
+    def invite_tokens(self):
+        """Gets the invite_tokens of this TokenGenerateBody.  # noqa: E501
 
 
-        :return: The tokens of this TokenGenerateBody.  # noqa: E501
+        :return: The invite_tokens of this TokenGenerateBody.  # noqa: E501
         :rtype: list[str]
         """
-        return self._tokens
+        return self._invite_tokens
 
-    @tokens.setter
-    def tokens(self, tokens):
-        """Sets the tokens of this TokenGenerateBody.
+    @invite_tokens.setter
+    def invite_tokens(self, invite_tokens):
+        """Sets the invite_tokens of this TokenGenerateBody.
 
 
-        :param tokens: The tokens of this TokenGenerateBody.  # noqa: E501
+        :param invite_tokens: The invite_tokens of this TokenGenerateBody.  # noqa: E501
         :type: list[str]
         """
 
-        self._tokens = tokens
+        self._invite_tokens = invite_tokens
 
     def to_dict(self):
         """Returns the model properties as a dict"""

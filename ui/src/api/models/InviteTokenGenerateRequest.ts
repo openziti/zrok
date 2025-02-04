@@ -24,7 +24,7 @@ export interface InviteTokenGenerateRequest {
      * @type {Array<string>}
      * @memberof InviteTokenGenerateRequest
      */
-    tokens?: Array<string>;
+    inviteTokens?: Array<string>;
 }
 
 /**
@@ -44,7 +44,7 @@ export function InviteTokenGenerateRequestFromJSONTyped(json: any, ignoreDiscrim
     }
     return {
         
-        'tokens': json['tokens'] == null ? undefined : json['tokens'],
+        'inviteTokens': json['inviteTokens'] == null ? undefined : json['inviteTokens'],
     };
 }
 
@@ -54,7 +54,7 @@ export function InviteTokenGenerateRequestToJSON(value?: InviteTokenGenerateRequ
     }
     return {
         
-        'tokens': value['tokens'],
+        'inviteTokens': value['inviteTokens'],
     };
 }
 

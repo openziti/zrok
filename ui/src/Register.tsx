@@ -186,7 +186,7 @@ const Register = () => {
         new AccountApi().register({body: {token: regToken, password: v.password}})
             .then(d => {
                 console.log(d);
-                setComponent(<RegistrationComplete token={d.token!} />);
+                setComponent(<RegistrationComplete token={d.accountToken!} />);
             })
             .catch(e => {
                 console.log("doRegistration", e);
@@ -195,7 +195,7 @@ const Register = () => {
 
     useEffect(() => {
         if(regToken) {
-            new AccountApi().verify({body: {token: regToken}})
+            new AccountApi().verify({body: {registrationToken: regToken}})
                 .then((d) => {
                     console.log(d);
                     setEmail(d.email);

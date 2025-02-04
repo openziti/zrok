@@ -24,7 +24,7 @@ export interface ListMemberships200ResponseMembershipsInner {
      * @type {string}
      * @memberof ListMemberships200ResponseMembershipsInner
      */
-    token?: string;
+    organizationToken?: string;
     /**
      * 
      * @type {string}
@@ -56,7 +56,7 @@ export function ListMemberships200ResponseMembershipsInnerFromJSONTyped(json: an
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'organizationToken': json['organizationToken'] == null ? undefined : json['organizationToken'],
         'description': json['description'] == null ? undefined : json['description'],
         'admin': json['admin'] == null ? undefined : json['admin'],
     };
@@ -68,7 +68,7 @@ export function ListMemberships200ResponseMembershipsInnerToJSON(value?: ListMem
     }
     return {
         
-        'token': value['token'],
+        'organizationToken': value['organizationToken'],
         'description': value['description'],
         'admin': value['admin'],
     };

@@ -31,7 +31,6 @@ import type {
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
   Verify200Response,
-  VerifyRequest,
 } from '../models/index';
 import {
     AddOrganizationMemberRequestFromJSON,
@@ -66,8 +65,6 @@ import {
     UpdateFrontendRequestToJSON,
     Verify200ResponseFromJSON,
     Verify200ResponseToJSON,
-    VerifyRequestFromJSON,
-    VerifyRequestToJSON,
 } from '../models/index';
 
 export interface AddOrganizationMemberOperationRequest {
@@ -107,7 +104,7 @@ export interface InviteTokenGenerateOperationRequest {
 }
 
 export interface ListOrganizationMembersRequest {
-    body?: VerifyRequest;
+    body?: CreateOrganization201Response;
 }
 
 export interface RemoveOrganizationMemberOperationRequest {
@@ -443,7 +440,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: VerifyRequestToJSON(requestParameters['body']),
+            body: CreateOrganization201ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ListOrganizationMembers200ResponseFromJSON(jsonValue));

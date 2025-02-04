@@ -31,7 +31,6 @@ import { RegenerateAccountToken200Response } from '../model/regenerateAccountTok
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
 import { Verify200Response } from '../model/verify200Response';
-import { VerifyRequest } from '../model/verifyRequest';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
 import { HttpBasicAuth, HttpBearerAuth, ApiKeyAuth, OAuth } from '../model/models';
@@ -727,7 +726,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async listOrganizationMembers (body?: VerifyRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ListOrganizationMembers200Response;  }> {
+    public async listOrganizationMembers (body?: CreateOrganization201Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ListOrganizationMembers200Response;  }> {
         const localVarPath = this.basePath + '/organization/list';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -751,7 +750,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "VerifyRequest")
+            body: ObjectSerializer.serialize(body, "CreateOrganization201Response")
         };
 
         let authenticationPromise = Promise.resolve();

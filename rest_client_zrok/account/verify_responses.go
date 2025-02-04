@@ -54,7 +54,7 @@ func NewVerifyOK() *VerifyOK {
 /*
 VerifyOK describes a response with status code 200, with default header values.
 
-token ready
+registration token ready
 */
 type VerifyOK struct {
 	Payload *VerifyOKBody
@@ -122,7 +122,7 @@ func NewVerifyNotFound() *VerifyNotFound {
 /*
 VerifyNotFound describes a response with status code 404, with default header values.
 
-token not found
+registration token not found
 */
 type VerifyNotFound struct {
 }
@@ -232,8 +232,8 @@ swagger:model VerifyBody
 */
 type VerifyBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// registration token
+	RegistrationToken string `json:"registrationToken,omitempty"`
 }
 
 // Validate validates this verify body

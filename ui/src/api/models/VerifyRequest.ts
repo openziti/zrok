@@ -24,7 +24,7 @@ export interface VerifyRequest {
      * @type {string}
      * @memberof VerifyRequest
      */
-    token?: string;
+    registrationToken?: string;
 }
 
 /**
@@ -44,7 +44,7 @@ export function VerifyRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'registrationToken': json['registrationToken'] == null ? undefined : json['registrationToken'],
     };
 }
 
@@ -54,7 +54,7 @@ export function VerifyRequestToJSON(value?: VerifyRequest | null): any {
     }
     return {
         
-        'token': value['token'],
+        'registrationToken': value['registrationToken'],
     };
 }
 

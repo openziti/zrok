@@ -775,7 +775,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "tokens": {
+                "inviteTokens": {
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -787,10 +787,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "invitation tokens created"
+            "description": "invite tokens created"
           },
           "400": {
-            "description": "invitation tokens not created"
+            "description": "invite tokens not created"
           },
           "401": {
             "description": "unauthorized"
@@ -911,7 +911,7 @@ func init() {
                       "description": {
                         "type": "string"
                       },
-                      "token": {
+                      "organizationToken": {
                         "type": "string"
                       }
                     }
@@ -1191,7 +1191,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1818,7 +1818,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "registrationToken": {
                   "type": "string"
                 }
               }
@@ -1827,7 +1827,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "token ready",
+            "description": "registration token ready",
             "schema": {
               "properties": {
                 "email": {
@@ -1837,7 +1837,7 @@ func init() {
             }
           },
           "404": {
-            "description": "token not found"
+            "description": "registration token not found"
           },
           "500": {
             "description": "internal server error"
@@ -2952,7 +2952,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "tokens": {
+                "inviteTokens": {
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -2964,10 +2964,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "invitation tokens created"
+            "description": "invite tokens created"
           },
           "400": {
-            "description": "invitation tokens not created"
+            "description": "invite tokens not created"
           },
           "401": {
             "description": "unauthorized"
@@ -3351,7 +3351,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3964,7 +3964,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "registrationToken": {
                   "type": "string"
                 }
               }
@@ -3973,7 +3973,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "token ready",
+            "description": "registration token ready",
             "schema": {
               "properties": {
                 "email": {
@@ -3983,7 +3983,7 @@ func init() {
             }
           },
           "404": {
-            "description": "token not found"
+            "description": "registration token not found"
           },
           "500": {
             "description": "internal server error"
@@ -4050,7 +4050,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "token": {
+        "organizationToken": {
           "type": "string"
         }
       }

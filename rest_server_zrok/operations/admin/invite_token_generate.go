@@ -78,8 +78,8 @@ func (o *InviteTokenGenerate) ServeHTTP(rw http.ResponseWriter, r *http.Request)
 // swagger:model InviteTokenGenerateBody
 type InviteTokenGenerateBody struct {
 
-	// tokens
-	Tokens []string `json:"tokens"`
+	// invite tokens
+	InviteTokens []string `json:"inviteTokens"`
 }
 
 // Validate validates this invite token generate body

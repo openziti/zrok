@@ -59,7 +59,7 @@ func NewInviteTokenGenerateCreated() *InviteTokenGenerateCreated {
 /*
 InviteTokenGenerateCreated describes a response with status code 201, with default header values.
 
-invitation tokens created
+invite tokens created
 */
 type InviteTokenGenerateCreated struct {
 }
@@ -115,7 +115,7 @@ func NewInviteTokenGenerateBadRequest() *InviteTokenGenerateBadRequest {
 /*
 InviteTokenGenerateBadRequest describes a response with status code 400, with default header values.
 
-invitation tokens not created
+invite tokens not created
 */
 type InviteTokenGenerateBadRequest struct {
 }
@@ -281,8 +281,8 @@ swagger:model InviteTokenGenerateBody
 */
 type InviteTokenGenerateBody struct {
 
-	// tokens
-	Tokens []string `json:"tokens"`
+	// invite tokens
+	InviteTokens []string `json:"inviteTokens"`
 }
 
 // Validate validates this invite token generate body

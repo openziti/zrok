@@ -53,7 +53,7 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	req := admin.NewInviteTokenGenerateParams()
-	req.Body.Tokens = tokens
+	req.Body.InviteTokens = tokens
 
 	_, err = zrok.Admin.InviteTokenGenerate(req, mustGetAdminAuth())
 	if err != nil {

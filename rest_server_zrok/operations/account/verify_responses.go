@@ -15,7 +15,7 @@ import (
 const VerifyOKCode int = 200
 
 /*
-VerifyOK token ready
+VerifyOK registration token ready
 
 swagger:response verifyOK
 */
@@ -60,7 +60,7 @@ func (o *VerifyOK) WriteResponse(rw http.ResponseWriter, producer runtime.Produc
 const VerifyNotFoundCode int = 404
 
 /*
-VerifyNotFound token not found
+VerifyNotFound registration token not found
 
 swagger:response verifyNotFound
 */

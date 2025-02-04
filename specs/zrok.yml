@@ -207,17 +207,17 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              registrationToken:
                 type: string
       responses:
         200:
-          description: token ready
+          description: registration token ready
           schema:
             properties:
               email:
                 type: string
         404:
-          description: token not found
+          description: registration token not found
         500:
           description: internal server error
 
@@ -438,15 +438,15 @@ paths:
           in: body
           schema:
             properties:
-              tokens:
+              inviteTokens:
                 type: array
                 items:
                   type: string
       responses:
         201:
-          description: invitation tokens created
+          description: invite tokens created
         400:
-          description: invitation tokens not created
+          description: invite tokens not created
         401:
           description: unauthorized
         500:
@@ -540,7 +540,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              organizationToken:
                 type: string
       responses:
         200:
@@ -817,7 +817,7 @@ paths:
                 type: array
                 items:
                   properties:
-                    token:
+                    organizationToken:
                       type: string
                     description:
                       type: string

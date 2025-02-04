@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **str** |  | [optional] 
+**organization_token** | **str** |  | [optional] 
 **description** | **str** |  | [optional] 
 **admin** | **bool** |  | [optional] 
 

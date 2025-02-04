@@ -13,7 +13,7 @@
 import { RequestFile } from './models';
 
 export class ListMemberships200ResponseMembershipsInner {
-    'token'?: string;
+    'organizationToken'?: string;
     'description'?: string;
     'admin'?: boolean;
 
@@ -21,8 +21,8 @@ export class ListMemberships200ResponseMembershipsInner {
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "organizationToken",
+            "baseName": "organizationToken",
             "type": "string"
         },
         {
