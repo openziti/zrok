@@ -15,27 +15,28 @@ type Frontend struct {
 	UrlTemplate    *string
 	Reserved       bool
 	PermissionMode PermissionMode
+	Description    *string
 }
 
 func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (environment_id, private_share_id, token, z_id, public_name, url_template, reserved, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id")
+	stmt, err := tx.Prepare("insert into frontends (environment_id, private_share_id, token, z_id, public_name, url_template, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing frontends insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, f.PrivateShareId, f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved, f.PermissionMode).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, f.PrivateShareId, f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved, f.PermissionMode, f.Description).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing frontends insert statement")
 	}
 	return id, nil
 }
 
 func (str *Store) CreateGlobalFrontend(f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (token, z_id, public_name, url_template, reserved, permission_mode) values ($1, $2, $3, $4, $5, $6) returning id")
+	stmt, err := tx.Prepare("insert into frontends (token, z_id, public_name, url_template, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing global frontends insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved, f.PermissionMode).Scan(&id); err != nil {
+	if err := stmt.QueryRow(f.Token, f.ZId, f.PublicName, f.UrlTemplate, f.Reserved, f.PermissionMode, f.Description).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing global frontends insert statement")
 	}
 	return id, nil
@@ -122,12 +123,12 @@ func (str *Store) FindFrontendsForPrivateShare(shrId int, tx *sqlx.Tx) ([]*Front
 }
 
 func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
-	sql := "update frontends set environment_id = $1, private_share_id = $2, token = $3, z_id = $4, public_name = $5, url_template = $6, reserved = $7, permission_mode = $8, updated_at = current_timestamp where id = $9"
+	sql := "update frontends set environment_id = $1, private_share_id = $2, token = $3, z_id = $4, public_name = $5, url_template = $6, reserved = $7, permission_mode = $8, description = $9, updated_at = current_timestamp where id = $10"
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends update statement")
 	}
-	_, err = stmt.Exec(fe.EnvironmentId, fe.PrivateShareId, fe.Token, fe.ZId, fe.PublicName, fe.UrlTemplate, fe.Reserved, fe.PermissionMode, fe.Id)
+	_, err = stmt.Exec(fe.EnvironmentId, fe.PrivateShareId, fe.Token, fe.ZId, fe.PublicName, fe.UrlTemplate, fe.Reserved, fe.PermissionMode, fe.Description, fe.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing frontends update statement")
 	}
