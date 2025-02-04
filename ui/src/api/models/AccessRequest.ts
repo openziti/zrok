@@ -30,7 +30,7 @@ export interface AccessRequest {
      * @type {string}
      * @memberof AccessRequest
      */
-    shrToken?: string;
+    shareToken?: string;
 }
 
 /**
@@ -51,7 +51,7 @@ export function AccessRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
-        'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
     };
 }
 
@@ -62,7 +62,7 @@ export function AccessRequestToJSON(value?: AccessRequest | null): any {
     return {
         
         'envZId': value['envZId'],
-        'shrToken': value['shrToken'],
+        'shareToken': value['shareToken'],
     };
 }
 

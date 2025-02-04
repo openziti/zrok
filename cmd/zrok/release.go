@@ -53,7 +53,7 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
 	req := share.NewUnshareParams()
 	req.Body.EnvZID = env.Environment().ZitiIdentity
-	req.Body.ShrToken = shrToken
+	req.Body.ShareToken = shrToken
 	req.Body.Reserved = true
 	if _, err := zrok.Share.Unshare(req, auth); err != nil {
 		if !panicInstead {

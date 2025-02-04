@@ -24,7 +24,7 @@ export interface UpdateShareRequest {
      * @type {string}
      * @memberof UpdateShareRequest
      */
-    shrToken?: string;
+    shareToken?: string;
     /**
      * 
      * @type {string}
@@ -62,7 +62,7 @@ export function UpdateShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'backendProxyEndpoint': json['backendProxyEndpoint'] == null ? undefined : json['backendProxyEndpoint'],
         'addAccessGrants': json['addAccessGrants'] == null ? undefined : json['addAccessGrants'],
         'removeAccessGrants': json['removeAccessGrants'] == null ? undefined : json['removeAccessGrants'],
@@ -75,7 +75,7 @@ export function UpdateShareRequestToJSON(value?: UpdateShareRequest | null): any
     }
     return {
         
-        'shrToken': value['shrToken'],
+        'shareToken': value['shareToken'],
         'backendProxyEndpoint': value['backendProxyEndpoint'],
         'addAccessGrants': value['addAccessGrants'],
         'removeAccessGrants': value['removeAccessGrants'],

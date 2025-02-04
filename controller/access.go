@@ -46,7 +46,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessNotFound()
 	}
 
-	shrToken := params.Body.ShrToken
+	shrToken := params.Body.ShareToken
 	shr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding share with token '%v': %v", shrToken, err)

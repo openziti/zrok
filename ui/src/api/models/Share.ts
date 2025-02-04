@@ -31,7 +31,7 @@ export interface Share {
      * @type {string}
      * @memberof Share
      */
-    token?: string;
+    shareToken?: string;
     /**
      * 
      * @type {string}
@@ -117,7 +117,7 @@ export function ShareFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sha
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'zId': json['zId'] == null ? undefined : json['zId'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
@@ -138,7 +138,7 @@ export function ShareToJSON(value?: Share | null): any {
     }
     return {
         
-        'token': value['token'],
+        'shareToken': value['shareToken'],
         'zId': value['zId'],
         'shareMode': value['shareMode'],
         'backendMode': value['backendMode'],

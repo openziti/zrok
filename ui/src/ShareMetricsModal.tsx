@@ -21,7 +21,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
 
     useEffect(() => {
         let metadataApi = getMetadataApi(user);
-        metadataApi.getShareMetrics({shrToken: share.id})
+        metadataApi.getShareMetrics({shareToken: share.id})
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
@@ -30,7 +30,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                     console.log("shareMetricsModal", ex.message);
                 });
             });
-        metadataApi.getShareMetrics({shrToken: share.id, duration: "168h"})
+        metadataApi.getShareMetrics({shareToken: share.id, duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
@@ -39,7 +39,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                     console.log("shareMetricsModal", ex.message);
                 });
             });
-        metadataApi.getShareMetrics({shrToken: share.id, duration: "24h"})
+        metadataApi.getShareMetrics({shareToken: share.id, duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })

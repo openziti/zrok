@@ -58,7 +58,7 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 			logrus.Errorf("error getting share for frontend '%d': %v", fe.Id, err)
 			return metadata.NewGetFrontendDetailInternalServerError()
 		}
-		payload.ShrToken = shr.Token
+		payload.ShareToken = shr.Token
 	}
 	return metadata.NewGetFrontendDetailOK().WithPayload(payload)
 }

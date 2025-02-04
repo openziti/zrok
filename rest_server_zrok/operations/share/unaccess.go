@@ -84,8 +84,8 @@ type UnaccessBody struct {
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 }
 
 // Validate validates this unaccess body

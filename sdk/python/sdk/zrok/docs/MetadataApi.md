@@ -10,8 +10,8 @@ Method | HTTP request | Description
 [**get_environment_detail**](MetadataApi.md#get_environment_detail) | **GET** /detail/environment/{envZId} | 
 [**get_environment_metrics**](MetadataApi.md#get_environment_metrics) | **GET** /metrics/environment/{envId} | 
 [**get_frontend_detail**](MetadataApi.md#get_frontend_detail) | **GET** /detail/frontend/{feId} | 
-[**get_share_detail**](MetadataApi.md#get_share_detail) | **GET** /detail/share/{shrToken} | 
-[**get_share_metrics**](MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shrToken} | 
+[**get_share_detail**](MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
+[**get_share_metrics**](MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 [**get_sparklines**](MetadataApi.md#get_sparklines) | **POST** /sparklines | 
 [**list_memberships**](MetadataApi.md#list_memberships) | **GET** /memberships | 
 [**list_org_members**](MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
@@ -314,7 +314,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_share_detail**
-> Share get_share_detail(shr_token)
+> Share get_share_detail(share_token)
 
 
 
@@ -334,10 +334,10 @@ configuration.api_key['x-token'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-shr_token = 'shr_token_example' # str | 
+share_token = 'share_token_example' # str | 
 
 try:
-    api_response = api_instance.get_share_detail(shr_token)
+    api_response = api_instance.get_share_detail(share_token)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling MetadataApi->get_share_detail: %s\n" % e)
@@ -347,7 +347,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shr_token** | **str**|  | 
+ **share_token** | **str**|  | 
 
 ### Return type
 
@@ -365,7 +365,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_share_metrics**
-> Metrics get_share_metrics(shr_token, duration=duration)
+> Metrics get_share_metrics(share_token, duration=duration)
 
 
 
@@ -385,11 +385,11 @@ configuration.api_key['x-token'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-shr_token = 'shr_token_example' # str | 
+share_token = 'share_token_example' # str | 
 duration = 'duration_example' # str |  (optional)
 
 try:
-    api_response = api_instance.get_share_metrics(shr_token, duration=duration)
+    api_response = api_instance.get_share_metrics(share_token, duration=duration)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling MetadataApi->get_share_metrics: %s\n" % e)
@@ -399,7 +399,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shr_token** | **str**|  | 
+ **share_token** | **str**|  | 
  **duration** | **str**|  | [optional] 
 
 ### Return type

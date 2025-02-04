@@ -63,8 +63,8 @@ func (o *Verify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model VerifyBody
 type VerifyBody struct {
 
-	// registration token
-	RegistrationToken string `json:"registrationToken,omitempty"`
+	// register token
+	RegisterToken string `json:"registerToken,omitempty"`
 }
 
 // Validate validates this verify body

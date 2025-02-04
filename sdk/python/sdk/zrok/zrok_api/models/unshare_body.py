@@ -29,26 +29,26 @@ class UnshareBody(object):
     """
     swagger_types = {
         'env_zid': 'str',
-        'shr_token': 'str',
+        'share_token': 'str',
         'reserved': 'bool'
     }
 
     attribute_map = {
         'env_zid': 'envZId',
-        'shr_token': 'shrToken',
+        'share_token': 'shareToken',
         'reserved': 'reserved'
     }
 
-    def __init__(self, env_zid=None, shr_token=None, reserved=None):  # noqa: E501
+    def __init__(self, env_zid=None, share_token=None, reserved=None):  # noqa: E501
         """UnshareBody - a model defined in Swagger"""  # noqa: E501
         self._env_zid = None
-        self._shr_token = None
+        self._share_token = None
         self._reserved = None
         self.discriminator = None
         if env_zid is not None:
             self.env_zid = env_zid
-        if shr_token is not None:
-            self.shr_token = shr_token
+        if share_token is not None:
+            self.share_token = share_token
         if reserved is not None:
             self.reserved = reserved
 
@@ -74,25 +74,25 @@ class UnshareBody(object):
         self._env_zid = env_zid
 
     @property
-    def shr_token(self):
-        """Gets the shr_token of this UnshareBody.  # noqa: E501
+    def share_token(self):
+        """Gets the share_token of this UnshareBody.  # noqa: E501
 
 
-        :return: The shr_token of this UnshareBody.  # noqa: E501
+        :return: The share_token of this UnshareBody.  # noqa: E501
         :rtype: str
         """
-        return self._shr_token
+        return self._share_token
 
-    @shr_token.setter
-    def shr_token(self, shr_token):
-        """Sets the shr_token of this UnshareBody.
+    @share_token.setter
+    def share_token(self, share_token):
+        """Sets the share_token of this UnshareBody.
 
 
-        :param shr_token: The shr_token of this UnshareBody.  # noqa: E501
+        :param share_token: The share_token of this UnshareBody.  # noqa: E501
         :type: str
         """
 
-        self._shr_token = shr_token
+        self._share_token = share_token
 
     @property
     def reserved(self):

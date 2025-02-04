@@ -43,7 +43,6 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
 
     const labels = {
         createdAt: "Created",
-        shrToken: "Share Token",
         feToken: "Frontend Token",
         updatedAt: "Updated",
     }

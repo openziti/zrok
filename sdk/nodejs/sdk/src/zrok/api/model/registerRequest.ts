@@ -13,15 +13,15 @@
 import { RequestFile } from './models';
 
 export class RegisterRequest {
-    'regToken'?: string;
+    'registerToken'?: string;
     'password'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "regToken",
-            "baseName": "regToken",
+            "name": "registerToken",
+            "baseName": "registerToken",
             "type": "string"
         },
         {

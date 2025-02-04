@@ -16,7 +16,7 @@ interface ReleaseShareProps {
 
 const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareProps) => {
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [token, setToken] = useState<String>("");
+    const [shareToken, setShareToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;
@@ -31,8 +31,8 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
     }, [isOpen]);
 
     useEffect(() => {
-        if(detail && detail.token) {
-            setToken(detail.token);
+        if(detail && detail.shareToken) {
+            setShareToken(detail.shareToken);
         }
     }, [detail]);
 
@@ -41,7 +41,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
             getShareApi(user).unshare({
                 body: {
                     envZId: share.data.envZId as string,
-                    shrToken: detail.token,
+                    shareToken: detail.shareToken,
                     reserved: detail.reserved
                 }
             })
@@ -52,7 +52,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     e.response.json().then(ex => {
                         console.log("releaseShare", ex.message);
                     });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.token}</code>!</Typography>);
+                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.shareToken}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);
@@ -68,10 +68,10 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     <Typography variant="h5"><strong>Release Share</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="body1">Would you like to release the share <code>{token}</code> ?</Typography>
+                    <Typography variant="body1">Would you like to release the share <code>{shareToken}</code> ?</Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{token}</code></p>} sx={{ mt: 2 }} />
+                    <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{shareToken}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
                 { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">

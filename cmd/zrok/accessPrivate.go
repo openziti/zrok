@@ -118,7 +118,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := share.NewAccessParams()
-	req.Body.ShrToken = shrToken
+	req.Body.ShareToken = shrToken
 	req.Body.EnvZID = root.Environment().ZitiIdentity
 
 	accessResp, err := zrok.Share.Access(req, auth)
@@ -321,7 +321,7 @@ func (cmd *accessPrivateCommand) shutdown(frontendName, envZId, shrToken string,
 	logrus.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body.FrontendToken = frontendName
-	req.Body.ShrToken = shrToken
+	req.Body.ShareToken = shrToken
 	req.Body.EnvZID = envZId
 	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")

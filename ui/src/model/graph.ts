@@ -53,10 +53,10 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         shrLabel = shr.backendProxyEndpoint!;
                     }
                     let shrNode = {
-                        id: shr.token!,
+                        id: shr.shareToken!,
                         data: {
                             label: shrLabel,
-                            shrToken: shr.token!,
+                            shareToken: shr.shareToken!,
                             envZId: env.environment?.zId!,
                             limited: !!limited,
                             accessed: false,
@@ -64,7 +64,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         type: "share",
                         position: { x: 0, y: 0 }
                     }
-                    allShares[shr.token!] = shrNode;
+                    allShares[shr.shareToken!] = shrNode;
                     newVov.nodes.push(shrNode);
                     newVov.edges.push({
                         id: envNode.id + "-" + shrNode.id,
@@ -82,7 +82,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         data: {
                             label: fe.feToken!,
                             feId: fe.id,
-                            target: fe.shrToken,
+                            target: fe.shareToken,
                             envZId: fe.zId,
                         },
                         type: "access",

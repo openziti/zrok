@@ -70,11 +70,11 @@ export interface GetFrontendDetailRequest {
 }
 
 export interface GetShareDetailRequest {
-    shrToken: string;
+    shareToken: string;
 }
 
 export interface GetShareMetricsRequest {
-    shrToken: string;
+    shareToken: string;
     duration?: string;
 }
 
@@ -292,10 +292,10 @@ export class MetadataApi extends runtime.BaseAPI {
     /**
      */
     async getShareDetailRaw(requestParameters: GetShareDetailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Share>> {
-        if (requestParameters['shrToken'] == null) {
+        if (requestParameters['shareToken'] == null) {
             throw new runtime.RequiredError(
-                'shrToken',
-                'Required parameter "shrToken" was null or undefined when calling getShareDetail().'
+                'shareToken',
+                'Required parameter "shareToken" was null or undefined when calling getShareDetail().'
             );
         }
 
@@ -308,7 +308,7 @@ export class MetadataApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/detail/share/{shrToken}`.replace(`{${"shrToken"}}`, encodeURIComponent(String(requestParameters['shrToken']))),
+            path: `/detail/share/{shareToken}`.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -327,10 +327,10 @@ export class MetadataApi extends runtime.BaseAPI {
     /**
      */
     async getShareMetricsRaw(requestParameters: GetShareMetricsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Metrics>> {
-        if (requestParameters['shrToken'] == null) {
+        if (requestParameters['shareToken'] == null) {
             throw new runtime.RequiredError(
-                'shrToken',
-                'Required parameter "shrToken" was null or undefined when calling getShareMetrics().'
+                'shareToken',
+                'Required parameter "shareToken" was null or undefined when calling getShareMetrics().'
             );
         }
 
@@ -347,7 +347,7 @@ export class MetadataApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/metrics/share/{shrToken}`.replace(`{${"shrToken"}}`, encodeURIComponent(String(requestParameters['shrToken']))),
+            path: `/metrics/share/{shareToken}`.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

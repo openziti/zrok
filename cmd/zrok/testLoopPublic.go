@@ -216,7 +216,7 @@ func (l *looper) startup() {
 	if err != nil {
 		panic(err)
 	}
-	l.shrToken = tunnelResp.Payload.ShrToken
+	l.shrToken = tunnelResp.Payload.ShareToken
 	l.proxyEndpoint = tunnelResp.Payload.FrontendProxyEndpoints[0]
 }
 
@@ -283,7 +283,7 @@ func (l *looper) shutdown() {
 
 	req := share.NewUnshareParams()
 	req.Body.EnvZID = l.env.ZitiIdentity
-	req.Body.ShrToken = l.shrToken
+	req.Body.ShareToken = l.shrToken
 	if _, err := l.zrok.Share.Unshare(req, l.auth); err != nil {
 		logrus.Errorf("error shutting down looper #%d: %v", l.id, err)
 	}

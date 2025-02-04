@@ -28,40 +28,40 @@ class VerifyBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'registration_token': 'str'
+        'register_token': 'str'
     }
 
     attribute_map = {
-        'registration_token': 'registrationToken'
+        'register_token': 'registerToken'
     }
 
-    def __init__(self, registration_token=None):  # noqa: E501
+    def __init__(self, register_token=None):  # noqa: E501
         """VerifyBody - a model defined in Swagger"""  # noqa: E501
-        self._registration_token = None
+        self._register_token = None
         self.discriminator = None
-        if registration_token is not None:
-            self.registration_token = registration_token
+        if register_token is not None:
+            self.register_token = register_token
 
     @property
-    def registration_token(self):
-        """Gets the registration_token of this VerifyBody.  # noqa: E501
+    def register_token(self):
+        """Gets the register_token of this VerifyBody.  # noqa: E501
 
 
-        :return: The registration_token of this VerifyBody.  # noqa: E501
+        :return: The register_token of this VerifyBody.  # noqa: E501
         :rtype: str
         """
-        return self._registration_token
+        return self._register_token
 
-    @registration_token.setter
-    def registration_token(self, registration_token):
-        """Sets the registration_token of this VerifyBody.
+    @register_token.setter
+    def register_token(self, register_token):
+        """Sets the register_token of this VerifyBody.
 
 
-        :param registration_token: The registration_token of this VerifyBody.  # noqa: E501
+        :param register_token: The register_token of this VerifyBody.  # noqa: E501
         :type: str
         """
 
-        self._registration_token = registration_token
+        self._register_token = register_token
 
     def to_dict(self):
         """Returns the model properties as a dict"""

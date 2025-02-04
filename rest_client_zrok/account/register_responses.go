@@ -309,8 +309,8 @@ type RegisterBody struct {
 	// password
 	Password string `json:"password,omitempty"`
 
-	// reg token
-	RegToken string `json:"regToken,omitempty"`
+	// register token
+	RegisterToken string `json:"registerToken,omitempty"`
 }
 
 // Validate validates this register body

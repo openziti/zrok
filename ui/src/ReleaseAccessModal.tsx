@@ -30,19 +30,19 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
     }, [isOpen]);
 
     useEffect(() => {
-        if(detail && detail.token) {
-            setFeToken(detail.token);
+        if(detail && detail.feToken) {
+            setFeToken(detail.feToken);
         }
     }, [detail]);
 
     const releaseAccess = () => {
         setErrorMessage(null);
-        if(detail && detail.token) {
+        if(detail && detail.feToken) {
             getShareApi(user).unaccess({
                 body: {
-                    frontendToken: detail.token,
+                    frontendToken: detail.feToken,
                     envZId: access.data.envZId as string,
-                    shrToken: detail.shrToken
+                    shareToken: detail.shareToken
                 }
             })
                 .then(() => {
@@ -52,7 +52,7 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                     e.response.json().then(ex => {
                         console.log("releaseAccess", ex.message);
                     });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.token}</code>!</Typography>);
+                    setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.feToken}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);

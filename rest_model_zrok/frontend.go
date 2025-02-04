@@ -26,8 +26,8 @@ type Frontend struct {
 	// id
 	ID int64 `json:"id,omitempty"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`

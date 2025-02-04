@@ -28,28 +28,28 @@ class ShareBody(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'shr_token': 'str',
+        'share_token': 'str',
         'backend_proxy_endpoint': 'str',
         'add_access_grants': 'list[str]',
         'remove_access_grants': 'list[str]'
     }
 
     attribute_map = {
-        'shr_token': 'shrToken',
+        'share_token': 'shareToken',
         'backend_proxy_endpoint': 'backendProxyEndpoint',
         'add_access_grants': 'addAccessGrants',
         'remove_access_grants': 'removeAccessGrants'
     }
 
-    def __init__(self, shr_token=None, backend_proxy_endpoint=None, add_access_grants=None, remove_access_grants=None):  # noqa: E501
+    def __init__(self, share_token=None, backend_proxy_endpoint=None, add_access_grants=None, remove_access_grants=None):  # noqa: E501
         """ShareBody - a model defined in Swagger"""  # noqa: E501
-        self._shr_token = None
+        self._share_token = None
         self._backend_proxy_endpoint = None
         self._add_access_grants = None
         self._remove_access_grants = None
         self.discriminator = None
-        if shr_token is not None:
-            self.shr_token = shr_token
+        if share_token is not None:
+            self.share_token = share_token
         if backend_proxy_endpoint is not None:
             self.backend_proxy_endpoint = backend_proxy_endpoint
         if add_access_grants is not None:
@@ -58,25 +58,25 @@ class ShareBody(object):
             self.remove_access_grants = remove_access_grants
 
     @property
-    def shr_token(self):
-        """Gets the shr_token of this ShareBody.  # noqa: E501
+    def share_token(self):
+        """Gets the share_token of this ShareBody.  # noqa: E501
 
 
-        :return: The shr_token of this ShareBody.  # noqa: E501
+        :return: The share_token of this ShareBody.  # noqa: E501
         :rtype: str
         """
-        return self._shr_token
+        return self._share_token
 
-    @shr_token.setter
-    def shr_token(self, shr_token):
-        """Sets the shr_token of this ShareBody.
+    @share_token.setter
+    def share_token(self, share_token):
+        """Sets the share_token of this ShareBody.
 
 
-        :param shr_token: The shr_token of this ShareBody.  # noqa: E501
+        :param share_token: The share_token of this ShareBody.  # noqa: E501
         :type: str
         """
 
-        self._shr_token = shr_token
+        self._share_token = share_token
 
     @property
     def backend_proxy_endpoint(self):

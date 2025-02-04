@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **int** |  | [optional] 
 **fe_token** | **str** |  | [optional] 
-**shr_token** | **str** |  | [optional] 
+**share_token** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
 **created_at** | **int** |  | [optional] 
 **updated_at** | **int** |  | [optional] 

@@ -59,7 +59,7 @@ paths:
             properties:
               email:
                 type: string
-              invToken:
+              inviteToken:
                 type: string
       responses:
         201:
@@ -131,7 +131,7 @@ paths:
           in: body
           schema:
             properties:
-              regToken:
+              registerToken:
                 type: string
               password:
                 type: string
@@ -207,7 +207,7 @@ paths:
           in: body
           schema:
             properties:
-              registrationToken:
+              registerToken:
                 type: string
       responses:
         200:
@@ -747,7 +747,7 @@ paths:
         500:
           description: internal server error
 
-  /detail/share/{shrToken}:
+  /detail/share/{shareToken}:
     get:
       tags:
         - metadata
@@ -755,7 +755,7 @@ paths:
         - key: []
       operationId: getShareDetail
       parameters:
-        - name: shrToken
+        - name: shareToken
           in: path
           type: string
           required: true
@@ -918,7 +918,7 @@ paths:
           description: internal server error
 
 
-  /metrics/share/{shrToken}:
+  /metrics/share/{shareToken}:
     get:
       tags:
         - metadata
@@ -926,7 +926,7 @@ paths:
         - key: []
       operationId: getShareMetrics
       parameters:
-        - name: shrToken
+        - name: shareToken
           in: path
           type: string
           required: true
@@ -1009,7 +1009,7 @@ paths:
             properties:
               envZId:
                 type: string
-              shrToken:
+              shareToken:
                 type: string
       responses:
         201:
@@ -1067,7 +1067,7 @@ paths:
           in: body
           schema:
             properties:
-              shrToken:
+              shareToken:
                 type: string
               backendProxyEndpoint:
                 type: string
@@ -1107,7 +1107,7 @@ paths:
                 type: string
               envZId:
                 type: string
-              shrToken:
+              shareToken:
                 type: string
       responses:
         200:
@@ -1133,7 +1133,7 @@ paths:
             properties:
               envZId:
                 type: string
-              shrToken:
+              shareToken:
                 type: string
               reserved:
                 type: boolean
@@ -1217,7 +1217,7 @@ definitions:
         type: integer
       feToken:
         type: string
-      shrToken:
+      shareToken:
         type: string
       zId:
         type: string
@@ -1282,7 +1282,7 @@ definitions:
   share:
     type: object
     properties:
-      token:
+      shareToken:
         type: string
       zId:
         type: string
@@ -1363,7 +1363,7 @@ definitions:
         type: array
         items:
           type: string
-      shrToken:
+      shareToken:
         type: string
 
   sparkData:

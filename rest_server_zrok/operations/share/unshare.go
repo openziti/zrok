@@ -84,8 +84,8 @@ type UnshareBody struct {
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 }
 
 // Validate validates this unshare body

@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **str** |  | [optional] 
+**share_token** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
 **share_mode** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 

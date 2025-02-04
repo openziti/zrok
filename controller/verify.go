@@ -13,8 +13,8 @@ func newVerifyHandler() *verifyHandler {
 }
 
 func (h *verifyHandler) Handle(params account.VerifyParams) middleware.Responder {
-	if params.Body.RegistrationToken != "" {
-		logrus.Debugf("received verify request for registration token '%v'", params.Body.RegistrationToken)
+	if params.Body.RegisterToken != "" {
+		logrus.Debugf("received verify request for registration token '%v'", params.Body.RegisterToken)
 		tx, err := str.Begin()
 		if err != nil {
 			logrus.Errorf("error starting transaction: %v", err)
@@ -22,9 +22,9 @@ func (h *verifyHandler) Handle(params account.VerifyParams) middleware.Responder
 		}
 		defer func() { _ = tx.Rollback() }()
 
-		ar, err := str.FindAccountRequestWithToken(params.Body.RegistrationToken, tx)
+		ar, err := str.FindAccountRequestWithToken(params.Body.RegisterToken, tx)
 		if err != nil {
-			logrus.Errorf("error finding account request with registration token '%v': %v", params.Body.RegistrationToken, err)
+			logrus.Errorf("error finding account request with registration token '%v': %v", params.Body.RegisterToken, err)
 			return account.NewVerifyNotFound()
 		}
 

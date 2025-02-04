@@ -107,7 +107,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := metadata.NewGetShareDetailParams()
-	req.ShrToken = shrToken
+	req.ShareToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)
 	if err != nil {
 		cmd.error("unable to retrieve reserved share", err)
@@ -132,7 +132,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 
 		if resp.Payload.BackendProxyEndpoint != target {
 			upReq := share.NewUpdateShareParams()
-			upReq.Body.ShrToken = shrToken
+			upReq.Body.ShareToken = shrToken
 			upReq.Body.BackendProxyEndpoint = target
 			if _, err := zrok.Share.UpdateShare(upReq, auth); err != nil {
 				cmd.error("unable to update backend target", err)
@@ -320,7 +320,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	if cmd.subordinate {
 		data := make(map[string]interface{})
 		data[subordinate.MessageKey] = subordinate.BootMessage
-		data["token"] = resp.Payload.Token
+		data["token"] = resp.Payload.ShareToken
 		data["backend_mode"] = resp.Payload.BackendMode
 		data["share_mode"] = resp.Payload.ShareMode
 		if resp.Payload.FrontendEndpoint != "" {

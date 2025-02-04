@@ -30,7 +30,7 @@ class Frontend(object):
     swagger_types = {
         'id': 'int',
         'fe_token': 'str',
-        'shr_token': 'str',
+        'share_token': 'str',
         'z_id': 'str',
         'created_at': 'int',
         'updated_at': 'int'
@@ -39,17 +39,17 @@ class Frontend(object):
     attribute_map = {
         'id': 'id',
         'fe_token': 'feToken',
-        'shr_token': 'shrToken',
+        'share_token': 'shareToken',
         'z_id': 'zId',
         'created_at': 'createdAt',
         'updated_at': 'updatedAt'
     }
 
-    def __init__(self, id=None, fe_token=None, shr_token=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, id=None, fe_token=None, share_token=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
         """Frontend - a model defined in Swagger"""  # noqa: E501
         self._id = None
         self._fe_token = None
-        self._shr_token = None
+        self._share_token = None
         self._z_id = None
         self._created_at = None
         self._updated_at = None
@@ -58,8 +58,8 @@ class Frontend(object):
             self.id = id
         if fe_token is not None:
             self.fe_token = fe_token
-        if shr_token is not None:
-            self.shr_token = shr_token
+        if share_token is not None:
+            self.share_token = share_token
         if z_id is not None:
             self.z_id = z_id
         if created_at is not None:
@@ -110,25 +110,25 @@ class Frontend(object):
         self._fe_token = fe_token
 
     @property
-    def shr_token(self):
-        """Gets the shr_token of this Frontend.  # noqa: E501
+    def share_token(self):
+        """Gets the share_token of this Frontend.  # noqa: E501
 
 
-        :return: The shr_token of this Frontend.  # noqa: E501
+        :return: The share_token of this Frontend.  # noqa: E501
         :rtype: str
         """
-        return self._shr_token
+        return self._share_token
 
-    @shr_token.setter
-    def shr_token(self, shr_token):
-        """Sets the shr_token of this Frontend.
+    @share_token.setter
+    def share_token(self, share_token):
+        """Sets the share_token of this Frontend.
 
 
-        :param shr_token: The shr_token of this Frontend.  # noqa: E501
+        :param share_token: The share_token of this Frontend.  # noqa: E501
         :type: str
         """
 
-        self._shr_token = shr_token
+        self._share_token = share_token
 
     @property
     def z_id(self):

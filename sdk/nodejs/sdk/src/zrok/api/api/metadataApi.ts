@@ -513,11 +513,11 @@ export class MetadataApi {
     }
     /**
      * 
-     * @param shrToken 
+     * @param shareToken 
      */
-    public async getShareDetail (shrToken: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Share;  }> {
-        const localVarPath = this.basePath + '/detail/share/{shrToken}'
-            .replace('{' + 'shrToken' + '}', encodeURIComponent(String(shrToken)));
+    public async getShareDetail (shareToken: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Share;  }> {
+        const localVarPath = this.basePath + '/detail/share/{shareToken}'
+            .replace('{' + 'shareToken' + '}', encodeURIComponent(String(shareToken)));
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
         const produces = ['application/zrok.v1+json'];
@@ -529,9 +529,9 @@ export class MetadataApi {
         }
         let localVarFormParams: any = {};
 
-        // verify required parameter 'shrToken' is not null or undefined
-        if (shrToken === null || shrToken === undefined) {
-            throw new Error('Required parameter shrToken was null or undefined when calling getShareDetail.');
+        // verify required parameter 'shareToken' is not null or undefined
+        if (shareToken === null || shareToken === undefined) {
+            throw new Error('Required parameter shareToken was null or undefined when calling getShareDetail.');
         }
 
         (<any>Object).assign(localVarHeaderParams, options.headers);
@@ -584,12 +584,12 @@ export class MetadataApi {
     }
     /**
      * 
-     * @param shrToken 
+     * @param shareToken 
      * @param duration 
      */
-    public async getShareMetrics (shrToken: string, duration?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Metrics;  }> {
-        const localVarPath = this.basePath + '/metrics/share/{shrToken}'
-            .replace('{' + 'shrToken' + '}', encodeURIComponent(String(shrToken)));
+    public async getShareMetrics (shareToken: string, duration?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Metrics;  }> {
+        const localVarPath = this.basePath + '/metrics/share/{shareToken}'
+            .replace('{' + 'shareToken' + '}', encodeURIComponent(String(shareToken)));
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
         const produces = ['application/zrok.v1+json'];
@@ -601,9 +601,9 @@ export class MetadataApi {
         }
         let localVarFormParams: any = {};
 
-        // verify required parameter 'shrToken' is not null or undefined
-        if (shrToken === null || shrToken === undefined) {
-            throw new Error('Required parameter shrToken was null or undefined when calling getShareMetrics.');
+        // verify required parameter 'shareToken' is not null or undefined
+        if (shareToken === null || shareToken === undefined) {
+            throw new Error('Required parameter shareToken was null or undefined when calling getShareMetrics.');
         }
 
         if (duration !== undefined) {

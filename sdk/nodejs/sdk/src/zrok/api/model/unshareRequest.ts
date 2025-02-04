@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 
 export class UnshareRequest {
     'envZId'?: string;
-    'shrToken'?: string;
+    'shareToken'?: string;
     'reserved'?: boolean;
 
     static discriminator: string | undefined = undefined;
@@ -26,8 +26,8 @@ export class UnshareRequest {
             "type": "string"
         },
         {
-            "name": "shrToken",
-            "baseName": "shrToken",
+            "name": "shareToken",
+            "baseName": "shareToken",
             "type": "string"
         },
         {

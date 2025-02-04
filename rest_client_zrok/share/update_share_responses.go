@@ -352,8 +352,8 @@ type UpdateShareBody struct {
 	// remove access grants
 	RemoveAccessGrants []string `json:"removeAccessGrants"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 }
 
 // Validate validates this update share body

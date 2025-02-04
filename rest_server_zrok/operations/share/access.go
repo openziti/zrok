@@ -81,8 +81,8 @@ type AccessBody struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 }
 
 // Validate validates this access body

@@ -55,7 +55,7 @@ func init() {
                 "envZId": {
                   "type": "string"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -303,7 +303,7 @@ func init() {
         }
       }
     },
-    "/detail/share/{shrToken}": {
+    "/detail/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -317,7 +317,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           }
@@ -732,7 +732,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "invToken": {
+                "inviteToken": {
                   "type": "string"
                 }
               }
@@ -1003,7 +1003,7 @@ func init() {
         }
       }
     },
-    "/metrics/share/{shrToken}": {
+    "/metrics/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -1017,7 +1017,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           },
@@ -1442,7 +1442,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "regToken": {
+                "registerToken": {
                   "type": "string"
                 }
               }
@@ -1626,7 +1626,7 @@ func init() {
                     "type": "string"
                   }
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -1734,7 +1734,7 @@ func init() {
                 "frontendToken": {
                   "type": "string"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -1780,7 +1780,7 @@ func init() {
                 "reserved": {
                   "type": "boolean"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -1818,7 +1818,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "registrationToken": {
+                "registerToken": {
                   "type": "string"
                 }
               }
@@ -1958,7 +1958,7 @@ func init() {
         "id": {
           "type": "integer"
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -2073,7 +2073,7 @@ func init() {
         "shareMode": {
           "type": "string"
         },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -2174,7 +2174,7 @@ func init() {
             "type": "string"
           }
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         }
       }
@@ -2252,7 +2252,7 @@ func init() {
                 "envZId": {
                   "type": "string"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -2500,7 +2500,7 @@ func init() {
         }
       }
     },
-    "/detail/share/{shrToken}": {
+    "/detail/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -2514,7 +2514,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           }
@@ -2909,7 +2909,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "invToken": {
+                "inviteToken": {
                   "type": "string"
                 }
               }
@@ -3163,7 +3163,7 @@ func init() {
         }
       }
     },
-    "/metrics/share/{shrToken}": {
+    "/metrics/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -3177,7 +3177,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           },
@@ -3588,7 +3588,7 @@ func init() {
                 "password": {
                   "type": "string"
                 },
-                "regToken": {
+                "registerToken": {
                   "type": "string"
                 }
               }
@@ -3772,7 +3772,7 @@ func init() {
                     "type": "string"
                   }
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -3880,7 +3880,7 @@ func init() {
                 "frontendToken": {
                   "type": "string"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -3926,7 +3926,7 @@ func init() {
                 "reserved": {
                   "type": "boolean"
                 },
-                "shrToken": {
+                "shareToken": {
                   "type": "string"
                 }
               }
@@ -3964,7 +3964,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "registrationToken": {
+                "registerToken": {
                   "type": "string"
                 }
               }
@@ -4160,7 +4160,7 @@ func init() {
         "id": {
           "type": "integer"
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -4275,7 +4275,7 @@ func init() {
         "shareMode": {
           "type": "string"
         },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -4376,7 +4376,7 @@ func init() {
             "type": "string"
           }
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         }
       }

@@ -58,7 +58,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	}
 
 	return &Share{
-		Token:             in.Payload.ShrToken,
+		Token:             in.Payload.ShareToken,
 		FrontendEndpoints: in.Payload.FrontendProxyEndpoints,
 	}, nil
 }
@@ -98,7 +98,7 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 func DeleteShare(root env_core.Root, shr *Share) error {
 	req := share.NewUnshareParams()
 	req.Body.EnvZID = root.Environment().ZitiIdentity
-	req.Body.ShrToken = shr.Token
+	req.Body.ShareToken = shr.Token
 
 	zrok, err := root.Client()
 	if err != nil {

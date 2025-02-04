@@ -13,7 +13,7 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	}
 
 	out := share.NewAccessParams()
-	out.Body.ShrToken = request.ShareToken
+	out.Body.ShareToken = request.ShareToken
 	out.Body.EnvZID = root.Environment().ZitiIdentity
 
 	zrok, err := root.Client()
@@ -33,7 +33,7 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 func DeleteAccess(root env_core.Root, acc *Access) error {
 	out := share.NewUnaccessParams()
 	out.Body.FrontendToken = acc.Token
-	out.Body.ShrToken = acc.ShareToken
+	out.Body.ShareToken = acc.ShareToken
 	out.Body.EnvZID = root.Environment().ZitiIdentity
 
 	zrok, err := root.Client()

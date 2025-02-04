@@ -36,7 +36,7 @@ export interface UnaccessRequest {
      * @type {string}
      * @memberof UnaccessRequest
      */
-    shrToken?: string;
+    shareToken?: string;
 }
 
 /**
@@ -58,7 +58,7 @@ export function UnaccessRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
-        'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
     };
 }
 
@@ -70,7 +70,7 @@ export function UnaccessRequestToJSON(value?: UnaccessRequest | null): any {
         
         'frontendToken': value['frontendToken'],
         'envZId': value['envZId'],
-        'shrToken': value['shrToken'],
+        'shareToken': value['shareToken'],
     };
 }
 

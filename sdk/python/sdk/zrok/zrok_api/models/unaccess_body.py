@@ -30,27 +30,27 @@ class UnaccessBody(object):
     swagger_types = {
         'frontend_token': 'str',
         'env_zid': 'str',
-        'shr_token': 'str'
+        'share_token': 'str'
     }
 
     attribute_map = {
         'frontend_token': 'frontendToken',
         'env_zid': 'envZId',
-        'shr_token': 'shrToken'
+        'share_token': 'shareToken'
     }
 
-    def __init__(self, frontend_token=None, env_zid=None, shr_token=None):  # noqa: E501
+    def __init__(self, frontend_token=None, env_zid=None, share_token=None):  # noqa: E501
         """UnaccessBody - a model defined in Swagger"""  # noqa: E501
         self._frontend_token = None
         self._env_zid = None
-        self._shr_token = None
+        self._share_token = None
         self.discriminator = None
         if frontend_token is not None:
             self.frontend_token = frontend_token
         if env_zid is not None:
             self.env_zid = env_zid
-        if shr_token is not None:
-            self.shr_token = shr_token
+        if share_token is not None:
+            self.share_token = share_token
 
     @property
     def frontend_token(self):
@@ -95,25 +95,25 @@ class UnaccessBody(object):
         self._env_zid = env_zid
 
     @property
-    def shr_token(self):
-        """Gets the shr_token of this UnaccessBody.  # noqa: E501
+    def share_token(self):
+        """Gets the share_token of this UnaccessBody.  # noqa: E501
 
 
-        :return: The shr_token of this UnaccessBody.  # noqa: E501
+        :return: The share_token of this UnaccessBody.  # noqa: E501
         :rtype: str
         """
-        return self._shr_token
+        return self._share_token
 
-    @shr_token.setter
-    def shr_token(self, shr_token):
-        """Sets the shr_token of this UnaccessBody.
+    @share_token.setter
+    def share_token(self, share_token):
+        """Sets the share_token of this UnaccessBody.
 
 
-        :param shr_token: The shr_token of this UnaccessBody.  # noqa: E501
+        :param share_token: The share_token of this UnaccessBody.  # noqa: E501
         :type: str
         """
 
-        self._shr_token = shr_token
+        self._share_token = share_token
 
     def to_dict(self):
         """Returns the model properties as a dict"""

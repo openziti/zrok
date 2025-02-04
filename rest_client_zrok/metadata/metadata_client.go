@@ -305,7 +305,7 @@ func (a *Client) GetShareDetail(params *GetShareDetailParams, authInfo runtime.C
 	op := &runtime.ClientOperation{
 		ID:                 "getShareDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/share/{shrToken}",
+		PathPattern:        "/detail/share/{shareToken}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
@@ -344,7 +344,7 @@ func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime
 	op := &runtime.ClientOperation{
 		ID:                 "getShareMetrics",
 		Method:             "GET",
-		PathPattern:        "/metrics/share/{shrToken}",
+		PathPattern:        "/metrics/share/{shareToken}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

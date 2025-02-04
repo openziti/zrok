@@ -66,7 +66,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
 			envShr := &rest_model_zrok.Share{
-				Token:                shr.Token,
+				ShareToken:           shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,
 				BackendMode:          shr.BackendMode,
@@ -98,7 +98,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
 					return metadata.NewOverviewInternalServerError()
 				}
-				envFe.ShrToken = feShr.Token
+				envFe.ShareToken = feShr.Token
 			}
 			ear.Frontends = append(ear.Frontends, envFe)
 		}

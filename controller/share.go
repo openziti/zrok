@@ -209,7 +209,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	return share.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,
-		ShrToken:               shrToken,
+		ShareToken:             shrToken,
 	})
 }
 

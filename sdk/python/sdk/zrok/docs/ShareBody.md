@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**shr_token** | **str** |  | [optional] 
+**share_token** | **str** |  | [optional] 
 **backend_proxy_endpoint** | **str** |  | [optional] 
 **add_access_grants** | **list[str]** |  | [optional] 
 **remove_access_grants** | **list[str]** |  | [optional] 

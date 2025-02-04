@@ -30,7 +30,7 @@ export interface InviteRequest {
      * @type {string}
      * @memberof InviteRequest
      */
-    invToken?: string;
+    inviteToken?: string;
 }
 
 /**
@@ -51,7 +51,7 @@ export function InviteRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'email': json['email'] == null ? undefined : json['email'],
-        'invToken': json['invToken'] == null ? undefined : json['invToken'],
+        'inviteToken': json['inviteToken'] == null ? undefined : json['inviteToken'],
     };
 }
 
@@ -62,7 +62,7 @@ export function InviteRequestToJSON(value?: InviteRequest | null): any {
     return {
         
         'email': value['email'],
-        'invToken': value['invToken'],
+        'inviteToken': value['inviteToken'],
     };
 }
 

@@ -79,7 +79,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 
 		req := account.NewInviteParams()
 		req.Body.Email = email
-		req.Body.InvToken = invToken
+		req.Body.InviteToken = invToken
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
 			cmd.endpointError(env.ApiEndpoint())

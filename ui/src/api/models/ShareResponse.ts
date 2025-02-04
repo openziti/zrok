@@ -30,7 +30,7 @@ export interface ShareResponse {
      * @type {string}
      * @memberof ShareResponse
      */
-    shrToken?: string;
+    shareToken?: string;
 }
 
 /**
@@ -51,7 +51,7 @@ export function ShareResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'frontendProxyEndpoints': json['frontendProxyEndpoints'] == null ? undefined : json['frontendProxyEndpoints'],
-        'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
     };
 }
 
@@ -62,7 +62,7 @@ export function ShareResponseToJSON(value?: ShareResponse | null): any {
     return {
         
         'frontendProxyEndpoints': value['frontendProxyEndpoints'],
-        'shrToken': value['shrToken'],
+        'shareToken': value['shareToken'],
     };
 }
 

@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class VerifyRequest {
-    'registrationToken'?: string;
+    'registerToken'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "registrationToken",
-            "baseName": "registrationToken",
+            "name": "registerToken",
+            "baseName": "registerToken",
             "type": "string"
         }    ];
 

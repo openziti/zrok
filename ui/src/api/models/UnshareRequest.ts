@@ -30,7 +30,7 @@ export interface UnshareRequest {
      * @type {string}
      * @memberof UnshareRequest
      */
-    shrToken?: string;
+    shareToken?: string;
     /**
      * 
      * @type {boolean}
@@ -57,7 +57,7 @@ export function UnshareRequestFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
-        'shrToken': json['shrToken'] == null ? undefined : json['shrToken'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'reserved': json['reserved'] == null ? undefined : json['reserved'],
     };
 }
@@ -69,7 +69,7 @@ export function UnshareRequestToJSON(value?: UnshareRequest | null): any {
     return {
         
         'envZId': value['envZId'],
-        'shrToken': value['shrToken'],
+        'shareToken': value['shareToken'],
         'reserved': value['reserved'],
     };
 }

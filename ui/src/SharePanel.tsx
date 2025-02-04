@@ -69,7 +69,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getShareDetail({ shrToken: share.data!.shrToken! as string })
+        getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string })
             .then(d => {
                 delete d.activity;
                 delete d.limited;

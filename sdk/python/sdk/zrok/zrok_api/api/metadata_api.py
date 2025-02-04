@@ -574,43 +574,43 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_share_detail(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_detail(self, share_token, **kwargs):  # noqa: E501
         """get_share_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_detail(shr_token, async_req=True)
+        >>> thread = api.get_share_detail(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :return: Share
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_share_detail_with_http_info(shr_token, **kwargs)  # noqa: E501
+            return self.get_share_detail_with_http_info(share_token, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_share_detail_with_http_info(shr_token, **kwargs)  # noqa: E501
+            (data) = self.get_share_detail_with_http_info(share_token, **kwargs)  # noqa: E501
             return data
 
-    def get_share_detail_with_http_info(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_detail_with_http_info(self, share_token, **kwargs):  # noqa: E501
         """get_share_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_detail_with_http_info(shr_token, async_req=True)
+        >>> thread = api.get_share_detail_with_http_info(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :return: Share
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['shr_token']  # noqa: E501
+        all_params = ['share_token']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -625,16 +625,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'shr_token' is set
-        if ('shr_token' not in params or
-                params['shr_token'] is None):
-            raise ValueError("Missing the required parameter `shr_token` when calling `get_share_detail`")  # noqa: E501
+        # verify the required parameter 'share_token' is set
+        if ('share_token' not in params or
+                params['share_token'] is None):
+            raise ValueError("Missing the required parameter `share_token` when calling `get_share_detail`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'shr_token' in params:
-            path_params['shrToken'] = params['shr_token']  # noqa: E501
+        if 'share_token' in params:
+            path_params['shareToken'] = params['share_token']  # noqa: E501
 
         query_params = []
 
@@ -652,7 +652,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/detail/share/{shrToken}', 'GET',
+            '/detail/share/{shareToken}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -667,16 +667,16 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_share_metrics(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_metrics(self, share_token, **kwargs):  # noqa: E501
         """get_share_metrics  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_metrics(shr_token, async_req=True)
+        >>> thread = api.get_share_metrics(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :param str duration:
         :return: Metrics
                  If the method is called asynchronously,
@@ -684,28 +684,28 @@ class MetadataApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_share_metrics_with_http_info(shr_token, **kwargs)  # noqa: E501
+            return self.get_share_metrics_with_http_info(share_token, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_share_metrics_with_http_info(shr_token, **kwargs)  # noqa: E501
+            (data) = self.get_share_metrics_with_http_info(share_token, **kwargs)  # noqa: E501
             return data
 
-    def get_share_metrics_with_http_info(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_metrics_with_http_info(self, share_token, **kwargs):  # noqa: E501
         """get_share_metrics  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_metrics_with_http_info(shr_token, async_req=True)
+        >>> thread = api.get_share_metrics_with_http_info(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :param str duration:
         :return: Metrics
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['shr_token', 'duration']  # noqa: E501
+        all_params = ['share_token', 'duration']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -720,16 +720,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'shr_token' is set
-        if ('shr_token' not in params or
-                params['shr_token'] is None):
-            raise ValueError("Missing the required parameter `shr_token` when calling `get_share_metrics`")  # noqa: E501
+        # verify the required parameter 'share_token' is set
+        if ('share_token' not in params or
+                params['share_token'] is None):
+            raise ValueError("Missing the required parameter `share_token` when calling `get_share_metrics`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'shr_token' in params:
-            path_params['shrToken'] = params['shr_token']  # noqa: E501
+        if 'share_token' in params:
+            path_params['shareToken'] = params['share_token']  # noqa: E501
 
         query_params = []
         if 'duration' in params:
@@ -749,7 +749,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/metrics/share/{shrToken}', 'GET',
+            '/metrics/share/{shareToken}', 'GET',
             path_params,
             query_params,
             header_params,

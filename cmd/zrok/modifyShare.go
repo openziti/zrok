@@ -58,7 +58,7 @@ func (cmd *modifyShareCommand) run(_ *cobra.Command, args []string) {
 
 	if len(cmd.addAccessGrants) > 0 || len(cmd.removeAccessGrants) > 0 {
 		req := share.NewUpdateShareParams()
-		req.Body.ShrToken = shrToken
+		req.Body.ShareToken = shrToken
 		req.Body.AddAccessGrants = cmd.addAccessGrants
 		req.Body.RemoveAccessGrants = cmd.removeAccessGrants
 		if _, err := zrok.Share.UpdateShare(req, auth); err != nil {
