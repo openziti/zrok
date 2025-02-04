@@ -70,7 +70,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_account**
-> VerifyBody create_account(body=body)
+> InlineResponse200 create_account(body=body)
 
 
 
@@ -107,7 +107,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**VerifyBody**](VerifyBody.md)
+[**InlineResponse200**](InlineResponse200.md)
 
 ### Authorization
 

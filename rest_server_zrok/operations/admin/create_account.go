@@ -118,8 +118,8 @@ func (o *CreateAccountBody) UnmarshalBinary(b []byte) error {
 // swagger:model CreateAccountCreatedBody
 type CreateAccountCreatedBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// account token
+	AccountToken string `json:"accountToken,omitempty"`
 }
 
 // Validate validates this create account created body

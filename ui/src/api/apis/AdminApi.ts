@@ -26,6 +26,7 @@ import type {
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
   LoginRequest,
+  RegenerateAccountToken200Response,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
   Verify200Response,
@@ -54,6 +55,8 @@ import {
     ListOrganizations200ResponseToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
+    RegenerateAccountToken200ResponseFromJSON,
+    RegenerateAccountToken200ResponseToJSON,
     RemoveOrganizationMemberRequestFromJSON,
     RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
@@ -149,7 +152,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createAccountRaw(requestParameters: CreateAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
+    async createAccountRaw(requestParameters: CreateAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegenerateAccountToken200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -168,12 +171,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: LoginRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegenerateAccountToken200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async createAccount(requestParameters: CreateAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
+    async createAccount(requestParameters: CreateAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegenerateAccountToken200Response> {
         const response = await this.createAccountRaw(requestParameters, initOverrides);
         return await response.value();
     }

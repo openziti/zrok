@@ -120,7 +120,7 @@ func init() {
             "description": "created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -2317,7 +2317,7 @@ func init() {
             "description": "created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }

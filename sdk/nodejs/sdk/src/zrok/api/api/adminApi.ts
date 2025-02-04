@@ -26,6 +26,7 @@ import { ListFrontends200ResponseInner } from '../model/listFrontends200Response
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
 import { ListOrganizations200Response } from '../model/listOrganizations200Response';
 import { LoginRequest } from '../model/loginRequest';
+import { RegenerateAccountToken200Response } from '../model/regenerateAccountToken200Response';
 import { RemoveOrganizationMemberRequest } from '../model/removeOrganizationMemberRequest';
 import { UpdateFrontendRequest } from '../model/updateFrontendRequest';
 import { Verify200Response } from '../model/verify200Response';
@@ -165,7 +166,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createAccount (body?: LoginRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
+    public async createAccount (body?: LoginRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: RegenerateAccountToken200Response;  }> {
         const localVarPath = this.basePath + '/account';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -211,13 +212,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: RegenerateAccountToken200Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
+                            body = ObjectSerializer.deserialize(body, "RegenerateAccountToken200Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
