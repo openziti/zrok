@@ -42,6 +42,12 @@ export interface Frontend {
      * @type {string}
      * @memberof Frontend
      */
+    description?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Frontend
+     */
     zId?: string;
     /**
      * 
@@ -77,6 +83,7 @@ export function FrontendFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'id': json['id'] == null ? undefined : json['id'],
         'feToken': json['feToken'] == null ? undefined : json['feToken'],
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
+        'description': json['description'] == null ? undefined : json['description'],
         'zId': json['zId'] == null ? undefined : json['zId'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
@@ -92,6 +99,7 @@ export function FrontendToJSON(value?: Frontend | null): any {
         'id': value['id'],
         'feToken': value['feToken'],
         'shareToken': value['shareToken'],
+        'description': value['description'],
         'zId': value['zId'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],

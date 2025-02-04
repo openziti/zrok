@@ -31,6 +31,7 @@ class Frontend(object):
         'id': 'int',
         'fe_token': 'str',
         'share_token': 'str',
+        'description': 'str',
         'z_id': 'str',
         'created_at': 'int',
         'updated_at': 'int'
@@ -40,16 +41,18 @@ class Frontend(object):
         'id': 'id',
         'fe_token': 'feToken',
         'share_token': 'shareToken',
+        'description': 'description',
         'z_id': 'zId',
         'created_at': 'createdAt',
         'updated_at': 'updatedAt'
     }
 
-    def __init__(self, id=None, fe_token=None, share_token=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, id=None, fe_token=None, share_token=None, description=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
         """Frontend - a model defined in Swagger"""  # noqa: E501
         self._id = None
         self._fe_token = None
         self._share_token = None
+        self._description = None
         self._z_id = None
         self._created_at = None
         self._updated_at = None
@@ -60,6 +63,8 @@ class Frontend(object):
             self.fe_token = fe_token
         if share_token is not None:
             self.share_token = share_token
+        if description is not None:
+            self.description = description
         if z_id is not None:
             self.z_id = z_id
         if created_at is not None:
@@ -129,6 +134,27 @@ class Frontend(object):
         """
 
         self._share_token = share_token
+
+    @property
+    def description(self):
+        """Gets the description of this Frontend.  # noqa: E501
+
+
+        :return: The description of this Frontend.  # noqa: E501
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description):
+        """Sets the description of this Frontend.
+
+
+        :param description: The description of this Frontend.  # noqa: E501
+        :type: str
+        """
+
+        self._description = description
 
     @property
     def z_id(self):

@@ -29,23 +29,28 @@ class AccessBody(object):
     """
     swagger_types = {
         'env_zid': 'str',
-        'share_token': 'str'
+        'share_token': 'str',
+        'description': 'str'
     }
 
     attribute_map = {
         'env_zid': 'envZId',
-        'share_token': 'shareToken'
+        'share_token': 'shareToken',
+        'description': 'description'
     }
 
-    def __init__(self, env_zid=None, share_token=None):  # noqa: E501
+    def __init__(self, env_zid=None, share_token=None, description=None):  # noqa: E501
         """AccessBody - a model defined in Swagger"""  # noqa: E501
         self._env_zid = None
         self._share_token = None
+        self._description = None
         self.discriminator = None
         if env_zid is not None:
             self.env_zid = env_zid
         if share_token is not None:
             self.share_token = share_token
+        if description is not None:
+            self.description = description
 
     @property
     def env_zid(self):
@@ -88,6 +93,27 @@ class AccessBody(object):
         """
 
         self._share_token = share_token
+
+    @property
+    def description(self):
+        """Gets the description of this AccessBody.  # noqa: E501
+
+
+        :return: The description of this AccessBody.  # noqa: E501
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description):
+        """Sets the description of this AccessBody.
+
+
+        :param description: The description of this AccessBody.  # noqa: E501
+        :type: str
+        """
+
+        self._description = description
 
     def to_dict(self):
         """Returns the model properties as a dict"""

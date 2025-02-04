@@ -16,6 +16,7 @@ export class Frontend {
     'id'?: number;
     'feToken'?: string;
     'shareToken'?: string;
+    'description'?: string;
     'zId'?: string;
     'createdAt'?: number;
     'updatedAt'?: number;
@@ -36,6 +37,11 @@ export class Frontend {
         {
             "name": "shareToken",
             "baseName": "shareToken",
+            "type": "string"
+        },
+        {
+            "name": "description",
+            "baseName": "description",
             "type": "string"
         },
         {

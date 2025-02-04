@@ -294,6 +294,9 @@ swagger:model AccessBody
 */
 type AccessBody struct {
 
+	// description
+	Description string `json:"description,omitempty"`
+
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 

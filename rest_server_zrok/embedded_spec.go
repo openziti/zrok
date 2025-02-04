@@ -52,6 +52,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "description": {
+                  "type": "string"
+                },
                 "envZId": {
                   "type": "string"
                 },
@@ -1952,6 +1955,9 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
+        "description": {
+          "type": "string"
+        },
         "feToken": {
           "type": "string"
         },
@@ -2249,6 +2255,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "description": {
+                  "type": "string"
+                },
                 "envZId": {
                   "type": "string"
                 },
@@ -4153,6 +4162,9 @@ func init() {
       "properties": {
         "createdAt": {
           "type": "integer"
+        },
+        "description": {
+          "type": "string"
         },
         "feToken": {
           "type": "string"

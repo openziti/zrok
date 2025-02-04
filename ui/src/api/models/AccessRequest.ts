@@ -31,6 +31,12 @@ export interface AccessRequest {
      * @memberof AccessRequest
      */
     shareToken?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccessRequest
+     */
+    description?: string;
 }
 
 /**
@@ -52,6 +58,7 @@ export function AccessRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
@@ -63,6 +70,7 @@ export function AccessRequestToJSON(value?: AccessRequest | null): any {
         
         'envZId': value['envZId'],
         'shareToken': value['shareToken'],
+        'description': value['description'],
     };
 }
 

@@ -1011,6 +1011,8 @@ paths:
                 type: string
               shareToken:
                 type: string
+              description:
+                type: string
       responses:
         201:
           description: access created
@@ -1218,6 +1220,8 @@ definitions:
       feToken:
         type: string
       shareToken:
+        type: string
+      description:
         type: string
       zId:
         type: string

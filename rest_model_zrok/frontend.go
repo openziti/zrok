@@ -20,6 +20,9 @@ type Frontend struct {
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
+	// description
+	Description string `json:"description,omitempty"`
+
 	// fe token
 	FeToken string `json:"feToken,omitempty"`
 
