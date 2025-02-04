@@ -81,11 +81,11 @@ type ListFrontendsOKBodyItems0 struct {
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+
 	// public name
 	PublicName string `json:"publicName,omitempty"`
-
-	// token
-	Token string `json:"token,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`

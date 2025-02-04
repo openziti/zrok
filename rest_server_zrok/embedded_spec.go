@@ -475,7 +475,7 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
+                "frontendToken": {
                   "type": "string"
                 }
               }
@@ -602,10 +602,10 @@ func init() {
                   "createdAt": {
                     "type": "integer"
                   },
-                  "publicName": {
+                  "frontendToken": {
                     "type": "string"
                   },
-                  "token": {
+                  "publicName": {
                     "type": "string"
                   },
                   "updatedAt": {
@@ -2672,7 +2672,7 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
+                "frontendToken": {
                   "type": "string"
                 }
               }
@@ -4015,10 +4015,10 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
-        "publicName": {
+        "frontendToken": {
           "type": "string"
         },
-        "token": {
+        "publicName": {
           "type": "string"
         },
         "updatedAt": {

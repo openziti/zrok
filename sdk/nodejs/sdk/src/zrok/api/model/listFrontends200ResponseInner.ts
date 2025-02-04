@@ -13,7 +13,7 @@
 import { RequestFile } from './models';
 
 export class ListFrontends200ResponseInner {
-    'token'?: string;
+    'frontendToken'?: string;
     'zId'?: string;
     'urlTemplate'?: string;
     'publicName'?: string;
@@ -24,8 +24,8 @@ export class ListFrontends200ResponseInner {
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "frontendToken",
+            "baseName": "frontendToken",
             "type": "string"
         },
         {

@@ -28,7 +28,7 @@ class InlineResponse2002(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'token': 'str',
+        'frontend_token': 'str',
         'z_id': 'str',
         'url_template': 'str',
         'public_name': 'str',
@@ -37,7 +37,7 @@ class InlineResponse2002(object):
     }
 
     attribute_map = {
-        'token': 'token',
+        'frontend_token': 'frontendToken',
         'z_id': 'zId',
         'url_template': 'urlTemplate',
         'public_name': 'publicName',
@@ -45,17 +45,17 @@ class InlineResponse2002(object):
         'updated_at': 'updatedAt'
     }
 
-    def __init__(self, token=None, z_id=None, url_template=None, public_name=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, frontend_token=None, z_id=None, url_template=None, public_name=None, created_at=None, updated_at=None):  # noqa: E501
         """InlineResponse2002 - a model defined in Swagger"""  # noqa: E501
-        self._token = None
+        self._frontend_token = None
         self._z_id = None
         self._url_template = None
         self._public_name = None
         self._created_at = None
         self._updated_at = None
         self.discriminator = None
-        if token is not None:
-            self.token = token
+        if frontend_token is not None:
+            self.frontend_token = frontend_token
         if z_id is not None:
             self.z_id = z_id
         if url_template is not None:
@@ -68,25 +68,25 @@ class InlineResponse2002(object):
             self.updated_at = updated_at
 
     @property
-    def token(self):
-        """Gets the token of this InlineResponse2002.  # noqa: E501
+    def frontend_token(self):
+        """Gets the frontend_token of this InlineResponse2002.  # noqa: E501
 
 
-        :return: The token of this InlineResponse2002.  # noqa: E501
+        :return: The frontend_token of this InlineResponse2002.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._frontend_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this InlineResponse2002.
+    @frontend_token.setter
+    def frontend_token(self, frontend_token):
+        """Sets the frontend_token of this InlineResponse2002.
 
 
-        :param token: The token of this InlineResponse2002.  # noqa: E501
+        :param frontend_token: The frontend_token of this InlineResponse2002.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._frontend_token = frontend_token
 
     @property
     def z_id(self):

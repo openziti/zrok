@@ -16,11 +16,11 @@
 import * as runtime from '../runtime';
 import type {
   AddOrganizationMemberRequest,
+  CreateFrontend201Response,
   CreateFrontendRequest,
   CreateIdentity201Response,
   CreateIdentityRequest,
   CreateOrganizationRequest,
-  DeleteFrontendRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
   ListOrganizationMembers200Response,
@@ -35,6 +35,8 @@ import type {
 import {
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
+    CreateFrontend201ResponseFromJSON,
+    CreateFrontend201ResponseToJSON,
     CreateFrontendRequestFromJSON,
     CreateFrontendRequestToJSON,
     CreateIdentity201ResponseFromJSON,
@@ -43,8 +45,6 @@ import {
     CreateIdentityRequestToJSON,
     CreateOrganizationRequestFromJSON,
     CreateOrganizationRequestToJSON,
-    DeleteFrontendRequestFromJSON,
-    DeleteFrontendRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
@@ -87,8 +87,8 @@ export interface CreateOrganizationOperationRequest {
     body?: CreateOrganizationRequest;
 }
 
-export interface DeleteFrontendOperationRequest {
-    body?: DeleteFrontendRequest;
+export interface DeleteFrontendRequest {
+    body?: CreateFrontend201Response;
 }
 
 export interface DeleteOrganizationRequest {
@@ -183,7 +183,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyRequest>> {
+    async createFrontendRaw(requestParameters: CreateFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateFrontend201Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -202,12 +202,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: CreateFrontendRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyRequestFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateFrontend201ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyRequest> {
+    async createFrontend(requestParameters: CreateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateFrontend201Response> {
         const response = await this.createFrontendRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -276,7 +276,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async deleteFrontendRaw(requestParameters: DeleteFrontendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteFrontendRaw(requestParameters: DeleteFrontendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -292,7 +292,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: DeleteFrontendRequestToJSON(requestParameters['body']),
+            body: CreateFrontend201ResponseToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -300,7 +300,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async deleteFrontend(requestParameters: DeleteFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async deleteFrontend(requestParameters: DeleteFrontendRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteFrontendRaw(requestParameters, initOverrides);
     }
 

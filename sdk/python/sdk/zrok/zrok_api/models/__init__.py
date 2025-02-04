@@ -44,6 +44,7 @@ from zrok_api.models.inline_response2005_memberships import InlineResponse2005Me
 from zrok_api.models.inline_response2006 import InlineResponse2006
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.inline_response2011 import InlineResponse2011
+from zrok_api.models.inline_response2012 import InlineResponse2012
 from zrok_api.models.invite_body import InviteBody
 from zrok_api.models.login_body import LoginBody
 from zrok_api.models.metrics import Metrics

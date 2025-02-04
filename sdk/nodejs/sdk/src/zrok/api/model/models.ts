@@ -6,11 +6,11 @@ export * from './addOrganizationMemberRequest';
 export * from './authUser';
 export * from './changePasswordRequest';
 export * from './configuration';
+export * from './createFrontend201Response';
 export * from './createFrontendRequest';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
 export * from './createOrganizationRequest';
-export * from './deleteFrontendRequest';
 export * from './disableRequest';
 export * from './enableRequest';
 export * from './environment';
@@ -67,11 +67,11 @@ import { AddOrganizationMemberRequest } from './addOrganizationMemberRequest';
 import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
 import { Configuration } from './configuration';
+import { CreateFrontend201Response } from './createFrontend201Response';
 import { CreateFrontendRequest } from './createFrontendRequest';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
 import { CreateOrganizationRequest } from './createOrganizationRequest';
-import { DeleteFrontendRequest } from './deleteFrontendRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
 import { Environment } from './environment';
@@ -136,11 +136,11 @@ let typeMap: {[index: string]: any} = {
     "AuthUser": AuthUser,
     "ChangePasswordRequest": ChangePasswordRequest,
     "Configuration": Configuration,
+    "CreateFrontend201Response": CreateFrontend201Response,
     "CreateFrontendRequest": CreateFrontendRequest,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
     "CreateOrganizationRequest": CreateOrganizationRequest,
-    "DeleteFrontendRequest": DeleteFrontendRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,
     "Environment": Environment,

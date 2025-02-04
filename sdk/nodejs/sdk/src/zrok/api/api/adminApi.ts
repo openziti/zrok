@@ -16,11 +16,11 @@ import http from 'http';
 
 /* tslint:disable:no-unused-locals */
 import { AddOrganizationMemberRequest } from '../model/addOrganizationMemberRequest';
+import { CreateFrontend201Response } from '../model/createFrontend201Response';
 import { CreateFrontendRequest } from '../model/createFrontendRequest';
 import { CreateIdentity201Response } from '../model/createIdentity201Response';
 import { CreateIdentityRequest } from '../model/createIdentityRequest';
 import { CreateOrganizationRequest } from '../model/createOrganizationRequest';
-import { DeleteFrontendRequest } from '../model/deleteFrontendRequest';
 import { InviteTokenGenerateRequest } from '../model/inviteTokenGenerateRequest';
 import { ListFrontends200ResponseInner } from '../model/listFrontends200ResponseInner';
 import { ListOrganizationMembers200Response } from '../model/listOrganizationMembers200Response';
@@ -232,7 +232,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }> {
+    public async createFrontend (body?: CreateFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: CreateFrontend201Response;  }> {
         const localVarPath = this.basePath + '/frontend';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -278,13 +278,13 @@ export class AdminApi {
                     localVarRequestOptions.form = localVarFormParams;
                 }
             }
-            return new Promise<{ response: http.IncomingMessage; body: VerifyRequest;  }>((resolve, reject) => {
+            return new Promise<{ response: http.IncomingMessage; body: CreateFrontend201Response;  }>((resolve, reject) => {
                 localVarRequest(localVarRequestOptions, (error, response, body) => {
                     if (error) {
                         reject(error);
                     } else {
                         if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            body = ObjectSerializer.deserialize(body, "VerifyRequest");
+                            body = ObjectSerializer.deserialize(body, "CreateFrontend201Response");
                             resolve({ response: response, body: body });
                         } else {
                             reject(new HttpError(response, body, response.statusCode));
@@ -430,7 +430,7 @@ export class AdminApi {
      * 
      * @param body 
      */
-    public async deleteFrontend (body?: DeleteFrontendRequest, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
+    public async deleteFrontend (body?: CreateFrontend201Response, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body?: any;  }> {
         const localVarPath = this.basePath + '/frontend';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -447,7 +447,7 @@ export class AdminApi {
             uri: localVarPath,
             useQuerystring: this._useQuerystring,
             json: true,
-            body: ObjectSerializer.serialize(body, "DeleteFrontendRequest")
+            body: ObjectSerializer.serialize(body, "CreateFrontend201Response")
         };
 
         let authenticationPromise = Promise.resolve();

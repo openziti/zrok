@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**token** | **str** |  | [optional] 
+**frontend_token** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
 **url_template** | **str** |  | [optional] 
 **public_name** | **str** |  | [optional] 

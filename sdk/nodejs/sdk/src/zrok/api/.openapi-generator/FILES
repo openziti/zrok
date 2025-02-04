@@ -13,11 +13,11 @@ model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts
 model/configuration.ts
+model/createFrontend201Response.ts
 model/createFrontendRequest.ts
 model/createIdentity201Response.ts
 model/createIdentityRequest.ts
 model/createOrganizationRequest.ts
-model/deleteFrontendRequest.ts
 model/disableRequest.ts
 model/enableRequest.ts
 model/environment.ts

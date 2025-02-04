@@ -68,5 +68,5 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	logrus.Infof("created global public frontend '%v'", resp.Payload.Token)
+	logrus.Infof("created global public frontend '%v'", resp.Payload.FrontendToken)
 }

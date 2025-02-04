@@ -28,66 +28,66 @@ class InlineResponse2011(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'frontend_token': 'str',
-        'backend_mode': 'str'
+        'identity': 'str',
+        'cfg': 'str'
     }
 
     attribute_map = {
-        'frontend_token': 'frontendToken',
-        'backend_mode': 'backendMode'
+        'identity': 'identity',
+        'cfg': 'cfg'
     }
 
-    def __init__(self, frontend_token=None, backend_mode=None):  # noqa: E501
+    def __init__(self, identity=None, cfg=None):  # noqa: E501
         """InlineResponse2011 - a model defined in Swagger"""  # noqa: E501
-        self._frontend_token = None
-        self._backend_mode = None
+        self._identity = None
+        self._cfg = None
         self.discriminator = None
-        if frontend_token is not None:
-            self.frontend_token = frontend_token
-        if backend_mode is not None:
-            self.backend_mode = backend_mode
+        if identity is not None:
+            self.identity = identity
+        if cfg is not None:
+            self.cfg = cfg
 
     @property
-    def frontend_token(self):
-        """Gets the frontend_token of this InlineResponse2011.  # noqa: E501
+    def identity(self):
+        """Gets the identity of this InlineResponse2011.  # noqa: E501
 
 
-        :return: The frontend_token of this InlineResponse2011.  # noqa: E501
+        :return: The identity of this InlineResponse2011.  # noqa: E501
         :rtype: str
         """
-        return self._frontend_token
+        return self._identity
 
-    @frontend_token.setter
-    def frontend_token(self, frontend_token):
-        """Sets the frontend_token of this InlineResponse2011.
+    @identity.setter
+    def identity(self, identity):
+        """Sets the identity of this InlineResponse2011.
 
 
-        :param frontend_token: The frontend_token of this InlineResponse2011.  # noqa: E501
+        :param identity: The identity of this InlineResponse2011.  # noqa: E501
         :type: str
         """
 
-        self._frontend_token = frontend_token
+        self._identity = identity
 
     @property
-    def backend_mode(self):
-        """Gets the backend_mode of this InlineResponse2011.  # noqa: E501
+    def cfg(self):
+        """Gets the cfg of this InlineResponse2011.  # noqa: E501
 
 
-        :return: The backend_mode of this InlineResponse2011.  # noqa: E501
+        :return: The cfg of this InlineResponse2011.  # noqa: E501
         :rtype: str
         """
-        return self._backend_mode
+        return self._cfg
 
-    @backend_mode.setter
-    def backend_mode(self, backend_mode):
-        """Sets the backend_mode of this InlineResponse2011.
+    @cfg.setter
+    def cfg(self, cfg):
+        """Sets the cfg of this InlineResponse2011.
 
 
-        :param backend_mode: The backend_mode of this InlineResponse2011.  # noqa: E501
+        :param cfg: The cfg of this InlineResponse2011.  # noqa: E501
         :type: str
         """
 
-        self._backend_mode = backend_mode
+        self._cfg = cfg
 
     def to_dict(self):
         """Returns the model properties as a dict"""

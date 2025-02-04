@@ -10,11 +10,11 @@ models/AccessRequest.ts
 models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
+models/CreateFrontend201Response.ts
 models/CreateFrontendRequest.ts
 models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
 models/CreateOrganizationRequest.ts
-models/DeleteFrontendRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
 models/Environment.ts

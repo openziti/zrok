@@ -280,7 +280,7 @@ paths:
           schema:
             type: object
             properties:
-              token:
+              frontendToken:
                 type: string
         400:
           description: bad request
@@ -356,7 +356,7 @@ paths:
             items:
               type: object
               properties:
-                token:
+                frontendToken:
                   type: string
                 zId:
                   type: string

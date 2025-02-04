@@ -24,7 +24,7 @@ export interface ListFrontends200ResponseInner {
      * @type {string}
      * @memberof ListFrontends200ResponseInner
      */
-    token?: string;
+    frontendToken?: string;
     /**
      * 
      * @type {string}
@@ -74,7 +74,7 @@ export function ListFrontends200ResponseInnerFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
-        'token': json['token'] == null ? undefined : json['token'],
+        'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
         'zId': json['zId'] == null ? undefined : json['zId'],
         'urlTemplate': json['urlTemplate'] == null ? undefined : json['urlTemplate'],
         'publicName': json['publicName'] == null ? undefined : json['publicName'],
@@ -89,7 +89,7 @@ export function ListFrontends200ResponseInnerToJSON(value?: ListFrontends200Resp
     }
     return {
         
-        'token': value['token'],
+        'frontendToken': value['frontendToken'],
         'zId': value['zId'],
         'urlTemplate': value['urlTemplate'],
         'publicName': value['publicName'],

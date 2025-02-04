@@ -179,8 +179,8 @@ func (o *CreateFrontendBody) UnmarshalBinary(b []byte) error {
 // swagger:model CreateFrontendCreatedBody
 type CreateFrontendCreatedBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
 }
 
 // Validate validates this create frontend created body

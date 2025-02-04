@@ -222,6 +222,7 @@ Class | Method | HTTP request | Description
  - [InlineResponse2006](docs/InlineResponse2006.md)
  - [InlineResponse201](docs/InlineResponse201.md)
  - [InlineResponse2011](docs/InlineResponse2011.md)
+ - [InlineResponse2012](docs/InlineResponse2012.md)
  - [InviteBody](docs/InviteBody.md)
  - [LoginBody](docs/LoginBody.md)
  - [Metrics](docs/Metrics.md)
