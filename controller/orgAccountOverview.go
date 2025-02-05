@@ -120,11 +120,11 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 		}
 		for _, fe := range fes {
 			envFe := &rest_model_zrok.Frontend{
-				ID:        int64(fe.Id),
-				FeToken:   fe.Token,
-				ZID:       fe.ZId,
-				CreatedAt: fe.CreatedAt.UnixMilli(),
-				UpdatedAt: fe.UpdatedAt.UnixMilli(),
+				ID:            int64(fe.Id),
+				FrontendToken: fe.Token,
+				ZID:           fe.ZId,
+				CreatedAt:     fe.CreatedAt.UnixMilli(),
+				UpdatedAt:     fe.UpdatedAt.UnixMilli(),
 			}
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)

@@ -46,11 +46,14 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 		return metadata.NewGetFrontendDetailNotFound()
 	}
 	payload := &rest_model_zrok.Frontend{
-		ID:        int64(fe.Id),
-		FeToken:   fe.Token,
-		ZID:       fe.ZId,
-		CreatedAt: fe.CreatedAt.UnixMilli(),
-		UpdatedAt: fe.UpdatedAt.UnixMilli(),
+		ID:            int64(fe.Id),
+		FrontendToken: fe.Token,
+		ZID:           fe.ZId,
+		CreatedAt:     fe.CreatedAt.UnixMilli(),
+		UpdatedAt:     fe.UpdatedAt.UnixMilli(),
+	}
+	if fe.Description != nil {
+		payload.Description = *fe.Description
 	}
 	if fe.PrivateShareId != nil {
 		shr, err := str.GetShare(*fe.PrivateShareId, trx)

@@ -25,7 +25,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getFrontendDetail({feId: access.data.feId as number})
+        getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number})
             .then(d => {
                 delete d.id;
                 delete d.zId;
@@ -43,7 +43,6 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
 
     const labels = {
         createdAt: "Created",
-        feToken: "Frontend Token",
         updatedAt: "Updated",
     }
 

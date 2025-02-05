@@ -16,7 +16,7 @@ interface ReleaseAccessProps {
 
 const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAccessProps) => {
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [feToken, setFeToken] = useState<String>("");
+    const [frontendToken, setFrontendToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>(checked);
 
@@ -30,17 +30,17 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
     }, [isOpen]);
 
     useEffect(() => {
-        if(detail && detail.feToken) {
-            setFeToken(detail.feToken);
+        if(detail && detail.frontendToken) {
+            setFrontendToken(detail.frontendToken);
         }
     }, [detail]);
 
     const releaseAccess = () => {
         setErrorMessage(null);
-        if(detail && detail.feToken) {
+        if(detail && detail.frontendToken) {
             getShareApi(user).unaccess({
                 body: {
-                    frontendToken: detail.feToken,
+                    frontendToken: detail.frontendToken,
                     envZId: access.data.envZId as string,
                     shareToken: detail.shareToken
                 }
@@ -52,7 +52,7 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                     e.response.json().then(ex => {
                         console.log("releaseAccess", ex.message);
                     });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.feToken}</code>!</Typography>);
+                    setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.frontendToken}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);
@@ -68,10 +68,10 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                     <Typography variant="h5"><strong>Release Access</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="body1">Would you like to release the access <code>{feToken}</code> ?</Typography>
+                    <Typography variant="body1">Would you like to release the access <code>{frontendToken}</code> ?</Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{feToken}</code></p>} sx={{ mt: 2 }} />
+                    <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{frontendToken}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
                 { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
                 <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">

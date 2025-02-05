@@ -1999,7 +1999,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "feToken": {
+        "frontendToken": {
           "type": "string"
         },
         "id": {
@@ -4248,7 +4248,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "feToken": {
+        "frontendToken": {
           "type": "string"
         },
         "id": {

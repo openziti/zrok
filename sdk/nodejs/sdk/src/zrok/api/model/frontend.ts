@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 
 export class Frontend {
     'id'?: number;
-    'feToken'?: string;
+    'frontendToken'?: string;
     'shareToken'?: string;
     'description'?: string;
     'zId'?: string;
@@ -30,8 +30,8 @@ export class Frontend {
             "type": "number"
         },
         {
-            "name": "feToken",
-            "baseName": "feToken",
+            "name": "frontendToken",
+            "baseName": "frontendToken",
             "type": "string"
         },
         {

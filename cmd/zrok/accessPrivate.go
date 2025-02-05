@@ -138,6 +138,14 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		bindAddress = autoAddress
 	}
 
+	upReq := share.NewUpdateAccessParams()
+	upReq.Body.FrontendToken = accessResp.Payload.FrontendToken
+	upReq.Body.Description = bindAddress
+	_, err = zrok.Share.UpdateAccess(upReq, auth)
+	if err != nil {
+		cmd.error(err)
+	}
+
 	protocol := "http://"
 	switch accessResp.Payload.BackendMode {
 	case "tcpTunnel":

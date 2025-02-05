@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **int** |  | [optional] 
-**fe_token** | **str** |  | [optional] 
+**frontend_token** | **str** |  | [optional] 
 **share_token** | **str** |  | [optional] 
 **description** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 

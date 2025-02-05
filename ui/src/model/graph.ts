@@ -78,9 +78,9 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 envNode.data.empty = false;
                 env.frontends.forEach(fe => {
                     let feNode = {
-                        id: fe.feToken!,
+                        id: fe.frontendToken!,
                         data: {
-                            label: fe.feToken!,
+                            label: fe.frontendToken!,
                             feId: fe.id,
                             target: fe.shareToken,
                             envZId: fe.zId,

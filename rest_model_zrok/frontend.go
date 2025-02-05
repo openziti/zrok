@@ -23,8 +23,8 @@ type Frontend struct {
 	// description
 	Description string `json:"description,omitempty"`
 
-	// fe token
-	FeToken string `json:"feToken,omitempty"`
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
 
 	// id
 	ID int64 `json:"id,omitempty"`

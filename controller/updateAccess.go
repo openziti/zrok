@@ -56,11 +56,11 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 		logrus.Errorf("error updating frontend '%v': %v", feToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
+	logrus.Warnf("updated frontend '%v' description to '%v'", feToken, *fe.Description)
 
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing transaction for frontend '%v': %v", feToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
-
 	return share.NewUpdateAccessOK()
 }

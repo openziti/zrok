@@ -1241,7 +1241,7 @@ definitions:
     properties:
       id:
         type: integer
-      feToken:
+      frontendToken:
         type: string
       shareToken:
         type: string

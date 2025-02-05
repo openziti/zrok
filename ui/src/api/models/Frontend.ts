@@ -30,7 +30,7 @@ export interface Frontend {
      * @type {string}
      * @memberof Frontend
      */
-    feToken?: string;
+    frontendToken?: string;
     /**
      * 
      * @type {string}
@@ -81,7 +81,7 @@ export function FrontendFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'feToken': json['feToken'] == null ? undefined : json['feToken'],
+        'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'description': json['description'] == null ? undefined : json['description'],
         'zId': json['zId'] == null ? undefined : json['zId'],
@@ -97,7 +97,7 @@ export function FrontendToJSON(value?: Frontend | null): any {
     return {
         
         'id': value['id'],
-        'feToken': value['feToken'],
+        'frontendToken': value['frontendToken'],
         'shareToken': value['shareToken'],
         'description': value['description'],
         'zId': value['zId'],
