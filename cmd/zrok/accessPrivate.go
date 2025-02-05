@@ -140,7 +140,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	upReq := share.NewUpdateAccessParams()
 	upReq.Body.FrontendToken = accessResp.Payload.FrontendToken
-	upReq.Body.Description = bindAddress
+	upReq.Body.BindAddress = bindAddress
 	_, err = zrok.Share.UpdateAccess(upReq, auth)
 	if err != nil {
 		cmd.error(err)

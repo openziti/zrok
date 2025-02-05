@@ -52,6 +52,9 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 		CreatedAt:     fe.CreatedAt.UnixMilli(),
 		UpdatedAt:     fe.UpdatedAt.UnixMilli(),
 	}
+	if fe.BindAddress != nil {
+		payload.BindAddress = *fe.BindAddress
+	}
 	if fe.Description != nil {
 		payload.Description = *fe.Description
 	}
@@ -62,6 +65,7 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 			return metadata.NewGetFrontendDetailInternalServerError()
 		}
 		payload.ShareToken = shr.Token
+		payload.BackendMode = shr.BackendMode
 	}
 	return metadata.NewGetFrontendDetailOK().WithPayload(payload)
 }

@@ -14,7 +14,8 @@ func newUpdateAccessHandler() *updateAccessHandler {
 }
 
 func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	feToken := params.Body.FrontendToken
+	frontendToken := params.Body.FrontendToken
+	bindAddress := params.Body.BindAddress
 	desc := params.Body.Description
 
 	trx, err := str.Begin()
@@ -24,9 +25,9 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	fe, err := str.FindFrontendWithToken(feToken, trx)
+	fe, err := str.FindFrontendWithToken(frontendToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding frontend with token '%v': %v", feToken, err)
+		logrus.Errorf("error finding frontend with token '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessNotFound()
 	}
 
@@ -43,7 +44,7 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 		}
 	}
 	if !envMatched {
-		logrus.Errorf("account '%v' does not own frontend '%v'", principal.Email, feToken)
+		logrus.Errorf("account '%v' does not own frontend '%v'", principal.Email, frontendToken)
 		return share.NewUpdateAccessNotFound()
 	}
 
@@ -52,14 +53,17 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 	} else {
 		fe.Description = nil
 	}
+	if bindAddress != "" {
+		fe.BindAddress = &bindAddress
+	} else {
+		fe.BindAddress = nil
+	}
 	if err := str.UpdateFrontend(fe, trx); err != nil {
-		logrus.Errorf("error updating frontend '%v': %v", feToken, err)
+		logrus.Errorf("error updating frontend '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
-	logrus.Warnf("updated frontend '%v' description to '%v'", feToken, *fe.Description)
-
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for frontend '%v': %v", feToken, err)
+		logrus.Errorf("error committing transaction for frontend '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
 	return share.NewUpdateAccessOK()
