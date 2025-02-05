@@ -9,7 +9,7 @@ import PropertyTable from "./PropertyTable.tsx";
 import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
-import LimitedWarning from "./LimitedWarning.tsx";
+import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
 
 interface AccessPanelProps {
     access: Node;
@@ -92,7 +92,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
                             <h5 style={{ margin: 0 }}>A private access frontend <code>{access.id}</code>{detail && detail.bindAddress ? <span> at <code>{detail.bindAddress}</code></span> : null}</h5>
                         </Grid2>
-                        { limited ? <LimitedWarning /> : null }
+                        { limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Release Access">
                                 <Button variant="contained" color="error" onClick={openReleaseAccess}><DeleteIcon /></Button>
