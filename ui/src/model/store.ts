@@ -7,6 +7,7 @@ import {MRT_PaginationState, MRT_SortingState} from "material-react-table";
 
 type StoreState = {
     user: User;
+    limited: boolean;
     graph: Graph;
     environments: Array<Environment>;
     sparkdata: Map<string, Number[]>;
@@ -20,6 +21,7 @@ type StoreState = {
 
 type StoreAction = {
     updateUser: (user: StoreState['user']) => void,
+    updateLimited: (limited: StoreState['limited']) => void,
     updateGraph: (vov: StoreState['graph']) => void,
     updateEnvironments: (environments: StoreState['environments']) => void,
     updateSparkdata: (sparkdata: StoreState['sparkdata']) => void,
@@ -33,6 +35,7 @@ type StoreAction = {
 
 const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     user: null,
+    limited: false,
     graph: new Graph(),
     environments: new Array<Environment>(),
     sparkdata: new Map<string, Number[]>(),
@@ -43,6 +46,7 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     pagination: {pageIndex: 0, pageSize: 15},
     sorting: [{id: "data.label", desc: false}] as MRT_SortingState,
     updateUser: (user) => set({user: user}),
+    updateLimited: (limited) => set({limited: limited}),
     updateGraph: (vov) => set({overview: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
     updateSparkdata: (sparkdata) => set({sparkdata: sparkdata}),

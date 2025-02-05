@@ -2,7 +2,9 @@ import {AppBar, Box, Button, Grid2, Toolbar, Tooltip, Typography} from "@mui/mat
 import LogoutIcon from "@mui/icons-material/Logout";
 import VisualizerIcon from "@mui/icons-material/Hub";
 import TabularIcon from "@mui/icons-material/TableRows";
-import zroket from "./assets/zrok-1.0.0-rocket-green.svg";
+import LimitIcon from "@mui/icons-material/CrisisAlert";
+import zrokLogo from "./assets/zrok-1.0.0-rocket-green.svg";
+import useApiConsoleStore from "./model/store.ts";
 
 interface NavBarProps {
     logout: () => void;
@@ -11,6 +13,16 @@ interface NavBarProps {
 }
 
 const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
+    const limited = useApiConsoleStore((state) => state.limited);
+
+    const limitedIndicator = (
+        <Grid2 display="flex" justifyContent="right">
+            <Tooltip title="Bandwidth Limit Reached!">
+                <Button color="error" ><LimitIcon /></Button>
+            </Tooltip>
+        </Grid2>
+    );
+
     const handleClick = () => {
         toggleMode(!visualizer);
     }
@@ -22,7 +34,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         <Grid2 container sx={{ flexGrow: 1 }}>
                             <Grid2 display="flex" justifyContent="left">
-                                <img src={zroket} height="30" />
+                                <img src={zrokLogo} height="30" />
                             </Grid2>
                             <Grid2 display="flex" justifyContent="left" size="grow" sx={{ ml: 3 }} color="#9bf316">
                                 <strong>z r o k</strong>
@@ -33,6 +45,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                         <Grid2 display="flex" justifyContent="right" size="grow">
                             <Button variant="outline" color="inherit">CLICK HERE TO GET STARTED!</Button>
                         </Grid2>
+                        { limited ? limitedIndicator : null }
                         <Grid2 display="flex" justifyContent="right">
                             <Tooltip title="Toggle Interface Mode (Ctrl-`)">
                                 <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>

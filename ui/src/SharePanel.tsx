@@ -11,6 +11,7 @@ import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import ShareMetricsModal from "./ShareMetricsModal.tsx";
+import LimitedWarning from "./LimitedWarning.tsx";
 
 interface SharePanelProps {
     share: Node;
@@ -95,6 +96,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
                     <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></h5>
                 </Grid2>
+                { share.data.limited ? <LimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Share Metrics">
                         <Button variant="contained" onClick={openShareMetrics}><MetricsIcon /></Button>

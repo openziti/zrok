@@ -15,7 +15,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
         id: u.token,
         data: {
             label: u.email,
-            limited: !!limited
+            limited: limited
         },
         type: "account",
         position: { x: 0, y: 0 },

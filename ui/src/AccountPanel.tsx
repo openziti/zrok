@@ -12,6 +12,7 @@ import RegenerateAccountTokenModal from "./RegenerateAccountTokenModal.tsx";
 import ClipboardText from "./ClipboardText.tsx";
 import AccountMetricsModal from "./AccountMetricsModal.tsx";
 import MetricsIcon from "@mui/icons-material/QueryStats";
+import LimitedWarning from "./LimitedWarning.tsx";
 
 interface AccountPanelProps {
     account: Node;
@@ -19,6 +20,7 @@ interface AccountPanelProps {
 
 const AccountPanel = ({ account }: AccountPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const limited = useApiConsoleStore((state) => state.limited);
     const [accountMetricsOpen, setAccountMetricsOpen] = useState<boolean>(false);
     const openAccountMetrics = () => {
         setAccountMetricsOpen(true);
@@ -59,6 +61,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
                     <h5 style={{ margin: 0 }}>Your zrok account, <code>{user.email}</code></h5>
                 </Grid2>
+                { limited ? <LimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Account Metrics">
                         <Button variant="contained" onClick={openAccountMetrics}><MetricsIcon /></Button>

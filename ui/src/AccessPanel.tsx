@@ -9,6 +9,7 @@ import PropertyTable from "./PropertyTable.tsx";
 import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
+import LimitedWarning from "./LimitedWarning.tsx";
 
 interface AccessPanelProps {
     access: Node;
@@ -16,6 +17,7 @@ interface AccessPanelProps {
 
 const AccessPanel = ({ access }: AccessPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const limited = useApiConsoleStore((state) => state.limited);
     const [detail, setDetail] = useState<Frontend>(null);
     const [releaseAccessOpen, setReleaseAccessOpen] = useState<boolean>(false);
     const openReleaseAccess = () => {
@@ -90,6 +92,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
                             <h5 style={{ margin: 0 }}>A private access frontend <code>{access.id}</code>{detail && detail.bindAddress ? <span> at <code>{detail.bindAddress}</code></span> : null}</h5>
                         </Grid2>
+                        { limited ? <LimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Release Access">
                                 <Button variant="contained" color="error" onClick={openReleaseAccess}><DeleteIcon /></Button>

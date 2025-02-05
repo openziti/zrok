@@ -20,6 +20,7 @@ interface ApiConsoleProps {
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const userRef = useRef<User>(user);
+    const updateLimited = useApiConsoleStore((state) => state.updateLimited);
     const graph = useApiConsoleStore((state) => state.graph);
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
@@ -53,6 +54,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const retrieveOverview = () => {
         getMetadataApi(userRef.current).overview()
             .then(d => {
+                updateLimited(d.accountLimited!);
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
                     console.log("refreshed vov", oldGraph.current.nodes, newVov.nodes);
