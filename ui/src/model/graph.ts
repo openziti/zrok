@@ -32,7 +32,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 data: {
                     label: env.environment?.description,
                     envZId: env.environment?.zId!,
-                    limited: !!limited,
+                    limited: limited,
                     empty: true
                 },
                 type: "environment",
@@ -48,7 +48,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             if(env.shares) {
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
-                    let shrLabel = shr.token!;
+                    let shrLabel = shr.shareToken!;
                     if(shr.backendProxyEndpoint !== "") {
                         shrLabel = shr.backendProxyEndpoint!;
                     }
@@ -58,7 +58,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                             label: shrLabel,
                             shareToken: shr.shareToken!,
                             envZId: env.environment?.zId!,
-                            limited: !!limited,
+                            limited: limited,
                             accessed: false,
                         },
                         type: "share",

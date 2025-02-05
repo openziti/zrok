@@ -42,6 +42,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				Description: env.Description,
 				Host:        env.Host,
 				ZID:         env.ZId,
+				Limited:     accountLimited,
 				CreatedAt:   env.CreatedAt.UnixMilli(),
 				UpdatedAt:   env.UpdatedAt.UnixMilli(),
 			},
@@ -74,6 +75,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				FrontendEndpoint:     feEndpoint,
 				BackendProxyEndpoint: beProxyEndpoint,
 				Reserved:             shr.Reserved,
+				Limited:              accountLimited,
 				CreatedAt:            shr.CreatedAt.UnixMilli(),
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			}
