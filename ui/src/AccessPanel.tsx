@@ -2,12 +2,13 @@ import {Node} from "@xyflow/react";
 import {Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
 import useApiConsoleStore from "./model/store.ts";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Frontend} from "./api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropertyTable from "./PropertyTable.tsx";
 import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
+import ClipboardText from "./ClipboardText.tsx";
 
 interface AccessPanelProps {
     access: Node;
@@ -38,6 +39,36 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }, [access]);
 
     const customProperties = {
+        bindAddress: row => <>
+            <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                <Grid2 display="flex" justifyContent="left">
+                    <span>{row.value}</span>
+                </Grid2>
+                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
+                    <ClipboardText text={row.value} />
+                </Grid2>
+            </Grid2>
+        </>,
+        frontendToken: row => <>
+            <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                <Grid2 display="flex" justifyContent="left">
+                    <span>{row.value}</span>
+                </Grid2>
+                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
+                    <ClipboardText text={row.value} />
+                </Grid2>
+            </Grid2>
+        </>,
+        shareToken: row => <>
+            <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                <Grid2 display="flex" justifyContent="left">
+                    <span>{row.value}</span>
+                </Grid2>
+                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
+                    <ClipboardText text={row.value} />
+                </Grid2>
+            </Grid2>
+        </>,
         createdAt: row => new Date(row.value).toLocaleString(),
         updatedAt: row => new Date(row.value).toLocaleString(),
     }

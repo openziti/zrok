@@ -48,7 +48,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
             </Grid2>
         </>,
         reserved: row => row.value ? "reserved" : "ephemeral",
-        token: row => <>
+        shareToken: row => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
                     <span>{row.value}</span>
