@@ -21,6 +21,7 @@ import type {
   ShareResponse,
   UnaccessRequest,
   UnshareRequest,
+  UpdateAccessRequest,
   UpdateShareRequest,
 } from '../models/index';
 import {
@@ -36,6 +37,8 @@ import {
     UnaccessRequestToJSON,
     UnshareRequestFromJSON,
     UnshareRequestToJSON,
+    UpdateAccessRequestFromJSON,
+    UpdateAccessRequestToJSON,
     UpdateShareRequestFromJSON,
     UpdateShareRequestToJSON,
 } from '../models/index';
@@ -54,6 +57,10 @@ export interface UnaccessOperationRequest {
 
 export interface UnshareOperationRequest {
     body?: UnshareRequest;
+}
+
+export interface UpdateAccessOperationRequest {
+    body?: UpdateAccessRequest;
 }
 
 export interface UpdateShareOperationRequest {
@@ -185,6 +192,36 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async unshare(requestParameters: UnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.unshareRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateAccessRaw(requestParameters: UpdateAccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/access`,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateAccessRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateAccess(requestParameters: UpdateAccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateAccessRaw(requestParameters, initOverrides);
     }
 
     /**

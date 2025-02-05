@@ -188,11 +188,13 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
+*ShareApi* | [**update_access**](docs/ShareApi.md#update_access) | **PATCH** /access | 
 *ShareApi* | [**update_share**](docs/ShareApi.md#update_share) | **PATCH** /share | 
 
 ## Documentation For Models
 
  - [AccessBody](docs/AccessBody.md)
+ - [AccessBody1](docs/AccessBody1.md)
  - [AccountBody](docs/AccountBody.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordBody](docs/ChangePasswordBody.md)

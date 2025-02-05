@@ -49,6 +49,7 @@ models/ShareResponse.ts
 models/SparkDataSample.ts
 models/UnaccessRequest.ts
 models/UnshareRequest.ts
+models/UpdateAccessRequest.ts
 models/UpdateFrontendRequest.ts
 models/UpdateShareRequest.ts
 models/Verify200Response.ts

@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 # import models into model package
 from zrok_api.models.access_body import AccessBody
+from zrok_api.models.access_body1 import AccessBody1
 from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody

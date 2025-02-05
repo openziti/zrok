@@ -44,6 +44,7 @@ export * from './shareResponse';
 export * from './sparkDataSample';
 export * from './unaccessRequest';
 export * from './unshareRequest';
+export * from './updateAccessRequest';
 export * from './updateFrontendRequest';
 export * from './updateShareRequest';
 export * from './verify200Response';
@@ -106,6 +107,7 @@ import { ShareResponse } from './shareResponse';
 import { SparkDataSample } from './sparkDataSample';
 import { UnaccessRequest } from './unaccessRequest';
 import { UnshareRequest } from './unshareRequest';
+import { UpdateAccessRequest } from './updateAccessRequest';
 import { UpdateFrontendRequest } from './updateFrontendRequest';
 import { UpdateShareRequest } from './updateShareRequest';
 import { Verify200Response } from './verify200Response';
@@ -176,6 +178,7 @@ let typeMap: {[index: string]: any} = {
     "SparkDataSample": SparkDataSample,
     "UnaccessRequest": UnaccessRequest,
     "UnshareRequest": UnshareRequest,
+    "UpdateAccessRequest": UpdateAccessRequest,
     "UpdateFrontendRequest": UpdateFrontendRequest,
     "UpdateShareRequest": UpdateShareRequest,
     "Verify200Response": Verify200Response,

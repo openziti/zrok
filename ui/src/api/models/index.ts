@@ -44,6 +44,7 @@ export * from './ShareResponse';
 export * from './SparkDataSample';
 export * from './UnaccessRequest';
 export * from './UnshareRequest';
+export * from './UpdateAccessRequest';
 export * from './UpdateFrontendRequest';
 export * from './UpdateShareRequest';
 export * from './Verify200Response';

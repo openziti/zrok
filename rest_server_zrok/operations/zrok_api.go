@@ -166,6 +166,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
 		}),
+		ShareUpdateAccessHandler: share.UpdateAccessHandlerFunc(func(params share.UpdateAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.UpdateAccess has not yet been implemented")
+		}),
 		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
 		}),
@@ -306,6 +309,8 @@ type ZrokAPI struct {
 	ShareUnaccessHandler share.UnaccessHandler
 	// ShareUnshareHandler sets the operation handler for the unshare operation
 	ShareUnshareHandler share.UnshareHandler
+	// ShareUpdateAccessHandler sets the operation handler for the update access operation
+	ShareUpdateAccessHandler share.UpdateAccessHandler
 	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
 	AdminUpdateFrontendHandler admin.UpdateFrontendHandler
 	// ShareUpdateShareHandler sets the operation handler for the update share operation
@@ -511,6 +516,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareUnshareHandler == nil {
 		unregistered = append(unregistered, "share.UnshareHandler")
+	}
+	if o.ShareUpdateAccessHandler == nil {
+		unregistered = append(unregistered, "share.UpdateAccessHandler")
 	}
 	if o.AdminUpdateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.UpdateFrontendHandler")
@@ -779,6 +787,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/unshare"] = share.NewUnshare(o.context, o.ShareUnshareHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
+	o.handlers["PATCH"]["/access"] = share.NewUpdateAccess(o.context, o.ShareUpdateAccessHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}

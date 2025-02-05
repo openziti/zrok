@@ -1028,6 +1028,30 @@ paths:
           description: not found
         500:
           description: internal server error
+    patch:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: updateAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              frontendToken:
+                type: string
+              description:
+                type: string
+      responses:
+        200:
+          description: access updated
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   /share:
     post:

@@ -25,6 +25,7 @@ from zrok_api.api_client import ApiClient
 from zrok_api.configuration import Configuration
 # import models into sdk package
 from zrok_api.models.access_body import AccessBody
+from zrok_api.models.access_body1 import AccessBody1
 from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody
