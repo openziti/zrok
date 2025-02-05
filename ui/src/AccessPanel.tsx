@@ -29,6 +29,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
             .then(d => {
                 delete d.id;
                 delete d.zId;
+                delete d.description;
                 setDetail(d);
             })
             .catch(e => {
