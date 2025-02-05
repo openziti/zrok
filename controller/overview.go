@@ -92,6 +92,12 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				CreatedAt:     fe.CreatedAt.UnixMilli(),
 				UpdatedAt:     fe.UpdatedAt.UnixMilli(),
 			}
+			if fe.BindAddress != nil {
+				envFe.BindAddress = *fe.BindAddress
+			}
+			if fe.Description != nil {
+				envFe.Description = *fe.Description
+			}
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
 				if err != nil {
@@ -99,6 +105,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 					return metadata.NewOverviewInternalServerError()
 				}
 				envFe.ShareToken = feShr.Token
+				envFe.BackendMode = feShr.BackendMode
 			}
 			ear.Frontends = append(ear.Frontends, envFe)
 		}
