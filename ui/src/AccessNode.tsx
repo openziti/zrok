@@ -17,7 +17,7 @@ const AccessNode = ({ data }) => {
             {shareHandle}
             <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                 <Grid2 display="flex"><AccessIcon sx={{ fontSize: 15, mr: 0.5 }}/></Grid2>
-                <Grid2 display="flex">{data.bindAddress}</Grid2>
+                <Grid2 display="flex">{data.bindAddress ? data.bindAddress : data.label}</Grid2>
             </Grid2>
         </>
     );
