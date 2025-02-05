@@ -17,6 +17,12 @@ import (
 // swagger:model frontend
 type Frontend struct {
 
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 

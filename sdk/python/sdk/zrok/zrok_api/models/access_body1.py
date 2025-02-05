@@ -29,21 +29,26 @@ class AccessBody1(object):
     """
     swagger_types = {
         'frontend_token': 'str',
+        'bind_address': 'str',
         'description': 'str'
     }
 
     attribute_map = {
         'frontend_token': 'frontendToken',
+        'bind_address': 'bindAddress',
         'description': 'description'
     }
 
-    def __init__(self, frontend_token=None, description=None):  # noqa: E501
+    def __init__(self, frontend_token=None, bind_address=None, description=None):  # noqa: E501
         """AccessBody1 - a model defined in Swagger"""  # noqa: E501
         self._frontend_token = None
+        self._bind_address = None
         self._description = None
         self.discriminator = None
         if frontend_token is not None:
             self.frontend_token = frontend_token
+        if bind_address is not None:
+            self.bind_address = bind_address
         if description is not None:
             self.description = description
 
@@ -67,6 +72,27 @@ class AccessBody1(object):
         """
 
         self._frontend_token = frontend_token
+
+    @property
+    def bind_address(self):
+        """Gets the bind_address of this AccessBody1.  # noqa: E501
+
+
+        :return: The bind_address of this AccessBody1.  # noqa: E501
+        :rtype: str
+        """
+        return self._bind_address
+
+    @bind_address.setter
+    def bind_address(self, bind_address):
+        """Sets the bind_address of this AccessBody1.
+
+
+        :param bind_address: The bind_address of this AccessBody1.  # noqa: E501
+        :type: str
+        """
+
+        self._bind_address = bind_address
 
     @property
     def description(self):

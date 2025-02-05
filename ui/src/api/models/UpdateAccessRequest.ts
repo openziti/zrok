@@ -30,6 +30,12 @@ export interface UpdateAccessRequest {
      * @type {string}
      * @memberof UpdateAccessRequest
      */
+    bindAddress?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateAccessRequest
+     */
     description?: string;
 }
 
@@ -51,6 +57,7 @@ export function UpdateAccessRequestFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
+        'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'description': json['description'] == null ? undefined : json['description'],
     };
 }
@@ -62,6 +69,7 @@ export function UpdateAccessRequestToJSON(value?: UpdateAccessRequest | null): a
     return {
         
         'frontendToken': value['frontendToken'],
+        'bindAddress': value['bindAddress'],
         'description': value['description'],
     };
 }

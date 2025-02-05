@@ -15,6 +15,7 @@ import { RequestFile } from './models';
 export class AccessRequest {
     'envZId'?: string;
     'shareToken'?: string;
+    'bindAddress'?: string;
     'description'?: string;
 
     static discriminator: string | undefined = undefined;
@@ -28,6 +29,11 @@ export class AccessRequest {
         {
             "name": "shareToken",
             "baseName": "shareToken",
+            "type": "string"
+        },
+        {
+            "name": "bindAddress",
+            "baseName": "bindAddress",
             "type": "string"
         },
         {

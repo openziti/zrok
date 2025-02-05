@@ -6,6 +6,8 @@ Name | Type | Description | Notes
 **id** | **int** |  | [optional] 
 **frontend_token** | **str** |  | [optional] 
 **share_token** | **str** |  | [optional] 
+**backend_mode** | **str** |  | [optional] 
+**bind_address** | **str** |  | [optional] 
 **description** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
 **created_at** | **int** |  | [optional] 

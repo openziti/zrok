@@ -52,6 +52,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
                 "description": {
                   "type": "string"
                 },
@@ -106,6 +109,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
                 "description": {
                   "type": "string"
                 },
@@ -1993,6 +1999,12 @@ func init() {
     "frontend": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "integer"
         },
@@ -2296,6 +2308,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
                 "description": {
                   "type": "string"
                 },
@@ -2350,6 +2365,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
                 "description": {
                   "type": "string"
                 },
@@ -4242,6 +4260,12 @@ func init() {
     "frontend": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "integer"
         },

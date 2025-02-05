@@ -31,6 +31,8 @@ class Frontend(object):
         'id': 'int',
         'frontend_token': 'str',
         'share_token': 'str',
+        'backend_mode': 'str',
+        'bind_address': 'str',
         'description': 'str',
         'z_id': 'str',
         'created_at': 'int',
@@ -41,17 +43,21 @@ class Frontend(object):
         'id': 'id',
         'frontend_token': 'frontendToken',
         'share_token': 'shareToken',
+        'backend_mode': 'backendMode',
+        'bind_address': 'bindAddress',
         'description': 'description',
         'z_id': 'zId',
         'created_at': 'createdAt',
         'updated_at': 'updatedAt'
     }
 
-    def __init__(self, id=None, frontend_token=None, share_token=None, description=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, id=None, frontend_token=None, share_token=None, backend_mode=None, bind_address=None, description=None, z_id=None, created_at=None, updated_at=None):  # noqa: E501
         """Frontend - a model defined in Swagger"""  # noqa: E501
         self._id = None
         self._frontend_token = None
         self._share_token = None
+        self._backend_mode = None
+        self._bind_address = None
         self._description = None
         self._z_id = None
         self._created_at = None
@@ -63,6 +69,10 @@ class Frontend(object):
             self.frontend_token = frontend_token
         if share_token is not None:
             self.share_token = share_token
+        if backend_mode is not None:
+            self.backend_mode = backend_mode
+        if bind_address is not None:
+            self.bind_address = bind_address
         if description is not None:
             self.description = description
         if z_id is not None:
@@ -134,6 +144,48 @@ class Frontend(object):
         """
 
         self._share_token = share_token
+
+    @property
+    def backend_mode(self):
+        """Gets the backend_mode of this Frontend.  # noqa: E501
+
+
+        :return: The backend_mode of this Frontend.  # noqa: E501
+        :rtype: str
+        """
+        return self._backend_mode
+
+    @backend_mode.setter
+    def backend_mode(self, backend_mode):
+        """Sets the backend_mode of this Frontend.
+
+
+        :param backend_mode: The backend_mode of this Frontend.  # noqa: E501
+        :type: str
+        """
+
+        self._backend_mode = backend_mode
+
+    @property
+    def bind_address(self):
+        """Gets the bind_address of this Frontend.  # noqa: E501
+
+
+        :return: The bind_address of this Frontend.  # noqa: E501
+        :rtype: str
+        """
+        return self._bind_address
+
+    @bind_address.setter
+    def bind_address(self, bind_address):
+        """Sets the bind_address of this Frontend.
+
+
+        :param bind_address: The bind_address of this Frontend.  # noqa: E501
+        :type: str
+        """
+
+        self._bind_address = bind_address
 
     @property
     def description(self):

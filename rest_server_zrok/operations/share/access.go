@@ -78,6 +78,9 @@ func (o *Access) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model AccessBody
 type AccessBody struct {
 
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
 	// description
 	Description string `json:"description,omitempty"`
 

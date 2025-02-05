@@ -281,6 +281,9 @@ swagger:model UpdateAccessBody
 */
 type UpdateAccessBody struct {
 
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
 	// description
 	Description string `json:"description,omitempty"`
 

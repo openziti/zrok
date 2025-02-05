@@ -16,6 +16,8 @@ export class Frontend {
     'id'?: number;
     'frontendToken'?: string;
     'shareToken'?: string;
+    'backendMode'?: string;
+    'bindAddress'?: string;
     'description'?: string;
     'zId'?: string;
     'createdAt'?: number;
@@ -37,6 +39,16 @@ export class Frontend {
         {
             "name": "shareToken",
             "baseName": "shareToken",
+            "type": "string"
+        },
+        {
+            "name": "backendMode",
+            "baseName": "backendMode",
+            "type": "string"
+        },
+        {
+            "name": "bindAddress",
+            "baseName": "bindAddress",
             "type": "string"
         },
         {

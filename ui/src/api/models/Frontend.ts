@@ -42,6 +42,18 @@ export interface Frontend {
      * @type {string}
      * @memberof Frontend
      */
+    backendMode?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Frontend
+     */
+    bindAddress?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Frontend
+     */
     description?: string;
     /**
      * 
@@ -83,6 +95,8 @@ export function FrontendFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'id': json['id'] == null ? undefined : json['id'],
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
+        'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
+        'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'description': json['description'] == null ? undefined : json['description'],
         'zId': json['zId'] == null ? undefined : json['zId'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
@@ -99,6 +113,8 @@ export function FrontendToJSON(value?: Frontend | null): any {
         'id': value['id'],
         'frontendToken': value['frontendToken'],
         'shareToken': value['shareToken'],
+        'backendMode': value['backendMode'],
+        'bindAddress': value['bindAddress'],
         'description': value['description'],
         'zId': value['zId'],
         'createdAt': value['createdAt'],

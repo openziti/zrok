@@ -14,6 +14,7 @@ import { RequestFile } from './models';
 
 export class UpdateAccessRequest {
     'frontendToken'?: string;
+    'bindAddress'?: string;
     'description'?: string;
 
     static discriminator: string | undefined = undefined;
@@ -22,6 +23,11 @@ export class UpdateAccessRequest {
         {
             "name": "frontendToken",
             "baseName": "frontendToken",
+            "type": "string"
+        },
+        {
+            "name": "bindAddress",
+            "baseName": "bindAddress",
             "type": "string"
         },
         {

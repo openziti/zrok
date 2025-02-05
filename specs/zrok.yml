@@ -1011,6 +1011,8 @@ paths:
                 type: string
               shareToken:
                 type: string
+              bindAddress:
+                type: string
               description:
                 type: string
       responses:
@@ -1040,6 +1042,8 @@ paths:
           schema:
             properties:
               frontendToken:
+                type: string
+              bindAddress:
                 type: string
               description:
                 type: string
@@ -1244,6 +1248,10 @@ definitions:
       frontendToken:
         type: string
       shareToken:
+        type: string
+      backendMode:
+        type: string
+      bindAddress:
         type: string
       description:
         type: string

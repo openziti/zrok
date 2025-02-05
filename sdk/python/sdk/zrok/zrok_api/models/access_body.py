@@ -30,25 +30,30 @@ class AccessBody(object):
     swagger_types = {
         'env_zid': 'str',
         'share_token': 'str',
+        'bind_address': 'str',
         'description': 'str'
     }
 
     attribute_map = {
         'env_zid': 'envZId',
         'share_token': 'shareToken',
+        'bind_address': 'bindAddress',
         'description': 'description'
     }
 
-    def __init__(self, env_zid=None, share_token=None, description=None):  # noqa: E501
+    def __init__(self, env_zid=None, share_token=None, bind_address=None, description=None):  # noqa: E501
         """AccessBody - a model defined in Swagger"""  # noqa: E501
         self._env_zid = None
         self._share_token = None
+        self._bind_address = None
         self._description = None
         self.discriminator = None
         if env_zid is not None:
             self.env_zid = env_zid
         if share_token is not None:
             self.share_token = share_token
+        if bind_address is not None:
+            self.bind_address = bind_address
         if description is not None:
             self.description = description
 
@@ -93,6 +98,27 @@ class AccessBody(object):
         """
 
         self._share_token = share_token
+
+    @property
+    def bind_address(self):
+        """Gets the bind_address of this AccessBody.  # noqa: E501
+
+
+        :return: The bind_address of this AccessBody.  # noqa: E501
+        :rtype: str
+        """
+        return self._bind_address
+
+    @bind_address.setter
+    def bind_address(self, bind_address):
+        """Sets the bind_address of this AccessBody.
+
+
+        :param bind_address: The bind_address of this AccessBody.  # noqa: E501
+        :type: str
+        """
+
+        self._bind_address = bind_address
 
     @property
     def description(self):
