@@ -87,6 +87,7 @@ func Run(inCfg *config.Config) error {
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
+	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
 	if err := controllerStartup(); err != nil {
