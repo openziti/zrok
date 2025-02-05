@@ -87,10 +87,10 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                     <Grid2 >
                         <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                             <Grid2 display="flex"><AccessIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
-                            <Grid2 display="flex" component="h3">{String(access.data.label)}</Grid2>
+                            <Grid2 display="flex" component="h3">{ access.data.bindAddress ? access.data.bindAddress : String(access.data.label)}</Grid2>
                         </Grid2>
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                            <h5 style={{ margin: 0 }}>A private access frontend <code>{access.id}</code>{detail && detail.bindAddress ? <span> at <code>{detail.bindAddress}</code></span> : null}</h5>
+                            <h5 style={{ margin: 0 }}>A private access frontend {detail && detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token {detail?.frontendToken}</span>}</h5>
                         </Grid2>
                         { limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
