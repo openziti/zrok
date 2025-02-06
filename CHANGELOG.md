@@ -18,6 +18,10 @@ CHANGE: Refactored API implementation. Cleanup, lint removal, additional data el
 
 CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
 
+## v0.4.48
+
+FIX: the Python SDK erroneously assumed the enabled zrok environment contained a config.json file, and was changed to only load it if the file was present (https://github.com/openziti/zrok/pull/853/).
+
 ## v0.4.47
 
 CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)
