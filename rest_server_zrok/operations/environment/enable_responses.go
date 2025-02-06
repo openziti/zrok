@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // EnableCreatedCode is the HTTP code returned for type EnableCreated
@@ -26,7 +24,7 @@ type EnableCreated struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.EnableResponse `json:"body,omitempty"`
+	Payload *EnableCreatedBody `json:"body,omitempty"`
 }
 
 // NewEnableCreated creates EnableCreated with default headers values
@@ -36,13 +34,13 @@ func NewEnableCreated() *EnableCreated {
 }
 
 // WithPayload adds the payload to the enable created response
-func (o *EnableCreated) WithPayload(payload *rest_model_zrok.EnableResponse) *EnableCreated {
+func (o *EnableCreated) WithPayload(payload *EnableCreatedBody) *EnableCreated {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the enable created response
-func (o *EnableCreated) SetPayload(payload *rest_model_zrok.EnableResponse) {
+func (o *EnableCreated) SetPayload(payload *EnableCreatedBody) {
 	o.Payload = payload
 }
 

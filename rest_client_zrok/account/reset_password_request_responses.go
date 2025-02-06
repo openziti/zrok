@@ -53,7 +53,7 @@ func NewResetPasswordRequestCreated() *ResetPasswordRequestCreated {
 /*
 ResetPasswordRequestCreated describes a response with status code 201, with default header values.
 
-forgot password request created
+reset password request created
 */
 type ResetPasswordRequestCreated struct {
 }
@@ -109,7 +109,7 @@ func NewResetPasswordRequestBadRequest() *ResetPasswordRequestBadRequest {
 /*
 ResetPasswordRequestBadRequest describes a response with status code 400, with default header values.
 
-forgot password request not created
+reset password request not created
 */
 type ResetPasswordRequestBadRequest struct {
 }

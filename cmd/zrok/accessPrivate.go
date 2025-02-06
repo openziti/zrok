@@ -20,7 +20,6 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
@@ -119,10 +118,9 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
 	req := share.NewAccessParams()
-	req.Body = &rest_model_zrok.AccessRequest{
-		ShrToken: shrToken,
-		EnvZID:   root.Environment().ZitiIdentity,
-	}
+	req.Body.ShareToken = shrToken
+	req.Body.EnvZID = root.Environment().ZitiIdentity
+
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
 		cmd.error(err)
@@ -131,13 +129,24 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	bindAddress := cmd.bindAddress
 	if cmd.autoMode {
 		if accessResp.Payload.BackendMode == "udpTunnel" {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(errors.New("auto-addressing is not compatible with the 'udpTunnel' backend mode"))
 		}
 		autoAddress, err := util.AutoListenerAddress("tcp", cmd.autoAddress, cmd.autoStartPort, cmd.autoEndPort)
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		bindAddress = autoAddress
+	}
+
+	upReq := share.NewUpdateAccessParams()
+	upReq.Body.FrontendToken = accessResp.Payload.FrontendToken
+	upReq.Body.BindAddress = bindAddress
+	_, err = zrok.Share.UpdateAccess(upReq, auth)
+	if err != nil {
+		cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
+		cmd.error(err)
 	}
 
 	protocol := "http://"
@@ -150,6 +159,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	endpointUrl, err := url.Parse(protocol + bindAddress)
 	if err != nil {
+		cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 		cmd.error(err)
 	}
 
@@ -163,10 +173,12 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
+				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 				cmd.error(err)
 			}
 		}()
@@ -180,10 +192,12 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			IdleTime:     time.Minute,
 		})
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
+				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 				cmd.error(err)
 			}
 		}()
@@ -196,10 +210,12 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
+				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 				cmd.error(err)
 			}
 		}()
@@ -214,10 +230,12 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			RequestsChan: requests,
 		})
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
+				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 				cmd.error(err)
 			}
 		}()
@@ -230,10 +248,12 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		cfg.RequestsChan = requests
 		fe, err := proxy.NewFrontend(cfg)
 		if err != nil {
+			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 			cmd.error(err)
 		}
 		go func() {
 			if err := fe.Run(); err != nil {
+				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
 				cmd.error(err)
 			}
 		}()
@@ -319,14 +339,12 @@ func (cmd *accessPrivateCommand) error(err error) {
 	panic(err)
 }
 
-func (cmd *accessPrivateCommand) shutdown(frontendName, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
+func (cmd *accessPrivateCommand) shutdown(frontendToken, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
 	logrus.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
-	req.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendToken: frontendName,
-		ShrToken:      shrToken,
-		EnvZID:        envZId,
-	}
+	req.Body.FrontendToken = frontendToken
+	req.Body.ShareToken = shrToken
+	req.Body.EnvZID = envZId
 	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
 		logrus.Debugf("shutdown complete")
 	} else {

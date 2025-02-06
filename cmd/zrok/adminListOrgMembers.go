@@ -41,7 +41,7 @@ func (cmd *adminListOrgMembersCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewListOrganizationMembersParams()
-	req.Body.Token = args[0]
+	req.Body.OrganizationToken = args[0]
 
 	resp, err := zrok.Admin.ListOrganizationMembers(req, mustGetAdminAuth())
 	if err != nil {

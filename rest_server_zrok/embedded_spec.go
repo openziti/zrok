@@ -51,7 +51,20 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accessRequest"
+              "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -59,8 +72,59 @@ func init() {
           "201": {
             "description": "access created",
             "schema": {
-              "$ref": "#/definitions/accessResponse"
+              "properties": {
+                "backendMode": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "access updated"
           },
           "401": {
             "description": "unauthorized"
@@ -106,7 +170,7 @@ func init() {
             "description": "created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -137,13 +201,23 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/changePasswordRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "newPassword": {
+                  "type": "string"
+                },
+                "oldPassword": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "changed password"
+            "description": "password changed"
           },
           "400": {
             "description": "password not changed"
@@ -241,7 +315,7 @@ func init() {
         }
       }
     },
-    "/detail/frontend/{feId}": {
+    "/detail/frontend/{frontendId}": {
       "get": {
         "security": [
           {
@@ -255,7 +329,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "name": "feId",
+            "name": "frontendId",
             "in": "path",
             "required": true
           }
@@ -279,7 +353,7 @@ func init() {
         }
       }
     },
-    "/detail/share/{shrToken}": {
+    "/detail/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -293,7 +367,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           }
@@ -333,7 +407,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/disableRequest"
+              "properties": {
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -366,7 +444,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/enableRequest"
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -374,7 +459,14 @@ func init() {
           "201": {
             "description": "environment enabled",
             "schema": {
-              "$ref": "#/definitions/enableResponse"
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -405,7 +497,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createFrontendRequest"
+              "type": "object",
+              "properties": {
+                "permissionMode": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "public_name": {
+                  "type": "string"
+                },
+                "url_template": {
+                  "type": "string"
+                },
+                "zId": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -413,7 +523,12 @@ func init() {
           "201": {
             "description": "frontend created",
             "schema": {
-              "$ref": "#/definitions/createFrontendResponse"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "400": {
@@ -445,7 +560,12 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/deleteFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -479,7 +599,18 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                },
+                "publicName": {
+                  "type": "string"
+                },
+                "urlTemplate": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -514,7 +645,30 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/publicFrontendList"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "integer"
+                  },
+                  "frontendToken": {
+                    "type": "string"
+                  },
+                  "publicName": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "integer"
+                  },
+                  "urlTemplate": {
+                    "type": "string"
+                  },
+                  "zId": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           },
           "401": {
@@ -624,7 +778,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "inviteToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -663,16 +824,23 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteTokenGenerateRequest"
+              "properties": {
+                "inviteTokens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "invitation tokens created"
+            "description": "invite tokens created"
           },
           "400": {
-            "description": "invitation tokens not created"
+            "description": "invite tokens not created"
           },
           "401": {
             "description": "unauthorized"
@@ -694,7 +862,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/loginRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -702,7 +877,7 @@ func init() {
           "200": {
             "description": "login successful",
             "schema": {
-              "$ref": "#/definitions/loginResponse"
+              "type": "string"
             }
           },
           "401": {
@@ -786,7 +961,7 @@ func init() {
                       "description": {
                         "type": "string"
                       },
-                      "token": {
+                      "organizationToken": {
                         "type": "string"
                       }
                     }
@@ -878,7 +1053,7 @@ func init() {
         }
       }
     },
-    "/metrics/share/{shrToken}": {
+    "/metrics/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -892,7 +1067,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           },
@@ -950,7 +1125,7 @@ func init() {
             "description": "organization created",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -980,7 +1155,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1026,7 +1201,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1066,7 +1241,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1126,7 +1301,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -1172,7 +1347,7 @@ func init() {
                       "description": {
                         "type": "string"
                       },
-                      "token": {
+                      "organizationToken": {
                         "type": "string"
                       }
                     }
@@ -1258,7 +1433,7 @@ func init() {
         }
       }
     },
-    "/regenerateToken": {
+    "/regenerateAccountToken": {
       "post": {
         "security": [
           {
@@ -1268,7 +1443,7 @@ func init() {
         "tags": [
           "account"
         ],
-        "operationId": "regenerateToken",
+        "operationId": "regenerateAccountToken",
         "parameters": [
           {
             "name": "body",
@@ -1287,7 +1462,7 @@ func init() {
             "description": "regenerate account token",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -1313,7 +1488,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/registerRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "registerToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1321,7 +1503,11 @@ func init() {
           "200": {
             "description": "account created",
             "schema": {
-              "$ref": "#/definitions/registerResponse"
+              "properties": {
+                "accountToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -1350,7 +1536,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/resetPasswordRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "resetToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1394,10 +1587,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "forgot password request created"
+            "description": "reset password request created"
           },
           "400": {
-            "description": "forgot password request not created"
+            "description": "reset password request not created"
           },
           "500": {
             "description": "internal server error"
@@ -1467,7 +1660,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateShareRequest"
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendProxyEndpoint": {
+                  "type": "string"
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1483,6 +1695,65 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/sparklines": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getSparklines",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "account": {
+                  "type": "boolean"
+                },
+                "environments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sparklines data",
+            "schema": {
+              "properties": {
+                "sparklines": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/metrics"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"
@@ -1506,7 +1777,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unaccessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1542,7 +1823,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unshareRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1576,19 +1867,27 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/verifyRequest"
+              "properties": {
+                "registerToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "token ready",
+            "description": "registration token ready",
             "schema": {
-              "$ref": "#/definitions/verifyResponse"
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
-            "description": "token not found"
+            "description": "registration token not found"
           },
           "500": {
             "description": "internal server error"
@@ -1614,28 +1913,6 @@ func init() {
     }
   },
   "definitions": {
-    "accessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "accessResponse": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        }
-      }
-    },
     "authUser": {
       "type": "object",
       "properties": {
@@ -1643,20 +1920,6 @@ func init() {
           "type": "string"
         },
         "username": {
-          "type": "string"
-        }
-      }
-    },
-    "changePasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "newPassword": {
-          "type": "string"
-        },
-        "oldPassword": {
           "type": "string"
         }
       }
@@ -1670,9 +1933,6 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
-        "passwordRequirements": {
-          "$ref": "#/definitions/passwordRequirements"
-        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -1680,73 +1940,6 @@ func init() {
           "type": "string"
         },
         "version": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "permissionMode": {
-          "type": "string",
-          "enum": [
-            "open",
-            "closed"
-          ]
-        },
-        "public_name": {
-          "type": "string"
-        },
-        "url_template": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "deleteFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        }
-      }
-    },
-    "disableRequest": {
-      "type": "object",
-      "properties": {
-        "identity": {
-          "type": "string"
-        }
-      }
-    },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "host": {
-          "type": "string"
-        }
-      }
-    },
-    "enableResponse": {
-      "type": "object",
-      "properties": {
-        "cfg": {
-          "type": "string"
-        },
-        "identity": {
           "type": "string"
         }
       }
@@ -1806,16 +1999,25 @@ func init() {
     "frontend": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
         },
         "id": {
           "type": "integer"
         },
-        "shrToken": {
-          "type": "string"
-        },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -1831,42 +2033,6 @@ func init() {
       "items": {
         "$ref": "#/definitions/frontend"
       }
-    },
-    "inviteRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "inviteTokenGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "loginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "loginResponse": {
-      "type": "string"
     },
     "metrics": {
       "type": "object",
@@ -1916,26 +2082,6 @@ func init() {
         }
       }
     },
-    "passwordRequirements": {
-      "type": "object",
-      "properties": {
-        "length": {
-          "type": "integer"
-        },
-        "requireCapital": {
-          "type": "boolean"
-        },
-        "requireNumeric": {
-          "type": "boolean"
-        },
-        "requireSpecial": {
-          "type": "boolean"
-        },
-        "validSpecialCharacters": {
-          "type": "string"
-        }
-      }
-    },
     "principal": {
       "type": "object",
       "properties": {
@@ -1950,65 +2096,6 @@ func init() {
         },
         "limitless": {
           "type": "boolean"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontend": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "urlTemplate": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontendList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "registerRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "registerResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "resetPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
         },
         "token": {
           "type": "string"
@@ -2045,7 +2132,7 @@ func init() {
         "shareMode": {
           "type": "string"
         },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -2146,7 +2233,7 @@ func init() {
             "type": "string"
           }
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         }
       }
@@ -2171,87 +2258,6 @@ func init() {
         },
         "tx": {
           "type": "number"
-        }
-      }
-    },
-    "unaccessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "unshareRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "reserved": {
-          "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "urlTemplate": {
-          "type": "string"
-        }
-      }
-    },
-    "updateShareRequest": {
-      "type": "object",
-      "properties": {
-        "addAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "removeAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyResponse": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
         }
       }
     },
@@ -2301,7 +2307,20 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/accessRequest"
+              "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2309,8 +2328,59 @@ func init() {
           "201": {
             "description": "access created",
             "schema": {
-              "$ref": "#/definitions/accessResponse"
+              "properties": {
+                "backendMode": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "bindAddress": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "access updated"
           },
           "401": {
             "description": "unauthorized"
@@ -2356,7 +2426,7 @@ func init() {
             "description": "created",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -2387,13 +2457,23 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/changePasswordRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "newPassword": {
+                  "type": "string"
+                },
+                "oldPassword": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "changed password"
+            "description": "password changed"
           },
           "400": {
             "description": "password not changed"
@@ -2491,7 +2571,7 @@ func init() {
         }
       }
     },
-    "/detail/frontend/{feId}": {
+    "/detail/frontend/{frontendId}": {
       "get": {
         "security": [
           {
@@ -2505,7 +2585,7 @@ func init() {
         "parameters": [
           {
             "type": "integer",
-            "name": "feId",
+            "name": "frontendId",
             "in": "path",
             "required": true
           }
@@ -2529,7 +2609,7 @@ func init() {
         }
       }
     },
-    "/detail/share/{shrToken}": {
+    "/detail/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -2543,7 +2623,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           }
@@ -2583,7 +2663,11 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/disableRequest"
+              "properties": {
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2616,7 +2700,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/enableRequest"
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2624,7 +2715,14 @@ func init() {
           "201": {
             "description": "environment enabled",
             "schema": {
-              "$ref": "#/definitions/enableResponse"
+              "properties": {
+                "cfg": {
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -2655,7 +2753,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createFrontendRequest"
+              "type": "object",
+              "properties": {
+                "permissionMode": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "public_name": {
+                  "type": "string"
+                },
+                "url_template": {
+                  "type": "string"
+                },
+                "zId": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2663,7 +2779,12 @@ func init() {
           "201": {
             "description": "frontend created",
             "schema": {
-              "$ref": "#/definitions/createFrontendResponse"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "400": {
@@ -2695,7 +2816,12 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/deleteFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2729,7 +2855,18 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateFrontendRequest"
+              "type": "object",
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                },
+                "publicName": {
+                  "type": "string"
+                },
+                "urlTemplate": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2764,7 +2901,10 @@ func init() {
           "200": {
             "description": "ok",
             "schema": {
-              "$ref": "#/definitions/publicFrontendList"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListFrontendsOKBodyItems0"
+              }
             }
           },
           "401": {
@@ -2874,7 +3014,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "inviteToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2913,16 +3060,23 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/inviteTokenGenerateRequest"
+              "properties": {
+                "inviteTokens": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
         "responses": {
           "201": {
-            "description": "invitation tokens created"
+            "description": "invite tokens created"
           },
           "400": {
-            "description": "invitation tokens not created"
+            "description": "invite tokens not created"
           },
           "401": {
             "description": "unauthorized"
@@ -2944,7 +3098,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/loginRequest"
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -2952,7 +3113,7 @@ func init() {
           "200": {
             "description": "login successful",
             "schema": {
-              "$ref": "#/definitions/loginResponse"
+              "type": "string"
             }
           },
           "401": {
@@ -3111,7 +3272,7 @@ func init() {
         }
       }
     },
-    "/metrics/share/{shrToken}": {
+    "/metrics/share/{shareToken}": {
       "get": {
         "security": [
           {
@@ -3125,7 +3286,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "shrToken",
+            "name": "shareToken",
             "in": "path",
             "required": true
           },
@@ -3183,7 +3344,7 @@ func init() {
             "description": "organization created",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3213,7 +3374,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3259,7 +3420,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3299,7 +3460,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3352,7 +3513,7 @@ func init() {
                 "email": {
                   "type": "string"
                 },
-                "token": {
+                "organizationToken": {
                   "type": "string"
                 }
               }
@@ -3477,7 +3638,7 @@ func init() {
         }
       }
     },
-    "/regenerateToken": {
+    "/regenerateAccountToken": {
       "post": {
         "security": [
           {
@@ -3487,7 +3648,7 @@ func init() {
         "tags": [
           "account"
         ],
-        "operationId": "regenerateToken",
+        "operationId": "regenerateAccountToken",
         "parameters": [
           {
             "name": "body",
@@ -3506,7 +3667,7 @@ func init() {
             "description": "regenerate account token",
             "schema": {
               "properties": {
-                "token": {
+                "accountToken": {
                   "type": "string"
                 }
               }
@@ -3532,7 +3693,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/registerRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "registerToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3540,7 +3708,11 @@ func init() {
           "200": {
             "description": "account created",
             "schema": {
-              "$ref": "#/definitions/registerResponse"
+              "properties": {
+                "accountToken": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
@@ -3569,7 +3741,14 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/resetPasswordRequest"
+              "properties": {
+                "password": {
+                  "type": "string"
+                },
+                "resetToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3613,10 +3792,10 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "forgot password request created"
+            "description": "reset password request created"
           },
           "400": {
-            "description": "forgot password request not created"
+            "description": "reset password request not created"
           },
           "500": {
             "description": "internal server error"
@@ -3686,7 +3865,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateShareRequest"
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendProxyEndpoint": {
+                  "type": "string"
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3702,6 +3900,65 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/sparklines": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getSparklines",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "account": {
+                  "type": "boolean"
+                },
+                "environments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sparklines data",
+            "schema": {
+              "properties": {
+                "sparklines": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/metrics"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
           },
           "500": {
             "description": "internal server error"
@@ -3725,7 +3982,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unaccessRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3761,7 +4028,17 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/unshareRequest"
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -3795,19 +4072,27 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/verifyRequest"
+              "properties": {
+                "registerToken": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "token ready",
+            "description": "registration token ready",
             "schema": {
-              "$ref": "#/definitions/verifyResponse"
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
             }
           },
           "404": {
-            "description": "token not found"
+            "description": "registration token not found"
           },
           "500": {
             "description": "internal server error"
@@ -3833,6 +4118,29 @@ func init() {
     }
   },
   "definitions": {
+    "ListFrontendsOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "publicName": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "urlTemplate": {
+          "type": "string"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "MembersItems0": {
       "properties": {
         "admin": {
@@ -3851,7 +4159,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "token": {
+        "organizationToken": {
           "type": "string"
         }
       }
@@ -3861,29 +4169,7 @@ func init() {
         "description": {
           "type": "string"
         },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "accessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "accessResponse": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "frontendToken": {
+        "organizationToken": {
           "type": "string"
         }
       }
@@ -3899,20 +4185,6 @@ func init() {
         }
       }
     },
-    "changePasswordRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "newPassword": {
-          "type": "string"
-        },
-        "oldPassword": {
-          "type": "string"
-        }
-      }
-    },
     "configuration": {
       "type": "object",
       "properties": {
@@ -3922,9 +4194,6 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
-        "passwordRequirements": {
-          "$ref": "#/definitions/passwordRequirements"
-        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -3932,73 +4201,6 @@ func init() {
           "type": "string"
         },
         "version": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "permissionMode": {
-          "type": "string",
-          "enum": [
-            "open",
-            "closed"
-          ]
-        },
-        "public_name": {
-          "type": "string"
-        },
-        "url_template": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "createFrontendResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "deleteFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        }
-      }
-    },
-    "disableRequest": {
-      "type": "object",
-      "properties": {
-        "identity": {
-          "type": "string"
-        }
-      }
-    },
-    "enableRequest": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "host": {
-          "type": "string"
-        }
-      }
-    },
-    "enableResponse": {
-      "type": "object",
-      "properties": {
-        "cfg": {
-          "type": "string"
-        },
-        "identity": {
           "type": "string"
         }
       }
@@ -4058,16 +4260,25 @@ func init() {
     "frontend": {
       "type": "object",
       "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
         "createdAt": {
           "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
         },
         "id": {
           "type": "integer"
         },
-        "shrToken": {
-          "type": "string"
-        },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -4083,42 +4294,6 @@ func init() {
       "items": {
         "$ref": "#/definitions/frontend"
       }
-    },
-    "inviteRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "inviteTokenGenerateRequest": {
-      "type": "object",
-      "properties": {
-        "tokens": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "loginRequest": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      }
-    },
-    "loginResponse": {
-      "type": "string"
     },
     "metrics": {
       "type": "object",
@@ -4168,26 +4343,6 @@ func init() {
         }
       }
     },
-    "passwordRequirements": {
-      "type": "object",
-      "properties": {
-        "length": {
-          "type": "integer"
-        },
-        "requireCapital": {
-          "type": "boolean"
-        },
-        "requireNumeric": {
-          "type": "boolean"
-        },
-        "requireSpecial": {
-          "type": "boolean"
-        },
-        "validSpecialCharacters": {
-          "type": "string"
-        }
-      }
-    },
     "principal": {
       "type": "object",
       "properties": {
@@ -4202,65 +4357,6 @@ func init() {
         },
         "limitless": {
           "type": "boolean"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontend": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "integer"
-        },
-        "urlTemplate": {
-          "type": "string"
-        },
-        "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "publicFrontendList": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/publicFrontend"
-      }
-    },
-    "registerRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        },
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "registerResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "resetPasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
         },
         "token": {
           "type": "string"
@@ -4297,7 +4393,7 @@ func init() {
         "shareMode": {
           "type": "string"
         },
-        "token": {
+        "shareToken": {
           "type": "string"
         },
         "updatedAt": {
@@ -4398,7 +4494,7 @@ func init() {
             "type": "string"
           }
         },
-        "shrToken": {
+        "shareToken": {
           "type": "string"
         }
       }
@@ -4423,87 +4519,6 @@ func init() {
         },
         "tx": {
           "type": "number"
-        }
-      }
-    },
-    "unaccessRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "frontendToken": {
-          "type": "string"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "unshareRequest": {
-      "type": "object",
-      "properties": {
-        "envZId": {
-          "type": "string"
-        },
-        "reserved": {
-          "type": "boolean"
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "updateFrontendRequest": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
-        },
-        "publicName": {
-          "type": "string"
-        },
-        "urlTemplate": {
-          "type": "string"
-        }
-      }
-    },
-    "updateShareRequest": {
-      "type": "object",
-      "properties": {
-        "addAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
-        "removeAccessGrants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "shrToken": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
-    "verifyResponse": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
         }
       }
     },

@@ -1,0 +1,25 @@
+.react-flow__node {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.6em;
+    color: white;
+    border: 2px solid white;
+    border-radius: 10px;
+    background-color: #241775;
+    text-color: white;
+}
+.react-flow__node.selected {
+    color: black;
+    background-color: #9bf316;
+    border: 2px solid #241775;
+    font-weight: bold;
+}
+.react-flow__handle {
+    background-color: #9bf316;
+    border: 1px solid #241775;
+}
+.react-flow__edge-path {
+    stroke: #241775;
+}
+.react-flow__attribution {
+    display: none;
+}

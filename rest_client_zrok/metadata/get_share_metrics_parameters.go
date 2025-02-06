@@ -64,8 +64,8 @@ type GetShareMetricsParams struct {
 	// Duration.
 	Duration *string
 
-	// ShrToken.
-	ShrToken string
+	// ShareToken.
+	ShareToken string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -131,15 +131,15 @@ func (o *GetShareMetricsParams) SetDuration(duration *string) {
 	o.Duration = duration
 }
 
-// WithShrToken adds the shrToken to the get share metrics params
-func (o *GetShareMetricsParams) WithShrToken(shrToken string) *GetShareMetricsParams {
-	o.SetShrToken(shrToken)
+// WithShareToken adds the shareToken to the get share metrics params
+func (o *GetShareMetricsParams) WithShareToken(shareToken string) *GetShareMetricsParams {
+	o.SetShareToken(shareToken)
 	return o
 }
 
-// SetShrToken adds the shrToken to the get share metrics params
-func (o *GetShareMetricsParams) SetShrToken(shrToken string) {
-	o.ShrToken = shrToken
+// SetShareToken adds the shareToken to the get share metrics params
+func (o *GetShareMetricsParams) SetShareToken(shareToken string) {
+	o.ShareToken = shareToken
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -167,8 +167,8 @@ func (o *GetShareMetricsParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		}
 	}
 
-	// path param shrToken
-	if err := r.SetPathParam("shrToken", o.ShrToken); err != nil {
+	// path param shareToken
+	if err := r.SetPathParam("shareToken", o.ShareToken); err != nil {
 		return err
 	}
 

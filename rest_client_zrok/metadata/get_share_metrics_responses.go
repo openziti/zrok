@@ -48,7 +48,7 @@ func (o *GetShareMetricsReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("[GET /metrics/share/{shrToken}] getShareMetrics", response, response.Code())
+		return nil, runtime.NewAPIError("[GET /metrics/share/{shareToken}] getShareMetrics", response, response.Code())
 	}
 }
 
@@ -97,11 +97,11 @@ func (o *GetShareMetricsOK) Code() int {
 }
 
 func (o *GetShareMetricsOK) Error() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetShareMetricsOK) String() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetShareMetricsOK) GetPayload() *rest_model_zrok.Metrics {
@@ -164,11 +164,11 @@ func (o *GetShareMetricsBadRequest) Code() int {
 }
 
 func (o *GetShareMetricsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsBadRequest ", 400)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsBadRequest ", 400)
 }
 
 func (o *GetShareMetricsBadRequest) String() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsBadRequest ", 400)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsBadRequest ", 400)
 }
 
 func (o *GetShareMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +220,11 @@ func (o *GetShareMetricsUnauthorized) Code() int {
 }
 
 func (o *GetShareMetricsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsUnauthorized ", 401)
 }
 
 func (o *GetShareMetricsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsUnauthorized ", 401)
 }
 
 func (o *GetShareMetricsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +276,11 @@ func (o *GetShareMetricsInternalServerError) Code() int {
 }
 
 func (o *GetShareMetricsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsInternalServerError ", 500)
 }
 
 func (o *GetShareMetricsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /metrics/share/{shrToken}][%d] getShareMetricsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /metrics/share/{shareToken}][%d] getShareMetricsInternalServerError ", 500)
 }
 
 func (o *GetShareMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

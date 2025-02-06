@@ -11,7 +11,6 @@
  */
 
 import { RequestFile } from './models';
-import { PasswordRequirements } from './passwordRequirements';
 
 export class Configuration {
     'version'?: string;
@@ -19,7 +18,6 @@ export class Configuration {
     'invitesOpen'?: boolean;
     'requiresInviteToken'?: boolean;
     'inviteTokenContact'?: string;
-    'passwordRequirements'?: PasswordRequirements;
 
     static discriminator: string | undefined = undefined;
 
@@ -48,11 +46,6 @@ export class Configuration {
             "name": "inviteTokenContact",
             "baseName": "inviteTokenContact",
             "type": "string"
-        },
-        {
-            "name": "passwordRequirements",
-            "baseName": "passwordRequirements",
-            "type": "PasswordRequirements"
         }    ];
 
     static getAttributeTypeMap() {

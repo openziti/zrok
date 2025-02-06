@@ -55,5 +55,5 @@ func (h *createAccountHandler) Handle(params admin.CreateAccountParams, principa
 
 	logrus.Infof("administratively created account '%v'", params.Body.Email)
 
-	return admin.NewCreateAccountCreated().WithPayload(&admin.CreateAccountCreatedBody{Token: token})
+	return admin.NewCreateAccountCreated().WithPayload(&admin.CreateAccountCreatedBody{AccountToken: token})
 }

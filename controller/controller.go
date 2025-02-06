@@ -46,7 +46,7 @@ func Run(inCfg *config.Config) error {
 	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
-	api.AccountRegenerateTokenHandler = newRegenerateTokenHandler()
+	api.AccountRegenerateAccountTokenHandler = newRegenerateAccountTokenHandler()
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
@@ -68,6 +68,7 @@ func Run(inCfg *config.Config) error {
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
+	api.MetadataGetSparklinesHandler = newSparklinesHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
@@ -86,6 +87,7 @@ func Run(inCfg *config.Config) error {
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
+	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
 	if err := controllerStartup(); err != nil {

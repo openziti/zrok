@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class InviteTokenGenerateRequest {
-    'tokens'?: Array<string>;
+    'inviteTokens'?: Array<string>;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "tokens",
-            "baseName": "tokens",
+            "name": "inviteTokens",
+            "baseName": "inviteTokens",
             "type": "Array<string>"
         }    ];
 

@@ -13,7 +13,7 @@
 import { RequestFile } from './models';
 
 export class UpdateShareRequest {
-    'shrToken'?: string;
+    'shareToken'?: string;
     'backendProxyEndpoint'?: string;
     'addAccessGrants'?: Array<string>;
     'removeAccessGrants'?: Array<string>;
@@ -22,8 +22,8 @@ export class UpdateShareRequest {
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "shrToken",
-            "baseName": "shrToken",
+            "name": "shareToken",
+            "baseName": "shareToken",
             "type": "string"
         },
         {

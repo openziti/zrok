@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 
 export class InviteRequest {
     'email'?: string;
-    'token'?: string;
+    'inviteToken'?: string;
 
     static discriminator: string | undefined = undefined;
 
@@ -25,8 +25,8 @@ export class InviteRequest {
             "type": "string"
         },
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "inviteToken",
+            "baseName": "inviteToken",
             "type": "string"
         }    ];
 

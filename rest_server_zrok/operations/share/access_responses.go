@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // AccessCreatedCode is the HTTP code returned for type AccessCreated
@@ -26,7 +24,7 @@ type AccessCreated struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.AccessResponse `json:"body,omitempty"`
+	Payload *AccessCreatedBody `json:"body,omitempty"`
 }
 
 // NewAccessCreated creates AccessCreated with default headers values
@@ -36,13 +34,13 @@ func NewAccessCreated() *AccessCreated {
 }
 
 // WithPayload adds the payload to the access created response
-func (o *AccessCreated) WithPayload(payload *rest_model_zrok.AccessResponse) *AccessCreated {
+func (o *AccessCreated) WithPayload(payload *AccessCreatedBody) *AccessCreated {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the access created response
-func (o *AccessCreated) SetPayload(payload *rest_model_zrok.AccessResponse) {
+func (o *AccessCreated) SetPayload(payload *AccessCreatedBody) {
 	o.Payload = payload
 }
 

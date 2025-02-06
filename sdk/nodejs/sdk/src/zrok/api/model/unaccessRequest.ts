@@ -15,7 +15,7 @@ import { RequestFile } from './models';
 export class UnaccessRequest {
     'frontendToken'?: string;
     'envZId'?: string;
-    'shrToken'?: string;
+    'shareToken'?: string;
 
     static discriminator: string | undefined = undefined;
 
@@ -31,8 +31,8 @@ export class UnaccessRequest {
             "type": "string"
         },
         {
-            "name": "shrToken",
-            "baseName": "shrToken",
+            "name": "shareToken",
+            "baseName": "shareToken",
             "type": "string"
         }    ];
 

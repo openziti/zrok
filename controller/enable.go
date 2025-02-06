@@ -81,9 +81,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	}
 	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
 
-	resp := environment.NewEnableCreated().WithPayload(&rest_model_zrok.EnableResponse{
-		Identity: envZId,
-	})
+	resp := environment.NewEnableCreated().WithPayload(&environment.EnableCreatedBody{Identity: envZId})
 
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)

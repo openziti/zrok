@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewResetPasswordParams creates a new ResetPasswordParams object,
@@ -64,7 +62,7 @@ ResetPasswordParams contains all the parameters to send to the API endpoint
 type ResetPasswordParams struct {
 
 	// Body.
-	Body *rest_model_zrok.ResetPasswordRequest
+	Body ResetPasswordBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *ResetPasswordParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the reset password params
-func (o *ResetPasswordParams) WithBody(body *rest_model_zrok.ResetPasswordRequest) *ResetPasswordParams {
+func (o *ResetPasswordParams) WithBody(body ResetPasswordBody) *ResetPasswordParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the reset password params
-func (o *ResetPasswordParams) SetBody(body *rest_model_zrok.ResetPasswordRequest) {
+func (o *ResetPasswordParams) SetBody(body ResetPasswordBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *ResetPasswordParams) WriteToRequest(r runtime.ClientRequest, reg strfmt
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

@@ -26,13 +26,13 @@ func (h *listOrganizationMembersHandler) Handle(params admin.ListOrganizationMem
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	org, err := str.FindOrganizationByToken(params.Body.Token, trx)
+	org, err := str.FindOrganizationByToken(params.Body.OrganizationToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding organization by token: %v", err)
 		return admin.NewListOrganizationMembersNotFound()
 	}
 	if org == nil {
-		logrus.Errorf("organization '%v' not found", params.Body.Token)
+		logrus.Errorf("organization '%v' not found", params.Body.OrganizationToken)
 		return admin.NewListOrganizationMembersNotFound()
 	}
 

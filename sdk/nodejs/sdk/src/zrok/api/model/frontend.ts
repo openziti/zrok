@@ -14,8 +14,11 @@ import { RequestFile } from './models';
 
 export class Frontend {
     'id'?: number;
-    'token'?: string;
-    'shrToken'?: string;
+    'frontendToken'?: string;
+    'shareToken'?: string;
+    'backendMode'?: string;
+    'bindAddress'?: string;
+    'description'?: string;
     'zId'?: string;
     'createdAt'?: number;
     'updatedAt'?: number;
@@ -29,13 +32,28 @@ export class Frontend {
             "type": "number"
         },
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "frontendToken",
+            "baseName": "frontendToken",
             "type": "string"
         },
         {
-            "name": "shrToken",
-            "baseName": "shrToken",
+            "name": "shareToken",
+            "baseName": "shareToken",
+            "type": "string"
+        },
+        {
+            "name": "backendMode",
+            "baseName": "backendMode",
+            "type": "string"
+        },
+        {
+            "name": "bindAddress",
+            "baseName": "bindAddress",
+            "type": "string"
+        },
+        {
+            "name": "description",
+            "baseName": "description",
             "type": "string"
         },
         {

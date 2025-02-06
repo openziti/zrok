@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 
 export class ShareResponse {
     'frontendProxyEndpoints'?: Array<string>;
-    'shrToken'?: string;
+    'shareToken'?: string;
 
     static discriminator: string | undefined = undefined;
 
@@ -25,8 +25,8 @@ export class ShareResponse {
             "type": "Array<string>"
         },
         {
-            "name": "shrToken",
-            "baseName": "shrToken",
+            "name": "shareToken",
+            "baseName": "shareToken",
             "type": "string"
         }    ];
 

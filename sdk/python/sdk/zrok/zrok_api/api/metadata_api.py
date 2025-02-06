@@ -481,43 +481,43 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_frontend_detail(self, fe_id, **kwargs):  # noqa: E501
+    def get_frontend_detail(self, frontend_id, **kwargs):  # noqa: E501
         """get_frontend_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_frontend_detail(fe_id, async_req=True)
+        >>> thread = api.get_frontend_detail(frontend_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int fe_id: (required)
+        :param int frontend_id: (required)
         :return: Frontend
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_frontend_detail_with_http_info(fe_id, **kwargs)  # noqa: E501
+            return self.get_frontend_detail_with_http_info(frontend_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_frontend_detail_with_http_info(fe_id, **kwargs)  # noqa: E501
+            (data) = self.get_frontend_detail_with_http_info(frontend_id, **kwargs)  # noqa: E501
             return data
 
-    def get_frontend_detail_with_http_info(self, fe_id, **kwargs):  # noqa: E501
+    def get_frontend_detail_with_http_info(self, frontend_id, **kwargs):  # noqa: E501
         """get_frontend_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_frontend_detail_with_http_info(fe_id, async_req=True)
+        >>> thread = api.get_frontend_detail_with_http_info(frontend_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int fe_id: (required)
+        :param int frontend_id: (required)
         :return: Frontend
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['fe_id']  # noqa: E501
+        all_params = ['frontend_id']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -532,16 +532,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'fe_id' is set
-        if ('fe_id' not in params or
-                params['fe_id'] is None):
-            raise ValueError("Missing the required parameter `fe_id` when calling `get_frontend_detail`")  # noqa: E501
+        # verify the required parameter 'frontend_id' is set
+        if ('frontend_id' not in params or
+                params['frontend_id'] is None):
+            raise ValueError("Missing the required parameter `frontend_id` when calling `get_frontend_detail`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'fe_id' in params:
-            path_params['feId'] = params['fe_id']  # noqa: E501
+        if 'frontend_id' in params:
+            path_params['frontendId'] = params['frontend_id']  # noqa: E501
 
         query_params = []
 
@@ -559,7 +559,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/detail/frontend/{feId}', 'GET',
+            '/detail/frontend/{frontendId}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -574,43 +574,43 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_share_detail(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_detail(self, share_token, **kwargs):  # noqa: E501
         """get_share_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_detail(shr_token, async_req=True)
+        >>> thread = api.get_share_detail(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :return: Share
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_share_detail_with_http_info(shr_token, **kwargs)  # noqa: E501
+            return self.get_share_detail_with_http_info(share_token, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_share_detail_with_http_info(shr_token, **kwargs)  # noqa: E501
+            (data) = self.get_share_detail_with_http_info(share_token, **kwargs)  # noqa: E501
             return data
 
-    def get_share_detail_with_http_info(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_detail_with_http_info(self, share_token, **kwargs):  # noqa: E501
         """get_share_detail  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_detail_with_http_info(shr_token, async_req=True)
+        >>> thread = api.get_share_detail_with_http_info(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :return: Share
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['shr_token']  # noqa: E501
+        all_params = ['share_token']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -625,16 +625,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'shr_token' is set
-        if ('shr_token' not in params or
-                params['shr_token'] is None):
-            raise ValueError("Missing the required parameter `shr_token` when calling `get_share_detail`")  # noqa: E501
+        # verify the required parameter 'share_token' is set
+        if ('share_token' not in params or
+                params['share_token'] is None):
+            raise ValueError("Missing the required parameter `share_token` when calling `get_share_detail`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'shr_token' in params:
-            path_params['shrToken'] = params['shr_token']  # noqa: E501
+        if 'share_token' in params:
+            path_params['shareToken'] = params['share_token']  # noqa: E501
 
         query_params = []
 
@@ -652,7 +652,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/detail/share/{shrToken}', 'GET',
+            '/detail/share/{shareToken}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -667,16 +667,16 @@ class MetadataApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_share_metrics(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_metrics(self, share_token, **kwargs):  # noqa: E501
         """get_share_metrics  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_metrics(shr_token, async_req=True)
+        >>> thread = api.get_share_metrics(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :param str duration:
         :return: Metrics
                  If the method is called asynchronously,
@@ -684,28 +684,28 @@ class MetadataApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_share_metrics_with_http_info(shr_token, **kwargs)  # noqa: E501
+            return self.get_share_metrics_with_http_info(share_token, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_share_metrics_with_http_info(shr_token, **kwargs)  # noqa: E501
+            (data) = self.get_share_metrics_with_http_info(share_token, **kwargs)  # noqa: E501
             return data
 
-    def get_share_metrics_with_http_info(self, shr_token, **kwargs):  # noqa: E501
+    def get_share_metrics_with_http_info(self, share_token, **kwargs):  # noqa: E501
         """get_share_metrics  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_share_metrics_with_http_info(shr_token, async_req=True)
+        >>> thread = api.get_share_metrics_with_http_info(share_token, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str shr_token: (required)
+        :param str share_token: (required)
         :param str duration:
         :return: Metrics
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['shr_token', 'duration']  # noqa: E501
+        all_params = ['share_token', 'duration']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -720,16 +720,16 @@ class MetadataApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'shr_token' is set
-        if ('shr_token' not in params or
-                params['shr_token'] is None):
-            raise ValueError("Missing the required parameter `shr_token` when calling `get_share_metrics`")  # noqa: E501
+        # verify the required parameter 'share_token' is set
+        if ('share_token' not in params or
+                params['share_token'] is None):
+            raise ValueError("Missing the required parameter `share_token` when calling `get_share_metrics`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
-        if 'shr_token' in params:
-            path_params['shrToken'] = params['shr_token']  # noqa: E501
+        if 'share_token' in params:
+            path_params['shareToken'] = params['share_token']  # noqa: E501
 
         query_params = []
         if 'duration' in params:
@@ -749,7 +749,7 @@ class MetadataApi(object):
         auth_settings = ['key']  # noqa: E501
 
         return self.api_client.call_api(
-            '/metrics/share/{shrToken}', 'GET',
+            '/metrics/share/{shareToken}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -757,6 +757,99 @@ class MetadataApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='Metrics',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def get_sparklines(self, **kwargs):  # noqa: E501
+        """get_sparklines  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_sparklines(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param SparklinesBody body:
+        :return: InlineResponse2006
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_sparklines_with_http_info(**kwargs)  # noqa: E501
+        else:
+            (data) = self.get_sparklines_with_http_info(**kwargs)  # noqa: E501
+            return data
+
+    def get_sparklines_with_http_info(self, **kwargs):  # noqa: E501
+        """get_sparklines  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_sparklines_with_http_info(async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param SparklinesBody body:
+        :return: InlineResponse2006
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_sparklines" % key
+                )
+            params[key] = val
+        del params['kwargs']
+
+        collection_formats = {}
+
+        path_params = {}
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/zrok.v1+json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['key']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/sparklines', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='InlineResponse2006',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -773,7 +866,7 @@ class MetadataApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: InlineResponse2003
+        :return: InlineResponse2005
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -793,7 +886,7 @@ class MetadataApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :return: InlineResponse2003
+        :return: InlineResponse2005
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -841,7 +934,7 @@ class MetadataApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse2003',  # noqa: E501
+            response_type='InlineResponse2005',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -859,7 +952,7 @@ class MetadataApi(object):
 
         :param async_req bool
         :param str organization_token: (required)
-        :return: InlineResponse2001
+        :return: InlineResponse2003
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -880,7 +973,7 @@ class MetadataApi(object):
 
         :param async_req bool
         :param str organization_token: (required)
-        :return: InlineResponse2001
+        :return: InlineResponse2003
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -934,7 +1027,7 @@ class MetadataApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='InlineResponse2001',  # noqa: E501
+            response_type='InlineResponse2003',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

@@ -284,8 +284,8 @@ type RemoveOrganizationMemberBody struct {
 	// email
 	Email string `json:"email,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this remove organization member body

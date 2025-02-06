@@ -13,15 +13,15 @@
 import { RequestFile } from './models';
 
 export class ResetPasswordRequest {
-    'token'?: string;
+    'resetToken'?: string;
     'password'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "resetToken",
+            "baseName": "resetToken",
             "type": "string"
         },
         {

@@ -19,7 +19,7 @@ func newChangePasswordHandler(cfg *config.Config) *changePasswordHandler {
 }
 
 func (handler *changePasswordHandler) Handle(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	if params.Body == nil || params.Body.Email == "" || params.Body.OldPassword == "" || params.Body.NewPassword == "" {
+	if params.Body.Email == "" || params.Body.OldPassword == "" || params.Body.NewPassword == "" {
 		logrus.Error("missing email, old, or new password")
 		return account.NewChangePasswordUnauthorized()
 	}

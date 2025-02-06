@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 import { SparkDataSample } from './sparkDataSample';
 
 export class Share {
-    'token'?: string;
+    'shareToken'?: string;
     'zId'?: string;
     'shareMode'?: string;
     'backendMode'?: string;
@@ -31,8 +31,8 @@ export class Share {
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "shareToken",
+            "baseName": "shareToken",
             "type": "string"
         },
         {

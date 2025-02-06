@@ -6,13 +6,13 @@ package account
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/go-openapi/swag"
 )
 
 // VerifyReader is a Reader for the Verify structure.
@@ -54,10 +54,10 @@ func NewVerifyOK() *VerifyOK {
 /*
 VerifyOK describes a response with status code 200, with default header values.
 
-token ready
+registration token ready
 */
 type VerifyOK struct {
-	Payload *rest_model_zrok.VerifyResponse
+	Payload *VerifyOKBody
 }
 
 // IsSuccess returns true when this verify o k response has a 2xx status code
@@ -98,13 +98,13 @@ func (o *VerifyOK) String() string {
 	return fmt.Sprintf("[POST /verify][%d] verifyOK  %+v", 200, o.Payload)
 }
 
-func (o *VerifyOK) GetPayload() *rest_model_zrok.VerifyResponse {
+func (o *VerifyOK) GetPayload() *VerifyOKBody {
 	return o.Payload
 }
 
 func (o *VerifyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.VerifyResponse)
+	o.Payload = new(VerifyOKBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -122,7 +122,7 @@ func NewVerifyNotFound() *VerifyNotFound {
 /*
 VerifyNotFound describes a response with status code 404, with default header values.
 
-token not found
+registration token not found
 */
 type VerifyNotFound struct {
 }
@@ -223,5 +223,81 @@ func (o *VerifyInternalServerError) String() string {
 
 func (o *VerifyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+VerifyBody verify body
+swagger:model VerifyBody
+*/
+type VerifyBody struct {
+
+	// register token
+	RegisterToken string `json:"registerToken,omitempty"`
+}
+
+// Validate validates this verify body
+func (o *VerifyBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this verify body based on context it is used
+func (o *VerifyBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *VerifyBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *VerifyBody) UnmarshalBinary(b []byte) error {
+	var res VerifyBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+VerifyOKBody verify o k body
+swagger:model VerifyOKBody
+*/
+type VerifyOKBody struct {
+
+	// email
+	Email string `json:"email,omitempty"`
+}
+
+// Validate validates this verify o k body
+func (o *VerifyOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this verify o k body based on context it is used
+func (o *VerifyOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *VerifyOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *VerifyOKBody) UnmarshalBinary(b []byte) error {
+	var res VerifyOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

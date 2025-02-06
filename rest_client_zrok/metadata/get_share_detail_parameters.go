@@ -61,8 +61,8 @@ GetShareDetailParams contains all the parameters to send to the API endpoint
 */
 type GetShareDetailParams struct {
 
-	// ShrToken.
-	ShrToken string
+	// ShareToken.
+	ShareToken string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *GetShareDetailParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithShrToken adds the shrToken to the get share detail params
-func (o *GetShareDetailParams) WithShrToken(shrToken string) *GetShareDetailParams {
-	o.SetShrToken(shrToken)
+// WithShareToken adds the shareToken to the get share detail params
+func (o *GetShareDetailParams) WithShareToken(shareToken string) *GetShareDetailParams {
+	o.SetShareToken(shareToken)
 	return o
 }
 
-// SetShrToken adds the shrToken to the get share detail params
-func (o *GetShareDetailParams) SetShrToken(shrToken string) {
-	o.ShrToken = shrToken
+// SetShareToken adds the shareToken to the get share detail params
+func (o *GetShareDetailParams) SetShareToken(shareToken string) {
+	o.ShareToken = shareToken
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -136,8 +136,8 @@ func (o *GetShareDetailParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 	}
 	var res []error
 
-	// path param shrToken
-	if err := r.SetPathParam("shrToken", o.ShrToken); err != nil {
+	// path param shareToken
+	if err := r.SetPathParam("shareToken", o.ShareToken); err != nil {
 		return err
 	}
 

@@ -5,7 +5,6 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 )
@@ -59,11 +58,9 @@ func (cmd *modifyShareCommand) run(_ *cobra.Command, args []string) {
 
 	if len(cmd.addAccessGrants) > 0 || len(cmd.removeAccessGrants) > 0 {
 		req := share.NewUpdateShareParams()
-		req.Body = &rest_model_zrok.UpdateShareRequest{
-			ShrToken:           shrToken,
-			AddAccessGrants:    cmd.addAccessGrants,
-			RemoveAccessGrants: cmd.removeAccessGrants,
-		}
+		req.Body.ShareToken = shrToken
+		req.Body.AddAccessGrants = cmd.addAccessGrants
+		req.Body.RemoveAccessGrants = cmd.removeAccessGrants
 		if _, err := zrok.Share.UpdateShare(req, auth); err != nil {
 			if !panicInstead {
 				tui.Error("unable to update share", err)

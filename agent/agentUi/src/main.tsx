@@ -11,4 +11,4 @@ createRoot(document.getElementById('root')!).render(
             <AgentUi />
         </ThemeProvider>
     </StrictMode>
-)
+);
