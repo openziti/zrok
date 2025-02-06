@@ -59,7 +59,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const helpButton = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Help">
-                <Button color="inherit"><HelpIcon /></Button>
+                <Button color="inherit" href="https://docs.zrok.io" target="_"><HelpIcon /></Button>
             </Tooltip>
         </Grid2>
     );
