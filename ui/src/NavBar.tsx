@@ -3,10 +3,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import VisualizerIcon from "@mui/icons-material/Hub";
 import TabularIcon from "@mui/icons-material/TableRows";
 import LimitIcon from "@mui/icons-material/CrisisAlert";
+import HelpIcon from "@mui/icons-material/LiveHelp";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-green.svg";
 import useApiConsoleStore from "./model/store.ts";
 import BandwidthLimitedModal from "./BandwidthLimitedModal.tsx";
 import {useEffect, useState} from "react";
+import GettingStartedModal from "./GettingStartedModal.tsx";
 
 interface NavBarProps {
     logout: () => void;
@@ -15,6 +17,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
+    const nodes = useApiConsoleStore((state) => state.nodes);
     const limited = useApiConsoleStore((state) => state.limited);
     const [limitedModalOpen, setLimitedModalOpen] = useState<boolean>(false);
     const openLimitedModal = () => {
@@ -22,6 +25,13 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     }
     const closeLimitedModal = () => {
         setLimitedModalOpen(false);
+    }
+    const [gettingStartedOpen, setGettingStartedOpen] = useState<boolean>(false);
+    const openGettingStarted = () => {
+        setGettingStartedOpen(true);
+    }
+    const closeGettingStarted = () => {
+        setGettingStartedOpen(false);
     }
 
     useEffect(() => {
@@ -34,6 +44,22 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Bandwidth Limit Reached!">
                 <Button color="error" onClick={openLimitedModal}><LimitIcon /></Button>
+            </Tooltip>
+        </Grid2>
+    );
+
+    const gettingStartedButton = (
+        <Grid2 display="flex" justifyContent="right">
+            <Tooltip title="Getting Started Help">
+                <Button style={{ backgroundColor: "#9bf316", color: "black" }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
+            </Tooltip>
+        </Grid2>
+    );
+
+    const helpButton = (
+        <Grid2 display="flex" justifyContent="right">
+            <Tooltip title="Help">
+                <Button color="inherit"><HelpIcon /></Button>
             </Tooltip>
         </Grid2>
     );
@@ -59,14 +85,12 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                         </Typography>
                         <Grid2 container sx={{ flexGrow: 1 }}>
                             <Grid2 display="flex" justifyContent="right" size="grow">
-                                <Button style={{ backgroundColor: "#9bf316", color: "black" }}>CLICK HERE TO GET STARTED!</Button>
-                            </Grid2>
-                            { limited ? limitedIndicator : null }
-                            <Grid2 display="flex" justifyContent="right">
                                 <Tooltip title="Toggle Interface Mode (Ctrl-`)">
                                     <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
                                 </Tooltip>
                             </Grid2>
+                            { !nodes || nodes.length > 1 ? helpButton : gettingStartedButton }
+                            { limited ? limitedIndicator : null }
                             <Grid2 display="flex" justifyContent="right">
                                 <Tooltip title="Logout">
                                     <Button color="inherit" onClick={logout}><LogoutIcon /></Button>
@@ -77,6 +101,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                 </AppBar>
             </Box>
             <BandwidthLimitedModal close={closeLimitedModal} isOpen={limitedModalOpen} />
+            <GettingStartedModal close={closeGettingStarted} isOpen={gettingStartedOpen} />
         </>
     );
 }
