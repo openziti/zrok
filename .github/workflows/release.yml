@@ -47,7 +47,7 @@ jobs:
       - run: npm install
         working-directory: agent/agentUi
 
-      - run: npm run build-darwin
+      - run: npm run build
         working-directory: agent/agentUi
         env:
           CI: "true"
