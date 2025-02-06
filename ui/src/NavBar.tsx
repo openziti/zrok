@@ -89,8 +89,8 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                                     <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
                                 </Tooltip>
                             </Grid2>
-                            { !nodes || nodes.length > 1 ? helpButton : gettingStartedButton }
                             { limited ? limitedIndicator : null }
+                            { !nodes || nodes.length > 1 ? helpButton : gettingStartedButton }
                             <Grid2 display="flex" justifyContent="right">
                                 <Tooltip title="Logout">
                                     <Button color="inherit" onClick={logout}><LogoutIcon /></Button>
