@@ -122,6 +122,14 @@ jobs:
         env:
           CI: "true"
 
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
+        env:
+          CI: "true"
+
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -191,6 +199,14 @@ jobs:
         working-directory: ui
         env:
           CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
+        env:
+          CI: "true"          
 
       - uses: goreleaser/goreleaser-action@v6
         with:
@@ -266,6 +282,14 @@ jobs:
         env:
           CI: "true"
 
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
+        env:
+          CI: "true"
+
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -308,6 +332,14 @@ jobs:
 
       - run: npm run build
         working-directory: ui
+        env:
+          CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
         env:
           CI: "true"
 
