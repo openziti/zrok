@@ -44,6 +44,14 @@ jobs:
         env:
           CI: "true"
 
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build-darwin
+        working-directory: agent/agentUi
+        env:
+          CI: "true"
+
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
