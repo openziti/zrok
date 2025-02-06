@@ -2,6 +2,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {Box, Grid2, Modal, Typography} from "@mui/material";
 import ClipboardText from "./ClipboardText.tsx";
 import useApiConsoleStore from "./model/store.ts";
+import {useEffect} from "react";
 
 interface GettingStartedModalProps {
     close: () => void;
@@ -10,6 +11,13 @@ interface GettingStartedModalProps {
 
 const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
     const user = useApiConsoleStore(store => store.user);
+    const nodes = useApiConsoleStore(store => store.nodes);
+
+    useEffect(() => {
+        if(nodes && nodes.length > 1) {
+            close();
+        }
+    }, [nodes]);
 
     return (
         <Modal open={isOpen} onClose={close}>
@@ -29,7 +37,7 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
-                        <a href="https://github.com/openziti/zrok/releases">https://github.com/openziti/zrok/releases</a>
+                        <a href="https://github.com/openziti/zrok/releases" target="_">https://github.com/openziti/zrok/releases</a>
                     </Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
@@ -80,7 +88,7 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         Visit the <a href="https://docs.zrok.io/docs/getting-started" target="_">Getting Started Guide</a>
-                        <span> </span>in the <a href="https://docs.zrok.io" target="_">zrok Documentation</a> for more help.
+                        <span> </span>and the <a href="https://docs.zrok.io" target="_">zrok Documentation</a> for more help.
                     </Typography>
                 </Grid2>
             </Box>
