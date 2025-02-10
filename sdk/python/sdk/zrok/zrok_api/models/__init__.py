@@ -75,3 +75,4 @@ from zrok_api.models.unaccess_body import UnaccessBody
 from zrok_api.models.unshare_body import UnshareBody
 from zrok_api.models.verify_body import VerifyBody
 from zrok_api.models.version import Version
+from zrok_api.models.version_body import VersionBody

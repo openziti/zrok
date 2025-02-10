@@ -4,6 +4,7 @@ All URIs are relative to */api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**client_version_check**](MetadataApi.md#client_version_check) | **POST** /version | 
 [**configuration**](MetadataApi.md#configuration) | **GET** /configuration | 
 [**get_account_detail**](MetadataApi.md#get_account_detail) | **GET** /detail/account | 
 [**get_account_metrics**](MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
@@ -18,6 +19,50 @@ Method | HTTP request | Description
 [**org_account_overview**](MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 [**overview**](MetadataApi.md#overview) | **GET** /overview | 
 [**version**](MetadataApi.md#version) | **GET** /version | 
+
+# **client_version_check**
+> client_version_check(body=body)
+
+
+
+### Example
+```python
+from __future__ import print_function
+import time
+import zrok_api
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = zrok_api.MetadataApi()
+body = zrok_api.VersionBody() # VersionBody |  (optional)
+
+try:
+    api_instance.client_version_check(body=body)
+except ApiException as e:
+    print("Exception when calling MetadataApi->client_version_check: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**VersionBody**](VersionBody.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **configuration**
 > Configuration configuration()

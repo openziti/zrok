@@ -12,6 +12,7 @@ model/accessRequest.ts
 model/addOrganizationMemberRequest.ts
 model/authUser.ts
 model/changePasswordRequest.ts
+model/clientVersionCheckRequest.ts
 model/configuration.ts
 model/createFrontend201Response.ts
 model/createFrontendRequest.ts

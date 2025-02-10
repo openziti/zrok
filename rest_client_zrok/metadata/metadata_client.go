@@ -30,6 +30,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	ClientVersionCheck(params *ClientVersionCheckParams, opts ...ClientOption) (*ClientVersionCheckOK, error)
+
 	Configuration(params *ConfigurationParams, opts ...ClientOption) (*ConfigurationOK, error)
 
 	GetAccountDetail(params *GetAccountDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountDetailOK, error)
@@ -59,6 +61,44 @@ type ClientService interface {
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+ClientVersionCheck client version check API
+*/
+func (a *Client) ClientVersionCheck(params *ClientVersionCheckParams, opts ...ClientOption) (*ClientVersionCheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewClientVersionCheckParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "clientVersionCheck",
+		Method:             "POST",
+		PathPattern:        "/version",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ClientVersionCheckReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ClientVersionCheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for clientVersionCheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*

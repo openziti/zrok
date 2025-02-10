@@ -67,9 +67,10 @@ func Run(inCfg *config.Config) error {
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
+	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
+	api.MetadataClientVersionCheckHandler = metadata.ClientVersionCheckHandlerFunc(clientVersionCheckHandler)
 	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
 	api.MetadataGetSparklinesHandler = newSparklinesHandler()
-	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
 		api.MetadataGetEnvironmentMetricsHandler = newGetEnvironmentMetricsHandler(cfg.Metrics.Influx)
