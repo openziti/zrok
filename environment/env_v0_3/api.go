@@ -55,7 +55,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "client version error accessing api endpoint '%v' (%v): %v", apiEndpoint, err)
+		return nil, errors.Wrapf(err, "client version error accessing api endpoint '%v': %v", apiEndpoint, err)
 	}
 
 	return zrok, nil
