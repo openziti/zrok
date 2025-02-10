@@ -58,6 +58,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
+		MetadataClientVersionCheckHandler: metadata.ClientVersionCheckHandlerFunc(func(params metadata.ClientVersionCheckParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ClientVersionCheck has not yet been implemented")
+		}),
 		MetadataConfigurationHandler: metadata.ConfigurationHandlerFunc(func(params metadata.ConfigurationParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Configuration has not yet been implemented")
 		}),
@@ -237,6 +240,8 @@ type ZrokAPI struct {
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
+	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
+	MetadataClientVersionCheckHandler metadata.ClientVersionCheckHandler
 	// MetadataConfigurationHandler sets the operation handler for the configuration operation
 	MetadataConfigurationHandler metadata.ConfigurationHandler
 	// AdminCreateAccountHandler sets the operation handler for the create account operation
@@ -408,6 +413,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
+	}
+	if o.MetadataClientVersionCheckHandler == nil {
+		unregistered = append(unregistered, "metadata.ClientVersionCheckHandler")
 	}
 	if o.MetadataConfigurationHandler == nil {
 		unregistered = append(unregistered, "metadata.ConfigurationHandler")
@@ -643,6 +651,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/version"] = metadata.NewClientVersionCheck(o.context, o.MetadataClientVersionCheckHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

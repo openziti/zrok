@@ -7,11 +7,12 @@ import (
 	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
+	metadata2 "github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"net/url"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 )
 
@@ -48,18 +49,16 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 
+	logrus.Infof("version = %v", build.Version)
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
-	v, err := zrok.Metadata.Version(nil)
+	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
+		Body: metadata2.ClientVersionCheckBody{
+			ClientVersion: build.String(),
+		},
+	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting version from api endpoint '%v': %v", apiEndpoint, err)
+		return nil, errors.Wrapf(err, "client version error accessing api endpoint '%v': %v", apiEndpoint, err)
 	}
-	// allow reported version string to be optionally prefixed with
-	// "refs/heads/" or "refs/tags/"
-	re := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
-	if !re.MatchString(string(v.Payload)) {
-		return nil, errors.Errorf("expected a '%v' version, received: '%v'", build.Series, v.Payload)
-	}
-
 	return zrok, nil
 }
 

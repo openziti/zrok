@@ -1909,6 +1909,36 @@ func init() {
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "clientVersionCheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "clientVersion": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "compatible"
+          },
+          "400": {
+            "description": "not compatible",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },
@@ -4111,6 +4141,36 @@ func init() {
             "description": "legacy upgrade required",
             "schema": {
               "$ref": "#/definitions/version"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "clientVersionCheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "clientVersion": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "compatible"
+          },
+          "400": {
+            "description": "not compatible",
+            "schema": {
+              "type": "string"
             }
           }
         }

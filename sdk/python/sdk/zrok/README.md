@@ -170,6 +170,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
+*MetadataApi* | [**client_version_check**](docs/MetadataApi.md#client_version_check) | **POST** /version | 
 *MetadataApi* | [**configuration**](docs/MetadataApi.md#configuration) | **GET** /configuration | 
 *MetadataApi* | [**get_account_detail**](docs/MetadataApi.md#get_account_detail) | **GET** /detail/account | 
 *MetadataApi* | [**get_account_metrics**](docs/MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
@@ -254,6 +255,7 @@ Class | Method | HTTP request | Description
  - [UnshareBody](docs/UnshareBody.md)
  - [VerifyBody](docs/VerifyBody.md)
  - [Version](docs/Version.md)
+ - [VersionBody](docs/VersionBody.md)
 
 ## Documentation For Authorization
 

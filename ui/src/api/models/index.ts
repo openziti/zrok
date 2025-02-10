@@ -5,6 +5,7 @@ export * from './AccessRequest';
 export * from './AddOrganizationMemberRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';
+export * from './ClientVersionCheckRequest';
 export * from './CreateFrontend201Response';
 export * from './CreateFrontendRequest';
 export * from './CreateIdentity201Response';

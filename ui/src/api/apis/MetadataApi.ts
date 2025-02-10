@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  ClientVersionCheckRequest,
   Environment,
   EnvironmentAndResources,
   Frontend,
@@ -28,6 +29,8 @@ import type {
   Share,
 } from '../models/index';
 import {
+    ClientVersionCheckRequestFromJSON,
+    ClientVersionCheckRequestToJSON,
     EnvironmentFromJSON,
     EnvironmentToJSON,
     EnvironmentAndResourcesFromJSON,
@@ -51,6 +54,10 @@ import {
     ShareFromJSON,
     ShareToJSON,
 } from '../models/index';
+
+export interface ClientVersionCheckOperationRequest {
+    body?: ClientVersionCheckRequest;
+}
 
 export interface GetAccountMetricsRequest {
     duration?: string;
@@ -118,6 +125,32 @@ export class MetadataApi extends runtime.BaseAPI {
     async _configuration(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ModelConfiguration> {
         const response = await this._configurationRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async clientVersionCheckRaw(requestParameters: ClientVersionCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        const response = await this.request({
+            path: `/version`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ClientVersionCheckRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async clientVersionCheck(requestParameters: ClientVersionCheckOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.clientVersionCheckRaw(requestParameters, initOverrides);
     }
 
     /**

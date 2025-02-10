@@ -10,6 +10,7 @@ models/AccessRequest.ts
 models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
+models/ClientVersionCheckRequest.ts
 models/CreateFrontend201Response.ts
 models/CreateFrontendRequest.ts
 models/CreateIdentity201Response.ts
