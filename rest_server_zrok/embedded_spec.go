@@ -1903,7 +1903,7 @@ func init() {
         "operationId": "version",
         "responses": {
           "200": {
-            "description": "current server version",
+            "description": "legacy upgrade required",
             "schema": {
               "$ref": "#/definitions/version"
             }
@@ -4108,7 +4108,7 @@ func init() {
         "operationId": "version",
         "responses": {
           "200": {
-            "description": "current server version",
+            "description": "legacy upgrade required",
             "schema": {
               "$ref": "#/definitions/version"
             }

@@ -18,6 +18,8 @@ CHANGE: Refactored API implementation. Cleanup, lint removal, additional data el
 
 CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
 
+CHANGE: The protocol for determining valid client versions has been changed. Previously a zrok client would do a `GET` against the `/api/v1/version` endpoint and do a local version string comparison (as a normal precondition to any API call) to see if the controller version matched. The protocol has been amended so that any out-of-date client using the old protocol will receive a version string indicating that they need to uprade their client. New clients will do a `POST` against the `/api/v1/version` endpoint, posting their client version, and the server will check for compatibility. Does not change the security posture in any significant way, but gives more flexibility on the server side for managing client compatibility (https://github.com/openziti/zrok/issues/859)
+
 ## v0.4.48
 
 FIX: the Python SDK erroneously assumed the enabled zrok environment contained a config.json file, and was changed to only load it if the file was present (https://github.com/openziti/zrok/pull/853/).
