@@ -158,6 +158,7 @@ reset_password:
 #store:
 #  path:                           "host=127.0.0.1 user=zrok password=zrok dbname=zrok"
 #  type:                           "postgres"
+#  disable_auto_migration:         true
 #
 store:
   path:                           zrok.db
