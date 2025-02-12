@@ -22,9 +22,10 @@ type Model struct {
 }
 
 type Config struct {
-	Path          string `cf:"+secret"`
-	Type          string
-	EnableLocking bool
+	Path                 string `cf:"+secret"`
+	Type                 string
+	EnableLocking        bool
+	DisableAutoMigration bool
 }
 
 type Store struct {
@@ -57,8 +58,10 @@ func Open(cfg *Config) (*Store, error) {
 	dbx.MapperFunc(strcase.ToSnake)
 
 	store := &Store{cfg: cfg, db: dbx}
-	if err := store.migrate(cfg); err != nil {
-		return nil, errors.Wrapf(err, "error migrating database '%v'", cfg.Path)
+	if !cfg.DisableAutoMigration {
+		if err := store.migrate(cfg); err != nil {
+			return nil, errors.Wrapf(err, "error migrating database '%v'", cfg.Path)
+		}
 	}
 	return store, nil
 }
