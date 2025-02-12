@@ -47,6 +47,9 @@ func (cmd *configUnsetCommand) run(_ *cobra.Command, args []string) {
 		case "defaultFrontend":
 			cfg.DefaultFrontend = ""
 
+		case "headless":
+			cfg.Headless = false
+
 		default:
 			fmt.Printf("unknown config name '%v'\n", configName)
 			os.Exit(1)

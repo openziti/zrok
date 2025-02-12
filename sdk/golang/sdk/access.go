@@ -4,7 +4,6 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/pkg/errors"
 )
 
@@ -14,10 +13,8 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	}
 
 	out := share.NewAccessParams()
-	out.Body = &rest_model_zrok.AccessRequest{
-		ShrToken: request.ShareToken,
-		EnvZID:   root.Environment().ZitiIdentity,
-	}
+	out.Body.ShareToken = request.ShareToken
+	out.Body.EnvZID = root.Environment().ZitiIdentity
 
 	zrok, err := root.Client()
 	if err != nil {
@@ -35,11 +32,9 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 
 func DeleteAccess(root env_core.Root, acc *Access) error {
 	out := share.NewUnaccessParams()
-	out.Body = &rest_model_zrok.UnaccessRequest{
-		FrontendToken: acc.Token,
-		ShrToken:      acc.ShareToken,
-		EnvZID:        root.Environment().ZitiIdentity,
-	}
+	out.Body.FrontendToken = acc.Token
+	out.Body.ShareToken = acc.ShareToken
+	out.Body.EnvZID = root.Environment().ZitiIdentity
 
 	zrok, err := root.Client()
 	if err != nil {

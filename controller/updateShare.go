@@ -14,7 +14,7 @@ func newUpdateShareHandler() *updateShareHandler {
 }
 
 func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	shrToken := params.Body.ShrToken
+	shrToken := params.Body.ShareToken
 	backendProxyEndpoint := params.Body.BackendProxyEndpoint
 
 	tx, err := str.Begin()

@@ -21,9 +21,9 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		return metadata.NewGetShareDetailInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
-	shr, err := str.FindShareWithToken(params.ShrToken, tx)
+	shr, err := str.FindShareWithToken(params.ShareToken, tx)
 	if err != nil {
-		logrus.Errorf("error finding share '%v': %v", params.ShrToken, err)
+		logrus.Errorf("error finding share '%v': %v", params.ShareToken, err)
 		return metadata.NewGetShareDetailNotFound()
 	}
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
@@ -39,7 +39,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		}
 	}
 	if !found {
-		logrus.Errorf("environment not matched for share '%v' for account '%v'", params.ShrToken, principal.Email)
+		logrus.Errorf("environment not matched for share '%v' for account '%v'", params.ShareToken, principal.Email)
 		return metadata.NewGetShareDetailNotFound()
 	}
 	sparkRx := make(map[string][]int64)
@@ -69,7 +69,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		sparkData = append(sparkData, &rest_model_zrok.SparkDataSample{Rx: float64(sparkRx[shr.Token][i]), Tx: float64(sparkTx[shr.Token][i])})
 	}
 	return metadata.NewGetShareDetailOK().WithPayload(&rest_model_zrok.Share{
-		Token:                shr.Token,
+		ShareToken:           shr.Token,
 		ZID:                  shr.ZId,
 		ShareMode:            shr.ShareMode,
 		BackendMode:          shr.BackendMode,

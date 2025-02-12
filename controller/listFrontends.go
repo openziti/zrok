@@ -32,13 +32,13 @@ func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principa
 		return admin.NewListFrontendsInternalServerError()
 	}
 
-	var frontends rest_model_zrok.PublicFrontendList
+	var frontends []*admin.ListFrontendsOKBodyItems0
 	for _, sfe := range sfes {
-		frontend := &rest_model_zrok.PublicFrontend{
-			Token:     sfe.Token,
-			ZID:       sfe.ZId,
-			CreatedAt: sfe.CreatedAt.UnixMilli(),
-			UpdatedAt: sfe.UpdatedAt.UnixMilli(),
+		frontend := &admin.ListFrontendsOKBodyItems0{
+			FrontendToken: sfe.Token,
+			ZID:           sfe.ZId,
+			CreatedAt:     sfe.CreatedAt.UnixMilli(),
+			UpdatedAt:     sfe.UpdatedAt.UnixMilli(),
 		}
 		if sfe.UrlTemplate != nil {
 			frontend.URLTemplate = *sfe.UrlTemplate

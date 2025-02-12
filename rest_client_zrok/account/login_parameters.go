@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewLoginParams creates a new LoginParams object,
@@ -64,7 +62,7 @@ LoginParams contains all the parameters to send to the API endpoint
 type LoginParams struct {
 
 	// Body.
-	Body *rest_model_zrok.LoginRequest
+	Body LoginBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *LoginParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the login params
-func (o *LoginParams) WithBody(body *rest_model_zrok.LoginRequest) *LoginParams {
+func (o *LoginParams) WithBody(body LoginBody) *LoginParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the login params
-func (o *LoginParams) SetBody(body *rest_model_zrok.LoginRequest) {
+func (o *LoginParams) SetBody(body LoginBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *LoginParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registr
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

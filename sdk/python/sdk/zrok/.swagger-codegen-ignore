@@ -21,12 +21,3 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
-
-.travis.yml
-git_push.sh
-tox.ini
-test-requirements.txt
-test/
-docs/
-README.md
-setup.py

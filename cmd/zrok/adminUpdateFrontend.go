@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -49,11 +48,9 @@ func (cmd *adminUpdateFrontendCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewUpdateFrontendParams()
-	req.Body = &rest_model_zrok.UpdateFrontendRequest{
-		FrontendToken: feToken,
-		PublicName:    cmd.newPublicName,
-		URLTemplate:   cmd.newUrlTemplate,
-	}
+	req.Body.FrontendToken = feToken
+	req.Body.PublicName = cmd.newPublicName
+	req.Body.URLTemplate = cmd.newUrlTemplate
 
 	_, err = zrok.Admin.UpdateFrontend(req, mustGetAdminAuth())
 	if err != nil {

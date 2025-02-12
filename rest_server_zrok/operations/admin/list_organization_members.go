@@ -80,8 +80,8 @@ func (o *ListOrganizationMembers) ServeHTTP(rw http.ResponseWriter, r *http.Requ
 // swagger:model ListOrganizationMembersBody
 type ListOrganizationMembersBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this list organization members body

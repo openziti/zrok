@@ -6,10 +6,12 @@ package admin
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // UpdateFrontendReader is a Reader for the UpdateFrontend structure.
@@ -270,5 +272,49 @@ func (o *UpdateFrontendInternalServerError) String() string {
 
 func (o *UpdateFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+UpdateFrontendBody update frontend body
+swagger:model UpdateFrontendBody
+*/
+type UpdateFrontendBody struct {
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+
+	// public name
+	PublicName string `json:"publicName,omitempty"`
+
+	// url template
+	URLTemplate string `json:"urlTemplate,omitempty"`
+}
+
+// Validate validates this update frontend body
+func (o *UpdateFrontendBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this update frontend body based on context it is used
+func (o *UpdateFrontendBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UpdateFrontendBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UpdateFrontendBody) UnmarshalBinary(b []byte) error {
+	var res UpdateFrontendBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }
