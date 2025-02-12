@@ -2,6 +2,8 @@
 
 ## v0.4.48
 
+FEATURE: The controller configuration now supports a `disable_auto_migration` boolean in the `store` stanza. When set to `true`, the controller will not attempt to auto-migrate (or otherwise validate the migration state) of the underlying database. Leaving `disable_auto_migration` out, or setting it to false will retain the default behavior of auto-migrating when starting the zrok controller. The `zrok admin migrate` command will still perform a migration regardless of how this setting is configured in the controller configuration (https://github.com/openziti/zrok/issues/866)
+
 FIX: the Python SDK erroneously assumed the enabled zrok environment contained a config.json file, and was changed to only load it if the file was present (https://github.com/openziti/zrok/pull/853/).
 
 ## v0.4.47
