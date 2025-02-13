@@ -1,0 +1,112 @@
+---
+title: Getting Started with Docker
+---
+
+import Details from '@theme/MDXComponents/Details';
+
+## Overview
+
+To follow the guides in this section you will need [Docker](https://docs.docker.com/get-docker/).
+
+You have the option to enable a `zrok` account on the Docker host and mount it on the container or you can use the provided Docker Compose project files (`compose.yml`) to enable a separate `zrok` environment for each project.
+
+This page provides `docker` and `docker compose` examples of mounting the host's `zrok` environment on the container. You'll need to first [enable zrok on the Docker host](/docs/getting-started/#installing-the-zrok-command) to use this approach.
+
+## Permanent Public Share
+
+Let's say you have a `compose.yml` file that defines a web app known within the project's bridge network as `https://myapp:8080` and you want to publish it as a reliable, public site.
+
+1. Reserve a subdomain by running `zrok reserve public --unique-name "myapp" https://myapp:8080` on the Docker host.
+1. Merge this YAML with `compose.yml` or save it in the same directory as `compose.override.yml` to let `docker compose up` merge it for you.
+
+    ```yaml
+    services:
+      zrok:
+        image: openziti/zrok
+        restart: unless-stopped
+        user: "${UID}"
+        volumes:
+          - ${HOME}/.zrok:/home/ziggy/.zrok
+        environment:
+          PFXLOG_NO_JSON: "true"
+        command: share reserved "myapp" --headless
+    ```
+
+The reserved share will be available at `https://myapp.share.zrok.io` each time the `zrok` container starts up.
+
+## Temporary Public Share
+
+Let's say you have a web server running on the host's private network at `https://10.11.12.13:8080`. With one additional `docker` command, you can share the web server publicly as long as the `zrok` container stays running.
+
+```bash title="BASH"
+docker run \
+    --rm \
+    --network=host \
+    --volume ~/.zrok:/home/ziggy/.zrok \
+    --user "${UID:-1000}:${GID:-1000}" \
+    openziti/zrok share public \
+        --headless \
+        https://10.11.12.13:8080
+```
+
+<Details>
+<summary>PowerShell</summary>
+
+```powershell
+docker.exe run `
+    --rm `
+    --network "host" `
+    --volume "${env:USERPROFILE}\.zrok:/.zrok" `
+    --user "1000" `
+    openziti/zrok share public `
+        --headless `
+        https://10.11.12.13:8080
+```
+
+</Details>
+
+
+<Details>
+<summary>Command Prompt (batch)</summary>
+
+```cmd
+docker.exe run ^
+    --rm ^
+    --network "host" ^
+    --volume "%USERPROFILE%\.zrok:/.zrok" ^
+    --user "1000" ^
+    openziti/zrok share public ^
+        --headless ^
+        https://10.11.12.13:8080
+```
+
+</Details>
+
+<Details>
+<summary>Windows Subsystem for Linux (WSL)</summary>
+
+```bash
+docker run \
+    --rm \
+    --network "host" \
+    --volume "/mnt/c/Users/$(powershell.exe -Command 'Write-Output $env:USERNAME' | tr -d '\r')/.zrok:/home/ziggy/.zrok" \
+    --user "${UID:-1000}:${GID:-1000}" \
+    openziti/zrok share public \
+        --headless \
+        https://10.11.12.13:8080
+```
+
+</Details>
+
+The public share URL appears near the beginning of the container's log.
+
+Let's break down those options and arguments.
+
+1. `--rm` don't save this container because it's providing a temporary public share that's destroyed when the container stops
+1. `--network=host` shares the host's network with the container so that the container can reach the web server directly. This is always necessary when the web server is listening only on the host's loopback interface, e.g., `https://::1:8080`, and may not be strictly necessary if the target is routeable from the default Docker bridge.
+1. `--volume ~/.zrok:/home/ziggy/.zrok` mounts the `zrok` configuration from the Docker host into the container.
+1. `--user "${UID:-1000}:${GID:-1000}"` sets the container's user to the current user on the Docker host to avoid permission issues with reading the mounted `zrok` configuration (defaults to `1000:1000`).
+1. `openziti/zrok` is the `zrok` Docker image.
+1. `share public` is the `zrok` command to share the target publicly until zrok exits.
+1. `--headless` runs the `zrok` command without the interactive terminal UI.
+1. `https://10.11.12.13:8080` is the target web server to share.

@@ -1,0 +1,107 @@
+---
+sidebar_position: 50
+sidebar_label: NGINX TLS
+---
+
+# NGINX Reverse Proxy for zrok
+
+## Walkthrough Video
+
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/870A5dke_u4?start=1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## Before You Begin
+
+I'll assume you have a running `zrok` controller and frontend and wish to front both with NGINX providing server TLS. Go back to [Self-Hosting Guide](/guides/self-hosting/linux/index.mdx) if you still need to spin those up.
+
+## Choose a Reverse Proxy Address
+
+I'll use `https://api.zrok.quigley.com:443` in this example, and assume you already set up wildcard DNS like `*.zrok.quigley.com`. This lets us elect `api.zrok.quigley.com` as the controller DNS name, and forward any other incoming requests to the zrok public frontend.
+
+## Obtain a Wildcard Server Certificate
+
+You must complete a DNS challenge to obtain a wildcard certificate from Let's Encrypt. I'll assume you know how to create the necessary TXT record in the DNS zone you're using with zrok.
+
+1. Install certbot: https://eff-certbot.readthedocs.io/en/stable/install.html
+2. Run certbot with the manual plugin: https://certbot.eff.org/docs/using.html#manual
+
+    ```bash
+    # install cert for *.zrok.quigley.com in /etc/letsencrypt
+    sudo certbot certonly --manual
+    ````
+
+## [Install NGINX](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/)
+
+## Configure NGINX
+
+```
+server {
+    listen              443 ssl;
+    server_name         api.zrok.quigley.com;
+    ssl_certificate     /etc/letsencrypt/live/zrok.quigley.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/zrok.quigley.com/privkey.pem;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    location / {
+      proxy_pass      http://127.0.0.1:18080;
+      error_log       /var/log/nginx/zrok-controller.log;
+    }
+
+}
+
+map $http_upgrade $connection_upgrade {
+    default      keep-alive;
+    'websocket'  upgrade;
+    ''           close;
+}
+
+server {
+    listen              443 ssl;
+    server_name         *.zrok.quigley.com;
+    ssl_certificate     /etc/letsencrypt/live/zrok.quigley.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/zrok.quigley.com/privkey.pem;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    location / {
+      proxy_pass       http://127.0.0.1:8080;
+      proxy_set_header Host $host;
+      error_log        /var/log/nginx/zrok-frontend.log;
+      proxy_busy_buffers_size   512k;
+      proxy_buffers    4 512k;
+      proxy_buffer_size   256k;
+
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+## Restart NGINX
+
+Load the new configuration by restarting NGINX. Check the logs to make sure it's happy.
+
+> Started A high performance web server and a reverse proxy server.
+
+## Check the Firewall
+
+If you followed the non-TLS quickstart then you may have opened 8080,108080/tcp in your firewall. You can go ahead and replace those exceptions with 443/tcp because only NGINX needs to be reachable for zrok to function.
+
+## Update the zrok Frontend
+
+List available frontends to obtain the token identifier of the frontend named "public". You may need to set `ZROK_ADMIN_TOKEN` or `ZROK_API_ENDPOINT` before running `zrok admin`.
+
+```bash
+$ zrok admin list frontends
+
+ TOKEN         ZID        PUBLIC NAME  URL TEMPLATE                              CREATED AT                         UPDATED AT                    
+ 2NiDTRYUww18  7DsLh9DXG  public       http://{token}.zrok.quigley.com:8080  2023-01-19 05:29:20.793 +0000 UTC  2023-01-19 06:17:25 +0000 UTC 
+```
+
+Update the URL template to use NGINX.
+
+```bash
+$ zrok admin update frontend 2NiDTRYUww18 --url-template https://{token}.zrok.quigley.com:443
+[   0.028]    INFO main.(*adminUpdateFrontendCommand).run: updated global frontend '2NiDTRYUww18'
+```
