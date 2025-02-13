@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  parse_version:
+  enforce_stable_semver:
     name: Require Stable Release Semver
     runs-on: ubuntu-24.04
     outputs:
@@ -33,7 +33,7 @@ jobs:
 
   promote_docker:
     name: Tag Container Image ${{ matrix.image.repo }}:latest
-    needs: parse_version
+    needs: enforce_stable_semver
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: true
@@ -52,11 +52,11 @@ jobs:
         run: >
           docker buildx imagetools create --tag
           ${{ matrix.image.repo }}:latest
-          ${{ matrix.image.repo }}:${{ needs.parse_version.outputs.version }}
+          ${{ matrix.image.repo }}:${{ needs.enforce_stable_semver.outputs.version }}
 
   promote_artifactory:
     name: Promote ${{ matrix.package_name }}-${{ matrix.arch.rpm }}.${{ matrix.packager }}
-    needs: parse_version
+    needs: enforce_stable_semver
     strategy:
       fail-fast: true
       matrix:
@@ -93,7 +93,7 @@ jobs:
           --recursive=false
           --flat=true
           --fail-no-op=true
-          ${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.parse_version.outputs.version }}-1.${{ matrix.arch.rpm }}.rpm
+          ${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${{ matrix.arch.rpm }}.rpm
           ${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/
 
       - name: Copy DEB from test repo to stable repo with jFrog CLI
@@ -104,5 +104,5 @@ jobs:
           --recursive=false
           --flat=true
           --fail-no-op=true
-          ${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.parse_version.outputs.version }}-1_${{ matrix.arch.deb }}.deb
+          ${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${{ matrix.arch.deb }}.deb
           ${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/

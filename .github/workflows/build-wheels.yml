@@ -5,7 +5,26 @@ on:
     types: [released]
 
 jobs:
+  enforce_stable_semver:
+    name: Require Stable Release Semver
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - name: Parse Release Version
+        id: parse
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+            exit 1
+          fi
+
   build_wheels:
+    needs: enforce_stable_semver
     defaults:
       run:
         working-directory: sdk/python/sdk/zrok
