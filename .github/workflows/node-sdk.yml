@@ -2,7 +2,7 @@ name: Build/Release Node SDK
 
 on:
   release:
-    types: [ published ]
+    types: [ released ]
   pull_request:
     branches: [ main ]
 
