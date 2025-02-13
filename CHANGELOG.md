@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.4.49
+
+FIX: Pre-releases are no longer uploaded to the stable Linux package repo.
+
+CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Docker Hub for testing. [RELEASING.md](./RELEASING.md) describes releaser steps and the events they trigger.
+
+CHANGE: Linux release binaries are now built on the ziti-builder container image based on Ubuntu Focal 20.04 to preserve backward compatibility as the ubuntu-20.04 GitHub runner is end of life.
+
 ## v0.4.48
 
 FEATURE: The controller configuration now supports a `disable_auto_migration` boolean in the `store` stanza. When set to `true`, the controller will not attempt to auto-migrate (or otherwise validate the migration state) of the underlying database. Leaving `disable_auto_migration` out, or setting it to false will retain the default behavior of auto-migrating when starting the zrok controller. The `zrok admin migrate` command will still perform a migration regardless of how this setting is configured in the controller configuration (https://github.com/openziti/zrok/issues/866)
