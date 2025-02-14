@@ -22,7 +22,7 @@ Pre-release version strings must contain exactly one hyphen, and may not contain
     1. A release is drafted in GitHub.
 1. Edit the draft and publish the release as a pre-release (`isPrerelease: true`).
     1. The one-time GitHub "published" event fires, and binaries are available in GitHub.
-1. If the release does not have a pre-release suffix, mark it as stable by un-checking (`isPrerelease: false`).
+1. If the release does not have a pre-release suffix, mark it as stable by un-checking "Set as a pre-release" (`isPrerelease: false`).
     1. The one-time GitHub "released" event fires.
     1. Linux packages are promoted to "stable" in Artifactory.
     1. Docker images are promoted to `:latest` in Docker Hub.
