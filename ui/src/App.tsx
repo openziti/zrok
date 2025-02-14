@@ -14,7 +14,6 @@ const App = () => {
 
     useEffect(() => {
         const checkUser = () => {
-            console.log("checkUser");
             const user = localStorage.getItem("user");
             if (user) {
                 updateUser(JSON.parse(user));
