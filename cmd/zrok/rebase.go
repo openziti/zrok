@@ -20,7 +20,7 @@ type rebaseCommand struct {
 func newRebaseCommand() *rebaseCommand {
 	cmd := &cobra.Command{
 		Use:   "rebase <apiEndpoint>",
-		Short: "Update the API endpoint for an already-enabled environment",
+		Short: "Rebase an enabled environment onto a different API endpoint URL",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &rebaseCommand{cmd: cmd}
