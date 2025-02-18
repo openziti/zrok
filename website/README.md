@@ -31,7 +31,7 @@ New doc releases should only be cut when major revisions are coming and the curr
 Cutting a new version will snapshot the current ./docs directory and copy it all into the ./website/versioned_docs directory based on the version that is tagged.
 
 ```
-$ yarn docusaurus docs:version 1.1.0`
+$ yarn docusaurus docs:version 1.1`
 ```
 
 The default doc version that is displayed is managed in the `docusaurus.config.js` file.
@@ -46,7 +46,7 @@ the "current" doc version.
           lastVersion: 'current',
           versions: {
              current: {
-               label: '1.0.x',
+               label: '1.0',
              },
           },
 
