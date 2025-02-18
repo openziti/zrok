@@ -1,0 +1,166 @@
+import LinuxShareInstall from './_linux-share-install.mdx'
+import AnsibleRepoSetup from './install/_ansible_repo_setup.yaml'
+import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
+
+## Installation
+
+<LinuxShareInstall />
+
+<Details>
+<summary>Ansible Playbook</summary>
+
+<ConcatenateYamlSnippets
+  title="Set up package repository and install zrok-share"
+>
+{AnsibleRepoSetup}
+{`
+- name: Install zrok-share package
+  gather_facts: false
+  hosts: all 
+  become: true
+  tasks:
+  - name: Install zrok-share
+    ansible.builtin.package:
+      name: zrok-share
+      state: present
+
+  - name: Copy env config from Ansible controller to target
+    copy:
+      dest: /opt/openziti/etc/zrok/zrok-share.env
+      src: /opt/openziti/etc/zrok/zrok-share.env
+
+  - name: Enable and restart service
+    systemd:
+      name: zrok-share
+      enabled: yes
+      state: restarted
+      daemon_reload: yes
+
+  - name: Wait for service
+    systemd:
+      name: zrok-share
+      state: started
+    register: service_status
+    until: service_status.status.ActiveState == 'active'
+    retries: 30
+    delay: 1
+`}
+</ConcatenateYamlSnippets>
+
+</Details>
+
+## Enable
+
+Save the enable token from the zrok console in the configuration file.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_ENABLE_TOKEN="14cbfca9772f"
+```
+
+## Name your Share
+
+This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_UNIQUE_NAME="my-prod-app"
+```
+
+## Use Cases
+
+You may change the target for the current backend mode, e.g. `proxy`, by editing the configuration file and restarting the service. The reserved subdomain will remain the same.
+
+You may switch between backend modes or change authentication options by deleting `/var/lib/zrok-share/.zrok/reserved.json` and restarting the service. A new subdomain will be reserved.
+
+### Proxy a Web Server
+
+Proxy a reserved subdomain to an existing web server. The web server could be on a private network or on the same host as zrok.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_TARGET="http://127.0.0.1:3000"
+ZROK_BACKEND_MODE="proxy"
+```
+
+If your HTTPS server has an unverifiable TLS server certificate then you must set `--insecure`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_INSECURE="--insecure"
+```
+
+### Serve Static Files
+
+Run zrok's embedded web server to serve the files in a directory. If there's an `index.html` file in the directory then visitors will see that web page in their browser, otherwise they'll see a generated index of the files. The directory must be readable by 'other', e.g. `chmod -R o+rX /var/www/html`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_TARGET="/var/www/html"
+ZROK_BACKEND_MODE="web"
+```
+
+### Caddy Server
+
+Use zrok's built-in Caddy server to serve static files or as a reverse proxy to multiple web servers with various HTTP routes or as a load-balanced set. A sample Caddyfile is available in the path shown.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_TARGET="/opt/openziti/etc/zrok/multiple_upstream.Caddyfile"
+ZROK_BACKEND_MODE="caddy"
+```
+
+### Network Drive
+
+This uses zrok's `drive` backend mode to serve a directory of static files as a virtual network drive. The directory must be readable by 'other', e.g. `chmod -R o+rX /usr/share/doc`.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_TARGET="/usr/share/doc"
+ZROK_BACKEND_MODE="drive"
+```
+
+[Learn more about this feature in this blog post](https://blog.openziti.io/zrok-drives-an-early-preview).
+
+## Authentication
+
+You can limit access to certain email addresses with OAuth or require a password.
+
+### OAuth
+
+You can require that visitors authenticate with an email address that matches at least one of the suffixes you specify. Add the following to the configuration file.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_OAUTH_PROVIDER="github"  # or google
+ZROK_OAUTH_EMAILS="alice@example.com *@acme.example.com"
+```
+
+### Password
+
+Enable HTTP basic authentication by adding the following to the configuration file.
+
+```bash title="/opt/openziti/etc/zrok/zrok-share.env"
+ZROK_BASIC_AUTH="user:passwd"
+```
+
+## Start the Service
+
+Start the service, and check the zrok console or the service log for the reserved subdomain.
+
+```bash title="run now and at startup"
+sudo systemctl enable --now zrok-share.service
+```
+
+```bash title="run now"
+sudo systemctl restart zrok-share.service
+```
+
+```bash
+journalctl -u zrok-share.service
+```
+
+## Compatibility
+
+The Linux distribution must have a package manager that understands the `.deb` or `.rpm` format and be running systemd v232 or newer. The service was tested with:
+
+* Ubuntu 20.04, 22.04, 23.04
+* Debian 11 12
+* Rocky 8, 9
+* Fedora 37, 38
+
+## Package Contents
+
+The files included in the `zrok-share` package are sourced [here in GitHub](https://github.com/openziti/zrok/tree/main/nfpm).

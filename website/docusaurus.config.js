@@ -6,7 +6,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Zrok',
+  title: 'zrok',
   staticDirectories: ['static', '../docs/images', '../docker/compose', '../etc/caddy'],
   tagline: 'Globally distributed reverse proxy',
   url: 'https://docs.zrok.io',
@@ -83,6 +83,15 @@ const config = {
             'https://github.com/openziti/zrok/blob/main/docs',
           path: '../docs',
           include: ['**/*.md', '**/*.mdx'],
+
+          // Uncomment these lines when we're ready to show the 1.0 docs by default
+          // lastVersion: 'current',
+          versions: {
+            current: {
+              label: '1.0',
+            },
+          },
+
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -113,6 +122,9 @@ const config = {
         },
         items: [
           {
+            type: 'docsVersionDropdown',
+          },
+          {
             href: 'https://zrok.io/pricing/',
             position: 'right',
             label: 'pricing',
@@ -138,7 +150,7 @@ const config = {
             position: 'right',
             className: 'header-discourse-link',
             title: 'Discourse'
-          },
+          }
         ],
       },
       footer: {
