@@ -1,4 +1,5 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckMarkIcon from "@mui/icons-material/Check";
 import {useEffect, useState} from "react";
 import {Button, Popover, Typography} from "@mui/material";
 
@@ -8,13 +9,13 @@ interface ClipboardTextProps {
 
 const ClipboardText = ({ text }: ClipboardTextProps) => {
     const [copied, setCopied] = useState<boolean>(false);
-    const [color, setColor] = useState<string>("black");
+    const [control, setControl] = useState<React.JSX.Element>(<ContentCopyIcon />);
 
     useEffect(() => {
         if(copied) {
-            setColor("red");
+            setControl(<CheckMarkIcon />);
         } else {
-            setColor("black");
+            setControl(<ContentCopyIcon />);
         }
     }, [copied]);
 
@@ -26,7 +27,7 @@ const ClipboardText = ({ text }: ClipboardTextProps) => {
 
     return (
         <>
-            <Button onClick={copy} sx={{ minWidth: "30px" }} style={{ color: color }} ><ContentCopyIcon /></Button>
+            <Button onClick={copy} sx={{ minWidth: "30px" }} style={{ color: "black" }}>{control}</Button>
             <Popover anchorOrigin={{ vertical: "top", horizontal: "right" }} open={copied}><Typography sx={{ p: 2 }}>Copied!</Typography></Popover>
         </>
     );
