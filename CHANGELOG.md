@@ -14,6 +14,8 @@ FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now au
 
 FEATURE `zrok access private` supports a new `--auto` mode, which can automatically find an available open address/port to bind the frontend listener on. Also includes `--auto-address`, `--auto-start-port`, and `--auto-end-port` features with sensible defaults. Supported by both the agent and local operating modes (https://github.com/openziti/zrok/issues/780)
 
+FEATURE `zrok rebase` command allows "rebasing" an enabled environment onto a different API endpoint. This is useful for migrating already-enabled environments between endpoints supporting different zrok versions (https://github.com/openziti/zrok/issues/869)
+
 CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
 
 CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)

@@ -9,7 +9,6 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	metadata2 "github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -49,7 +48,6 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 
-	logrus.Infof("version = %v", build.Version)
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
 	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
 		Body: metadata2.ClientVersionCheckBody{
