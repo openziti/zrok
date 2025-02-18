@@ -1,0 +1,81 @@
+---
+title: zrok frontdoor
+sidebar_label: frontdoor
+sidebar_position: 20
+hide_table_of_contents: true
+---
+
+import OsTabs from '@theme/OsTabs';
+import TabItem from '@theme/TabItem';
+import LinuxService from './_frontdoor-linux.mdx';
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+**zrok frontdoor** is the heavy-duty front door to your app or site. It makes your website or app available to your online audience through the shield of zrok.io's hardened, managed frontends.
+
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/5Vi8GKuTi_I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## Overview
+
+zrok frontends are the parts of zrok that proxy incoming public web traffic to zrok backend shares via OpenZiti. When you use zrok with a `zrok.io` frontend, you're using **zrok frontdoor**. `zrok.io` is zrok-as-a-service by NetFoundry, the team behind OpenZiti. You need a free account to use **zrok frontdoor**.
+
+
+<ThemedImage
+  alt="frontdoor diagram"
+  sources={{
+    light: useBaseUrl('/img/zrok-frontdoor-light-mode.svg'),
+    dark: useBaseUrl('/img/zrok-frontdoor-dark-mode.svg'),
+  }}
+/>
+
+## Choose your OS
+
+Choose between installing the Linux package or running zrok with Docker (Linux, macOS, or Windows).
+
+{/* The OsTabs component must be aligned with these specific values: `Linux`, `Docker` which are auto-selected based on
+the detected OS of the visitor's browser */}
+<OsTabs
+  queryString="os"
+  values={[
+    { label: 'Linux', value: 'Linux', },
+    { label: 'Docker', value: 'Docker', },
+  ]}
+>
+
+  <TabItem value="Linux">
+
+On Linux, zrok frontdoor is implemented natively as a system service provided by the `zrok-share` DEB or RPM package.
+
+## Goal
+
+Proxy a reserved public subdomain to a backend target with an always-on Linux system service.
+
+## How it Works
+
+The `zrok-share` package creates a `zrok-share.service` unit in systemd. The administrator edits the service's configuration file to specify the:
+
+1. zrok account token
+1. target URL or files to be shared and backend mode, e.g. `proxy`
+1. authentication options, if wanted
+
+When the service starts it will:
+
+1. enable the zrok environment unless `/var/lib/zrok-share/.zrok/environment.json` exists
+1. reserve a public subdomain for the service unless `/var/lib/zrok-share/.zrok/reserved.json` exists
+1. start sharing the target specified as `ZROK_TARGET` in the environment file
+
+  <LinuxService/>
+
+  </TabItem>
+
+  <TabItem value="Docker">
+
+On macOS and Windows, zrok frontdoor is implemented as a Docker Compose project which reserves a public subdomain for your website or service and manages a zrok environment that's separate from the Docker host. [Link to the Docker Public Share Guide](/guides/docker-share/docker_public_share_guide.md)
+
+  </TabItem>
+
+</OsTabs>
+
+## Concepts
+
+Overview of [zrok reserved shares](/concepts/sharing-reserved.md)

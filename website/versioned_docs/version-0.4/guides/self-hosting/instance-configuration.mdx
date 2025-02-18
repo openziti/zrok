@@ -1,0 +1,46 @@
+---
+title: Use Another zrok Instance
+sidebar_label: Instance Config
+---
+
+:::note
+This guide is relevant if you are self-hosting or using a friend's `zrok` instance instead of using zrok-as-a-service from `zrok.io`.
+:::
+
+The `zrok` *command* on your computer uses a `zrok` *instance* over the network.
+
+The default instance API endpoint for the `zrok` command is `api.zrok.io`. Set the API endpoint to another instance's API endpoint:
+
+```text
+zrok config set apiEndpoint https://zrok.example.com
+```
+
+```buttonless title="Output"
+[WARNING]: unable to open environment metadata; ignoring
+
+zrok configuration updated
+```
+
+:::note
+The `WARNING` about `environment metadata` is expected when you run `zrok config set` before `zrok enable`.
+:::
+
+You can use the `zrok status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as an _environment_.
+
+```text
+zrok status
+```
+
+```buttonless title="Output"
+Config:
+
+ CONFIG       VALUE                      SOURCE 
+ apiEndpoint  https://zrok.mydomain.com  config 
+
+[WARNING]: Unable to load your local environment!
+
+To create a local environment use the zrok enable command.
+```
+
+The `zrok status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
+

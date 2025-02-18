@@ -1,0 +1,8 @@
+{
+  "label": "Linux User Share",
+  "position": 40,
+  "link": {
+    "type": "doc",
+    "id": "guides/linux-user-share/index"
+  }
+}
