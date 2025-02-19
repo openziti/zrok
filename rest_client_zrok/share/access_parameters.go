@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewAccessParams creates a new AccessParams object,
@@ -64,7 +62,7 @@ AccessParams contains all the parameters to send to the API endpoint
 type AccessParams struct {
 
 	// Body.
-	Body *rest_model_zrok.AccessRequest
+	Body AccessBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *AccessParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the access params
-func (o *AccessParams) WithBody(body *rest_model_zrok.AccessRequest) *AccessParams {
+func (o *AccessParams) WithBody(body AccessBody) *AccessParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the access params
-func (o *AccessParams) SetBody(body *rest_model_zrok.AccessRequest) {
+func (o *AccessParams) SetBody(body AccessBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *AccessParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

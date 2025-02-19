@@ -81,6 +81,10 @@ func (c *CaddyWebBackend) Run() error {
 	return caddy.Run(c.caddyCfg)
 }
 
+func (c *CaddyWebBackend) Stop() error {
+	return caddy.Stop()
+}
+
 func (c *CaddyWebBackend) Requests() func() int32 {
 	return func() int32 { return 0 }
 }

@@ -33,7 +33,12 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
+
 	logrus.Info(cf.Dump(inCfg, cf.DefaultOptions()))
+
+	// override the 'disable_auto_migration' setting... the user is requesting a migration here.
+	inCfg.Store.DisableAutoMigration = false
+
 	if _, err := store.Open(inCfg.Store); err != nil {
 		panic(err)
 	}

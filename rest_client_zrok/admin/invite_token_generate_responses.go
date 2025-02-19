@@ -6,10 +6,12 @@ package admin
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // InviteTokenGenerateReader is a Reader for the InviteTokenGenerate structure.
@@ -57,7 +59,7 @@ func NewInviteTokenGenerateCreated() *InviteTokenGenerateCreated {
 /*
 InviteTokenGenerateCreated describes a response with status code 201, with default header values.
 
-invitation tokens created
+invite tokens created
 */
 type InviteTokenGenerateCreated struct {
 }
@@ -113,7 +115,7 @@ func NewInviteTokenGenerateBadRequest() *InviteTokenGenerateBadRequest {
 /*
 InviteTokenGenerateBadRequest describes a response with status code 400, with default header values.
 
-invitation tokens not created
+invite tokens not created
 */
 type InviteTokenGenerateBadRequest struct {
 }
@@ -270,5 +272,43 @@ func (o *InviteTokenGenerateInternalServerError) String() string {
 
 func (o *InviteTokenGenerateInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+InviteTokenGenerateBody invite token generate body
+swagger:model InviteTokenGenerateBody
+*/
+type InviteTokenGenerateBody struct {
+
+	// invite tokens
+	InviteTokens []string `json:"inviteTokens"`
+}
+
+// Validate validates this invite token generate body
+func (o *InviteTokenGenerateBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this invite token generate body based on context it is used
+func (o *InviteTokenGenerateBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *InviteTokenGenerateBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *InviteTokenGenerateBody) UnmarshalBinary(b []byte) error {
+	var res InviteTokenGenerateBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

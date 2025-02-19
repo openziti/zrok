@@ -24,7 +24,11 @@ func init() {
 	adminCmd.AddCommand(adminDeleteCmd)
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
-	testCmd.AddCommand(testCanaryCmd)
+	rootCmd.AddCommand(agentCmd)
+	agentCmd.AddCommand(agentAccessCmd)
+	agentCmd.AddCommand(agentShareCmd)
+	agentCmd.AddCommand(agentReleaseCmd)
+	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
@@ -32,6 +36,7 @@ func init() {
 	rootCmd.AddCommand(organizationCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
+	testCmd.AddCommand(testCanaryCmd)
 	rootCmd.AddCommand(gendoc.NewGendocCmd(rootCmd))
 	transport.AddAddressParser(tcp.AddressParser{})
 	transport.AddAddressParser(udp.AddressParser{})
@@ -77,6 +82,27 @@ var adminListCmd = &cobra.Command{
 var adminUpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update global resources",
+}
+
+var agentAccessCmd = &cobra.Command{
+	Use:   "access",
+	Short: "zrok Agent access commands",
+}
+
+var agentCmd = &cobra.Command{
+	Use:     "agent",
+	Short:   "zrok Agent commands",
+	Aliases: []string{"daemon"},
+}
+
+var agentShareCmd = &cobra.Command{
+	Use:   "share",
+	Short: "zrok Agent sharing commands",
+}
+
+var agentReleaseCmd = &cobra.Command{
+	Use:   "release",
+	Short: "zrok Agent release commands",
 }
 
 var configCmd = &cobra.Command{

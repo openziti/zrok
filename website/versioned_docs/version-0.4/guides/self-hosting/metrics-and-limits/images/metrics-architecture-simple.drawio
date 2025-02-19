@@ -1,0 +1,70 @@
+<mxfile host="Electron" modified="2023-04-04T16:56:44.671Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="hNOxKmEJVuYIWfjZN-Q2" version="21.1.2" type="device">
+  <diagram name="Page-1" id="IMoEC3u-7S6gkD3jGaqt">
+    <mxGraphModel dx="1030" dy="801" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="600" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-1" value="Ziti&lt;br&gt;Controller" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-2" value="events.json" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;" vertex="1" parent="1">
+          <mxGeometry x="190" y="65" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-1" target="z8BNBxY42kQ6VSPeSeC1-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="280" y="280" as="sourcePoint" />
+            <mxPoint x="330" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-15" value="zrok&lt;br&gt;Metrics Store&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;(InfluxDB)&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="471" y="40" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-17" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-15" target="z8BNBxY42kQ6VSPeSeC1-11">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="501" y="284" as="sourcePoint" />
+            <mxPoint x="551" y="234" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-18" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-2" target="z8BNBxY42kQ6VSPeSeC1-11">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="230" as="sourcePoint" />
+            <mxPoint x="240" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-19" value="Ziti&lt;br&gt;Controller" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="98" y="270" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-24" value="zrok&lt;br&gt;Metrics Store&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;(InfluxDB)&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="413" y="260" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-25" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-24" target="z8BNBxY42kQ6VSPeSeC1-23">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="443" y="504" as="sourcePoint" />
+            <mxPoint x="493" y="454" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-23" value="zrok&lt;br&gt;Controller" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="252" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-29" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-19" target="z8BNBxY42kQ6VSPeSeC1-23">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="198" y="462" as="sourcePoint" />
+            <mxPoint x="248" y="412" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-30" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="220" y="310" as="sourcePoint" />
+            <mxPoint x="250" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-31" value="Events over Websocket" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="200" y="210" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-11" value="zrok&lt;br&gt;Controller" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

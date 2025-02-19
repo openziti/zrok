@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewUnshareParams creates a new UnshareParams object,
@@ -64,7 +62,7 @@ UnshareParams contains all the parameters to send to the API endpoint
 type UnshareParams struct {
 
 	// Body.
-	Body *rest_model_zrok.UnshareRequest
+	Body UnshareBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *UnshareParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the unshare params
-func (o *UnshareParams) WithBody(body *rest_model_zrok.UnshareRequest) *UnshareParams {
+func (o *UnshareParams) WithBody(body UnshareBody) *UnshareParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the unshare params
-func (o *UnshareParams) SetBody(body *rest_model_zrok.UnshareRequest) {
+func (o *UnshareParams) SetBody(body UnshareBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *UnshareParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regis
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

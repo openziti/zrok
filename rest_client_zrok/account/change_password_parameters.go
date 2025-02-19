@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewChangePasswordParams creates a new ChangePasswordParams object,
@@ -64,7 +62,7 @@ ChangePasswordParams contains all the parameters to send to the API endpoint
 type ChangePasswordParams struct {
 
 	// Body.
-	Body *rest_model_zrok.ChangePasswordRequest
+	Body ChangePasswordBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *ChangePasswordParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the change password params
-func (o *ChangePasswordParams) WithBody(body *rest_model_zrok.ChangePasswordRequest) *ChangePasswordParams {
+func (o *ChangePasswordParams) WithBody(body ChangePasswordBody) *ChangePasswordParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the change password params
-func (o *ChangePasswordParams) SetBody(body *rest_model_zrok.ChangePasswordRequest) {
+func (o *ChangePasswordParams) SetBody(body ChangePasswordBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *ChangePasswordParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

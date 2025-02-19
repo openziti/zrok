@@ -6,10 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // UnaccessReader is a Reader for the Unaccess structure.
@@ -270,5 +272,49 @@ func (o *UnaccessInternalServerError) String() string {
 
 func (o *UnaccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+UnaccessBody unaccess body
+swagger:model UnaccessBody
+*/
+type UnaccessBody struct {
+
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this unaccess body
+func (o *UnaccessBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this unaccess body based on context it is used
+func (o *UnaccessBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UnaccessBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UnaccessBody) UnmarshalBinary(b []byte) error {
+	var res UnaccessBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

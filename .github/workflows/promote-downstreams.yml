@@ -1,0 +1,108 @@
+name: Promote Downstream Releases
+
+on: 
+  # may be triggered manually on a release tag that represents a prerelease to promote it to a release in the downstream package repositories and Docker Hub
+  workflow_dispatch:
+  # automatically trigger if an existing GitHub release is marked "latest"
+  release:
+    types: [released]  # this release event activity type excludes prereleases
+
+# cancel older, redundant runs of same workflow on same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  enforce_stable_semver:
+    name: Require Stable Release Semver
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - name: Parse Release Version
+        id: parse
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+            exit 1
+          fi
+
+  promote_docker:
+    name: Tag Container Image ${{ matrix.image.repo }}:latest
+    needs: enforce_stable_semver
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        image:
+          - repo: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'docker.io/openziti/zrok' }}
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_HUB_API_USER || secrets.DOCKER_HUB_API_USER }}
+          password: ${{ secrets.DOCKER_HUB_API_TOKEN }}
+
+      - name: Tag Latest
+        shell: bash
+        run: >
+          docker buildx imagetools create --tag
+          ${{ matrix.image.repo }}:latest
+          ${{ matrix.image.repo }}:${{ needs.enforce_stable_semver.outputs.version }}
+
+  promote_artifactory:
+    name: Promote ${{ matrix.package_name }}-${{ matrix.arch.rpm }}.${{ matrix.packager }}
+    needs: enforce_stable_semver
+    strategy:
+      fail-fast: true
+      matrix:
+        package_name:
+          - zrok
+          - zrok-share
+        arch:
+          - deb: amd64
+            rpm: x86_64
+          - deb: arm64
+            rpm: aarch64
+          - deb: armhf
+            rpm: armv7hl
+        packager:
+          - rpm
+          - deb
+    runs-on: ubuntu-24.04
+    env:
+      ZITI_DEB_TEST_REPO: ${{ vars.ZITI_DEB_TEST_REPO || 'zitipax-openziti-deb-test' }}
+      ZITI_RPM_TEST_REPO: ${{ vars.ZITI_RPM_TEST_REPO || 'zitipax-openziti-rpm-test' }}
+      ZITI_DEB_PROD_REPO: ${{ vars.ZITI_DEB_PROD_REPO || 'zitipax-openziti-deb-stable' }}
+      ZITI_RPM_PROD_REPO: ${{ vars.ZITI_RPM_PROD_REPO || 'zitipax-openziti-rpm-stable' }}
+    steps:
+      - name: Configure jFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_ENV_1: ${{ secrets.ZITI_ARTIFACTORY_CLI_CONFIG_PACKAGE_UPLOAD }}
+
+      - name: Copy RPM from test repo to stable repo with jFrog CLI
+        if: matrix.packager == 'rpm'
+        shell: bash
+        run: >
+          jf rt copy
+          --recursive=false
+          --flat=true
+          --fail-no-op=true
+          ${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${{ matrix.arch.rpm }}.rpm
+          ${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/
+
+      - name: Copy DEB from test repo to stable repo with jFrog CLI
+        if: matrix.packager == 'deb'
+        shell: bash
+        run: >
+          jf rt copy
+          --recursive=false
+          --flat=true
+          --fail-no-op=true
+          ${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${{ matrix.arch.deb }}.deb
+          ${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/

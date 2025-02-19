@@ -1,55 +1,40 @@
 name: Publish Docker Images
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       zrok-version:
-        description: zrok release tag to publish as a Docker image
+        description: Image tag to publish for zrok container images
         type: string
         required: true
-  release:
-    types:
-      - released  # excludes "prereleased" which is included in "published" to
-                  # avoid prematurely releasing semver tagged container images
 
 jobs:
   publish-docker-images:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
-      RELEASE_REF: ${{ inputs.zrok-version || github.ref }}
+      RELEASE_REF: ${{ inputs.zrok-version }}
     steps:
       # compose the semver string without leading "refs/tags" or "v" so we can predict the
       # release artifact filename
       - name: Set zrok Version Semver from Tag Ref
         id: semver
         run: |
-          zrok_semver=${RELEASE_REF#refs/tags/}
-          echo "zrok_semver=${zrok_semver#v}" | tee -a $GITHUB_OUTPUT
+          echo "zrok_semver=${RELEASE_REF#v}" | tee -a $GITHUB_OUTPUT
 
       - name: Checkout Workspace
         uses: actions/checkout@v4
 
-      - name: Create the Release Arch Dirs
-        run: |
-          for TGZ in dist/{amd,arm}64/linux/; do
-            mkdir -pv ${TGZ}
-          done
-
       - name: Download Linux AMD64 Release Artifact
-        uses: dsaltares/fetch-gh-release-asset@1.1.2
+        uses: actions/download-artifact@v4
         with:
-          version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok.*_linux_amd64.tar.gz
-          regex: true
-          target: dist/amd64/linux/zrok_linux_amd64.tar.gz
+          name: release-builds-linux-amd64
+          path: dist/amd64/linux
 
       - name: Download Linux ARM64 Release Artifact
-        uses: dsaltares/fetch-gh-release-asset@1.1.2
+        uses: actions/download-artifact@v4
         with:
-          version: tags/v${{ steps.semver.outputs.zrok_semver }}
-          file: zrok.*_linux_arm64.tar.gz
-          regex: true
-          target: dist/arm64/linux/zrok_linux_arm64.tar.gz
+          name: release-builds-linux-arm64
+          path: dist/arm64/linux
 
       - name: Unpack the Release Artifacts
         run: |
@@ -79,7 +64,6 @@ jobs:
         id: tagprep_cli
         run: |
           DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}"
-          DOCKER_TAGS+=",${ZROK_CONTAINER_IMAGE_REPO}:latest"
           echo "DOCKER_TAGS=${DOCKER_TAGS}" | tee -a $GITHUB_OUTPUT
 
       # this is the CLI image with the Linux binary for each

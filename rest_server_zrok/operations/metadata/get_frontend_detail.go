@@ -32,7 +32,7 @@ func NewGetFrontendDetail(ctx *middleware.Context, handler GetFrontendDetailHand
 }
 
 /*
-	GetFrontendDetail swagger:route GET /detail/frontend/{feId} metadata getFrontendDetail
+	GetFrontendDetail swagger:route GET /detail/frontend/{frontendId} metadata getFrontendDetail
 
 GetFrontendDetail get frontend detail API
 */

@@ -16,7 +16,7 @@ import (
 
 // GetFrontendDetailURL generates an URL for the get frontend detail operation
 type GetFrontendDetailURL struct {
-	FeID int64
+	FrontendID int64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -42,13 +42,13 @@ func (o *GetFrontendDetailURL) SetBasePath(bp string) {
 func (o *GetFrontendDetailURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/detail/frontend/{feId}"
+	var _path = "/detail/frontend/{frontendId}"
 
-	feID := swag.FormatInt64(o.FeID)
-	if feID != "" {
-		_path = strings.Replace(_path, "{feId}", feID, -1)
+	frontendID := swag.FormatInt64(o.FrontendID)
+	if frontendID != "" {
+		_path = strings.Replace(_path, "{frontendId}", frontendID, -1)
 	} else {
-		return nil, errors.New("feId is required on GetFrontendDetailURL")
+		return nil, errors.New("frontendId is required on GetFrontendDetailURL")
 	}
 
 	_basePath := o._basePath

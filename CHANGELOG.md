@@ -1,5 +1,56 @@
 # CHANGELOG
 
+## v1.0.0
+
+MAJOR RELEASE: zrok reaches version 1.0.0!
+
+FEATURE: Completely redesigned web interface ("API Console"). New implementation provides a dual-mode interface supporting an improved visual network navigator and also a "tabular" view, which provides a more traditional "data" view. New stack built using vite, React, and TypeScript (https://github.com/openziti/zrok/issues/724)
+
+FEATURE: New "zrok Agent", a background manager process for your zrok environments, which allows you to easily manage and work with multiple `zrok share` and `zrok access` processes. New `--subordinate` flag added to `zrok share [public|private|reserved]` and `zrok access private` to operate in a mode that allows an Agent to manage shares and accesses (https://github.com/openziti/zrok/issues/463)
+
+FEATURE: New "zrok Agent UI" a web-based user interface for the zrok Agent, which allows creating and releasing shares and accesses through a web browser. This is just an initial chunk of the new Agent UI, and is considered a "minimum viable" version of this interface (https://github.com/openziti/zrok/issues/221)
+
+FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now auto-detect if the zrok Agent is running in an environment and will automatically service share and access requests through the Agent, rather than in-process if the Agent is running. If the Agent is not running, operation remains as it was in `v0.4.x` and the share or access is handled in-process. New `--force-agent` and `--force-local` flags exist to skip Agent detection and manually select an operating mode (https://github.com/openziti/zrok/issues/751)
+
+FEATURE `zrok access private` supports a new `--auto` mode, which can automatically find an available open address/port to bind the frontend listener on. Also includes `--auto-address`, `--auto-start-port`, and `--auto-end-port` features with sensible defaults. Supported by both the agent and local operating modes (https://github.com/openziti/zrok/issues/780)
+
+FEATURE `zrok rebase` command allows "rebasing" an enabled environment onto a different API endpoint. This is useful for migrating already-enabled environments between endpoints supporting different zrok versions (https://github.com/openziti/zrok/issues/869)
+
+CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
+
+CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
+
+CHANGE: The protocol for determining valid client versions has been changed. Previously a zrok client would do a `GET` against the `/api/v1/version` endpoint and do a local version string comparison (as a normal precondition to any API call) to see if the controller version matched. The protocol has been amended so that any out-of-date client using the old protocol will receive a version string indicating that they need to uprade their client. New clients will do a `POST` against the `/api/v1/version` endpoint, posting their client version, and the server will check for compatibility. Does not change the security posture in any significant way, but gives more flexibility on the server side for managing client compatibility. Provides a better, cleared out-of-date error message for old clients when accessing `v1.0.0`+ (https://github.com/openziti/zrok/issues/859)
+
+## v0.4.49
+
+FIX: Pre-releases are no longer uploaded to the stable Linux package repo.
+
+CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Docker Hub for testing. [RELEASING.md](./RELEASING.md) describes releaser steps and the events they trigger.
+
+CHANGE: Linux release binaries are now built on the ziti-builder container image based on Ubuntu Focal 20.04 to preserve backward compatibility as the ubuntu-20.04 GitHub runner is end of life.
+
+## v0.4.48
+
+FEATURE: The controller configuration now supports a `disable_auto_migration` boolean in the `store` stanza. When set to `true`, the controller will not attempt to auto-migrate (or otherwise validate the migration state) of the underlying database. Leaving `disable_auto_migration` out, or setting it to false will retain the default behavior of auto-migrating when starting the zrok controller. The `zrok admin migrate` command will still perform a migration regardless of how this setting is configured in the controller configuration (https://github.com/openziti/zrok/issues/866)
+
+FIX: the Python SDK erroneously assumed the enabled zrok environment contained a config.json file, and was changed to only load it if the file was present (https://github.com/openziti/zrok/pull/853/).
+
+## v0.4.47
+
+CHANGE: the Docker instance will wait for the ziti container healthy status (contribution from Ben Wong @bwong365 - https://github.com/openziti/zrok/pull/790)
+
+CHANGE: Document solving the DNS propagation timeout for Docker instances that are using Caddy to manage the wildcard certificate.
+
+CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all valid `configName` and their current values by running `zrok status`.
+
+CHANGE: The Python SDK's `Overview()` function was refactored as a class method (https://github.com/openziti/zrok/pull/846).
+
+FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
+Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
+
+FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
+
 ## v0.4.46
 
 FEATURE: Linux service template for systemd user units (https://github.com/openziti/zrok/pull/818)

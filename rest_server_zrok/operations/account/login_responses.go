@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // LoginOKCode is the HTTP code returned for type LoginOK
@@ -26,7 +24,7 @@ type LoginOK struct {
 	/*
 	  In: Body
 	*/
-	Payload rest_model_zrok.LoginResponse `json:"body,omitempty"`
+	Payload string `json:"body,omitempty"`
 }
 
 // NewLoginOK creates LoginOK with default headers values
@@ -36,13 +34,13 @@ func NewLoginOK() *LoginOK {
 }
 
 // WithPayload adds the payload to the login o k response
-func (o *LoginOK) WithPayload(payload rest_model_zrok.LoginResponse) *LoginOK {
+func (o *LoginOK) WithPayload(payload string) *LoginOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the login o k response
-func (o *LoginOK) SetPayload(payload rest_model_zrok.LoginResponse) {
+func (o *LoginOK) SetPayload(payload string) {
 	o.Payload = payload
 }
 

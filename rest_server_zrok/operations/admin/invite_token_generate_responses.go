@@ -15,7 +15,7 @@ import (
 const InviteTokenGenerateCreatedCode int = 201
 
 /*
-InviteTokenGenerateCreated invitation tokens created
+InviteTokenGenerateCreated invite tokens created
 
 swagger:response inviteTokenGenerateCreated
 */
@@ -40,7 +40,7 @@ func (o *InviteTokenGenerateCreated) WriteResponse(rw http.ResponseWriter, produ
 const InviteTokenGenerateBadRequestCode int = 400
 
 /*
-InviteTokenGenerateBadRequest invitation tokens not created
+InviteTokenGenerateBadRequest invite tokens not created
 
 swagger:response inviteTokenGenerateBadRequest
 */

@@ -1,0 +1,44 @@
+---
+title: Linux User Share
+---
+
+import LinuxShareInstall from '/../docs/guides/_linux-share-install.mdx'
+
+## Overview
+
+You can run any number of zrok share services as `systemd --user` units with your Linux user's zrok environment in `~/.zrok`. This is like [zrok frontdoor](/guides/frontdoor.mdx) except that frontdoor is a system service managed by root separately from your user's login. Linux user shares, Linux system services, and Docker shares all use the same configuration environment variables.
+
+## Install the Linux Package
+
+The package provides the `zrok` executable and service unit template.
+
+<LinuxShareInstall />
+
+## Create a User Share Configuration File
+
+Substitute a name for your instance in place of `my-instance` in the following example. To avoid character escaping problems, use only letters, numbers, hyphens, and underscores in the instance name, not spaces or other special characters.
+
+```bash
+ZROK_INSTANCE="my-instance"
+cp /opt/openziti/etc/zrok/zrok-share.env ~/.zrok/zrok-share@${ZROK_INSTANCE}.env
+```
+
+## Edit the User Share Configuration File
+
+Edit the configuration file in `~/.zrok/zrok-share@${ZROK_INSTANCE}.env` as you would for [zrok frontdoor](/guides/frontdoor.mdx), except ignore the first section "ZROK ENVIRONMENT" because user shares re-use `~/.zrok` and do not need a separate zrok environment.
+
+## Start the User Share Service
+
+```bash
+systemctl --user enable --now zrok-share@${ZROK_INSTANCE}.service
+```
+
+## Check the User Share Journal
+
+```bash
+journalctl --user -lfu zrok-share@${ZROK_INSTANCE}.service
+```
+
+## Add Another User Share
+
+To create another user share, choose another instance name, copy the `zrok-share.env` file, edit the configuration file, and start the service.

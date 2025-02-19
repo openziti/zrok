@@ -46,5 +46,5 @@ func (cmd *adminCreateAccount) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	fmt.Println(resp.GetPayload().Token)
+	fmt.Println(resp.GetPayload().AccountToken)
 }

@@ -32,7 +32,7 @@ func NewGetShareDetail(ctx *middleware.Context, handler GetShareDetailHandler) *
 }
 
 /*
-	GetShareDetail swagger:route GET /detail/share/{shrToken} metadata getShareDetail
+	GetShareDetail swagger:route GET /detail/share/{shareToken} metadata getShareDetail
 
 GetShareDetail get share detail API
 */

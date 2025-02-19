@@ -2,13 +2,34 @@ name: Build/Release Node SDK
 
 on:
   release:
-    types: [ published ]
+    types: [ released ]
   pull_request:
     branches: [ main ]
 
 jobs:
 
+  enforce_stable_semver:
+    name: Require Stable Release Semver
+    if: github.event.action == 'released'
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - name: Parse Release Version
+        id: parse
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+            exit 1
+          fi
+
   build:
+    needs: enforce_stable_semver
+    if: always()
     name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.os }}
 
@@ -69,4 +90,3 @@ jobs:
         npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-

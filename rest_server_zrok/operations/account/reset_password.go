@@ -6,9 +6,12 @@ package account
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // ResetPasswordHandlerFunc turns a function with the right signature into a reset password handler
@@ -53,4 +56,44 @@ func (o *ResetPassword) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ResetPasswordBody reset password body
+//
+// swagger:model ResetPasswordBody
+type ResetPasswordBody struct {
+
+	// password
+	Password string `json:"password,omitempty"`
+
+	// reset token
+	ResetToken string `json:"resetToken,omitempty"`
+}
+
+// Validate validates this reset password body
+func (o *ResetPasswordBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this reset password body based on context it is used
+func (o *ResetPasswordBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ResetPasswordBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ResetPasswordBody) UnmarshalBinary(b []byte) error {
+	var res ResetPasswordBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

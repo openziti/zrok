@@ -88,5 +88,5 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 
 	logrus.Infof("created global frontend '%v' with public name '%v'", fe.Token, *fe.PublicName)
 
-	return admin.NewCreateFrontendCreated().WithPayload(&rest_model_zrok.CreateFrontendResponse{Token: feToken})
+	return admin.NewCreateFrontendCreated().WithPayload(&admin.CreateFrontendCreatedBody{FrontendToken: feToken})
 }

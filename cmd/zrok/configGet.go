@@ -18,6 +18,7 @@ func newConfigGetCommand() *configGetCommand {
 	cmd := &cobra.Command{
 		Use:   "get <configName>",
 		Short: "Get a value from the environment config",
+		Long:  "Get a value from the environment config. Use 'zrok status' to list available configuration names and current values.",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &configGetCommand{cmd: cmd}
@@ -45,6 +46,12 @@ func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 			fmt.Printf("defaultFrontend = %v\n", env.Config().DefaultFrontend)
 		} else {
 			fmt.Println("defaultFrontend = <unset>")
+		}
+	case "headless":
+		if env.Config() != nil {
+			fmt.Printf("headless = %v\n", env.Config().Headless)
+		} else {
+			fmt.Println("headless = <unset>")
 		}
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)

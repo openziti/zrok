@@ -6,9 +6,12 @@ package environment
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,84 @@ func (o *Enable) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// EnableBody enable body
+//
+// swagger:model EnableBody
+type EnableBody struct {
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// host
+	Host string `json:"host,omitempty"`
+}
+
+// Validate validates this enable body
+func (o *EnableBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this enable body based on context it is used
+func (o *EnableBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *EnableBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *EnableBody) UnmarshalBinary(b []byte) error {
+	var res EnableBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// EnableCreatedBody enable created body
+//
+// swagger:model EnableCreatedBody
+type EnableCreatedBody struct {
+
+	// cfg
+	Cfg string `json:"cfg,omitempty"`
+
+	// identity
+	Identity string `json:"identity,omitempty"`
+}
+
+// Validate validates this enable created body
+func (o *EnableCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this enable created body based on context it is used
+func (o *EnableCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *EnableCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *EnableCreatedBody) UnmarshalBinary(b []byte) error {
+	var res EnableCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

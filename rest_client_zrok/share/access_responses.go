@@ -6,13 +6,13 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/go-openapi/swag"
 )
 
 // AccessReader is a Reader for the Access structure.
@@ -63,7 +63,7 @@ AccessCreated describes a response with status code 201, with default header val
 access created
 */
 type AccessCreated struct {
-	Payload *rest_model_zrok.AccessResponse
+	Payload *AccessCreatedBody
 }
 
 // IsSuccess returns true when this access created response has a 2xx status code
@@ -104,13 +104,13 @@ func (o *AccessCreated) String() string {
 	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
 }
 
-func (o *AccessCreated) GetPayload() *rest_model_zrok.AccessResponse {
+func (o *AccessCreated) GetPayload() *AccessCreatedBody {
 	return o.Payload
 }
 
 func (o *AccessCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.AccessResponse)
+	o.Payload = new(AccessCreatedBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -285,5 +285,93 @@ func (o *AccessInternalServerError) String() string {
 
 func (o *AccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+AccessBody access body
+swagger:model AccessBody
+*/
+type AccessBody struct {
+
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this access body
+func (o *AccessBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this access body based on context it is used
+func (o *AccessBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AccessBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AccessBody) UnmarshalBinary(b []byte) error {
+	var res AccessBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AccessCreatedBody access created body
+swagger:model AccessCreatedBody
+*/
+type AccessCreatedBody struct {
+
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+}
+
+// Validate validates this access created body
+func (o *AccessCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this access created body based on context it is used
+func (o *AccessCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AccessCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AccessCreatedBody) UnmarshalBinary(b []byte) error {
+	var res AccessCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

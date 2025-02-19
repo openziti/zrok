@@ -78,8 +78,8 @@ func (o *DeleteOrganization) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 // swagger:model DeleteOrganizationBody
 type DeleteOrganizationBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this delete organization body

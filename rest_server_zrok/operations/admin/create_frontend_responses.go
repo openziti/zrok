@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // CreateFrontendCreatedCode is the HTTP code returned for type CreateFrontendCreated
@@ -26,7 +24,7 @@ type CreateFrontendCreated struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.CreateFrontendResponse `json:"body,omitempty"`
+	Payload *CreateFrontendCreatedBody `json:"body,omitempty"`
 }
 
 // NewCreateFrontendCreated creates CreateFrontendCreated with default headers values
@@ -36,13 +34,13 @@ func NewCreateFrontendCreated() *CreateFrontendCreated {
 }
 
 // WithPayload adds the payload to the create frontend created response
-func (o *CreateFrontendCreated) WithPayload(payload *rest_model_zrok.CreateFrontendResponse) *CreateFrontendCreated {
+func (o *CreateFrontendCreated) WithPayload(payload *CreateFrontendCreatedBody) *CreateFrontendCreated {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the create frontend created response
-func (o *CreateFrontendCreated) SetPayload(payload *rest_model_zrok.CreateFrontendResponse) {
+func (o *CreateFrontendCreated) SetPayload(payload *CreateFrontendCreatedBody) {
 	o.Payload = payload
 }
 

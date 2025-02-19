@@ -5,7 +5,26 @@ on:
     types: [released]
 
 jobs:
+  enforce_stable_semver:
+    name: Require Stable Release Semver
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - name: Parse Release Version
+        id: parse
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+            exit 1
+          fi
+
   build_wheels:
+    needs: enforce_stable_semver
     defaults:
       run:
         working-directory: sdk/python/sdk/zrok
@@ -45,7 +64,7 @@ jobs:
           name: zrok_sdk_${{ matrix.spec.target }}
           path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
 
-  publish:
+  publish-testpypi:
     runs-on: ubuntu-20.04
     needs: [ build_wheels ]
     permissions:
@@ -54,15 +73,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./download
+          path: ./dist
           merge-multiple: true
           pattern: zrok_sdk_*
-
-      - name: check
-        run: |
-          ls -lR ./download/
-          mkdir dist
-          cp ./download/* ./dist/
 
       - name: Publish wheels (TestPYPI)
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -71,6 +84,19 @@ jobs:
           packages-dir: dist
           skip-existing: true
           verbose: true
+
+  publish-pypi:
+    runs-on: ubuntu-20.04
+    needs: [ publish-testpypi ]
+    permissions:
+          id-token: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./dist
+          merge-multiple: true
+          pattern: zrok_sdk_*
 
       - name: Publish wheels (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1

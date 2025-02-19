@@ -270,8 +270,8 @@ swagger:model CreateOrganizationCreatedBody
 */
 type CreateOrganizationCreatedBody struct {
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this create organization created body
