@@ -28,7 +28,6 @@ func init() {
 	agentCmd.AddCommand(agentAccessCmd)
 	agentCmd.AddCommand(agentShareCmd)
 	agentCmd.AddCommand(agentReleaseCmd)
-	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
@@ -36,6 +35,7 @@ func init() {
 	rootCmd.AddCommand(organizationCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
+	testCmd.AddCommand(testCanaryCmd)
 	rootCmd.AddCommand(gendoc.NewGendocCmd(rootCmd))
 	transport.AddAddressParser(tcp.AddressParser{})
 	transport.AddAddressParser(udp.AddressParser{})
@@ -109,12 +109,6 @@ var configCmd = &cobra.Command{
 	Short: "Configure your zrok environment",
 }
 
-var loopCmd = &cobra.Command{
-	Use:     "loopback",
-	Aliases: []string{"loop"},
-	Short:   "Loopback testing utilities",
-}
-
 var modifyCmd = &cobra.Command{
 	Use:     "modify",
 	Aliases: []string{"mod"},
@@ -139,7 +133,12 @@ var shareCmd = &cobra.Command{
 
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Utilities for testing zrok deployments",
+	Short: "Utilities for testing deployments",
+}
+
+var testCanaryCmd = &cobra.Command{
+	Use:   "canary",
+	Short: "Utilities for performance management",
 }
 
 func main() {

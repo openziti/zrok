@@ -16,6 +16,8 @@ FEATURE `zrok access private` supports a new `--auto` mode, which can automatica
 
 FEATURE `zrok rebase` command allows "rebasing" an enabled environment onto a different API endpoint. This is useful for migrating already-enabled environments between endpoints supporting different zrok versions (https://github.com/openziti/zrok/issues/869)
 
+FEATURE `zrok test canary` CLI tree replaces the old `zrok test loop` tree; new `zrok test canary public-proxy` and `zrok test canary private-proxy` provide modernized, updated versions of what the `zrok test loop` commands used to do. This new approach will serve as the foundation for all future zrok testing infrastructure (https://github.com/openziti/zrok/issues/771)
+
 CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
 
 CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
