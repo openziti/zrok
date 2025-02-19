@@ -28,7 +28,6 @@ func init() {
 	agentCmd.AddCommand(agentAccessCmd)
 	agentCmd.AddCommand(agentShareCmd)
 	agentCmd.AddCommand(agentReleaseCmd)
-	testCmd.AddCommand(loopCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
