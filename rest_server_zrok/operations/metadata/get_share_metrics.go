@@ -32,7 +32,7 @@ func NewGetShareMetrics(ctx *middleware.Context, handler GetShareMetricsHandler)
 }
 
 /*
-	GetShareMetrics swagger:route GET /metrics/share/{shrToken} metadata getShareMetrics
+	GetShareMetrics swagger:route GET /metrics/share/{shareToken} metadata getShareMetrics
 
 GetShareMetrics get share metrics API
 */

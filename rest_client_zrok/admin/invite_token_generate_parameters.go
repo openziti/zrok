@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewInviteTokenGenerateParams creates a new InviteTokenGenerateParams object,
@@ -64,7 +62,7 @@ InviteTokenGenerateParams contains all the parameters to send to the API endpoin
 type InviteTokenGenerateParams struct {
 
 	// Body.
-	Body *rest_model_zrok.InviteTokenGenerateRequest
+	Body InviteTokenGenerateBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *InviteTokenGenerateParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the invite token generate params
-func (o *InviteTokenGenerateParams) WithBody(body *rest_model_zrok.InviteTokenGenerateRequest) *InviteTokenGenerateParams {
+func (o *InviteTokenGenerateParams) WithBody(body InviteTokenGenerateBody) *InviteTokenGenerateParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the invite token generate params
-func (o *InviteTokenGenerateParams) SetBody(body *rest_model_zrok.InviteTokenGenerateRequest) {
+func (o *InviteTokenGenerateParams) SetBody(body InviteTokenGenerateBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *InviteTokenGenerateParams) WriteToRequest(r runtime.ClientRequest, reg 
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

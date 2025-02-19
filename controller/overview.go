@@ -42,6 +42,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				Description: env.Description,
 				Host:        env.Host,
 				ZID:         env.ZId,
+				Limited:     accountLimited,
 				CreatedAt:   env.CreatedAt.UnixMilli(),
 				UpdatedAt:   env.UpdatedAt.UnixMilli(),
 			},
@@ -66,7 +67,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
 			envShr := &rest_model_zrok.Share{
-				Token:                shr.Token,
+				ShareToken:           shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,
 				BackendMode:          shr.BackendMode,
@@ -74,6 +75,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 				FrontendEndpoint:     feEndpoint,
 				BackendProxyEndpoint: beProxyEndpoint,
 				Reserved:             shr.Reserved,
+				Limited:              accountLimited,
 				CreatedAt:            shr.CreatedAt.UnixMilli(),
 				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
 			}
@@ -86,11 +88,17 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		}
 		for _, fe := range fes {
 			envFe := &rest_model_zrok.Frontend{
-				ID:        int64(fe.Id),
-				Token:     fe.Token,
-				ZID:       fe.ZId,
-				CreatedAt: fe.CreatedAt.UnixMilli(),
-				UpdatedAt: fe.UpdatedAt.UnixMilli(),
+				ID:            int64(fe.Id),
+				FrontendToken: fe.Token,
+				ZID:           fe.ZId,
+				CreatedAt:     fe.CreatedAt.UnixMilli(),
+				UpdatedAt:     fe.UpdatedAt.UnixMilli(),
+			}
+			if fe.BindAddress != nil {
+				envFe.BindAddress = *fe.BindAddress
+			}
+			if fe.Description != nil {
+				envFe.Description = *fe.Description
 			}
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
@@ -98,7 +106,8 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
 					return metadata.NewOverviewInternalServerError()
 				}
-				envFe.ShrToken = feShr.Token
+				envFe.ShareToken = feShr.Token
+				envFe.BackendMode = feShr.BackendMode
 			}
 			ear.Frontends = append(ear.Frontends, envFe)
 		}

@@ -14,7 +14,7 @@ import (
 
 // GetShareDetailURL generates an URL for the get share detail operation
 type GetShareDetailURL struct {
-	ShrToken string
+	ShareToken string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -40,13 +40,13 @@ func (o *GetShareDetailURL) SetBasePath(bp string) {
 func (o *GetShareDetailURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/detail/share/{shrToken}"
+	var _path = "/detail/share/{shareToken}"
 
-	shrToken := o.ShrToken
-	if shrToken != "" {
-		_path = strings.Replace(_path, "{shrToken}", shrToken, -1)
+	shareToken := o.ShareToken
+	if shareToken != "" {
+		_path = strings.Replace(_path, "{shareToken}", shareToken, -1)
 	} else {
-		return nil, errors.New("shrToken is required on GetShareDetailURL")
+		return nil, errors.New("shareToken is required on GetShareDetailURL")
 	}
 
 	_basePath := o._basePath

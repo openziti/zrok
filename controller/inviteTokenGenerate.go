@@ -22,14 +22,14 @@ func (handler *inviteTokenGenerateHandler) Handle(params admin.InviteTokenGenera
 		return admin.NewInviteTokenGenerateUnauthorized()
 	}
 
-	if params.Body == nil || len(params.Body.Tokens) == 0 {
+	if len(params.Body.InviteTokens) == 0 {
 		logrus.Error("missing tokens")
 		return admin.NewInviteTokenGenerateBadRequest()
 	}
-	logrus.Infof("received invite generate request with %d tokens", len(params.Body.Tokens))
+	logrus.Infof("received invite generate request with %d tokens", len(params.Body.InviteTokens))
 
-	invites := make([]*store.InviteToken, len(params.Body.Tokens))
-	for i, token := range params.Body.Tokens {
+	invites := make([]*store.InviteToken, len(params.Body.InviteTokens))
+	for i, token := range params.Body.InviteTokens {
 		invites[i] = &store.InviteToken{
 			Token: token,
 		}

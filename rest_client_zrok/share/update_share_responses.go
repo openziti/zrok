@@ -6,10 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // UpdateShareReader is a Reader for the UpdateShare structure.
@@ -332,5 +334,52 @@ func (o *UpdateShareInternalServerError) String() string {
 
 func (o *UpdateShareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+UpdateShareBody update share body
+swagger:model UpdateShareBody
+*/
+type UpdateShareBody struct {
+
+	// add access grants
+	AddAccessGrants []string `json:"addAccessGrants"`
+
+	// backend proxy endpoint
+	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
+
+	// remove access grants
+	RemoveAccessGrants []string `json:"removeAccessGrants"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this update share body
+func (o *UpdateShareBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this update share body based on context it is used
+func (o *UpdateShareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UpdateShareBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UpdateShareBody) UnmarshalBinary(b []byte) error {
+	var res UpdateShareBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

@@ -6,11 +6,13 @@ package account
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -283,5 +285,46 @@ func (o *InviteInternalServerError) String() string {
 
 func (o *InviteInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+InviteBody invite body
+swagger:model InviteBody
+*/
+type InviteBody struct {
+
+	// email
+	Email string `json:"email,omitempty"`
+
+	// invite token
+	InviteToken string `json:"inviteToken,omitempty"`
+}
+
+// Validate validates this invite body
+func (o *InviteBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this invite body based on context it is used
+func (o *InviteBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *InviteBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *InviteBody) UnmarshalBinary(b []byte) error {
+	var res InviteBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

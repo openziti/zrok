@@ -19,7 +19,7 @@ func newConsoleCommand() *consoleCommand {
 	cmd := &cobra.Command{
 		Use:   "console",
 		Short: "Open the web console",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.NoArgs,
 	}
 	command := &consoleCommand{cmd}
 	cmd.Run = command.run

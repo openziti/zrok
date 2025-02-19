@@ -6,13 +6,16 @@ package admin
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CreateFrontendReader is a Reader for the CreateFrontend structure.
@@ -69,7 +72,7 @@ CreateFrontendCreated describes a response with status code 201, with default he
 frontend created
 */
 type CreateFrontendCreated struct {
-	Payload *rest_model_zrok.CreateFrontendResponse
+	Payload *CreateFrontendCreatedBody
 }
 
 // IsSuccess returns true when this create frontend created response has a 2xx status code
@@ -110,13 +113,13 @@ func (o *CreateFrontendCreated) String() string {
 	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated  %+v", 201, o.Payload)
 }
 
-func (o *CreateFrontendCreated) GetPayload() *rest_model_zrok.CreateFrontendResponse {
+func (o *CreateFrontendCreated) GetPayload() *CreateFrontendCreatedBody {
 	return o.Payload
 }
 
 func (o *CreateFrontendCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(rest_model_zrok.CreateFrontendResponse)
+	o.Payload = new(CreateFrontendCreatedBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -347,5 +350,142 @@ func (o *CreateFrontendInternalServerError) String() string {
 
 func (o *CreateFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+CreateFrontendBody create frontend body
+swagger:model CreateFrontendBody
+*/
+type CreateFrontendBody struct {
+
+	// permission mode
+	// Enum: [open closed]
+	PermissionMode string `json:"permissionMode,omitempty"`
+
+	// public name
+	PublicName string `json:"public_name,omitempty"`
+
+	// url template
+	URLTemplate string `json:"url_template,omitempty"`
+
+	// z Id
+	ZID string `json:"zId,omitempty"`
+}
+
+// Validate validates this create frontend body
+func (o *CreateFrontendBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validatePermissionMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var createFrontendBodyTypePermissionModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["open","closed"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createFrontendBodyTypePermissionModePropEnum = append(createFrontendBodyTypePermissionModePropEnum, v)
+	}
+}
+
+const (
+
+	// CreateFrontendBodyPermissionModeOpen captures enum value "open"
+	CreateFrontendBodyPermissionModeOpen string = "open"
+
+	// CreateFrontendBodyPermissionModeClosed captures enum value "closed"
+	CreateFrontendBodyPermissionModeClosed string = "closed"
+)
+
+// prop value enum
+func (o *CreateFrontendBody) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createFrontendBodyTypePermissionModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *CreateFrontendBody) validatePermissionMode(formats strfmt.Registry) error {
+	if swag.IsZero(o.PermissionMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validatePermissionModeEnum("body"+"."+"permissionMode", "body", o.PermissionMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this create frontend body based on context it is used
+func (o *CreateFrontendBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateFrontendBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateFrontendBody) UnmarshalBinary(b []byte) error {
+	var res CreateFrontendBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+CreateFrontendCreatedBody create frontend created body
+swagger:model CreateFrontendCreatedBody
+*/
+type CreateFrontendCreatedBody struct {
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+}
+
+// Validate validates this create frontend created body
+func (o *CreateFrontendCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this create frontend created body based on context it is used
+func (o *CreateFrontendCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateFrontendCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateFrontendCreatedBody) UnmarshalBinary(b []byte) error {
+	var res CreateFrontendCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/account"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/spf13/cobra"
@@ -76,13 +75,11 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 	}
 	if cmd.tui.done {
 		email := cmd.tui.emailInputs[0].Value()
-		token := cmd.tui.tokenInput.Value()
+		invToken := cmd.tui.tokenInput.Value()
 
 		req := account.NewInviteParams()
-		req.Body = &rest_model_zrok.InviteRequest{
-			Email: email,
-			Token: token,
-		}
+		req.Body.Email = email
+		req.Body.InviteToken = invToken
 		_, err = zrok.Account.Invite(req)
 		if err != nil {
 			cmd.endpointError(env.ApiEndpoint())

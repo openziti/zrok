@@ -5,7 +5,6 @@ import (
 	"github.com/jaevor/go-nanoid"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -54,9 +53,8 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	req := admin.NewInviteTokenGenerateParams()
-	req.Body = &rest_model_zrok.InviteTokenGenerateRequest{
-		Tokens: tokens,
-	}
+	req.Body.InviteTokens = tokens
+
 	_, err = zrok.Admin.InviteTokenGenerate(req, mustGetAdminAuth())
 	if err != nil {
 		if !panicInstead {

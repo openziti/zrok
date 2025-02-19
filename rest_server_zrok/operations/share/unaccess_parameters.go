@@ -12,8 +12,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewUnaccessParams creates a new UnaccessParams object
@@ -36,7 +34,7 @@ type UnaccessParams struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.UnaccessRequest
+	Body UnaccessBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +48,7 @@ func (o *UnaccessParams) BindRequest(r *http.Request, route *middleware.MatchedR
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.UnaccessRequest
+		var body UnaccessBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -65,7 +63,7 @@ func (o *UnaccessParams) BindRequest(r *http.Request, route *middleware.MatchedR
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}

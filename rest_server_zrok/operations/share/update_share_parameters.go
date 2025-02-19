@@ -12,8 +12,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewUpdateShareParams creates a new UpdateShareParams object
@@ -36,7 +34,7 @@ type UpdateShareParams struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.UpdateShareRequest
+	Body UpdateShareBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +48,7 @@ func (o *UpdateShareParams) BindRequest(r *http.Request, route *middleware.Match
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.UpdateShareRequest
+		var body UpdateShareBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -65,7 +63,7 @@ func (o *UpdateShareParams) BindRequest(r *http.Request, route *middleware.Match
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}

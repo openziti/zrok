@@ -35,7 +35,7 @@ type GetFrontendDetailParams struct {
 	  Required: true
 	  In: path
 	*/
-	FeID int64
+	FrontendID int64
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -47,8 +47,8 @@ func (o *GetFrontendDetailParams) BindRequest(r *http.Request, route *middleware
 
 	o.HTTPRequest = r
 
-	rFeID, rhkFeID, _ := route.Params.GetOK("feId")
-	if err := o.bindFeID(rFeID, rhkFeID, route.Formats); err != nil {
+	rFrontendID, rhkFrontendID, _ := route.Params.GetOK("frontendId")
+	if err := o.bindFrontendID(rFrontendID, rhkFrontendID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 	if len(res) > 0 {
@@ -57,8 +57,8 @@ func (o *GetFrontendDetailParams) BindRequest(r *http.Request, route *middleware
 	return nil
 }
 
-// bindFeID binds and validates parameter FeID from path.
-func (o *GetFrontendDetailParams) bindFeID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+// bindFrontendID binds and validates parameter FrontendID from path.
+func (o *GetFrontendDetailParams) bindFrontendID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -69,9 +69,9 @@ func (o *GetFrontendDetailParams) bindFeID(rawData []string, hasKey bool, format
 
 	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("feId", "path", "int64", raw)
+		return errors.InvalidType("frontendId", "path", "int64", raw)
 	}
-	o.FeID = value
+	o.FrontendID = value
 
 	return nil
 }

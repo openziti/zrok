@@ -6,9 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,90 @@ func (o *Access) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// AccessBody access body
+//
+// swagger:model AccessBody
+type AccessBody struct {
+
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this access body
+func (o *AccessBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this access body based on context it is used
+func (o *AccessBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AccessBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AccessBody) UnmarshalBinary(b []byte) error {
+	var res AccessBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// AccessCreatedBody access created body
+//
+// swagger:model AccessCreatedBody
+type AccessCreatedBody struct {
+
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+}
+
+// Validate validates this access created body
+func (o *AccessCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this access created body based on context it is used
+func (o *AccessCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AccessCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AccessCreatedBody) UnmarshalBinary(b []byte) error {
+	var res AccessCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }
