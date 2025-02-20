@@ -2,30 +2,6 @@
 title: Install
 ---
 
-import { AssetsProvider } from '@site/src/components/assets-context';
-import DownloadCard from '@site/src/components/download-card';
-import styles from '@site/src/css/download-card.module.css';
+import InstallCards from './_install_cards.mdx';
 
-<AssetsProvider>
-  <div className={styles.downloadContainer}>
-    <DownloadCard
-      osName="Windows"
-      osLogo="/img/logo-windows.svg"
-      infoText="Binary executable"
-      guideLink="/docs/guides/install/windows"
-    />
-    <DownloadCard
-      osName="macOS"
-      osLogo="/img/logo-apple.svg"
-      infoText="Binary executable"
-      guideLink="/docs/guides/install/macos"
-    />
-    <DownloadCard
-      osName="Linux"
-      osLogo="/img/logo-linux.svg"
-      infoText="DEB, RPM packages"
-      guideLink="/docs/guides/install/linux"
-    />
-  </div>
-</AssetsProvider>
-
+<InstallCards />
