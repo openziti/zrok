@@ -8,6 +8,44 @@ import DownloadCard from '@site/src/components/download-card';
 import styles from '@site/src/css/download-card.module.css';
 import AnsibleRepoSetup from './_ansible_repo_setup.yaml'
 import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
+import Homebrew from './_homebrew.mdx';
+
+## Install `zrok` from the Repository
+
+This will configure the system to receive DEB or RPM package updates.
+
+```text
+curl -sSf https://get.openziti.io/install.bash | sudo bash -s zrok
+```
+
+:::info
+Check out [zrok frontdoor](/guides/frontdoor.mdx?os=Linux) for running `zrok` as an always-on service.
+:::
+
+<Details>
+<summary>Ansible Playbook</summary>
+
+<ConcatenateYamlSnippets
+  title="Set up package repository and install zrok">
+{AnsibleRepoSetup}
+{`
+- name: Install zrok package
+  gather_facts: false
+  hosts: all 
+  become: true
+  tasks:
+  - name: Install zrok
+    ansible.builtin.package:
+      name: zrok
+      state: present
+`}
+</ConcatenateYamlSnippets>
+
+</Details>
+
+## Homebrew
+
+<Homebrew />
 
 ## Linux Binary
 
@@ -94,104 +132,5 @@ sudo install -o root -g root ./zrok /usr/local/bin/;
 
 zrok version;
 ```
-
-</Details>
-## Install `zrok` from the Repository
-
-We recommend that you install `zrok` from the Linux package repository with the manual steps or the setup script. DEB and RPM packages are available for amd64, arm64, and armv7 architectures.
-
-:::info
-
-Check out [zrok frontdoor](/guides/frontdoor.mdx?os=Linux) for running `zrok` as an always-on service.
-
-:::
-
-<Details>
-<summary>Manually set up DEB repository</summary>
-
-```text
-(set -euo pipefail;
-
-curl -sSLf https://get.openziti.io/tun/package-repos.gpg \
-| sudo gpg --dearmor --output /usr/share/keyrings/openziti.gpg;
-sudo chmod a+r /usr/share/keyrings/openziti.gpg;
-
-sudo tee /etc/apt/sources.list.d/openziti-release.list >/dev/null <<EOF;
-deb [signed-by=/usr/share/keyrings/openziti.gpg] https://packages.openziti.org/zitipax-openziti-deb-stable debian main
-EOF
-
-sudo apt update;
-sudo apt install zrok;
-zrok version;
-)
-```
-
-</Details>
-
-<Details>
-<summary>Manually set up RPM repository</summary>
-
-```text
-(set -euo pipefail;
-
-sudo tee /etc/yum.repos.d/openziti-release.repo >/dev/null <<\EOF;
-[OpenZitiRelease]
-name=OpenZiti Release
-baseurl=https://packages.openziti.org/zitipax-openziti-rpm-stable/redhat/$basearch
-enabled=1
-gpgcheck=0
-gpgkey=https://packages.openziti.org/zitipax-openziti-rpm-stable/redhat/$basearch/repodata/repomd.xml.key
-repo_gpgcheck=1
-EOF
-
-sudo dnf update;
-sudo dnf install zrok;
-zrok version;
-)
-```
-
-</Details>
-
-<Details>
-<summary>Script to set up DEB or RPM repository</summary>
-
-1. Download the zrok install script.
-
-    ```text
-    curl -sSLfo ./zrok-install.bash https://get.openziti.io/install.bash
-    ```
-
-1. Inspect the script to ensure it is suitable to run as root on your system.
-
-    ```text
-    less ./zrok-install.bash
-    ```
-
-1. Run the script as root to add the package repo and install the `zrok` package.
-
-    ```text
-    sudo bash ./zrok-install.bash zrok
-    ```
-
-</Details>
-
-<Details>
-<summary>Ansible Playbook</summary>
-
-<ConcatenateYamlSnippets
-  title="Set up package repository and install zrok">
-{AnsibleRepoSetup}
-{`
-- name: Install zrok package
-  gather_facts: false
-  hosts: all 
-  become: true
-  tasks:
-  - name: Install zrok
-    ansible.builtin.package:
-      name: zrok
-      state: present
-`}
-</ConcatenateYamlSnippets>
 
 </Details>
