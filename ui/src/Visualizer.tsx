@@ -77,6 +77,7 @@ const Visualizer = () => {
             edges={edges}
             onSelectionChange={onSelectionChange}
             nodesDraggable={false}
+            nodesConnectable={false}
             defaultViewport={viewport}
             fitView={fitView}
         >
