@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, TextField, Typography} from "@mui/material";
+import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {useParams} from "react-router";
 import {useFormik} from "formik";
@@ -95,83 +95,87 @@ interface RegistrationCompleteProps {
 
 const RegistrationComplete = ({ token }: RegistrationCompleteProps) => {
     return (
-        <Box component="div">
-            <Container>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Typography component="div">
-                        <h2>Registration completed!</h2>
-                    </Typography>
-                </Box>
-            </Container>
-            <Container>
-                <Box>
-                    <Typography component="p">
-                        Your account was created successfully!
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        Your new account token is: <code>{token}</code> <ClipboardText text={token} />
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        You can create an environment using your account token, like this:
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        <code>$ zrok enable {token}</code> <ClipboardText text={"zrok enable " + token} />
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        <strong>Your account token is a secret (like a password).
-                            Please do not share it with anyone!</strong>
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        You can use your new password to log into the console here:
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        <a href={window.location.origin}>{window.location.origin}</a>
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                        <h3>Enjoy zrok!</h3>
-                    </Typography>
-                </Box>
-            </Container>
-        </Box>
+        <Paper sx={{ p: 5 }}>
+            <Box component="div">
+                <Container>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography component="div">
+                            <h2>Registration completed!</h2>
+                        </Typography>
+                    </Box>
+                </Container>
+                <Container>
+                    <Box>
+                        <Typography component="p">
+                            Your account was created successfully!
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            Your new account token is: <code>{token}</code> <ClipboardText text={token} />
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            You can create an environment using your account token, like this:
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            <code>$ zrok enable {token}</code> <ClipboardText text={"zrok enable " + token} />
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            <strong>Your account token is a secret (like a password).
+                                Please do not share it with anyone!</strong>
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            You can use your new password to log into the console here:
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            <a href={window.location.origin}>{window.location.origin}</a>
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            <h3>Enjoy zrok!</h3>
+                        </Typography>
+                    </Box>
+                </Container>
+            </Box>
+        </Paper>
     );
 }
 
 const InvalidToken = () => {
     return (
-        <Box component="div">
-            <Container>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Typography component="div"><h2 style={{ color: "red" }} align="center">Invalid registration token?!</h2></Typography>
-                </Box>
-            </Container>
-            <Container>
-                <Box>
-                    <Typography component="p">
-                        Your registration token may have expired!
-                    </Typography>
-                </Box>
-                <Box sx={{ mt: 3 }}>
-                    <Typography component="p">
-                       Please use the <code>zrok invite</code> command to
-                        generate a new registration request and try again.
-                    </Typography>
-                </Box>
-            </Container>
-        </Box>
+        <Paper sx={{ p: 5 }}>
+            <Box component="div">
+                <Container>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography component="div"><h2 style={{ color: "red" }} align="center">Invalid registration token?!</h2></Typography>
+                    </Box>
+                </Container>
+                <Container>
+                    <Box>
+                        <Typography component="p">
+                            Your registration token may have expired!
+                        </Typography>
+                    </Box>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography component="p">
+                            Please use the <code>zrok invite</code> command to
+                            generate a new registration request and try again.
+                        </Typography>
+                    </Box>
+                </Container>
+            </Box>
+        </Paper>
     );
 }
 
@@ -183,7 +187,7 @@ const Register = () => {
     const [touLink, setTouLink] = useState<string>();
 
     const doRegistration = (v) => {
-        new AccountApi().register({body: {token: regToken, password: v.password}})
+        new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {
                 console.log(d);
                 setComponent(<RegistrationComplete token={d.accountToken!} />);
@@ -195,7 +199,7 @@ const Register = () => {
 
     useEffect(() => {
         if(regToken) {
-            new AccountApi().verify({body: {registrationToken: regToken}})
+            new AccountApi().verify({body: {registerToken: regToken}})
                 .then((d) => {
                     console.log(d);
                     setEmail(d.email);

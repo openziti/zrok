@@ -1,4 +1,4 @@
-import {Box, Button, Container, TextField, Typography} from "@mui/material";
+import {Box, Button, Container, Paper, TextField, Typography} from "@mui/material";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {Link} from "react-router";
 import {AccountApi} from "./api";
@@ -51,22 +51,24 @@ const ForgotPasswordForm = ({ doRequest }: ForgotPasswordFormProps) => {
 
 const RequestSubmittedMessage = () => {
     return (
-        <Box component="div">
-            <Typography component="div" align="center"><h2>Request Submitted...</h2></Typography>
-            <Typography component="div">
-                <p>
-                    If your email address is found, you will be sent an email with a link to reset your password.
-                </p>
-            </Typography>
-            <Typography component="div">
-                <p>
-                    <strong>Please check your "spam" folder for this email if you do not receive it after a few minutes!</strong>
-                </p>
-            </Typography>
-            <Box component="div" style={{ textAlign: "center" }}>
-                <Link to="/">Return to Login</Link>
+        <Paper sx={{ p: 5 }}>
+            <Box component="div">
+                <Typography component="div" align="center"><h2>Request Submitted...</h2></Typography>
+                <Typography component="div">
+                    <p>
+                        If your email address is found, you will be sent an email with a link to reset your password.
+                    </p>
+                </Typography>
+                <Typography component="div">
+                    <p>
+                        <strong>Please check your "spam" folder for this email if you do not receive it after a few minutes!</strong>
+                    </p>
+                </Typography>
+                <Box component="div" style={{ textAlign: "center" }}>
+                    <Link to="/">Return to Login</Link>
+                </Box>
             </Box>
-        </Box>
+        </Paper>
     );
 }
 
