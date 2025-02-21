@@ -18,6 +18,7 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
     const [successMessage, setSuccessMessage] = useState<React.JSX.Element>(null);
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>(checked);
+    checkedRef.current = checked;
 
     const toggleChecked = () => {
         setChecked(!checkedRef.current);

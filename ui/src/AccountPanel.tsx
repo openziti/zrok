@@ -59,7 +59,7 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                     <Grid2 display="flex" component="h3">{String(account.data.label)}</Grid2>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                    <h5 style={{ margin: 0 }}>Your zrok account, <code>{user.email}</code></h5>
+                    <h5 style={{ margin: 0 }}>Your zrok account <code>{user.email}</code></h5>
                 </Grid2>
                 { limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
