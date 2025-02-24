@@ -269,6 +269,12 @@ jobs:
       - run: |
           mkdir -p ./automated-release-build
 
+      - name: Fetch Source Archive
+        shell: bash
+        run: |
+          curl -L -o ./automated-release-build/source.tar.gz \
+            https://api.github.com/repos/${{ github.repository }}/tarball/${{ github.ref_name }}
+
       - uses: actions/download-artifact@v4
         with:
           path: ./automated-release-build
@@ -277,7 +283,8 @@ jobs:
 
       - run: |
           ls -lAR ./automated-release-build/
-          shasum ./automated-release-build/* > ./automated-release-build/checksums.txt
+          cd ./automated-release-build/
+          shasum --algorithm 256 ./* | tee ./checksums.sha256.txt
 
       - uses: goreleaser/goreleaser-action@v6
         with:
