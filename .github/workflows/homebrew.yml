@@ -38,8 +38,8 @@ jobs:
       - name: Get Source Archive
         shell: bash
         run: |
-          curl -sSLf -o source.tar.gz \
-            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source.tar.gz
+          curl -sSLf -o source-${{ github.ref_name }}.tar.gz \
+            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source-${{ github.ref_name }}.tar.gz
 
       - name: Verify Source Archive Checksum
         shell: bash
@@ -58,7 +58,7 @@ jobs:
         with:
           formula-name: zrok
           formula-path: Formula/z/zrok.rb
-          download-url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source.tar.gz
+          download-url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source-${{ github.ref_name }}.tar.gz
           download-sha256: ${{ steps.source.outputs.sha256 }}
           homebrew-tap: ${{ vars.ZROK_BREW_TAP || 'Homebrew/homebrew-core' }}
         env:
