@@ -8,6 +8,8 @@ FIX: Pre-releases are no longer uploaded to the stable Linux package repo, and w
 
 CHANGE: The release `checksums.txt` has been renamed `checksums.sha256.txt` to reflect the use of a collision-resistant algorithm instead of `shasum`'s default algorithm, SHA-1.
 
+CHANGE: The dependency graph is now published as a release artifact named `sbom-{version}.spdx.json` (https://github.com/openziti/zrok/issues/888).
+
 CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Docker Hub for testing. [RELEASING.md](./RELEASING.md) describes releaser steps and the events they trigger.
 
 CHANGE: Linux release binaries are now built on the ziti-builder container image based on Ubuntu Focal 20.04 to preserve backward compatibility as the ubuntu-20.04 GitHub runner is end of life.
