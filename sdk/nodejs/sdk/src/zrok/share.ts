@@ -5,9 +5,7 @@ import {
     ShareRequest,
     ShareResponse,
     AuthUser,
-    ShareRequestOauthProviderEnum,
-    ShareRequestShareModeEnum,
-    UnshareRequest} from "./api"
+    UnshareRequest} from "./api/api"
 import * as model from "./model"
 
 export async function CreateShare(root: Root, request: model.ShareRequest): Promise<model.Share> {
@@ -17,10 +15,10 @@ export async function CreateShare(root: Root, request: model.ShareRequest): Prom
     let out: ShareRequest
 
     switch(request.ShareMode) {
-        case ShareRequestShareModeEnum.Private:
+        case ShareRequest.ShareModeEnum.Private:
             out = newPrivateShare(root, request)
             break
-        case ShareRequestShareModeEnum.Public:
+        case ShareRequest.ShareModeEnum.Public:
             out = newPublicShare(root, request)
             break
         default:
@@ -53,7 +51,7 @@ export async function CreateShare(root: Root, request: model.ShareRequest): Prom
         .catch(resp => {
             throw new Error("unable to create share " + resp)
         })
-    return new model.Share(shr.shrToken||"", shr.frontendProxyEndpoints||[])
+    return new model.Share(shr.shareToken||"", shr.frontendProxyEndpoints||[])
 }
 
 function newPrivateShare(root: Root, request: model.ShareRequest): ShareRequest {
@@ -81,7 +79,7 @@ export async function DeleteShare(root: Root, shr: model.Share): Promise<void> {
     let client = new ShareApi(conf)
     let req: UnshareRequest = {
         envZId: root.env.ZitiIdentity,
-        shrToken: shr.Token,
+        shareToken: shr.Token,
     }
     req.envZId = root.env.ZitiIdentity
     return client.unshare({body: req})
