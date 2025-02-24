@@ -50,7 +50,7 @@ jobs:
         id: source
         shell: bash
         run: |
-          CHECKSUM=$(grep -E '\bsource\.tar\.gz$' checksums.sha256.txt | cut -d' ' -f1)
+          CHECKSUM=$(grep -E "\bsource-${{ github.ref_name }}\.tar\.gz$" checksums.sha256.txt | cut -d' ' -f1)
           echo "sha256=${CHECKSUM}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Upload Release Source Archive to Homebrew
