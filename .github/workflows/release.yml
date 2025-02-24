@@ -299,6 +299,7 @@ jobs:
           ls -lAR ./automated-release-build/
 
           # create checksum file for the attestations
+          mkdir -p ./dist
           shasum --algorithm 256 ./automated-release-build/* | tee ./dist/attestation-subject-checksums.sha256.txt
 
           # create checksum file for the release
