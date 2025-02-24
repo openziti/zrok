@@ -7,6 +7,7 @@ sidebar_position: 10
 import { AssetsProvider } from '@site/src/components/assets-context';
 import DownloadCard from '@site/src/components/download-card';
 import DownloadCardStyles from '@site/src/css/download-card.module.css';
+import InstallCards from '/../docs/guides/install/_install_cards.mdx';
 
 ## Your Secure Internet Sharing Perimeter
 
@@ -102,28 +103,7 @@ If [sharing privately](./concepts/sharing-private.mdx), only users with the shar
 
 ## Installing the zrok Command
 
-<AssetsProvider>
-  <div className={DownloadCardStyles.downloadContainer}>
-    <DownloadCard
-      osName="Windows"
-      osLogo="/img/logo-windows.svg"
-      infoText="Binary executable"
-      guideLink="/docs/guides/install/windows"
-    />
-    <DownloadCard
-      osName="macOS"
-      osLogo="/img/logo-apple.svg"
-      infoText="Binary executable"
-      guideLink="/docs/guides/install/macos"
-    />
-    <DownloadCard
-      osName="Linux"
-      osLogo="/img/logo-linux.svg"
-      infoText="DEB, RPM packages"
-      guideLink="/docs/guides/install/linux"
-    />
-  </div>
-</AssetsProvider>
+<InstallCards />
 
 ## Enabling Your zrok Environment
 

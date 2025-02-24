@@ -1,0 +1,26 @@
+import { AssetsProvider } from '@site/src/components/assets-context';
+import DownloadCard from '@site/src/components/download-card';
+import DownloadCardStyles from '@site/src/css/download-card.module.css';
+
+<AssetsProvider>
+  <div className={DownloadCardStyles.downloadContainer}>
+    <DownloadCard
+      osName="Windows"
+      osLogo="/img/logo-windows.svg"
+      infoText="Download EXE"
+      guideLink="/docs/guides/install/windows"
+    />
+    <DownloadCard
+      osName="macOS"
+      osLogo="/img/logo-apple.svg"
+      infoText="Homebrew or Download"
+      guideLink="/docs/guides/install/macos"
+    />
+    <DownloadCard
+      osName="Linux"
+      osLogo="/img/logo-linux.svg"
+      infoText="RPM/DEB or Homebrew"
+      guideLink="/docs/guides/install/linux"
+    />
+  </div>
+</AssetsProvider>
