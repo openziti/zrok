@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           curl -sSLf -o source.tar.gz \
-            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source.tar.gz
+            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source-${{ github.ref_name }}.tar.gz
 
       - name: Verify Source Archive Checksum
         shell: bash
