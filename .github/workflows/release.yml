@@ -277,6 +277,8 @@ jobs:
 
       - name: Build SBOM from Dependency Graph as SPDX JSON
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh api \
             -H "Accept: application/vnd.github+json" \
