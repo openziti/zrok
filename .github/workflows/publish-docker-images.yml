@@ -12,8 +12,7 @@ jobs:
   publish-docker-images:
     runs-on: ubuntu-24.04
     permissions:
-      contents: write  # need write to draft the release
-      id-token: write  # need write to get OIDC token for generating attestations
+      id-token: write      # need write to get OIDC token for generating attestations
       attestations: write  # need write to create attestations
     env:
       REGISTRY: docker.io
