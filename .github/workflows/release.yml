@@ -275,6 +275,15 @@ jobs:
           curl -sSLf -o ./automated-release-build/source-${{ github.ref_name }}.tar.gz \
             https://api.github.com/repos/${{ github.repository }}/tarball/${{ github.ref_name }}
 
+      - name: Build SBOM from Dependency Graph as SPDX JSON
+        shell: bash
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/dependency-graph/sbom \
+            | tee ./automated-release-build/sbom-${{ github.ref_name }}.spdx.json
+
       - uses: actions/download-artifact@v4
         with:
           path: ./automated-release-build
