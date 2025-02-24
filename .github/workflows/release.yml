@@ -299,8 +299,7 @@ jobs:
           ls -lAR ./automated-release-build/
 
           # create checksum file for the attestations
-          mkdir -p ./dist
-          shasum --algorithm 256 ./automated-release-build/* | tee ./dist/attestation-subject-checksums.sha256.txt
+          shasum --algorithm 256 ./automated-release-build/* | tee /tmp/attestation-subjects.sha256.txt
 
           # create checksum file for the release
           cd ./automated-release-build/
@@ -309,7 +308,7 @@ jobs:
       - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v2
         with:
-          subject-checksums: ./dist/attestation-subject-checksums.sha256.txt
+          subject-checksums: /tmp/attestation-subjects.sha256.txt
 
       - name: Draft Release
         uses: goreleaser/goreleaser-action@v6
