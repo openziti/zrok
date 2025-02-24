@@ -2,7 +2,11 @@
 
 ## v0.4.49
 
-FIX: Pre-releases are no longer uploaded to the stable Linux package repo.
+FIX: Release artifacts now include a reproducible source archive. The archive's download URL is now used by the Homebrew formula when building from source instead of the archive generated on-demand by GitHub (https://github.com/openziti/zrok/issues/858).
+
+FIX: Pre-releases are no longer uploaded to the stable Linux package repo, and workflows that promote stable release artifacts to downstream distribution channels enforce semver stable release tags, i.e., not having a semver hyphenated prerelease suffix.
+
+CHANGE: The release `checksums.txt` has been renamed `checksums.sha256.txt` to reflect the use of a collision-resistant algorithm instead of `shasum`'s default algorithm, SHA-1.
 
 CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Docker Hub for testing. [RELEASING.md](./RELEASING.md) describes releaser steps and the events they trigger.
 
