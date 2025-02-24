@@ -14,6 +14,8 @@ CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Dock
 
 CHANGE: Linux release binaries are now built on the ziti-builder container image based on Ubuntu Focal 20.04 to preserve backward compatibility as the ubuntu-20.04 GitHub runner is end of life.
 
+CHANGE: Container images now include SLSA and SBOM attestations, and these are also published to the Docker Hub registry (https://github.com/openziti/zrok/issues/890).
+
 CHANGE: Release binary and text artifacts are now accompanied by provenance attestations (https://github.com/openziti/zrok/issues/889).
 
 ## v0.4.48

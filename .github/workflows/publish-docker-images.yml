@@ -11,13 +11,18 @@ on:
 jobs:
   publish-docker-images:
     runs-on: ubuntu-24.04
+    permissions:
+      id-token: write      # need write to get OIDC token for generating attestations
+      attestations: write  # need write to create attestations
     env:
+      REGISTRY: docker.io
       RELEASE_REF: ${{ inputs.zrok-version }}
     steps:
       # compose the semver string without leading "refs/tags" or "v" so we can predict the
       # release artifact filename
       - name: Set zrok Version Semver from Tag Ref
         id: semver
+        shell: bash
         run: |
           echo "zrok_semver=${RELEASE_REF#v}" | tee -a $GITHUB_OUTPUT
 
@@ -37,6 +42,7 @@ jobs:
           path: dist/arm64/linux
 
       - name: Unpack the Release Artifacts
+        shell: bash
         run: |
           for TGZ in dist/{amd,arm}64/linux; do
             tar -xvzf ${TGZ}/*.tar.gz -C ${TGZ}
@@ -54,6 +60,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
+          registry: ${{ env.REGISTRY}}
           username: ${{ vars.DOCKER_HUB_API_USER || secrets.DOCKER_HUB_API_USER }}
           password: ${{ secrets.DOCKER_HUB_API_TOKEN }}
 
@@ -62,14 +69,14 @@ jobs:
           ZROK_CONTAINER_IMAGE_REPO: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'openziti/zrok' }}
           ZROK_CONTAINER_IMAGE_TAG: ${{ steps.semver.outputs.zrok_semver }}
         id: tagprep_cli
+        shell: bash
         run: |
           DOCKER_TAGS="${ZROK_CONTAINER_IMAGE_REPO}:${ZROK_CONTAINER_IMAGE_TAG}"
           echo "DOCKER_TAGS=${DOCKER_TAGS}" | tee -a $GITHUB_OUTPUT
 
-      # this is the CLI image with the Linux binary for each
-      # arch that was downloaded in ./dist/
       - name: Build & Push Multi-Platform CLI Container Image to Hub
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
+        id: push
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ${{ github.workspace }}/
@@ -79,4 +86,15 @@ jobs:
           build-args: |
             DOCKER_BUILD_DIR=./docker/images/zrok
             ARTIFACTS_DIR=./dist
+          provenance: mode=max
+          sbom: true
           push: true
+
+      - name: Publish Attestations to GitHub
+        uses: actions/attest-build-provenance@v1
+        env:
+          IMAGE_REPO: ${{ vars.ZROK_CONTAINER_IMAGE_REPO || 'openziti/zrok' }}
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_REPO }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
