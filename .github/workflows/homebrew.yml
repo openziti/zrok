@@ -57,6 +57,7 @@ jobs:
         uses: mislav/bump-homebrew-formula-action@v3.2
         with:
           formula-name: zrok
+          formula-path: Formula/z/zrok.rb
           download-url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source.tar.gz
           download-sha256: ${{ steps.source.outputs.sha256 }}
           homebrew-tap: ${{ vars.ZROK_BREW_TAP || 'Homebrew/homebrew-core' }}
