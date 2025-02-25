@@ -1,0 +1,34 @@
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-width: 320px;
+}
+
+code {
+  font-family: 'JetBrains Mono', sans-serif;
+}
+
+a {
+  font-weight: 500;
+  color: #241775;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #9bf316;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+#footer {
+  text-align: center;
+}

@@ -1,4 +1,6 @@
-import {ShareRequestBackendModeEnum, ShareRequestShareModeEnum, ShareRequestOauthProviderEnum} from "./api"
+// import {ShareRequestBackendModeEnum, ShareRequestShareModeEnum, ShareRequestOauthProviderEnum} from "./api"
+
+import {ShareRequest as ApiShareRequest} from "./api/api";
 
 export type BackendMode = string
 
@@ -100,40 +102,40 @@ export const AUTH_SCHEME_NONE: AuthScheme = "none"
 export const AUTH_SCHEME_BASIC: AuthScheme = "basic"
 export const AUTH_SCHEME_OAUTH: AuthScheme = "oauth"
 
-export function zrokBackendModeToOpenApi(z: BackendMode): ShareRequestBackendModeEnum | undefined{
+export function zrokBackendModeToOpenApi(z: BackendMode): ApiShareRequest.BackendModeEnum | undefined{
     switch(z){
         case PROXY_BACKEND_MODE:
-            return ShareRequestBackendModeEnum.Proxy
+            return ApiShareRequest.BackendModeEnum.Proxy
         case WEB_BACKEND_MODE:
-            return ShareRequestBackendModeEnum.Web
+            return ApiShareRequest.BackendModeEnum.Web
         case TCP_TUNNEL_BACKEND_MODE:
-            return ShareRequestBackendModeEnum.TcpTunnel
+            return ApiShareRequest.BackendModeEnum.TcpTunnel
         case UDP_TUNNEL_BACKEND_MODE:
-            return ShareRequestBackendModeEnum.UdpTunnel
+            return ApiShareRequest.BackendModeEnum.UdpTunnel
         case CADDY_BACKEND_MODE:
-            return ShareRequestBackendModeEnum.Caddy
+            return ApiShareRequest.BackendModeEnum.Caddy
         default:
             return undefined
     }
 }
 
-export function zrokShareModeToOpenApi(z: ShareMode): ShareRequestShareModeEnum | undefined {
+export function zrokShareModeToOpenApi(z: ShareMode): ApiShareRequest.ShareModeEnum | undefined {
     switch(z) {
         case PRIVATE_SHARE_MODE:
-            return ShareRequestShareModeEnum.Private
+            return ApiShareRequest.ShareModeEnum.Private
         case PUBLIC_SHARE_MODE:
-            return ShareRequestShareModeEnum.Public
+            return ApiShareRequest.ShareModeEnum.Public
         default:
             return undefined
     }
 }
 
-export function zrokOauthProviderToOpenApi(z: string): ShareRequestOauthProviderEnum | undefined {
+export function zrokOauthProviderToOpenApi(z: string): ApiShareRequest.OauthProviderEnum | undefined {
     switch(z.toLowerCase()){
-        case ShareRequestOauthProviderEnum.Github.toString().toLowerCase():
-            return ShareRequestOauthProviderEnum.Github
-        case ShareRequestOauthProviderEnum.Google.toString().toLowerCase():
-            return ShareRequestOauthProviderEnum.Google 
+        case (ApiShareRequest.OauthProviderEnum.Github as string).toString().toLowerCase():
+            return ApiShareRequest.OauthProviderEnum.Github
+        case (ApiShareRequest.OauthProviderEnum.Google as string).toString().toLowerCase():
+            return ApiShareRequest.OauthProviderEnum.Google
         default:
             return undefined 
     }

@@ -18,7 +18,7 @@ func newUnaccessHandler() *unaccessHandler {
 
 func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	feToken := params.Body.FrontendToken
-	shrToken := params.Body.ShrToken
+	shrToken := params.Body.ShareToken
 	envZId := params.Body.EnvZID
 	logrus.Infof("processing unaccess request for frontend '%v' (share '%v', environment '%v')", feToken, shrToken, envZId)
 

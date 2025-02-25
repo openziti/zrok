@@ -1,6 +1,6 @@
 import { configFile, environmentFile, identityFile, metadataFile, rootDir } from "./dirs";
 import fs from "node:fs"
-import { Configuration, MetadataApi, HTTPHeaders } from "../zrok/api"
+import {Configuration, MetadataApi, MetadataApiApiKeys} from "../zrok/api/api"
 
 const V = "v0.4"
 
@@ -61,12 +61,8 @@ export class Root {
 
     public async Client(): Promise<Configuration> {
         let apiEndpoint = this.ApiEndpoint()
-        let conf = new Configuration({
-            basePath: apiEndpoint.endpoint + '/api/v1',
-            apiKey: this.env.Token,
-        })
-
-       let mapi = new MetadataApi(conf)
+       let mapi = new MetadataApi({basePath: apiEndpoint.endpoint + "/api/v1"})
+        mapi.setApiKey(MetadataApiApiKeys, this.env.Token);
        let ver: Promise<string> = mapi.version()
 
        const regex : RegExp = new RegExp("^(refs/(heads|tags)/)?" + V);

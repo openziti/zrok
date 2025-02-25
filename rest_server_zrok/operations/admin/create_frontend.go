@@ -6,9 +6,15 @@ package admin
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +74,139 @@ func (o *CreateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// CreateFrontendBody create frontend body
+//
+// swagger:model CreateFrontendBody
+type CreateFrontendBody struct {
+
+	// permission mode
+	// Enum: [open closed]
+	PermissionMode string `json:"permissionMode,omitempty"`
+
+	// public name
+	PublicName string `json:"public_name,omitempty"`
+
+	// url template
+	URLTemplate string `json:"url_template,omitempty"`
+
+	// z Id
+	ZID string `json:"zId,omitempty"`
+}
+
+// Validate validates this create frontend body
+func (o *CreateFrontendBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validatePermissionMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var createFrontendBodyTypePermissionModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["open","closed"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createFrontendBodyTypePermissionModePropEnum = append(createFrontendBodyTypePermissionModePropEnum, v)
+	}
+}
+
+const (
+
+	// CreateFrontendBodyPermissionModeOpen captures enum value "open"
+	CreateFrontendBodyPermissionModeOpen string = "open"
+
+	// CreateFrontendBodyPermissionModeClosed captures enum value "closed"
+	CreateFrontendBodyPermissionModeClosed string = "closed"
+)
+
+// prop value enum
+func (o *CreateFrontendBody) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createFrontendBodyTypePermissionModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *CreateFrontendBody) validatePermissionMode(formats strfmt.Registry) error {
+	if swag.IsZero(o.PermissionMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validatePermissionModeEnum("body"+"."+"permissionMode", "body", o.PermissionMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this create frontend body based on context it is used
+func (o *CreateFrontendBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateFrontendBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateFrontendBody) UnmarshalBinary(b []byte) error {
+	var res CreateFrontendBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// CreateFrontendCreatedBody create frontend created body
+//
+// swagger:model CreateFrontendCreatedBody
+type CreateFrontendCreatedBody struct {
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+}
+
+// Validate validates this create frontend created body
+func (o *CreateFrontendCreatedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this create frontend created body based on context it is used
+func (o *CreateFrontendCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CreateFrontendCreatedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CreateFrontendCreatedBody) UnmarshalBinary(b []byte) error {
+	var res CreateFrontendCreatedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

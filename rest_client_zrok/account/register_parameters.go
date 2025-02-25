@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewRegisterParams creates a new RegisterParams object,
@@ -64,7 +62,7 @@ RegisterParams contains all the parameters to send to the API endpoint
 type RegisterParams struct {
 
 	// Body.
-	Body *rest_model_zrok.RegisterRequest
+	Body RegisterBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *RegisterParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the register params
-func (o *RegisterParams) WithBody(body *rest_model_zrok.RegisterRequest) *RegisterParams {
+func (o *RegisterParams) WithBody(body RegisterBody) *RegisterParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the register params
-func (o *RegisterParams) SetBody(body *rest_model_zrok.RegisterRequest) {
+func (o *RegisterParams) SetBody(body RegisterBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *RegisterParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

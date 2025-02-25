@@ -1,27 +1,28 @@
 import localVarRequest from 'request';
 
+export * from './access201Response';
 export * from './accessRequest';
-export * from './accessResponse';
 export * from './addOrganizationMemberRequest';
 export * from './authUser';
 export * from './changePasswordRequest';
+export * from './clientVersionCheckRequest';
 export * from './configuration';
-export * from './createAccountRequest';
+export * from './createFrontend201Response';
 export * from './createFrontendRequest';
-export * from './createFrontendResponse';
 export * from './createIdentity201Response';
 export * from './createIdentityRequest';
+export * from './createOrganization201Response';
 export * from './createOrganizationRequest';
-export * from './deleteFrontendRequest';
 export * from './disableRequest';
 export * from './enableRequest';
-export * from './enableResponse';
 export * from './environment';
 export * from './environmentAndResources';
 export * from './frontend';
-export * from './grantsRequest';
+export * from './getSparklines200Response';
+export * from './getSparklinesRequest';
 export * from './inviteRequest';
 export * from './inviteTokenGenerateRequest';
+export * from './listFrontends200ResponseInner';
 export * from './listMemberships200Response';
 export * from './listMemberships200ResponseMembershipsInner';
 export * from './listOrganizationMembers200Response';
@@ -32,13 +33,10 @@ export * from './loginRequest';
 export * from './metrics';
 export * from './metricsSample';
 export * from './overview';
-export * from './passwordRequirements';
 export * from './principal';
-export * from './publicFrontend';
-export * from './regenerateToken200Response';
-export * from './regenerateTokenRequest';
+export * from './regenerateAccountToken200Response';
+export * from './regenerateAccountTokenRequest';
 export * from './registerRequest';
-export * from './registerResponse';
 export * from './removeOrganizationMemberRequest';
 export * from './resetPasswordRequest';
 export * from './share';
@@ -47,10 +45,12 @@ export * from './shareResponse';
 export * from './sparkDataSample';
 export * from './unaccessRequest';
 export * from './unshareRequest';
+export * from './updateAccessRequest';
 export * from './updateFrontendRequest';
 export * from './updateShareRequest';
+export * from './verify200Response';
 export * from './verifyRequest';
-export * from './verifyResponse';
+export * from './versionInventory200Response';
 
 import * as fs from 'fs';
 
@@ -65,28 +65,29 @@ export interface RequestDetailedFile {
 export type RequestFile = string | Buffer | fs.ReadStream | RequestDetailedFile;
 
 
+import { Access201Response } from './access201Response';
 import { AccessRequest } from './accessRequest';
-import { AccessResponse } from './accessResponse';
 import { AddOrganizationMemberRequest } from './addOrganizationMemberRequest';
 import { AuthUser } from './authUser';
 import { ChangePasswordRequest } from './changePasswordRequest';
+import { ClientVersionCheckRequest } from './clientVersionCheckRequest';
 import { Configuration } from './configuration';
-import { CreateAccountRequest } from './createAccountRequest';
+import { CreateFrontend201Response } from './createFrontend201Response';
 import { CreateFrontendRequest } from './createFrontendRequest';
-import { CreateFrontendResponse } from './createFrontendResponse';
 import { CreateIdentity201Response } from './createIdentity201Response';
 import { CreateIdentityRequest } from './createIdentityRequest';
+import { CreateOrganization201Response } from './createOrganization201Response';
 import { CreateOrganizationRequest } from './createOrganizationRequest';
-import { DeleteFrontendRequest } from './deleteFrontendRequest';
 import { DisableRequest } from './disableRequest';
 import { EnableRequest } from './enableRequest';
-import { EnableResponse } from './enableResponse';
 import { Environment } from './environment';
 import { EnvironmentAndResources } from './environmentAndResources';
 import { Frontend } from './frontend';
-import { GrantsRequest } from './grantsRequest';
+import { GetSparklines200Response } from './getSparklines200Response';
+import { GetSparklinesRequest } from './getSparklinesRequest';
 import { InviteRequest } from './inviteRequest';
 import { InviteTokenGenerateRequest } from './inviteTokenGenerateRequest';
+import { ListFrontends200ResponseInner } from './listFrontends200ResponseInner';
 import { ListMemberships200Response } from './listMemberships200Response';
 import { ListMemberships200ResponseMembershipsInner } from './listMemberships200ResponseMembershipsInner';
 import { ListOrganizationMembers200Response } from './listOrganizationMembers200Response';
@@ -97,13 +98,10 @@ import { LoginRequest } from './loginRequest';
 import { Metrics } from './metrics';
 import { MetricsSample } from './metricsSample';
 import { Overview } from './overview';
-import { PasswordRequirements } from './passwordRequirements';
 import { Principal } from './principal';
-import { PublicFrontend } from './publicFrontend';
-import { RegenerateToken200Response } from './regenerateToken200Response';
-import { RegenerateTokenRequest } from './regenerateTokenRequest';
+import { RegenerateAccountToken200Response } from './regenerateAccountToken200Response';
+import { RegenerateAccountTokenRequest } from './regenerateAccountTokenRequest';
 import { RegisterRequest } from './registerRequest';
-import { RegisterResponse } from './registerResponse';
 import { RemoveOrganizationMemberRequest } from './removeOrganizationMemberRequest';
 import { ResetPasswordRequest } from './resetPasswordRequest';
 import { Share } from './share';
@@ -112,10 +110,12 @@ import { ShareResponse } from './shareResponse';
 import { SparkDataSample } from './sparkDataSample';
 import { UnaccessRequest } from './unaccessRequest';
 import { UnshareRequest } from './unshareRequest';
+import { UpdateAccessRequest } from './updateAccessRequest';
 import { UpdateFrontendRequest } from './updateFrontendRequest';
 import { UpdateShareRequest } from './updateShareRequest';
+import { Verify200Response } from './verify200Response';
 import { VerifyRequest } from './verifyRequest';
-import { VerifyResponse } from './verifyResponse';
+import { VersionInventory200Response } from './versionInventory200Response';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -138,28 +138,29 @@ let enumsMap: {[index: string]: any} = {
 }
 
 let typeMap: {[index: string]: any} = {
+    "Access201Response": Access201Response,
     "AccessRequest": AccessRequest,
-    "AccessResponse": AccessResponse,
     "AddOrganizationMemberRequest": AddOrganizationMemberRequest,
     "AuthUser": AuthUser,
     "ChangePasswordRequest": ChangePasswordRequest,
+    "ClientVersionCheckRequest": ClientVersionCheckRequest,
     "Configuration": Configuration,
-    "CreateAccountRequest": CreateAccountRequest,
+    "CreateFrontend201Response": CreateFrontend201Response,
     "CreateFrontendRequest": CreateFrontendRequest,
-    "CreateFrontendResponse": CreateFrontendResponse,
     "CreateIdentity201Response": CreateIdentity201Response,
     "CreateIdentityRequest": CreateIdentityRequest,
+    "CreateOrganization201Response": CreateOrganization201Response,
     "CreateOrganizationRequest": CreateOrganizationRequest,
-    "DeleteFrontendRequest": DeleteFrontendRequest,
     "DisableRequest": DisableRequest,
     "EnableRequest": EnableRequest,
-    "EnableResponse": EnableResponse,
     "Environment": Environment,
     "EnvironmentAndResources": EnvironmentAndResources,
     "Frontend": Frontend,
-    "GrantsRequest": GrantsRequest,
+    "GetSparklines200Response": GetSparklines200Response,
+    "GetSparklinesRequest": GetSparklinesRequest,
     "InviteRequest": InviteRequest,
     "InviteTokenGenerateRequest": InviteTokenGenerateRequest,
+    "ListFrontends200ResponseInner": ListFrontends200ResponseInner,
     "ListMemberships200Response": ListMemberships200Response,
     "ListMemberships200ResponseMembershipsInner": ListMemberships200ResponseMembershipsInner,
     "ListOrganizationMembers200Response": ListOrganizationMembers200Response,
@@ -170,13 +171,10 @@ let typeMap: {[index: string]: any} = {
     "Metrics": Metrics,
     "MetricsSample": MetricsSample,
     "Overview": Overview,
-    "PasswordRequirements": PasswordRequirements,
     "Principal": Principal,
-    "PublicFrontend": PublicFrontend,
-    "RegenerateToken200Response": RegenerateToken200Response,
-    "RegenerateTokenRequest": RegenerateTokenRequest,
+    "RegenerateAccountToken200Response": RegenerateAccountToken200Response,
+    "RegenerateAccountTokenRequest": RegenerateAccountTokenRequest,
     "RegisterRequest": RegisterRequest,
-    "RegisterResponse": RegisterResponse,
     "RemoveOrganizationMemberRequest": RemoveOrganizationMemberRequest,
     "ResetPasswordRequest": ResetPasswordRequest,
     "Share": Share,
@@ -185,10 +183,12 @@ let typeMap: {[index: string]: any} = {
     "SparkDataSample": SparkDataSample,
     "UnaccessRequest": UnaccessRequest,
     "UnshareRequest": UnshareRequest,
+    "UpdateAccessRequest": UpdateAccessRequest,
     "UpdateFrontendRequest": UpdateFrontendRequest,
     "UpdateShareRequest": UpdateShareRequest,
+    "Verify200Response": Verify200Response,
     "VerifyRequest": VerifyRequest,
-    "VerifyResponse": VerifyResponse,
+    "VersionInventory200Response": VersionInventory200Response,
 }
 
 export class ObjectSerializer {

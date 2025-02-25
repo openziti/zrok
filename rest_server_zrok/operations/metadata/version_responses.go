@@ -17,7 +17,7 @@ import (
 const VersionOKCode int = 200
 
 /*
-VersionOK current server version
+VersionOK legacy upgrade required
 
 swagger:response versionOK
 */

@@ -46,7 +46,7 @@ func Run(inCfg *config.Config) error {
 	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
-	api.AccountRegenerateTokenHandler = newRegenerateTokenHandler()
+	api.AccountRegenerateAccountTokenHandler = newRegenerateAccountTokenHandler()
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
@@ -67,8 +67,10 @@ func Run(inCfg *config.Config) error {
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
-	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
+	api.MetadataClientVersionCheckHandler = metadata.ClientVersionCheckHandlerFunc(clientVersionCheckHandler)
+	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
+	api.MetadataGetSparklinesHandler = newSparklinesHandler()
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		api.MetadataGetAccountMetricsHandler = newGetAccountMetricsHandler(cfg.Metrics.Influx)
 		api.MetadataGetEnvironmentMetricsHandler = newGetEnvironmentMetricsHandler(cfg.Metrics.Influx)
@@ -82,10 +84,12 @@ func Run(inCfg *config.Config) error {
 	api.MetadataOrgAccountOverviewHandler = newOrgAccountOverviewHandler()
 	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
+	api.MetadataVersionInventoryHandler = metadata.VersionInventoryHandlerFunc(versionInventoryHandler)
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
+	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
 	if err := controllerStartup(); err != nil {

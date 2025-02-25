@@ -14,7 +14,7 @@ import (
 
 // GetShareMetricsURL generates an URL for the get share metrics operation
 type GetShareMetricsURL struct {
-	ShrToken string
+	ShareToken string
 
 	Duration *string
 
@@ -42,13 +42,13 @@ func (o *GetShareMetricsURL) SetBasePath(bp string) {
 func (o *GetShareMetricsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/metrics/share/{shrToken}"
+	var _path = "/metrics/share/{shareToken}"
 
-	shrToken := o.ShrToken
-	if shrToken != "" {
-		_path = strings.Replace(_path, "{shrToken}", shrToken, -1)
+	shareToken := o.ShareToken
+	if shareToken != "" {
+		_path = strings.Replace(_path, "{shareToken}", shareToken, -1)
 	} else {
-		return nil, errors.New("shrToken is required on GetShareMetricsURL")
+		return nil, errors.New("shareToken is required on GetShareMetricsURL")
 	}
 
 	_basePath := o._basePath

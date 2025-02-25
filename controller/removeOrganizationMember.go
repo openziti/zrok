@@ -32,9 +32,9 @@ func (h *removeOrganizationMemberHandler) Handle(params admin.RemoveOrganization
 		return admin.NewAddOrganizationMemberNotFound()
 	}
 
-	org, err := str.FindOrganizationByToken(params.Body.Token, trx)
+	org, err := str.FindOrganizationByToken(params.Body.OrganizationToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding organization '%v': %v", params.Body.Token, err)
+		logrus.Errorf("error finding organization '%v': %v", params.Body.OrganizationToken, err)
 		return admin.NewAddOrganizationMemberNotFound()
 	}
 

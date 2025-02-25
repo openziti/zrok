@@ -49,5 +49,5 @@ func (h *createOrganizationHandler) Handle(params admin.CreateOrganizationParams
 
 	logrus.Infof("added organzation '%v' with description '%v'", org.Token, org.Description)
 
-	return admin.NewCreateOrganizationCreated().WithPayload(&admin.CreateOrganizationCreatedBody{Token: org.Token})
+	return admin.NewCreateOrganizationCreated().WithPayload(&admin.CreateOrganizationCreatedBody{OrganizationToken: org.Token})
 }

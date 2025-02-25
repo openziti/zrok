@@ -68,7 +68,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 			sparkData = append(sparkData, &rest_model_zrok.SparkDataSample{Rx: float64(sparkRx[shr.Token][i]), Tx: float64(sparkTx[shr.Token][i])})
 		}
 		es.Shares = append(es.Shares, &rest_model_zrok.Share{
-			Token:                shr.Token,
+			ShareToken:           shr.Token,
 			ZID:                  shr.ZId,
 			ShareMode:            shr.ShareMode,
 			BackendMode:          shr.BackendMode,

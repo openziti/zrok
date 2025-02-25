@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
@@ -52,12 +51,10 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		permissionMode = sdk.ClosedPermissionMode
 	}
 	req := admin.NewCreateFrontendParams()
-	req.Body = &rest_model_zrok.CreateFrontendRequest{
-		ZID:            zId,
-		PublicName:     publicName,
-		URLTemplate:    urlTemplate,
-		PermissionMode: string(permissionMode),
-	}
+	req.Body.ZID = zId
+	req.Body.PublicName = publicName
+	req.Body.URLTemplate = urlTemplate
+	req.Body.PermissionMode = string(permissionMode)
 
 	resp, err := zrok.Admin.CreateFrontend(req, mustGetAdminAuth())
 	if err != nil {
@@ -71,5 +68,5 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	logrus.Infof("created global public frontend '%v'", resp.Payload.Token)
+	logrus.Infof("created global public frontend '%v'", resp.Payload.FrontendToken)
 }

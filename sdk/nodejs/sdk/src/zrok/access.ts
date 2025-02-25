@@ -1,11 +1,9 @@
 import {Root} from "../environment/root"
 import {
-    Share,
     ShareApi,
     AccessRequest,
-    AccessResponse,
-    AuthUser,
-    UnaccessRequest} from "./api"
+    Access201Response,
+    UnaccessRequest} from "./api/api"
 import * as model from "./model"
 
 export async function CreateAccess(root: Root, request: model.AccessRequest): Promise<model.Access> {
@@ -15,12 +13,12 @@ export async function CreateAccess(root: Root, request: model.AccessRequest): Pr
 
     let out: AccessRequest = {
         envZId: root.env.ZitiIdentity,
-        shrToken: request.ShareToken
+        shareToken: request.ShareToken
     }
     
     let conf = await root.Client()
     let client = new ShareApi(conf)
-    let shr: AccessResponse = await client.access({body: out})
+    let shr = await client.access({body: out})
         .catch(resp => {
             throw new Error("unable to create access " + resp)
         })
@@ -38,7 +36,7 @@ export async function CreateAccess(root: Root, request: model.AccessRequest): Pr
 export async function DeleteAccess(root: Root, acc: model.Access): Promise<void> {
     let out: UnaccessRequest = {
         frontendToken: acc.Token,
-        shrToken: acc.ShareToken,
+        shareToken: acc.ShareToken,
         envZId: root.env.ZitiIdentity
     }
     let conf = await root.Client()

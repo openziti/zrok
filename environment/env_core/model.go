@@ -14,6 +14,7 @@ type Root interface {
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
 	DefaultFrontend() (string, string)
+	Headless() (bool, string)
 
 	IsEnabled() bool
 	Environment() *Environment
@@ -26,6 +27,8 @@ type Root interface {
 	ZitiIdentityNamed(name string) (string, error)
 	SaveZitiIdentityNamed(name, data string) error
 	DeleteZitiIdentityNamed(name string) error
+
+	AgentSocket() (string, error)
 }
 
 type Environment struct {
@@ -37,6 +40,7 @@ type Environment struct {
 type Config struct {
 	ApiEndpoint     string
 	DefaultFrontend string
+	Headless        bool
 }
 
 type Metadata struct {
