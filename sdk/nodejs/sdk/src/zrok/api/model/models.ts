@@ -50,6 +50,7 @@ export * from './updateFrontendRequest';
 export * from './updateShareRequest';
 export * from './verify200Response';
 export * from './verifyRequest';
+export * from './versionInventory200Response';
 
 import * as fs from 'fs';
 
@@ -114,6 +115,7 @@ import { UpdateFrontendRequest } from './updateFrontendRequest';
 import { UpdateShareRequest } from './updateShareRequest';
 import { Verify200Response } from './verify200Response';
 import { VerifyRequest } from './verifyRequest';
+import { VersionInventory200Response } from './versionInventory200Response';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -186,6 +188,7 @@ let typeMap: {[index: string]: any} = {
     "UpdateShareRequest": UpdateShareRequest,
     "Verify200Response": Verify200Response,
     "VerifyRequest": VerifyRequest,
+    "VersionInventory200Response": VersionInventory200Response,
 }
 
 export class ObjectSerializer {

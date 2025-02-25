@@ -19,6 +19,7 @@ from zrok_api.models.access_body1 import AccessBody1
 from zrok_api.models.account_body import AccountBody
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_body import ChangePasswordBody
+from zrok_api.models.client_version_check_body import ClientVersionCheckBody
 from zrok_api.models.configuration import Configuration
 from zrok_api.models.disable_body import DisableBody
 from zrok_api.models.enable_body import EnableBody
@@ -43,6 +44,7 @@ from zrok_api.models.inline_response2004_organizations import InlineResponse2004
 from zrok_api.models.inline_response2005 import InlineResponse2005
 from zrok_api.models.inline_response2005_memberships import InlineResponse2005Memberships
 from zrok_api.models.inline_response2006 import InlineResponse2006
+from zrok_api.models.inline_response2007 import InlineResponse2007
 from zrok_api.models.inline_response201 import InlineResponse201
 from zrok_api.models.inline_response2011 import InlineResponse2011
 from zrok_api.models.inline_response2012 import InlineResponse2012
@@ -75,4 +77,3 @@ from zrok_api.models.unaccess_body import UnaccessBody
 from zrok_api.models.unshare_body import UnshareBody
 from zrok_api.models.verify_body import VerifyBody
 from zrok_api.models.version import Version
-from zrok_api.models.version_body import VersionBody

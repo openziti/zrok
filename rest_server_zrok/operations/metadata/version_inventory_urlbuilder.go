@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// ClientVersionCheckURL generates an URL for the client version check operation
-type ClientVersionCheckURL struct {
+// VersionInventoryURL generates an URL for the version inventory operation
+type VersionInventoryURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ClientVersionCheckURL) WithBasePath(bp string) *ClientVersionCheckURL {
+func (o *VersionInventoryURL) WithBasePath(bp string) *VersionInventoryURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *ClientVersionCheckURL) WithBasePath(bp string) *ClientVersionCheckURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ClientVersionCheckURL) SetBasePath(bp string) {
+func (o *VersionInventoryURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *ClientVersionCheckURL) Build() (*url.URL, error) {
+func (o *VersionInventoryURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/clientVersionCheck"
+	var _path = "/versions"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -47,7 +47,7 @@ func (o *ClientVersionCheckURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *ClientVersionCheckURL) Must(u *url.URL, err error) *url.URL {
+func (o *VersionInventoryURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *ClientVersionCheckURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *ClientVersionCheckURL) String() string {
+func (o *VersionInventoryURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *ClientVersionCheckURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *VersionInventoryURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on ClientVersionCheckURL")
+		return nil, errors.New("scheme is required for a full url on VersionInventoryURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on ClientVersionCheckURL")
+		return nil, errors.New("host is required for a full url on VersionInventoryURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *ClientVersionCheckURL) BuildFull(scheme, host string) (*url.URL, error)
 }
 
 // StringFull returns the string representation of a complete url
-func (o *ClientVersionCheckURL) StringFull(scheme, host string) string {
+func (o *VersionInventoryURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

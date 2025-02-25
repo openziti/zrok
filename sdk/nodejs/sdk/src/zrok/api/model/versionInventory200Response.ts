@@ -12,20 +12,20 @@
 
 import { RequestFile } from './models';
 
-export class RegenerateToken200Response {
-    'token'?: string;
+export class VersionInventory200Response {
+    'controllerVersion'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "token",
-            "baseName": "token",
+            "name": "controllerVersion",
+            "baseName": "controllerVersion",
             "type": "string"
         }    ];
 
     static getAttributeTypeMap() {
-        return RegenerateToken200Response.attributeTypeMap;
+        return VersionInventory200Response.attributeTypeMap;
     }
 }
 

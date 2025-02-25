@@ -4,7 +4,7 @@ All URIs are relative to */api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**client_version_check**](MetadataApi.md#client_version_check) | **POST** /version | 
+[**client_version_check**](MetadataApi.md#client_version_check) | **POST** /clientVersionCheck | 
 [**configuration**](MetadataApi.md#configuration) | **GET** /configuration | 
 [**get_account_detail**](MetadataApi.md#get_account_detail) | **GET** /detail/account | 
 [**get_account_metrics**](MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**org_account_overview**](MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 [**overview**](MetadataApi.md#overview) | **GET** /overview | 
 [**version**](MetadataApi.md#version) | **GET** /version | 
+[**version_inventory**](MetadataApi.md#version_inventory) | **GET** /versions | 
 
 # **client_version_check**
 > client_version_check(body=body)
@@ -35,7 +36,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = zrok_api.MetadataApi()
-body = zrok_api.VersionBody() # VersionBody |  (optional)
+body = zrok_api.ClientVersionCheckBody() # ClientVersionCheckBody |  (optional)
 
 try:
     api_instance.client_version_check(body=body)
@@ -47,7 +48,7 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**VersionBody**](VersionBody.md)|  | [optional] 
+ **body** | [**ClientVersionCheckBody**](ClientVersionCheckBody.md)|  | [optional] 
 
 ### Return type
 
@@ -740,6 +741,47 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**Version**](Version.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **version_inventory**
+> InlineResponse2007 version_inventory()
+
+
+
+### Example
+```python
+from __future__ import print_function
+import time
+import zrok_api
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = zrok_api.MetadataApi()
+
+try:
+    api_response = api_instance.version_inventory()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling MetadataApi->version_inventory: %s\n" % e)
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**InlineResponse2007**](InlineResponse2007.md)
 
 ### Authorization
 

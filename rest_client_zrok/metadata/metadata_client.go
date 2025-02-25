@@ -60,6 +60,8 @@ type ClientService interface {
 
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
+	VersionInventory(params *VersionInventoryParams, opts ...ClientOption) (*VersionInventoryOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -74,7 +76,7 @@ func (a *Client) ClientVersionCheck(params *ClientVersionCheckParams, opts ...Cl
 	op := &runtime.ClientOperation{
 		ID:                 "clientVersionCheck",
 		Method:             "POST",
-		PathPattern:        "/version",
+		PathPattern:        "/clientVersionCheck",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
@@ -642,6 +644,44 @@ func (a *Client) Version(params *VersionParams, opts ...ClientOption) (*VersionO
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for version: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+VersionInventory version inventory API
+*/
+func (a *Client) VersionInventory(params *VersionInventoryParams, opts ...ClientOption) (*VersionInventoryOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewVersionInventoryParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "versionInventory",
+		Method:             "GET",
+		PathPattern:        "/versions",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &VersionInventoryReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*VersionInventoryOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for versionInventory: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

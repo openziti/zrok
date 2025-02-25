@@ -27,6 +27,7 @@ import type {
   ModelConfiguration,
   Overview,
   Share,
+  VersionInventory200Response,
 } from '../models/index';
 import {
     ClientVersionCheckRequestFromJSON,
@@ -53,6 +54,8 @@ import {
     OverviewToJSON,
     ShareFromJSON,
     ShareToJSON,
+    VersionInventory200ResponseFromJSON,
+    VersionInventory200ResponseToJSON,
 } from '../models/index';
 
 export interface ClientVersionCheckOperationRequest {
@@ -137,7 +140,7 @@ export class MetadataApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
         const response = await this.request({
-            path: `/version`,
+            path: `/clientVersionCheck`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -585,6 +588,30 @@ export class MetadataApi extends runtime.BaseAPI {
      */
     async version(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.versionRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async versionInventoryRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VersionInventory200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/versions`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => VersionInventory200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async versionInventory(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VersionInventory200Response> {
+        const response = await this.versionInventoryRaw(initOverrides);
         return await response.value();
     }
 

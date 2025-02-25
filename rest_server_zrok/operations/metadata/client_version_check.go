@@ -33,7 +33,7 @@ func NewClientVersionCheck(ctx *middleware.Context, handler ClientVersionCheckHa
 }
 
 /*
-	ClientVersionCheck swagger:route POST /version metadata clientVersionCheck
+	ClientVersionCheck swagger:route POST /clientVersionCheck metadata clientVersionCheck
 
 ClientVersionCheck client version check API
 */

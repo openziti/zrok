@@ -26,3 +26,9 @@ func clientVersionCheckHandler(params metadata.ClientVersionCheckParams) middlew
 	}
 	return metadata.NewClientVersionCheckOK()
 }
+
+func versionInventoryHandler(params metadata.VersionInventoryParams) middleware.Responder {
+	return metadata.NewVersionInventoryOK().WithPayload(&metadata.VersionInventoryOKBody{
+		ControllerVersion: build.String(),
+	})
+}

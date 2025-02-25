@@ -55,5 +55,6 @@ models/UpdateFrontendRequest.ts
 models/UpdateShareRequest.ts
 models/Verify200Response.ts
 models/VerifyRequest.ts
+models/VersionInventory200Response.ts
 models/index.ts
 runtime.ts

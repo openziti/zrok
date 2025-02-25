@@ -36,7 +36,7 @@ func (o *ClientVersionCheckReader) ReadResponse(response runtime.ClientResponse,
 		}
 		return nil, result
 	default:
-		return nil, runtime.NewAPIError("[POST /version] clientVersionCheck", response, response.Code())
+		return nil, runtime.NewAPIError("[POST /clientVersionCheck] clientVersionCheck", response, response.Code())
 	}
 }
 
@@ -84,11 +84,11 @@ func (o *ClientVersionCheckOK) Code() int {
 }
 
 func (o *ClientVersionCheckOK) Error() string {
-	return fmt.Sprintf("[POST /version][%d] clientVersionCheckOK ", 200)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK ", 200)
 }
 
 func (o *ClientVersionCheckOK) String() string {
-	return fmt.Sprintf("[POST /version][%d] clientVersionCheckOK ", 200)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK ", 200)
 }
 
 func (o *ClientVersionCheckOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -141,11 +141,11 @@ func (o *ClientVersionCheckBadRequest) Code() int {
 }
 
 func (o *ClientVersionCheckBadRequest) Error() string {
-	return fmt.Sprintf("[POST /version][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *ClientVersionCheckBadRequest) String() string {
-	return fmt.Sprintf("[POST /version][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *ClientVersionCheckBadRequest) GetPayload() string {

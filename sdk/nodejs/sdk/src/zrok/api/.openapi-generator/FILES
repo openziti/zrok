@@ -1,4 +1,5 @@
 .gitignore
+.openapi-generator-ignore
 api.ts
 api/accountApi.ts
 api/adminApi.ts
@@ -58,3 +59,4 @@ model/updateFrontendRequest.ts
 model/updateShareRequest.ts
 model/verify200Response.ts
 model/verifyRequest.ts
+model/versionInventory200Response.ts

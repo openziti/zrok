@@ -28,50 +28,50 @@ class InlineResponse2006Memberships(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'token': 'str',
+        'organization_token': 'str',
         'description': 'str',
         'admin': 'bool'
     }
 
     attribute_map = {
-        'token': 'token',
+        'organization_token': 'organizationToken',
         'description': 'description',
         'admin': 'admin'
     }
 
-    def __init__(self, token=None, description=None, admin=None):  # noqa: E501
+    def __init__(self, organization_token=None, description=None, admin=None):  # noqa: E501
         """InlineResponse2006Memberships - a model defined in Swagger"""  # noqa: E501
-        self._token = None
+        self._organization_token = None
         self._description = None
         self._admin = None
         self.discriminator = None
-        if token is not None:
-            self.token = token
+        if organization_token is not None:
+            self.organization_token = organization_token
         if description is not None:
             self.description = description
         if admin is not None:
             self.admin = admin
 
     @property
-    def token(self):
-        """Gets the token of this InlineResponse2006Memberships.  # noqa: E501
+    def organization_token(self):
+        """Gets the organization_token of this InlineResponse2006Memberships.  # noqa: E501
 
 
-        :return: The token of this InlineResponse2006Memberships.  # noqa: E501
+        :return: The organization_token of this InlineResponse2006Memberships.  # noqa: E501
         :rtype: str
         """
-        return self._token
+        return self._organization_token
 
-    @token.setter
-    def token(self, token):
-        """Sets the token of this InlineResponse2006Memberships.
+    @organization_token.setter
+    def organization_token(self, organization_token):
+        """Sets the organization_token of this InlineResponse2006Memberships.
 
 
-        :param token: The token of this InlineResponse2006Memberships.  # noqa: E501
+        :param organization_token: The organization_token of this InlineResponse2006Memberships.  # noqa: E501
         :type: str
         """
 
-        self._token = token
+        self._organization_token = organization_token
 
     @property
     def description(self):

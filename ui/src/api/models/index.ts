@@ -50,3 +50,4 @@ export * from './UpdateFrontendRequest';
 export * from './UpdateShareRequest';
 export * from './Verify200Response';
 export * from './VerifyRequest';
+export * from './VersionInventory200Response';

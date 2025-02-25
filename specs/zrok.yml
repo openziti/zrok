@@ -673,6 +673,26 @@ paths:
   #
   # metadata
   #
+  /clientVersionCheck:
+    post:
+      tags:
+        - metadata
+      operationId: clientVersionCheck
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              clientVersion:
+                type: string
+      responses:
+        200:
+          description: compatible
+        400:
+          description: not compatible
+          schema:
+            type: string
+
   /configuration:
     get:
       tags:
@@ -981,6 +1001,7 @@ paths:
         500:
           description: internal server error
 
+  # deprecated (for legacy clients)
   /version:
     get:
       tags:
@@ -991,24 +1012,19 @@ paths:
           description: legacy upgrade required
           schema:
             $ref: "#/definitions/version"
-    post:
+
+  /versions:
+    get:
       tags:
         - metadata
-      operationId: clientVersionCheck
-      parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              clientVersion:
-                type: string
+      operationId: versionInventory
       responses:
         200:
-          description: compatible
-        400:
-          description: not compatible
+          description: ok
           schema:
-            type: string
+            properties:
+              controllerVersion:
+                type: string
 
   #
   # share

@@ -84,6 +84,7 @@ func Run(inCfg *config.Config) error {
 	api.MetadataOrgAccountOverviewHandler = newOrgAccountOverviewHandler()
 	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
+	api.MetadataVersionInventoryHandler = metadata.VersionInventoryHandlerFunc(versionInventoryHandler)
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()

@@ -237,6 +237,38 @@ func init() {
         }
       }
     },
+    "/clientVersionCheck": {
+      "post": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "clientVersionCheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "clientVersion": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "compatible"
+          },
+          "400": {
+            "description": "not compatible",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "/configuration": {
       "get": {
         "tags": [
@@ -1909,33 +1941,23 @@ func init() {
             }
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/versions": {
+      "get": {
         "tags": [
           "metadata"
         ],
-        "operationId": "clientVersionCheck",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
+        "operationId": "versionInventory",
+        "responses": {
+          "200": {
+            "description": "ok",
             "schema": {
               "properties": {
-                "clientVersion": {
+                "controllerVersion": {
                   "type": "string"
                 }
               }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "compatible"
-          },
-          "400": {
-            "description": "not compatible",
-            "schema": {
-              "type": "string"
             }
           }
         }
@@ -2519,6 +2541,38 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/clientVersionCheck": {
+      "post": {
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "clientVersionCheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "clientVersion": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "compatible"
+          },
+          "400": {
+            "description": "not compatible",
+            "schema": {
+              "type": "string"
+            }
           }
         }
       }
@@ -4144,33 +4198,23 @@ func init() {
             }
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/versions": {
+      "get": {
         "tags": [
           "metadata"
         ],
-        "operationId": "clientVersionCheck",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
+        "operationId": "versionInventory",
+        "responses": {
+          "200": {
+            "description": "ok",
             "schema": {
               "properties": {
-                "clientVersion": {
+                "controllerVersion": {
                   "type": "string"
                 }
               }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "compatible"
-          },
-          "400": {
-            "description": "not compatible",
-            "schema": {
-              "type": "string"
             }
           }
         }

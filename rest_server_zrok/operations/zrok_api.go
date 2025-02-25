@@ -184,6 +184,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
+		MetadataVersionInventoryHandler: metadata.VersionInventoryHandlerFunc(func(params metadata.VersionInventoryParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.VersionInventory has not yet been implemented")
+		}),
 
 		// Applies when the "x-token" header is set
 		KeyAuth: func(token string) (*rest_model_zrok.Principal, error) {
@@ -324,6 +327,8 @@ type ZrokAPI struct {
 	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
+	// MetadataVersionInventoryHandler sets the operation handler for the version inventory operation
+	MetadataVersionInventoryHandler metadata.VersionInventoryHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -540,6 +545,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
 	}
+	if o.MetadataVersionInventoryHandler == nil {
+		unregistered = append(unregistered, "metadata.VersionInventoryHandler")
+	}
 
 	if len(unregistered) > 0 {
 		return fmt.Errorf("missing registration: %s", strings.Join(unregistered, ", "))
@@ -654,7 +662,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/version"] = metadata.NewClientVersionCheck(o.context, o.MetadataClientVersionCheckHandler)
+	o.handlers["POST"]["/clientVersionCheck"] = metadata.NewClientVersionCheck(o.context, o.MetadataClientVersionCheckHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -819,6 +827,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/version"] = metadata.NewVersion(o.context, o.MetadataVersionHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/versions"] = metadata.NewVersionInventory(o.context, o.MetadataVersionInventoryHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

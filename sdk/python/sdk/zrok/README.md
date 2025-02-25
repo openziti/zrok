@@ -170,7 +170,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
-*MetadataApi* | [**client_version_check**](docs/MetadataApi.md#client_version_check) | **POST** /version | 
+*MetadataApi* | [**client_version_check**](docs/MetadataApi.md#client_version_check) | **POST** /clientVersionCheck | 
 *MetadataApi* | [**configuration**](docs/MetadataApi.md#configuration) | **GET** /configuration | 
 *MetadataApi* | [**get_account_detail**](docs/MetadataApi.md#get_account_detail) | **GET** /detail/account | 
 *MetadataApi* | [**get_account_metrics**](docs/MetadataApi.md#get_account_metrics) | **GET** /metrics/account | 
@@ -185,6 +185,7 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**org_account_overview**](docs/MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 *MetadataApi* | [**overview**](docs/MetadataApi.md#overview) | **GET** /overview | 
 *MetadataApi* | [**version**](docs/MetadataApi.md#version) | **GET** /version | 
+*MetadataApi* | [**version_inventory**](docs/MetadataApi.md#version_inventory) | **GET** /versions | 
 *ShareApi* | [**access**](docs/ShareApi.md#access) | **POST** /access | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
@@ -199,6 +200,7 @@ Class | Method | HTTP request | Description
  - [AccountBody](docs/AccountBody.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordBody](docs/ChangePasswordBody.md)
+ - [ClientVersionCheckBody](docs/ClientVersionCheckBody.md)
  - [Configuration](docs/Configuration.md)
  - [DisableBody](docs/DisableBody.md)
  - [EnableBody](docs/EnableBody.md)
@@ -223,6 +225,7 @@ Class | Method | HTTP request | Description
  - [InlineResponse2005](docs/InlineResponse2005.md)
  - [InlineResponse2005Memberships](docs/InlineResponse2005Memberships.md)
  - [InlineResponse2006](docs/InlineResponse2006.md)
+ - [InlineResponse2007](docs/InlineResponse2007.md)
  - [InlineResponse201](docs/InlineResponse201.md)
  - [InlineResponse2011](docs/InlineResponse2011.md)
  - [InlineResponse2012](docs/InlineResponse2012.md)
@@ -255,7 +258,6 @@ Class | Method | HTTP request | Description
  - [UnshareBody](docs/UnshareBody.md)
  - [VerifyBody](docs/VerifyBody.md)
  - [Version](docs/Version.md)
- - [VersionBody](docs/VersionBody.md)
 
 ## Documentation For Authorization
 
