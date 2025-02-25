@@ -23,20 +23,43 @@ jobs:
             exit 1
           fi
 
-  update-brew:
+  brew_formula:
     needs: enforce_stable_semver
-    if: github.repository_owner == 'openziti'
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'openziti' || github.repository_owner == 'openziti-test-kitchen'
+    runs-on: ubuntu-24.04
     steps:
-      - name: Extract Version
-        id: extract-version
-        run: |
-          echo "tag-name=${GITHUB_REF#refs/tags/}" | tee -a ${GITHUB_OUTPUT}
 
-      - uses: mislav/bump-homebrew-formula-action@v3.1
-        if: ${{ !contains(github.ref, '-') }}
+      - name: Get Checksums File
+        shell: bash
+        run: |
+          curl -sSLf -o checksums.sha256.txt \
+            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/checksums.sha256.txt
+
+      - name: Get Source Archive
+        shell: bash
+        run: |
+          curl -sSLf -o source-${{ github.ref_name }}.tar.gz \
+            https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source-${{ github.ref_name }}.tar.gz
+
+      - name: Verify Source Archive Checksum
+        shell: bash
+        run: |
+          shasum --algorithm 256 --ignore-missing --check checksums.sha256.txt
+
+      - name: Extract Source Archive Checksum
+        id: source
+        shell: bash
+        run: |
+          CHECKSUM=$(grep -E "\bsource-${{ github.ref_name }}\.tar\.gz$" checksums.sha256.txt | cut -d' ' -f1)
+          echo "sha256=${CHECKSUM}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Upload Release Source Archive to Homebrew
+        uses: mislav/bump-homebrew-formula-action@v3.2
         with:
           formula-name: zrok
-          download-url: https://github.com/openziti/zrok/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
+          formula-path: Formula/z/zrok.rb
+          download-url: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/source-${{ github.ref_name }}.tar.gz
+          download-sha256: ${{ steps.source.outputs.sha256 }}
+          homebrew-tap: ${{ vars.ZROK_BREW_TAP || 'Homebrew/homebrew-core' }}
         env:
           COMMITTER_TOKEN: ${{ secrets.BREW_COMMITTER_TOKEN }}

@@ -26,11 +26,21 @@ CHANGE: The protocol for determining valid client versions has been changed. Pre
 
 ## v0.4.49
 
-FIX: Pre-releases are no longer uploaded to the stable Linux package repo.
+FIX: Release artifacts now include a reproducible source archive. The archive's download URL is now used by the Homebrew formula when building from source instead of the archive generated on-demand by GitHub (https://github.com/openziti/zrok/issues/858).
+
+FIX: Pre-releases are no longer uploaded to the stable Linux package repo, and workflows that promote stable release artifacts to downstream distribution channels enforce semver stable release tags, i.e., not having a semver hyphenated prerelease suffix.
+
+CHANGE: The release `checksums.txt` has been renamed `checksums.sha256.txt` to reflect the use of a collision-resistant algorithm instead of `shasum`'s default algorithm, SHA-1.
+
+CHANGE: The dependency graph is now published as a release artifact named `sbom-{version}.spdx.json` (https://github.com/openziti/zrok/issues/888).
 
 CHANGE: Pre-releases are uploaded to the pre-release Linux package repo and Docker Hub for testing. [RELEASING.md](./RELEASING.md) describes releaser steps and the events they trigger.
 
 CHANGE: Linux release binaries are now built on the ziti-builder container image based on Ubuntu Focal 20.04 to preserve backward compatibility as the ubuntu-20.04 GitHub runner is end of life.
+
+CHANGE: Container images now include SLSA and SBOM attestations, and these are also published to the Docker Hub registry (https://github.com/openziti/zrok/issues/890).
+
+CHANGE: Release binary and text artifacts are now accompanied by provenance attestations (https://github.com/openziti/zrok/issues/889).
 
 ## v0.4.48
 

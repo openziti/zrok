@@ -5,10 +5,6 @@ on:
     tags:
       - 'v*.*.*'
 
-# grant write permission to GITHUB_TOKEN for goreleaser
-permissions:
-  contents: write
-
 env:
   ZITI_DEB_TEST_REPO: ${{ vars.ZITI_DEB_TEST_REPO || 'zitipax-openziti-deb-test' }}
   ZITI_RPM_TEST_REPO: ${{ vars.ZITI_RPM_TEST_REPO || 'zitipax-openziti-rpm-test' }}
@@ -287,11 +283,32 @@ jobs:
   draft-release:
     runs-on: ubuntu-latest
     needs: call-publish-docker-images
+    permissions:
+      contents: write  # need write to draft the release
+      id-token: write  # need write to get OIDC token for generating attestations
+      attestations: write  # need write to create attestations
     steps:
       - uses: actions/checkout@v4
 
       - run: |
           mkdir -p ./automated-release-build
+
+      - name: Fetch Source Archive
+        shell: bash
+        run: |
+          curl -sSLf -o ./automated-release-build/source-${{ github.ref_name }}.tar.gz \
+            https://api.github.com/repos/${{ github.repository }}/tarball/${{ github.ref_name }}
+
+      - name: Build SBOM from Dependency Graph as SPDX JSON
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/dependency-graph/sbom \
+            | tee ./automated-release-build/sbom-${{ github.ref_name }}.spdx.json
 
       - uses: actions/download-artifact@v4
         with:
@@ -299,11 +316,26 @@ jobs:
           merge-multiple: true
           pattern: release-builds-*
 
-      - run: |
-          ls -lAR ./automated-release-build/
-          shasum ./automated-release-build/* > ./automated-release-build/checksums.txt
+      - name: Create Checksum Files
+        shell: bash
+        run: |
 
-      - uses: goreleaser/goreleaser-action@v6
+          ls -lAR ./automated-release-build/
+
+          # create checksum file for the attestations
+          shasum --algorithm 256 ./automated-release-build/* | tee /tmp/attestation-subjects.sha256.txt
+
+          # create checksum file for the release
+          cd ./automated-release-build/
+          shasum --algorithm 256 ./* | tee ./checksums.sha256.txt
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-checksums: /tmp/attestation-subjects.sha256.txt
+
+      - name: Draft Release
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: '~> v2'
