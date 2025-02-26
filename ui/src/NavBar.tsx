@@ -50,7 +50,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
 
     const gettingStartedButton = (
         <Grid2 display="flex" justifyContent="right">
-            <Tooltip title="Getting Started Help">
+            <Tooltip title="Getting Started Wizard">
                 <Button style={{ backgroundColor: "#9bf316", color: "black" }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
             </Tooltip>
         </Grid2>
@@ -58,8 +58,8 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
 
     const helpButton = (
         <Grid2 display="flex" justifyContent="right">
-            <Tooltip title="Help">
-                <Button color="inherit" href="https://docs.zrok.io" target="_"><HelpIcon /></Button>
+            <Tooltip title="Getting Started Wizard">
+                <Button style={{ color: "#9bf316" }} onClick={openGettingStarted}><HelpIcon /></Button>
             </Tooltip>
         </Grid2>
     );
