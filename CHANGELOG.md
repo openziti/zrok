@@ -14,7 +14,7 @@ FEATURE: `zrok share [public|private|reserved]` and `zrok access private` now au
 
 FEATURE: `zrok access private` supports a new `--auto` mode, which can automatically find an available open address/port to bind the frontend listener on. Also includes `--auto-address`, `--auto-start-port`, and `--auto-end-port` features with sensible defaults. Supported by both the agent and local operating modes (https://github.com/openziti/zrok/issues/780)
 
-FEATURE: `zrok rebase` command allows "rebasing" an enabled environment onto a different API endpoint. This is useful for migrating already-enabled environments between endpoints supporting different zrok versions (https://github.com/openziti/zrok/issues/869)
+FEATURE: `zrok rebase` commands (`zrok rebase apiEndpoint` and `zrok rebase accountToken`) allows "rebasing" an enabled environment onto a different API endpoint or a different account token. This is useful for migrating already-enabled environments between endpoints supporting different zrok versions, and is also useful when regenerating an account token (https://github.com/openziti/zrok/issues/869, https://github.com/openziti/zrok/issues/897)
 
 FEATURE: `zrok test canary` CLI tree replaces the old `zrok test loop` tree; new `zrok test canary public-proxy` and `zrok test canary private-proxy` provide modernized, updated versions of what the `zrok test loop` commands used to do. This new approach will serve as the foundation for all future zrok testing infrastructure (https://github.com/openziti/zrok/issues/771)
 

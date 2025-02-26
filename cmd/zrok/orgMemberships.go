@@ -49,7 +49,7 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	in, err := zrok.Metadata.ListMemberships(nil, auth)
 	if err != nil {

@@ -33,6 +33,7 @@ func init() {
 	rootCmd.AddCommand(modifyCmd)
 	organizationCmd.AddCommand(organizationAdminCmd)
 	rootCmd.AddCommand(organizationCmd)
+	rootCmd.AddCommand(rebaseCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
 	testCmd.AddCommand(testCanaryCmd)
@@ -124,6 +125,11 @@ var organizationCmd = &cobra.Command{
 	Use:     "organization",
 	Aliases: []string{"org"},
 	Short:   "Organization commands",
+}
+
+var rebaseCmd = &cobra.Command{
+	Use:   "rebase",
+	Short: "Rebase enabled zrok environment",
 }
 
 var shareCmd = &cobra.Command{

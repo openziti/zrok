@@ -282,7 +282,7 @@ func loadEnvironment() (*env_core.Environment, error) {
 		return nil, errors.Wrapf(err, "error unmarshaling environment file '%v'", ef)
 	}
 	out := &env_core.Environment{
-		Token:        env.Token,
+		AccountToken: env.AccountToken,
 		ZitiIdentity: env.ZId,
 		ApiEndpoint:  env.ApiEndpoint,
 	}
@@ -291,9 +291,9 @@ func loadEnvironment() (*env_core.Environment, error) {
 
 func saveEnvironment(env *env_core.Environment) error {
 	in := &environment{
-		Token:       env.Token,
-		ZId:         env.ZitiIdentity,
-		ApiEndpoint: env.ApiEndpoint,
+		AccountToken: env.AccountToken,
+		ZId:          env.ZitiIdentity,
+		ApiEndpoint:  env.ApiEndpoint,
 	}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
@@ -335,7 +335,7 @@ type config struct {
 }
 
 type environment struct {
-	Token       string `json:"zrok_token"`
-	ZId         string `json:"ziti_identity"`
-	ApiEndpoint string `json:"api_endpoint"`
+	AccountToken string `json:"zrok_token"`
+	ZId          string `json:"ziti_identity"`
+	ApiEndpoint  string `json:"api_endpoint"`
 }

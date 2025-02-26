@@ -50,7 +50,7 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().AccountToken)
 	req := share.NewUnshareParams()
 	req.Body.EnvZID = env.Environment().ZitiIdentity
 	req.Body.ShareToken = shrToken

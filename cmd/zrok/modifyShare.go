@@ -54,7 +54,7 @@ func (cmd *modifyShareCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	if len(cmd.addAccessGrants) > 0 || len(cmd.removeAccessGrants) > 0 {
 		req := share.NewUpdateShareParams()
