@@ -120,7 +120,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		prg.Send("writing the environment details...")
 	}
 	apiEndpoint, _ := env.ApiEndpoint()
-	if err := env.SetEnvironment(&env_core.Environment{Token: token, ZitiIdentity: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
+	if err := env.SetEnvironment(&env_core.Environment{AccountToken: token, ZitiIdentity: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
 			prg.Quit()

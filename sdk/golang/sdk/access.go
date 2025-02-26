@@ -20,7 +20,7 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting zrok client")
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	in, err := zrok.Share.Access(out, auth)
 	if err != nil {
@@ -40,7 +40,7 @@ func DeleteAccess(root env_core.Root, acc *Access) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting zrok client")
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	_, err = zrok.Share.Unaccess(out, auth)
 	if err != nil {

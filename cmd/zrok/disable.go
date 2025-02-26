@@ -49,7 +49,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().AccountToken)
 	req := restEnvironment.NewDisableParams()
 	req.Body.Identity = env.Environment().ZitiIdentity
 

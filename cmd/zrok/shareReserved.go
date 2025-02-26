@@ -105,7 +105,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	if err != nil {
 		cmd.error("unable to create zrok client", err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 	req := metadata.NewGetShareDetailParams()
 	req.ShareToken = shrToken
 	resp, err := zrok.Metadata.GetShareDetail(req, auth)

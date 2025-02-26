@@ -84,18 +84,25 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
-                        You will need to manually edit your <code>$&#123;HOME&#125;/.zrok/environment.json</code> files
-                        (in each environment) to use the new <code>zrok_token</code>. Updating these files will restore
-                        the functionality of your environments.
+                        You will need to use the <code> zrok rebase accountToken </code> command to update any enabled
+                        environments to use your new account token. Rebasing your environments will minimize any service
+                        disruptions caused by regenerating your account token.
                     </Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
-                        Alternatively, you can just <code>zrok disable</code> any enabled environments and re-enable
-                        using the updated account token. Running <code>zrok disable</code> before you regenerate will
+                        Keep in mind that once you've regenerated your account token, any running <code> zrok share </code>
+                        or <code> zrok access </code> processes may not be able to interact with the zrok service properly
+                        until they are restarted.
+                    </Typography>
+                </Grid2>
+                <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+                    <Typography>
+                        Alternatively, you can just <code> zrok disable </code> any enabled environments and re-enable
+                        using the updated account token. Running <code> zrok disable </code> before you regenerate will
                         delete your environments and any shares they contain (including reserved shares). So if you have
-                        environments and reserved shares you need to preserve, your best option is to update the <code>zrok_token</code> in
-                        those environments as described above.
+                        environments and reserved shares you need to preserve, your best option is to use the
+                        <code> zrok rebase accountToken </code> command as described above.
                     </Typography>
                 </Grid2>
                 { successMessage ? null : controls }

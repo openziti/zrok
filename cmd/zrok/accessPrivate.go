@@ -116,7 +116,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		cmd.error(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 	req := share.NewAccessParams()
 	req.Body.ShareToken = shrToken
 	req.Body.EnvZID = root.Environment().ZitiIdentity

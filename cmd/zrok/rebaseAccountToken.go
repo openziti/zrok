@@ -10,25 +10,25 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newRebaseCommand().cmd)
+	rebaseCmd.AddCommand(newRebaseAccountTokenCommand().cmd)
 }
 
-type rebaseCommand struct {
+type rebaseAccountTokenCommand struct {
 	cmd *cobra.Command
 }
 
-func newRebaseCommand() *rebaseCommand {
+func newRebaseAccountTokenCommand() *rebaseAccountTokenCommand {
 	cmd := &cobra.Command{
-		Use:   "rebase <apiEndpoint>",
-		Short: "Rebase an enabled environment onto a different API endpoint URL",
+		Use:   "accountToken <accountToken>",
+		Short: "Rebase an enabled environment onto a different account token",
 		Args:  cobra.ExactArgs(1),
 	}
-	command := &rebaseCommand{cmd: cmd}
+	command := &rebaseAccountTokenCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *rebaseCommand) run(_ *cobra.Command, args []string) {
+func (cmd *rebaseAccountTokenCommand) run(_ *cobra.Command, args []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("error loading root", err)
@@ -38,9 +38,9 @@ func (cmd *rebaseCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("environment not enabled; 'zrok enable' your environment instead", nil)
 	}
 
-	currentEndpoint, _ := root.ApiEndpoint()
-	if args[0] != currentEndpoint {
-		fmt.Printf("this action will rebase your enabled environment to use the zrok API at: %v\n", currentEndpoint)
+	env := root.Environment()
+	if args[0] != env.AccountToken {
+		fmt.Printf("this action will rebase your enabled environment to use the account token '%v'\n", args[0])
 		fmt.Println()
 		fmt.Println("you should only proceed if you understand why you're doing this!")
 		fmt.Println()
@@ -54,16 +54,13 @@ func (cmd *rebaseCommand) run(_ *cobra.Command, args []string) {
 		}
 		fmt.Println()
 
-		env := root.Environment()
-		env.ApiEndpoint = args[0]
-
+		env.AccountToken = args[0]
 		if err := root.SetEnvironment(env); err != nil {
 			tui.Error("error rebasing environment", err)
 		}
 
-		fmt.Printf("environment rebased to zrok API at: %v\n", env.ApiEndpoint)
-
+		fmt.Printf("environment rebased to account token '%v'\n", env.AccountToken)
 	} else {
-		fmt.Printf("environment already configured to use API endpoint: %v\n", currentEndpoint)
+		fmt.Printf("environment already configured to use the account token '%v'\n", env.AccountToken)
 	}
 }

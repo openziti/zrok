@@ -32,7 +32,7 @@ type Root interface {
 }
 
 type Environment struct {
-	Token        string
+	AccountToken string
 	ZitiIdentity string
 	ApiEndpoint  string
 }
