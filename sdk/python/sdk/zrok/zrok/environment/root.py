@@ -61,7 +61,7 @@ class Root:
         return zrock_client
 
     def ApiEndpoint(self) -> ApiEndpoint:
-        apiEndpoint = "https://api.zrok.io"
+        apiEndpoint = "https://api-v1.zrok.io"
         frm = "binary"
 
         if self.cfg.ApiEndpoint != "":

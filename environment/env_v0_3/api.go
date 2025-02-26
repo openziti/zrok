@@ -62,7 +62,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 }
 
 func (r *Root) ApiEndpoint() (string, string) {
-	apiEndpoint := "https://api.zrok.io"
+	apiEndpoint := "https://api-v1.zrok.io"
 	from := "binary"
 
 	if r.Config() != nil && r.Config().ApiEndpoint != "" {

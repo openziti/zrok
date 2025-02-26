@@ -76,7 +76,7 @@ export class Root {
     }
 
     public ApiEndpoint(): ApiEndpoint {
-        let apiEndpoint = "https://api.zrok.io"
+        let apiEndpoint = "https://api-v1.zrok.io"
         let frm = "binary"
 
         if (this.cfg.ApiEndpoint != "") {
