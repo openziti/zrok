@@ -20,6 +20,8 @@ FEATURE: `zrok test canary` CLI tree replaces the old `zrok test loop` tree; new
 
 FEATURE: New `/api/v1/versions` endpoint to return comprehensive, full stack version information about the deployed service instance. Currently only returns a single `controllerVersion` property (https://github.com/openziti/zrok/issues/881) 
 
+CHANGE: The default API URL for `v1.0.x` zrok clients is now `https://api-v1.zrok.io` (instead of the older `https://api.zrok.io`). The zrok.io deployment will now be maintaining version-specific DNS for versioned API endpoints.
+
 CHANGE: Refactored API implementation. Cleanup, lint removal, additional data elements added, unused data removed (https://github.com/openziti/zrok/issues/834)
 
 CHANGE: Deprecated the `passwords` configuration stanza. The zrok controller and API console now use a hard-coded set of (what we believe to be) reasonable assumptions about password quality (https://github.com/openziti/zrok/issues/834)
