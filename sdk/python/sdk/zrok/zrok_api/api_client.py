@@ -66,8 +66,7 @@ class ApiClient(object):
             configuration = Configuration()
         self.configuration = configuration
 
-        # Use the pool property to lazily initialize the ThreadPool.
-        self._pool = None
+        self.pool = ThreadPool()
         self.rest_client = rest.RESTClientObject(configuration)
         self.default_headers = {}
         if header_name is not None:
@@ -75,18 +74,10 @@ class ApiClient(object):
         self.cookie = cookie
         # Set default User-Agent.
         self.user_agent = 'Swagger-Codegen/1.0.0/python'
-        self.client_side_validation = configuration.client_side_validation
 
     def __del__(self):
-        if self._pool is not None:
-            self._pool.close()
-            self._pool.join()
-
-    @property
-    def pool(self):
-        if self._pool is None:
-            self._pool = ThreadPool()
-        return self._pool
+        self.pool.close()
+        self.pool.join()
 
     @property
     def user_agent(self):
@@ -533,10 +524,14 @@ class ApiClient(object):
             filename = re.search(r'filename=[\'"]?([^\'"\s]+)[\'"]?',
                                  content_disposition).group(1)
             path = os.path.join(os.path.dirname(path), filename)
-
-        with open(path, "w") as f:
-            f.write(response.data)
-
+            response_data = response.data
+            with open(path, "wb") as f:
+                if isinstance(response_data, str):
+                    # change str to bytes so we can write it
+                    response_data = response_data.encode('utf-8')
+                    f.write(response_data)
+                else:
+                    f.write(response_data)
         return path
 
     def __deserialize_primitive(self, data, klass):
@@ -601,7 +596,7 @@ class ApiClient(object):
             )
 
     def __hasattr(self, object, name):
-        return name in object.__class__.__dict__
+            return name in object.__class__.__dict__
 
     def __deserialize_model(self, data, klass):
         """Deserializes list or dict to model.
@@ -611,8 +606,7 @@ class ApiClient(object):
         :return: model object.
         """
 
-        if (not klass.swagger_types and
-                not self.__hasattr(klass, 'get_real_child_model')):
+        if not klass.swagger_types and not self.__hasattr(klass, 'get_real_child_model'):
             return data
 
         kwargs = {}
