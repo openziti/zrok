@@ -56,5 +56,12 @@ echo "...generating python sdk client"
 swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python
 
 git checkout rest_server_zrok/configure_zrok.go
-rm sdk/nodejs/sdk/src/zrok/api/git_push.sh
-rm sdk/python/sdk/zrok/git_push.sh
+
+for OLD in sdk/python/sdk/zrok/git_push.sh sdk/nodejs/sdk/src/zrok/api/git_push.sh
+do
+  if [ -e "$OLD" ]
+  then
+    rm "$OLD"
+  fi
+done
+
