@@ -37,9 +37,9 @@ def CreateAccess(root: Root, request: model.AccessRequest) -> model.Access:
         res = ShareApi(zrok).access(body=out)
     except Exception as e:
         raise Exception("unable to create access", e)
-    return model.Access(Token=res.frontend_token,
+    return model.Access(Token=res['frontendToken'],
                         ShareToken=request.ShareToken,
-                        BackendMode=res.backend_mode)
+                        BackendMode=res['backendMode'])
 
 
 def DeleteAccess(root: Root, acc: model.Access):

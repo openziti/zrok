@@ -34,7 +34,7 @@ class AccessRequest(object):
 
     attribute_map = {
         'env_zid': 'envZId',
-        'shr_token': 'shrToken'
+        'shr_token': 'shareToken'
     }
 
     def __init__(self, env_zid=None, shr_token=None):  # noqa: E501

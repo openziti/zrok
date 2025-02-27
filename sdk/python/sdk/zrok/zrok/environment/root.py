@@ -89,16 +89,15 @@ class Root:
         """Check if the client version is compatible with the API."""
         metadata_api = zrok.MetadataApi(zrock_client)
         try:
-            print(f"Sending client version: {V}")  # Log the version being sent
             data, status_code, headers = metadata_api.client_version_check_with_http_info(body={"clientVersion": V})
-            
+
             # Check if the response status code is 200 OK
             if status_code != 200:
                 raise Exception(f"Client version check failed: Unexpected status code {status_code}")
-            
+
             # Success case - status code is 200 and empty response body is expected
             return
-            
+
         except Exception as e:
             raise Exception(f"Client version check failed: {str(e)}")
 
