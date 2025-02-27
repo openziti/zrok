@@ -1,0 +1,40 @@
+{
+  "name": "@openziti/zrok",
+  "version": "1.0.0",
+  "description": "SDK to allow interaction with the zrok service from Node.js applications",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "security",
+    "network",
+    "peer-to-peer",
+    "reverse-proxy",
+    "zero-trust"
+  ],
+  "author": "NetFoundry",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openziti/zrok"
+  },
+  "bugs": {
+    "url": "https://github.com/openziti/zrok/issues"
+  },
+  "homepage": "https://github.com/openziti/zrok#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}

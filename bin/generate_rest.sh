@@ -46,6 +46,10 @@ openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/ag
 echo "...generating nodejs sdk ts client"
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/zrok/api -g typescript-node
 
+echo "...generating nodejs1 sdk ts client"
+rm -rf sdk/nodejs1/sdk/src/api
+openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs1/sdk/src/api -g typescript-fetch
+
 echo "...generating python sdk client"
 swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python
 
