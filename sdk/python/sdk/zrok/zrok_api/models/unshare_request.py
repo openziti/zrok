@@ -35,7 +35,7 @@ class UnshareRequest(object):
 
     attribute_map = {
         'env_zid': 'envZId',
-        'shr_token': 'shrToken',
+        'shr_token': 'shareToken',
         'reserved': 'reserved'
     }
 

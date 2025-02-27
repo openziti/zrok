@@ -110,6 +110,7 @@ class MetadataApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
+            # '/version', 'POST',
             '/clientVersionCheck', 'POST',
             path_params,
             query_params,

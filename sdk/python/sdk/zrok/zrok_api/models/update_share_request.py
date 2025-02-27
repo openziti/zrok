@@ -35,7 +35,7 @@ class UpdateShareRequest(object):
     }
 
     attribute_map = {
-        'shr_token': 'shrToken',
+        'shr_token': 'shareToken',
         'backend_proxy_endpoint': 'backendProxyEndpoint',
         'add_access_grants': 'addAccessGrants',
         'remove_access_grants': 'removeAccessGrants'
