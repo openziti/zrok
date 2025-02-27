@@ -7,8 +7,7 @@ import zrok_api as zrok
 from zrok_api.configuration import Configuration
 import re
 
-V = "v0.4"
-
+V = "v1.0"
 
 @dataclass
 class Metadata:
@@ -52,12 +51,7 @@ class Root:
         cfg.api_key_prefix['Authorization'] = 'Bearer'
 
         zrock_client = zrok.ApiClient(configuration=cfg)
-        v = zrok.MetadataApi(zrock_client).version()
-        # allow reported version string to be optionally prefixed with
-        # "refs/heads/" or "refs/tags/"
-        rxp = re.compile("^(refs/(heads|tags)/)?" + V)
-        if not rxp.match(v):
-            raise Exception("expected a '" + V + "' version, received: '" + v + "'")
+        self.client_version_check(zrock_client)  # Perform version check
         return zrock_client
 
     def ApiEndpoint(self) -> ApiEndpoint:
@@ -91,6 +85,22 @@ class Root:
     def ZitiIdentityNamed(self, name: str) -> str:
         return identityFile(name)
 
+    def client_version_check(self, zrock_client):
+        """Check if the client version is compatible with the API."""
+        metadata_api = zrok.MetadataApi(zrock_client)
+        try:
+            print(f"Sending client version: {V}")  # Log the version being sent
+            data, status_code, headers = metadata_api.client_version_check_with_http_info(body={"clientVersion": V})
+            
+            # Check if the response status code is 200 OK
+            if status_code != 200:
+                raise Exception(f"Client version check failed: Unexpected status code {status_code}")
+            
+            # Success case - status code is 200 and empty response body is expected
+            return
+            
+        except Exception as e:
+            raise Exception(f"Client version check failed: {str(e)}")
 
 def Default() -> Root:
     r = Root()

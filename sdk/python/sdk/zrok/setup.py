@@ -12,7 +12,7 @@ VERSION = "1.0.0"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil", "openziti >= 0.8.1"]
+REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil", "openziti >= 1.0.0"]
 
 setup(
     name=NAME,

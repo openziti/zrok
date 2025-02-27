@@ -1,5 +1,6 @@
 from zrok.environment.root import Root
-from zrok_api.models import AccessRequest, UnaccessRequest
+from zrok_api.models.access_request import AccessRequest
+from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.api import ShareApi
 from zrok import model
 

@@ -1,7 +1,9 @@
-from zrok.environment.root import Root
-from zrok_api.models import ShareRequest, UnshareRequest, AuthUser
-from zrok_api.api import ShareApi
 from zrok import model
+from zrok_api.api import ShareApi
+from zrok.environment.root import Root
+from zrok_api.models.auth_user import AuthUser
+from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.unshare_request import UnshareRequest
 
 
 class Share():
@@ -58,7 +60,7 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
     except Exception as e:
         raise Exception("unable to create share", e)
 
-    return model.Share(Token=res.shr_token,
+    return model.Share(Token=res.share_token,
                        FrontendEndpoints=res.frontend_proxy_endpoints)
 
 
