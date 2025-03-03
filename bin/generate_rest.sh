@@ -29,10 +29,14 @@ zrokDir=$(realpath "$scriptDir/..")
 
 zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
-pythonConfig=$(realpath "$zrokDir/bin/python_config.json")
-
 echo "...clean generate zrok server/client"
-rm -rf rest_*
+for GEN in \
+  ./rest_client_zrok/ \
+  ./rest_model_zrok/ \
+  ./rest_server_zrok/
+do
+  [[ -d $GEN ]] && rm -rf "$GEN"
+done
 
 echo "...generating zrok server"
 swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
@@ -53,6 +57,17 @@ rm -rf sdk/nodejs/sdk/src/api
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g typescript-fetch
 
 echo "...generating python sdk client"
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -g python
+# Clean up existing files listed in .openapi-generator/FILES before regeneration
+if [ -f sdk/python/sdk/zrok/.openapi-generator/FILES ]; then
+  while IFS= read -r file; do
+    if [ -f "sdk/python/sdk/zrok/$file" ]; then
+      echo "Removing existing file: sdk/python/sdk/zrok/$file"
+      rm "sdk/python/sdk/zrok/$file"
+    fi
+  done < sdk/python/sdk/zrok/.openapi-generator/FILES
+fi
+# Then remove the tracking file itself
+rm -f sdk/python/sdk/zrok/.openapi-generator/FILES
+openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok --package-name zrok_api -g python
 
 git checkout rest_server_zrok/configure_zrok.go
