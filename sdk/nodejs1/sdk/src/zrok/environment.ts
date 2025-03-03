@@ -1,6 +1,6 @@
 import {environmentFile, identityFile, metadataFile} from "./paths";
 import * as fs from "node:fs";
-import {Configuration} from "./api";
+import {Configuration} from "../api";
 
 const ENVIRONMENT_V = "v0.4";
 

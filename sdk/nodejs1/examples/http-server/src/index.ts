@@ -1,7 +1,14 @@
 import {Command} from "commander";
-import {loadRoot} from "@openziti/zrok/dist/environment";
-import {express, init} from "@openziti/zrok/dist/express";
-import {createShare, deleteShare, PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, ShareRequest} from "@openziti/zrok/dist/share";
+import {
+    createShare,
+    deleteShare,
+    express,
+    init,
+    loadRoot,
+    PROXY_BACKEND_MODE,
+    PUBLIC_SHARE_MODE,
+    ShareRequest
+} from "@openziti/zrok";
 
 const program = new Command();
 
@@ -19,6 +26,7 @@ program
         let req = new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http-server");
         req.frontends = ["public"];
         let shr = await createShare(root, req);
+
         let app = express(shr);
         app.get("/", (r: Request, res: any) => {
             res.write("hello, world!");

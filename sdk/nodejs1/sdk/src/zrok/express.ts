@@ -1,4 +1,4 @@
-import {Share} from "./api";
+import {Share} from "../api";
 import Express from "express";
 // @ts-ignore
 import ziti from "@openziti/ziti-sdk-nodejs";

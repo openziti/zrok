@@ -5,7 +5,7 @@ import {
     ShareRequestBackendModeEnum,
     ShareRequestShareModeEnum,
     UnshareRequest
-} from "./api";
+} from "../api";
 
 export type ShareMode = string;
 export const PRIVATE_SHARE_MODE: ShareMode = "private";

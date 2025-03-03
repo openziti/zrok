@@ -1,7 +1,5 @@
 import {Command} from "commander";
-import {loadRoot} from "@openziti/zrok/dist/environment";
-import {createShare, deleteShare, PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, ShareRequest} from "@openziti/zrok/dist/share";
-
+import {createShare, deleteShare, loadRoot, PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, ShareRequest} from "@openziti/zrok";
 
 const program = new Command();
 
@@ -22,7 +20,6 @@ program
             .catch(ex => {
                 console.log("exception", ex);
             });
-
     });
 
 program.parse(process.argv);
