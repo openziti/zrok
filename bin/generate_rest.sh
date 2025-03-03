@@ -53,15 +53,6 @@ rm -rf sdk/nodejs/sdk/src/api
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g typescript-fetch
 
 echo "...generating python sdk client"
-swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python
+openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -g python
 
 git checkout rest_server_zrok/configure_zrok.go
-
-for OLD in sdk/python/sdk/zrok/git_push.sh sdk/nodejs/sdk/src/zrok/api/git_push.sh
-do
-  if [ -e "$OLD" ]
-  then
-    rm "$OLD"
-  fi
-done
-
