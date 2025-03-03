@@ -23,13 +23,11 @@ program
                 console.log(err);
                 return process.exit(1);
             });
-        let req = new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http-server");
-        req.frontends = ["public"];
-        let shr = await createShare(root, req);
+        let shr = await createShare(root, new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http-server"));
 
         let app = express(shr);
         app.get("/", (r: Request, res: any) => {
-            res.write("hello, world!");
+            res.write("hello, world!\n");
             res.end();
         });
         app.listen(undefined, () => {

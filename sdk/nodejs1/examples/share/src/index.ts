@@ -11,7 +11,6 @@ program
         let root = loadRoot();
         console.log("root.isEnabled", root.isEnabled());
         let req = new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http://localhost:8000");
-        req.frontends = ["public"];
         createShare(root, req)
             .then(shr => {
                 console.log(shr);

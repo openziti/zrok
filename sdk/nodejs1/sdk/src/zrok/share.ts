@@ -40,7 +40,7 @@ export class ShareRequest {
         this.backendMode = backendMode;
         this.shareMode = shareMode;
         this.target = target;
-        this.frontends = undefined;
+        this.frontends = shareMode === PUBLIC_SHARE_MODE ? ["public"] : undefined;
         this.basicAuth = undefined;
         this.oauthProvider = undefined;
         this.oauthEmailAddressPatterns = undefined;
