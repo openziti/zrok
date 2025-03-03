@@ -19,40 +19,59 @@ Method | HTTP request | Description
 [**remove_organization_member**](AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 [**update_frontend**](AdminApi.md#update_frontend) | **PATCH** /frontend | 
 
+
 # **add_organization_member**
 > add_organization_member(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.OrganizationAddBody() # OrganizationAddBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.AddOrganizationMemberRequest() # AddOrganizationMemberRequest |  (optional)
 
-try:
-    api_instance.add_organization_member(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->add_organization_member: %s\n" % e)
+    try:
+        api_instance.add_organization_member(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->add_organization_member: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OrganizationAddBody**](OrganizationAddBody.md)|  | [optional] 
+ **body** | [**AddOrganizationMemberRequest**](AddOrganizationMemberRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -67,47 +86,76 @@ void (empty response body)
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | member added |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_account**
-> InlineResponse200 create_account(body=body)
+> RegenerateAccountToken200Response create_account(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.login_request import LoginRequest
+from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.AccountBody() # AccountBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.LoginRequest() # LoginRequest |  (optional)
 
-try:
-    api_response = api_instance.create_account(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->create_account: %s\n" % e)
+    try:
+        api_response = api_instance.create_account(body=body)
+        print("The response of AdminApi->create_account:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->create_account: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**AccountBody**](AccountBody.md)|  | [optional] 
+ **body** | [**LoginRequest**](LoginRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**RegenerateAccountToken200Response**](RegenerateAccountToken200Response.md)
 
 ### Authorization
 
@@ -117,48 +165,76 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | created |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_frontend**
-> InlineResponse201 create_frontend(body=body)
+> CreateFrontend201Response create_frontend(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_frontend201_response import CreateFrontend201Response
+from zrok_api.models.create_frontend_request import CreateFrontendRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.FrontendBody() # FrontendBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateFrontendRequest() # CreateFrontendRequest |  (optional)
 
-try:
-    api_response = api_instance.create_frontend(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->create_frontend: %s\n" % e)
+    try:
+        api_response = api_instance.create_frontend(body=body)
+        print("The response of AdminApi->create_frontend:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->create_frontend: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**FrontendBody**](FrontendBody.md)|  | [optional] 
+ **body** | [**CreateFrontendRequest**](CreateFrontendRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse201**](InlineResponse201.md)
+[**CreateFrontend201Response**](CreateFrontend201Response.md)
 
 ### Authorization
 
@@ -168,48 +244,78 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | frontend created |  -  |
+**400** | bad request |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_identity**
-> InlineResponse2011 create_identity(body=body)
+> CreateIdentity201Response create_identity(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_identity201_response import CreateIdentity201Response
+from zrok_api.models.create_identity_request import CreateIdentityRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.IdentityBody() # IdentityBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateIdentityRequest() # CreateIdentityRequest |  (optional)
 
-try:
-    api_response = api_instance.create_identity(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->create_identity: %s\n" % e)
+    try:
+        api_response = api_instance.create_identity(body=body)
+        print("The response of AdminApi->create_identity:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->create_identity: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**IdentityBody**](IdentityBody.md)|  | [optional] 
+ **body** | [**CreateIdentityRequest**](CreateIdentityRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse2011**](InlineResponse2011.md)
+[**CreateIdentity201Response**](CreateIdentity201Response.md)
 
 ### Authorization
 
@@ -219,48 +325,76 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | created |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_organization**
-> InlineResponse2012 create_organization(body=body)
+> CreateOrganization201Response create_organization(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_organization201_response import CreateOrganization201Response
+from zrok_api.models.create_organization_request import CreateOrganizationRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.OrganizationBody() # OrganizationBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateOrganizationRequest() # CreateOrganizationRequest |  (optional)
 
-try:
-    api_response = api_instance.create_organization(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->create_organization: %s\n" % e)
+    try:
+        api_response = api_instance.create_organization(body=body)
+        print("The response of AdminApi->create_organization:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->create_organization: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OrganizationBody**](OrganizationBody.md)|  | [optional] 
+ **body** | [**CreateOrganizationRequest**](CreateOrganizationRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse2012**](InlineResponse2012.md)
+[**CreateOrganization201Response**](CreateOrganization201Response.md)
 
 ### Authorization
 
@@ -270,6 +404,14 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | organization created |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -279,34 +421,52 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_frontend201_response import CreateFrontend201Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.FrontendBody1() # FrontendBody1 |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateFrontend201Response() # CreateFrontend201Response |  (optional)
 
-try:
-    api_instance.delete_frontend(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->delete_frontend: %s\n" % e)
+    try:
+        api_instance.delete_frontend(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->delete_frontend: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**FrontendBody1**](FrontendBody1.md)|  | [optional] 
+ **body** | [**CreateFrontend201Response**](CreateFrontend201Response.md)|  | [optional] 
 
 ### Return type
 
@@ -320,6 +480,15 @@ void (empty response body)
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | frontend deleted |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -329,34 +498,52 @@ void (empty response body)
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_organization201_response import CreateOrganization201Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.OrganizationBody1() # OrganizationBody1 |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateOrganization201Response() # CreateOrganization201Response |  (optional)
 
-try:
-    api_instance.delete_organization(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->delete_organization: %s\n" % e)
+    try:
+        api_instance.delete_organization(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->delete_organization: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OrganizationBody1**](OrganizationBody1.md)|  | [optional] 
+ **body** | [**CreateOrganization201Response**](CreateOrganization201Response.md)|  | [optional] 
 
 ### Return type
 
@@ -370,6 +557,15 @@ void (empty response body)
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | organization deleted |  -  |
+**401** | unauthorized |  -  |
+**404** | organization not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -379,34 +575,52 @@ void (empty response body)
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.verify200_response import Verify200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.GrantsBody() # GrantsBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.Verify200Response() # Verify200Response |  (optional)
 
-try:
-    api_instance.grants(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->grants: %s\n" % e)
+    try:
+        api_instance.grants(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->grants: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**GrantsBody**](GrantsBody.md)|  | [optional] 
+ **body** | [**Verify200Response**](Verify200Response.md)|  | [optional] 
 
 ### Return type
 
@@ -420,6 +634,15 @@ void (empty response body)
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -429,34 +652,52 @@ void (empty response body)
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.TokenGenerateBody() # TokenGenerateBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.InviteTokenGenerateRequest() # InviteTokenGenerateRequest |  (optional)
 
-try:
-    api_instance.invite_token_generate(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->invite_token_generate: %s\n" % e)
+    try:
+        api_instance.invite_token_generate(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->invite_token_generate: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**TokenGenerateBody**](TokenGenerateBody.md)|  | [optional] 
+ **body** | [**InviteTokenGenerateRequest**](InviteTokenGenerateRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -471,43 +712,71 @@ void (empty response body)
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | invite tokens created |  -  |
+**400** | invite tokens not created |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_frontends**
-> list[InlineResponse2002] list_frontends()
+> List[ListFrontends200ResponseInner] list_frontends()
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
 
-try:
-    api_response = api_instance.list_frontends()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->list_frontends: %s\n" % e)
+    try:
+        api_response = api_instance.list_frontends()
+        print("The response of AdminApi->list_frontends:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->list_frontends: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**list[InlineResponse2002]**](InlineResponse2002.md)
+[**List[ListFrontends200ResponseInner]**](ListFrontends200ResponseInner.md)
 
 ### Authorization
 
@@ -518,47 +787,75 @@ This endpoint does not need any parameter.
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_organization_members**
-> InlineResponse2003 list_organization_members(body=body)
+> ListOrganizationMembers200Response list_organization_members(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.create_organization201_response import CreateOrganization201Response
+from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.OrganizationListBody() # OrganizationListBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.CreateOrganization201Response() # CreateOrganization201Response |  (optional)
 
-try:
-    api_response = api_instance.list_organization_members(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->list_organization_members: %s\n" % e)
+    try:
+        api_response = api_instance.list_organization_members(body=body)
+        print("The response of AdminApi->list_organization_members:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->list_organization_members: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OrganizationListBody**](OrganizationListBody.md)|  | [optional] 
+ **body** | [**CreateOrganization201Response**](CreateOrganization201Response.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse2003**](InlineResponse2003.md)
+[**ListOrganizationMembers200Response**](ListOrganizationMembers200Response.md)
 
 ### Authorization
 
@@ -569,43 +866,71 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | list organization members |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_organizations**
-> InlineResponse2004 list_organizations()
+> ListOrganizations200Response list_organizations()
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.list_organizations200_response import ListOrganizations200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
 
-try:
-    api_response = api_instance.list_organizations()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AdminApi->list_organizations: %s\n" % e)
+    try:
+        api_response = api_instance.list_organizations()
+        print("The response of AdminApi->list_organizations:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->list_organizations: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2004**](InlineResponse2004.md)
+[**ListOrganizations200Response**](ListOrganizations200Response.md)
 
 ### Authorization
 
@@ -615,6 +940,14 @@ This endpoint does not need any parameter.
 
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -624,34 +957,52 @@ This endpoint does not need any parameter.
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.OrganizationRemoveBody() # OrganizationRemoveBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.RemoveOrganizationMemberRequest() # RemoveOrganizationMemberRequest |  (optional)
 
-try:
-    api_instance.remove_organization_member(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->remove_organization_member: %s\n" % e)
+    try:
+        api_instance.remove_organization_member(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->remove_organization_member: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**OrganizationRemoveBody**](OrganizationRemoveBody.md)|  | [optional] 
+ **body** | [**RemoveOrganizationMemberRequest**](RemoveOrganizationMemberRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -665,6 +1016,15 @@ void (empty response body)
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | member removed |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -674,34 +1034,52 @@ void (empty response body)
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.update_frontend_request import UpdateFrontendRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AdminApi(zrok_api.ApiClient(configuration))
-body = zrok_api.FrontendBody2() # FrontendBody2 |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.UpdateFrontendRequest() # UpdateFrontendRequest |  (optional)
 
-try:
-    api_instance.update_frontend(body=body)
-except ApiException as e:
-    print("Exception when calling AdminApi->update_frontend: %s\n" % e)
+    try:
+        api_instance.update_frontend(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->update_frontend: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**FrontendBody2**](FrontendBody2.md)|  | [optional] 
+ **body** | [**UpdateFrontendRequest**](UpdateFrontendRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -715,6 +1093,15 @@ void (empty response body)
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | frontend updated |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

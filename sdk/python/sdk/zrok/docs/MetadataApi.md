@@ -21,34 +21,48 @@ Method | HTTP request | Description
 [**version**](MetadataApi.md#version) | **GET** /version | 
 [**version_inventory**](MetadataApi.md#version_inventory) | **GET** /versions | 
 
+
 # **client_version_check**
 > client_version_check(body=body)
 
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi()
-body = zrok_api.ClientVersionCheckBody() # ClientVersionCheckBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_instance.client_version_check(body=body)
-except ApiException as e:
-    print("Exception when calling MetadataApi->client_version_check: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    body = zrok_api.ClientVersionCheckRequest() # ClientVersionCheckRequest |  (optional)
+
+    try:
+        api_instance.client_version_check(body=body)
+    except Exception as e:
+        print("Exception when calling MetadataApi->client_version_check: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ClientVersionCheckBody**](ClientVersionCheckBody.md)|  | [optional] 
+ **body** | [**ClientVersionCheckRequest**](ClientVersionCheckRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -63,6 +77,13 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | compatible |  -  |
+**400** | not compatible |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **configuration**
@@ -71,24 +92,38 @@ No authorization required
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.configuration import Configuration
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi()
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.configuration()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->configuration: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+
+    try:
+        api_response = api_instance.configuration()
+        print("The response of MetadataApi->configuration:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->configuration: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
@@ -104,43 +139,68 @@ No authorization required
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | current configuration |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_account_detail**
-> Environments get_account_detail()
+> List[Environment] get_account_detail()
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.environment import Environment
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
 
-try:
-    api_response = api_instance.get_account_detail()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_account_detail: %s\n" % e)
+    try:
+        api_response = api_instance.get_account_detail()
+        print("The response of MetadataApi->get_account_detail:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_account_detail: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**Environments**](Environments.md)
+[**List[Environment]**](Environment.md)
 
 ### Authorization
 
@@ -151,6 +211,13 @@ This endpoint does not need any parameter.
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_account_metrics**
@@ -159,31 +226,50 @@ This endpoint does not need any parameter.
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-duration = 'duration_example' # str |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    duration = 'duration_example' # str |  (optional)
 
-try:
-    api_response = api_instance.get_account_metrics(duration=duration)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_account_metrics: %s\n" % e)
+    try:
+        api_response = api_instance.get_account_metrics(duration=duration)
+        print("The response of MetadataApi->get_account_metrics:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_account_metrics: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -202,6 +288,14 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | account metrics |  -  |
+**400** | bad request |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_environment_detail**
@@ -210,31 +304,50 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-env_zid = 'env_zid_example' # str | 
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    env_zid = 'env_zid_example' # str | 
 
-try:
-    api_response = api_instance.get_environment_detail(env_zid)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_environment_detail: %s\n" % e)
+    try:
+        api_response = api_instance.get_environment_detail(env_zid)
+        print("The response of MetadataApi->get_environment_detail:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_environment_detail: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -253,6 +366,15 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_environment_metrics**
@@ -261,32 +383,51 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-env_id = 'env_id_example' # str | 
-duration = 'duration_example' # str |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    env_id = 'env_id_example' # str | 
+    duration = 'duration_example' # str |  (optional)
 
-try:
-    api_response = api_instance.get_environment_metrics(env_id, duration=duration)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_environment_metrics: %s\n" % e)
+    try:
+        api_response = api_instance.get_environment_metrics(env_id, duration=duration)
+        print("The response of MetadataApi->get_environment_metrics:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_environment_metrics: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -306,6 +447,15 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | environment metrics |  -  |
+**400** | bad request |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_frontend_detail**
@@ -314,31 +464,50 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.frontend import Frontend
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-frontend_id = 56 # int | 
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    frontend_id = 56 # int | 
 
-try:
-    api_response = api_instance.get_frontend_detail(frontend_id)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_frontend_detail: %s\n" % e)
+    try:
+        api_response = api_instance.get_frontend_detail(frontend_id)
+        print("The response of MetadataApi->get_frontend_detail:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_frontend_detail: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -357,6 +526,15 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_share_detail**
@@ -365,31 +543,50 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.share import Share
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-share_token = 'share_token_example' # str | 
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    share_token = 'share_token_example' # str | 
 
-try:
-    api_response = api_instance.get_share_detail(share_token)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_share_detail: %s\n" % e)
+    try:
+        api_response = api_instance.get_share_detail(share_token)
+        print("The response of MetadataApi->get_share_detail:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_share_detail: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -408,6 +605,15 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_share_metrics**
@@ -416,32 +622,51 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-share_token = 'share_token_example' # str | 
-duration = 'duration_example' # str |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    share_token = 'share_token_example' # str | 
+    duration = 'duration_example' # str |  (optional)
 
-try:
-    api_response = api_instance.get_share_metrics(share_token, duration=duration)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_share_metrics: %s\n" % e)
+    try:
+        api_response = api_instance.get_share_metrics(share_token, duration=duration)
+        print("The response of MetadataApi->get_share_metrics:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_share_metrics: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -461,47 +686,76 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | share metrics |  -  |
+**400** | bad request |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_sparklines**
-> InlineResponse2006 get_sparklines(body=body)
+> GetSparklines200Response get_sparklines(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.get_sparklines200_response import GetSparklines200Response
+from zrok_api.models.get_sparklines_request import GetSparklinesRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-body = zrok_api.SparklinesBody() # SparklinesBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    body = zrok_api.GetSparklinesRequest() # GetSparklinesRequest |  (optional)
 
-try:
-    api_response = api_instance.get_sparklines(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->get_sparklines: %s\n" % e)
+    try:
+        api_response = api_instance.get_sparklines(body=body)
+        print("The response of MetadataApi->get_sparklines:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->get_sparklines: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**SparklinesBody**](SparklinesBody.md)|  | [optional] 
+ **body** | [**GetSparklinesRequest**](GetSparklinesRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse2006**](InlineResponse2006.md)
+[**GetSparklines200Response**](GetSparklines200Response.md)
 
 ### Authorization
 
@@ -512,43 +766,70 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | sparklines data |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_memberships**
-> InlineResponse2005 list_memberships()
+> ListMemberships200Response list_memberships()
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.list_memberships200_response import ListMemberships200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
 
-try:
-    api_response = api_instance.list_memberships()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->list_memberships: %s\n" % e)
+    try:
+        api_response = api_instance.list_memberships()
+        print("The response of MetadataApi->list_memberships:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->list_memberships: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2005**](InlineResponse2005.md)
+[**ListMemberships200Response**](ListMemberships200Response.md)
 
 ### Authorization
 
@@ -559,39 +840,65 @@ This endpoint does not need any parameter.
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_org_members**
-> InlineResponse2003 list_org_members(organization_token)
+> ListOrganizationMembers200Response list_org_members(organization_token)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-organization_token = 'organization_token_example' # str | 
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    organization_token = 'organization_token_example' # str | 
 
-try:
-    api_response = api_instance.list_org_members(organization_token)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->list_org_members: %s\n" % e)
+    try:
+        api_response = api_instance.list_org_members(organization_token)
+        print("The response of MetadataApi->list_org_members:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->list_org_members: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -599,7 +906,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2003**](InlineResponse2003.md)
+[**ListOrganizationMembers200Response**](ListOrganizationMembers200Response.md)
 
 ### Authorization
 
@@ -609,6 +916,14 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -618,32 +933,51 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.overview import Overview
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
-organization_token = 'organization_token_example' # str | 
-account_email = 'account_email_example' # str | 
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    organization_token = 'organization_token_example' # str | 
+    account_email = 'account_email_example' # str | 
 
-try:
-    api_response = api_instance.org_account_overview(organization_token, account_email)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->org_account_overview: %s\n" % e)
+    try:
+        api_response = api_instance.org_account_overview(organization_token, account_email)
+        print("The response of MetadataApi->org_account_overview:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->org_account_overview: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
@@ -663,6 +997,14 @@ Name | Type | Description  | Notes
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **overview**
@@ -671,30 +1013,49 @@ Name | Type | Description  | Notes
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.overview import Overview
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi(zrok_api.ApiClient(configuration))
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
 
-try:
-    api_response = api_instance.overview()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->overview: %s\n" % e)
+    try:
+        api_response = api_instance.overview()
+        print("The response of MetadataApi->overview:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->overview: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
@@ -710,37 +1071,57 @@ This endpoint does not need any parameter.
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | overview returned |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **version**
-> Version version()
+> str version()
 
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi()
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.version()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->version: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+
+    try:
+        api_response = api_instance.version()
+        print("The response of MetadataApi->version:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->version: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**Version**](Version.md)
+**str**
 
 ### Authorization
 
@@ -750,38 +1131,58 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | legacy upgrade required |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **version_inventory**
-> InlineResponse2007 version_inventory()
+> VersionInventory200Response version_inventory()
 
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.version_inventory200_response import VersionInventory200Response
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.MetadataApi()
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.version_inventory()
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling MetadataApi->version_inventory: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+
+    try:
+        api_response = api_instance.version_inventory()
+        print("The response of MetadataApi->version_inventory:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->version_inventory: %s\n" % e)
 ```
 
+
+
 ### Parameters
+
 This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2007**](InlineResponse2007.md)
+[**VersionInventory200Response**](VersionInventory200Response.md)
 
 ### Authorization
 
@@ -791,6 +1192,12 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

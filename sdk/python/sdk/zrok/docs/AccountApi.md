@@ -13,40 +13,59 @@ Method | HTTP request | Description
 [**reset_password_request**](AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
 [**verify**](AccountApi.md#verify) | **POST** /verify | 
 
+
 # **change_password**
 > change_password(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.change_password_request import ChangePasswordRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi(zrok_api.ApiClient(configuration))
-body = zrok_api.ChangePasswordBody() # ChangePasswordBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.ChangePasswordRequest() # ChangePasswordRequest |  (optional)
 
-try:
-    api_instance.change_password(body=body)
-except ApiException as e:
-    print("Exception when calling AccountApi->change_password: %s\n" % e)
+    try:
+        api_instance.change_password(body=body)
+    except Exception as e:
+        print("Exception when calling AccountApi->change_password: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ChangePasswordBody**](ChangePasswordBody.md)|  | [optional] 
+ **body** | [**ChangePasswordRequest**](ChangePasswordRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -61,6 +80,16 @@ void (empty response body)
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | password changed |  -  |
+**400** | password not changed |  -  |
+**401** | unauthorized |  -  |
+**422** | password validation failure |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **invite**
@@ -69,28 +98,41 @@ void (empty response body)
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.invite_request import InviteRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.InviteBody() # InviteBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_instance.invite(body=body)
-except ApiException as e:
-    print("Exception when calling AccountApi->invite: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.InviteRequest() # InviteRequest |  (optional)
+
+    try:
+        api_instance.invite(body=body)
+    except Exception as e:
+        print("Exception when calling AccountApi->invite: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**InviteBody**](InviteBody.md)|  | [optional] 
+ **body** | [**InviteRequest**](InviteRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -105,6 +147,15 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | invitation created |  -  |
+**400** | invitation not created (already exists) |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **login**
@@ -113,29 +164,43 @@ No authorization required
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.login_request import LoginRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.LoginBody() # LoginBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.login(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AccountApi->login: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.LoginRequest() # LoginRequest |  (optional)
+
+    try:
+        api_response = api_instance.login(body=body)
+        print("The response of AccountApi->login:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->login: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**LoginBody**](LoginBody.md)|  | [optional] 
+ **body** | [**LoginRequest**](LoginRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -150,47 +215,74 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | login successful |  -  |
+**401** | invalid login |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **regenerate_account_token**
-> InlineResponse200 regenerate_account_token(body=body)
+> RegenerateAccountToken200Response regenerate_account_token(body=body)
 
 
 
 ### Example
+
+* Api Key Authentication (key):
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
+from zrok_api.models.regenerate_account_token_request import RegenerateAccountTokenRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
 # Configure API key authorization: key
-configuration = zrok_api.Configuration()
-configuration.api_key['x-token'] = 'YOUR_API_KEY'
+configuration.api_key['key'] = os.environ["API_KEY"]
+
 # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-# configuration.api_key_prefix['x-token'] = 'Bearer'
+# configuration.api_key_prefix['key'] = 'Bearer'
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi(zrok_api.ApiClient(configuration))
-body = zrok_api.RegenerateAccountTokenBody() # RegenerateAccountTokenBody |  (optional)
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.RegenerateAccountTokenRequest() # RegenerateAccountTokenRequest |  (optional)
 
-try:
-    api_response = api_instance.regenerate_account_token(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AccountApi->regenerate_account_token: %s\n" % e)
+    try:
+        api_response = api_instance.regenerate_account_token(body=body)
+        print("The response of AccountApi->regenerate_account_token:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->regenerate_account_token: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**RegenerateAccountTokenBody**](RegenerateAccountTokenBody.md)|  | [optional] 
+ **body** | [**RegenerateAccountTokenRequest**](RegenerateAccountTokenRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**RegenerateAccountToken200Response**](RegenerateAccountToken200Response.md)
 
 ### Authorization
 
@@ -201,41 +293,64 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | regenerate account token |  -  |
+**404** | account not found |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **register**
-> InlineResponse200 register(body=body)
+> RegenerateAccountToken200Response register(body=body)
 
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
+from zrok_api.models.register_request import RegisterRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.RegisterBody() # RegisterBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.register(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AccountApi->register: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.RegisterRequest() # RegisterRequest |  (optional)
+
+    try:
+        api_response = api_instance.register(body=body)
+        print("The response of AccountApi->register:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->register: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**RegisterBody**](RegisterBody.md)|  | [optional] 
+ **body** | [**RegisterRequest**](RegisterRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**RegenerateAccountToken200Response**](RegenerateAccountToken200Response.md)
 
 ### Authorization
 
@@ -246,6 +361,15 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | account created |  -  |
+**404** | request not found |  -  |
+**422** | password validation failure |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **reset_password**
@@ -254,28 +378,41 @@ No authorization required
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.ResetPasswordBody() # ResetPasswordBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_instance.reset_password(body=body)
-except ApiException as e:
-    print("Exception when calling AccountApi->reset_password: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.ResetPasswordRequest() # ResetPasswordRequest |  (optional)
+
+    try:
+        api_instance.reset_password(body=body)
+    except Exception as e:
+        print("Exception when calling AccountApi->reset_password: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ResetPasswordBody**](ResetPasswordBody.md)|  | [optional] 
+ **body** | [**ResetPasswordRequest**](ResetPasswordRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -290,6 +427,15 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | password reset |  -  |
+**404** | request not found |  -  |
+**422** | password validation failure |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **reset_password_request**
@@ -298,28 +444,41 @@ No authorization required
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.regenerate_account_token_request import RegenerateAccountTokenRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.ResetPasswordRequestBody() # ResetPasswordRequestBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_instance.reset_password_request(body=body)
-except ApiException as e:
-    print("Exception when calling AccountApi->reset_password_request: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.RegenerateAccountTokenRequest() # RegenerateAccountTokenRequest |  (optional)
+
+    try:
+        api_instance.reset_password_request(body=body)
+    except Exception as e:
+        print("Exception when calling AccountApi->reset_password_request: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ResetPasswordRequestBody**](ResetPasswordRequestBody.md)|  | [optional] 
+ **body** | [**RegenerateAccountTokenRequest**](RegenerateAccountTokenRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -334,41 +493,64 @@ No authorization required
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: Not defined
 
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | reset password request created |  -  |
+**400** | reset password request not created |  -  |
+**500** | internal server error |  -  |
+
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **verify**
-> InlineResponse2001 verify(body=body)
+> Verify200Response verify(body=body)
 
 
 
 ### Example
+
+
 ```python
-from __future__ import print_function
-import time
 import zrok_api
+from zrok_api.models.verify200_response import Verify200Response
+from zrok_api.models.verify_request import VerifyRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# create an instance of the API class
-api_instance = zrok_api.AccountApi()
-body = zrok_api.VerifyBody() # VerifyBody |  (optional)
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
 
-try:
-    api_response = api_instance.verify(body=body)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling AccountApi->verify: %s\n" % e)
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.VerifyRequest() # VerifyRequest |  (optional)
+
+    try:
+        api_response = api_instance.verify(body=body)
+        print("The response of AccountApi->verify:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->verify: %s\n" % e)
 ```
+
+
 
 ### Parameters
 
+
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**VerifyBody**](VerifyBody.md)|  | [optional] 
+ **body** | [**VerifyRequest**](VerifyRequest.md)|  | [optional] 
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**Verify200Response**](Verify200Response.md)
 
 ### Authorization
 
@@ -378,6 +560,14 @@ No authorization required
 
  - **Content-Type**: application/zrok.v1+json
  - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | registration token ready |  -  |
+**404** | registration token not found |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

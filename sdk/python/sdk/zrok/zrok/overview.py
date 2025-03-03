@@ -6,7 +6,7 @@ import urllib3
 from zrok.environment.root import Root
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
-from zrok_api.models.frontends import Frontends
+from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner
 from zrok_api.models.share import Share
 
 
@@ -71,7 +71,7 @@ class Overview:
             env_resources = EnvironmentAndResources(
                 environment=environment,
                 shares=share_list,
-                frontends=Frontends()  # Empty frontends for now as it's not in the input data
+                frontends=ListFrontends200ResponseInner()  # Empty frontends for now as it's not in the input data
             )
             overview.environments.append(env_resources)
 

@@ -15,7 +15,7 @@ from __future__ import absolute_import
 import unittest
 
 import zrok_api
-from zrok_api.models.frontends import Frontends  # noqa: E501
+from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner  # noqa: E501
 from zrok_api.rest import ApiException
 
 

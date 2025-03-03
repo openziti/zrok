@@ -5,6 +5,7 @@ import os
 import json
 import zrok_api as zrok
 from zrok_api.configuration import Configuration
+from ..api_client_wrapper import ZrokApiClient
 import re
 
 V = "v1.0"
@@ -42,7 +43,7 @@ class Root:
     def HasConfig(self) -> bool:
         return self.cfg != Config()
 
-    def Client(self) -> zrok.ApiClient:
+    def Client(self) -> ZrokApiClient:
         apiEndpoint = self.ApiEndpoint()
 
         cfg = Configuration()
@@ -50,9 +51,16 @@ class Root:
         cfg.api_key["x-token"] = self.env.Token
         cfg.api_key_prefix['Authorization'] = 'Bearer'
 
-        zrock_client = zrok.ApiClient(configuration=cfg)
-        self.client_version_check(zrock_client)  # Perform version check
-        return zrock_client
+        version_check_client = ZrokApiClient(configuration=cfg)
+        # Perform version check without authentication
+        self.client_version_check(version_check_client)
+        
+        # Create a new client with the same configuration for authenticated requests
+        auth_client = ZrokApiClient(configuration=cfg)
+        # Explicitly set the x-token header in default_headers to ensure it's used
+        auth_client.set_default_header('x-token', self.env.Token)
+        
+        return auth_client
 
     def ApiEndpoint(self) -> ApiEndpoint:
         apiEndpoint = "https://api.zrok.io"
@@ -89,11 +97,22 @@ class Root:
         """Check if the client version is compatible with the API."""
         metadata_api = zrok.MetadataApi(zrock_client)
         try:
-            data, status_code, headers = metadata_api.client_version_check_with_http_info(body={"clientVersion": V})
+            # Create a request with NO authentication for version check
+            # We'll remove any authentication headers for this initial check
+            # The client's default_headers might already have x-token, so let's ensure this call doesn't use it
+            custom_headers = {}
+            for key, value in zrock_client.default_headers.items():
+                if key.lower() != 'x-token':  # Skip the auth token header
+                    custom_headers[key] = value
+                    
+            response = metadata_api.client_version_check_with_http_info(
+                body={"clientVersion": V},
+                _headers=custom_headers  # Pass custom headers without auth token
+            )
 
             # Check if the response status code is 200 OK
-            if status_code != 200:
-                raise Exception(f"Client version check failed: Unexpected status code {status_code}")
+            if response.status_code != 200:
+                raise Exception(f"Client version check failed: Unexpected status code {response.status_code}")
 
             # Success case - status code is 200 and empty response body is expected
             return
