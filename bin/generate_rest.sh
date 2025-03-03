@@ -57,17 +57,16 @@ rm -rf sdk/nodejs/sdk/src/api
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g typescript-fetch
 
 echo "...generating python sdk client"
-# Clean up existing files listed in .openapi-generator/FILES before regeneration
-if [ -f sdk/python/sdk/zrok/.openapi-generator/FILES ]; then
-  while IFS= read -r file; do
-    if [ -f "sdk/python/sdk/zrok/$file" ]; then
-      echo "Removing existing file: sdk/python/sdk/zrok/$file"
-      rm "sdk/python/sdk/zrok/$file"
-    fi
-  done < sdk/python/sdk/zrok/.openapi-generator/FILES
-fi
-# Then remove the tracking file itself
+# Delete tracked Python files
+while IFS= read -r file; do
+  if [ -f "sdk/python/sdk/zrok/$file" ]; then
+    echo "Removing existing file: sdk/python/sdk/zrok/$file"
+    rm -f "sdk/python/sdk/zrok/$file"
+  fi
+done < sdk/python/sdk/zrok/.openapi-generator/FILES
+# Delete the tracking file
 rm -f sdk/python/sdk/zrok/.openapi-generator/FILES
+# Generate and track new files
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok --package-name zrok_api -g python
 
 git checkout rest_server_zrok/configure_zrok.go
