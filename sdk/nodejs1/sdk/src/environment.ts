@@ -1,4 +1,4 @@
-import {environmentFile, metadataFile} from "./paths";
+import {environmentFile, identityFile, metadataFile} from "./paths";
 import * as fs from "node:fs";
 import {Configuration} from "./api";
 
@@ -53,6 +53,14 @@ export class Root {
 
     public isEnabled = (): boolean => {
         return this.environment !== undefined;
+    }
+
+    public environmentIdentityName = (): string => {
+        return "environment";
+    }
+
+    public zitiIdentityName = (name: string): string => {
+        return identityFile(name);
     }
 }
 

@@ -12,3 +12,11 @@ export const metadataFile = (): string => {
 export const environmentFile = (): string => {
     return join(rootDir(), "environment.json");
 }
+
+export const identitiesDir = (): string => {
+    return join(rootDir(), "identities");
+}
+
+export const identityFile = (name: string): string => {
+    return join(identitiesDir(), name + ".json");
+}
