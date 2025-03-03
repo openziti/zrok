@@ -11,6 +11,10 @@ export class Root {
         this.metadata = metadata;
         this.environment = environment;
     }
+
+    public isEnabled = (): boolean => {
+        return this.environment != undefined;
+    }
 }
 
 export class Metadata {
