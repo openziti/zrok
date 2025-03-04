@@ -13,8 +13,6 @@ import {
 } from "@openziti/zrok";
 import readlineSync = require('readline-sync');
 
-const program = new Command();
-
 const copyto = async () => {
     let text = readlineSync.question("enter some text: ");
     let root = loadRoot();
@@ -36,5 +34,6 @@ const copyto = async () => {
     });
 }
 
+const program = new Command();
 program.command("copyto").version("1.0.0").description("serve a copy buffer").action(copyto);
 program.parse(process.argv);
