@@ -1,17 +1,45 @@
 from setuptools import setup, find_packages  # noqa: H301
 import os
 import versioneer
+from pathlib import Path
+import re
 
-# optionally upload to TestPyPi with alternative name in testing repo
 NAME = os.getenv('ZROK_PY_NAME', "zrok")
 VERSION = "1.0.0"
-REQUIRES = [
-    "openziti >= 1.0.0",
-    "urllib3 >= 2.1.0",  # urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
-    "python_dateutil >= 2.8.2",
-    "pydantic >= 2",
-    "typing-extensions >= 4.7.1",
-]
+
+# Define your package overrides here - these take precedence over the generated requirements.txt
+OVERRIDES = {
+    # Override specific packages with version constraints different from the generated requirements.txt
+    "openziti": "openziti >= 1.0.0",
+    "urllib3": "urllib3 >= 2.1.0",  # urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
+}
+
+# Parse the generated requirements.txt
+def parse_requirements(filename):
+    requirements = []
+    if not Path(filename).exists():
+        return requirements
+
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+
+            # Extract package name (everything before any version specifier)
+            package_name = re.split(r'[<>=~]', line)[0].strip()
+
+            # If we have an override for this package, skip it
+            if package_name in OVERRIDES:
+                continue
+
+            requirements.append(line)
+
+    return requirements
+
+# Combine requirements from requirements.txt and overrides
+requirements_file = Path(__file__).parent / "requirements.txt"
+REQUIRES = parse_requirements(requirements_file) + list(OVERRIDES.values())
 
 setup(
     name=NAME,
@@ -25,6 +53,9 @@ setup(
     python_requires='>3.10.0',
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        '': ['requirements.txt'],  # Include the generated requirements.txt in the package
+    },
     long_description="""\
     Geo-scale, next-generation peer-to-peer sharing platform built on top of OpenZiti.
     """
