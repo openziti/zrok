@@ -83,9 +83,9 @@ class Share(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in activity (list)
         _items = []
         if self.activity:
-            for _item in self.activity:
-                if _item:
-                    _items.append(_item.to_dict())
+            for _item_activity in self.activity:
+                if _item_activity:
+                    _items.append(_item_activity.to_dict())
             _dict['activity'] = _items
         return _dict
 

@@ -23,8 +23,6 @@ Method | HTTP request | Description
 # **add_organization_member**
 > add_organization_member(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -99,8 +97,6 @@ void (empty response body)
 
 # **create_account**
 > RegenerateAccountToken200Response create_account(body=body)
-
-
 
 ### Example
 
@@ -178,8 +174,6 @@ Name | Type | Description  | Notes
 
 # **create_frontend**
 > CreateFrontend201Response create_frontend(body=body)
-
-
 
 ### Example
 
@@ -260,8 +254,6 @@ Name | Type | Description  | Notes
 # **create_identity**
 > CreateIdentity201Response create_identity(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -338,8 +330,6 @@ Name | Type | Description  | Notes
 
 # **create_organization**
 > CreateOrganization201Response create_organization(body=body)
-
-
 
 ### Example
 
@@ -418,8 +408,6 @@ Name | Type | Description  | Notes
 # **delete_frontend**
 > delete_frontend(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -494,8 +482,6 @@ void (empty response body)
 
 # **delete_organization**
 > delete_organization(body=body)
-
-
 
 ### Example
 
@@ -572,8 +558,6 @@ void (empty response body)
 # **grants**
 > grants(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -648,8 +632,6 @@ void (empty response body)
 
 # **invite_token_generate**
 > invite_token_generate(body=body)
-
-
 
 ### Example
 
@@ -726,8 +708,6 @@ void (empty response body)
 # **list_frontends**
 > List[ListFrontends200ResponseInner] list_frontends()
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -799,8 +779,6 @@ This endpoint does not need any parameter.
 
 # **list_organization_members**
 > ListOrganizationMembers200Response list_organization_members(body=body)
-
-
 
 ### Example
 
@@ -880,8 +858,6 @@ Name | Type | Description  | Notes
 # **list_organizations**
 > ListOrganizations200Response list_organizations()
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -953,8 +929,6 @@ This endpoint does not need any parameter.
 
 # **remove_organization_member**
 > remove_organization_member(body=body)
-
-
 
 ### Example
 
@@ -1030,8 +1004,6 @@ void (empty response body)
 
 # **update_frontend**
 > update_frontend(body=body)
-
-
 
 ### Example
 

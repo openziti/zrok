@@ -125,9 +125,9 @@ class ShareRequest(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in auth_users (list)
         _items = []
         if self.auth_users:
-            for _item in self.auth_users:
-                if _item:
-                    _items.append(_item.to_dict())
+            for _item_auth_users in self.auth_users:
+                if _item_auth_users:
+                    _items.append(_item_auth_users.to_dict())
             _dict['authUsers'] = _items
         return _dict
 

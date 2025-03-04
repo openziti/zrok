@@ -17,8 +17,6 @@ Method | HTTP request | Description
 # **change_password**
 > change_password(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -95,8 +93,6 @@ void (empty response body)
 # **invite**
 > invite(body=body)
 
-
-
 ### Example
 
 
@@ -161,8 +157,6 @@ No authorization required
 # **login**
 > str login(body=body)
 
-
-
 ### Example
 
 
@@ -226,8 +220,6 @@ No authorization required
 
 # **regenerate_account_token**
 > RegenerateAccountToken200Response regenerate_account_token(body=body)
-
-
 
 ### Example
 
@@ -306,8 +298,6 @@ Name | Type | Description  | Notes
 # **register**
 > RegenerateAccountToken200Response register(body=body)
 
-
-
 ### Example
 
 
@@ -375,8 +365,6 @@ No authorization required
 # **reset_password**
 > reset_password(body=body)
 
-
-
 ### Example
 
 
@@ -441,8 +429,6 @@ No authorization required
 # **reset_password_request**
 > reset_password_request(body=body)
 
-
-
 ### Example
 
 
@@ -505,8 +491,6 @@ No authorization required
 
 # **verify**
 > Verify200Response verify(body=body)
-
-
 
 ### Example
 

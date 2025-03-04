@@ -11,8 +11,6 @@ Method | HTTP request | Description
 # **disable**
 > disable(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -86,8 +84,6 @@ void (empty response body)
 
 # **enable**
 > CreateIdentity201Response enable(body=body)
-
-
 
 ### Example
 

@@ -15,8 +15,6 @@ Method | HTTP request | Description
 # **access**
 > Access201Response access(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -94,8 +92,6 @@ Name | Type | Description  | Notes
 
 # **share**
 > ShareResponse share(body=body)
-
-
 
 ### Example
 
@@ -177,8 +173,6 @@ Name | Type | Description  | Notes
 # **unaccess**
 > unaccess(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -253,8 +247,6 @@ void (empty response body)
 
 # **unshare**
 > unshare(body=body)
-
-
 
 ### Example
 
@@ -331,8 +323,6 @@ void (empty response body)
 # **update_access**
 > update_access(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -407,8 +397,6 @@ void (empty response body)
 
 # **update_share**
 > update_share(body=body)
-
-
 
 ### Example
 

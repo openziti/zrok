@@ -25,8 +25,6 @@ Method | HTTP request | Description
 # **client_version_check**
 > client_version_check(body=body)
 
-
-
 ### Example
 
 
@@ -89,8 +87,6 @@ No authorization required
 # **configuration**
 > Configuration configuration()
 
-
-
 ### Example
 
 
@@ -149,8 +145,6 @@ No authorization required
 
 # **get_account_detail**
 > List[Environment] get_account_detail()
-
-
 
 ### Example
 
@@ -222,8 +216,6 @@ This endpoint does not need any parameter.
 
 # **get_account_metrics**
 > Metrics get_account_metrics(duration=duration)
-
-
 
 ### Example
 
@@ -301,8 +293,6 @@ Name | Type | Description  | Notes
 # **get_environment_detail**
 > EnvironmentAndResources get_environment_detail(env_zid)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -379,8 +369,6 @@ Name | Type | Description  | Notes
 
 # **get_environment_metrics**
 > Metrics get_environment_metrics(env_id, duration=duration)
-
-
 
 ### Example
 
@@ -461,8 +449,6 @@ Name | Type | Description  | Notes
 # **get_frontend_detail**
 > Frontend get_frontend_detail(frontend_id)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -540,8 +526,6 @@ Name | Type | Description  | Notes
 # **get_share_detail**
 > Share get_share_detail(share_token)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -618,8 +602,6 @@ Name | Type | Description  | Notes
 
 # **get_share_metrics**
 > Metrics get_share_metrics(share_token, duration=duration)
-
-
 
 ### Example
 
@@ -700,8 +682,6 @@ Name | Type | Description  | Notes
 # **get_sparklines**
 > GetSparklines200Response get_sparklines(body=body)
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -779,8 +759,6 @@ Name | Type | Description  | Notes
 # **list_memberships**
 > ListMemberships200Response list_memberships()
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -851,8 +829,6 @@ This endpoint does not need any parameter.
 
 # **list_org_members**
 > ListOrganizationMembers200Response list_org_members(organization_token)
-
-
 
 ### Example
 
@@ -929,8 +905,6 @@ Name | Type | Description  | Notes
 
 # **org_account_overview**
 > Overview org_account_overview(organization_token, account_email)
-
-
 
 ### Example
 
@@ -1010,8 +984,6 @@ Name | Type | Description  | Notes
 # **overview**
 > Overview overview()
 
-
-
 ### Example
 
 * Api Key Authentication (key):
@@ -1083,8 +1055,6 @@ This endpoint does not need any parameter.
 # **version**
 > str version()
 
-
-
 ### Example
 
 
@@ -1142,8 +1112,6 @@ No authorization required
 
 # **version_inventory**
 > VersionInventory200Response version_inventory()
-
-
 
 ### Example
 

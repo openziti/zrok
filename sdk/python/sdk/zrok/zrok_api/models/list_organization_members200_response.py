@@ -72,9 +72,9 @@ class ListOrganizationMembers200Response(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in members (list)
         _items = []
         if self.members:
-            for _item in self.members:
-                if _item:
-                    _items.append(_item.to_dict())
+            for _item_members in self.members:
+                if _item_members:
+                    _items.append(_item_members.to_dict())
             _dict['members'] = _items
         return _dict
 

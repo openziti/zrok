@@ -73,9 +73,9 @@ class Overview(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in environments (list)
         _items = []
         if self.environments:
-            for _item in self.environments:
-                if _item:
-                    _items.append(_item.to_dict())
+            for _item_environments in self.environments:
+                if _item_environments:
+                    _items.append(_item_environments.to_dict())
             _dict['environments'] = _items
         return _dict
 
