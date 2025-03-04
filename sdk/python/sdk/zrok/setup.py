@@ -5,15 +5,13 @@ import versioneer
 # optionally upload to TestPyPi with alternative name in testing repo
 NAME = os.getenv('ZROK_PY_NAME', "zrok")
 VERSION = "1.0.0"
-# To install the library, run the following
-#
-# python setup.py install
-#
-# prerequisite: setuptools
-# http://pypi.python.org/pypi/setuptools
-
-# urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
-REQUIRES = ["openziti >= 1.0.0", "urllib3 >= 2.1.0" ]
+REQUIRES = [
+    "openziti >= 1.0.0",
+    "urllib3 >= 2.1.0",  # urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
+    "python_dateutil >= 2.8.2",
+    "pydantic >= 2",
+    "typing-extensions >= 4.7.1",
+]
 
 setup(
     name=NAME,
