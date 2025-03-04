@@ -17,7 +17,7 @@ concurrency:
 jobs:
   ubuntu-build:
     name: Build Linux AMD64 CLI
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -112,6 +112,7 @@ jobs:
           set -o xtrace
 
           python -m pip install --upgrade pip
+          pip install -e "$PWD"
           pip install -r requirements.txt
           pip install -r test-requirements.txt
 
@@ -130,7 +131,7 @@ jobs:
     needs: ubuntu-build
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v')
     name: Build Release Candidate Container Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Set a container image tag from the branch name
         id: slug
