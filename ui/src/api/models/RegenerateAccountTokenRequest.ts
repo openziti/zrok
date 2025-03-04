@@ -48,10 +48,15 @@ export function RegenerateAccountTokenRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function RegenerateAccountTokenRequestToJSON(value?: RegenerateAccountTokenRequest | null): any {
+export function RegenerateAccountTokenRequestToJSON(json: any): RegenerateAccountTokenRequest {
+    return RegenerateAccountTokenRequestToJSONTyped(json, false);
+}
+
+export function RegenerateAccountTokenRequestToJSONTyped(value?: RegenerateAccountTokenRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'emailAddress': value['emailAddress'],

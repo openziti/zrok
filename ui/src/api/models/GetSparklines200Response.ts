@@ -18,6 +18,7 @@ import {
     MetricsFromJSON,
     MetricsFromJSONTyped,
     MetricsToJSON,
+    MetricsToJSONTyped,
 } from './Metrics';
 
 /**
@@ -55,10 +56,15 @@ export function GetSparklines200ResponseFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function GetSparklines200ResponseToJSON(value?: GetSparklines200Response | null): any {
+export function GetSparklines200ResponseToJSON(json: any): GetSparklines200Response {
+    return GetSparklines200ResponseToJSONTyped(json, false);
+}
+
+export function GetSparklines200ResponseToJSONTyped(value?: GetSparklines200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'sparklines': value['sparklines'] == null ? undefined : ((value['sparklines'] as Array<any>).map(MetricsToJSON)),

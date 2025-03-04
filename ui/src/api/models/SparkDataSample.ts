@@ -55,10 +55,15 @@ export function SparkDataSampleFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function SparkDataSampleToJSON(value?: SparkDataSample | null): any {
+export function SparkDataSampleToJSON(json: any): SparkDataSample {
+    return SparkDataSampleToJSONTyped(json, false);
+}
+
+export function SparkDataSampleToJSONTyped(value?: SparkDataSample | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'rx': value['rx'],

@@ -104,10 +104,15 @@ export function FrontendFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function FrontendToJSON(value?: Frontend | null): any {
+export function FrontendToJSON(json: any): Frontend {
+    return FrontendToJSONTyped(json, false);
+}
+
+export function FrontendToJSONTyped(value?: Frontend | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

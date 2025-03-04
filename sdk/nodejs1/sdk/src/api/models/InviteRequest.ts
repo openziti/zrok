@@ -55,10 +55,15 @@ export function InviteRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function InviteRequestToJSON(value?: InviteRequest | null): any {
+export function InviteRequestToJSON(json: any): InviteRequest {
+    return InviteRequestToJSONTyped(json, false);
+}
+
+export function InviteRequestToJSONTyped(value?: InviteRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

@@ -48,10 +48,15 @@ export function SharePrivateResponseFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function SharePrivateResponseToJSON(value?: SharePrivateResponse | null): any {
+export function SharePrivateResponseToJSON(json: any): SharePrivateResponse {
+    return SharePrivateResponseToJSONTyped(json, false);
+}
+
+export function SharePrivateResponseToJSONTyped(value?: SharePrivateResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'token': value['token'],

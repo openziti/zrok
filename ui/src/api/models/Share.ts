@@ -18,6 +18,7 @@ import {
     SparkDataSampleFromJSON,
     SparkDataSampleFromJSONTyped,
     SparkDataSampleToJSON,
+    SparkDataSampleToJSONTyped,
 } from './SparkDataSample';
 
 /**
@@ -132,10 +133,15 @@ export function ShareFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sha
     };
 }
 
-export function ShareToJSON(value?: Share | null): any {
+export function ShareToJSON(json: any): Share {
+    return ShareToJSONTyped(json, false);
+}
+
+export function ShareToJSONTyped(value?: Share | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'shareToken': value['shareToken'],

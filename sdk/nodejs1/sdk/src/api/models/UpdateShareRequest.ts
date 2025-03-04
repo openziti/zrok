@@ -69,10 +69,15 @@ export function UpdateShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function UpdateShareRequestToJSON(value?: UpdateShareRequest | null): any {
+export function UpdateShareRequestToJSON(json: any): UpdateShareRequest {
+    return UpdateShareRequestToJSONTyped(json, false);
+}
+
+export function UpdateShareRequestToJSONTyped(value?: UpdateShareRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'shareToken': value['shareToken'],

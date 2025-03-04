@@ -18,6 +18,7 @@ import {
     SparkDataSampleFromJSON,
     SparkDataSampleFromJSONTyped,
     SparkDataSampleToJSON,
+    SparkDataSampleToJSONTyped,
 } from './SparkDataSample';
 
 /**
@@ -104,10 +105,15 @@ export function EnvironmentFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function EnvironmentToJSON(value?: Environment | null): any {
+export function EnvironmentToJSON(json: any): Environment {
+    return EnvironmentToJSONTyped(json, false);
+}
+
+export function EnvironmentToJSONTyped(value?: Environment | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

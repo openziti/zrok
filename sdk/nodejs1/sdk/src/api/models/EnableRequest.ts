@@ -55,10 +55,15 @@ export function EnableRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function EnableRequestToJSON(value?: EnableRequest | null): any {
+export function EnableRequestToJSON(json: any): EnableRequest {
+    return EnableRequestToJSONTyped(json, false);
+}
+
+export function EnableRequestToJSONTyped(value?: EnableRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

@@ -55,10 +55,15 @@ export function AuthUserFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function AuthUserToJSON(value?: AuthUser | null): any {
+export function AuthUserToJSON(json: any): AuthUser {
+    return AuthUserToJSONTyped(json, false);
+}
+
+export function AuthUserToJSONTyped(value?: AuthUser | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'username': value['username'],

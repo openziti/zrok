@@ -18,18 +18,21 @@ import {
     FrontendFromJSON,
     FrontendFromJSONTyped,
     FrontendToJSON,
+    FrontendToJSONTyped,
 } from './Frontend';
 import type { Environment } from './Environment';
 import {
     EnvironmentFromJSON,
     EnvironmentFromJSONTyped,
     EnvironmentToJSON,
+    EnvironmentToJSONTyped,
 } from './Environment';
 import type { Share } from './Share';
 import {
     ShareFromJSON,
     ShareFromJSONTyped,
     ShareToJSON,
+    ShareToJSONTyped,
 } from './Share';
 
 /**
@@ -81,10 +84,15 @@ export function EnvironmentAndResourcesFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function EnvironmentAndResourcesToJSON(value?: EnvironmentAndResources | null): any {
+export function EnvironmentAndResourcesToJSON(json: any): EnvironmentAndResources {
+    return EnvironmentAndResourcesToJSONTyped(json, false);
+}
+
+export function EnvironmentAndResourcesToJSONTyped(value?: EnvironmentAndResources | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'environment': EnvironmentToJSON(value['environment']),

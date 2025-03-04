@@ -69,10 +69,15 @@ export function AccessRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function AccessRequestToJSON(value?: AccessRequest | null): any {
+export function AccessRequestToJSON(json: any): AccessRequest {
+    return AccessRequestToJSONTyped(json, false);
+}
+
+export function AccessRequestToJSONTyped(value?: AccessRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'envZId': value['envZId'],

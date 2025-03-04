@@ -18,6 +18,7 @@ import {
     ListMemberships200ResponseMembershipsInnerFromJSON,
     ListMemberships200ResponseMembershipsInnerFromJSONTyped,
     ListMemberships200ResponseMembershipsInnerToJSON,
+    ListMemberships200ResponseMembershipsInnerToJSONTyped,
 } from './ListMemberships200ResponseMembershipsInner';
 
 /**
@@ -55,10 +56,15 @@ export function ListMemberships200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function ListMemberships200ResponseToJSON(value?: ListMemberships200Response | null): any {
+export function ListMemberships200ResponseToJSON(json: any): ListMemberships200Response {
+    return ListMemberships200ResponseToJSONTyped(json, false);
+}
+
+export function ListMemberships200ResponseToJSONTyped(value?: ListMemberships200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'memberships': value['memberships'] == null ? undefined : ((value['memberships'] as Array<any>).map(ListMemberships200ResponseMembershipsInnerToJSON)),

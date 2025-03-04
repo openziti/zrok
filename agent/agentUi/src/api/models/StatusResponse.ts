@@ -18,12 +18,14 @@ import {
     AccessDetailFromJSON,
     AccessDetailFromJSONTyped,
     AccessDetailToJSON,
+    AccessDetailToJSONTyped,
 } from './AccessDetail';
 import type { ShareDetail } from './ShareDetail';
 import {
     ShareDetailFromJSON,
     ShareDetailFromJSONTyped,
     ShareDetailToJSON,
+    ShareDetailToJSONTyped,
 } from './ShareDetail';
 
 /**
@@ -68,10 +70,15 @@ export function StatusResponseFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function StatusResponseToJSON(value?: StatusResponse | null): any {
+export function StatusResponseToJSON(json: any): StatusResponse {
+    return StatusResponseToJSONTyped(json, false);
+}
+
+export function StatusResponseToJSONTyped(value?: StatusResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'accesses': value['accesses'] == null ? undefined : ((value['accesses'] as Array<any>).map(AccessDetailToJSON)),

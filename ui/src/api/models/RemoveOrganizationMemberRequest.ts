@@ -55,10 +55,15 @@ export function RemoveOrganizationMemberRequestFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function RemoveOrganizationMemberRequestToJSON(value?: RemoveOrganizationMemberRequest | null): any {
+export function RemoveOrganizationMemberRequestToJSON(json: any): RemoveOrganizationMemberRequest {
+    return RemoveOrganizationMemberRequestToJSONTyped(json, false);
+}
+
+export function RemoveOrganizationMemberRequestToJSONTyped(value?: RemoveOrganizationMemberRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'organizationToken': value['organizationToken'],

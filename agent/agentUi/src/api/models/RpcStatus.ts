@@ -18,6 +18,7 @@ import {
     ProtobufAnyFromJSON,
     ProtobufAnyFromJSONTyped,
     ProtobufAnyToJSON,
+    ProtobufAnyToJSONTyped,
 } from './ProtobufAny';
 
 /**
@@ -69,10 +70,15 @@ export function RpcStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function RpcStatusToJSON(value?: RpcStatus | null): any {
+export function RpcStatusToJSON(json: any): RpcStatus {
+    return RpcStatusToJSONTyped(json, false);
+}
+
+export function RpcStatusToJSONTyped(value?: RpcStatus | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'code': value['code'],

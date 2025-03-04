@@ -48,10 +48,15 @@ export function CreateOrganization201ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function CreateOrganization201ResponseToJSON(value?: CreateOrganization201Response | null): any {
+export function CreateOrganization201ResponseToJSON(json: any): CreateOrganization201Response {
+    return CreateOrganization201ResponseToJSONTyped(json, false);
+}
+
+export function CreateOrganization201ResponseToJSONTyped(value?: CreateOrganization201Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'organizationToken': value['organizationToken'],

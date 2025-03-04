@@ -48,10 +48,15 @@ export function VerifyRequestFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function VerifyRequestToJSON(value?: VerifyRequest | null): any {
+export function VerifyRequestToJSON(json: any): VerifyRequest {
+    return VerifyRequestToJSONTyped(json, false);
+}
+
+export function VerifyRequestToJSONTyped(value?: VerifyRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'registerToken': value['registerToken'],

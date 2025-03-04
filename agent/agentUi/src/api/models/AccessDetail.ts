@@ -69,10 +69,15 @@ export function AccessDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function AccessDetailToJSON(value?: AccessDetail | null): any {
+export function AccessDetailToJSON(json: any): AccessDetail {
+    return AccessDetailToJSONTyped(json, false);
+}
+
+export function AccessDetailToJSONTyped(value?: AccessDetail | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

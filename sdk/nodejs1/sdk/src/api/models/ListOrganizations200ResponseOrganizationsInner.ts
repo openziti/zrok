@@ -55,10 +55,15 @@ export function ListOrganizations200ResponseOrganizationsInnerFromJSONTyped(json
     };
 }
 
-export function ListOrganizations200ResponseOrganizationsInnerToJSON(value?: ListOrganizations200ResponseOrganizationsInner | null): any {
+export function ListOrganizations200ResponseOrganizationsInnerToJSON(json: any): ListOrganizations200ResponseOrganizationsInner {
+    return ListOrganizations200ResponseOrganizationsInnerToJSONTyped(json, false);
+}
+
+export function ListOrganizations200ResponseOrganizationsInnerToJSONTyped(value?: ListOrganizations200ResponseOrganizationsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'organizationToken': value['organizationToken'],

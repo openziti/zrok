@@ -55,10 +55,15 @@ export function VersionResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function VersionResponseToJSON(value?: VersionResponse | null): any {
+export function VersionResponseToJSON(json: any): VersionResponse {
+    return VersionResponseToJSONTyped(json, false);
+}
+
+export function VersionResponseToJSONTyped(value?: VersionResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'v': value['v'],

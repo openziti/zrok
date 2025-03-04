@@ -48,10 +48,15 @@ export function CreateFrontend201ResponseFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function CreateFrontend201ResponseToJSON(value?: CreateFrontend201Response | null): any {
+export function CreateFrontend201ResponseToJSON(json: any): CreateFrontend201Response {
+    return CreateFrontend201ResponseToJSONTyped(json, false);
+}
+
+export function CreateFrontend201ResponseToJSONTyped(value?: CreateFrontend201Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

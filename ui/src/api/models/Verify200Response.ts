@@ -48,10 +48,15 @@ export function Verify200ResponseFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function Verify200ResponseToJSON(value?: Verify200Response | null): any {
+export function Verify200ResponseToJSON(json: any): Verify200Response {
+    return Verify200ResponseToJSONTyped(json, false);
+}
+
+export function Verify200ResponseToJSONTyped(value?: Verify200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

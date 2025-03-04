@@ -48,10 +48,15 @@ export function InviteTokenGenerateRequestFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function InviteTokenGenerateRequestToJSON(value?: InviteTokenGenerateRequest | null): any {
+export function InviteTokenGenerateRequestToJSON(json: any): InviteTokenGenerateRequest {
+    return InviteTokenGenerateRequestToJSONTyped(json, false);
+}
+
+export function InviteTokenGenerateRequestToJSONTyped(value?: InviteTokenGenerateRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inviteTokens': value['inviteTokens'],

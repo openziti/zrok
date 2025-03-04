@@ -55,10 +55,15 @@ export function ListOrganizationMembers200ResponseMembersInnerFromJSONTyped(json
     };
 }
 
-export function ListOrganizationMembers200ResponseMembersInnerToJSON(value?: ListOrganizationMembers200ResponseMembersInner | null): any {
+export function ListOrganizationMembers200ResponseMembersInnerToJSON(json: any): ListOrganizationMembers200ResponseMembersInner {
+    return ListOrganizationMembers200ResponseMembersInnerToJSONTyped(json, false);
+}
+
+export function ListOrganizationMembers200ResponseMembersInnerToJSONTyped(value?: ListOrganizationMembers200ResponseMembersInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

@@ -55,10 +55,15 @@ export function RegisterRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function RegisterRequestToJSON(value?: RegisterRequest | null): any {
+export function RegisterRequestToJSON(json: any): RegisterRequest {
+    return RegisterRequestToJSONTyped(json, false);
+}
+
+export function RegisterRequestToJSONTyped(value?: RegisterRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'registerToken': value['registerToken'],

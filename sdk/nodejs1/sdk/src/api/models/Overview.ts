@@ -18,6 +18,7 @@ import {
     EnvironmentAndResourcesFromJSON,
     EnvironmentAndResourcesFromJSONTyped,
     EnvironmentAndResourcesToJSON,
+    EnvironmentAndResourcesToJSONTyped,
 } from './EnvironmentAndResources';
 
 /**
@@ -62,10 +63,15 @@ export function OverviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function OverviewToJSON(value?: Overview | null): any {
+export function OverviewToJSON(json: any): Overview {
+    return OverviewToJSONTyped(json, false);
+}
+
+export function OverviewToJSONTyped(value?: Overview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'accountLimited': value['accountLimited'],

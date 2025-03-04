@@ -48,10 +48,15 @@ export function ClientVersionCheckRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function ClientVersionCheckRequestToJSON(value?: ClientVersionCheckRequest | null): any {
+export function ClientVersionCheckRequestToJSON(json: any): ClientVersionCheckRequest {
+    return ClientVersionCheckRequestToJSONTyped(json, false);
+}
+
+export function ClientVersionCheckRequestToJSONTyped(value?: ClientVersionCheckRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'clientVersion': value['clientVersion'],

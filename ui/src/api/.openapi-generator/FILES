@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/AccountApi.ts
 apis/AdminApi.ts
 apis/EnvironmentApi.ts

@@ -97,10 +97,15 @@ export function ShareDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function ShareDetailToJSON(value?: ShareDetail | null): any {
+export function ShareDetailToJSON(json: any): ShareDetail {
+    return ShareDetailToJSONTyped(json, false);
+}
+
+export function ShareDetailToJSONTyped(value?: ShareDetail | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'token': value['token'],

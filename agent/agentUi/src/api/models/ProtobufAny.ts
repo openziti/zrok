@@ -50,10 +50,15 @@ export function ProtobufAnyFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function ProtobufAnyToJSON(value?: ProtobufAny | null): any {
+export function ProtobufAnyToJSON(json: any): ProtobufAny {
+    return ProtobufAnyToJSONTyped(json, false);
+}
+
+export function ProtobufAnyToJSONTyped(value?: ProtobufAny | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
             ...value,

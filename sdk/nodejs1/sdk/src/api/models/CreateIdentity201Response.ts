@@ -55,10 +55,15 @@ export function CreateIdentity201ResponseFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function CreateIdentity201ResponseToJSON(value?: CreateIdentity201Response | null): any {
+export function CreateIdentity201ResponseToJSON(json: any): CreateIdentity201Response {
+    return CreateIdentity201ResponseToJSONTyped(json, false);
+}
+
+export function CreateIdentity201ResponseToJSONTyped(value?: CreateIdentity201Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'identity': value['identity'],

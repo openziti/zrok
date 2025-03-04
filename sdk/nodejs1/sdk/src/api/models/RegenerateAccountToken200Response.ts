@@ -48,10 +48,15 @@ export function RegenerateAccountToken200ResponseFromJSONTyped(json: any, ignore
     };
 }
 
-export function RegenerateAccountToken200ResponseToJSON(value?: RegenerateAccountToken200Response | null): any {
+export function RegenerateAccountToken200ResponseToJSON(json: any): RegenerateAccountToken200Response {
+    return RegenerateAccountToken200ResponseToJSONTyped(json, false);
+}
+
+export function RegenerateAccountToken200ResponseToJSONTyped(value?: RegenerateAccountToken200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'accountToken': value['accountToken'],

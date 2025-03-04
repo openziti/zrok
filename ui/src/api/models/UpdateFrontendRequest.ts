@@ -62,10 +62,15 @@ export function UpdateFrontendRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function UpdateFrontendRequestToJSON(value?: UpdateFrontendRequest | null): any {
+export function UpdateFrontendRequestToJSON(json: any): UpdateFrontendRequest {
+    return UpdateFrontendRequestToJSONTyped(json, false);
+}
+
+export function UpdateFrontendRequestToJSONTyped(value?: UpdateFrontendRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

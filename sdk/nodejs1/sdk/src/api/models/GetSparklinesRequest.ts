@@ -62,10 +62,15 @@ export function GetSparklinesRequestFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function GetSparklinesRequestToJSON(value?: GetSparklinesRequest | null): any {
+export function GetSparklinesRequestToJSON(json: any): GetSparklinesRequest {
+    return GetSparklinesRequestToJSONTyped(json, false);
+}
+
+export function GetSparklinesRequestToJSONTyped(value?: GetSparklinesRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'account': value['account'],

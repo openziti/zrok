@@ -83,10 +83,15 @@ export function ListFrontends200ResponseInnerFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function ListFrontends200ResponseInnerToJSON(value?: ListFrontends200ResponseInner | null): any {
+export function ListFrontends200ResponseInnerToJSON(json: any): ListFrontends200ResponseInner {
+    return ListFrontends200ResponseInnerToJSONTyped(json, false);
+}
+
+export function ListFrontends200ResponseInnerToJSONTyped(value?: ListFrontends200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

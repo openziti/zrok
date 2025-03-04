@@ -62,10 +62,15 @@ export function AddOrganizationMemberRequestFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function AddOrganizationMemberRequestToJSON(value?: AddOrganizationMemberRequest | null): any {
+export function AddOrganizationMemberRequestToJSON(json: any): AddOrganizationMemberRequest {
+    return AddOrganizationMemberRequestToJSONTyped(json, false);
+}
+
+export function AddOrganizationMemberRequestToJSONTyped(value?: AddOrganizationMemberRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'organizationToken': value['organizationToken'],

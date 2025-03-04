@@ -48,10 +48,15 @@ export function DisableRequestFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function DisableRequestToJSON(value?: DisableRequest | null): any {
+export function DisableRequestToJSON(json: any): DisableRequest {
+    return DisableRequestToJSONTyped(json, false);
+}
+
+export function DisableRequestToJSONTyped(value?: DisableRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'identity': value['identity'],

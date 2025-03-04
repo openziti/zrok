@@ -18,6 +18,7 @@ import {
     MetricsSampleFromJSON,
     MetricsSampleFromJSONTyped,
     MetricsSampleToJSON,
+    MetricsSampleToJSONTyped,
 } from './MetricsSample';
 
 /**
@@ -76,10 +77,15 @@ export function MetricsFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
     };
 }
 
-export function MetricsToJSON(value?: Metrics | null): any {
+export function MetricsToJSON(json: any): Metrics {
+    return MetricsToJSONTyped(json, false);
+}
+
+export function MetricsToJSONTyped(value?: Metrics | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'scope': value['scope'],

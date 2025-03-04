@@ -48,10 +48,15 @@ export function AccessPrivateResponseFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function AccessPrivateResponseToJSON(value?: AccessPrivateResponse | null): any {
+export function AccessPrivateResponseToJSON(json: any): AccessPrivateResponse {
+    return AccessPrivateResponseToJSONTyped(json, false);
+}
+
+export function AccessPrivateResponseToJSONTyped(value?: AccessPrivateResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

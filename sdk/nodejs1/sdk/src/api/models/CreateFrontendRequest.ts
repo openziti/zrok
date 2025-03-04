@@ -80,10 +80,15 @@ export function CreateFrontendRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function CreateFrontendRequestToJSON(value?: CreateFrontendRequest | null): any {
+export function CreateFrontendRequestToJSON(json: any): CreateFrontendRequest {
+    return CreateFrontendRequestToJSONTyped(json, false);
+}
+
+export function CreateFrontendRequestToJSONTyped(value?: CreateFrontendRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'zId': value['zId'],

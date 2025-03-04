@@ -62,10 +62,15 @@ export function ListMemberships200ResponseMembershipsInnerFromJSONTyped(json: an
     };
 }
 
-export function ListMemberships200ResponseMembershipsInnerToJSON(value?: ListMemberships200ResponseMembershipsInner | null): any {
+export function ListMemberships200ResponseMembershipsInnerToJSON(json: any): ListMemberships200ResponseMembershipsInner {
+    return ListMemberships200ResponseMembershipsInnerToJSONTyped(json, false);
+}
+
+export function ListMemberships200ResponseMembershipsInnerToJSONTyped(value?: ListMemberships200ResponseMembershipsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'organizationToken': value['organizationToken'],

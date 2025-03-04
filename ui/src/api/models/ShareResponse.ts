@@ -55,10 +55,15 @@ export function ShareResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ShareResponseToJSON(value?: ShareResponse | null): any {
+export function ShareResponseToJSON(json: any): ShareResponse {
+    return ShareResponseToJSONTyped(json, false);
+}
+
+export function ShareResponseToJSONTyped(value?: ShareResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendProxyEndpoints': value['frontendProxyEndpoints'],

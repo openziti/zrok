@@ -55,10 +55,15 @@ export function LoginRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function LoginRequestToJSON(value?: LoginRequest | null): any {
+export function LoginRequestToJSON(json: any): LoginRequest {
+    return LoginRequestToJSONTyped(json, false);
+}
+
+export function LoginRequestToJSONTyped(value?: LoginRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

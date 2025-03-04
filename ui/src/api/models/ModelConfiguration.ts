@@ -76,10 +76,15 @@ export function ModelConfigurationFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function ModelConfigurationToJSON(value?: ModelConfiguration | null): any {
+export function ModelConfigurationToJSON(json: any): ModelConfiguration {
+    return ModelConfigurationToJSONTyped(json, false);
+}
+
+export function ModelConfigurationToJSONTyped(value?: ModelConfiguration | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'version': value['version'],

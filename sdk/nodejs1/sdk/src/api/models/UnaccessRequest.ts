@@ -62,10 +62,15 @@ export function UnaccessRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function UnaccessRequestToJSON(value?: UnaccessRequest | null): any {
+export function UnaccessRequestToJSON(json: any): UnaccessRequest {
+    return UnaccessRequestToJSONTyped(json, false);
+}
+
+export function UnaccessRequestToJSONTyped(value?: UnaccessRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],

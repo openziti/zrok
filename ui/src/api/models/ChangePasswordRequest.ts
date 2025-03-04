@@ -62,10 +62,15 @@ export function ChangePasswordRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ChangePasswordRequestToJSON(value?: ChangePasswordRequest | null): any {
+export function ChangePasswordRequestToJSON(json: any): ChangePasswordRequest {
+    return ChangePasswordRequestToJSONTyped(json, false);
+}
+
+export function ChangePasswordRequestToJSONTyped(value?: ChangePasswordRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'email': value['email'],

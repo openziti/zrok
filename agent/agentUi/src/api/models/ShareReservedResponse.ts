@@ -76,10 +76,15 @@ export function ShareReservedResponseFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ShareReservedResponseToJSON(value?: ShareReservedResponse | null): any {
+export function ShareReservedResponseToJSON(json: any): ShareReservedResponse {
+    return ShareReservedResponseToJSONTyped(json, false);
+}
+
+export function ShareReservedResponseToJSONTyped(value?: ShareReservedResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'token': value['token'],

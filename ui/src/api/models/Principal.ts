@@ -76,10 +76,15 @@ export function PrincipalFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function PrincipalToJSON(value?: Principal | null): any {
+export function PrincipalToJSON(json: any): Principal {
+    return PrincipalToJSONTyped(json, false);
+}
+
+export function PrincipalToJSONTyped(value?: Principal | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

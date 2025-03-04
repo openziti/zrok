@@ -48,10 +48,15 @@ export function CreateIdentityRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function CreateIdentityRequestToJSON(value?: CreateIdentityRequest | null): any {
+export function CreateIdentityRequestToJSON(json: any): CreateIdentityRequest {
+    return CreateIdentityRequestToJSONTyped(json, false);
+}
+
+export function CreateIdentityRequestToJSONTyped(value?: CreateIdentityRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

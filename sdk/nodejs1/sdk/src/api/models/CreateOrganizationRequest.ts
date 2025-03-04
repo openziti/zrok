@@ -48,10 +48,15 @@ export function CreateOrganizationRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function CreateOrganizationRequestToJSON(value?: CreateOrganizationRequest | null): any {
+export function CreateOrganizationRequestToJSON(json: any): CreateOrganizationRequest {
+    return CreateOrganizationRequestToJSONTyped(json, false);
+}
+
+export function CreateOrganizationRequestToJSONTyped(value?: CreateOrganizationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'description': value['description'],

@@ -62,10 +62,15 @@ export function MetricsSampleFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function MetricsSampleToJSON(value?: MetricsSample | null): any {
+export function MetricsSampleToJSON(json: any): MetricsSample {
+    return MetricsSampleToJSONTyped(json, false);
+}
+
+export function MetricsSampleToJSONTyped(value?: MetricsSample | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'rx': value['rx'],

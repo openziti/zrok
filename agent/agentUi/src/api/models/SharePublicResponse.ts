@@ -55,10 +55,15 @@ export function SharePublicResponseFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function SharePublicResponseToJSON(value?: SharePublicResponse | null): any {
+export function SharePublicResponseToJSON(json: any): SharePublicResponse {
+    return SharePublicResponseToJSONTyped(json, false);
+}
+
+export function SharePublicResponseToJSONTyped(value?: SharePublicResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'token': value['token'],

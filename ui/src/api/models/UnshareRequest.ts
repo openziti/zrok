@@ -62,10 +62,15 @@ export function UnshareRequestFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function UnshareRequestToJSON(value?: UnshareRequest | null): any {
+export function UnshareRequestToJSON(json: any): UnshareRequest {
+    return UnshareRequestToJSONTyped(json, false);
+}
+
+export function UnshareRequestToJSONTyped(value?: UnshareRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'envZId': value['envZId'],

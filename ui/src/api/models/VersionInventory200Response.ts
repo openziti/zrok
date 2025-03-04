@@ -48,10 +48,15 @@ export function VersionInventory200ResponseFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function VersionInventory200ResponseToJSON(value?: VersionInventory200Response | null): any {
+export function VersionInventory200ResponseToJSON(json: any): VersionInventory200Response {
+    return VersionInventory200ResponseToJSONTyped(json, false);
+}
+
+export function VersionInventory200ResponseToJSONTyped(value?: VersionInventory200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'controllerVersion': value['controllerVersion'],

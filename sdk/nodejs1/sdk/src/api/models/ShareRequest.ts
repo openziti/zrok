@@ -18,6 +18,7 @@ import {
     AuthUserFromJSON,
     AuthUserFromJSONTyped,
     AuthUserToJSON,
+    AuthUserToJSONTyped,
 } from './AuthUser';
 
 /**
@@ -190,10 +191,15 @@ export function ShareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ShareRequestToJSON(value?: ShareRequest | null): any {
+export function ShareRequestToJSON(json: any): ShareRequest {
+    return ShareRequestToJSONTyped(json, false);
+}
+
+export function ShareRequestToJSONTyped(value?: ShareRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'envZId': value['envZId'],

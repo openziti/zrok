@@ -55,10 +55,15 @@ export function Access201ResponseFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function Access201ResponseToJSON(value?: Access201Response | null): any {
+export function Access201ResponseToJSON(json: any): Access201Response {
+    return Access201ResponseToJSONTyped(json, false);
+}
+
+export function Access201ResponseToJSONTyped(value?: Access201Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'frontendToken': value['frontendToken'],
