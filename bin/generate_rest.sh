@@ -74,7 +74,7 @@ done < ${PYMOD}/.openapi-generator/FILES
 # Delete the tracking file
 rm -f "${PYMOD}/.openapi-generator/FILES"
 # Generate and track new files
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/src/zrok -g python \
+openapi-generator-cli generate -i specs/zrok.yml -o "${PYMOD}" -g python \
   --package-name zrok_api --additional-properties projectName=zrok
 
 git checkout rest_server_zrok/configure_zrok.go
