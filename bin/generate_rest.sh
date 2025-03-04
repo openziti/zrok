@@ -22,17 +22,26 @@ command -v realpath 2>&1 || {
   exit 1
 }
 
-scriptPath=$(realpath $0)
+scriptPath=$(realpath "$0")
 scriptDir=$(dirname "$scriptPath")
 
 zrokDir=$(realpath "$scriptDir/..")
 
 zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
-pythonConfig=$(realpath "$zrokDir/bin/python_config.json")
-
 echo "...clean generate zrok server/client"
-rm -rf rest_*
+for genDir in \
+  ./rest_client_zrok/ \
+  ./rest_model_zrok/ \
+  ./rest_server_zrok/
+do
+  if [[ -d $genDir ]]
+  then
+    rm -rf "$genDir"
+  else
+    echo "WARN: not deleting $genDir because it does not exist" >&2
+  fi
+done
 
 echo "...generating zrok server"
 swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
@@ -42,7 +51,7 @@ swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_clie
 
 echo "...generating api console ts client"
 rm -rf ui/src/api
-openapi-generator-cli generate -i specs/zrok.yml -o ui/src/api -g typescript-fetch
+openapi-generator-cli generate -i "$zrokSpec" -o ui/src/api -g typescript-fetch
 
 echo "...generating agent console ts client"
 rm -rf agent/agentUi/src/api
@@ -50,11 +59,21 @@ openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/ag
 
 echo "...generating nodejs sdk ts client"
 rm -rf sdk/nodejs/sdk/src/api
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g typescript-fetch
+openapi-generator-cli generate -i "$zrokSpec" -o sdk/nodejs/sdk/src/api -g typescript-fetch
 
 echo "...generating python sdk client"
-swagger-codegen generate -i specs/zrok.yml -o sdk/python/sdk/zrok -c $pythonConfig -l python
+pyMod="sdk/python/src"
+while IFS= read -r genFile
+do
+  if [[ -e "$pyMod/$genFile" ]]
+  then
+    rm -f "$pyMod/$genFile"
+  fi
+done < "$pyMod/.openapi-generator/FILES"
+# Delete the tracking file
+rm -f "$pyMod/.openapi-generator/FILES"
+# Generate and track new files
+openapi-generator-cli generate -i "$zrokSpec" -o "$pyMod" -g python \
+  --package-name zrok_api --additional-properties projectName=zrok
 
 git checkout rest_server_zrok/configure_zrok.go
-rm sdk/nodejs/sdk/src/zrok/api/git_push.sh
-rm sdk/python/sdk/zrok/git_push.sh

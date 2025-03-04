@@ -1,0 +1,18 @@
+#
+## unwanted files should not be generated
+#
+
+git_push.sh
+.gitlab-ci.yml
+.travis.yml
+pyproject.toml
+.github/workflows/python.yml
+tox.ini
+test-requirements.txt
+
+#
+## custom files that must not be overwritten
+#
+
+setup.py
+setup.cfg
