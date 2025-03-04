@@ -8,7 +8,6 @@ git_push.sh
 pyproject.toml
 .github/workflows/python.yml
 tox.ini
-test-requirements.txt
 
 #
 ## custom files that must not be overwritten

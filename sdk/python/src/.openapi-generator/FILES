@@ -57,6 +57,7 @@ docs/Verify200Response.md
 docs/VerifyRequest.md
 docs/VersionInventory200Response.md
 requirements.txt
+test-requirements.txt
 test/__init__.py
 test/test_access201_response.py
 test/test_access_request.py

@@ -88,6 +88,43 @@ jobs:
           path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
           if-no-files-found: error
 
+  pytest:
+
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        shell: bash
+        working-directory: sdk/python/src/
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r test-requirements.txt
+
+      - name: Test with pytest
+        shell: bash
+        working-directory: sdk/python/src/
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          pytest --cov=zrok_api
+
   # build a release candidate container image for branches named "main" or like "v*"
   rc-container-build:
     needs: ubuntu-build
