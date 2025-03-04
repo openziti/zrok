@@ -12,7 +12,8 @@ VERSION = "1.0.0"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["urllib3 >= 1.15", "six >= 1.10", "certifi", "python-dateutil", "openziti >= 1.0.0"]
+# urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
+REQUIRES = ["openziti >= 1.0.0", "urllib3 >= 2.1.0" ]
 
 setup(
     name=NAME,
@@ -21,7 +22,7 @@ setup(
     description="zrok",
     author_email="",
     url="",
-    keywords=["Swagger", "zrok"],
+    keywords=["zrok"],
     install_requires=REQUIRES,
     python_requires='>3.10.0',
     packages=find_packages(),

@@ -67,6 +67,6 @@ done < sdk/python/sdk/zrok/.openapi-generator/FILES
 # Delete the tracking file
 rm -f sdk/python/sdk/zrok/.openapi-generator/FILES
 # Generate and track new files
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok --package-name zrok_api -g python
+openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/sdk/zrok --package-name zrok_api --additional-properties projectName=zrok -g python
 
 git checkout rest_server_zrok/configure_zrok.go
