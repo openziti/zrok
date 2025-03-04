@@ -105,6 +105,7 @@ const toPrivateApiShareRequest = (root: Root, request: ShareRequest): ApiShareRe
         shareMode: ShareRequestShareModeEnum.Private,
         backendMode: toApiBackendMode(request.backendMode),
         backendProxyEndpoint: request.target,
+        authScheme: "none",
     };
 }
 
