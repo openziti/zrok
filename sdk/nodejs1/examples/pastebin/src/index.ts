@@ -1,8 +1,12 @@
 import {Command} from "commander";
 // @ts-ignore
 import {
+    AccessRequest,
+    createAccess,
     createShare,
+    deleteAccess,
     deleteShare,
+    dialer,
     init,
     listener,
     loadRoot,
@@ -34,6 +38,22 @@ const copyto = async () => {
     });
 }
 
+const pastefrom = async (shareToken: string) => {
+    let root = loadRoot();
+    await init(root).catch((err: Error) => {
+        console.log(err);
+        return process.exit(1);
+    });
+    let acc = await createAccess(root, new AccessRequest(shareToken));
+
+    dialer(acc, () => {}, async (data: any) => {
+        console.log(new TextDecoder().decode(data));
+        await deleteAccess(root, acc);
+        process.exit(0);
+    });
+}
+
 const program = new Command();
-program.command("copyto").version("1.0.0").description("serve a copy buffer").action(copyto);
+program.command("copyto").description("serve a copy buffer").action(copyto);
+program.command("pastefrom <shareToken>").description("receive a copy buffer").action(pastefrom);
 program.parse(process.argv);

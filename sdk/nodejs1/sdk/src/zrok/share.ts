@@ -78,14 +78,14 @@ export const createShare = async (root: Root, request: ShareRequest): Promise<Sh
     }
 
     let shr = await new ShareApi(root.apiConfiguration()).share({body: req})
-        .catch(resp => {
-            throw new Error("unable to create share: " + resp);
+        .catch(err => {
+            throw new Error("unable to create share: " + err);
         });
 
     return new Share(shr.shareToken!, shr.frontendProxyEndpoints);
 }
 
-export const deleteShare = (root: Root, shr: Share): void => {
+export const deleteShare = async (root: Root, shr: Share): Promise<any> => {
     if(!root.isEnabled()) {
         throw new Error("environment is not enable; enable with 'zrok enable' first!");
     }
@@ -93,9 +93,9 @@ export const deleteShare = (root: Root, shr: Share): void => {
         envZId: root.environment?.zId!,
         shareToken: shr.shareToken
     };
-    new ShareApi(root.apiConfiguration()).unshare({body: req})
-        .catch(resp => {
-            throw new Error("unable to delete share: " + resp);
+    return new ShareApi(root.apiConfiguration()).unshare({body: req})
+        .catch(err => {
+            throw new Error("unable to delete share: " + err);
         });
 }
 
