@@ -30,16 +30,16 @@ zrokDir=$(realpath "$scriptDir/..")
 zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
 echo "...clean generate zrok server/client"
-for GEN in \
+for genDir in \
   ./rest_client_zrok/ \
   ./rest_model_zrok/ \
   ./rest_server_zrok/
 do
-  if [[ -d $GEN ]]
+  if [[ -d $genDir ]]
   then
-    rm -rf "$GEN"
+    rm -rf "$genDir"
   else
-    echo "WARN: not deleting $GEN because it does not exist" >&2
+    echo "WARN: not deleting $genDir because it does not exist" >&2
   fi
 done
 
@@ -51,7 +51,7 @@ swagger generate client -P rest_model_zrok.Principal -f "$zrokSpec" -c rest_clie
 
 echo "...generating api console ts client"
 rm -rf ui/src/api
-openapi-generator-cli generate -i specs/zrok.yml -o ui/src/api -g typescript-fetch
+openapi-generator-cli generate -i "$zrokSpec" -o ui/src/api -g typescript-fetch
 
 echo "...generating agent console ts client"
 rm -rf agent/agentUi/src/api
@@ -59,22 +59,21 @@ openapi-generator-cli generate -i agent/agentGrpc/agent.swagger.json -o agent/ag
 
 echo "...generating nodejs sdk ts client"
 rm -rf sdk/nodejs/sdk/src/api
-openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g typescript-fetch
+openapi-generator-cli generate -i "$zrokSpec" -o sdk/nodejs/sdk/src/api -g typescript-fetch
 
 echo "...generating python sdk client"
-# Delete tracked Python files
-PYMOD=sdk/python/src
-while IFS= read -r FILE
+pyMod="sdk/python/src"
+while IFS= read -r genFile
 do
-  if [[ -e "${PYMOD}/${FILE}" ]]
+  if [[ -e "$pyMod/$genFile" ]]
   then
-    rm -f "${PYMOD}/${FILE}"
+    rm -f "$pyMod/$genFile"
   fi
-done < ${PYMOD}/.openapi-generator/FILES
+done < "$pyMod/.openapi-generator/FILES"
 # Delete the tracking file
-rm -f "${PYMOD}/.openapi-generator/FILES"
+rm -f "$pyMod/.openapi-generator/FILES"
 # Generate and track new files
-openapi-generator-cli generate -i specs/zrok.yml -o "${PYMOD}" -g python \
+openapi-generator-cli generate -i "$zrokSpec" -o "$pyMod" -g python \
   --package-name zrok_api --additional-properties projectName=zrok
 
 git checkout rest_server_zrok/configure_zrok.go
