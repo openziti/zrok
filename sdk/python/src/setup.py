@@ -7,12 +7,13 @@ import re
 NAME = os.getenv('ZROK_PY_NAME', "zrok")
 VERSION = "1.0.0"
 
-# Define your package overrides here - these take precedence over the generated requirements.txt
 OVERRIDES = {
     # Override specific packages with version constraints different from the generated requirements.txt
     "openziti": "openziti >= 1.0.0",
-    "urllib3": "urllib3 >= 2.1.0",  # urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
+    # urllib3 2.1.0 introduced breaking changes that are implemented by openapi-generator 7.12.0
+    "urllib3": "urllib3 >= 2.1.0",
 }
+
 
 # Parse the generated requirements.txt
 def parse_requirements(filename):
@@ -36,6 +37,7 @@ def parse_requirements(filename):
             requirements.append(line)
 
     return requirements
+
 
 # Combine requirements from requirements.txt and overrides
 requirements_file = Path(__file__).parent / "requirements.txt"

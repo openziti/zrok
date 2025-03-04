@@ -40,3 +40,4 @@ sdk/nodejs/sdk/dist
 
 # py module artifacts
 *.egg-info/
+__pycache__/
