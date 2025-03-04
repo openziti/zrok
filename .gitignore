@@ -37,3 +37,6 @@ yarn-error.log*
 .obsidian
 
 sdk/nodejs/sdk/dist
+
+# py module artifacts
+*.egg-info/
