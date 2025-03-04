@@ -6,7 +6,7 @@ import {
     init,
     listener,
     loadRoot,
-    PRIVATE_SHARE_MODE, setLogLevel,
+    PRIVATE_SHARE_MODE,
     ShareRequest,
     TCP_TUNNEL_BACKEND_MODE,
     write
@@ -24,14 +24,14 @@ const copyto = async () => {
             return process.exit(1);
         });
     let shr = await createShare(root, new ShareRequest(PRIVATE_SHARE_MODE, TCP_TUNNEL_BACKEND_MODE, "copyto"));
-    console.log("connect with 'copyto " + shr.shareToken + "'");
-    listener(shr, {clientConnectCallback: (data: any) => {
-        console.log("data", data);
-        write(data.client, text) ;
-    }});
+
+    console.log("connect with 'pastefrom " + shr.shareToken + "'");
+
+    listener(shr, (data: any) => {
+        write(data.client, new TextEncoder().encode(text + "\n"));
+    });
 
     process.on("SIGINT", async () => {
-        console.log("cleaning up");
         deleteShare(root, shr);
     });
 }

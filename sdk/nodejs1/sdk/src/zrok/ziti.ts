@@ -12,17 +12,10 @@ export const setLogLevel = (level: number) => {
 }
 
 export const listener = (shr: Share,
-                         callbacks?: {
-                            listenCallback?: any,
-                            listenClientCallback?: any,
-                            clientConnectCallback: any,
-                            clientDataCallback?: any
-                         }): ziti.listener => {
-    let listenCallback = callbacks?.listenCallback ? callbacks.listenClientCallback : (data: any) => {};
-    let listenClientCallback = callbacks?.listenClientCallback ? callbacks.listenClientCallback : (data: any) => {};
-    let clientConnectCallback = callbacks?.clientConnectCallback ? callbacks.clientConnectCallback : (data: any) => {};
-    let clientDataCallback = callbacks?.clientDataCallback ? callbacks.clientDataCallback : (data: any) => {};
-    console.log("client connect callback", clientConnectCallback);
+                         clientConnectCallback: any,
+                         clientDataCallback: any = (data: any) => {},
+                         listenCallback: any = (data: any) => {},
+                         listenClientCallback: any = (data: any) => {}): ziti.listener => {
     ziti.listen(shr.shareToken, 0, listenCallback, listenClientCallback, clientConnectCallback, clientDataCallback);
 }
 
