@@ -31,6 +31,9 @@ zrokSpec=$(realpath "$zrokDir/specs/zrok.yml")
 
 pythonConfig=$(realpath "$zrokDir/bin/python_config.json")
 
+echo "...clean generate zrok server/client"
+rm -rf rest_*
+
 echo "...generating zrok server"
 swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
 
