@@ -6,9 +6,12 @@ package admin
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,56 @@ func (o *ListFrontends) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ListFrontendsOKBodyItems0 list frontends o k body items0
+//
+// swagger:model ListFrontendsOKBodyItems0
+type ListFrontendsOKBodyItems0 struct {
+
+	// created at
+	CreatedAt int64 `json:"createdAt,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+
+	// public name
+	PublicName string `json:"publicName,omitempty"`
+
+	// updated at
+	UpdatedAt int64 `json:"updatedAt,omitempty"`
+
+	// url template
+	URLTemplate string `json:"urlTemplate,omitempty"`
+
+	// z Id
+	ZID string `json:"zId,omitempty"`
+}
+
+// Validate validates this list frontends o k body items0
+func (o *ListFrontendsOKBodyItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this list frontends o k body items0 based on context it is used
+func (o *ListFrontendsOKBodyItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ListFrontendsOKBodyItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ListFrontendsOKBodyItems0) UnmarshalBinary(b []byte) error {
+	var res ListFrontendsOKBodyItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

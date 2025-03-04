@@ -42,7 +42,7 @@ func NewVersionOK() *VersionOK {
 /*
 VersionOK describes a response with status code 200, with default header values.
 
-current server version
+legacy upgrade required
 */
 type VersionOK struct {
 	Payload rest_model_zrok.Version

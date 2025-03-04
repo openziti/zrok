@@ -19,7 +19,7 @@ func Middleware(handler http.Handler, healthCheck func(w http.ResponseWriter, r 
 			return
 		}
 
-		staticPath := "build"
+		staticPath := "dist"
 		indexPath := "index.html"
 
 		// get the absolute path to prevent directory traversal

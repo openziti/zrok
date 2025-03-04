@@ -1,7 +1,5 @@
-//module.exports = require("./environment");
-export * from "./zrok/model"
-export * from "./zrok/share"
-export * from "./zrok/access"
-export * from "./zrok/zrok"
-export * from "./environment/dirs"
-export * from "./environment/root"
+export * from "./zrok/access";
+export * from "./zrok/environment";
+export * from "./zrok/express";
+export * from "./zrok/share";
+export * from "./zrok/ziti";

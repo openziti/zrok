@@ -29,7 +29,7 @@ func (h *listMembershipsHandler) Handle(_ metadata.ListMembershipsParams, princi
 
 	var out []*metadata.ListMembershipsOKBodyMembershipsItems0
 	for _, om := range oms {
-		out = append(out, &metadata.ListMembershipsOKBodyMembershipsItems0{Token: om.Token, Description: om.Description, Admin: om.Admin})
+		out = append(out, &metadata.ListMembershipsOKBodyMembershipsItems0{OrganizationToken: om.Token, Description: om.Description, Admin: om.Admin})
 	}
 	return metadata.NewListMembershipsOK().WithPayload(&metadata.ListMembershipsOKBody{Memberships: out})
 }

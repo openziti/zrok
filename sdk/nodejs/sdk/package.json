@@ -1,20 +1,18 @@
 {
   "name": "@openziti/zrok",
-  "version": "0.1.0",
-  "description": "SDK to enable programmatic use of the zrok sharing methods",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "version": "1.0.0",
+  "description": "SDK to allow interaction with the zrok service from Node.js applications",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup --external request",
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/openziti/zrok.git"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "security",
@@ -25,28 +23,23 @@
   ],
   "author": "NetFoundry",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openziti/zrok"
+  },
   "bugs": {
     "url": "https://github.com/openziti/zrok/issues"
   },
   "homepage": "https://github.com/openziti/zrok#readme",
-  "dependencies": {
-    "@openziti/ziti-sdk-nodejs": "^0.17.0",
-    "axios": "^1.7.2",
-    "express": "^4.19.2"
-  },
-  "exports": {
-    ".": "./dist/index.js",
-    "./zrok": "./dist/zrok",
-    "./environment": "./dist/environment"
-  },
-  "imports": {
-    "./zrok": "./zrok"
-  },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/isomorphic-fetch": "^0.0.39",
-    "ts-node": "^10.9.1",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  },
+  "dependencies": {
+    "@openziti/ziti-sdk-nodejs": "^0.19.0",
+    "express": "^4.21.2"
   }
 }

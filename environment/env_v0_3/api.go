@@ -7,11 +7,12 @@ import (
 	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
+	metadata2 "github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/pkg/errors"
 	"net/url"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strconv"
 )
 
 func (r *Root) Metadata() *env_core.Metadata {
@@ -48,22 +49,20 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
-	v, err := zrok.Metadata.Version(nil)
+	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
+		Body: metadata2.ClientVersionCheckBody{
+			ClientVersion: build.String(),
+		},
+	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting version from api endpoint '%v': %v", apiEndpoint, err)
-	}
-	// allow reported version string to be optionally prefixed with
-	// "refs/heads/" or "refs/tags/"
-	re := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
-	if !re.MatchString(string(v.Payload)) {
-		return nil, errors.Errorf("expected a '%v' version, received: '%v'", build.Series, v.Payload)
+		return nil, errors.Wrapf(err, "client version error accessing api endpoint '%v': %v", apiEndpoint, err)
 	}
 
 	return zrok, nil
 }
 
 func (r *Root) ApiEndpoint() (string, string) {
-	apiEndpoint := "https://api.zrok.io"
+	apiEndpoint := "https://api-v1.zrok.io"
 	from := "binary"
 
 	if r.Config() != nil && r.Config().ApiEndpoint != "" {
@@ -101,6 +100,26 @@ func (r *Root) DefaultFrontend() (string, string) {
 	}
 
 	return defaultFrontend, from
+}
+
+func (r *Root) Headless() (bool, string) {
+	headless := false
+	from := "binary"
+
+	if r.Config() != nil {
+		headless = r.Config().Headless
+		from = "config"
+	}
+
+	env := os.Getenv("ZROK_HEADLESS")
+	if env != "" {
+		if v, err := strconv.ParseBool(env); err == nil {
+			headless = v
+			from = "ZROK_HEADLESS"
+		}
+	}
+
+	return headless, from
 }
 
 func (r *Root) Environment() *env_core.Environment {
@@ -172,6 +191,10 @@ func (r *Root) DeleteZitiIdentityNamed(name string) error {
 		return errors.Wrapf(err, "error removing ziti identity file '%v'", zif)
 	}
 	return nil
+}
+
+func (r *Root) AgentSocket() (string, error) {
+	return "", errors.Errorf("this environment version does not support agent sockets; please 'zrok update' this environment")
 }
 
 func (r *Root) Obliterate() error {

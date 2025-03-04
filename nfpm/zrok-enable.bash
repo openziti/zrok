@@ -51,7 +51,7 @@ if [[ -z "${ZROK_ENABLE_TOKEN}" ]]; then
   echo "ERROR: ZROK_ENABLE_TOKEN is not defined" >&2
   exit 1
 else
-  zrok config set apiEndpoint "${ZROK_API_ENDPOINT:-https://api.zrok.io}"
+  zrok config set apiEndpoint "${ZROK_API_ENDPOINT:-https://api-v1.zrok.io}"
   echo "INFO: running: zrok enable ..."
   exec zrok enable --headless --description "${ZROK_ENVIRONMENT_NAME:-${DEFAULT_ZROK_ENVIRONMENT_NAME}}" "${ZROK_ENABLE_TOKEN}"
 fi
