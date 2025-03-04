@@ -22,7 +22,7 @@ command -v realpath 2>&1 || {
   exit 1
 }
 
-scriptPath=$(realpath $0)
+scriptPath=$(realpath "$0")
 scriptDir=$(dirname "$scriptPath")
 
 zrokDir=$(realpath "$scriptDir/..")
@@ -35,7 +35,12 @@ for GEN in \
   ./rest_model_zrok/ \
   ./rest_server_zrok/
 do
-  [[ -d $GEN ]] && rm -rf "$GEN"
+  if [[ -d $GEN ]]
+  then
+    rm -rf "$GEN"
+  else
+    echo "WARN: not deleting $GEN because it does not exist" >&2
+  fi
 done
 
 echo "...generating zrok server"
@@ -58,14 +63,16 @@ openapi-generator-cli generate -i specs/zrok.yml -o sdk/nodejs/sdk/src/api -g ty
 
 echo "...generating python sdk client"
 # Delete tracked Python files
-while IFS= read -r file; do
-  if [ -f "sdk/python/src/$file" ]; then
-    echo "Removing existing file: sdk/python/src/$file"
-    rm -f "sdk/python/src/$file"
+PYMOD=sdk/python/src
+while IFS= read -r FILE
+do
+  if [[ -e "${PYMOD}/${FILE}" ]]
+  then
+    rm -f "${PYMOD}/${FILE}"
   fi
-done < sdk/python/src/.openapi-generator/FILES
+done < ${PYMOD}/.openapi-generator/FILES
 # Delete the tracking file
-rm -f sdk/python/src/.openapi-generator/FILES
+rm -f "${PYMOD}/.openapi-generator/FILES"
 # Generate and track new files
 openapi-generator-cli generate -i specs/zrok.yml -o sdk/python/src/zrok -g python \
   --package-name zrok_api --additional-properties projectName=zrok
