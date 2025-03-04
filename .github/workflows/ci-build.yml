@@ -124,7 +124,7 @@ jobs:
           set -o pipefail
           set -o xtrace
 
-          pytest --cov=zrok_api
+          pytest --cov=zrok_api --verbose 
 
   # build a release candidate container image for branches named "main" or like "v*"
   rc-container-build:
