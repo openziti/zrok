@@ -26,7 +26,7 @@ def CreateAccess(root: Root, request: model.AccessRequest) -> model.Access:
     if not root.IsEnabled():
         raise Exception("environment is not enabled; enable with 'zrok enable' first!")
 
-    out = AccessRequest(shr_token=request.ShareToken,
+    out = AccessRequest(share_token=request.ShareToken,
                         env_zid=root.env.ZitiIdentity)
 
     try:
@@ -44,7 +44,7 @@ def CreateAccess(root: Root, request: model.AccessRequest) -> model.Access:
 
 def DeleteAccess(root: Root, acc: model.Access):
     req = UnaccessRequest(frontend_token=acc.Token,
-                          shr_token=acc.ShareToken,
+                          share_token=acc.ShareToken,
                           env_zid=root.env.ZitiIdentity)
 
     try:

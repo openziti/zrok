@@ -136,7 +136,7 @@ def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
 
 def DeleteShare(root: Root, shr: model.Share):
     req = UnshareRequest(env_zid=root.env.ZitiIdentity,
-                         shr_token=shr.Token)
+                         share_token=shr.Token)
 
     try:
         zrok = root.Client()
@@ -168,7 +168,7 @@ def DeleteShare(root: Root, shr: model.Share):
 
 def ReleaseReservedShare(root: Root, shr: model.Share):
     req = UnshareRequest(env_zid=root.env.ZitiIdentity,
-                         shr_token=shr.Token,
+                         share_token=shr.Token,
                          reserved=True)
 
     try:
