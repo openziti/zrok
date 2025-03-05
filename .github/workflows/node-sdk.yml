@@ -12,8 +12,6 @@ jobs:
     name: Require Stable Release Semver
     if: github.event.action == 'released'
     runs-on: ubuntu-24.04
-    outputs:
-      version: ${{ steps.parse.outputs.version }}
     steps:
       - name: Parse Release Version
         id: parse
@@ -59,10 +57,12 @@ jobs:
     - name: Get current zrok repo tag
       if: github.ref_type == 'tag'
       id: tag
+      shell: bash
       run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
       if: github.ref_type == 'tag'
+      shell: bash
       run: |
         cd sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
@@ -76,6 +76,7 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
 
     - name: Build the zrok NodeJS-SDK
+      shell: bash
       run: |
         cd sdk/nodejs/sdk
         npm install
@@ -85,6 +86,7 @@ jobs:
 
     - name: NPM Publish
       if: github.ref_type == 'tag'
+      shell: bash
       run: |
         cd sdk/nodejs/sdk
         npm publish --access public
