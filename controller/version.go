@@ -12,7 +12,7 @@ import (
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
 	outOfDate := "your local zrok installation is out of date and needs to be upgraded! " +
-		"please visit 'https://github.com/openziti/zrok/releases' for the latest build!"
+		"please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!"
 	return metadata.NewVersionOK().WithPayload(rest_model_zrok.Version(outOfDate))
 }
 
@@ -22,7 +22,7 @@ func clientVersionCheckHandler(params metadata.ClientVersionCheckParams) middlew
 	// "refs/heads/" or "refs/tags/"
 	re := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
 	if !re.MatchString(params.Body.ClientVersion) {
-		return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("expecting a zrok client version matching '%v' version, received: '%v'; please visit 'https://github.com/openziti/zrok/releases' to make sure you're running the correct client version!", build.Series, params.Body.ClientVersion))
+		return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("expecting a zrok client version matching '%v' version, received: '%v'; please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!", build.Series, params.Body.ClientVersion))
 	}
 	return metadata.NewClientVersionCheckOK()
 }
