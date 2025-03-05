@@ -14,7 +14,7 @@ Like other offerings in this space, `zrok` allows users to share tunnels for HTT
 
 You can be up and sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved:
 
-* Download the binary for your platform [here](https://github.com/openziti/zrok/releases/latest)
+* [Install the package or download the binary for your platform](https://docs.zrok.io/docs/guides/install/).
 * `zrok invite` to create an account with the service
 * `zrok enable` to enable your shell environment for sharing with the service
 
