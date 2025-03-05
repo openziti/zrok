@@ -57,6 +57,7 @@ jobs:
       with:
         fetch-depth: 0
         submodules: 'recursive'
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get current zrok repo tag
       id: tag
