@@ -32,9 +32,9 @@ jobs:
       fail-fast: false
       matrix:
         spec:
-          - { name: 'linux x86_64', runner: ubuntu-20.04, target: manylinux_2_27_x86_64 }
-          - { name: 'macOS x86_64', runner: macos-13, target: macosx_10_14_x86_64 }
-          - { name: 'Windows x86_64', runner: windows-2019, target: win_amd64 }
+          - { name: 'linux x86_64', runner: ubuntu-24.04, platform: linux, target: manylinux_2_27_x86_64 }
+          - { name: 'macOS x86_64', runner: macos-13, platform: macos, target: macosx_10_14_x86_64 }
+          - { name: 'Windows x86_64', runner: windows-2019, platform: windows, target: win_amd64 }
     name: building ${{ matrix.spec.name }}
     runs-on: ${{ matrix.spec.runner }}
     steps:
@@ -55,17 +55,40 @@ jobs:
         env:
           ZROK_VERSION: ${{ github.event.release.tag_name }}
           ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
+        shell: bash
         run: |
-          python setup.py sdist
+
+          set -o pipefail
+          set -o xtrace
+
+          pip install --upgrade pip
+
+          if [ "${{ matrix.spec.platform }}" == "linux" ]; then
+            # Use cibuildwheel for Linux builds (proper manylinux containers)
+            pip install cibuildwheel
+            python -m cibuildwheel --output-dir ./dist
+            # Also build an sdist
+            pip install build
+            python -m build --sdist
+
+          elif [ "${{ matrix.spec.platform }}" == "windows" ]; then
+            # For Windows, use regular build with Windows-specific script handling
+            pip install build wheel
+            python -m build
+          else
+            # For macOS, use regular build
+            pip install build wheel
+            python -m build
+          fi
 
       - uses: actions/upload-artifact@v4
         if: startsWith(matrix.spec.name, 'linux')
         with:
           name: zrok_sdk_${{ matrix.spec.target }}
-          path: dist/*
+          path: sdk/python/src/dist/*
 
   publish-testpypi:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [ build_wheels ]
     permissions:
           id-token: write
@@ -86,7 +109,7 @@ jobs:
           verbose: true
 
   publish-pypi:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [ publish-testpypi ]
     permissions:
           id-token: write
@@ -94,12 +117,12 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./dist
+          path: sdk/python/src/dist
           merge-multiple: true
           pattern: zrok_sdk_*
 
       - name: Publish wheels (PyPI)
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist
+          packages-dir: sdk/python/src/dist
           verbose: true
