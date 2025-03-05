@@ -1,4 +1,3 @@
-from zrok import model
 from zrok_api.api import ShareApi
 from zrok.environment.root import Root
 from zrok_api.models.auth_user import AuthUser
@@ -58,7 +57,7 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
         zrok = root.Client()
     except Exception as e:
         raise Exception("error getting zrok client", e)
-    
+
     try:
         # Use share_with_http_info to get access to the HTTP info and handle custom response format
         share_api = ShareApi(zrok)
@@ -66,18 +65,18 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
         custom_headers = {
             'Accept': 'application/json, application/zrok.v1+json'
         }
-        
+
         response_data = share_api.share_with_http_info(
             body=out,
             _headers=custom_headers
         )
-        
+
         # Parse response
         if hasattr(response_data, 'data') and response_data.data is not None:
             res = response_data.data
         else:
             raise Exception("invalid response from server")
-            
+
     except ApiException as e:
         # If it's a content type error, try to parse the raw JSON
         if "Unsupported content type: application/zrok.v1+json" in str(e) and hasattr(e, 'body'):
@@ -85,11 +84,12 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
                 # Parse the response body directly
                 res_dict = json.loads(e.body)
                 # Create a response object with the expected fields
+
                 class ShareResponse:
                     def __init__(self, share_token, frontend_proxy_endpoints):
                         self.share_token = share_token
                         self.frontend_proxy_endpoints = frontend_proxy_endpoints
-                
+
                 res = ShareResponse(
                     share_token=res_dict.get('shareToken', ''),
                     frontend_proxy_endpoints=res_dict.get('frontendProxyEndpoints', [])
@@ -149,7 +149,7 @@ def DeleteShare(root: Root, shr: model.Share):
         custom_headers = {
             'Accept': 'application/json, application/zrok.v1+json'
         }
-        
+
         # Use unshare_with_http_info to get access to the HTTP info
         share_api.unshare_with_http_info(
             body=req,
@@ -182,7 +182,7 @@ def ReleaseReservedShare(root: Root, shr: model.Share):
         custom_headers = {
             'Accept': 'application/json, application/zrok.v1+json'
         }
-        
+
         # Use unshare_with_http_info to get access to the HTTP info
         share_api.unshare_with_http_info(
             body=req,

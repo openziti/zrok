@@ -27,7 +27,7 @@ jobs:
     needs: enforce_stable_semver
     defaults:
       run:
-        working-directory: sdk/python/sdk/zrok
+        working-directory: sdk/python/src
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +62,7 @@ jobs:
         if: startsWith(matrix.spec.name, 'linux')
         with:
           name: zrok_sdk_${{ matrix.spec.target }}
-          path: ${{ github.workspace }}/sdk/python/sdk/zrok/dist/*
+          path: dist/*
 
   publish-testpypi:
     runs-on: ubuntu-20.04

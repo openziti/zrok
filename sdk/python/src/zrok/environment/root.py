@@ -48,16 +48,16 @@ class Root:
 
         cfg = Configuration()
         cfg.host = apiEndpoint[0] + "/api/v1"
-        
+
         # Update: Configure authentication token
         # The token needs to be set with 'key' instead of 'x-token'
         # This matches the securityDefinitions in the OpenAPI spec
         cfg.api_key["key"] = self.env.Token
-        
+
         # Create the API client with the configured authentication
         auth_client = zrok.ApiClient(configuration=cfg)
         self.client_version_check(auth_client)
-        
+
         return auth_client
 
     def ApiEndpoint(self) -> ApiEndpoint:
