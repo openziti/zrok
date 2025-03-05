@@ -11,6 +11,7 @@ import {
     listener,
     loadRoot,
     PRIVATE_SHARE_MODE,
+    setLogLevel,
     ShareRequest,
     TCP_TUNNEL_BACKEND_MODE,
     write
@@ -20,6 +21,7 @@ import readlineSync = require('readline-sync');
 const copyto = async () => {
     let text = readlineSync.question("enter some text: ");
     let root = loadRoot();
+    setLogLevel(0);
     await init(root)
         .catch((err: Error) => {
             console.log(err);
@@ -40,6 +42,7 @@ const copyto = async () => {
 
 const pastefrom = async (shareToken: string) => {
     let root = loadRoot();
+    setLogLevel(0);
     await init(root).catch((err: Error) => {
         console.log(err);
         return process.exit(1);

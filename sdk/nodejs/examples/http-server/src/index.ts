@@ -7,11 +7,13 @@ import {
     loadRoot,
     PROXY_BACKEND_MODE,
     PUBLIC_SHARE_MODE,
+    setLogLevel,
     ShareRequest
 } from "@openziti/zrok";
 
 const httpServer = async () => {
     let root = loadRoot();
+    setLogLevel(0);
     await init(root)
         .catch((err: Error) => {
             console.log(err);
