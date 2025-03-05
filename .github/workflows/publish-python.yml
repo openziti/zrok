@@ -24,12 +24,12 @@ jobs:
           fi
 
   build_distributions:
+    name: Building Python Distributions
     needs: enforce_stable_semver
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: sdk/python/src
-    runs-on: ubuntu-24.04
-    name: Building Python Distributions
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
           # Install build requirements
           pip install --upgrade pip
           pip install -r build-requirements.txt
-
+          
           # Build source distribution and wheel
           python -m build
           
@@ -66,6 +66,7 @@ jobs:
           path: sdk/python/src/dist/*
 
   publish_testpypi:
+    name: Publish Test PyPI
     runs-on: ubuntu-24.04
     needs: [ build_distributions ]
     permissions:
@@ -87,6 +88,7 @@ jobs:
           verbose: true
 
   publish_pypi:
+    name: Publish PyPI
     runs-on: ubuntu-24.04
     needs: [ publish_testpypi ]
     permissions:
