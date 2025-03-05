@@ -36,7 +36,7 @@ then
 fi
 
 echo "...clean generate zrok server/client"
-rm -rf ./rest_*
+rm -rf ./rest_client_zrok ./rest_server_zrok ./rest_model_zrok
 
 echo "...generating zrok server"
 swagger generate server -P rest_model_zrok.Principal -f "$zrokSpec" -s rest_server_zrok -t "$zrokDir" -m "rest_model_zrok" --exclude-main
