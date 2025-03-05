@@ -1,4 +1,4 @@
-name: build wheels
+name: Publish Python Distributions
 
 on:
   release:
@@ -23,84 +23,62 @@ jobs:
             exit 1
           fi
 
-  build_wheels:
+  build_distributions:
     needs: enforce_stable_semver
     defaults:
       run:
         working-directory: sdk/python/src
-    strategy:
-      fail-fast: false
-      matrix:
-        spec:
-          - { name: 'linux x86_64', runner: ubuntu-24.04, platform: linux, target: manylinux_2_27_x86_64 }
-          - { name: 'macOS x86_64', runner: macos-13, platform: macos, target: macosx_10_14_x86_64 }
-          - { name: 'Windows x86_64', runner: windows-2019, platform: windows, target: win_amd64 }
-    name: building ${{ matrix.spec.name }}
-    runs-on: ${{ matrix.spec.runner }}
+    runs-on: ubuntu-24.04
+    name: Building Python Distributions
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+          cache: 'pip'
 
-      - name: Install Python Tools
-        run: python -m pip install -U pip setuptools
-
-      - name: Build distro
+      - name: Build Python distributions
         env:
           ZROK_VERSION: ${{ github.event.release.tag_name }}
           ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
         shell: bash
         run: |
 
-          set -o pipefail
+          set -o pipefail 
           set -o xtrace
 
+          # Install build requirements
           pip install --upgrade pip
+          pip install -r build-requirements.txt
 
-          if [ "${{ matrix.spec.platform }}" == "linux" ]; then
-            # Use cibuildwheel for Linux builds (proper manylinux containers)
-            pip install cibuildwheel
-            python -m cibuildwheel --output-dir ./dist
-            # Also build an sdist
-            pip install build
-            python -m build --sdist
-
-          elif [ "${{ matrix.spec.platform }}" == "windows" ]; then
-            # For Windows, use regular build with Windows-specific script handling
-            pip install build wheel
-            python -m build
-          else
-            # For macOS, use regular build
-            pip install build wheel
-            python -m build
-          fi
+          # Build source distribution and wheel
+          python -m build
+          
+          # List built distributions
+          ls -lAR ./dist
 
       - uses: actions/upload-artifact@v4
-        if: startsWith(matrix.spec.name, 'linux')
         with:
-          name: zrok_sdk_${{ matrix.spec.target }}
+          name: zrok_sdk_distributions
           path: sdk/python/src/dist/*
 
-  publish-testpypi:
+  publish_testpypi:
     runs-on: ubuntu-24.04
-    needs: [ build_wheels ]
+    needs: [ build_distributions ]
     permissions:
-          id-token: write
+      id-token: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./dist
+          path: sdk/python/src/dist
           merge-multiple: true
-          pattern: zrok_sdk_*
+          pattern: zrok_sdk_distributions
 
-      - name: Publish wheels (TestPYPI)
+      - name: Publish Distributions to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -108,20 +86,20 @@ jobs:
           skip-existing: true
           verbose: true
 
-  publish-pypi:
+  publish_pypi:
     runs-on: ubuntu-24.04
-    needs: [ publish-testpypi ]
+    needs: [ publish_testpypi ]
     permissions:
-          id-token: write
+      id-token: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: sdk/python/src/dist
           merge-multiple: true
-          pattern: zrok_sdk_*
+          pattern: zrok_sdk_distributions
 
-      - name: Publish wheels (PyPI)
+      - name: Publish Distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: sdk/python/src/dist
