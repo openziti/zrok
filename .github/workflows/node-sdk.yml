@@ -88,6 +88,13 @@ jobs:
       shell: bash
       run: |
         cd sdk/nodejs/sdk
-        npm publish --access public
+        # Check if this is the official repository
+        if [[ "${{ github.repository_owner }}" == "openziti" ]]; then
+          echo "Publishing from official repository with @latest tag"
+          npm publish --access public
+        else
+          echo "Publishing from fork/test repository with @canary tag"
+          npm publish --access public --tag canary
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
