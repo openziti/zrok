@@ -66,7 +66,7 @@ jobs:
           path: sdk/python/src/dist/*
 
   publish_testpypi:
-    name: Publish Test PyPI
+    name: Publish TestPyPI
     runs-on: ubuntu-24.04
     needs: [ build_distributions ]
     permissions:
@@ -79,11 +79,11 @@ jobs:
           merge-multiple: true
           pattern: zrok_sdk_distributions
 
-      - name: Publish Distributions to Test PyPI
+      - name: Publish Distributions to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-          packages-dir: dist
+          packages-dir: sdk/python/src/dist
           skip-existing: true
           verbose: true
 
