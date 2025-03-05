@@ -54,8 +54,8 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v4
-      # with:
-      #   fetch-depth: 0
+      with:
+        fetch-depth: 0
       #   submodules: recursive
       #   token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -64,13 +64,14 @@ jobs:
     #     git config --global url."https://x-access-token:${GITHUB_PAT}@github.com/".insteadOf "https://github.com/"
 
     - name: Get current zrok repo tag
+      if: github.ref_type == 'tag'
       id: tag
-      run: echo "TAG=$(git describe --tags --abbrev=0)" | tee -a $GITHUB_OUTPUT
+      run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
       if: github.ref_type == 'tag'
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        cd sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
 
     - name: Setup .npmrc
@@ -83,7 +84,7 @@ jobs:
 
     - name: Build the zrok NodeJS-SDK
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        cd sdk/nodejs/sdk
         npm install
         npm run build
       env:
@@ -92,7 +93,7 @@ jobs:
     - name: NPM Publish
       if: github.ref_type == 'tag'
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        cd sdk/nodejs/sdk
         npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
