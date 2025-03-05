@@ -33,10 +33,10 @@ jobs:
     name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.runs-on }}
     container: ${{ matrix.config.container }}
-
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      # GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     
     strategy:
       matrix:
@@ -54,10 +54,14 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
-        token: ${{ secrets.GITHUB_TOKEN }}
+      # with:
+      #   fetch-depth: 0
+      #   submodules: recursive
+      #   token: ${{ secrets.GITHUB_TOKEN }}
+
+    # - name: Configure Git Authentication
+    #   run: |
+    #     git config --global url."https://x-access-token:${GITHUB_PAT}@github.com/".insteadOf "https://github.com/"
 
     - name: Get current zrok repo tag
       id: tag
