@@ -16,8 +16,6 @@ node_modules/
 .docusaurus
 .cache-loader
 
-sdk/python/sdk/build/
-
 # Misc
 .DS_Store
 .env.local
@@ -37,3 +35,9 @@ yarn-error.log*
 .obsidian
 
 sdk/nodejs/sdk/dist
+
+# py module artifacts
+/sdk/python/src/**/*.egg-info/
+/sdk/python/src/**/__pycache__/
+/.coverage
+/sdk/python/src/dist/

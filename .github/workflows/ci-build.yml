@@ -17,7 +17,7 @@ concurrency:
 jobs:
   ubuntu-build:
     name: Build Linux AMD64 CLI
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -61,19 +61,6 @@ jobs:
         shell: bash
         run: go test -v ./...
 
-      - name: setup python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10' 
-
-      - name: python deps
-        shell: bash
-        run: python -m pip install -U pip flake8
-
-      - name: python lint
-        shell: bash
-        run: flake8 sdk/python/sdk/zrok
-
       - name: solve GOBIN
         id: solve_go_bin
         shell: bash
@@ -88,12 +75,61 @@ jobs:
           path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
           if-no-files-found: error
 
+  pytest:
+    name: Test the Python SDK
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: sdk/python
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          python -m pip install --upgrade pip
+          pip install -r src/requirements.txt
+          pip install -r src/test-requirements.txt
+          pip install -r src/build-requirements.txt
+          pip install -e src/
+
+      - name: Test with pytest
+        shell: bash
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          pytest --cov=zrok_api --verbose src/
+
+      - name: Lint the Python SDK
+        shell: bash
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          flake8 .
+
   # build a release candidate container image for branches named "main" or like "v*"
   rc-container-build:
     needs: ubuntu-build
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v')
     name: Build Release Candidate Container Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Set a container image tag from the branch name
         id: slug

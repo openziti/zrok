@@ -29,11 +29,15 @@ fi
 (
     HOME=/tmp/builder
     # Navigate to the "ui" directory and run npm commands
-    npm config set cache /mnt/.npm
-    cd ./ui/
     mkdir -p $HOME
-    npm install
-    npm run build
+    npm config set cache /mnt/.npm
+    for UI in ./ui ./agent/agentUi
+    do
+        pushd ${UI}
+        npm install
+        npm run build
+        popd
+    done
 )
 
 for ARCH in "${JOBS[@]}"; do
