@@ -61,19 +61,6 @@ jobs:
         shell: bash
         run: go test -v ./...
 
-      - name: setup python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.13'
-
-      - name: python deps
-        shell: bash
-        run: python -m pip install -U pip flake8
-
-      - name: python lint
-        shell: bash
-        run: flake8 sdk/python/src
-
       - name: solve GOBIN
         id: solve_go_bin
         shell: bash
@@ -89,14 +76,14 @@ jobs:
           if-no-files-found: error
 
   pytest:
-
+    name: Test the Python SDK
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: sdk/python/src
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: sdk/python
 
     steps:
       - uses: actions/checkout@v4
@@ -114,9 +101,10 @@ jobs:
           set -o xtrace
 
           python -m pip install --upgrade pip
-          pip install -e "$PWD"
-          pip install -r requirements.txt
-          pip install -r test-requirements.txt
+          pip install -r src/requirements.txt
+          pip install -r src/test-requirements.txt
+          pip install -r src/build-requirements.txt
+          pip install -e src/
 
       - name: Test with pytest
         shell: bash
@@ -125,7 +113,16 @@ jobs:
           set -o pipefail
           set -o xtrace
 
-          pytest --cov=zrok_api --verbose 
+          pytest --cov=zrok_api --verbose src/
+
+      - name: Lint the Python SDK
+        shell: bash
+        run: |
+
+          set -o pipefail
+          set -o xtrace
+
+          flake8 .
 
   # build a release candidate container image for branches named "main" or like "v*"
   rc-container-build:
