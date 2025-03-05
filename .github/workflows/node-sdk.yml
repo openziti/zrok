@@ -54,20 +54,20 @@ jobs:
         fetch-depth: 0
 
     - name: Get current zrok repo tag
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
       id: tag
       shell: bash
       run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
       shell: bash
       run: |
         cd sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
 
     - name: Setup .npmrc
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
       # Setup .npmrc file to prepare for possible publish to npm
       uses: actions/setup-node@v4
       with:
@@ -84,7 +84,7 @@ jobs:
         BUILD_DATE: ${{ steps.date.outputs.date }}
 
     - name: NPM Publish
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
       shell: bash
       run: |
         cd sdk/nodejs/sdk
