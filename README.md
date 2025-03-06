@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="https://github.com/openziti/zrok/blob/v1_0_0/docs/images/zrok_cover.png" alt="zrok logo"/>
-</p>
+![zrok logo](docs/images/zrok_cover.png)
 
 `zrok` is a next-generation, peer-to-peer sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
 
