@@ -30,6 +30,8 @@ type testCanaryPrivateProxy struct {
 	maxDwell       time.Duration
 	minPacing      time.Duration
 	maxPacing      time.Duration
+	targetName     string
+	bindAddress    string
 }
 
 func newTestCanaryPrivateProxy() *testCanaryPrivateProxy {
@@ -52,6 +54,8 @@ func newTestCanaryPrivateProxy() *testCanaryPrivateProxy {
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
+	cmd.Flags().StringVar(&command.targetName, "target-name", "", "Metadata describing the virtual target")
+	cmd.Flags().StringVar(&command.bindAddress, "bind-address", "", "Metadata describing the virtual bind address")
 	return command
 }
 
@@ -84,6 +88,8 @@ func (cmd *testCanaryPrivateProxy) run(_ *cobra.Command, _ []string) {
 			MaxDwell:       cmd.maxDwell,
 			MinPacing:      cmd.minPacing,
 			MaxPacing:      cmd.maxPacing,
+			TargetName:     cmd.targetName,
+			BindAddress:    cmd.bindAddress,
 		}
 		looper := canary.NewPrivateHttpLooper(i, looperOpts, root)
 		loopers = append(loopers, looper)

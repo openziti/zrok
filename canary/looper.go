@@ -16,6 +16,8 @@ type LooperOptions struct {
 	MaxDwell       time.Duration
 	MinPacing      time.Duration
 	MaxPacing      time.Duration
+	TargetName     string
+	BindAddress    string
 }
 
 type LooperResults struct {

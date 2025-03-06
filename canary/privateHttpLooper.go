@@ -19,15 +19,17 @@ import (
 )
 
 type PrivateHttpLooper struct {
-	id       uint
-	acc      *sdk.Access
-	opt      *LooperOptions
-	root     env_core.Root
-	shr      *sdk.Share
-	listener edge.Listener
-	abort    bool
-	done     chan struct{}
-	results  *LooperResults
+	id          uint
+	target      string
+	bindAddress string
+	acc         *sdk.Access
+	opt         *LooperOptions
+	root        env_core.Root
+	shr         *sdk.Share
+	listener    edge.Listener
+	abort       bool
+	done        chan struct{}
+	results     *LooperResults
 }
 
 func NewPrivateHttpLooper(id uint, opt *LooperOptions, root env_core.Root) *PrivateHttpLooper {
@@ -74,10 +76,14 @@ func (l *PrivateHttpLooper) Results() *LooperResults {
 }
 
 func (l *PrivateHttpLooper) startup() error {
+	target := "canary.PrivateHttpLooper"
+	if l.opt.TargetName != "" {
+		target = l.opt.TargetName
+	}
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
 		ShareMode:      sdk.PrivateShareMode,
 		BackendMode:    sdk.ProxyBackendMode,
-		Target:         "canary.PrivateHttpLooper",
+		Target:         target,
 		PermissionMode: sdk.ClosedPermissionMode,
 	})
 	if err != nil {
@@ -85,8 +91,13 @@ func (l *PrivateHttpLooper) startup() error {
 	}
 	l.shr = shr
 
+	bindAddress := ""
+	if l.opt.BindAddress != "" {
+		bindAddress = l.opt.BindAddress
+	}
 	acc, err := sdk.CreateAccess(l.root, &sdk.AccessRequest{
-		ShareToken: shr.Token,
+		ShareToken:  shr.Token,
+		BindAddress: bindAddress,
 	})
 	if err != nil {
 		return err
@@ -156,7 +167,7 @@ func (l *PrivateHttpLooper) iterate() {
 	l.results.StartTime = time.Now()
 	defer func() { l.results.StopTime = time.Now() }()
 
-	for i := uint(0); i < l.opt.Iterations; i++ {
+	for i := uint(0); i < l.opt.Iterations && !l.abort; i++ {
 		if i > 0 && i%l.opt.StatusInterval == 0 {
 			logrus.Infof("#%d: iteration %d", l.id, i)
 		}

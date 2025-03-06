@@ -81,7 +81,11 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	if _, err := str.CreateFrontend(envId, &store.Frontend{PrivateShareId: &shr.Id, Token: feToken, ZId: envZId, PermissionMode: store.ClosedPermissionMode}, trx); err != nil {
+	fe := &store.Frontend{PrivateShareId: &shr.Id, Token: feToken, ZId: envZId, PermissionMode: store.ClosedPermissionMode}
+	if params.Body.BindAddress != "" {
+		fe.BindAddress = &params.Body.BindAddress
+	}
+	if _, err := str.CreateFrontend(envId, fe, trx); err != nil {
 		logrus.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
