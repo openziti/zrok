@@ -24,14 +24,19 @@ func init() {
 	adminCmd.AddCommand(adminDeleteCmd)
 	adminCmd.AddCommand(adminListCmd)
 	adminCmd.AddCommand(adminUpdateCmd)
-	testCmd.AddCommand(loopCmd)
+	rootCmd.AddCommand(agentCmd)
+	agentCmd.AddCommand(agentAccessCmd)
+	agentCmd.AddCommand(agentShareCmd)
+	agentCmd.AddCommand(agentReleaseCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
 	organizationCmd.AddCommand(organizationAdminCmd)
 	rootCmd.AddCommand(organizationCmd)
+	rootCmd.AddCommand(rebaseCmd)
 	rootCmd.AddCommand(shareCmd)
 	rootCmd.AddCommand(testCmd)
+	testCmd.AddCommand(testCanaryCmd)
 	rootCmd.AddCommand(gendoc.NewGendocCmd(rootCmd))
 	transport.AddAddressParser(tcp.AddressParser{})
 	transport.AddAddressParser(udp.AddressParser{})
@@ -79,15 +84,30 @@ var adminUpdateCmd = &cobra.Command{
 	Short: "Update global resources",
 }
 
+var agentAccessCmd = &cobra.Command{
+	Use:   "access",
+	Short: "zrok Agent access commands",
+}
+
+var agentCmd = &cobra.Command{
+	Use:     "agent",
+	Short:   "zrok Agent commands",
+	Aliases: []string{"daemon"},
+}
+
+var agentShareCmd = &cobra.Command{
+	Use:   "share",
+	Short: "zrok Agent sharing commands",
+}
+
+var agentReleaseCmd = &cobra.Command{
+	Use:   "release",
+	Short: "zrok Agent release commands",
+}
+
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure your zrok environment",
-}
-
-var loopCmd = &cobra.Command{
-	Use:     "loopback",
-	Aliases: []string{"loop"},
-	Short:   "Loopback testing utilities",
 }
 
 var modifyCmd = &cobra.Command{
@@ -107,6 +127,11 @@ var organizationCmd = &cobra.Command{
 	Short:   "Organization commands",
 }
 
+var rebaseCmd = &cobra.Command{
+	Use:   "rebase",
+	Short: "Rebase enabled zrok environment",
+}
+
 var shareCmd = &cobra.Command{
 	Use:   "share",
 	Short: "Create backend access for shares",
@@ -114,7 +139,12 @@ var shareCmd = &cobra.Command{
 
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Utilities for testing zrok deployments",
+	Short: "Utilities for testing deployments",
+}
+
+var testCanaryCmd = &cobra.Command{
+	Use:   "canary",
+	Short: "Utilities for performance management",
 }
 
 func main() {

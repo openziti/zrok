@@ -39,7 +39,7 @@ func (cmd *adminDeleteOrganizationCommand) run(_ *cobra.Command, args []string) 
 	}
 
 	req := admin.NewDeleteOrganizationParams()
-	req.Body.Token = args[0]
+	req.Body.OrganizationToken = args[0]
 
 	_, err = zrok.Admin.DeleteOrganization(req, mustGetAdminAuth())
 	if err != nil {

@@ -19,7 +19,7 @@ func Overview(root env_core.Root) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req.Header.Add("X-TOKEN", root.Environment().Token)
+	req.Header.Add("X-TOKEN", root.Environment().AccountToken)
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err

@@ -2,21 +2,19 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
 
-type verifyHandler struct {
-}
+type verifyHandler struct{}
 
 func newVerifyHandler() *verifyHandler {
 	return &verifyHandler{}
 }
 
-func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Responder {
-	if params.Body != nil {
-		logrus.Debugf("received verify request for token '%v'", params.Body.Token)
+func (h *verifyHandler) Handle(params account.VerifyParams) middleware.Responder {
+	if params.Body.RegisterToken != "" {
+		logrus.Debugf("received verify request for registration token '%v'", params.Body.RegisterToken)
 		tx, err := str.Begin()
 		if err != nil {
 			logrus.Errorf("error starting transaction: %v", err)
@@ -24,13 +22,13 @@ func (self *verifyHandler) Handle(params account.VerifyParams) middleware.Respon
 		}
 		defer func() { _ = tx.Rollback() }()
 
-		ar, err := str.FindAccountRequestWithToken(params.Body.Token, tx)
+		ar, err := str.FindAccountRequestWithToken(params.Body.RegisterToken, tx)
 		if err != nil {
-			logrus.Errorf("error finding account request with token '%v': %v", params.Body.Token, err)
+			logrus.Errorf("error finding account request with registration token '%v': %v", params.Body.RegisterToken, err)
 			return account.NewVerifyNotFound()
 		}
 
-		return account.NewVerifyOK().WithPayload(&rest_model_zrok.VerifyResponse{Email: ar.Email})
+		return account.NewVerifyOK().WithPayload(&account.VerifyOKBody{Email: ar.Email})
 	}
 	logrus.Error("empty verification request")
 	return account.NewVerifyInternalServerError()

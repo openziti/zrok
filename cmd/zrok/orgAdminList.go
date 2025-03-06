@@ -50,7 +50,7 @@ func (c *orgAdminListCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	req := metadata.NewListOrgMembersParams()
 	req.OrganizationToken = args[0]

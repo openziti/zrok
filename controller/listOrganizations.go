@@ -34,7 +34,7 @@ func (h *listOrganizationsHandler) Handle(_ admin.ListOrganizationsParams, princ
 
 	var out []*admin.ListOrganizationsOKBodyOrganizationsItems0
 	for _, org := range orgs {
-		out = append(out, &admin.ListOrganizationsOKBodyOrganizationsItems0{Description: org.Description, Token: org.Token})
+		out = append(out, &admin.ListOrganizationsOKBodyOrganizationsItems0{Description: org.Description, OrganizationToken: org.Token})
 	}
 	return admin.NewListOrganizationsOK().WithPayload(&admin.ListOrganizationsOKBody{Organizations: out})
 }

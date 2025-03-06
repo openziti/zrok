@@ -4,7 +4,6 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -51,13 +50,11 @@ func (cmd *releaseCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().AccountToken)
 	req := share.NewUnshareParams()
-	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   env.Environment().ZitiIdentity,
-		ShrToken: shrToken,
-		Reserved: true,
-	}
+	req.Body.EnvZID = env.Environment().ZitiIdentity
+	req.Body.ShareToken = shrToken
+	req.Body.Reserved = true
 	if _, err := zrok.Share.Unshare(req, auth); err != nil {
 		if !panicInstead {
 			tui.Error("error releasing share", err)

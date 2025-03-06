@@ -1,51 +1,47 @@
-import {Root} from "../environment/root"
-import {
-    Share,
-    ShareApi,
-    AccessRequest,
-    AccessResponse,
-    AuthUser,
-    UnaccessRequest} from "./api"
-import * as model from "./model"
+import {BackendMode} from "./share";
+import {Root} from "./environment";
+import {instanceOfCreateFrontend201Response, ShareApi} from "../api";
 
-export async function CreateAccess(root: Root, request: model.AccessRequest): Promise<model.Access> {
-    if (!root.IsEnabled()){
-        throw new Error("environment is not enabled; enable with 'zrok enable' first!")
-    }
+export class AccessRequest {
+    shareToken: string;
 
-    let out: AccessRequest = {
-        envZId: root.env.ZitiIdentity,
-        shrToken: request.ShareToken
+    constructor(shareToken: string) {
+        this.shareToken = shareToken;
     }
-    
-    let conf = await root.Client()
-    let client = new ShareApi(conf)
-    let shr: AccessResponse = await client.access({body: out})
-        .catch(resp => {
-            throw new Error("unable to create access " + resp)
-        })
-
-    if (shr.frontendToken == undefined) {
-        throw new Error("expected frontend token from access. Got none")
-    }
-    if (shr.backendMode == undefined) {
-        throw new Error("expected backend mode from access. Got none")
-    }
-
-    return new model.Access(shr.frontendToken, request.ShareToken, shr.backendMode)
 }
 
-export async function DeleteAccess(root: Root, acc: model.Access): Promise<void> {
-    let out: UnaccessRequest = {
-        frontendToken: acc.Token,
-        shrToken: acc.ShareToken,
-        envZId: root.env.ZitiIdentity
-    }
-    let conf = await root.Client()
-    let client = new ShareApi(conf)
+export class Access {
+    frontendToken: string;
+    shareToken: string;
+    backendMode: BackendMode;
 
-    return client.unaccess({body:out})
-        .catch(resp => {
-            throw new Error("error deleting access " + resp)
-        })
+    constructor(frontendToken: string, shareToken: string, backendMode: BackendMode) {
+        this.frontendToken = frontendToken;
+        this.shareToken = shareToken;
+        this.backendMode = backendMode;
+    }
+}
+
+export const createAccess = async (root: Root, request: AccessRequest): Promise<Access> => {
+    if(!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok enable' first!");
+    }
+
+    let acc = await new ShareApi(root.apiConfiguration()).access({body: {
+            envZId: root.environment?.zId,
+            shareToken: request.shareToken
+        }});
+
+    return new Access(acc.frontendToken!, request.shareToken, acc.backendMode!);
+}
+
+export const deleteAccess = async (root: Root, acc: Access): Promise<any> => {
+    if(!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok enable' first!");
+    }
+    return new ShareApi(root.apiConfiguration()).unaccess({body: {
+            envZId: root.environment?.zId,
+            shareToken: acc.shareToken,
+            frontendToken: acc.frontendToken
+        }});
 }

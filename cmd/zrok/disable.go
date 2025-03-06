@@ -5,7 +5,6 @@ import (
 	httpTransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/environment"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -50,11 +49,10 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().Token)
+	auth := httpTransport.APIKeyAuth("X-TOKEN", "header", env.Environment().AccountToken)
 	req := restEnvironment.NewDisableParams()
-	req.Body = &rest_model_zrok.DisableRequest{
-		Identity: env.Environment().ZitiIdentity,
-	}
+	req.Body.Identity = env.Environment().ZitiIdentity
+
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
 		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)

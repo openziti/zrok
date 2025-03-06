@@ -26,7 +26,7 @@ type RegisterOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *rest_model_zrok.RegisterResponse `json:"body,omitempty"`
+	Payload *RegisterOKBody `json:"body,omitempty"`
 }
 
 // NewRegisterOK creates RegisterOK with default headers values
@@ -36,13 +36,13 @@ func NewRegisterOK() *RegisterOK {
 }
 
 // WithPayload adds the payload to the register o k response
-func (o *RegisterOK) WithPayload(payload *rest_model_zrok.RegisterResponse) *RegisterOK {
+func (o *RegisterOK) WithPayload(payload *RegisterOKBody) *RegisterOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the register o k response
-func (o *RegisterOK) SetPayload(payload *rest_model_zrok.RegisterResponse) {
+func (o *RegisterOK) SetPayload(payload *RegisterOKBody) {
 	o.Payload = payload
 }
 

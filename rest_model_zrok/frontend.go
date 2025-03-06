@@ -17,17 +17,26 @@ import (
 // swagger:model frontend
 type Frontend struct {
 
+	// backend mode
+	BackendMode string `json:"backendMode,omitempty"`
+
+	// bind address
+	BindAddress string `json:"bindAddress,omitempty"`
+
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
 
 	// id
 	ID int64 `json:"id,omitempty"`
 
-	// shr token
-	ShrToken string `json:"shrToken,omitempty"`
-
-	// token
-	Token string `json:"token,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`

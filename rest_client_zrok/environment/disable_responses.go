@@ -6,10 +6,12 @@ package environment
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // DisableReader is a Reader for the Disable structure.
@@ -208,5 +210,43 @@ func (o *DisableInternalServerError) String() string {
 
 func (o *DisableInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+/*
+DisableBody disable body
+swagger:model DisableBody
+*/
+type DisableBody struct {
+
+	// identity
+	Identity string `json:"identity,omitempty"`
+}
+
+// Validate validates this disable body
+func (o *DisableBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this disable body based on context it is used
+func (o *DisableBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *DisableBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *DisableBody) UnmarshalBinary(b []byte) error {
+	var res DisableBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

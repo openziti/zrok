@@ -52,7 +52,7 @@ func (c *adminListOrganizationsCommand) run(_ *cobra.Command, _ []string) {
 	t.SetStyle(table.StyleColoredDark)
 	t.AppendHeader(table.Row{"Organization Token", "Description"})
 	for _, org := range resp.Payload.Organizations {
-		t.AppendRow(table.Row{org.Token, org.Description})
+		t.AppendRow(table.Row{org.OrganizationToken, org.Description})
 	}
 	t.Render()
 	fmt.Println()

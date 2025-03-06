@@ -85,7 +85,7 @@ const config = {
           include: ['**/*.md', '**/*.mdx'],
 
           // Uncomment these lines when we're ready to show the 1.0 docs by default
-          // lastVersion: 'current',
+          lastVersion: 'current',
           versions: {
             current: {
               label: '1.0',

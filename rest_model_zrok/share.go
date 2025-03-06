@@ -45,8 +45,8 @@ type Share struct {
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
