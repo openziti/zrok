@@ -6,9 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,47 @@ func (o *Unshare) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// UnshareBody unshare body
+//
+// swagger:model UnshareBody
+type UnshareBody struct {
+
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this unshare body
+func (o *UnshareBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this unshare body based on context it is used
+func (o *UnshareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UnshareBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UnshareBody) UnmarshalBinary(b []byte) error {
+	var res UnshareBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

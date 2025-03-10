@@ -51,13 +51,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       - run: npm install
         working-directory: ui
 
       - run: npm run build
         working-directory: ui
+        env:
+          CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
         env:
           CI: "true"
 
@@ -177,13 +185,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       - run: npm install
         working-directory: ui
 
       - run: npm run build
         working-directory: ui
+        env:
+          CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
         env:
           CI: "true"
 
@@ -222,13 +238,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       - run: npm install
         working-directory: ui
 
       - run: npm run build
         working-directory: ui
+        env:
+          CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
         env:
           CI: "true"
 

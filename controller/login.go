@@ -2,13 +2,12 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/sirupsen/logrus"
 )
 
 func loginHandler(params account.LoginParams) middleware.Responder {
-	if params.Body == nil || params.Body.Email == "" || params.Body.Password == "" {
+	if params.Body.Email == "" || params.Body.Password == "" {
 		logrus.Errorf("missing email or password")
 		return account.NewLoginUnauthorized()
 	}
@@ -36,5 +35,5 @@ func loginHandler(params account.LoginParams) middleware.Responder {
 		return account.NewLoginUnauthorized()
 	}
 
-	return account.NewLoginOK().WithPayload(rest_model_zrok.LoginResponse(a.Token))
+	return account.NewLoginOK().WithPayload(a.Token)
 }

@@ -15,7 +15,7 @@ import (
 const ResetPasswordRequestCreatedCode int = 201
 
 /*
-ResetPasswordRequestCreated forgot password request created
+ResetPasswordRequestCreated reset password request created
 
 swagger:response resetPasswordRequestCreated
 */
@@ -40,7 +40,7 @@ func (o *ResetPasswordRequestCreated) WriteResponse(rw http.ResponseWriter, prod
 const ResetPasswordRequestBadRequestCode int = 400
 
 /*
-ResetPasswordRequestBadRequest forgot password request not created
+ResetPasswordRequestBadRequest reset password request not created
 
 swagger:response resetPasswordRequestBadRequest
 */

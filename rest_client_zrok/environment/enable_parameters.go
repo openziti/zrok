@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewEnableParams creates a new EnableParams object,
@@ -64,7 +62,7 @@ EnableParams contains all the parameters to send to the API endpoint
 type EnableParams struct {
 
 	// Body.
-	Body *rest_model_zrok.EnableRequest
+	Body EnableBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *EnableParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the enable params
-func (o *EnableParams) WithBody(body *rest_model_zrok.EnableRequest) *EnableParams {
+func (o *EnableParams) WithBody(body EnableBody) *EnableParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the enable params
-func (o *EnableParams) SetBody(body *rest_model_zrok.EnableRequest) {
+func (o *EnableParams) SetBody(body EnableBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *EnableParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

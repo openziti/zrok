@@ -1,91 +1,177 @@
-import {Root} from "../environment/root"
+import {Root} from "./environment";
 import {
-    Share,
-    ShareApi,
-    ShareRequest,
-    ShareResponse,
     AuthUser,
-    ShareRequestOauthProviderEnum,
+    ShareApi,
+    ShareRequest as ApiShareRequest,
+    ShareRequestBackendModeEnum, ShareRequestOauthProviderEnum,
     ShareRequestShareModeEnum,
-    UnshareRequest} from "./api"
-import * as model from "./model"
+    UnshareRequest
+} from "../api";
 
-export async function CreateShare(root: Root, request: model.ShareRequest): Promise<model.Share> {
-    if (!root.IsEnabled()){
-        throw new Error("environment is not enabled; enable with 'zrok enable' first!")
+export type ShareMode = string;
+export const PRIVATE_SHARE_MODE: ShareMode = "private";
+export const PUBLIC_SHARE_MODE: ShareMode = "public";
+
+export type BackendMode = string;
+export const PROXY_BACKEND_MODE: BackendMode = "proxy";
+export const TCP_TUNNEL_BACKEND_MODE: BackendMode = "tcpTunnel";
+export const UDP_TUNNEL_BACKEND_MODE: BackendMode = "udpTunnel";
+
+export type AuthScheme = string;
+export const AUTH_SCHEME_NONE = "none";
+export const AUTH_SCHEME_BASIC = "basic";
+export const AUTH_SCHEME_OAUTH = "oauth";
+
+export type OauthProvider = string;
+export const OAUTH_PROVIDER_GOOGLE = "google";
+export const OAUTH_PROVIDER_GITHUB = "github";
+
+export type PermissionMode = string;
+export const OPEN_PERMISSION_MODE = "open";
+export const CLOSED_PERMISSION_MODE = "closed";
+
+export class ShareRequest {
+    reserved: boolean;
+    uniqueName: string | undefined;
+    backendMode: BackendMode;
+    shareMode: ShareMode;
+    target: string;
+    frontends: string[] | undefined;
+    basicAuth: string[] | undefined;
+    oauthProvider: string | undefined;
+    oauthEmailAddressPatterns: string[] | undefined;
+    oauthAuthorizationCheckInterval: string | undefined;
+    permissionMode: PermissionMode;
+    accessGrants: string[] | undefined;
+
+    constructor(shareMode: ShareMode, backendMode: BackendMode, target: string) {
+        this.reserved = false;
+        this.uniqueName = undefined;
+        this.backendMode = backendMode;
+        this.shareMode = shareMode;
+        this.target = target;
+        this.frontends = shareMode === PUBLIC_SHARE_MODE ? ["public"] : undefined;
+        this.basicAuth = undefined;
+        this.oauthProvider = undefined;
+        this.oauthEmailAddressPatterns = undefined;
+        this.oauthAuthorizationCheckInterval = undefined;
+        this.permissionMode = CLOSED_PERMISSION_MODE;
+        this.accessGrants = undefined;
     }
-    let out: ShareRequest
+}
 
-    switch(request.ShareMode) {
-        case ShareRequestShareModeEnum.Private:
-            out = newPrivateShare(root, request)
-            break
-        case ShareRequestShareModeEnum.Public:
-            out = newPublicShare(root, request)
-            break
+export class Share {
+    shareToken: string;
+    frontendEndpoints: string[] | undefined;
+
+    constructor(shareToken: string, frontendEndpoints: string[] | undefined) {
+        this.shareToken = shareToken;
+        this.frontendEndpoints = frontendEndpoints;
+    }
+}
+
+export const createShare = async (root: Root, request: ShareRequest): Promise<Share> => {
+    if(!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok enable' first!");
+    }
+
+    let req: ApiShareRequest;
+    switch(request.shareMode) {
+        case PRIVATE_SHARE_MODE:
+            req = toPrivateApiShareRequest(root, request);
+            break;
+        case PUBLIC_SHARE_MODE:
+            req = toPublicApiShareRequest(root, request);
+            break;
         default:
-            throw new Error("unknown share mode " + request.ShareMode)
+            throw new Error("unknown share mode '" + request.shareMode + "'");
     }
 
-    if (request.BasicAuth.length > 0) {
-        out.authScheme = model.AUTH_SCHEME_BASIC
-        for(let pair in request.BasicAuth) {
-            let tokens = pair.split(":")
-            if (tokens.length === 2) {
-                if (out.authUsers === undefined) {
-                    out.authUsers = new Array<AuthUser>
+    let shr = await new ShareApi(root.apiConfiguration()).share({body: req})
+        .catch(err => {
+            throw new Error("unable to create share: " + err);
+        });
+
+    return new Share(shr.shareToken!, shr.frontendProxyEndpoints);
+}
+
+export const deleteShare = async (root: Root, shr: Share): Promise<any> => {
+    if(!root.isEnabled()) {
+        throw new Error("environment is not enable; enable with 'zrok enable' first!");
+    }
+    let req: UnshareRequest = {
+        envZId: root.environment?.zId!,
+        shareToken: shr.shareToken
+    };
+    return new ShareApi(root.apiConfiguration()).unshare({body: req})
+        .catch(err => {
+            throw new Error("unable to delete share: " + err);
+        });
+}
+
+const toPrivateApiShareRequest = (root: Root, request: ShareRequest): ApiShareRequest => {
+    return {
+        envZId: root.environment?.zId,
+        shareMode: ShareRequestShareModeEnum.Private,
+        backendMode: toApiBackendMode(request.backendMode),
+        backendProxyEndpoint: request.target,
+        authScheme: AUTH_SCHEME_NONE,
+        permissionMode: CLOSED_PERMISSION_MODE,
+    };
+}
+
+const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareRequest => {
+    let out: ApiShareRequest = {
+        envZId: root.environment?.zId,
+        shareMode: ShareRequestShareModeEnum.Public,
+        frontendSelection: request.frontends,
+        backendMode: toApiBackendMode(request.backendMode),
+        backendProxyEndpoint: request.target,
+        authScheme: AUTH_SCHEME_NONE,
+    };
+
+    if(request.oauthProvider !== undefined) {
+        out.authScheme = AUTH_SCHEME_OAUTH;
+        out.oauthProvider = toApiOauthProvider(request.oauthProvider);
+        out.oauthEmailDomains = request.oauthEmailAddressPatterns;
+        out.oauthAuthorizationCheckInterval = request.oauthAuthorizationCheckInterval;
+
+    } else if(request.basicAuth?.length! > 0) {
+        out.authScheme = AUTH_SCHEME_BASIC;
+        for(let pair in request.basicAuth) {
+            let tokens = pair.split(":");
+            if(tokens.length === 2) {
+                if(out.authUsers === undefined) {
+                    out.authUsers = new Array<AuthUser>();
                 }
                 out.authUsers.push({username: tokens[0].trim(), password: tokens[1].trim()})
-            }
-            else {
-                throw new Error("invalid username:password pair: " + pair)
             }
         }
     }
 
-    if (request.OauthProvider !== undefined) {
-        out.authScheme = model.AUTH_SCHEME_OAUTH
+    return out;
+}
+
+const toApiBackendMode = (mode: BackendMode): ShareRequestBackendModeEnum | undefined => {
+    switch(mode) {
+        case PROXY_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.Proxy;
+        case TCP_TUNNEL_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.TcpTunnel;
+        case UDP_TUNNEL_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.UdpTunnel;
+        default:
+            return undefined;
     }
-
-    let conf = await root.Client()
-    let client = new ShareApi(conf)
-    let shr = await client.share({body: out})
-        .catch(resp => {
-            throw new Error("unable to create share " + resp)
-        })
-    return new model.Share(shr.shrToken||"", shr.frontendProxyEndpoints||[])
 }
 
-function newPrivateShare(root: Root, request: model.ShareRequest): ShareRequest {
-    return {envZId: root.env.ZitiIdentity,
-        shareMode: model.zrokShareModeToOpenApi(request.ShareMode),
-        backendMode: model.zrokBackendModeToOpenApi(request.BackendMode),
-        backendProxyEndpoint: request.Target,
-        authScheme: model.AUTH_SCHEME_NONE}
-}
-
-function newPublicShare(root: Root, request: model.ShareRequest): ShareRequest {
-    return {envZId: root.env.ZitiIdentity,
-        shareMode: model.zrokShareModeToOpenApi(request.ShareMode),
-        frontendSelection: request.Frontends,
-        backendMode: model.zrokBackendModeToOpenApi(request.BackendMode),
-        backendProxyEndpoint: request.Target,
-        authScheme: model.AUTH_SCHEME_NONE,
-        oauthProvider: model.zrokOauthProviderToOpenApi(request.OauthProvider),
-        oauthEmailDomains: request.OauthEmailDomains,
-        oauthAuthorizationCheckInterval: request.OauthAuthorizationCheckInterval}
-}
-
-export async function DeleteShare(root: Root, shr: model.Share): Promise<void> {
-    let conf = await root.Client()
-    let client = new ShareApi(conf)
-    let req: UnshareRequest = {
-        envZId: root.env.ZitiIdentity,
-        shrToken: shr.Token,
+const toApiOauthProvider = (provider: OauthProvider): ShareRequestOauthProviderEnum | undefined => {
+    switch(provider) {
+        case OAUTH_PROVIDER_GITHUB:
+            return ShareRequestOauthProviderEnum.Github;
+        case OAUTH_PROVIDER_GOOGLE:
+            return ShareRequestOauthProviderEnum.Google;
+        default:
+            return undefined;
     }
-    req.envZId = root.env.ZitiIdentity
-    return client.unshare({body: req})
-        .catch(resp => {
-            throw new Error("error deleting share " + resp)
-        })
 }

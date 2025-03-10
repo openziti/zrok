@@ -6,9 +6,12 @@ package account
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,47 @@ func (o *ChangePassword) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ChangePasswordBody change password body
+//
+// swagger:model ChangePasswordBody
+type ChangePasswordBody struct {
+
+	// email
+	Email string `json:"email,omitempty"`
+
+	// new password
+	NewPassword string `json:"newPassword,omitempty"`
+
+	// old password
+	OldPassword string `json:"oldPassword,omitempty"`
+}
+
+// Validate validates this change password body
+func (o *ChangePasswordBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this change password body based on context it is used
+func (o *ChangePasswordBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ChangePasswordBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ChangePasswordBody) UnmarshalBinary(b []byte) error {
+	var res ChangePasswordBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

@@ -30,14 +30,5 @@ func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middlewar
 	if cfg.Invites != nil {
 		data.InviteTokenContact = cfg.Invites.TokenContact
 	}
-	if cfg.Passwords != nil {
-		data.PasswordRequirements = &rest_model_zrok.PasswordRequirements{
-			Length:                 int64(cfg.Passwords.Length),
-			RequireCapital:         cfg.Passwords.RequireCapital,
-			RequireNumeric:         cfg.Passwords.RequireNumeric,
-			RequireSpecial:         cfg.Passwords.RequireSpecial,
-			ValidSpecialCharacters: cfg.Passwords.ValidSpecialCharacters,
-		}
-	}
 	return metadata.NewConfigurationOK().WithPayload(data)
 }

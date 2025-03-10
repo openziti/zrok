@@ -47,6 +47,12 @@ func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 		} else {
 			fmt.Println("defaultFrontend = <unset>")
 		}
+	case "headless":
+		if env.Config() != nil {
+			fmt.Printf("headless = %v\n", env.Config().Headless)
+		} else {
+			fmt.Println("headless = <unset>")
+		}
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)
 	}

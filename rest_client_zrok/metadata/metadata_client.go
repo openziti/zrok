@@ -30,6 +30,8 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	ClientVersionCheck(params *ClientVersionCheckParams, opts ...ClientOption) (*ClientVersionCheckOK, error)
+
 	Configuration(params *ConfigurationParams, opts ...ClientOption) (*ConfigurationOK, error)
 
 	GetAccountDetail(params *GetAccountDetailParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountDetailOK, error)
@@ -46,6 +48,8 @@ type ClientService interface {
 
 	GetShareMetrics(params *GetShareMetricsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetShareMetricsOK, error)
 
+	GetSparklines(params *GetSparklinesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSparklinesOK, error)
+
 	ListMemberships(params *ListMembershipsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListMembershipsOK, error)
 
 	ListOrgMembers(params *ListOrgMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrgMembersOK, error)
@@ -56,7 +60,47 @@ type ClientService interface {
 
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
+	VersionInventory(params *VersionInventoryParams, opts ...ClientOption) (*VersionInventoryOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+ClientVersionCheck client version check API
+*/
+func (a *Client) ClientVersionCheck(params *ClientVersionCheckParams, opts ...ClientOption) (*ClientVersionCheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewClientVersionCheckParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "clientVersionCheck",
+		Method:             "POST",
+		PathPattern:        "/clientVersionCheck",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ClientVersionCheckReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ClientVersionCheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for clientVersionCheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -264,7 +308,7 @@ func (a *Client) GetFrontendDetail(params *GetFrontendDetailParams, authInfo run
 	op := &runtime.ClientOperation{
 		ID:                 "getFrontendDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/frontend/{feId}",
+		PathPattern:        "/detail/frontend/{frontendId}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
@@ -303,7 +347,7 @@ func (a *Client) GetShareDetail(params *GetShareDetailParams, authInfo runtime.C
 	op := &runtime.ClientOperation{
 		ID:                 "getShareDetail",
 		Method:             "GET",
-		PathPattern:        "/detail/share/{shrToken}",
+		PathPattern:        "/detail/share/{shareToken}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
@@ -342,7 +386,7 @@ func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime
 	op := &runtime.ClientOperation{
 		ID:                 "getShareMetrics",
 		Method:             "GET",
-		PathPattern:        "/metrics/share/{shrToken}",
+		PathPattern:        "/metrics/share/{shareToken}",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
@@ -367,6 +411,45 @@ func (a *Client) GetShareMetrics(params *GetShareMetricsParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getShareMetrics: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetSparklines get sparklines API
+*/
+func (a *Client) GetSparklines(params *GetSparklinesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSparklinesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetSparklinesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getSparklines",
+		Method:             "POST",
+		PathPattern:        "/sparklines",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetSparklinesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetSparklinesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getSparklines: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -561,6 +644,44 @@ func (a *Client) Version(params *VersionParams, opts ...ClientOption) (*VersionO
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for version: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+VersionInventory version inventory API
+*/
+func (a *Client) VersionInventory(params *VersionInventoryParams, opts ...ClientOption) (*VersionInventoryOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewVersionInventoryParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "versionInventory",
+		Method:             "GET",
+		PathPattern:        "/versions",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &VersionInventoryReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*VersionInventoryOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for versionInventory: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

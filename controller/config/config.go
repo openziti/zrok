@@ -28,7 +28,6 @@ type Config struct {
 	Limits        *limits.Config
 	Maintenance   *MaintenanceConfig
 	Metrics       *metrics.Config
-	Passwords     *PasswordsConfig
 	Registration  *RegistrationConfig
 	ResetPassword *ResetPasswordConfig
 	Store         *store.Config
@@ -56,14 +55,6 @@ type InvitesConfig struct {
 type MaintenanceConfig struct {
 	ResetPassword *ResetPasswordMaintenanceConfig
 	Registration  *RegistrationMaintenanceConfig
-}
-
-type PasswordsConfig struct {
-	Length                 int
-	RequireCapital         bool
-	RequireNumeric         bool
-	RequireSpecial         bool
-	ValidSpecialCharacters string
 }
 
 type RegistrationConfig struct {
@@ -105,13 +96,6 @@ func DefaultConfig() *Config {
 				CheckFrequency:    time.Hour,
 				BatchLimit:        500,
 			},
-		},
-		Passwords: &PasswordsConfig{
-			Length:                 8,
-			RequireCapital:         true,
-			RequireNumeric:         true,
-			RequireSpecial:         true,
-			ValidSpecialCharacters: `!@$&*_-., "#%'()+/:;<=>?[\]^{|}~`,
 		},
 	}
 }

@@ -17,10 +17,10 @@ type verificationEmail struct {
 	Version      string
 }
 
-func sendVerificationEmail(emailAddress, token string) error {
+func sendVerificationEmail(emailAddress, regToken string) error {
 	emailData := &verificationEmail{
 		EmailAddress: emailAddress,
-		VerifyUrl:    cfg.Registration.RegistrationUrlTemplate + "/" + token,
+		VerifyUrl:    cfg.Registration.RegistrationUrlTemplate + "/" + regToken,
 		Version:      build.String(),
 	}
 

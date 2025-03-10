@@ -41,7 +41,7 @@ func (cmd *adminCreateOrgMemberCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := admin.NewAddOrganizationMemberParams()
-	req.Body.Token = args[0]
+	req.Body.OrganizationToken = args[0]
 	req.Body.Email = args[1]
 	req.Body.Admin = cmd.admin
 
