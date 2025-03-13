@@ -1,12 +1,12 @@
 ![zrok logo](docs/images/zrok_cover.png)
 
+## Your Secure Internet Sharing Perimeter
+
 `zrok` is a next-generation, peer-to-peer sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
 
-`zrok` facilitates sharing resources both publicly and privately. Public sharing allows you to share `zrok` resources with non-`zrok` users over the public internet. Private sharing allows you to directly share your resources peer-to-peer with other `zrok` users without changing your security or firewall settings.
+`zrok` facilitates both public and private sharing. Public sharing allows you to share securely with non-`zrok` users over the public internet. Private sharing allows you to directly share peer-to-peer with other `zrok` users. No security or firewall changes are required for either type of sharing. No inbound connectivity is required. The OpenZiti overlay provides peer-to-peer connectivity without IP addresses, and employs end-to-end encryption for world-class security.
 
-Like other offerings in this space, `zrok` allows users to share tunnels for HTTP, TCP and UDP network resources. `zrok` additionally allows users to easily and rapidly share files, web content, and custom resources in a peer-to-peer manner.
-
-`zrok` is an extensible platform for sharing. Initially we're targeting technical users. Super-simple sharing for end users is planned and in the backlog.
+Like other offerings in this space, `zrok` allows users to create tunnels for HTTP, TCP and UDP network resources. `zrok` additionally allows users to easily and rapidly share files, web content, and custom resources in a peer-to-peer manner.
 
 ![zrok Web Console](docs/images/zrok_web_console.png)
 
@@ -15,7 +15,7 @@ Like other offerings in this space, `zrok` allows users to share tunnels for HTT
 You can be up and sharing using the `zrok.io` service in minutes. Here is a synopsis of what's involved:
 
 * [Install the package or download the binary for your platform](https://docs.zrok.io/docs/guides/install/).
-* `zrok invite` to create an account with the service
+* `zrok invite` to create an account with the service (use the [NetFoundry hosted zrok.io service](https://docs.zrok.io/docs/getting-started/))
 * `zrok enable` to enable your shell environment for sharing with the service
 
 ### And then... sharing...
