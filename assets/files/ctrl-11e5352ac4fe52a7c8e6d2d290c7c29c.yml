@@ -1,0 +1,168 @@
+#    _____ __ ___ | | __
+#   |_  / '__/ _ \| |/ /
+#    / /| | | (_) |   <
+#   /___|_|  \___/|_|\_\
+# controller configuration
+#
+
+# The `v` field determines the configuration version. When software is released that changes the structure of the
+# configuration, the software will expect this field to be incremented. This protects you against invalid configuration
+# versions and will refer to you to the documentation when the configuration structure changes.
+#
+v: 4
+
+admin:
+  # The `secrets` array contains a list of strings that represent valid `ZROK_ADMIN_TOKEN` values to be used for
+  # administration of the `zrok` controller.
+  #
+  # Change this for your installation.
+  #
+  secrets:
+    -                             77623cad-1847-4d6d-8ffe-37defc33c909
+  #
+  # If `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
+  #
+  tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
+  #
+  # If `profile_endpoint` is present, the controller will start a `net/http/pprof` endpoint at the specified host:port
+  #
+  #profile_endpoint:               localhost:6060
+
+# The `bridge` section configures the `zrok controller metrics bridge`, specifying the source and sink where OpenZiti
+# `fabric.usage` events are consumed and then sent into `zrok`. For production environments, we recommend that you use
+# the `fileSource`, tailing the events from a JSON file written to by the OpenZiti controller. The `amqpSink` will then
+# forward the events to an AMQP queue for consumption by multiple `zrok` controllers.
+#
+bridge:
+  source:
+    type:           fileSource
+    path:           /tmp/fabric-usage.json
+  sink:
+    type:           amqpSink
+    url:            amqp://guest:guest@localhost:5672
+    queue_name:     events
+
+# The `endpoint` section determines where the HTTP listener that serves the API and web console will be bound.
+#
+endpoint:
+  host:                           0.0.0.0
+  port:                           18080
+
+# Outbound email configuration.
+#
+email:
+  host:                           smtp.server.com
+  port:                           587  # this must be a STARTTLS port, not the TLS port (465)
+  username:                       ""
+  password:                       ""
+  from:                           ziggy@zrok.io
+
+# Invites
+#
+invites:
+  #
+  # Setting `invites_open` to `true` will allow your service instance to allow users to request invites.
+  #
+  invites_open:                   false
+  #
+  # Setting `token_strategy` to `store` will use the `invite_tokens` table in the database for available invite tokens.
+  #
+  token_strategy:                 store
+  #
+  # Setting `token_contact` to something other than an empty string will show the contact information in the
+  # `zrok invite` command.
+  #
+  token_contact:                  invite@zrok.io
+
+# Service instance limits global configuration.
+#
+# See `docs/guides/metrics-and-limits/configuring-limits.md` for details.
+#
+limits:
+  environments:     -1
+  shares:           -1
+  reserved_shares:  -1
+  unique_names:     -1
+  share_frontends:  -1
+  bandwidth:
+    period:         5m
+    warning:
+      rx:           -1
+      tx:           -1
+      total:        7242880
+    limit:
+      rx:           -1
+      tx:           -1
+      total:        10485760
+  enforcing:        false
+  cycle:            5m
+
+# Background maintenance job configuration. The `registration` job purges registration requests created through the
+# `zrok invite` tool. The `reset_password` job purges password reset requests.
+#
+maintenance:
+  registration:
+    expiration_timeout:           24h
+    check_frequency:              1h
+    batch_limit:                  500
+  reset_password:
+    expiration_timeout:           15m
+    check_frequency:              15m
+    batch_limit:                  500
+
+# Metrics configuration.
+#
+metrics:
+  agent:
+    # The `source` controls where the `zrok controller` looks to consume OpenZiti `fabric.usage` events. This works in
+    # concert with the `bridge` section above to consume events from an AMQP queue. This can also be configured to work
+    # with a `fileSource` (see the `bridge` section above for details), and also with a `websocketSource`.
+    #
+    source:
+      type:         amqpSource
+      url:          amqp://guest:guest@localhost:5672
+      queue_name:   events
+  #
+  # The `influx` section configures access to the InfluxDB instance used to store `zrok` metrics.
+  #
+  influx:
+    url:            "http://127.0.0.1:8086"
+    bucket:         zrok
+    org:            zrok
+    token:          "<INFLUX TOKEN>"
+
+# Configure the generated URL for the registration email. The registration token will be appended to this URL.
+#
+registration:
+  registration_url_template:      https://zrok.server.com/register
+
+# Configure the generated URL for password resets. The reset token will be appended to this URL.
+#
+reset_password:
+  reset_url_template:             https://zrok.server.com/resetPassword
+
+# Configure the controller database. Supports either PostgreSQL or sqlite3.
+#
+# sqlite3 only supports a single controller instance. To run multiple controllers, you must use PostgreSQL.
+#
+#store:
+#  path:                           "host=127.0.0.1 user=zrok password=zrok dbname=zrok"
+#  type:                           "postgres"
+#  disable_auto_migration:         true
+#
+store:
+  path:                           zrok.db
+  type:                           sqlite3
+
+# The `tls` section sets the cert and key to use and enables serving over HTTPS
+#
+#tls:
+#  cert_path: "/Path/To/Cert/zrok.crt"
+#  key_path:  "/Path/To/Cert/zrok.key"
+
+# Ziti configuration.
+#
+ziti:
+  api_endpoint:                   https://127.0.0.1:1280
+  username:                       admin
+  password:                       admin
