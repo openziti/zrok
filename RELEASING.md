@@ -35,3 +35,28 @@ Pre-release version strings must contain exactly one hyphen, and may not contain
 ## Rolling Back Downstreams
 
 The concepts, tools, and procedures for managing existing downstream artifacts in Artifactory and Docker Hub are identical for zrok and ziti. Here's the [RELEASING.md document for ziti](https://github.com/openziti/ziti/blob/main/RELEASING.md#rolling-back-downstreams).
+
+## Updating the Homebrew Formula
+
+([`zrok.rb`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/z/zrok.rb)) is a Ruby script in `Homebrew/homebrew-core` that defines the build procedure for the `zrok` binary. The Homebrew workflow triggered by the "released" event in GitHub sends a pull request to update the zrok formula. Usually, the only differences are the HTTP URL of the release's source code archive and it's checksum. It's also necessary to send a PR for the Ruby script when the zrok build procedure changes  ([example PR](https://github.com/Homebrew/homebrew-core/pull/210917)).
+
+```bash
+# Clone the Homebrew/homebrew-core repository
+brew tap --force homebrew/core
+cd $(brew --repo homebrew/core)
+
+# Disable API-based installation to enable local build and testing
+export HOMEBREW_NO_INSTALL_FROM_API=1
+
+# Edit ./Formula/z/zrok.rb
+brew edit zrok
+
+# Build from source
+brew install --verbose --formula --build-bottle zrok
+
+# Test the zrok formula
+brew test zrok
+
+```
+
+[Homebrew Documentation](https://docs.brew.sh/FAQ#can-i-edit-formulae-myself)
