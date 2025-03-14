@@ -6,9 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,47 @@ func (o *Unaccess) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// UnaccessBody unaccess body
+//
+// swagger:model UnaccessBody
+type UnaccessBody struct {
+
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
+	// frontend token
+	FrontendToken string `json:"frontendToken,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this unaccess body
+func (o *UnaccessBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this unaccess body based on context it is used
+func (o *UnaccessBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UnaccessBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UnaccessBody) UnmarshalBinary(b []byte) error {
+	var res UnaccessBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

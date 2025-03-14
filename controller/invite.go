@@ -24,7 +24,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Warnf("not accepting invites; attempt from '%v'", params.Body.Email)
 		return account.NewInviteBadRequest()
 	}
-	if params.Body == nil || params.Body.Email == "" {
+	if params.Body.Email == "" {
 		logrus.Errorf("missing email")
 		return account.NewInviteBadRequest()
 	}
@@ -33,7 +33,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		return account.NewInviteBadRequest()
 	}
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
-	var token string
+	var regToken string
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -43,9 +43,9 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	defer func() { _ = tx.Rollback() }()
 
 	if h.cfg.Invites != nil && h.cfg.Invites.TokenStrategy == "store" {
-		inviteToken, err := str.FindInviteTokenByToken(params.Body.Token, tx)
+		inviteToken, err := str.FindInviteTokenByToken(params.Body.InviteToken, tx)
 		if err != nil {
-			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.Token, params.Body.Email, err)
+			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.InviteToken, params.Body.Email, err)
 			return account.NewInviteBadRequest().WithPayload("missing invite token")
 		}
 		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
@@ -55,13 +55,13 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Infof("using invite token '%v' to process invite request for '%v'", inviteToken.Token, params.Body.Email)
 	}
 
-	token, err = CreateToken()
+	regToken, err = CreateToken()
 	if err != nil {
 		logrus.Error(err)
 		return account.NewInviteInternalServerError()
 	}
 	ar := &store.AccountRequest{
-		Token:         token,
+		Token:         regToken,
 		Email:         params.Body.Email,
 		SourceAddress: params.HTTPRequest.RemoteAddr,
 	}
@@ -94,7 +94,7 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	}
 
 	if cfg.Email != nil && cfg.Registration != nil {
-		if err := sendVerificationEmail(params.Body.Email, token); err != nil {
+		if err := sendVerificationEmail(params.Body.Email, regToken); err != nil {
 			logrus.Errorf("error sending verification email for '%v': %v", params.Body.Email, err)
 			return account.NewInviteInternalServerError()
 		}

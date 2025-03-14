@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewUpdateFrontendParams creates a new UpdateFrontendParams object,
@@ -64,7 +62,7 @@ UpdateFrontendParams contains all the parameters to send to the API endpoint
 type UpdateFrontendParams struct {
 
 	// Body.
-	Body *rest_model_zrok.UpdateFrontendRequest
+	Body UpdateFrontendBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *UpdateFrontendParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the update frontend params
-func (o *UpdateFrontendParams) WithBody(body *rest_model_zrok.UpdateFrontendRequest) *UpdateFrontendParams {
+func (o *UpdateFrontendParams) WithBody(body UpdateFrontendBody) *UpdateFrontendParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the update frontend params
-func (o *UpdateFrontendParams) SetBody(body *rest_model_zrok.UpdateFrontendRequest) {
+func (o *UpdateFrontendParams) SetBody(body UpdateFrontendBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *UpdateFrontendParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

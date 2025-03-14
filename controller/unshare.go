@@ -34,7 +34,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
-	shrToken := params.Body.ShrToken
+	shrToken := params.Body.ShareToken
 	shrZId, err := h.findShareZId(shrToken, edge)
 	if err != nil {
 		logrus.Errorf("error finding share identity for '%v' (%v): %v", shrToken, principal.Email, err)

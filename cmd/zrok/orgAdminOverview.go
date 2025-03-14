@@ -51,7 +51,7 @@ func (cmd *orgAdminOverviewCommand) run(_ *cobra.Command, args []string) {
 		}
 		panic(err)
 	}
-	req.Header.Add("X-TOKEN", root.Environment().Token)
+	req.Header.Add("X-TOKEN", root.Environment().AccountToken)
 	resp, err := client.Do(req)
 	if err != nil {
 		if !panicInstead {

@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewVerifyParams creates a new VerifyParams object,
@@ -64,7 +62,7 @@ VerifyParams contains all the parameters to send to the API endpoint
 type VerifyParams struct {
 
 	// Body.
-	Body *rest_model_zrok.VerifyRequest
+	Body VerifyBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *VerifyParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the verify params
-func (o *VerifyParams) WithBody(body *rest_model_zrok.VerifyRequest) *VerifyParams {
+func (o *VerifyParams) WithBody(body VerifyBody) *VerifyParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the verify params
-func (o *VerifyParams) SetBody(body *rest_model_zrok.VerifyRequest) {
+func (o *VerifyParams) SetBody(body VerifyBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *VerifyParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regist
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

@@ -6,9 +6,12 @@ package share
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -68,4 +71,50 @@ func (o *UpdateShare) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// UpdateShareBody update share body
+//
+// swagger:model UpdateShareBody
+type UpdateShareBody struct {
+
+	// add access grants
+	AddAccessGrants []string `json:"addAccessGrants"`
+
+	// backend proxy endpoint
+	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
+
+	// remove access grants
+	RemoveAccessGrants []string `json:"removeAccessGrants"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this update share body
+func (o *UpdateShareBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this update share body based on context it is used
+func (o *UpdateShareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UpdateShareBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UpdateShareBody) UnmarshalBinary(b []byte) error {
+	var res UpdateShareBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

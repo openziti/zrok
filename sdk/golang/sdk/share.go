@@ -50,7 +50,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting zrok client")
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	in, err := zrok.Share.Share(out, auth)
 	if err != nil {
@@ -58,7 +58,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	}
 
 	return &Share{
-		Token:             in.Payload.ShrToken,
+		Token:             in.Payload.ShareToken,
 		FrontendEndpoints: in.Payload.FrontendProxyEndpoints,
 	}, nil
 }
@@ -97,16 +97,14 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 
 func DeleteShare(root env_core.Root, shr *Share) error {
 	req := share.NewUnshareParams()
-	req.Body = &rest_model_zrok.UnshareRequest{
-		EnvZID:   root.Environment().ZitiIdentity,
-		ShrToken: shr.Token,
-	}
+	req.Body.EnvZID = root.Environment().ZitiIdentity
+	req.Body.ShareToken = shr.Token
 
 	zrok, err := root.Client()
 	if err != nil {
 		return errors.Wrap(err, "error getting zrok client")
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	_, err = zrok.Share.Unshare(req, auth)
 	if err != nil {

@@ -58,6 +58,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
+		MetadataClientVersionCheckHandler: metadata.ClientVersionCheckHandlerFunc(func(params metadata.ClientVersionCheckParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ClientVersionCheck has not yet been implemented")
+		}),
 		MetadataConfigurationHandler: metadata.ConfigurationHandlerFunc(func(params metadata.ConfigurationParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Configuration has not yet been implemented")
 		}),
@@ -106,6 +109,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataGetShareMetricsHandler: metadata.GetShareMetricsHandlerFunc(func(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
+		MetadataGetSparklinesHandler: metadata.GetSparklinesHandlerFunc(func(params metadata.GetSparklinesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.GetSparklines has not yet been implemented")
+		}),
 		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
 		}),
@@ -139,8 +145,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
-		AccountRegenerateTokenHandler: account.RegenerateTokenHandlerFunc(func(params account.RegenerateTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation account.RegenerateToken has not yet been implemented")
+		AccountRegenerateAccountTokenHandler: account.RegenerateAccountTokenHandlerFunc(func(params account.RegenerateAccountTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation account.RegenerateAccountToken has not yet been implemented")
 		}),
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
@@ -163,6 +169,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
 		}),
+		ShareUpdateAccessHandler: share.UpdateAccessHandlerFunc(func(params share.UpdateAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.UpdateAccess has not yet been implemented")
+		}),
 		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
 		}),
@@ -174,6 +183,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
+		}),
+		MetadataVersionInventoryHandler: metadata.VersionInventoryHandlerFunc(func(params metadata.VersionInventoryParams) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.VersionInventory has not yet been implemented")
 		}),
 
 		// Applies when the "x-token" header is set
@@ -231,6 +243,8 @@ type ZrokAPI struct {
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
+	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
+	MetadataClientVersionCheckHandler metadata.ClientVersionCheckHandler
 	// MetadataConfigurationHandler sets the operation handler for the configuration operation
 	MetadataConfigurationHandler metadata.ConfigurationHandler
 	// AdminCreateAccountHandler sets the operation handler for the create account operation
@@ -263,6 +277,8 @@ type ZrokAPI struct {
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
 	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
+	// MetadataGetSparklinesHandler sets the operation handler for the get sparklines operation
+	MetadataGetSparklinesHandler metadata.GetSparklinesHandler
 	// AdminGrantsHandler sets the operation handler for the grants operation
 	AdminGrantsHandler admin.GrantsHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
@@ -285,8 +301,8 @@ type ZrokAPI struct {
 	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
-	// AccountRegenerateTokenHandler sets the operation handler for the regenerate token operation
-	AccountRegenerateTokenHandler account.RegenerateTokenHandler
+	// AccountRegenerateAccountTokenHandler sets the operation handler for the regenerate account token operation
+	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
@@ -301,6 +317,8 @@ type ZrokAPI struct {
 	ShareUnaccessHandler share.UnaccessHandler
 	// ShareUnshareHandler sets the operation handler for the unshare operation
 	ShareUnshareHandler share.UnshareHandler
+	// ShareUpdateAccessHandler sets the operation handler for the update access operation
+	ShareUpdateAccessHandler share.UpdateAccessHandler
 	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
 	AdminUpdateFrontendHandler admin.UpdateFrontendHandler
 	// ShareUpdateShareHandler sets the operation handler for the update share operation
@@ -309,6 +327,8 @@ type ZrokAPI struct {
 	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
 	MetadataVersionHandler metadata.VersionHandler
+	// MetadataVersionInventoryHandler sets the operation handler for the version inventory operation
+	MetadataVersionInventoryHandler metadata.VersionInventoryHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -399,6 +419,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
 	}
+	if o.MetadataClientVersionCheckHandler == nil {
+		unregistered = append(unregistered, "metadata.ClientVersionCheckHandler")
+	}
 	if o.MetadataConfigurationHandler == nil {
 		unregistered = append(unregistered, "metadata.ConfigurationHandler")
 	}
@@ -447,6 +470,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataGetShareMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
 	}
+	if o.MetadataGetSparklinesHandler == nil {
+		unregistered = append(unregistered, "metadata.GetSparklinesHandler")
+	}
 	if o.AdminGrantsHandler == nil {
 		unregistered = append(unregistered, "admin.GrantsHandler")
 	}
@@ -480,8 +506,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
-	if o.AccountRegenerateTokenHandler == nil {
-		unregistered = append(unregistered, "account.RegenerateTokenHandler")
+	if o.AccountRegenerateAccountTokenHandler == nil {
+		unregistered = append(unregistered, "account.RegenerateAccountTokenHandler")
 	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
@@ -504,6 +530,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.ShareUnshareHandler == nil {
 		unregistered = append(unregistered, "share.UnshareHandler")
 	}
+	if o.ShareUpdateAccessHandler == nil {
+		unregistered = append(unregistered, "share.UpdateAccessHandler")
+	}
 	if o.AdminUpdateFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.UpdateFrontendHandler")
 	}
@@ -515,6 +544,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataVersionHandler == nil {
 		unregistered = append(unregistered, "metadata.VersionHandler")
+	}
+	if o.MetadataVersionInventoryHandler == nil {
+		unregistered = append(unregistered, "metadata.VersionInventoryHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -627,6 +659,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/clientVersionCheck"] = metadata.NewClientVersionCheck(o.context, o.MetadataClientVersionCheckHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -682,15 +718,19 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/detail/frontend/{feId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
+	o.handlers["GET"]["/detail/frontend/{frontendId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/detail/share/{shrToken}"] = metadata.NewGetShareDetail(o.context, o.MetadataGetShareDetailHandler)
+	o.handlers["GET"]["/detail/share/{shareToken}"] = metadata.NewGetShareDetail(o.context, o.MetadataGetShareDetailHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/metrics/share/{shrToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
+	o.handlers["GET"]["/metrics/share/{shareToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/sparklines"] = metadata.NewGetSparklines(o.context, o.MetadataGetSparklinesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -738,7 +778,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/regenerateToken"] = account.NewRegenerateToken(o.context, o.AccountRegenerateTokenHandler)
+	o.handlers["POST"]["/regenerateAccountToken"] = account.NewRegenerateAccountToken(o.context, o.AccountRegenerateAccountTokenHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -770,6 +810,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
+	o.handlers["PATCH"]["/access"] = share.NewUpdateAccess(o.context, o.ShareUpdateAccessHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
 	o.handlers["PATCH"]["/frontend"] = admin.NewUpdateFrontend(o.context, o.AdminUpdateFrontendHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
@@ -783,6 +827,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/version"] = metadata.NewVersion(o.context, o.MetadataVersionHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/versions"] = metadata.NewVersionInventory(o.context, o.MetadataVersionInventoryHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

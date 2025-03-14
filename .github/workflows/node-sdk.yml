@@ -12,8 +12,6 @@ jobs:
     name: Require Stable Release Semver
     if: github.event.action == 'released'
     runs-on: ubuntu-24.04
-    outputs:
-      version: ${{ steps.parse.outputs.version }}
     steps:
       - name: Parse Release Version
         id: parse
@@ -32,18 +30,17 @@ jobs:
     if: always()
     name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
     runs-on: ${{ matrix.config.os }}
-
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    
+
     strategy:
       matrix:
         config:
-          - { os: ubuntu-20.04,   target: "linux", arch: "x64" }
+          - { os: ubuntu-24.04, target: "linux", arch: "x64" }
         node_ver: [ 20 ]
       fail-fast: false
-    
+
     steps:
 
     - name: Node Version
@@ -55,20 +52,22 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        submodules: 'recursive'
 
     - name: Get current zrok repo tag
+      if: github.event.action == 'released'
       id: tag
-      run: echo "TAG=$(git describe --tags --abbrev=0)" | tee -a $GITHUB_OUTPUT
+      shell: bash
+      run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
 
     - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
+      shell: bash
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        cd sdk/nodejs/sdk
         npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
 
     - name: Setup .npmrc
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
       # Setup .npmrc file to prepare for possible publish to npm
       uses: actions/setup-node@v4
       with:
@@ -76,17 +75,26 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
 
     - name: Build the zrok NodeJS-SDK
+      shell: bash
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
+        cd sdk/nodejs/sdk
         npm install
         npm run build
       env:
         BUILD_DATE: ${{ steps.date.outputs.date }}
 
     - name: NPM Publish
-      if: github.ref_type == 'tag'
+      if: github.event.action == 'released'
+      shell: bash
       run: |
-        cd ${{ runner.workspace }}/${{ github.event.repository.name }}/sdk/nodejs/sdk
-        npm publish --access public
+        cd sdk/nodejs/sdk
+        # Check if this is the official repository
+        if [[ "${{ github.repository_owner }}" == "openziti" ]]; then
+          echo "Publishing from official repository with @latest tag"
+          npm publish --access public
+        else
+          echo "Publishing from fork/test repository with @canary tag"
+          npm publish --access public --tag canary
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

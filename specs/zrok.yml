@@ -1,7 +1,7 @@
 info:
   description: zrok client access
   title: zrok
-  version: 0.3.0
+  version: 1.0.0
 
 basePath: /api/v1
 
@@ -26,10 +26,16 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: '#/definitions/changePasswordRequest'
+            properties:
+              email:
+                type: string
+              oldPassword:
+                type: string
+              newPassword:
+                type: string
       responses:
         200:
-          description: changed password
+          description: password changed
         400:
           description: password not changed
         401:
@@ -50,7 +56,11 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/inviteRequest"
+            properties:
+              email:
+                type: string
+              inviteToken:
+                type: string
       responses:
         201:
           description: invitation created
@@ -72,22 +82,26 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/loginRequest"
+            properties:
+              email:
+                type: string
+              password:
+                type: string
       responses:
         200:
           description: login successful
           schema:
-            $ref: "#/definitions/loginResponse"
+            type: string
         401:
           description: invalid login
 
-  /regenerateToken:
+  /regenerateAccountToken:
     post:
       tags:
         - account
       security:
         - key: []
-      operationId: regenerateToken
+      operationId: regenerateAccountToken
       parameters:
         - name: body
           in: body
@@ -100,7 +114,7 @@ paths:
           description: regenerate account token
           schema:
             properties:
-              token:
+              accountToken:
                 type: string
         404:
           description: account not found
@@ -116,12 +130,18 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/registerRequest"
+            properties:
+              registerToken:
+                type: string
+              password:
+                type: string
       responses:
         200:
           description: account created
           schema:
-            $ref: "#/definitions/registerResponse"
+            properties:
+              accountToken:
+                type: string
         404:
           description: request not found
         422:
@@ -140,7 +160,11 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/resetPasswordRequest"
+            properties:
+              resetToken:
+                type: string
+              password:
+                type: string
       responses:
         200:
           description: password reset
@@ -167,9 +191,9 @@ paths:
                 type: string
       responses:
         201:
-          description: forgot password request created
+          description: reset password request created
         400:
-          description: forgot password request not created
+          description: reset password request not created
         500:
           description: internal server error
 
@@ -182,14 +206,18 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/verifyRequest"
+            properties:
+              registerToken:
+                type: string
       responses:
         200:
-          description: token ready
+          description: registration token ready
           schema:
-            $ref: "#/definitions/verifyResponse"
+            properties:
+              email:
+                type: string
         404:
-          description: token not found
+          description: registration token not found
         500:
           description: internal server error
 
@@ -217,7 +245,7 @@ paths:
           description: created
           schema:
             properties:
-              token:
+              accountToken:
                 type: string
         401:
           description: unauthorized
@@ -235,12 +263,25 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/createFrontendRequest"
+            type: object
+            properties:
+              zId:
+                type: string
+              url_template:
+                type: string
+              public_name:
+                type: string
+              permissionMode:
+                type: string
+                enum: [ "open", "closed" ]
       responses:
         201:
           description: frontend created
           schema:
-            $ref: "#/definitions/createFrontendResponse"
+            type: object
+            properties:
+              frontendToken:
+                type: string
         400:
           description: bad request
         401:
@@ -259,7 +300,14 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/updateFrontendRequest"
+            type: object
+            properties:
+              frontendToken:
+                type: string
+              publicName:
+                type: string
+              urlTemplate:
+                type: string
       responses:
         200:
           description: frontend updated
@@ -279,7 +327,10 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/deleteFrontendRequest"
+            type: object
+            properties:
+              frontendToken:
+                type: string
       responses:
         200:
           description: frontend deleted
@@ -301,7 +352,22 @@ paths:
         200:
           description: ok
           schema:
-            $ref: "#/definitions/publicFrontendList"
+            type: array
+            items:
+              type: object
+              properties:
+                frontendToken:
+                  type: string
+                zId:
+                  type: string
+                urlTemplate:
+                  type: string
+                publicName:
+                  type: string
+                createdAt:
+                  type: integer
+                updatedAt:
+                  type: integer
         401:
           description: unauthorized
         500:
@@ -371,12 +437,16 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/inviteTokenGenerateRequest"
+            properties:
+              inviteTokens:
+                type: array
+                items:
+                  type: string
       responses:
         201:
-          description: invitation tokens created
+          description: invite tokens created
         400:
-          description: invitation tokens not created
+          description: invite tokens not created
         401:
           description: unauthorized
         500:
@@ -401,7 +471,7 @@ paths:
           description: organization created
           schema:
             properties:
-              token:
+              organizationToken:
                 type: string
         401:
           description: unauthorized
@@ -418,7 +488,7 @@ paths:
             in: body
             schema:
               properties:
-                token:
+                organizationToken:
                   type: string
         responses:
           200:
@@ -442,7 +512,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              organizationToken:
                 type: string
               email:
                 type: string
@@ -470,7 +540,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              organizationToken:
                 type: string
       responses:
         200:
@@ -504,7 +574,7 @@ paths:
           in: body
           schema:
             properties:
-              token:
+              organizationToken:
                 type: string
               email:
                 type: string
@@ -534,7 +604,7 @@ paths:
                 type: array
                 items:
                   properties:
-                    token:
+                    organizationToken:
                       type: string
                     description:
                       type: string
@@ -557,12 +627,20 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/enableRequest"
+            properties:
+              description:
+                type: string
+              host:
+                type: string
       responses:
         201:
           description: environment enabled
           schema:
-            $ref: "#/definitions/enableResponse"
+            properties:
+              identity:
+                type: string
+              cfg:
+                type: string
         401:
           description: unauthorized
         404:
@@ -581,7 +659,9 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/disableRequest"
+            properties:
+              identity:
+                type: string
       responses:
         200:
           description: environment disabled
@@ -593,6 +673,26 @@ paths:
   #
   # metadata
   #
+  /clientVersionCheck:
+    post:
+      tags:
+        - metadata
+      operationId: clientVersionCheck
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              clientVersion:
+                type: string
+      responses:
+        200:
+          description: compatible
+        400:
+          description: not compatible
+          schema:
+            type: string
+
   /configuration:
     get:
       tags:
@@ -643,7 +743,7 @@ paths:
         500:
           description: internal server error
 
-  /detail/frontend/{feId}:
+  /detail/frontend/{frontendId}:
     get:
       tags:
         - metadata
@@ -651,7 +751,7 @@ paths:
         - key: []
       operationId: getFrontendDetail
       parameters:
-        - name: feId
+        - name: frontendId
           in: path
           type: integer
           required: true
@@ -667,7 +767,7 @@ paths:
         500:
           description: internal server error
 
-  /detail/share/{shrToken}:
+  /detail/share/{shareToken}:
     get:
       tags:
         - metadata
@@ -675,7 +775,7 @@ paths:
         - key: []
       operationId: getShareDetail
       parameters:
-        - name: shrToken
+        - name: shareToken
           in: path
           type: string
           required: true
@@ -737,7 +837,7 @@ paths:
                 type: array
                 items:
                   properties:
-                    token:
+                    organizationToken:
                       type: string
                     description:
                       type: string
@@ -838,7 +938,7 @@ paths:
           description: internal server error
 
 
-  /metrics/share/{shrToken}:
+  /metrics/share/{shareToken}:
     get:
       tags:
         - metadata
@@ -846,7 +946,7 @@ paths:
         - key: []
       operationId: getShareMetrics
       parameters:
-        - name: shrToken
+        - name: shareToken
           in: path
           type: string
           required: true
@@ -865,7 +965,43 @@ paths:
         500:
           description: internal server error
 
+  /sparklines:
+    post:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: getSparklines
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              account:
+                type: boolean
+              environments:
+                type: array
+                items:
+                  type: string
+              shares:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: sparklines data
+          schema:
+            properties:
+              sparklines:
+                type: array
+                items:
+                  $ref: "#/definitions/metrics"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
 
+  # deprecated (for legacy clients)
   /version:
     get:
       tags:
@@ -873,9 +1009,22 @@ paths:
       operationId: version
       responses:
         200:
-          description: current server version
+          description: legacy upgrade required
           schema:
             $ref: "#/definitions/version"
+
+  /versions:
+    get:
+      tags:
+        - metadata
+      operationId: versionInventory
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              controllerVersion:
+                type: string
 
   #
   # share
@@ -891,12 +1040,50 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/accessRequest"
+            properties:
+              envZId:
+                type: string
+              shareToken:
+                type: string
+              bindAddress:
+                type: string
+              description:
+                type: string
       responses:
         201:
           description: access created
           schema:
-            $ref: "#/definitions/accessResponse"
+            properties:
+              frontendToken:
+                type: string
+              backendMode:
+                type: string
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    patch:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: updateAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              frontendToken:
+                type: string
+              bindAddress:
+                type: string
+              description:
+                type: string
+      responses:
+        200:
+          description: access updated
         401:
           description: unauthorized
         404:
@@ -943,7 +1130,19 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/updateShareRequest"
+            properties:
+              shareToken:
+                type: string
+              backendProxyEndpoint:
+                type: string
+              addAccessGrants:
+                type: array
+                items:
+                  type: string
+              removeAccessGrants:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: share updated
@@ -967,7 +1166,13 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/unaccessRequest"
+            properties:
+              frontendToken:
+                type: string
+              envZId:
+                type: string
+              shareToken:
+                type: string
       responses:
         200:
           description: access removed
@@ -989,7 +1194,13 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/unshareRequest"
+            properties:
+              envZId:
+                type: string
+              shareToken:
+                type: string
+              reserved:
+                type: boolean
       responses:
         200:
           description: share removed
@@ -1003,22 +1214,6 @@ paths:
             $ref: "#/definitions/errorMessage"
 
 definitions:
-  accessRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      shrToken:
-        type: string
-
-  accessResponse:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      backendMode:
-        type: string
-
   authUser:
     type: object
     properties:
@@ -1026,16 +1221,6 @@ definitions:
         type: string
       password:
         type: string
-
-  changePasswordRequest:
-    type: object
-    properties:
-      email:
-        type: string
-      oldPassword:
-        type: string
-      newPassword:
-         type: string
 
   configuration:
     type: object
@@ -1049,55 +1234,6 @@ definitions:
       requiresInviteToken:
         type: boolean
       inviteTokenContact:
-        type: string
-      passwordRequirements:
-        $ref: "#/definitions/passwordRequirements"
-
-  createFrontendRequest:
-    type: object
-    properties:
-      zId:
-        type: string
-      url_template:
-        type: string
-      public_name:
-        type: string
-      permissionMode:
-        type: string
-        enum: ["open", "closed"]
-
-  createFrontendResponse:
-    type: object
-    properties:
-      token:
-        type: string
-
-  deleteFrontendRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-
-  disableRequest:
-    type: object
-    properties:
-      identity:
-        type: string
-
-  enableRequest:
-    type: object
-    properties:
-      description:
-        type: string
-      host:
-        type: string
-
-  enableResponse:
-    type: object
-    properties:
-      identity:
-        type: string
-      cfg:
         type: string
 
   environment:
@@ -1143,9 +1279,15 @@ definitions:
     properties:
       id:
         type: integer
-      token:
+      frontendToken:
         type: string
-      shrToken:
+      shareToken:
+        type: string
+      backendMode:
+        type: string
+      bindAddress:
+        type: string
+      description:
         type: string
       zId:
         type: string
@@ -1158,33 +1300,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/frontend"
-
-  inviteTokenGenerateRequest:
-    type: object
-    properties:
-      tokens:
-        type: array
-        items:
-          type: string
-
-  inviteRequest:
-    type: object
-    properties:
-      email:
-        type: string
-      token:
-        type: string
-
-  loginRequest:
-    type: object
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-
-  loginResponse:
-    type: string
 
   metrics:
     type: object
@@ -1219,20 +1334,6 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/environmentAndResources"
-          
-  passwordRequirements:
-    type: object
-    properties:
-      length:
-        type: integer
-      requireCapital:
-        type: boolean
-      requireNumeric:
-        type: boolean
-      requireSpecial:
-        type: boolean
-      validSpecialCharacters:
-        type: string
 
   principal:
     type: object
@@ -1248,53 +1349,10 @@ definitions:
       admin:
         type: boolean
 
-  publicFrontend:
-    type: object
-    properties:
-      token:
-        type: string
-      zId:
-        type: string
-      urlTemplate:
-        type: string
-      publicName:
-        type: string
-      createdAt:
-        type: integer
-      updatedAt:
-        type: integer
-
-  publicFrontendList:
-    type: array
-    items:
-      $ref: "#/definitions/publicFrontend"
-
-  registerRequest:
-    type: object
-    properties:
-      token:
-        type: string
-      password:
-        type: string
-
-  registerResponse:
-    type: object
-    properties:
-      token:
-        type: string
-
-  resetPasswordRequest:
-    type: object
-    properties:
-      token:
-        type: string
-      password:
-        type: string
-
   share:
     type: object
     properties:
-      token:
+      shareToken:
         type: string
       zId:
         type: string
@@ -1375,7 +1433,7 @@ definitions:
         type: array
         items:
           type: string
-      shrToken:
+      shareToken:
         type: string
 
   sparkData:
@@ -1390,63 +1448,6 @@ definitions:
         type: number
       tx:
         type: number
-
-  unaccessRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      envZId:
-        type: string
-      shrToken:
-        type: string
-
-  unshareRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      shrToken:
-        type: string
-      reserved:
-        type: boolean
-
-  updateFrontendRequest:
-    type: object
-    properties:
-      frontendToken:
-        type: string
-      publicName:
-        type: string
-      urlTemplate:
-        type: string
-
-  updateShareRequest:
-    type: object
-    properties:
-      shrToken:
-        type: string
-      backendProxyEndpoint:
-        type: string
-      addAccessGrants:
-        type: array
-        items:
-          type: string
-      removeAccessGrants:
-        type: array
-        items:
-          type: string
-
-  verifyRequest:
-    type: object
-    properties:
-      token:
-        type: string
-  verifyResponse:
-    type: object
-    properties:
-      email:
-        type: string
 
   version:
     type: string

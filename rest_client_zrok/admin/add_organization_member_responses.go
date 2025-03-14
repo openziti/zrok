@@ -287,8 +287,8 @@ type AddOrganizationMemberBody struct {
 	// email
 	Email string `json:"email,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this add organization member body

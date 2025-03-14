@@ -54,7 +54,7 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
 	t.AppendHeader(table.Row{"Token", "zId", "Public Name", "Url Template", "Created At", "Updated At"})
 	for _, pfe := range resp.Payload {
 		t.AppendRow(table.Row{
-			pfe.Token,
+			pfe.FrontendToken,
 			pfe.ZID,
 			pfe.PublicName,
 			pfe.URLTemplate,

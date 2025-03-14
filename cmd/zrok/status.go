@@ -52,6 +52,8 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, apiEndpointFrom})
 	defaultFrontend, defaultFrontendFrom := env.DefaultFrontend()
 	t.AppendRow(table.Row{"defaultFrontend", defaultFrontend, defaultFrontendFrom})
+	headless, headlessFrom := env.Headless()
+	t.AppendRow(table.Row{"headless", headless, headlessFrom})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 
@@ -65,14 +67,14 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		t.SetStyle(table.StyleColoredDark)
 		t.AppendHeader(table.Row{"Property", "Value"})
 		if cmd.secrets {
-			t.AppendRow(table.Row{"Secret Token", env.Environment().Token})
+			t.AppendRow(table.Row{"Account Token", env.Environment().AccountToken})
 			t.AppendRow(table.Row{"Ziti Identity", env.Environment().ZitiIdentity})
 		} else {
 			secretToken := "<<SET>>"
-			if env.Environment().Token == "" {
+			if env.Environment().AccountToken == "" {
 				secretToken = "<<UNSET>>"
 			}
-			t.AppendRow(table.Row{"Secret Token", secretToken})
+			t.AppendRow(table.Row{"Account Token", secretToken})
 
 			zId := "<<SET>>"
 			if env.Environment().ZitiIdentity == "" {

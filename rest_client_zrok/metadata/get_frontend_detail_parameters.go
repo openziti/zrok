@@ -62,8 +62,8 @@ GetFrontendDetailParams contains all the parameters to send to the API endpoint
 */
 type GetFrontendDetailParams struct {
 
-	// FeID.
-	FeID int64
+	// FrontendID.
+	FrontendID int64
 
 	timeout    time.Duration
 	Context    context.Context
@@ -118,15 +118,15 @@ func (o *GetFrontendDetailParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithFeID adds the feID to the get frontend detail params
-func (o *GetFrontendDetailParams) WithFeID(feID int64) *GetFrontendDetailParams {
-	o.SetFeID(feID)
+// WithFrontendID adds the frontendID to the get frontend detail params
+func (o *GetFrontendDetailParams) WithFrontendID(frontendID int64) *GetFrontendDetailParams {
+	o.SetFrontendID(frontendID)
 	return o
 }
 
-// SetFeID adds the feId to the get frontend detail params
-func (o *GetFrontendDetailParams) SetFeID(feID int64) {
-	o.FeID = feID
+// SetFrontendID adds the frontendId to the get frontend detail params
+func (o *GetFrontendDetailParams) SetFrontendID(frontendID int64) {
+	o.FrontendID = frontendID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -137,8 +137,8 @@ func (o *GetFrontendDetailParams) WriteToRequest(r runtime.ClientRequest, reg st
 	}
 	var res []error
 
-	// path param feId
-	if err := r.SetPathParam("feId", swag.FormatInt64(o.FeID)); err != nil {
+	// path param frontendId
+	if err := r.SetPathParam("frontendId", swag.FormatInt64(o.FrontendID)); err != nil {
 		return err
 	}
 

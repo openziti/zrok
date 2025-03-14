@@ -8,7 +8,6 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/tui"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/sirupsen/logrus"
@@ -77,10 +76,8 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
 	req := restEnvironment.NewEnableParams()
-	req.Body = &rest_model_zrok.EnableRequest{
-		Description: cmd.description,
-		Host:        hostDetail,
-	}
+	req.Body.Description = cmd.description
+	req.Body.Host = hostDetail
 
 	var prg *tea.Program
 	var done = make(chan struct{})
@@ -123,7 +120,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		prg.Send("writing the environment details...")
 	}
 	apiEndpoint, _ := env.ApiEndpoint()
-	if err := env.SetEnvironment(&env_core.Environment{Token: token, ZitiIdentity: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
+	if err := env.SetEnvironment(&env_core.Environment{AccountToken: token, ZitiIdentity: resp.Payload.Identity, ApiEndpoint: apiEndpoint}); err != nil {
 		if !cmd.headless && prg != nil {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
 			prg.Quit()

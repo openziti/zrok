@@ -26,7 +26,7 @@ func (h *deleteOrganizationHandler) Handle(params admin.DeleteOrganizationParams
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	org, err := str.FindOrganizationByToken(params.Body.Token, trx)
+	org, err := str.FindOrganizationByToken(params.Body.OrganizationToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding organization by token: %v", err)
 		return admin.NewDeleteOrganizationNotFound()

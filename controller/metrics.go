@@ -165,9 +165,9 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 		return metadata.NewGetEnvironmentMetricsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
-	shr, err := str.FindShareWithToken(params.ShrToken, trx)
+	shr, err := str.FindShareWithToken(params.ShareToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share '%v' for '%v': %v", params.ShrToken, principal.Email, err)
+		logrus.Errorf("error finding share '%v' for '%v': %v", params.ShareToken, principal.Email, err)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
@@ -176,7 +176,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 	if env.AccountId != nil && int64(*env.AccountId) != principal.ID {
-		logrus.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShrToken)
+		logrus.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShareToken)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 

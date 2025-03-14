@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // NewDeleteFrontendParams creates a new DeleteFrontendParams object,
@@ -64,7 +62,7 @@ DeleteFrontendParams contains all the parameters to send to the API endpoint
 type DeleteFrontendParams struct {
 
 	// Body.
-	Body *rest_model_zrok.DeleteFrontendRequest
+	Body DeleteFrontendBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +118,13 @@ func (o *DeleteFrontendParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the delete frontend params
-func (o *DeleteFrontendParams) WithBody(body *rest_model_zrok.DeleteFrontendRequest) *DeleteFrontendParams {
+func (o *DeleteFrontendParams) WithBody(body DeleteFrontendBody) *DeleteFrontendParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the delete frontend params
-func (o *DeleteFrontendParams) SetBody(body *rest_model_zrok.DeleteFrontendRequest) {
+func (o *DeleteFrontendParams) SetBody(body DeleteFrontendBody) {
 	o.Body = body
 }
 
@@ -137,10 +135,8 @@ func (o *DeleteFrontendParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

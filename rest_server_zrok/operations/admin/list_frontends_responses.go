@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ListFrontendsOKCode is the HTTP code returned for type ListFrontendsOK
@@ -26,7 +24,7 @@ type ListFrontendsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload rest_model_zrok.PublicFrontendList `json:"body,omitempty"`
+	Payload []*ListFrontendsOKBodyItems0 `json:"body,omitempty"`
 }
 
 // NewListFrontendsOK creates ListFrontendsOK with default headers values
@@ -36,13 +34,13 @@ func NewListFrontendsOK() *ListFrontendsOK {
 }
 
 // WithPayload adds the payload to the list frontends o k response
-func (o *ListFrontendsOK) WithPayload(payload rest_model_zrok.PublicFrontendList) *ListFrontendsOK {
+func (o *ListFrontendsOK) WithPayload(payload []*ListFrontendsOKBodyItems0) *ListFrontendsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list frontends o k response
-func (o *ListFrontendsOK) SetPayload(payload rest_model_zrok.PublicFrontendList) {
+func (o *ListFrontendsOK) SetPayload(payload []*ListFrontendsOKBodyItems0) {
 	o.Payload = payload
 }
 
@@ -53,7 +51,7 @@ func (o *ListFrontendsOK) WriteResponse(rw http.ResponseWriter, producer runtime
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = rest_model_zrok.PublicFrontendList{}
+		payload = make([]*ListFrontendsOKBodyItems0, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

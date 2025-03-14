@@ -49,7 +49,7 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().Token)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
 	in, err := zrok.Metadata.ListMemberships(nil, auth)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 		t.SetStyle(table.StyleColoredDark)
 		t.AppendHeader(table.Row{"Organization Token", "Description", "Admin?"})
 		for _, i := range in.Payload.Memberships {
-			t.AppendRow(table.Row{i.Token, i.Description, i.Admin})
+			t.AppendRow(table.Row{i.OrganizationToken, i.Description, i.Admin})
 		}
 		t.Render()
 		fmt.Println()

@@ -344,8 +344,8 @@ type ListOrganizationsOKBodyOrganizationsItems0 struct {
 	// description
 	Description string `json:"description,omitempty"`
 
-	// token
-	Token string `json:"token,omitempty"`
+	// organization token
+	OrganizationToken string `json:"organizationToken,omitempty"`
 }
 
 // Validate validates this list organizations o k body organizations items0

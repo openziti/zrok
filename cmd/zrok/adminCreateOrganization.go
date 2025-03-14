@@ -48,5 +48,5 @@ func (cmd *adminCreateOrganizationCommand) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	logrus.Infof("created new organization with token '%v'", resp.Payload.Token)
+	logrus.Infof("created new organization with organization token '%v'", resp.Payload.OrganizationToken)
 }

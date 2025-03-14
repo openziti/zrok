@@ -6,9 +6,12 @@ package account
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // RegisterHandlerFunc turns a function with the right signature into a register handler
@@ -53,4 +56,81 @@ func (o *Register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// RegisterBody register body
+//
+// swagger:model RegisterBody
+type RegisterBody struct {
+
+	// password
+	Password string `json:"password,omitempty"`
+
+	// register token
+	RegisterToken string `json:"registerToken,omitempty"`
+}
+
+// Validate validates this register body
+func (o *RegisterBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this register body based on context it is used
+func (o *RegisterBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *RegisterBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *RegisterBody) UnmarshalBinary(b []byte) error {
+	var res RegisterBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// RegisterOKBody register o k body
+//
+// swagger:model RegisterOKBody
+type RegisterOKBody struct {
+
+	// account token
+	AccountToken string `json:"accountToken,omitempty"`
+}
+
+// Validate validates this register o k body
+func (o *RegisterOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this register o k body based on context it is used
+func (o *RegisterOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *RegisterOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *RegisterOKBody) UnmarshalBinary(b []byte) error {
+	var res RegisterOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

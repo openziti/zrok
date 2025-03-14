@@ -99,7 +99,7 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 				beProxyEndpoint = *shr.BackendProxyEndpoint
 			}
 			envShr := &rest_model_zrok.Share{
-				Token:                shr.Token,
+				ShareToken:           shr.Token,
 				ZID:                  shr.ZId,
 				ShareMode:            shr.ShareMode,
 				BackendMode:          shr.BackendMode,
@@ -120,11 +120,11 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 		}
 		for _, fe := range fes {
 			envFe := &rest_model_zrok.Frontend{
-				ID:        int64(fe.Id),
-				Token:     fe.Token,
-				ZID:       fe.ZId,
-				CreatedAt: fe.CreatedAt.UnixMilli(),
-				UpdatedAt: fe.UpdatedAt.UnixMilli(),
+				ID:            int64(fe.Id),
+				FrontendToken: fe.Token,
+				ZID:           fe.ZId,
+				CreatedAt:     fe.CreatedAt.UnixMilli(),
+				UpdatedAt:     fe.UpdatedAt.UnixMilli(),
 			}
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
@@ -132,7 +132,7 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
 					return metadata.NewOverviewInternalServerError()
 				}
-				envFe.ShrToken = feShr.Token
+				envFe.ShareToken = feShr.Token
 			}
 			ear.Frontends = append(ear.Frontends, envFe)
 		}
