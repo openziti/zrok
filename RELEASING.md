@@ -61,10 +61,17 @@ brew edit zrok
 # Build from source
 brew install --verbose --formula --build-bottle zrok
 
-# Test the zrok formula
+# run the test section of the formula
 brew test zrok
+
+# Audit the the formula
+brew audit --strict zrok
+
+# Check formula styles
+brew style zrok
 ```
 
 Finally, if correcting a failed GitHub Actions check on a PR based on Homebrew/homebrew-core master branch, then push commits as the ziti-ci user with the "gh_ci_key" SSH key to update the PR. A valid commit message is just the formula name and new version string, e.g., "zrok 1.0.0".
 
 [Homebrew Documentation](https://docs.brew.sh/FAQ#can-i-edit-formulae-myself)
+
