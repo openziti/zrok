@@ -64,7 +64,7 @@ ZROK_ADMIN_TOKEN=zroktoken
 ```
 
 ```bash title=".env options"
-# Caddy TLS option: rename compose.caddy.yml to compose.override.yml and set these vars; allow 80,443 in firewall
+# Caddy TLS option: rename compose.caddy.yml to compose.override.yml; allow CADDY_HTTPS_PORT in firewall
 
 #
 ## set these in .env for providers other than Route53
@@ -94,9 +94,10 @@ ZROK_CTRL_PORT=18080
 ZROK_FRONTEND_PORT=8080
 ZROK_OAUTH_PORT=8081
 
-# these secure ziti ports must be published to the internet
+# these secure ports must be published to the internet
 ZITI_CTRL_ADVERTISED_PORT=80
 ZITI_ROUTER_PORT=3022
+CADDY_HTTPS_PORT=443
 
 # optionally configure oauth for public shares
 #ZROK_OAUTH_HASH_KEY=oauthhashkeysecret
@@ -264,9 +265,10 @@ See "My internet connection can only send traffic to common ports" below about c
 
 1. My internet connection can only send traffic to common ports like 80, 443, and 3389.
 
-    You can change the required ports in the `.env` file. Caddy will still use port 443 for zrok shares and API if you renamed `compose.caddy.yml` as `compose.override.yml` to enable Caddy.
+    You can change the required ports in the `.env` file before the first run of the Docker Compose project.
 
     ```bash title=".env"
     ZITI_CTRL_ADVERTISED_PORT=80
     ZITI_ROUTER_PORT=3389
+    CADDY_HTTPS_PORT=443
     ```
