@@ -1,0 +1,18 @@
+# /usr/lib/systemd/user/zrok-agent.service
+
+[Unit]
+Description=zrok agent user service unit
+After=network-online.target
+
+[Service]
+Type=simple
+UMask=0007
+ExecStart=/opt/openziti/bin/zrok agent start
+Restart=always
+RestartSec=3
+#StandardInput=null
+#StandardOutput=journal
+#StandardError=journal
+
+[Install]
+WantedBy=default.target

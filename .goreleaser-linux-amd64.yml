@@ -137,3 +137,56 @@ nfpms:
       - dst: /opt/openziti/etc/zrok/
         src: ./etc/caddy/multiple_upstream.Caddyfile
         type: config|noreplace
+
+  - package_name: zrok-agent
+    id: zrok-agent
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |
+      This package provides zrok-agent.service. Enable your zrok account on this device with "zrok enable". Run 
+      "systemctl enable --user --now zrok-agent.service" to enable the service for the current user and visit the agent 
+      UI by running "zrok agent console".
+    license: Apache 2.0
+
+    # do not bundle the built binaries, only supporting files
+    meta: true
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+
+    # {{ .ConventionalFileName }} satisfies the RPM name convention.
+    file_name_template: "{{ .ConventionalFileName }}"
+
+    # Umask to be used on files without explicit mode set. (overridable)
+    umask: 0o002
+
+    # Package version within this release version.
+    release: 1
+
+    # Section.
+    section: default
+
+    # Priority.
+    priority: optional
+
+    # GoReleaser will automatically add the binaries here
+    dependencies:
+      - zrok
+
+    # this allows users to satisfy the requirement for jq another way, not with the package manager, e.g.
+    # apt install --no-recommends zrok-share
+    recommends: []
+
+    overrides:
+      # yum and dnf do not automatically install "weak deps" aka "recommends", so we need to add them as a dependency
+      rpm:
+        dependencies:
+          - zrok
+
+    # Contents to add to the package.
+    contents:
+      - dst: /usr/lib/systemd/user/
+        src: ./nfpm/zrok-agent.service
