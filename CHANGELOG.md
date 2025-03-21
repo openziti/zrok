@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1
+
+FEATURE: zrok-agent Linux package runs the agent as a user service (https://github.com/openziti/zrok/issues/883)
+
 ## v1.0.0
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
