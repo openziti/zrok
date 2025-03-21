@@ -10,9 +10,6 @@ UMask=0007
 ExecStart=/opt/openziti/bin/zrok agent start
 Restart=always
 RestartSec=3
-#StandardInput=null
-#StandardOutput=journal
-#StandardError=journal
 
 [Install]
 WantedBy=default.target
