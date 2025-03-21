@@ -27,7 +27,7 @@ nfpms:
     license: Apache 2.0
 
     # Build IDs for the builds you want to create NFPM packages for.
-    builds:
+    ids:
       - zrok-armv8
 
     # Formats to be generated.
