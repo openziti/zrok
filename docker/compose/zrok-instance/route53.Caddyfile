@@ -8,7 +8,7 @@
 # 	redir https://{host}{uri} permanent
 # }
 
-*.{$ZROK_DNS_ZONE} {
+*.{$ZROK_DNS_ZONE}:{$CADDY_HTTPS_PORT} {
 	tls {
 		dns route53 {
 			access_key_id {$AWS_ACCESS_KEY_ID}
