@@ -1,0 +1,87 @@
+---
+title: Agent
+sidebar_position: 20
+---
+
+The zrok agent centralizes management of your public and private zrok shares and private frontends for accessing [private shares](/concepts/sharing-private.mdx). It provides a web-based console interface and changes how the `zrok share` and `zrok access` commands behave.
+
+## Tutorial
+
+Run the agent in the foreground.
+
+```bash
+zrok agent
+```
+
+In another terminal, open the console.
+
+```bash
+zrok agent console
+```
+
+You should see the agent UI in your default web browser.
+
+Start sharing a public share with the agent.
+
+```bash
+zrok share public 8080
+```
+
+```buttonless title="Output"
+token:"zje5x8p0k9pi" frontendEndpoints:"https://zje5x8p0k9pi.share.zrok.io"
+```
+
+You will see the new public share in the agent UI and you can access it at the public share URL.
+
+Reserve a private share for the agent to share.
+
+```bash
+zrok reserve private 8080 --closed --unique-name "myshare"
+```
+```buttonless title="Output"
+[   1.883]    INFO main.(*reserveCommand).run: your reserved share token is 'myshare'
+```
+
+Start sharing the reserved share with the agent.
+
+```bash
+zrok share reserved "myshare"
+```
+```buttonless title="Output"
+[   0.001]    INFO main.(*shareReservedCommand).shareAgent: starting
+token:"myshare" backendMode:"proxy" shareMode:"private" target:"http://127.0.0.1:8080"
+```
+
+You will see the new reserved share in the agent UI and you can access it by running `zrok access "myshare"` on another device where you have enabled the same zrok account, since the share was reserved with closed permission mode.
+
+### Running the Agent in the background
+
+On Linux, you can [install the Linux package `zrok-agent`](/guides/linux-agent-service.mdx) to keep the agent running in the background after each reboot.
+
+## How the Agent Works
+
+### Centralized Management
+
+Without the agent running, each time you execute a `zrok share` or `zrok access` command, a separate process is created to handle that specific share or access.
+
+When the agent is running:
+
+- All shares and accesses are managed by a single agent process
+- The agent provides a web UI for monitoring and managing your shares and accesses
+- New `zrok share` and `zrok access` commands delegate their operations to the running agent
+- You can stop and restart individual shares/accesses without terminating the agent
+
+### Agent Console
+
+The agent provides a web-based console interface that can be accessed with:
+
+```bash
+zrok agent console
+```
+
+This command opens your default web browser to the agent's UI, where you can:
+
+- View the status of all your active shares and accesses
+- Create new shares and accesses using simple UI widgets
+- Stop or restart existing shares and accesses
+- Monitor traffic and connection statistics
