@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1
+
+CHANGE: The openziti/zrok Docker image has been updated to use the latest version of the ziti CLI, 1.4.3 (https://github.com/openziti/zrok/pull/917)
+
 ## v1.0.0
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
