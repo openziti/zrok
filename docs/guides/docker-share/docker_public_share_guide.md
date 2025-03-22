@@ -41,10 +41,10 @@ When the project runs it will:
 
 1. Name the Share
 
-    This unique name becomes part of the domain name of the share, e.g. `https://my-prod-app.in.zrok.io`. A random name is generated if you don't specify one.
+    This unique name becomes part of the domain name of the share, e.g. `https://toaster.share.zrok.io`. A random name is generated if you don't specify one.
 
     ```bash title=".env"
-    ZROK_UNIQUE_NAME="my-prod-app"
+    ZROK_UNIQUE_NAME="toaster"
     ```
 
 1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
@@ -60,7 +60,7 @@ When the project runs it will:
     ```
 
     ```buttonless title="Output"
-    zrok-public-share-1  |  https://w6r1vesearkj.in.zrok.io/
+    zrok-public-share-1  |  https://w6r1vesearkj.share.zrok.io/
     ```
 
 This concludes the minimum steps to begin sharing the demo web server. Read on to learn how to pivot to sharing any website or web service by leveraging additional zrok backend modes.
@@ -149,5 +149,5 @@ With Caddy, you can balance the workload for websites or web services or share s
     ```
 
     ```buttonless title="Output"
-    INFO: zrok public URL: https://88s803f2qvao.in.zrok.io/
+    INFO: zrok public URL: https://88s803f2qvao.share.zrok.io/
     ```
