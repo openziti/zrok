@@ -1,0 +1,95 @@
+# Dynamic configuration for Traefik
+
+# Entrypoints configuration is handled in the main Traefik configuration through environment variables
+# We don't define entryPoints here as they will be configured by the environment variables in compose.traefik.yml:
+# TRAEFIK_ENTRYPOINTS_websecure_ADDRESS: ":${TRAEFIK_HTTPS_PORT:-443}"
+
+# TLS wildcard certificate configuration
+[tls]
+  [tls.options]
+    [tls.options.default]
+      minVersion = "VersionTLS12"
+      sniStrict = true
+
+# HTTP to HTTPS redirect middleware
+[http.middlewares]
+  [http.middlewares.https-redirect.redirectScheme]
+    scheme = "https"
+    permanent = true
+  
+  # Note: We can't use template syntax here as it's not supported in static config
+  # Instead, we'll use passHostHeader in the loadBalancer configs
+
+# Define servers transports
+[http.serversTransports]
+  [http.serversTransports.ziti-transport]
+    insecureSkipVerify = true
+
+# Routing configuration
+[http.routers]
+  # Ziti router
+  [http.routers.ziti]
+    rule = "Host(`ziti.{{ env "ZROK_DNS_ZONE" }}`)"
+    service = "ziti"
+    entrypoints = ["websecure"]
+    [http.routers.ziti.tls]
+      certResolver = "default"
+      [[http.routers.ziti.tls.domains]]
+        main = "*.{{ env "ZROK_DNS_ZONE" }}"
+
+  # OAuth router
+  [http.routers.oauth]
+    rule = "Host(`oauth.{{ env "ZROK_DNS_ZONE" }}`)"
+    service = "oauth"
+    entrypoints = ["websecure"]
+    [http.routers.oauth.tls]
+      certResolver = "default"
+      [[http.routers.oauth.tls.domains]]
+        main = "*.{{ env "ZROK_DNS_ZONE" }}"
+
+  # Controller router
+  [http.routers.ctrl]
+    rule = "Host(`zrok.{{ env "ZROK_DNS_ZONE" }}`)"
+    service = "ctrl"
+    entrypoints = ["websecure"]
+    [http.routers.ctrl.tls]
+      certResolver = "default"
+      [[http.routers.ctrl.tls.domains]]
+        main = "*.{{ env "ZROK_DNS_ZONE" }}"
+
+  # Frontend router (default route)
+  [http.routers.frontend]
+    rule = "HostRegexp(`{subdomain:[a-zA-Z0-9-]+}.{{ env "ZROK_DNS_ZONE" }}`) && !Host(`ziti.{{ env "ZROK_DNS_ZONE" }}`) && !Host(`oauth.{{ env "ZROK_DNS_ZONE" }}`) && !Host(`zrok.{{ env "ZROK_DNS_ZONE" }}`)"
+    service = "frontend"
+    entrypoints = ["websecure"]
+    [http.routers.frontend.tls]
+      certResolver = "default"
+      [[http.routers.frontend.tls.domains]]
+        main = "*.{{ env "ZROK_DNS_ZONE" }}"
+
+# Service configuration
+[http.services]
+  # Ziti service
+  [http.services.ziti.loadBalancer]
+    passHostHeader = true
+    serversTransport = "ziti-transport"
+    [[http.services.ziti.loadBalancer.servers]]
+      url = "http://ziti-quickstart:{{ env "ZITI_CTRL_ADVERTISED_PORT" | default 80 }}"
+  
+  # OAuth service
+  [http.services.oauth.loadBalancer]
+    passHostHeader = true
+    [[http.services.oauth.loadBalancer.servers]]
+      url = "http://zrok-frontend:{{ env "ZROK_OAUTH_PORT" | default 8081 }}"
+  
+  # Controller service
+  [http.services.ctrl.loadBalancer]
+    passHostHeader = true
+    [[http.services.ctrl.loadBalancer.servers]]
+      url = "http://zrok-controller:{{ env "ZROK_CTRL_PORT" | default 18080 }}"
+  
+  # Frontend service
+  [http.services.frontend.loadBalancer]
+    passHostHeader = true
+    [[http.services.frontend.loadBalancer.servers]]
+      url = "http://zrok-frontend:{{ env "ZROK_FRONTEND_PORT" | default 8080 }}"
