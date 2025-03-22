@@ -11,7 +11,7 @@ services:
       - ./Caddyfile:/Caddyfile
     environment:
       # most relevant options
-      ZROK_UNIQUE_NAME:     "my-other-zrok-share"
+      ZROK_UNIQUE_NAME:     "butter"
       ZROK_BACKEND_MODE:    caddy
       ZROK_TARGET:          /Caddyfile
       # internal configuration

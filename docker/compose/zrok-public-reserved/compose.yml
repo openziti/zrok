@@ -38,7 +38,7 @@ services:
       HOME: /mnt  # zrok homedir in container
 
       # most relevant options
-      ZROK_UNIQUE_NAME:     # name is used to construct frontend domain name, e.g. "myapp" in "myapp.share.zrok.io"
+      ZROK_UNIQUE_NAME:     # name is used to construct frontend domain name, e.g. "toaster" in "toaster.share.zrok.io"; lowercase alphanumeric, between 4 and 32 characters in length
       ZROK_BACKEND_MODE:    # web, caddy, drive, proxy
       ZROK_TARGET:          # backend target, is a path in container filesystem unless proxy mode
       ZROK_INSECURE:        # "--insecure" if proxy target has unverifiable TLS server certificate

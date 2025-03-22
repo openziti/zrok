@@ -48,6 +48,6 @@ The following illustration shows the possibilities available.
 
 ![Frontend Selection](../../images/zrok_frontends_v0.3.png)
 
-The `*.in.zrok.io` frontend is a "public" frontend, available to all `zrok` users. Most `zrok` installations will want to have at least one public, global frontend for all public, internet-facing ingress traffic for private backend instances. In the underlying data store, the public frontend will have a `name` set to `public` (or some other representative name), allowing users to reference that `frontend` using a friendly label.
+The `*.share.zrok.io` frontend is a "public" frontend, available to all `zrok` users. Most `zrok` installations will want to have at least one public, global frontend for all public, internet-facing ingress traffic for private backend instances. In the underlying data store, the public frontend will have a `name` set to `public` (or some other representative name), allowing users to reference that `frontend` using a friendly label.
 
 The other two "private" frontends are configured with no `name` label (the lack of a `name` label signifies that these are "private" frontends). The ephemeral environment is allocated when a `zrok` frontend request is made without an account on behalf of a private share.
