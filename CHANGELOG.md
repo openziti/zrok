@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1
+
+CHANGE: let the Docker instance set the Caddy HTTPS port (https://github.com/openziti/zrok/pull/920)
+
 ## v1.0.0
 
 MAJOR RELEASE: zrok reaches version 1.0.0!
