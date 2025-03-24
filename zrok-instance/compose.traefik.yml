@@ -1,0 +1,80 @@
+# delete this file from your compose project if you do not want to use Traefik for TLS termination
+services:
+  traefik:
+    build:
+      context: .
+      dockerfile: ./traefik.Dockerfile
+    restart: unless-stopped
+    environment:
+      # DNS provider configuration
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_EMAIL: ${ZROK_USER_EMAIL}
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_CASERVER: ${TRAEFIK_ACME_API:-https://acme-v02.api.letsencrypt.org/directory}
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_DNSCHALLENGE: "true"
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_DNSCHALLENGE_PROVIDER: ${TRAEFIK_DNS_PROVIDER}
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_DNSCHALLENGE_RESOLVERS: "1.1.1.1:53,8.8.8.8:53"
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_DNSCHALLENGE_DELAYBEFORECHECK: "60"
+      TRAEFIK_CERTIFICATESRESOLVERS_default_ACME_STORAGE: /etc/traefik/acme/acme.json
+      
+      # Entrypoints configuration
+      TRAEFIK_ENTRYPOINTS_websecure_ADDRESS: ":${TRAEFIK_HTTPS_PORT:-443}"
+      
+      # DNS provider credentials - these will be mapped to environment variables expected by the provider
+      # See: https://doc.traefik.io/traefik/https/acme/#providers
+      TRAEFIK_DNS_PROVIDER: ${TRAEFIK_DNS_PROVIDER}  # e.g., "digitalocean"
+      
+      # Provider-specific credentials - uncomment and set in .env as needed
+      # Digital Ocean
+      # DO_AUTH_TOKEN: ${TRAEFIK_DNS_PROVIDER_TOKEN:-}
+      
+      # Cloudflare - Option 1: Using Email and API Key
+      # CLOUDFLARE_EMAIL: ${CLOUDFLARE_EMAIL:-}
+      # CLOUDFLARE_API_KEY: ${CLOUDFLARE_API_KEY:-}
+      
+      # Cloudflare - Option 2: Using API Tokens (recommended)
+      CLOUDFLARE_DNS_API_TOKEN: ${TRAEFIK_DNS_PROVIDER_TOKEN:-}
+      # CLOUDFLARE_ZONE_API_TOKEN: ${TRAEFIK_DNS_PROVIDER_TOKEN:-}
+
+      # AWS Route53 - uncomment if using Route53
+      # AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      # AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      # AWS_REGION: ${AWS_REGION:-}
+      # AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}  # if temporary credential, e.g., from STS
+
+      # General configuration
+      ZROK_DNS_ZONE: ${ZROK_DNS_ZONE}  # e.g., "example.com" or "127.0.0.1.sslip.io"
+      ZROK_CTRL_PORT: ${ZROK_CTRL_PORT:-18080}
+      ZROK_FRONTEND_PORT: ${ZROK_FRONTEND_PORT:-8080}
+      ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
+      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_ADVERTISED_PORT:-80}
+
+      # Traefik specific configurations
+      TRAEFIK_API_DASHBOARD: "true"
+      TRAEFIK_API_INSECURE: "false"
+      TRAEFIK_PROVIDERS_DOCKER: "false"  # Disable Docker provider since we're not mounting the socket
+      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: "false"
+      TRAEFIK_PROVIDERS_FILE_DIRECTORY: "/etc/traefik/dynamic"
+      TRAEFIK_PROVIDERS_FILE_WATCH: "true"
+      TRAEFIK_LOG_LEVEL: "DEBUG"
+      TRAEFIK_ACCESSLOG: "true"
+      TRAEFIK_ACCESSLOG_FORMAT: "common"
+      
+    expose:
+      - ${TRAEFIK_HTTPS_PORT:-443}/tcp
+      - ${TRAEFIK_HTTPS_PORT:-443}/udp   # For HTTP/3 (QUIC) (not published yet)
+      - 8080/tcp  # Traefik's admin API (not published)
+    ports:
+      - ${TRAEFIK_INTERFACE:-0.0.0.0}:${TRAEFIK_HTTPS_PORT:-443}:${TRAEFIK_HTTPS_PORT:-443}
+      # - ${TRAEFIK_INTERFACE:-0.0.0.0}:${TRAEFIK_HTTPS_PORT:-443}:${TRAEFIK_HTTPS_PORT:-443}/udp  # future: HTTP/3 (QUIC)
+    volumes:
+      - traefik_data:/etc/traefik/acme
+      # - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker provider for detecting new routes by label    
+    networks:
+      zrok-instance:
+  
+  zrok-frontend:
+    environment:
+      ZROK_FRONTEND_SCHEME: https
+      ZROK_FRONTEND_PORT: ${TRAEFIK_HTTPS_PORT:-443}
+
+volumes:
+  traefik_data:
