@@ -54,6 +54,8 @@ func (a *Agent) Run() error {
 		return err
 	}
 
+	logrus.Info("initialized proctree")
+
 	agentSocket, err := a.root.AgentSocket()
 	if err != nil {
 		return err
@@ -63,6 +65,8 @@ func (a *Agent) Run() error {
 		return err
 	}
 	a.agentSocket = agentSocket
+
+	logrus.Info("listening on agent socket")
 
 	go a.manager()
 	go a.gateway(a.cfg)

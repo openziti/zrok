@@ -8,7 +8,6 @@ import (
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
 	"os"
-	"path/filepath"
 )
 
 func init() {
@@ -31,7 +30,7 @@ func newAgentServiceInstallCommand() *agentServiceInstallCommand {
 }
 
 func (cmd *agentServiceInstallCommand) run(_ *cobra.Command, _ []string) {
-	exePath, err := filepath.Abs(os.Args[0])
+	exePath, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
@@ -42,25 +41,29 @@ func (cmd *agentServiceInstallCommand) run(_ *cobra.Command, _ []string) {
 	}
 	defer func() { _ = svcMgr.Disconnect() }()
 
-	svc, err := svcMgr.OpenService("zrokagent")
+	svc, err := svcMgr.OpenService(agentServiceName)
 	if err == nil {
 		_ = svc.Close()
 		logrus.Infof("service already exists!")
 		os.Exit(1)
 	}
 
-	svcCfg := mgr.Config{DisplayName: "zrok Agent"}
-	svc, err = svcMgr.CreateService("zrokagent", exePath, svcCfg, "agent", "service", "start")
+	svcCfg := mgr.Config{
+		DisplayName: "zrok Agent",
+		Description: "An agent that manages multiple zrok resources",
+	}
+	logrus.Infof("using exePath: %v", exePath)
+	svc, err = svcMgr.CreateService(agentServiceName, exePath, svcCfg, "agent", "service", "start")
 	if err != nil {
 		panic(err)
 	}
 	defer func() { _ = svc.Close() }()
 
-	err = eventlog.InstallAsEventCreate("zrokagent", eventlog.Error|eventlog.Warning|eventlog.Info)
+	err = eventlog.InstallAsEventCreate(agentServiceName, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		_ = svc.Delete()
 		panic(err)
 	}
 
-	logrus.Infof("zrok agent service installled")
+	logrus.Infof("zrok agent service installed")
 }
