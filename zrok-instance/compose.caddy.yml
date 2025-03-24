@@ -8,6 +8,7 @@ services:
         CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN} # e.g., "digitalocean" (see github.com/caddy-dns)
     restart: unless-stopped
     environment:
+      CADDY_HTTPS_PORT: ${CADDY_HTTPS_PORT:-443}
       #
       ## set these in .env for providers other than Route53
       #
@@ -31,12 +32,12 @@ services:
       ZROK_OAUTH_PORT: ${ZROK_OAUTH_PORT:-8081}
     expose:
       # - 80/tcp
-      - 443/tcp
-      - 443/udp   # Caddy's HTTP/3 (QUIC) (not published)
+      - ${CADDY_HTTPS_PORT:-443}/tcp
+      - ${CADDY_HTTPS_PORT:-443}/udp   # Caddy's HTTP/3 (QUIC) (not published)
       - 2019/tcp  # Caddy's admin API     (not published)
     ports:
-      # - ${CADDY_INTERFACE:-0.0.0.0}:80:80
-      - ${CADDY_INTERFACE:-0.0.0.0}:443:443
+      # - ${CADDY_INTERFACE:-0.0.0.0}:80:80         # port occupied by ziti
+      - ${CADDY_INTERFACE:-0.0.0.0}:${CADDY_HTTPS_PORT:-443}:${CADDY_HTTPS_PORT:-443}
       # - ${CADDY_INTERFACE:-0.0.0.0}:443:443/udp"  # future: HTTP/3 (QUIC)
     volumes:
       - caddy_data:/data
@@ -47,7 +48,7 @@ services:
   zrok-frontend:
     environment:
       ZROK_FRONTEND_SCHEME: https
-      ZROK_FRONTEND_PORT: 443
+      ZROK_FRONTEND_PORT: ${CADDY_HTTPS_PORT:-443}
 
 volumes:
   caddy_data:
