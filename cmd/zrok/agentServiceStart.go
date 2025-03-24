@@ -16,6 +16,7 @@ func newAgentServiceStartCommand() *agentServiceStartCommand {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Start the agent as a service (on Windows)",
+		Args:  cobra.NoArgs,
 	}
 	out := &agentServiceStartCommand{cmd: cmd}
 	cmd.Run = out.run
