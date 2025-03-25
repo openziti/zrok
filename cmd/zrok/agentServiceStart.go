@@ -66,6 +66,7 @@ func (cmd *agentServiceStartCommand) logToFile() error {
 		return err
 	}
 	logFPath := filepath.Join(zrokDir, "agent.log")
+	_ = os.MkdirAll(filepath.Dir(logFPath), 0755)
 	logF, err := os.OpenFile(logFPath, os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err

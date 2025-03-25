@@ -44,7 +44,7 @@ func (cmd *agentServiceInstallCommand) run(_ *cobra.Command, _ []string) {
 	svc, err := svcMgr.OpenService(agentServiceName)
 	if err == nil {
 		_ = svc.Close()
-		logrus.Infof("service already exists!")
+		logrus.Errorf("service already exists!")
 		os.Exit(1)
 	}
 
@@ -52,7 +52,6 @@ func (cmd *agentServiceInstallCommand) run(_ *cobra.Command, _ []string) {
 		DisplayName: "zrok Agent",
 		Description: "An agent that manages multiple zrok resources",
 	}
-	logrus.Infof("using exePath: %v", exePath)
 	svc, err = svcMgr.CreateService(agentServiceName, exePath, svcCfg, "agent", "service", "start")
 	if err != nil {
 		panic(err)

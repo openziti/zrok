@@ -29,6 +29,12 @@ func newAgentServiceRemoveCommand() *agentServiceRemoveCommand {
 }
 
 func (cmd *agentServiceRemoveCommand) run(_ *cobra.Command, _ []string) {
+	if err := eventlog.Remove(agentServiceName); err == nil {
+		logrus.Infof("removed zrok agent event log")
+	} else {
+		logrus.Errorf("error removing zrok agent event log: %v", err)
+	}
+
 	svcMgr, err := mgr.Connect()
 	if err != nil {
 		panic(err)
@@ -45,11 +51,5 @@ func (cmd *agentServiceRemoveCommand) run(_ *cobra.Command, _ []string) {
 		logrus.Infof("deleted zrok agent service")
 	} else {
 		logrus.Errorf("error deleting zrok agent service: %v", err)
-	}
-
-	if err := eventlog.Remove(agentServiceName); err == nil {
-		logrus.Infof("removed zrok agent event log")
-	} else {
-		logrus.Errorf("error removing zrok agent event log: %v", err)
 	}
 }

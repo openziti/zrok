@@ -8,7 +8,7 @@ func init() {
 	agentCmd.AddCommand(agentServiceCmd)
 }
 
-const agentServiceName = "zrok"
+const agentServiceName = "zrokAgent"
 
 var agentServiceCmd = &cobra.Command{
 	Use:     "service",
