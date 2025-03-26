@@ -107,13 +107,13 @@ The Agent console can be used to directly create shares and accesses, and the zr
 ```cmd
 C:\Program Files\zrok>nssm install zrokAgent "C:\Program Files\zrok\zrok.exe" agent start
 ```
-```
+```cmd
 C:\Program Files\zrok>nssm set zrokAgent AppDirectory C:\Windows\System32\config\systemprofile
 ```
-```
+```cmd
 C:\Program Files\zrok>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok\agent-stdout.log
 ```
-```
+```cmd
 C:\Program Files\zrok>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok\agent-stderr.log
 ```
 
@@ -128,6 +128,8 @@ The following commands can be used to remove the service from your system:
 
 ```cmd
 C:\>sc stop zrokAgent
+```
+```cmd
 C:\>sc delete zrokAgent
 ```
 
