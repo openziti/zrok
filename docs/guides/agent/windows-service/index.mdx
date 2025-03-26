@@ -15,3 +15,25 @@ Give the `nssm` documentation a quick review, here:
 You'll want to install both the `zrok.exe` and `nssm.exe` in a convenient protected location. In this example, we'll put them in `C:\Program Files\zrok`, as `C:\Program Files\zrok\zrok.exe` and `C:\Program Files\zrok\nssm.exe`.
 
 ![C:\\Program Files\\zrok](images/program-files.png)
+
+We're going to use a command prompt to install and configure our Agent service. Open a new command prompt and `cd "\Program Files\zrok"`:
+
+![Empty Command Prompt](images/empty-command-prompt.png)
+
+## Enabling the Service Environment
+
+On Windows, the `USERPROFILE` environment variable controls the "home" where zrok will look for the enabled environment. When running as a service on Windows, the process will be running as the `LocalSystem` user, which uses the directory `C:\Windows\System32\config\systemprofile` directory as the user's "home" directory.
+
+We're going to want to enable a zrok environment for our new Agent service in this directory. First, we'll run:
+
+```cmd
+C:\Program Files\zrok>set USERPROFILE=c:\Windows\System32\config\systemprofile
+```
+
+And with that environment variable set, we'll use the `zrok enable` command to enable an environment for our new Agent service:
+
+```cmd
+C:\Program Files\zrok>zrok enable <accountToken>
+```
+
+![Enabling the Service Environment](images/enable.png)
