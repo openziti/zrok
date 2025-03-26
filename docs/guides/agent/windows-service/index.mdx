@@ -12,7 +12,7 @@ Give the `nssm` documentation a quick review, here:
 
 [https://nssm.cc/usage](https://nssm.cc/usage)
 
-You'll want to install both the `zrok.exe` and `nssm.exe` in a convenient protected location. In this example, we'll put them in `C:\Program Files\zrok`, as `C:\Program Files\zrok\zrok.exe` and `C:\Program Files\zrok\nssm.exe`.
+You'll want to install both the `zrok.exe` and `nssm.exe` in a convenient, protected location. In this example, we'll put them in `C:\Program Files\zrok`, as `C:\Program Files\zrok\zrok.exe` and `C:\Program Files\zrok\nssm.exe`.
 
 ![C:\\Program Files\\zrok](images/program-files.png)
 
@@ -22,7 +22,7 @@ We're going to use a command prompt to install and configure our Agent service. 
 
 ## Enabling the Service Environment
 
-On Windows, the `USERPROFILE` environment variable controls the "home" where zrok will look for the enabled environment. When running as a service on Windows, the process will be running as the `LocalSystem` user, which uses the directory `C:\Windows\System32\config\systemprofile` directory as the user's "home" directory.
+On Windows, the `USERPROFILE` environment variable controls the "home" where zrok will look for the enabled environment. When running as a service on Windows, the process will be running as the `Local System` user, which uses the directory `C:\Windows\System32\config\systemprofile` directory as the user's "home" directory.
 
 We're going to want to enable a zrok environment for our new Agent service in this directory. First, we'll run:
 
@@ -52,7 +52,7 @@ Windows might ask you for elevated Administrator privileges and will then show t
 
 ![nssm install](images/nssm-install.png)
 
-We'll set "Path" to `C:\Program Files\zrok\zrok.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `LocalSystem` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok agent start`.
+We'll set "Path" to `C:\Program Files\zrok\zrok.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `Local System` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok agent start`.
 
 We'll set the "Service name" to `zrokAgent`.
 
@@ -106,8 +106,14 @@ The Agent console can be used to directly create shares and accesses, and the zr
 
 ```cmd
 C:\Program Files\zrok>nssm install zrokAgent "C:\Program Files\zrok\zrok.exe" agent start
+```
+```
 C:\Program Files\zrok>nssm set zrokAgent AppDirectory C:\Windows\System32\config\systemprofile
+```
+```
 C:\Program Files\zrok>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok\agent-stdout.log
+```
+```
 C:\Program Files\zrok>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok\agent-stderr.log
 ```
 
