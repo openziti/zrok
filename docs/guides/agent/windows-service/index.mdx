@@ -1,0 +1,17 @@
+---
+title: Configuring a Windows Service
+---
+
+In Windows environments, it can be useful to run the zrok Agent as a service, allowing it to automatically restart with your system.
+
+Support for running the zrok Agent as a Windows service is handled through a third party utility, `nssm`, which is available here:
+
+[https://nssm.cc/download](https://nssm.cc/download)
+
+Give the `nssm` documentation a quick review, here:
+
+[https://nssm.cc/usage](https://nssm.cc/usage)
+
+You'll want to install both the `zrok.exe` and `nssm.exe` in a convenient protected location. In this example, we'll put them in `C:\Program Files\zrok`, as `C:\Program Files\zrok\zrok.exe` and `C:\Program Files\zrok\nssm.exe`.
+
+![C:\\Program Files\\zrok](images/program-files.png)
