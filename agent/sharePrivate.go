@@ -27,6 +27,7 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	shr := &share{
 		shareMode:   sdk.PrivateShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
+		request:     req,
 		sub:         subordinate.NewMessageHandler(),
 		agent:       a,
 	}

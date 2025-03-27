@@ -60,6 +60,8 @@ type share struct {
 	closed                    bool
 	accessGrants              []string
 
+	request interface{}
+
 	process *proctree.Child
 	sub     *subordinate.MessageHandler
 

@@ -26,6 +26,8 @@ type access struct {
 	autoEndPort     uint16
 	responseHeaders []string
 
+	request *AccessPrivateRequest
+
 	process *proctree.Child
 	sub     *subordinate.MessageHandler
 

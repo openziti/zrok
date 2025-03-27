@@ -27,6 +27,7 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 	shr := &share{
 		shareMode:   sdk.PublicShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
+		request:     req,
 		sub:         subordinate.NewMessageHandler(),
 		agent:       a,
 	}

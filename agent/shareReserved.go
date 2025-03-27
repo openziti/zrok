@@ -25,6 +25,7 @@ func (a *Agent) ShareReserved(req *ShareReservedRequest) (*ShareReservedResponse
 	shrCmd := []string{os.Args[0], "share", "reserved", "--subordinate"}
 	shr := &share{
 		reserved: true,
+		request:  req,
 		sub:      subordinate.NewMessageHandler(),
 		agent:    a,
 	}
