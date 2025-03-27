@@ -9,6 +9,32 @@ import (
 	"time"
 )
 
+type SharePrivateRequest struct {
+	Target       string
+	BackendMode  string
+	Insecure     bool
+	Closed       bool
+	AccessGrants []string
+}
+
+type SharePublicRequest struct {
+	Target             string
+	BasicAuth          []string
+	FrontendSelection  []string
+	BackendMode        string
+	Insecure           bool
+	OauthProvider      string
+	OauthCheckInterval string
+	Closed             bool
+	AccessGrants       []string
+}
+
+type ShareReservedRequest struct {
+	Token            string
+	OverrideEndpoint string
+	Insecure         bool
+}
+
 type share struct {
 	token                     string
 	frontendEndpoints         []string

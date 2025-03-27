@@ -6,6 +6,16 @@ import (
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 )
 
+type AccessPrivateRequest struct {
+	Token           string
+	BindAddress     string
+	AutoMode        bool
+	AutoAddress     string
+	AutoStartPort   uint16
+	AutoEndPort     uint16
+	ResponseHeaders []string
+}
+
 type access struct {
 	frontendToken   string
 	token           string

@@ -12,14 +12,14 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPrivateRequest) (*agentGrpc.AccessPrivateResponse, error) {
+func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, err error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if !root.IsEnabled() {
-		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
 	accCmd := []string{os.Args[0], "access", "private", "--subordinate", "-b", req.BindAddress, req.Token}
@@ -38,7 +38,7 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 		autoEndPort:     uint16(req.AutoEndPort),
 		responseHeaders: req.ResponseHeaders,
 		sub:             subordinate.NewMessageHandler(),
-		agent:           i.agent,
+		agent:           a,
 	}
 	acc.sub.MessageHandler = func(msg subordinate.Message) {
 		logrus.Info(msg)
@@ -74,20 +74,36 @@ func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPr
 
 	acc.process, err = proctree.StartChild(acc.sub.Tail, accCmd...)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	<-acc.sub.BootComplete
 
 	if bootErr == nil {
 		go acc.monitor()
-		i.agent.addAccess <- acc
-		return &agentGrpc.AccessPrivateResponse{FrontendToken: acc.frontendToken}, nil
+		a.addAccess <- acc
+		return acc.frontendToken, nil
 
 	} else {
 		if err := proctree.WaitChild(acc.process); err != nil {
 			logrus.Errorf("error joining: %v", err)
 		}
-		return nil, fmt.Errorf("unable to start access: %v", bootErr)
+		return "", fmt.Errorf("unable to start access: %v", bootErr)
+	}
+}
+
+func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPrivateRequest) (*agentGrpc.AccessPrivateResponse, error) {
+	if frontendToken, err := i.agent.AccessPrivate(&AccessPrivateRequest{
+		Token:           req.Token,
+		BindAddress:     req.BindAddress,
+		AutoMode:        req.AutoMode,
+		AutoAddress:     req.AutoAddress,
+		AutoStartPort:   uint16(req.AutoStartPort),
+		AutoEndPort:     uint16(req.AutoEndPort),
+		ResponseHeaders: req.ResponseHeaders,
+	}); err == nil {
+		return &agentGrpc.AccessPrivateResponse{FrontendToken: frontendToken}, nil
+	} else {
+		return nil, err
 	}
 }
