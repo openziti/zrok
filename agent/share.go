@@ -18,21 +18,30 @@ type SharePrivateRequest struct {
 }
 
 type SharePublicRequest struct {
-	Target             string
-	BasicAuth          []string
-	FrontendSelection  []string
-	BackendMode        string
-	Insecure           bool
-	OauthProvider      string
-	OauthCheckInterval string
-	Closed             bool
-	AccessGrants       []string
+	Target                    string
+	BasicAuth                 []string
+	FrontendSelection         []string
+	BackendMode               string
+	Insecure                  bool
+	OauthProvider             string
+	OauthEmailAddressPatterns []string
+	OauthCheckInterval        string
+	Closed                    bool
+	AccessGrants              []string
 }
 
 type ShareReservedRequest struct {
 	Token            string
 	OverrideEndpoint string
 	Insecure         bool
+}
+
+type ShareReservedResponse struct {
+	Token             string
+	BackendMode       string
+	ShareMode         string
+	FrontendEndpoints []string
+	Target            string
 }
 
 type share struct {
