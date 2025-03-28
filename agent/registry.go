@@ -2,12 +2,16 @@ package agent
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
+const RegistryV = "1"
+
 type Registry struct {
-	ReservedShares  []*ShareReservedRequest
-	PrivateAccesses []*AccessPrivateRequest
+	V               string                  `json:"v"`
+	ReservedShares  []*ShareReservedRequest `json:"reserved_shares"`
+	PrivateAccesses []*AccessPrivateRequest `json:"private_accesses"`
 }
 
 func LoadRegistry(path string) (*Registry, error) {
@@ -19,10 +23,14 @@ func LoadRegistry(path string) (*Registry, error) {
 	if err := json.Unmarshal(data, r); err != nil {
 		return nil, err
 	}
+	if r.V != RegistryV {
+		return nil, fmt.Errorf("invalid registry version '%v'; expected '%v", r.V, RegistryV)
+	}
 	return r, nil
 }
 
 func (r *Registry) Save(path string) error {
+	r.V = RegistryV
 	data, err := json.MarshalIndent(r, "", "  ")
 	if err != nil {
 		return err

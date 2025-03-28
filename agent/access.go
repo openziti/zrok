@@ -7,13 +7,13 @@ import (
 )
 
 type AccessPrivateRequest struct {
-	Token           string
-	BindAddress     string
-	AutoMode        bool
-	AutoAddress     string
-	AutoStartPort   uint16
-	AutoEndPort     uint16
-	ResponseHeaders []string
+	Token           string   `json:"token"`
+	BindAddress     string   `json:"bind_address"`
+	AutoMode        bool     `json:"auto_mode"`
+	AutoAddress     string   `json:"auto_address"`
+	AutoStartPort   uint16   `json:"auto_start_port"`
+	AutoEndPort     uint16   `json:"auto_end_port"`
+	ResponseHeaders []string `json:"response_headers"`
 }
 
 type access struct {

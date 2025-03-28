@@ -10,30 +10,30 @@ import (
 )
 
 type SharePrivateRequest struct {
-	Target       string
-	BackendMode  string
-	Insecure     bool
-	Closed       bool
-	AccessGrants []string
+	Target       string   `json:"target"`
+	BackendMode  string   `json:"backend_mode"`
+	Insecure     bool     `json:"insecure"`
+	Closed       bool     `json:"closed"`
+	AccessGrants []string `json:"access_grants"`
 }
 
 type SharePublicRequest struct {
-	Target                    string
-	BasicAuth                 []string
-	FrontendSelection         []string
-	BackendMode               string
-	Insecure                  bool
-	OauthProvider             string
-	OauthEmailAddressPatterns []string
-	OauthCheckInterval        string
-	Closed                    bool
-	AccessGrants              []string
+	Target                    string   `json:"target"`
+	BasicAuth                 []string `json:"basic_auth"`
+	FrontendSelection         []string `json:"frontend_selection"`
+	BackendMode               string   `json:"backend_mode"`
+	Insecure                  bool     `json:"insecure"`
+	OauthProvider             string   `json:"oauth_provider"`
+	OauthEmailAddressPatterns []string `json:"oauth_email_address_patterns"`
+	OauthCheckInterval        string   `json:"oauth_check_interval"`
+	Closed                    bool     `json:"closed"`
+	AccessGrants              []string `json:"access_grants"`
 }
 
 type ShareReservedRequest struct {
-	Token            string
-	OverrideEndpoint string
-	Insecure         bool
+	Token            string `json:"token"`
+	OverrideEndpoint string `json:"override_endpoint"`
+	Insecure         bool   `json:"insecure"`
 }
 
 type ShareReservedResponse struct {
