@@ -19,16 +19,17 @@ import (
 )
 
 type Agent struct {
-	cfg          *AgentConfig
-	httpEndpoint string
-	root         env_core.Root
-	agentSocket  string
-	shares       map[string]*share
-	addShare     chan *share
-	rmShare      chan *share
-	accesses     map[string]*access
-	addAccess    chan *access
-	rmAccess     chan *access
+	cfg             *AgentConfig
+	httpEndpoint    string
+	root            env_core.Root
+	agentSocket     string
+	shares          map[string]*share
+	addShare        chan *share
+	rmShare         chan *share
+	accesses        map[string]*access
+	addAccess       chan *access
+	rmAccess        chan *access
+	persistRegistry bool
 }
 
 func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
@@ -67,6 +68,12 @@ func (a *Agent) Run() error {
 	go a.manager()
 	go a.gateway(a.cfg)
 
+	a.persistRegistry = false
+	if err := a.ReloadRegistry(); err != nil {
+		logrus.Errorf("error reloading registry '%v'", err)
+	}
+	a.persistRegistry = true
+
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
 	if err := srv.Serve(l); err != nil {
@@ -79,6 +86,7 @@ func (a *Agent) Run() error {
 func (a *Agent) Shutdown() {
 	logrus.Infof("stopping")
 
+	a.persistRegistry = false
 	if err := os.Remove(a.agentSocket); err != nil {
 		logrus.Warnf("unable to remove agent socket: %v", err)
 	}
@@ -94,6 +102,60 @@ func (a *Agent) Shutdown() {
 
 func (a *Agent) Config() *AgentConfig {
 	return a.cfg
+}
+
+func (a *Agent) ReloadRegistry() error {
+	registryPath, err := a.root.AgentRegistry()
+	if err != nil {
+		return err
+	}
+	registry, err := LoadRegistry(registryPath)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("loaded %d reserved shares, %d accesses", len(registry.ReservedShares), len(registry.PrivateAccesses))
+	for _, req := range registry.ReservedShares {
+		if resp, err := a.ShareReserved(req); err == nil {
+			logrus.Infof("restarted reserved share '%v' -> '%v'", req, resp)
+		} else {
+			logrus.Errorf("error restarting reserved share '%v': %v", req, err)
+		}
+	}
+	for _, req := range registry.PrivateAccesses {
+		if resp, err := a.AccessPrivate(req); err == nil {
+			logrus.Infof("restarted private access '%v' -> '%v'", req, resp)
+		} else {
+			logrus.Errorf("error restarting private access '%v': %v", req, err)
+		}
+	}
+	logrus.Infof("reload complete")
+	return nil
+}
+
+func (a *Agent) SaveRegistry() error {
+	r := &Registry{}
+	for _, shr := range a.shares {
+		if shr.request != nil {
+			switch shr.request.(type) {
+			case *ShareReservedRequest:
+				logrus.Infof("persisting reserved share '%v'", shr.token)
+				r.ReservedShares = append(r.ReservedShares, shr.request.(*ShareReservedRequest))
+			}
+		}
+	}
+	for _, acc := range a.accesses {
+		if acc.request != nil {
+			r.PrivateAccesses = append(r.PrivateAccesses, acc.request)
+		}
+	}
+	registryPath, err := a.root.AgentRegistry()
+	if err != nil {
+		return err
+	}
+	if err := r.Save(registryPath); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *Agent) gateway(cfg *AgentConfig) {
@@ -132,6 +194,12 @@ func (a *Agent) manager() {
 			logrus.Infof("adding new share '%v'", inShare.token)
 			a.shares[inShare.token] = inShare
 
+			if a.persistRegistry {
+				if err := a.SaveRegistry(); err != nil {
+					logrus.Errorf("unable to persist registry: %v", err)
+				}
+			}
+
 		case outShare := <-a.rmShare:
 			if shr, found := a.shares[outShare.token]; found {
 				logrus.Infof("removing share '%v'", shr.token)
@@ -147,6 +215,13 @@ func (a *Agent) manager() {
 					}
 				}
 				delete(a.shares, shr.token)
+
+				if a.persistRegistry {
+					if err := a.SaveRegistry(); err != nil {
+						logrus.Errorf("unable to persist registry: %v", err)
+					}
+				}
+
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) share removal")
 			}
@@ -154,6 +229,12 @@ func (a *Agent) manager() {
 		case inAccess := <-a.addAccess:
 			logrus.Infof("adding new access '%v'", inAccess.frontendToken)
 			a.accesses[inAccess.frontendToken] = inAccess
+
+			if a.persistRegistry {
+				if err := a.SaveRegistry(); err != nil {
+					logrus.Errorf("unable to persist registry: %v", err)
+				}
+			}
 
 		case outAccess := <-a.rmAccess:
 			if acc, found := a.accesses[outAccess.frontendToken]; found {
@@ -168,6 +249,13 @@ func (a *Agent) manager() {
 					logrus.Errorf("error deleting access '%v': %v", acc.frontendToken, err)
 				}
 				delete(a.accesses, acc.frontendToken)
+
+				if a.persistRegistry {
+					if err := a.SaveRegistry(); err != nil {
+						logrus.Errorf("unable to persist registry: %v", err)
+					}
+				}
+
 			} else {
 				logrus.Debug("skipping unidentified (orphaned) access removal")
 			}

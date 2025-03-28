@@ -7,13 +7,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (i *agentGrpcImpl) ReleaseAccess(_ context.Context, req *agentGrpc.ReleaseAccessRequest) (*agentGrpc.ReleaseAccessResponse, error) {
-	if acc, found := i.agent.accesses[req.FrontendToken]; found {
-		i.agent.rmAccess <- acc
+func (a *Agent) ReleaseAccess(frontendToken string) error {
+	if acc, found := a.accesses[frontendToken]; found {
+		a.rmAccess <- acc
 		logrus.Infof("released access '%v'", acc.frontendToken)
-
 	} else {
-		return nil, errors.Errorf("agent has no access with frontend token '%v'", req.FrontendToken)
+		return errors.Errorf("agent has no access with frontend token '%v'", frontendToken)
 	}
-	return nil, nil
+	return nil
+}
+
+func (i *agentGrpcImpl) ReleaseAccess(_ context.Context, req *agentGrpc.ReleaseAccessRequest) (*agentGrpc.ReleaseAccessResponse, error) {
+	return nil, i.agent.ReleaseAccess(req.FrontendToken)
 }

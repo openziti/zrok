@@ -196,6 +196,10 @@ func (r *Root) AgentSocket() (string, error) {
 	return agentSocket()
 }
 
+func (r *Root) AgentRegistry() (string, error) {
+	return agentRegistry()
+}
+
 func (r *Root) Obliterate() error {
 	zrd, err := rootDir()
 	if err != nil {

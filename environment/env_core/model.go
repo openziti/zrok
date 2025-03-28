@@ -29,6 +29,7 @@ type Root interface {
 	DeleteZitiIdentityNamed(name string) error
 
 	AgentSocket() (string, error)
+	AgentRegistry() (string, error)
 }
 
 type Environment struct {
