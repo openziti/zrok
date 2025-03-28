@@ -2,6 +2,8 @@
 
 ## v1.0.1
 
+FEATURE: zrok-agent Linux package runs the agent as a user service (https://github.com/openziti/zrok/issues/883)
+
 CHANGE: let the Docker instance set the Caddy HTTPS port (https://github.com/openziti/zrok/pull/920)
 
 CHANGE: Add Traefik option for TLS termination in the Docker instance (https://github.com/openziti/zrok/issues/808)
