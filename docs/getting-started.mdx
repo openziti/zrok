@@ -157,29 +157,29 @@ $ zrok enable 7g3K6gVKikWb
 Now, if we run a `zrok status` command, you will see the details of your environment:
 
 ```txt
-zrok status
-```
+$ zrok status
 
-```buttonless title="Output"
 Config:
 
- CONFIG       VALUE                        SOURCE
- apiEndpoint  https://api.staging.zrok.io  env
+ CONFIG           VALUE                   SOURCE 
+ apiEndpoint      https://api-v1.zrok.io  env    
+ defaultFrontend  public                  binary 
+ headless         false                   binary 
 
 Environment:
 
- PROPERTY       VALUE
- Secret Token   <<SET>>
- Ziti Identity  <<SET>>
+ PROPERTY       VALUE   
+ Account Token  <<SET>> 
+ Ziti Identity  <<SET>> 
 ```
 
 Excellent... our environment is now fully enabled.
 
-If we return to the _web console_, we'll now see the new environment reflected in the explorer view:
+If we return to the _web console_, we'll now see the new environment reflected in the API console visualizer:
 
-![New Environment in Web UI](images/zrok_web_ui_new_environment.png)
+![New Environment in Web UI](images/zrok-visualizer-enabled.png)
 
-In my case, the environment is named `michael@ziti-lx`, which is the username of my shell and the hostname of the system the shell is running on.
+In my case, the environment is named `michael@testing`, which is the username of my shell and the hostname of the system the shell is running on.
 
 :::note
 Should you want to use a non-default name for your environment, you can pass the `-d` option to the `zrok enable` command. See `zrok enable --help` for details.
@@ -187,16 +187,12 @@ Should you want to use a non-default name for your environment, you can pass the
 
 If you click on the environment node in the explorer in the _web console_, the details panel shown at the bottom of the page will change:
 
-![Empty Environment](images/zrok_web_ui_empty_shares.png)
+![Empty Environment](images/zrok-visualizer-environment.png)
 
-The explorer supports clicking, dragging, mouse wheel zooming, and selecting the nodes in the graph for more information (and available actions) for the selected node. If you ever get lost in the explorer, click the ![Zoom to Fit](images/zrok_zoom_to_fit.png) _zoom to fit_ icon in the lower right corner of the explorer.
-
-If we click on the `Detail` tab for our environment, we'll see something like:
-
-![Environment Detail](images/zrok_web_ui_empty_environment_detail.png)
+The visualizer supports clicking, dragging, mouse wheel zooming, and selecting the nodes in the graph for more information (and available actions) for the selected node. If you ever get lost in the visualizer, click the ![Zoom to Fit](images/zrok-zoom-to-fit.png) _zoom to fit_ icon in the lower right corner of the explorer.
 
 :::note
-With your `zrok` account you can `zrok enable` multiple environments. This will allow you to run `zrok share` in one environment, and `zrok access` in other environments.
+With your `zrok` account you can `zrok enable` multiple environments. This will allow you to share (and access your shares) from multiple environments simultaneously.
 :::
 
 Your environment is fully ready to go. Now we can move on to the fun stuff...
