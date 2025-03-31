@@ -122,27 +122,35 @@ After you have [an account](#your-first-share), you can enable your `zrok` envir
 
 A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
-When your `zrok` account was created, the service generated a _secret token_ that identifies and authenticates in a single step. Protect your secret token as if it were a password, or an important account number; it's a _secret_, protect it.
+When your `zrok` account was created, the service generated an _account token_ that identifies and authenticates in a single step. Protect your account token as if it were a password, or an important account number; it's a _secret_, protect it.
 
-When we left off you had downloaded, extracted, and configured your `zrok` environment. In order to use that environment with your account, you'll need to `enable` it. Enabling an environment generates a secure identity and the necessary underlying security policies with the OpenZiti network hosting the `zrok` service.
+When we left off you had downloaded, extracted, and configured your `zrok` software. In order to use that environment with your account, you'll need to `enable` an _environment_ on your system. Enabling an environment generates a secure identity and the necessary underlying security policies with the OpenZiti network hosting the `zrok` service so that you can begin sharing.
 
-From the web console, click on your email address in the upper right corner of the header. That drop down menu contains an `Enable Your Environment` link. Click that link and a modal dialog will be shown like this:
+Log into the API console at:
 
-![Enable Modal Dialog](images/zrok_enable_modal.png)
+<a href="https://api-v1.zrok.io/" target="_">https://api-v1.zrok.io/</a>
 
-This dialog box shows you the `zrok enable` command that you can use to enable any shell to work with your `zrok` account with a single command.
+When you first log into your account on the API console, your interface will look like this:
 
-Let's copy that command and paste it into your shell:
+![zrok API console, empty](images/zrok-getting-started-button.png)
+
+In the toolbar, there is a big green button that says "CLICK HERE TO GET STARTED!". If you click that button, you'll see the getting started wizard, which looks like this:
+
+![zrok getting started modal](images/zrok-getting-started-modal.png)
+
+This wizard is broken into multiple steps. The first step we've already covered, which gets the zrok software installed onto your system.
+
+Below "step 2" is a command: `zrok enable 7g3K6gVKikWb`. You'll want to copy this command into your shell and execute it:
 
 ```buttonless title="Example"
-$ zrok enable klFEoIi0QAg7 
+$ zrok enable 7g3K6gVKikWb 
 ⣻  contacting the zrok service...
 ```
 
 After a few seconds, the message will change and indicate that the enable operation succeeded:
 
 ```buttonless title="Example"
-$ zrok enable klFEoIi0QAg7 
+$ zrok enable 7g3K6gVKikWb 
 ⣻  the zrok environment was successfully enabled...
 ```
 
