@@ -3,7 +3,7 @@ title: Agent
 sidebar_position: 20
 ---
 
-The zrok agent centralizes management of your public and private zrok shares and private frontends for accessing [private shares](/concepts/sharing-private.mdx). It provides a web-based console interface and changes how the `zrok share` and `zrok access` commands behave.
+The zrok Agent centralizes management of your zrok shares and accesses. It provides a web-based console interface and changes how the `zrok share` and `zrok access` commands behave.
 
 ## Tutorial
 
@@ -38,6 +38,7 @@ Reserve a private share for the agent to share.
 ```bash
 zrok reserve private 8080 --closed --unique-name "myshare"
 ```
+
 ```buttonless title="Output"
 [   1.883]    INFO main.(*reserveCommand).run: your reserved share token is 'myshare'
 ```
@@ -47,6 +48,7 @@ Start sharing the reserved share with the agent.
 ```bash
 zrok share reserved "myshare"
 ```
+
 ```buttonless title="Output"
 [   0.001]    INFO main.(*shareReservedCommand).shareAgent: starting
 token:"myshare" backendMode:"proxy" shareMode:"private" target:"http://127.0.0.1:8080"
@@ -54,9 +56,27 @@ token:"myshare" backendMode:"proxy" shareMode:"private" target:"http://127.0.0.1
 
 You will see the new reserved share in the agent UI and you can access it by running `zrok access "myshare"` on another device where you have enabled the same zrok account, since the share was reserved with closed permission mode.
 
+Check the status of the agent's shares and accesses.
+
+```bash
+zrok agent status
+```
+
+```buttonless title="Output"
+ FRONTEND TOKEN  TOKEN  BIND ADDRESS
+0 accesses in agent
+
+ TOKEN         RESERVED  SHARE MODE  BACKEND MODE  TARGET
+ myshare       true      private     tcpTunnel     127.0.0.1:8080
+1 share in agent
+```
+
 ### Running the Agent in the background
 
-On Linux, you can [install the Linux package `zrok-agent`](/guides/agent/linux-service.mdx) to keep the agent running in the background after each reboot.
+You can keep the agent running reliably in the background by installing the agent service in Windows or Linux.
+
+- Windows - [set up the Windows system service](/guides/agent/windows-service/index.mdx)
+- Linux - [install the Linux package `zrok-agent`](/guides/agent/linux-service.mdx)
 
 ## How the Agent Works
 
