@@ -6,6 +6,8 @@ FEATURE: The zrok Agent now persists private accesses and reserved shares betwee
 
 FEATURE: zrok-agent Linux package runs the agent as a user service (https://github.com/openziti/zrok/issues/883)
 
+CHANGE: Updated the "Getting Started" guide to be slightly more streamlined and reflect the `v1.0` changes (https://github.com/openziti/zrok/issues/877)
+
 CHANGE: let the Docker instance set the Caddy HTTPS port (https://github.com/openziti/zrok/pull/920)
 
 CHANGE: Add Traefik option for TLS termination in the Docker instance (https://github.com/openziti/zrok/issues/808)
