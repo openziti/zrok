@@ -2,6 +2,8 @@
 
 ## v1.0.1
 
+FEATURE: The zrok Agent now persists private accesses and reserved shares between executions. Any `zrok access private` instances or `zrok share reserved` instances created using the agent are now persisted to a registry stored in `${HOME}/.zrok`. When restarting the agent these accesses and reserved shares are re-created from the data in this registry (https://github.com/openziti/zrok/pull/922)
+
 FEATURE: zrok-agent Linux package runs the agent as a user service (https://github.com/openziti/zrok/issues/883)
 
 CHANGE: let the Docker instance set the Caddy HTTPS port (https://github.com/openziti/zrok/pull/920)

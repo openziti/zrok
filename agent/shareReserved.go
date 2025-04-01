@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareReservedRequest) (*agentGrpc.ShareReservedResponse, error) {
+func (a *Agent) ShareReserved(req *ShareReservedRequest) (*ShareReservedResponse, error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, err
@@ -25,8 +25,9 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 	shrCmd := []string{os.Args[0], "share", "reserved", "--subordinate"}
 	shr := &share{
 		reserved: true,
+		request:  req,
 		sub:      subordinate.NewMessageHandler(),
-		agent:    i.agent,
+		agent:    a,
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
 		logrus.Info(msg)
@@ -60,8 +61,8 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 
 	if bootErr == nil {
 		go shr.monitor()
-		i.agent.addShare <- shr
-		return &agentGrpc.ShareReservedResponse{
+		a.addShare <- shr
+		return &ShareReservedResponse{
 			Token:             shr.token,
 			BackendMode:       string(shr.backendMode),
 			ShareMode:         string(shr.shareMode),
@@ -74,5 +75,23 @@ func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareRes
 			logrus.Errorf("error joining: %v", err)
 		}
 		return nil, fmt.Errorf("unable to start share: %v", bootErr)
+	}
+}
+
+func (i *agentGrpcImpl) ShareReserved(_ context.Context, req *agentGrpc.ShareReservedRequest) (*agentGrpc.ShareReservedResponse, error) {
+	if resp, err := i.agent.ShareReserved(&ShareReservedRequest{
+		Token:            req.Token,
+		OverrideEndpoint: req.OverrideEndpoint,
+		Insecure:         req.Insecure,
+	}); err == nil {
+		return &agentGrpc.ShareReservedResponse{
+			Token:             resp.Token,
+			BackendMode:       resp.BackendMode,
+			ShareMode:         resp.ShareMode,
+			FrontendEndpoints: resp.FrontendEndpoints,
+			Target:            resp.Target,
+		}, nil
+	} else {
+		return nil, err
 	}
 }
