@@ -90,7 +90,8 @@ When the agent is running:
 - The agent provides a web UI for monitoring and managing your shares and accesses.
 - The `zrok share` and `zrok access` commands delegate their operations to the running agent.
 - You can stop and restart individual shares/accesses without terminating the agent.
-- The agent will remember your reserved shares and any access private instances, restarting them when the agent starts each time.
+- The Agent will remember and automatically restart your shares started with `share reserved`, and any accesses started with `access private`.
+- The Agent will not restart regular, ephemeral shares started with `share private` or `share public`.
 
 ### Agent Console
 
