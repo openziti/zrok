@@ -25,6 +25,14 @@ Use the command `zrok rebase apiEndpoint https://api-v1.zrok.io/` to update your
 `zrok` (*/ziːɹɒk/ ZEE-rock*) is a secure, open-source, self-hostable sharing platform that simplifies shielding and sharing network services or files.
 There's a hardened zrok-as-a-service offering available at [myzrok.io](https://myzrok.io) with a generous free tier.
 
+## What's it for?
+
+Use `zrok` to share a running service, like a web server or a network socket, or to share a directory of static files. `zrok` goes beyond simple tunneling to provide sharing solutions for a variety of network and storage use cases.
+
+When using `zrok` to [share publicly](./concepts/sharing-public.mdx), you can reserve a public hostname, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
+
+If [sharing privately](./concepts/sharing-private.mdx), only users with the share token (and the appropriate permission grants) can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
+
 ### Your First Share
 
 1. Get an account token
@@ -33,36 +41,36 @@ There's a hardened zrok-as-a-service offering available at [myzrok.io](https://m
         <Card shadow='tl'>
             <CardHeader>
                 <h3>Hosted zrok</h3>
-            </CardHeader>
-            <CardBody>
-                Use NetFoundry's public zrok instance.
-            </CardBody>
-            <CardFooter>
-                <a href="https://myzrok.io/">
-                    <button className='button button--secondary button--block'>Get an Account</button>
-                </a>
-            </CardFooter>
-        </Card>
+   ​         </CardHeader>
+   ​         <CardBody>
+   ​             Use NetFoundry's public zrok instance.
+   ​         </CardBody>
+   ​         <CardFooter>
+   ​             <a href="https://myzrok.io/">
+   ​                 <button className='button button--secondary button--block'>Get an Account</button>
+   ​             </a>
+   ​         </CardFooter>
+   ​     </Card>
     </Column>
     <Column style={{paddingBottom: 20}}>
-        <Card shadow='tl'>
-            <CardHeader>
+   ​     <Card shadow='tl'>
+   ​         <CardHeader>
                 <h3>Self-Hosted zrok</h3>
-            </CardHeader>
-            <CardBody>
-                Run a zrok instance on Linux, Docker, or Kubernetes.
-            </CardBody>
-            <CardFooter>
-                <a href="/docs/category/self-hosting/">
-                    <button className='button button--secondary button--block'>Guides</button>
-                </a>
-            </CardFooter>
-        </Card>
+   ​         </CardHeader>
+   ​         <CardBody>
+   ​             Run a zrok instance on Linux, Docker, or Kubernetes.
+   ​         </CardBody>
+   ​         <CardFooter>
+   ​             <a href="/docs/category/self-hosting/">
+   ​                 <button className='button button--secondary button--block'>Guides</button>
+   ​             </a>
+   ​         </CardFooter>
+   ​     </Card>
     </Column>
 </Columns>
 
 2. [Download the zrok binary](#installing-the-zrok-command)
-3. Enable zrok for your [user environment](#enabling-your-zrok-environment)
+3. Enable zrok for your [environment](#enabling-your-zrok-environment)
 
     ```bash
     zrok enable <your_account_token>
@@ -78,39 +86,7 @@ There's a hardened zrok-as-a-service offering available at [myzrok.io](https://m
 
     ![zrok share public](images/zrok-share-public.png)
 
-## Share Backend Modes
-
-zrok shares can be public or private, with different options for backend modes, including:
-
-* [Public shares](./concepts/sharing-public.mdx) for [web services](./concepts/http.md) or [files](./concepts/files.md)
-* [Private shares for web services or files](./concepts/sharing-private.mdx)
-* [TCP Tunnels](./concepts/tunnels.md)
-* [UDP Tunnels](./concepts/tunnels.md)
-* [File Drives](./guides/drives.mdx)
-* [VPN](./guides/vpn/vpn.md)
-
-
-## Open Source
-
-`zrok` is licensed under Apache 2.0.
-
-Check [the roadmap](https://github.com/orgs/openziti/projects/16) if you're thinking about the future. We would love to hear your ideas for `zrok`!
-
-The best ways to engage are [Discourse](https://openziti.discourse.group/) for questions and [GitHub Issues](https://github.com/openziti/zrok/issues) for documenting problems.
-
-[Read more about zrok open source](/concepts/opensource.md).
-
-### Ziti native
-
-`zrok` is a _Ziti Native Application_, built on the [OpenZiti](https://openziti.io) platform, and supported by the OpenZiti community and NetFoundry team.
-
-## What's it for?
-
-Use `zrok` to share a running service, like a web server or a network socket, or to share a directory of static files.
-
-If [sharing publicly](./concepts/sharing-public.mdx), you can reserve a subdomain, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
-
-If [sharing privately](./concepts/sharing-private.mdx), only users with the share token can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
+# A Deeper Look at Getting Started
 
 ## Installing the zrok Command
 
