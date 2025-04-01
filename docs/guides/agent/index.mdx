@@ -86,11 +86,11 @@ Without the agent running, each time you execute a `zrok share` or `zrok access`
 
 When the agent is running:
 
-- All shares and accesses are managed by a single agent process
-- The agent provides a web UI for monitoring and managing your shares and accesses
-- New `zrok share` and `zrok access` commands delegate their operations to the running agent
-- You can stop and restart individual shares/accesses without terminating the agent
-- the Agent will automatically restart reserved shares and private accesses
+- All shares and accesses are managed by a single agent process.
+- The agent provides a web UI for monitoring and managing your shares and accesses.
+- The `zrok share` and `zrok access` commands delegate their operations to the running agent.
+- You can stop and restart individual shares/accesses without terminating the agent.
+- The agent will remember your reserved shares and any access private instances, restarting them when the agent starts each time.
 
 ### Agent Console
 
