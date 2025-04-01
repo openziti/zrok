@@ -108,7 +108,7 @@ When we left off you had downloaded, extracted, and configured your `zrok` softw
 
 Log into the API console at:
 
-<a href="https://api-v1.zrok.io/" target="_">https://api-v1.zrok.io/</a>
+[https://api-v1.zrok.io/](https://api-v1.zrok.io/)
 
 When you first log into your account on the API console, your interface will look like this:
 
@@ -120,16 +120,16 @@ In the toolbar, there is a big green button that says "CLICK HERE TO GET STARTED
 
 This wizard is broken into multiple steps. The first step we've already covered, which gets the zrok software installed onto your system.
 
-Below "step 2" is a command: `zrok enable 7g3K6gVKikWb`. You'll want to copy this command into your shell and execute it:
+Below "step 2" is a command: `zrok enable 7g3K6gVKikWb` (your account will have a different account token, other than `7g3K6gVKikWb`). You'll want to copy this command into your shell and execute it:
 
-```buttonless title="Example"
+```txt
 $ zrok enable 7g3K6gVKikWb 
 ⣻  contacting the zrok service...
 ```
 
 After a few seconds, the message will change and indicate that the enable operation succeeded:
 
-```buttonless title="Example"
+```txt
 $ zrok enable 7g3K6gVKikWb 
 ⣻  the zrok environment was successfully enabled...
 ```
@@ -155,7 +155,7 @@ Environment:
 
 Excellent... our environment is now fully enabled.
 
-If we return to the _web console_, we'll now see the new environment reflected in the API console visualizer:
+If we return to the _API console_, we'll now see the new environment reflected in the API console visualizer:
 
 ![New Environment in Web UI](images/zrok-visualizer-enabled.png)
 
@@ -222,7 +222,7 @@ If we try to reload the frontend endpoint in our web browser, we'll see:
 
 `zrok` also provides a powerful _private_ sharing model. If I execute the following command:
 
-```buttonless title="Example"
+```buttonless
 $ zrok share private http://localhost:8080
 ```
 
@@ -256,7 +256,7 @@ A reserved share can be re-used multiple times; it will survive termination of t
 
 The first step is to create the reserved share:
 
-```txt title="Example"
+```txt
 $ zrok reserve public --backend-mode web v0.3_getting_started
 [   0.275]    INFO main.(*reserveCommand).run: your reserved share token is 'mltwsinym1s2'
 [   0.275]    INFO main.(*reserveCommand).run: reserved frontend endpoint: https://mltwsinym1s2.share.zrok.io
@@ -274,7 +274,7 @@ This is the `404` error message returned by the `zrok` frontend. We're getting t
 
 This command:
 
-```txt title="Example"
+```txt
 $ zrok share reserved mltwsinym1s2
 ```
 
@@ -290,7 +290,7 @@ With the reserved share, we're free to stop and restart the `zrok share reserved
 
 When we're done with the reserved share, we can _release_ it using this command:
 
-```txt title="Example"
+```txt
 $ zrok release mltwsinym1s2
 [   0.230]    INFO main.(*releaseCommand).run: reserved share 'mltwsinym1s2' released
 ```
