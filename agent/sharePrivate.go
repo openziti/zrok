@@ -13,22 +13,23 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
+func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if !root.IsEnabled() {
-		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
 	shrCmd := []string{os.Args[0], "share", "private", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:   sdk.PrivateShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
+		request:     req,
 		sub:         subordinate.NewMessageHandler(),
-		agent:       i.agent,
+		agent:       a,
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
 		logrus.Info(msg)
@@ -63,20 +64,34 @@ func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePriv
 
 	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	<-shr.sub.BootComplete
 
 	if bootErr == nil {
 		go shr.monitor()
-		i.agent.addShare <- shr
-		return &agentGrpc.SharePrivateResponse{Token: shr.token}, nil
-		
+		a.addShare <- shr
+		return shr.token, nil
+
 	} else {
 		if err := proctree.WaitChild(shr.process); err != nil {
 			logrus.Errorf("error joining: %v", err)
 		}
-		return nil, fmt.Errorf("unable to start share: %v", bootErr)
+		return "", fmt.Errorf("unable to start share: %v", bootErr)
+	}
+}
+
+func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
+	if shareToken, err := i.agent.SharePrivate(&SharePrivateRequest{
+		Target:       req.Target,
+		BackendMode:  req.BackendMode,
+		Insecure:     req.Insecure,
+		Closed:       req.Closed,
+		AccessGrants: req.AccessGrants,
+	}); err == nil {
+		return &agentGrpc.SharePrivateResponse{Token: shareToken}, nil
+	} else {
+		return nil, err
 	}
 }
