@@ -9,6 +9,41 @@ import (
 	"time"
 )
 
+type SharePrivateRequest struct {
+	Target       string   `json:"target"`
+	BackendMode  string   `json:"backend_mode"`
+	Insecure     bool     `json:"insecure"`
+	Closed       bool     `json:"closed"`
+	AccessGrants []string `json:"access_grants"`
+}
+
+type SharePublicRequest struct {
+	Target                    string   `json:"target"`
+	BasicAuth                 []string `json:"basic_auth"`
+	FrontendSelection         []string `json:"frontend_selection"`
+	BackendMode               string   `json:"backend_mode"`
+	Insecure                  bool     `json:"insecure"`
+	OauthProvider             string   `json:"oauth_provider"`
+	OauthEmailAddressPatterns []string `json:"oauth_email_address_patterns"`
+	OauthCheckInterval        string   `json:"oauth_check_interval"`
+	Closed                    bool     `json:"closed"`
+	AccessGrants              []string `json:"access_grants"`
+}
+
+type ShareReservedRequest struct {
+	Token            string `json:"token"`
+	OverrideEndpoint string `json:"override_endpoint"`
+	Insecure         bool   `json:"insecure"`
+}
+
+type ShareReservedResponse struct {
+	Token             string
+	BackendMode       string
+	ShareMode         string
+	FrontendEndpoints []string
+	Target            string
+}
+
 type share struct {
 	token                     string
 	frontendEndpoints         []string
@@ -24,6 +59,8 @@ type share struct {
 	oauthCheckInterval        time.Duration
 	closed                    bool
 	accessGrants              []string
+
+	request interface{}
 
 	process *proctree.Child
 	sub     *subordinate.MessageHandler

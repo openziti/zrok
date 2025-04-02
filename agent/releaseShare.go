@@ -7,13 +7,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (i *agentGrpcImpl) ReleaseShare(_ context.Context, req *agentGrpc.ReleaseShareRequest) (*agentGrpc.ReleaseShareResponse, error) {
-	if shr, found := i.agent.shares[req.Token]; found {
-		i.agent.rmShare <- shr
+func (a *Agent) ReleaseShare(shareToken string) error {
+	if shr, found := a.shares[shareToken]; found {
+		a.rmShare <- shr
 		logrus.Infof("released share '%v'", shr.token)
-
 	} else {
-		return nil, errors.Errorf("agent has no share with token '%v'", req.Token)
+		errors.Errorf("agent has no share with token '%v'", shareToken)
 	}
-	return nil, nil
+	return nil
+}
+
+func (i *agentGrpcImpl) ReleaseShare(_ context.Context, req *agentGrpc.ReleaseShareRequest) (*agentGrpc.ReleaseShareResponse, error) {
+	return nil, i.agent.ReleaseShare(req.Token)
 }

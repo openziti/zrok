@@ -87,7 +87,7 @@ until [[ -n "${ZITI_PUBLIC_ID}" ]]; do
 done
 echo "DEBUG: 'public' ZITI_PUBLIC_ID=$ZITI_PUBLIC_ID"
 
-until curl -sSf "${ZROK_API_ENDPOINT}/api/v1/version"; do
+until curl -sSf "${ZROK_API_ENDPOINT}" &>/dev/null; do
     echo "DEBUG: waiting for zrok controller API version endpoint to respond"
     sleep 3
 done

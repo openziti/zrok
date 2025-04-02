@@ -63,6 +63,7 @@ jobs:
         package_name:
           - zrok
           - zrok-share
+          - zrok-agent
         arch:
           - deb: amd64
             rpm: x86_64
