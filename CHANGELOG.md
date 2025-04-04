@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.2
+
+CHANGE: The openziti/zrok Docker image has been updated to use the latest version of the ziti CLI, 1.4.3 (https://github.com/openziti/zrok/pull/917)
+
 ## v1.0.1
 
 FEATURE: The zrok Agent now persists private accesses and reserved shares between executions. Any `zrok access private` instances or `zrok share reserved` instances created using the agent are now persisted to a registry stored in `${HOME}/.zrok`. When restarting the agent these accesses and reserved shares are re-created from the data in this registry (https://github.com/openziti/zrok/pull/922)
