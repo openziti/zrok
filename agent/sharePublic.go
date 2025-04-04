@@ -13,22 +13,23 @@ import (
 	"os"
 )
 
-func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
+func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, frontendEndpoint []string, err error) {
 	root, err := environment.LoadRoot()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	if !root.IsEnabled() {
-		return nil, errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
 	shrCmd := []string{os.Args[0], "share", "public", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:   sdk.PublicShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
+		request:     req,
 		sub:         subordinate.NewMessageHandler(),
-		agent:       i.agent,
+		agent:       a,
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
 		logrus.Info(msg)
@@ -87,23 +88,39 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 
 	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	<-shr.sub.BootComplete
 
 	if bootErr == nil {
 		go shr.monitor()
-		i.agent.addShare <- shr
-		return &agentGrpc.SharePublicResponse{
-			Token:             shr.token,
-			FrontendEndpoints: shr.frontendEndpoints,
-		}, nil
+		a.addShare <- shr
+		return shr.token, shr.frontendEndpoints, nil
 
 	} else {
 		if err := proctree.WaitChild(shr.process); err != nil {
 			logrus.Errorf("error joining: %v", err)
 		}
-		return nil, fmt.Errorf("unable to start share: %v", bootErr)
+		return "", nil, fmt.Errorf("unable to start share: %v", bootErr)
+	}
+}
+
+func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
+	if shareToken, frontendEndpoints, err := i.agent.SharePublic(&SharePublicRequest{
+		Target:                    req.Target,
+		BasicAuth:                 req.BasicAuth,
+		FrontendSelection:         req.FrontendSelection,
+		BackendMode:               req.BackendMode,
+		Insecure:                  req.Insecure,
+		OauthProvider:             req.OauthProvider,
+		OauthEmailAddressPatterns: req.OauthEmailAddressPatterns,
+		OauthCheckInterval:        req.OauthCheckInterval,
+		Closed:                    req.Closed,
+		AccessGrants:              req.AccessGrants,
+	}); err == nil {
+		return &agentGrpc.SharePublicResponse{Token: shareToken, FrontendEndpoints: frontendEndpoints}, nil
+	} else {
+		return nil, err
 	}
 }

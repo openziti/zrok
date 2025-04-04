@@ -16,16 +16,16 @@ To delete your `reserved` share use the `zrok release` command or click the dele
 
 ## Unique Names
 
-The default is to generate a random _share token_ and you may specify a _unique name_.
+The default is to generate a random _share token_ and you may instead specify a _unique name_. The unique name must be lowercase alphanumeric, between 4 and 32 characters in length.
 
-This reserves public share token "myshare."
+This reserves public share token "toaster".
 
 ```bash title="Reserve with the Command Line"
-zrok reserve public 80 --unique-name "myshare"
+zrok reserve public 80 --unique-name "toaster"
 ```
 
-This shares `127.0.0.1:80` as `https://myshare.zrok.example.com` where `https://{token}.zrok.example.com` is the frontend's template.
+This shares `127.0.0.1:80` as `https://toaster.zrok.example.com` where `https://{token}.zrok.example.com` is the frontend's template.
 
 ```bash title="Share a Reserved Token"
-zrok share reserved "myshare"
+zrok share reserved "toaster"
 ```

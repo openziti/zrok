@@ -61,3 +61,11 @@ func agentSocket() (string, error) {
 	}
 	return filepath.Join(zrd, "agent.socket"), nil
 }
+
+func agentRegistry() (string, error) {
+	zrd, err := rootDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "agent-registry.json"), nil
+}

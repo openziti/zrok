@@ -1,0 +1,42 @@
+---
+title: Linux Agent Service
+sidebar_position: 40
+---
+
+import LinuxAgentInstall from '/../docs/guides/_linux-agent-install.mdx'
+
+## Overview
+
+Run the zrok agent as a `systemd --user` service under your Linux user account.
+
+## Install the Package
+
+The package provides the `zrok` executable and the `zrok-agent.service` unit.
+
+<LinuxAgentInstall />
+
+## Enable your Account
+
+This creates a `~/.zrok` directory enabled for your zrok account.
+
+```bash
+zrok enable <your_account_token>
+```
+
+## Start the Service
+
+```bash
+systemctl --user enable --now zrok-agent.service
+```
+
+## Use the agent
+
+Learn more about using the zrok agent in the [agent guide](/guides/agent/index.mdx).
+
+## Troubleshooting
+
+### Check the User Service Log
+
+```bash
+journalctl --user -lfu zrok-agent.service
+```
