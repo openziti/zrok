@@ -10,9 +10,9 @@ import AnsibleRepoSetup from './_ansible_repo_setup.yaml'
 import ConcatenateYamlSnippets from '@site/src/components/cat-yaml.jsx'
 import Homebrew from './_homebrew.mdx';
 
-## Install `zrok` from the Repository
+## Package Repository
 
-This will configure the system to receive DEB or RPM package updates.
+The RedHat (RPM) and Debian (DEB) packages are maintained by NetFoundry.
 
 ```text
 curl -sSf https://get.openziti.io/install.bash | sudo bash -s zrok
@@ -42,10 +42,6 @@ Check out [zrok frontdoor](/guides/frontdoor.mdx?os=Linux) for running `zrok` as
 </ConcatenateYamlSnippets>
 
 </Details>
-
-## Homebrew
-
-<Homebrew />
 
 ## Linux Binary
 
@@ -94,7 +90,7 @@ Download the binary distribution for your Linux distribution's architecture or r
      / /| | | (_) |   < 
     /___|_|  \___/|_|\_\
     
-    v0.4.0 [c889005]
+    v1.0.0 [c889005]
     ```
 
 </Details>
@@ -134,3 +130,11 @@ zrok version;
 ```
 
 </Details>
+
+## Arch User Repository
+
+[An Arch User Repository (AUR) package](https://aur.archlinux.org/packages/zrok-bin) is maintained by the Arch community. As of April 2025, the AUR package includes the `zrok` CLI and [the `zrok-agent.service` systemd `--user` service](/guides/agent/linux-service.mdx).
+
+## Homebrew Formula
+
+<Homebrew />
