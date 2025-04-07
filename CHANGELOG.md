@@ -2,6 +2,10 @@
 
 ## v1.0.2
 
+FEATURE: New `admin/new_account_link` configuration option to allow the insertion of "how do I register for an account?" links into the login form (https://github.com/openziti/zrok/issues/552)
+
+CHANGE: The release environment, share, and access modals in the API console now have a better message letting the user know they will still need to clean up their `zrok` processes (https://github.com/openziti/zrok/issues/910)
+
 CHANGE: The openziti/zrok Docker image has been updated to use the latest version of the ziti CLI, 1.4.3 (https://github.com/openziti/zrok/pull/917)
 
 ## v1.0.1
