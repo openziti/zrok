@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **version** | **str** |  | [optional] 
 **tou_link** | **str** |  | [optional] 
+**new_account_link** | **str** |  | [optional] 
 **invites_open** | **bool** |  | [optional] 
 **requires_invite_token** | **bool** |  | [optional] 
 **invite_token_contact** | **str** |  | [optional] 

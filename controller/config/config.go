@@ -38,6 +38,7 @@ type Config struct {
 type AdminConfig struct {
 	Secrets         []string `cf:"+secret"`
 	TouLink         string
+	NewAccountLink  string
 	ProfileEndpoint string
 }
 

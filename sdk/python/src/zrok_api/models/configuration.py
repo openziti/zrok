@@ -28,10 +28,11 @@ class Configuration(BaseModel):
     """ # noqa: E501
     version: Optional[StrictStr] = None
     tou_link: Optional[StrictStr] = Field(default=None, alias="touLink")
+    new_account_link: Optional[StrictStr] = Field(default=None, alias="newAccountLink")
     invites_open: Optional[StrictBool] = Field(default=None, alias="invitesOpen")
     requires_invite_token: Optional[StrictBool] = Field(default=None, alias="requiresInviteToken")
     invite_token_contact: Optional[StrictStr] = Field(default=None, alias="inviteTokenContact")
-    __properties: ClassVar[List[str]] = ["version", "touLink", "invitesOpen", "requiresInviteToken", "inviteTokenContact"]
+    __properties: ClassVar[List[str]] = ["version", "touLink", "newAccountLink", "invitesOpen", "requiresInviteToken", "inviteTokenContact"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -86,6 +87,7 @@ class Configuration(BaseModel):
         _obj = cls.model_validate({
             "version": obj.get("version"),
             "touLink": obj.get("touLink"),
+            "newAccountLink": obj.get("newAccountLink"),
             "invitesOpen": obj.get("invitesOpen"),
             "requiresInviteToken": obj.get("requiresInviteToken"),
             "inviteTokenContact": obj.get("inviteTokenContact")

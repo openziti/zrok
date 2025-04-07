@@ -1985,6 +1985,9 @@ func init() {
         "invitesOpen": {
           "type": "boolean"
         },
+        "newAccountLink": {
+          "type": "string"
+        },
         "requiresInviteToken": {
           "type": "boolean"
         },
@@ -4297,6 +4300,9 @@ func init() {
         },
         "invitesOpen": {
           "type": "boolean"
+        },
+        "newAccountLink": {
+          "type": "string"
         },
         "requiresInviteToken": {
           "type": "boolean"

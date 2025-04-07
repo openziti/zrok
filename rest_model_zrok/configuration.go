@@ -23,6 +23,9 @@ type Configuration struct {
 	// invites open
 	InvitesOpen bool `json:"invitesOpen,omitempty"`
 
+	// new account link
+	NewAccountLink string `json:"newAccountLink,omitempty"`
+
 	// requires invite token
 	RequiresInviteToken bool `json:"requiresInviteToken,omitempty"`
 
