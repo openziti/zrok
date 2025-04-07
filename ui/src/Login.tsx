@@ -13,13 +13,18 @@ const Login = ({ onLogin }: LoginProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
-    const [tou, setTou] = useState(null as string);
+    const [tou, setTou] = useState<string>("");
+    const [newAccountLink, setNewAccountLink] = useState<string>("");
 
     useEffect(() => {
         new MetadataApi()._configuration()
             .then(d => {
+                console.log("d", d);
                 if(d.touLink && d.touLink.trim() !== "") {
                     setTou(d.touLink);
+                }
+                if(d.newAccountLink && d.newAccountLink.trim() != "") {
+                    setNewAccountLink(d.newAccountLink)
                 }
             })
             .catch(e => {
@@ -85,6 +90,9 @@ const Login = ({ onLogin }: LoginProps) => {
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
                             <Link to="/forgotPassword">Forgot Password?</Link>
+                        </Box>
+                        <Box component="div" style={{ textAlign: "center" }}>
+                            <div dangerouslySetInnerHTML={{__html: newAccountLink}}></div>
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
                             <div dangerouslySetInnerHTML={{__html: tou}}></div>

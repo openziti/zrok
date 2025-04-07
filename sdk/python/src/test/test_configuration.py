@@ -37,6 +37,7 @@ class TestConfiguration(unittest.TestCase):
             return Configuration(
                 version = '',
                 tou_link = '',
+                new_account_link = '',
                 invites_open = True,
                 requires_invite_token = True,
                 invite_token_contact = ''
