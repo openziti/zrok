@@ -1,4 +1,4 @@
-9999999999999999999999999999999999999#!/bin/bash
+#!/bin/bash
 
 set -euo pipefail
 
