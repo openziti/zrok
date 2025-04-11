@@ -10,7 +10,7 @@ As of zrok `1.0.2`, the zrok rebase is automatic and the configuration will auto
 No action is necessary.
 :::
 
-If you are running version `1.0.0` or `1.01`, you can run the following to rebase your environment to use the new versioned API:
+If you are running version `1.0.0` or `1.0.1`, you can run the following to rebase your environment to use the new versioned API:
 ```
   zrok rebase apiEndpoint https://api-v1.zrok.io
 ```
