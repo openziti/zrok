@@ -33,6 +33,12 @@ export interface ModelConfiguration {
     touLink?: string;
     /**
      * 
+     * @type {string}
+     * @memberof ModelConfiguration
+     */
+    newAccountLink?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof ModelConfiguration
      */
@@ -70,6 +76,7 @@ export function ModelConfigurationFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'version': json['version'] == null ? undefined : json['version'],
         'touLink': json['touLink'] == null ? undefined : json['touLink'],
+        'newAccountLink': json['newAccountLink'] == null ? undefined : json['newAccountLink'],
         'invitesOpen': json['invitesOpen'] == null ? undefined : json['invitesOpen'],
         'requiresInviteToken': json['requiresInviteToken'] == null ? undefined : json['requiresInviteToken'],
         'inviteTokenContact': json['inviteTokenContact'] == null ? undefined : json['inviteTokenContact'],
@@ -89,6 +96,7 @@ export function ModelConfigurationToJSONTyped(value?: ModelConfiguration | null,
         
         'version': value['version'],
         'touLink': value['touLink'],
+        'newAccountLink': value['newAccountLink'],
         'invitesOpen': value['invitesOpen'],
         'requiresInviteToken': value['requiresInviteToken'],
         'inviteTokenContact': value['inviteTokenContact'],

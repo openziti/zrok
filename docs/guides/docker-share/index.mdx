@@ -14,9 +14,9 @@ This page provides `docker` and `docker compose` examples of mounting the host's
 
 ## Permanent Public Share
 
-Let's say you have a `compose.yml` file that defines a web app known within the project's bridge network as `https://myapp:8080` and you want to publish it as a reliable, public site.
+Let's say you have a `compose.yml` file that defines a web app known within the project's bridge network as `https://toaster:8080` and you want to publish it as a reliable, public site.
 
-1. Reserve a subdomain by running `zrok reserve public --unique-name "myapp" https://myapp:8080` on the Docker host.
+1. Reserve a subdomain by running `zrok reserve public --unique-name "toaster" https:toasterpp:8080` on the Docker host.
 1. Merge this YAML with `compose.yml` or save it in the same directory as `compose.override.yml` to let `docker compose up` merge it for you.
 
     ```yaml
@@ -29,10 +29,10 @@ Let's say you have a `compose.yml` file that defines a web app known within the 
           - ${HOME}/.zrok:/home/ziggy/.zrok
         environment:
           PFXLOG_NO_JSON: "true"
-        command: share reserved "myapp" --headless
+        command: share reserved "toaster" --headless
     ```
 
-The reserved share will be available at `https://myapp.share.zrok.io` each time the `zrok` container starts up.
+The reserved share will be available at `https://toaster.share.zrok.io` each time the `zrok` container starts up.
 
 ## Temporary Public Share
 

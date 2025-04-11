@@ -71,6 +71,9 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                     <Typography variant="body1">Would you like to release the access <code>{frontendToken}</code> ?</Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+                    <Typography variant="h6" color="red">WARNING: This operation removes permissions and frees resources, but it does NOT terminate your <code>zrok access</code> process&mdash;you must do that manually.</Typography>
+                </Grid2>
+                <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{frontendToken}</code></p>} sx={{ mt: 2 }} />
                 </Grid2>
                 { errorMessage ? <Grid2 container sx={{ mb: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}

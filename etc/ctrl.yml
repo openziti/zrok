@@ -20,9 +20,14 @@ admin:
   secrets:
     -                             77623cad-1847-4d6d-8ffe-37defc33c909
   #
-  # If `tou_link` is present, the frontend will display the "Terms of Use" link on the login and registration forms
+  # If `tou_link` is present, the API console will display the "Terms of Use" link on the login and registration forms
   #
   tou_link:                       '<a href="https://google.com" target="_">Terms and Conditions</a>'
+  #
+  # If `new_account_link` is present, the API console will inject the contents of this setting into the login form; the
+  # intention is that it is used to present a "How do I get an account?" link.
+  #
+  new_account_link:               '<a href="https://google.com" target="_">How do I get an account?</a>'
   #
   # If `profile_endpoint` is present, the controller will start a `net/http/pprof` endpoint at the specified host:port
   #

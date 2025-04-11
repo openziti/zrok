@@ -1,27 +1,18 @@
-
 ## Docker Instance
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/70zJ_h4uiD8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-This Docker Compose project creates a zrok instance and includes a ziti controller and router. An optional Caddy container is included to provide HTTPS and reverse proxy services for the zrok API and public shares.
+This Docker Compose project creates a zrok instance supported by a OpenZiti controller and router. It supports flexible deployment configurations:
 
-### DNS Configuration
-
-1. A wildcard record exists for the IP address where the zrok instance will run, e.g. if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`.
-
-#### Additional DNS Configuration for Caddy TLS
-
-The included Caddy container can automatically manage a wildcard certificate for your zrok instance. You can enable Caddy in this compose project by renaming `compose.caddy.yml` as `compose.override.yml`.
-
-1. Ensure A Caddy DNS plugin is available for your DNS provider (see [github.com/caddy-dns](https://github.com/orgs/caddy-dns/repositories?type=all&q=sort%3Aname-asc)).
-1. Designate A DNS zone for zrok, e.g. `example.com` or `share.example.com` and create the zone on your DNS provider's platform.
-1. Created an API token in your DNS provider that has permission to manage zrok's DNS zone.
+1. **Basic Configuration**: Services exposed on localhost only (no TLS)
+2. **With Caddy**: Services published using Caddy (TLS)
+3. **With Traefik**: Services published using Traefik (TLS)
 
 ### Create the Docker Compose Project
 
 Create a working directory on your Docker host and save these Docker Compose project files.
 
-#### Shortcut Option
+#### YOLO
 
 1. Run this script to download the files in the current directory.
 
@@ -35,7 +26,7 @@ Create a working directory on your Docker host and save these Docker Compose pro
     curl https://get.openziti.io/zrok-instance/fetch.bash | bash -s /path/to/compose/project/dir
     ```
 
-#### Manual Option
+#### I'll Do it Myself
 
 1. Get the zrok repo ZIP file.
 
@@ -49,81 +40,117 @@ Create a working directory on your Docker host and save these Docker Compose pro
     unzip -j -d . main.zip '*/docker/compose/zrok-instance/*'
     ```
 
-### Configure the Docker Compose Project Environment
+### Basic Configuration (No TLS, Localhost Only)
 
-Create an `.env` file in the working directory.
+This is the simplest way to get started with zrok, exposing services on localhost only, without TLS.
 
-```bash title=".env required"
+#### DNS Configuration (Optional for localhost-only setup)
+
+1. If you plan to use this beyond localhost, set up a wildcard record for the IP address where the zrok instance will run 
+   (e.g., if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`).
+
+#### Configure the Docker Compose Project Environment
+
+Create an `.env` file in the working directory with the minimal required configuration:
+
+```bash title=".env minimal configuration"
+# Required settings
 ZROK_DNS_ZONE=share.example.com
-
 ZROK_USER_EMAIL=me@example.com
 ZROK_USER_PWD=zrokuserpw
-
 ZITI_PWD=zitiadminpw
 ZROK_ADMIN_TOKEN=zroktoken
-```
 
-```bash title=".env options"
-# Caddy TLS option: rename compose.caddy.yml to compose.override.yml and set these vars; allow 80,443 in firewall
+# Expose services only on localhost (default)
+ZROK_INSECURE_INTERFACE=127.0.0.1
 
-#
-## set these in .env for providers other than Route53
-#
-# plugin name for your DNS provider
-CADDY_DNS_PLUGIN=cloudflare
-# API token from your DNS provider
-CADDY_DNS_PLUGIN_TOKEN=abcd1234
-# use the staging API until you're sure everything is working to avoid hitting the rate limit
-CADDY_ACME_API=https://acme-staging-v02.api.letsencrypt.org/directory
-
-#
-## set these in .env for Route53
-#
-# AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-# AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-# AWS_REGION: ${AWS_REGION}
-# AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}  # if temporary credential, e.g., from STS
-
-#
-## if not using Caddy for TLS, uncomment to publish the insecure ports to the internet
-#
-#ZROK_INSECURE_INTERFACE=0.0.0.0
-
-# these insecure ports must be proxied with TLS for security
+# Service ports
 ZROK_CTRL_PORT=18080
 ZROK_FRONTEND_PORT=8080
 ZROK_OAUTH_PORT=8081
-
-# these secure ziti ports must be published to the internet
 ZITI_CTRL_ADVERTISED_PORT=80
 ZITI_ROUTER_PORT=3022
-
-# optionally configure oauth for public shares
-#ZROK_OAUTH_HASH_KEY=oauthhashkeysecret
-#ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
-#ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
-#ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
-#ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
-
-# zrok version, e.g., 1.0.0
-ZROK_CLI_TAG=latest
-# ziti version, e.g., 1.0.0
-ZITI_CLI_TAG=latest
 ```
 
-### Start the Docker Compose Project
+#### Start the Docker Compose Project
 
-1. Start the zrok instance.
+Start the zrok instance:
 
-    The container images for zrok (including caddy) are built in this step. This provides a simple configuration to get started. You can modify the templates named like `*.envsubst` or mount a customized configuration file to mask the one that was built in.
+```bash
+docker compose up --build --detach
+```
 
-    ```bash
-    docker compose up --build --detach
-    ```
+### Expanded Configuration with TLS (Caddy or Traefik)
+
+For production deployments, you should use TLS. You can choose between Caddy or Traefik for TLS termination and reverse proxy to the zrok services. The ziti services are always published directly, not proxied, and they bring their own TLS.
+
+#### DNS Configuration for TLS
+
+1. Ensure a wildcard record exists for the IP address where the zrok instance will run
+   (e.g., if your DNS zone is `share.example.com`, then your wildcard record is `*.share.example.com`).
+
+2. Choose a DNS provider that supports automatic DNS challenge for obtaining wildcard certificates and for which a plugin is available in Caddy or Traefik.
+
+#### Configure the Docker Compose File
+
+Add this setting to your `.env` file to select which TLS provider to use:
+
+```bash
+# Use one of the following:
+COMPOSE_FILE=compose.yml:compose.caddy.yml  # For Caddy
+# OR
+COMPOSE_FILE=compose.yml:compose.traefik.yml  # For Traefik
+```
+
+#### Caddy Configuration
+
+If using Caddy, add these settings to your `.env` file:
+
+```bash title=".env for Caddy"
+# Caddy TLS configuration
+CADDY_DNS_PLUGIN=cloudflare  # Plugin name for your DNS provider (see github.com/caddy-dns)
+CADDY_DNS_PLUGIN_TOKEN=abcd1234  # API token from your DNS provider
+CADDY_ACME_API=https://acme-v02.api.letsencrypt.org/directory  # ACME API endpoint
+CADDY_HTTPS_PORT=443  # HTTPS port (optional, defaults to 443)
+CADDY_INTERFACE=0.0.0.0  # Interface to bind to (optional, defaults to all interfaces)
+
+# For AWS Route53, uncomment and set these instead of CADDY_DNS_PLUGIN_TOKEN:
+# AWS_ACCESS_KEY_ID=your-access-key
+# AWS_SECRET_ACCESS_KEY=your-secret-key
+# AWS_REGION=your-region
+# AWS_SESSION_TOKEN=your-session-token  # Only if using temporary credentials
+```
+
+#### Traefik Configuration
+
+If using Traefik, add these settings to your `.env` file:
+
+```bash title=".env for Traefik"
+# Traefik TLS configuration
+TRAEFIK_DNS_PROVIDER=digitalocean  # DNS provider for Traefik
+TRAEFIK_DNS_PROVIDER_TOKEN=abcd1234  # API token from your DNS provider
+TRAEFIK_ACME_API=https://acme-v02.api.letsencrypt.org/directory  # ACME API endpoint
+TRAEFIK_HTTPS_PORT=443  # HTTPS port (optional, defaults to 443)
+TRAEFIK_INTERFACE=0.0.0.0  # Interface to bind to (optional, defaults to all interfaces)
+
+# For AWS Route53, uncomment and set these instead of TRAEFIK_DNS_PROVIDER_TOKEN:
+# AWS_ACCESS_KEY_ID=your-access-key
+# AWS_SECRET_ACCESS_KEY=your-secret-key
+# AWS_REGION=your-region
+# AWS_SESSION_TOKEN=your-session-token  # Only if using temporary credentials
+```
+
+#### Start the Docker Compose Project
+
+Start the zrok instance with TLS support:
+
+```bash
+docker compose up --build --detach
+```
 
 ### Set up a User Account
 
-This step creates a user account. You will log in to the zrok web console with the account password created in this step. The ZROK_USER_EMAIL and ZROK_USER_PWD variables are set in the `.env` file. You can create more user accounts the same way by substituting a different email and password.
+This step creates a user account. You will log in to the zrok web console with the account password created in this step. The ZROK_USER_EMAIL and ZROK_USER_PWD variables are set in the `.env` file.
 
 ```bash title="Create the first user account"
 docker compose exec zrok-controller bash -xc 'zrok admin create account ${ZROK_USER_EMAIL} ${ZROK_USER_PWD}'
@@ -148,125 +175,74 @@ You must enable each device environment with the account token obtained when the
 
 Follow [the getting started guide](/docs/getting-started#installing-the-zrok-command) to install the zrok CLI on some device and enable a zrok environment.
 
-1. Configure the environment with the zrok API. Substitute the API endpoint with the one you're using, e.g. `https://zrok.${ZROK_DNS_ZONE}`.
+1. Configure the environment with the zrok API endpoint:
 
-    ```bash
-    zrok config set apiEndpoint https://zrok.share.example.com
-    ```
+   ```bash
+   # If using TLS (Caddy or Traefik)
+   zrok config set apiEndpoint https://zrok.share.example.com
+   
+   # If using basic configuration (localhost, no TLS)
+   zrok config set apiEndpoint http://localhost:18080
+   ```
 
-    or, if not using Caddy for TLS:
+2. Enable an environment on this device with the account token from the previous step.
 
-    ```bash
-    zrok config set apiEndpoint http://zrok.share.example.com:18080
-    ```
-
-1. Enable an environment on this device with the account token from the previous step.
-
-    ```bash
-    zrok enable heMqncCyxZcx
-    ```
+   ```bash
+   zrok enable heMqncCyxZcx
+   ```
 
 ### Firewall Configuration
 
-The `ziti-quickstart` and `caddy` containers publish ports to all devices that use zrok shares. The `zrok-controller` and `zrok-frontend` containers expose ports only to the `caddy` container and the Docker host's loopback interface.
+- `443/tcp` - HTTPS for all services (Caddy or Traefik)
+- `80/tcp` - ziti ctrl plane
+- `3022/tcp` - ziti data plane
 
-#### Required
+### Additional Configuration Options
 
-1. `443/tcp` - reverse proxy handles HTTPS requests for zrok API, OAuth, and public shares (published by container `caddy`)
-1. `80/tcp` - ziti ctrl plane (published by container `ziti-quickstart`)
-1. `3022/tcp` - ziti data plane (published by container `ziti-quickstart`)
+You can add these additional settings to your `.env` file for more customization:
 
-<!-- 1. 443/udp used by Caddy for HTTP/3 QUIC protocol (published by container `caddy`) -->
-
-See "My internet connection can only send traffic to common ports" below about changing the required ports.
+```bash
+# OAuth configuration for public shares
+ZROK_OAUTH_HASH_KEY=oauthhashkeysecret
+ZROK_OAUTH_GITHUB_CLIENT_ID=abcd1234
+ZROK_OAUTH_GITHUB_CLIENT_SECRET=abcd1234
+ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
+ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
+```
 
 ### Troubleshooting
 
-1. Check the ziti and zrok logs.
+1. Check the service logs:
 
-    You can substitute the service container name of each to check their logs individually: `ziti-quickstart`, `zrok-controller`, `zrok-frontend`.
+   ```bash
+   # View logs for a specific service
+   docker compose logs zrok-controller
+   docker compose logs zrok-frontend
+   docker compose logs ziti-quickstart
+   
+   # View logs for Caddy (if using)
+   docker compose logs caddy
+   
+   # View logs for Traefik (if using)
+   docker compose logs traefik
+   ```
 
-    ```bash
-    docker compose logs zrok-controller
-    ```
+2. Validate TLS configuration:
 
-1. Check the Caddy logs.
+   ```bash
+   # For Caddy
+   docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
+   
+   # For Traefik
+   docker compose exec traefik traefik healthcheck
+   ```
 
-    It can take a few minutes for Caddy to obtain the wildcard certificate. You can check the logs to see if there were any errors completing the DNS challenge which involves using the Caddy DNS plugin to create a TXT record in your DNS zone. This leverages the API token you provided in the `.env` file, which must have permission to create DNS records in the zrok DNS zone.
+3. Check certificate status:
 
-    ```bash
-    docker compose logs caddy
-    ```
-
-1. Caddy keeps failing to obtain a wildcard certificate because it timed out waiting for DNS.
-
-    Symptom: the Caddy log contains "timed out waiting for record to fully propagate." This means that Caddy added a DNS record with your DNS provider's API to prove to the CA it controls the zrok DNS zone, but it wasn't able to verify the record was created successfully with a DNS query.
-
-    Solutions:
-
-    - Add `propagation_delay` in your `Caddyfile` to delay the first DNS verification query. This avoids caching a verification query failure by waiting a few minutes for the record to become available so the verification query will succeed on the first attempt. Caddy will be unable to verify the DNS record if the failure remains in the cache too long.
-    - If the prior solution fails, you can override the default resolves/nameservers with `resolvers`, a space-separated list of DNS servers. This gives you more control over if and where the verification query result is cached.
-
-    ```
-    tls {
-        dns {CADDY_DNS_PLUGIN} {CADDY_DNS_PLUGIN_TOKEN}
-		propagation_timeout 60m  # default 2m
-        propagation_delay   5m   # default 0m
-    }
-    ```
-    
-1. `zrok enable` fails certificate verification: ensure you are not using the staging API for Let's Encrypt.
-
-    If you are using the staging API, you will see an error about the API certificate when you use the zrok CLI. You can switch to the production API by removing the overriding assignment of the `CADDY_ACME_API` variable.
-
-    ```buttonless title="Example output"
-    there was a problem enabling your environment!
-    you are trying to use the zrok service at: https://zrok.share.example.com
-    you can change your zrok service endpoint using this command:
-
-    $ zrok config set apiEndpoint <newEndpoint>
-
-    (where newEndpoint is something like: https://some.zrok.io)
-    [ERROR]: error creating service client (error getting version from api endpoint 'https://zrok.share.example.com': Get "https://zrok.share.example.com/api/v1/version": tls: failed to verify certificate: x509: certificate signed by unknown authority: Get "https://zrok.share.example.com/api/v1/version": tls: failed to verify certificate: x509: certificate signed by unknown authority)
-    ```
-
-1. Validate the Caddyfile.
-
-    ```bash
-    docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
-    ```
-
-1. Verify the correct DNS provider module was built-in to Caddy.
-
-    ```bash
-    docker compose exec caddy caddy list-modules | grep dns.providers
-    ```
-
-    ```buttonless title="Example output"
-    dns.providers.cloudflare
-    ```
-
-1. Use the Caddy admin API.
-
-    You can use the Caddy admin API to check the status of the Caddy instance. The admin API is available on port `2019/tcp` inside the Docker Compose project. You can modify `compose.override.yml` to publish the port if you want to access the admin API from the Docker host or elsewhere.
-
-    ```bash
-    docker compose exec caddy curl http://localhost:2019/config/ | jq
-    ```
-
-1. My DNS provider credential is composed of several values, not a single API token.
-
-    As long as your DNS provider is supported by Caddy then it will work. Here's a checklist for DNS providers like Route53 with credentials expressed as multiple values, e.g., `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
-
-    1. Define env vars in `.env` file.
-    1. Declare env vars in `compose.override.yml` file on `caddy`'s `environment`.
-    1. Modify `Caddyfile` according to the DNS plugin author's instructions ([link to Route53 README](https://github.com/caddy-dns/route53)). This means modifying the `Caddyfile` to reference the env vars. The provided file `route53.Caddyfile` serves as an example.
-
-1. My internet connection can only send traffic to common ports like 80, 443, and 3389.
-
-    You can change the required ports in the `.env` file. Caddy will still use port 443 for zrok shares and API if you renamed `compose.caddy.yml` as `compose.override.yml` to enable Caddy.
-
-    ```bash title=".env"
-    ZITI_CTRL_ADVERTISED_PORT=80
-    ZITI_ROUTER_PORT=3389
-    ```
+   ```bash
+   # For Caddy
+   docker compose exec caddy curl -s "http://localhost:2019/certificates"
+   
+   # For Traefik - view the ACME certificate file directly
+   docker compose exec traefik cat /etc/traefik/acme/acme.json | grep -A 5 "Certificates"
+   ```
