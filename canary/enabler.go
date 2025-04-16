@@ -10,7 +10,7 @@ import (
 )
 
 type EnablerOptions struct {
-	Iterations int
+	Iterations uint
 	MinDwell   time.Duration
 	MaxDwell   time.Duration
 	MinPacing  time.Duration
@@ -18,15 +18,15 @@ type EnablerOptions struct {
 }
 
 type Enabler struct {
-	id           uint
+	Id           uint
 	opt          *EnablerOptions
 	root         env_core.Root
-	Environments chan<- *sdk.Environment
+	Environments chan *sdk.Environment
 }
 
 func NewEnabler(id uint, opt *EnablerOptions, root env_core.Root) *Enabler {
 	return &Enabler{
-		id:           id,
+		Id:           id,
 		opt:          opt,
 		root:         root,
 		Environments: make(chan *sdk.Environment, opt.Iterations),
@@ -35,7 +35,7 @@ func NewEnabler(id uint, opt *EnablerOptions, root env_core.Root) *Enabler {
 
 func (e *Enabler) Run() {
 	defer close(e.Environments)
-	defer logrus.Infof("#%d stopping", e.id)
+	defer logrus.Infof("#%d stopping", e.Id)
 	e.dwell()
 	e.iterate()
 }
@@ -50,9 +50,9 @@ func (e *Enabler) dwell() {
 }
 
 func (e *Enabler) iterate() {
-	for i := 0; i < e.opt.Iterations; i++ {
+	for i := uint(0); i < e.opt.Iterations; i++ {
 		env, err := sdk.EnableEnvironment(e.root, &sdk.EnableRequest{
-			Host:        fmt.Sprintf("canary_%d_%d", e.id, i),
+			Host:        fmt.Sprintf("canary_%d_%d", e.Id, i),
 			Description: "canary.Enabler",
 		})
 		if err == nil {

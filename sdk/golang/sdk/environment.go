@@ -8,10 +8,6 @@ import (
 )
 
 func EnableEnvironment(env env_core.Root, request *EnableRequest) (*Environment, error) {
-	if env.IsEnabled() {
-		return nil, errors.New("environment is already enabled!")
-	}
-
 	zrok, err := env.Client()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create zrok client")
