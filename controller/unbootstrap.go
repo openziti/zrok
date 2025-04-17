@@ -120,21 +120,35 @@ func unbootstrapServices(edge *rest_management_api_client.ZitiEdgeManagement) er
 }
 
 func unbootstrapEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &edge_router_policy.ListEdgeRouterPoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.EdgeRouterPolicy.ListEdgeRouterPolicies(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, erp := range resp.Payload.Data {
-		logrus.Infof("found edge router policy: %v", *erp.ID)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &edge_router_policy.ListEdgeRouterPoliciesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.EdgeRouterPolicy.ListEdgeRouterPolicies(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, erp := range listResp.Payload.Data {
+			delReq := &edge_router_policy.DeleteEdgeRouterPolicyParams{
+				ID:      *erp.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.EdgeRouterPolicy.DeleteEdgeRouterPolicy(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted edge router policy '%v'", *erp.ID)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
