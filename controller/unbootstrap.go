@@ -80,41 +80,69 @@ func unbootstrapServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiE
 }
 
 func unbootstrapServicePolicies(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &service_policy.ListServicePoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.ServicePolicy.ListServicePolicies(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, sp := range resp.Payload.Data {
-		logrus.Infof("found service policy: %v", *sp.ID)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &service_policy.ListServicePoliciesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, sp := range listResp.Payload.Data {
+			delReq := &service_policy.DeleteServicePolicyParams{
+				ID:      *sp.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.ServicePolicy.DeleteServicePolicy(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted service policy '%v'", *sp.ID)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
 
 func unbootstrapServices(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &service.ListServicesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.Service.ListServices(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, svc := range resp.Payload.Data {
-		logrus.Infof("found service: %v (%v)", *svc.ID, *svc.Name)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &service.ListServicesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.Service.ListServices(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, svc := range listResp.Payload.Data {
+			delReq := &service.DeleteServiceParams{
+				ID:      *svc.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.Service.DeleteService(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted service '%v' (%v)", *svc.ID, *svc.Name)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -188,41 +216,69 @@ func unbootstrapIdentities(edge *rest_management_api_client.ZitiEdgeManagement) 
 }
 
 func unbootstrapConfigs(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &apiConfig.ListConfigsParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.Config.ListConfigs(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, listCfg := range resp.Payload.Data {
-		logrus.Infof("found config: %v", *listCfg.ID)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &apiConfig.ListConfigsParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.Config.ListConfigs(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, listCfg := range listResp.Payload.Data {
+			delReq := &apiConfig.DeleteConfigParams{
+				ID:      *listCfg.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.Config.DeleteConfig(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted config '%v'", *listCfg.ID)
+			} else {
+				return nil
+			}
+		}
 	}
 	return nil
 }
 
 func unbootstrapConfigType(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := fmt.Sprintf("name = \"%v\"", sdk.ZrokProxyConfig)
-	limit := int64(100)
-	offset := int64(0)
-	req := &apiConfig.ListConfigTypesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.Config.ListConfigTypes(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, listCfgType := range resp.Payload.Data {
-		logrus.Infof("found config type: %v (%v)", *listCfgType.ID, *listCfgType.Name)
+	for {
+		filter := fmt.Sprintf("name = \"%v\"", sdk.ZrokProxyConfig)
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &apiConfig.ListConfigTypesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.Config.ListConfigTypes(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, listCfgType := range listResp.Payload.Data {
+			delReq := &apiConfig.DeleteConfigTypeParams{
+				ID:      *listCfgType.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.Config.DeleteConfigType(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted config type '%v' (%v)", *listCfgType.ID, *listCfgType.Name)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
