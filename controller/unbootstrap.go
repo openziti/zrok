@@ -46,21 +46,35 @@ func Unbootstrap(cfg *config.Config) error {
 }
 
 func unbootstrapServiceEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, serp := range resp.Payload.Data {
-		logrus.Infof("found service edge router policy: %v", *serp.ID)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, serp := range listResp.Payload.Data {
+			delReq := &service_edge_router_policy.DeleteServiceEdgeRouterPolicyParams{
+				ID:      *serp.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.ServiceEdgeRouterPolicy.DeleteServiceEdgeRouterPolicy(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted service edge router policy '%v'", *serp.ID)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -126,21 +140,35 @@ func unbootstrapEdgeRouterPolicies(edge *rest_management_api_client.ZitiEdgeMana
 }
 
 func unbootstrapIdentities(edge *rest_management_api_client.ZitiEdgeManagement) error {
-	filter := "tags.zrok != null"
-	limit := int64(100)
-	offset := int64(0)
-	req := &identity.ListIdentitiesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	resp, err := edge.Identity.ListIdentities(req, nil)
-	if err != nil {
-		return err
-	}
-	for _, identity := range resp.Payload.Data {
-		logrus.Infof("found identity: %v", *identity.ID)
+	for {
+		filter := "tags.zrok != null"
+		limit := int64(100)
+		offset := int64(0)
+		listReq := &identity.ListIdentitiesParams{
+			Filter:  &filter,
+			Limit:   &limit,
+			Offset:  &offset,
+			Context: context.Background(),
+		}
+		listResp, err := edge.Identity.ListIdentities(listReq, nil)
+		if err != nil {
+			return err
+		}
+		if len(listResp.Payload.Data) < 1 {
+			break
+		}
+		for _, i := range listResp.Payload.Data {
+			delReq := &identity.DeleteIdentityParams{
+				ID:      *i.ID,
+				Context: context.Background(),
+			}
+			_, err := edge.Identity.DeleteIdentity(delReq, nil)
+			if err == nil {
+				logrus.Infof("deleted identity '%v' (%v)", *i.ID, *i.Name)
+			} else {
+				return err
+			}
+		}
 	}
 	return nil
 }
