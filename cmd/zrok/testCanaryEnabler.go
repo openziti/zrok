@@ -23,7 +23,7 @@ type testCanaryEnabler struct {
 	maxDwell    time.Duration
 	minPacing   time.Duration
 	maxPacing   time.Duration
-	disable     bool
+	skipDisable bool
 }
 
 func newTestCanaryEnabler() *testCanaryEnabler {
@@ -40,7 +40,7 @@ func newTestCanaryEnabler() *testCanaryEnabler {
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 0, "Maximum dwell time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
-	cmd.Flags().BoolVar(&command.disable, "disable", true, "Disable (clean up) enabled environments")
+	cmd.Flags().BoolVar(&command.skipDisable, "skip-disable", false, "Disable (clean up) enabled environments")
 	return command
 }
 
@@ -71,7 +71,7 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		go enabler.Run()
 	}
 
-	if cmd.disable {
+	if !cmd.skipDisable {
 		var disablers []*canary.Disabler
 		for i := uint(0); i < cmd.enablers; i++ {
 			disablerOpts := &canary.DisablerOptions{
