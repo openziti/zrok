@@ -2,6 +2,18 @@ package sdk
 
 import "time"
 
+type EnableRequest struct {
+	Host        string
+	Description string
+}
+
+type Environment struct {
+	Host         string
+	Description  string
+	ZitiIdentity string
+	ZitiConfig   string
+}
+
 type BackendMode string
 
 const (

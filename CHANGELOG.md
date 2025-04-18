@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.3
+
+FEATURE: New `zrok admin unbootstrap` to remove zrok resources from the underlying OpenZiti instance (https://github.com/openziti/zrok/issues/935)
+
 ## v1.0.2
 
 FEATURE: "Auto-rebase" for enabled environments where the `apiEndpoint` is set to `https://api.zrok.io`. This will automatically migrate existing environments to the new `apiEndpoint` for the `v1.0.x` series (https://github.com/openziti/zrok/issues/936)
