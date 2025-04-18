@@ -57,8 +57,16 @@ func (e *Enabler) iterate() {
 		})
 		if err == nil {
 			e.Environments <- env
+			logrus.Infof("#%d enabled environment '%v'", e.Id, env.ZitiIdentity)
 		} else {
-			logrus.Errorf("error creating canary environment: %v", err)
+			logrus.Errorf("error creating canary (#%d) environment: %v", e.Id, err)
+		}
+
+		pacingMs := e.opt.MaxPacing.Milliseconds()
+		pacingDelta := e.opt.MaxPacing.Milliseconds() - e.opt.MinPacing.Milliseconds()
+		if pacingDelta > 0 {
+			pacingMs = (rand.Int63() % pacingDelta) + e.opt.MinPacing.Milliseconds()
+			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
 	}
 }

@@ -23,6 +23,7 @@ type testCanaryEnabler struct {
 	maxDwell    time.Duration
 	minPacing   time.Duration
 	maxPacing   time.Duration
+	disable     bool
 }
 
 func newTestCanaryEnabler() *testCanaryEnabler {
@@ -35,10 +36,11 @@ func newTestCanaryEnabler() *testCanaryEnabler {
 	cmd.Run = command.run
 	cmd.Flags().UintVarP(&command.enablers, "enablers", "e", 1, "Number of concurrent enablers to start")
 	cmd.Flags().UintVarP(&command.iterations, "iterations", "i", 1, "Number of iterations")
-	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 1*time.Second, "Minimum dwell time")
-	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
+	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 0, "Minimum dwell time")
+	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 0, "Maximum dwell time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
+	cmd.Flags().BoolVar(&command.disable, "disable", true, "Disable (clean up) enabled environments")
 	return command
 }
 
@@ -69,15 +71,31 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		go enabler.Run()
 	}
 
-	for _, enabler := range enablers {
-	enablerLoop:
-		for {
-			select {
-			case env, ok := <-enabler.Environments:
-				if !ok {
-					break enablerLoop
+	if cmd.disable {
+		var disablers []*canary.Disabler
+		for i := uint(0); i < cmd.enablers; i++ {
+			disablerOpts := &canary.DisablerOptions{
+				Environments: enablers[i].Environments,
+			}
+			disabler := canary.NewDisabler(i, disablerOpts, root)
+			disablers = append(disablers, disabler)
+			go disabler.Run()
+		}
+		for _, disabler := range disablers {
+			<-disabler.Done
+		}
+
+	} else {
+		for _, enabler := range enablers {
+		enablerLoop:
+			for {
+				select {
+				case env, ok := <-enabler.Environments:
+					if !ok {
+						break enablerLoop
+					}
+					logrus.Infof("enabler #%d: %v", enabler.Id, env.ZitiIdentity)
 				}
-				logrus.Infof("enabler #%d: %v", enabler.Id, env.ZitiIdentity)
 			}
 		}
 	}
