@@ -9,11 +9,12 @@ import (
 )
 
 type DisablerOptions struct {
-	Environments chan *sdk.Environment
-	MinDwell     time.Duration
-	MaxDwell     time.Duration
-	MinPacing    time.Duration
-	MaxPacing    time.Duration
+	Environments  chan *sdk.Environment
+	MinDwell      time.Duration
+	MaxDwell      time.Duration
+	MinPacing     time.Duration
+	MaxPacing     time.Duration
+	SnapshotQueue chan *Snapshot
 }
 
 type Disabler struct {
@@ -49,16 +50,35 @@ func (d *Disabler) dwell() {
 }
 
 func (d *Disabler) iterate() {
+	iteration := uint64(0)
 	for {
 		select {
 		case env, ok := <-d.opt.Environments:
 			if !ok {
 				return
 			}
+
+			snapshot := NewSnapshot("disable", d.Id, iteration)
+			iteration++
+
 			if err := sdk.DisableEnvironment(env, d.root); err == nil {
+				snapshot.Completed = time.Now()
+				snapshot.Ok = true
+
 				logrus.Infof("#%d disabled environment '%v'", d.Id, env.ZitiIdentity)
+
 			} else {
+				snapshot.Completed = time.Now()
+				snapshot.Ok = false
+				snapshot.Error = err
+
 				logrus.Errorf("error disabling canary (#%d) environment '%v': %v", d.Id, env.ZitiIdentity, err)
+			}
+
+			if d.opt.SnapshotQueue != nil {
+				d.opt.SnapshotQueue <- snapshot
+			} else {
+				logrus.Info(snapshot)
 			}
 		}
 
