@@ -20,6 +20,7 @@ type EnablerOptions struct {
 
 type Enabler struct {
 	Id           uint
+	Done         chan struct{}
 	opt          *EnablerOptions
 	root         env_core.Root
 	Environments chan *sdk.Environment
@@ -28,6 +29,7 @@ type Enabler struct {
 func NewEnabler(id uint, opt *EnablerOptions, root env_core.Root) *Enabler {
 	return &Enabler{
 		Id:           id,
+		Done:         make(chan struct{}),
 		opt:          opt,
 		root:         root,
 		Environments: make(chan *sdk.Environment, opt.Iterations),
@@ -36,6 +38,7 @@ func NewEnabler(id uint, opt *EnablerOptions, root env_core.Root) *Enabler {
 
 func (e *Enabler) Run() {
 	defer close(e.Environments)
+	defer close(e.Done)
 	defer logrus.Infof("#%d stopping", e.Id)
 	e.dwell()
 	e.iterate()
@@ -51,6 +54,7 @@ func (e *Enabler) dwell() {
 }
 
 func (e *Enabler) iterate() {
+	defer logrus.Info("done")
 	for i := uint(0); i < e.opt.Iterations; i++ {
 		snapshot := NewSnapshot("enable", e.Id, uint64(i))
 

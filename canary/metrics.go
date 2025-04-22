@@ -3,6 +3,7 @@ package canary
 import (
 	"context"
 	"fmt"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"slices"
@@ -37,14 +38,16 @@ type SnapshotCollector struct {
 	InputQueue chan *Snapshot
 	Closed     chan struct{}
 	ctx        context.Context
+	cfg        *Config
 	snapshots  map[string][]*Snapshot
 }
 
-func NewSnapshotCollector(ctx context.Context) *SnapshotCollector {
+func NewSnapshotCollector(ctx context.Context, cfg *Config) *SnapshotCollector {
 	return &SnapshotCollector{
 		InputQueue: make(chan *Snapshot),
 		Closed:     make(chan struct{}),
 		ctx:        ctx,
+		cfg:        cfg,
 		snapshots:  make(map[string][]*Snapshot),
 	}
 }
@@ -68,4 +71,32 @@ func (sc *SnapshotCollector) Run() {
 			sc.snapshots[snapshot.Operation] = snapshots
 		}
 	}
+}
+
+func (sc *SnapshotCollector) Store() error {
+	idb := influxdb2.NewClient(sc.cfg.Influx.Url, sc.cfg.Influx.Token)
+	writeApi := idb.WriteAPIBlocking(sc.cfg.Influx.Org, sc.cfg.Influx.Bucket)
+	for key, arr := range sc.snapshots {
+		for _, snapshot := range arr {
+			tags := map[string]string{
+				"instance":  fmt.Sprintf("%d", snapshot.Instance),
+				"iteration": fmt.Sprintf("%d", snapshot.Iteration),
+				"ok":        fmt.Sprintf("%t", snapshot.Ok),
+			}
+			if snapshot.Error != nil {
+				tags["error"] = snapshot.Error.Error()
+			}
+			pt := influxdb2.NewPoint(snapshot.Operation, tags, map[string]interface{}{
+				"duration": snapshot.Completed.Sub(snapshot.Started),
+				"size":     snapshot.Size,
+			}, snapshot.Started)
+			if err := writeApi.WritePoint(context.Background(), pt); err != nil {
+				return err
+			}
+		}
+		logrus.Infof("wrote '%v' points for '%v'", len(arr), key)
+	}
+	idb.Close()
+	logrus.Infof("complete")
+	return nil
 }

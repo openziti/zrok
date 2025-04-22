@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/openziti/zrok/canary"
 	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
@@ -14,16 +15,17 @@ func init() {
 }
 
 type testCanaryEnabler struct {
-	cmd         *cobra.Command
-	enablers    uint
-	iterations  uint
-	minPreDelay time.Duration
-	maxPreDelay time.Duration
-	minDwell    time.Duration
-	maxDwell    time.Duration
-	minPacing   time.Duration
-	maxPacing   time.Duration
-	skipDisable bool
+	cmd          *cobra.Command
+	enablers     uint
+	iterations   uint
+	minPreDelay  time.Duration
+	maxPreDelay  time.Duration
+	minDwell     time.Duration
+	maxDwell     time.Duration
+	minPacing    time.Duration
+	maxPacing    time.Duration
+	skipDisable  bool
+	canaryConfig string
 }
 
 func newTestCanaryEnabler() *testCanaryEnabler {
@@ -41,6 +43,7 @@ func newTestCanaryEnabler() *testCanaryEnabler {
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
 	cmd.Flags().BoolVar(&command.skipDisable, "skip-disable", false, "Disable (clean up) enabled environments")
+	cmd.Flags().StringVar(&command.canaryConfig, "canary-config", "", "Path to canary configuration file")
 	return command
 }
 
@@ -52,6 +55,19 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
+	}
+
+	var sc *canary.SnapshotCollector
+	var scCtx context.Context
+	var scCancel context.CancelFunc
+	if cmd.canaryConfig != "" {
+		cfg, err := canary.LoadConfig(cmd.canaryConfig)
+		if err != nil {
+			panic(err)
+		}
+		scCtx, scCancel = context.WithCancel(context.Background())
+		sc = canary.NewSnapshotCollector(scCtx, cfg)
+		go sc.Run()
 	}
 
 	var enablers []*canary.Enabler
@@ -70,6 +86,9 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			MinPacing:  cmd.minPacing,
 			MaxPacing:  cmd.maxPacing,
 		}
+		if sc != nil {
+			enablerOpts.SnapshotQueue = sc.InputQueue
+		}
 		enabler := canary.NewEnabler(i, enablerOpts, root)
 		enablers = append(enablers, enabler)
 		go enabler.Run()
@@ -81,11 +100,15 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			disablerOpts := &canary.DisablerOptions{
 				Environments: enablers[i].Environments,
 			}
+			if sc != nil {
+				disablerOpts.SnapshotQueue = sc.InputQueue
+			}
 			disabler := canary.NewDisabler(i, disablerOpts, root)
 			disablers = append(disablers, disabler)
 			go disabler.Run()
 		}
 		for _, disabler := range disablers {
+			logrus.Infof("waiting for disabler #%d", disabler.Id)
 			<-disabler.Done
 		}
 
@@ -103,4 +126,18 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			}
 		}
 	}
+
+	for _, enabler := range enablers {
+		<-enabler.Done
+	}
+
+	if sc != nil {
+		scCancel()
+		<-sc.Closed
+		if err := sc.Store(); err != nil {
+			panic(err)
+		}
+	}
+
+	logrus.Infof("complete")
 }
