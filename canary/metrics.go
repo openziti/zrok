@@ -87,7 +87,7 @@ func (sc *SnapshotCollector) Store() error {
 				tags["error"] = snapshot.Error.Error()
 			}
 			pt := influxdb2.NewPoint(snapshot.Operation, tags, map[string]interface{}{
-				"duration": snapshot.Completed.Sub(snapshot.Started),
+				"duration": snapshot.Completed.Sub(snapshot.Started).Milliseconds(),
 				"size":     snapshot.Size,
 			}, snapshot.Started)
 			if err := writeApi.WritePoint(context.Background(), pt); err != nil {
