@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v1.0.3
+
+FEATURE: New `zrok admin unbootstrap` to remove zrok resources from the underlying OpenZiti instance (https://github.com/openziti/zrok/issues/935)
+
+FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` framework (https://github.com/openziti/zrok/issues/948)
+
+FEATURE: New `zrok test canary enabler` to validate `enable`/`disable` operations and gather performance metrics around how those paths are operating (https://github.com/openziti/zrok/issues/771)
+
+CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
+
 ## v1.0.2
 
 FEATURE: "Auto-rebase" for enabled environments where the `apiEndpoint` is set to `https://api.zrok.io`. This will automatically migrate existing environments to the new `apiEndpoint` for the `v1.0.x` series (https://github.com/openziti/zrok/issues/936)
