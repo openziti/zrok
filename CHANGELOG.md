@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## v1.0.3
+
+FEATURE: New `zrok admin unbootstrap` to remove zrok resources from the underlying OpenZiti instance (https://github.com/openziti/zrok/issues/935)
+
+FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` framework (https://github.com/openziti/zrok/issues/948)
+
+FEATURE: New `zrok test canary enabler` to validate `enable`/`disable` operations and gather performance metrics around how those paths are operating (https://github.com/openziti/zrok/issues/771)
+
+CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
+
+## v1.0.2
+
+FEATURE: "Auto-rebase" for enabled environments where the `apiEndpoint` is set to `https://api.zrok.io`. This will automatically migrate existing environments to the new `apiEndpoint` for the `v1.0.x` series (https://github.com/openziti/zrok/issues/936)
+
+FEATURE: New `admin/new_account_link` configuration option to allow the insertion of "how do I register for an account?" links into the login form (https://github.com/openziti/zrok/issues/552)
+
+CHANGE: The release environment, share, and access modals in the API console now have a better message letting the user know they will still need to clean up their `zrok` processes (https://github.com/openziti/zrok/issues/910)
+
+CHANGE: The openziti/zrok Docker image has been updated to use the latest version of the ziti CLI, 1.4.3 (https://github.com/openziti/zrok/pull/917)
+
 ## v1.0.1
 
 FEATURE: The zrok Agent now persists private accesses and reserved shares between executions. Any `zrok access private` instances or `zrok share reserved` instances created using the agent are now persisted to a registry stored in `${HOME}/.zrok`. When restarting the agent these accesses and reserved shares are re-created from the data in this registry (https://github.com/openziti/zrok/pull/922)

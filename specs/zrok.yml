@@ -1229,6 +1229,8 @@ definitions:
         type: string
       touLink:
         type: string
+      newAccountLink:
+        type: string
       invitesOpen:
         type: boolean
       requiresInviteToken:

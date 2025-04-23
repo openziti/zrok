@@ -6,8 +6,10 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const V = "v0.4"
@@ -285,6 +287,13 @@ func loadEnvironment() (*env_core.Environment, error) {
 		AccountToken: env.AccountToken,
 		ZitiIdentity: env.ZId,
 		ApiEndpoint:  env.ApiEndpoint,
+	}
+	if strings.HasPrefix(env.ApiEndpoint, "https://api.zrok.io") {
+		out.ApiEndpoint = "https://api-v1.zrok.io"
+		if err := saveEnvironment(out); err != nil {
+			return nil, errors.Wrap(err, "error auto-rebasing apiEndpoint")
+		}
+		logrus.Info("auto-rebased 'apiEndpoint' for v1.0.x")
 	}
 	return out, nil
 }

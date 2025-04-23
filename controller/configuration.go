@@ -26,6 +26,7 @@ func (ch *configurationHandler) Handle(_ metadata.ConfigurationParams) middlewar
 	}
 	if cfg.Admin != nil {
 		data.TouLink = cfg.Admin.TouLink
+		data.NewAccountLink = cfg.Admin.NewAccountLink
 	}
 	if cfg.Invites != nil {
 		data.InviteTokenContact = cfg.Invites.TokenContact

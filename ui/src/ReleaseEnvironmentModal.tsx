@@ -69,7 +69,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                     <Typography variant="body1">Would you like to release the environment <code>{description}</code> ?</Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="body1">Releasing this environment will also release any shares and accesses that are associated with it.</Typography>
+                    <Typography variant="h6" color="red">WARNING: Releasing this environment will also release any shares and accesses that are associated with it. This operation removes permissions and frees resources, but it does NOT terminate your <code>zrok share</code> or <code>zrok access</code> processes&mdash;you must do that manually.</Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm the release of <code>{description}</code></p>} sx={{ mt: 2 }} />
