@@ -6,6 +6,8 @@ FEATURE: New `zrok admin unbootstrap` to remove zrok resources from the underlyi
 
 FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` framework (https://github.com/openziti/zrok/issues/948)
 
+FEATURE: New `zrok test canary enabler` to validate `enable`/`disable` operations and gather performance metrics around how those paths are operating (https://github.com/openziti/zrok/issues/771)
+
 CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
 
 ## v1.0.2
