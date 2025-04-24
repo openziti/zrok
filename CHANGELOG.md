@@ -2,6 +2,8 @@
 
 ## v1.0.3
 
+FEATURE: `zrok agent console` now outputs the URL it is attempting to open. New `zrok agent console --headless` option to only emit the agent console URL (https://github.com/openziti/zrok/issues/944)
+
 FEATURE: New `zrok admin unbootstrap` to remove zrok resources from the underlying OpenZiti instance (https://github.com/openziti/zrok/issues/935)
 
 FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` framework (https://github.com/openziti/zrok/issues/948)
