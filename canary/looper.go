@@ -18,6 +18,7 @@ type LooperOptions struct {
 	MaxPacing      time.Duration
 	TargetName     string
 	BindAddress    string
+	SnapshotQueue  chan *Snapshot
 }
 
 type LooperResults struct {

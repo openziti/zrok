@@ -141,6 +141,8 @@ func (l *PublicHttpLooper) iterate() {
 	defer func() { l.results.StopTime = time.Now() }()
 
 	for i := uint(0); i < l.opt.Iterations && !l.abort; i++ {
+		snapshot := NewSnapshot("public-proxy", l.id, uint64(i))
+
 		if i > 0 && i%l.opt.StatusInterval == 0 {
 			logrus.Infof("#%d: iteration %d", l.id, i)
 		}
@@ -153,6 +155,7 @@ func (l *PublicHttpLooper) iterate() {
 		outPayload := make([]byte, payloadSize)
 		cryptorand.Read(outPayload)
 		outBase64 := base64.StdEncoding.EncodeToString(outPayload)
+		snapshot.Size = uint64(len(outBase64))
 
 		if req, err := http.NewRequest("POST", l.shr.FrontendEndpoints[0], bytes.NewBufferString(outBase64)); err == nil {
 			client := &http.Client{Timeout: l.opt.Timeout}
@@ -167,9 +170,16 @@ func (l *PublicHttpLooper) iterate() {
 				if inBase64 != outBase64 {
 					logrus.Errorf("#%d: payload mismatch", l.id)
 					l.results.Mismatches++
+
+					snapshot.Completed = time.Now()
+					snapshot.Ok = false
+					snapshot.Error = errors.New("payload mismatch")
 				} else {
 					l.results.Bytes += uint64(len(outBase64))
 					logrus.Debugf("#%d: payload match", l.id)
+
+					snapshot.Completed = time.Now()
+					snapshot.Ok = true
 				}
 			} else {
 				logrus.Errorf("#%d: error: %v", l.id, err)
@@ -178,6 +188,12 @@ func (l *PublicHttpLooper) iterate() {
 		} else {
 			logrus.Errorf("#%d: error creating request: %v", l.id, err)
 			l.results.Errors++
+		}
+
+		if l.opt.SnapshotQueue != nil {
+			l.opt.SnapshotQueue <- snapshot
+		} else {
+			logrus.Info(snapshot)
 		}
 
 		pacingMs := l.opt.MaxPacing.Milliseconds()

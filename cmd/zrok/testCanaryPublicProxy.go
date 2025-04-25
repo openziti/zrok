@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/openziti/zrok/canary"
 	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
@@ -31,6 +32,7 @@ type testCanaryPublicProxy struct {
 	minPacing         time.Duration
 	maxPacing         time.Duration
 	frontendSelection string
+	canaryConfig      string
 }
 
 func newTestCanaryPublicProxy() *testCanaryPublicProxy {
@@ -54,6 +56,7 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
 	cmd.Flags().StringVar(&command.frontendSelection, "frontend-selection", "public", "Select frontend selection")
+	cmd.Flags().StringVar(&command.canaryConfig, "canary-config", "", "Path to canary configuration file")
 	return command
 }
 
@@ -65,6 +68,19 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 
 	if !root.IsEnabled() {
 		logrus.Fatal("unable to load environment; did you 'zrok enable'?")
+	}
+
+	var sc *canary.SnapshotCollector
+	var scCtx context.Context
+	var scCancel context.CancelFunc
+	if cmd.canaryConfig != "" {
+		cfg, err := canary.LoadConfig(cmd.canaryConfig)
+		if err != nil {
+			panic(err)
+		}
+		scCtx, scCancel = context.WithCancel(context.Background())
+		sc = canary.NewSnapshotCollector(scCtx, cfg)
+		go sc.Run()
 	}
 
 	var loopers []*canary.PublicHttpLooper
@@ -87,6 +103,9 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			MinPacing:      cmd.minPacing,
 			MaxPacing:      cmd.maxPacing,
 		}
+		if sc != nil {
+			looperOpts.SnapshotQueue = sc.InputQueue
+		}
 		looper := canary.NewPublicHttpLooper(i, cmd.frontendSelection, looperOpts, root)
 		loopers = append(loopers, looper)
 		go looper.Run()
@@ -103,6 +122,14 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 
 	for _, l := range loopers {
 		<-l.Done()
+	}
+
+	if sc != nil {
+		scCancel()
+		<-sc.Closed
+		if err := sc.Store(); err != nil {
+			panic(err)
+		}
 	}
 
 	results := make([]*canary.LooperResults, 0)
