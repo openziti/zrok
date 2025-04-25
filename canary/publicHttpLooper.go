@@ -73,6 +73,8 @@ func (l *PublicHttpLooper) Results() *LooperResults {
 }
 
 func (l *PublicHttpLooper) startup() error {
+	snapshot := NewSnapshot("create-share", l.id, 0)
+
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
 		ShareMode:      sdk.PublicShareMode,
 		BackendMode:    sdk.ProxyBackendMode,
@@ -80,8 +82,18 @@ func (l *PublicHttpLooper) startup() error {
 		Frontends:      []string{l.frontend},
 		PermissionMode: sdk.ClosedPermissionMode,
 	})
+	snapshot.Completed = time.Now()
 	if err != nil {
+		snapshot.Ok = false
+		snapshot.Error = err
+		if l.opt.SnapshotQueue != nil {
+			l.opt.SnapshotQueue <- snapshot
+		}
 		return err
+	}
+	snapshot.Ok = true
+	if l.opt.SnapshotQueue != nil {
+		l.opt.SnapshotQueue <- snapshot
 	}
 	l.shr = shr
 
@@ -108,8 +120,23 @@ func (l *PublicHttpLooper) bind() error {
 		return errors.Wrapf(err, "#%d error creating ziti context", l.id)
 	}
 
+	snapshot := NewSnapshot("listen", l.id, 0)
+
 	if l.listener, err = zctx.ListenWithOptions(l.shr.Token, &options); err != nil {
+		snapshot.Completed = time.Now()
+		snapshot.Ok = false
+		snapshot.Error = err
+		if l.opt.SnapshotQueue != nil {
+			l.opt.SnapshotQueue <- snapshot
+		}
+
 		return errors.Wrapf(err, "#%d error binding listener", l.id)
+	}
+
+	snapshot.Completed = time.Now()
+	snapshot.Ok = true
+	if l.opt.SnapshotQueue != nil {
+		l.opt.SnapshotQueue <- snapshot
 	}
 
 	go func() {
