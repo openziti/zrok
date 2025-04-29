@@ -70,7 +70,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 		logrus.Fatal("unable to load environment; did you 'zrok enable'?")
 	}
 
-	var sc *canary.SnapshotCollector
+	var sc *canary.SnapshotStreamer
 	var scCtx context.Context
 	var scCancel context.CancelFunc
 	if cmd.canaryConfig != "" {
@@ -79,7 +79,10 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			panic(err)
 		}
 		scCtx, scCancel = context.WithCancel(context.Background())
-		sc = canary.NewSnapshotCollector(scCtx, cfg)
+		sc, err = canary.NewSnapshotStreamer(scCtx, cfg)
+		if err != nil {
+			panic(err)
+		}
 		go sc.Run()
 	}
 
@@ -127,9 +130,9 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 	if sc != nil {
 		scCancel()
 		<-sc.Closed
-		if err := sc.Store(); err != nil {
-			panic(err)
-		}
+		//if err := sc.Store(); err != nil {
+		//	panic(err)
+		//}
 	}
 
 	results := make([]*canary.LooperResults, 0)
