@@ -39,6 +39,7 @@ type testCanaryPublicProxy struct {
 	batchPacing       time.Duration
 	minBatchPacing    time.Duration
 	maxBatchPacing    time.Duration
+	targetName        string
 	frontendSelection string
 	canaryConfig      string
 }
@@ -58,6 +59,9 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().Uint64Var(&command.payload, "payload", 0, "Fixed payload size")
 	cmd.Flags().Uint64Var(&command.minPayload, "min-payload", 64, "Minimum payload size in bytes")
 	cmd.Flags().Uint64Var(&command.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
+	cmd.Flags().DurationVar(&command.preDelay, "pre-delay", 0, "Fixed pre-delay before creating the next looper")
+	cmd.Flags().DurationVar(&command.minPreDelay, "min-pre-delay", 0, "Minimum pre-delay before creating the next looper")
+	cmd.Flags().DurationVar(&command.maxPreDelay, "max-pre-delay", 0, "Maximum pre-delay before creating the next looper")
 	cmd.Flags().DurationVar(&command.dwell, "dwell", 1*time.Second, "Fixed dwell time")
 	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 1*time.Second, "Minimum dwell time")
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
@@ -68,6 +72,7 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().DurationVar(&command.batchPacing, "batch-pacing", 0, "Fixed batch pacing time")
 	cmd.Flags().DurationVar(&command.minBatchPacing, "min-batch-pacing", 0, "Minimum batch pacing time")
 	cmd.Flags().DurationVar(&command.maxBatchPacing, "max-batch-pacing", 0, "Maximum batch pacing time")
+	cmd.Flags().StringVar(&command.targetName, "target-name", "", "Metadata describing the virtual target")
 	cmd.Flags().StringVar(&command.frontendSelection, "frontend-selection", "public", "Select frontend selection")
 	cmd.Flags().StringVar(&command.canaryConfig, "canary-config", "", "Path to canary configuration file")
 	return command
@@ -83,67 +88,69 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 		logrus.Fatal("unable to load environment; did you 'zrok enable'?")
 	}
 
-	var sc *canary.SnapshotStreamer
-	var scCtx context.Context
-	var scCancel context.CancelFunc
+	var sns *canary.SnapshotStreamer
+	var snsCtx context.Context
+	var snsCancel context.CancelFunc
 	if cmd.canaryConfig != "" {
 		cfg, err := canary.LoadConfig(cmd.canaryConfig)
 		if err != nil {
 			panic(err)
 		}
-		scCtx, scCancel = context.WithCancel(context.Background())
-		sc, err = canary.NewSnapshotStreamer(scCtx, cfg)
+		snsCtx, snsCancel = context.WithCancel(context.Background())
+		sns, err = canary.NewSnapshotStreamer(snsCtx, cfg)
 		if err != nil {
 			panic(err)
 		}
-		go sc.Run()
+		go sns.Run()
 	}
 
 	var loopers []*canary.PublicHttpLooper
 	for i := uint(0); i < cmd.loopers; i++ {
-		preDelay := cmd.maxPreDelay.Milliseconds()
-		preDelayDelta := cmd.maxPreDelay.Milliseconds() - cmd.minPreDelay.Milliseconds()
-		if preDelayDelta > 0 {
-			preDelay = int64(rand.Intn(int(preDelayDelta))) + cmd.minPreDelay.Milliseconds()
-			time.Sleep(time.Duration(preDelay) * time.Millisecond)
+		var preDelay int64
+		if cmd.preDelay > 0 {
+			preDelay = cmd.preDelay.Milliseconds()
+		} else {
+			preDelay = cmd.maxPreDelay.Milliseconds()
+			preDelayDelta := cmd.maxPreDelay.Milliseconds() - cmd.minPreDelay.Milliseconds()
+			if preDelayDelta > 0 {
+				preDelay = int64(rand.Intn(int(preDelayDelta))) + cmd.minPreDelay.Milliseconds()
+			}
 		}
+		time.Sleep(time.Duration(preDelay) * time.Millisecond)
 
 		looperOpts := &canary.LooperOptions{
 			Iterations:     cmd.iterations,
 			StatusInterval: cmd.statusInterval,
 			Timeout:        cmd.timeout,
+			MinPayload:     cmd.minPayload,
+			MaxPayload:     cmd.maxPayload,
+			MinDwell:       cmd.minDwell,
+			MaxDwell:       cmd.maxDwell,
+			MinPacing:      cmd.minPacing,
+			MaxPacing:      cmd.maxPacing,
 			BatchSize:      cmd.batchSize,
+			MinBatchPacing: cmd.minBatchPacing,
+			MaxBatchPacing: cmd.maxBatchPacing,
+			TargetName:     cmd.targetName,
 		}
 		if cmd.payload > 0 {
 			looperOpts.MinPayload = cmd.payload
 			looperOpts.MaxPayload = cmd.payload
-		} else {
-			looperOpts.MinPayload = cmd.minPayload
-			looperOpts.MaxPayload = cmd.maxPayload
 		}
 		if cmd.dwell > 0 {
 			looperOpts.MinDwell = cmd.dwell
 			looperOpts.MaxDwell = cmd.dwell
-		} else {
-			looperOpts.MinDwell = cmd.minDwell
-			looperOpts.MaxDwell = cmd.maxDwell
 		}
 		if cmd.pacing > 0 {
 			looperOpts.MinPacing = cmd.pacing
 			looperOpts.MaxPacing = cmd.pacing
-		} else {
-			looperOpts.MinPacing = cmd.minPacing
-			looperOpts.MaxPacing = cmd.maxPacing
 		}
 		if cmd.batchPacing > 0 {
 			looperOpts.MinBatchPacing = cmd.batchPacing
 			looperOpts.MaxBatchPacing = cmd.batchPacing
-		} else {
-			looperOpts.MinBatchPacing = cmd.minBatchPacing
-			looperOpts.MaxBatchPacing = cmd.maxBatchPacing
 		}
-		if sc != nil {
-			looperOpts.SnapshotQueue = sc.InputQueue
+		if sns != nil {
+			looperOpts.SnapshotQueue = sns.InputQueue
 		}
 		looper := canary.NewPublicHttpLooper(i, cmd.frontendSelection, looperOpts, root)
 		loopers = append(loopers, looper)
@@ -163,9 +170,9 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 		<-l.Done()
 	}
 
-	if sc != nil {
-		scCancel()
-		<-sc.Closed
+	if sns != nil {
+		snsCancel()
+		<-sns.Closed
 	}
 
 	results := make([]*canary.LooperResults, 0)

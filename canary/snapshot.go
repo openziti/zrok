@@ -21,6 +21,28 @@ func NewSnapshot(operation string, instance uint, iteration uint64) *Snapshot {
 	return &Snapshot{Operation: operation, Instance: instance, Iteration: iteration, Started: time.Now()}
 }
 
+func (s *Snapshot) Complete() *Snapshot {
+	s.Completed = time.Now()
+	return s
+}
+
+func (s *Snapshot) Success() *Snapshot {
+	s.Ok = true
+	return s
+}
+
+func (s *Snapshot) Failed(err error) *Snapshot {
+	s.Ok = false
+	s.Error = err
+	return s
+}
+
+func (s *Snapshot) Send(queue chan *Snapshot) {
+	if queue != nil {
+		queue <- s
+	}
+}
+
 func (s *Snapshot) String() string {
 	if s.Ok {
 		return fmt.Sprintf("[%v, %d, %d] (ok) %v, %v", s.Operation, s.Instance, s.Iteration, s.Completed.Sub(s.Started), util.BytesToSize(int64(s.Size)))
