@@ -31,6 +31,10 @@ type testCanaryPublicProxy struct {
 	maxDwell          time.Duration
 	minPacing         time.Duration
 	maxPacing         time.Duration
+	batchSize         uint
+	batchPacing       time.Duration
+	minBatchPacing    time.Duration
+	maxBatchPacing    time.Duration
 	frontendSelection string
 	canaryConfig      string
 }
@@ -55,6 +59,10 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
+	cmd.Flags().UintVar(&command.batchSize, "batch-size", 0, "Iterate in batches of this size")
+	cmd.Flags().DurationVar(&command.batchPacing, "batch-pacing", 0, "Fixed batch pacing time")
+	cmd.Flags().DurationVar(&command.minBatchPacing, "min-batch-pacing", 0, "Minimum batch pacing time")
+	cmd.Flags().DurationVar(&command.maxBatchPacing, "max-batch-pacing", 0, "Maximum batch pacing time")
 	cmd.Flags().StringVar(&command.frontendSelection, "frontend-selection", "public", "Select frontend selection")
 	cmd.Flags().StringVar(&command.canaryConfig, "canary-config", "", "Path to canary configuration file")
 	return command
@@ -105,6 +113,14 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			MaxDwell:       cmd.maxDwell,
 			MinPacing:      cmd.minPacing,
 			MaxPacing:      cmd.maxPacing,
+			BatchSize:      cmd.batchSize,
+		}
+		if cmd.batchPacing > 0 {
+			looperOpts.MinBatchPacing = cmd.batchPacing
+			looperOpts.MaxBatchPacing = cmd.batchPacing
+		} else {
+			looperOpts.MinBatchPacing = cmd.minBatchPacing
+			looperOpts.MaxBatchPacing = cmd.maxBatchPacing
 		}
 		if sc != nil {
 			looperOpts.SnapshotQueue = sc.InputQueue

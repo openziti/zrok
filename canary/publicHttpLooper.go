@@ -168,6 +168,16 @@ func (l *PublicHttpLooper) iterate() {
 	defer func() { l.results.StopTime = time.Now() }()
 
 	for i := uint(0); i < l.opt.Iterations && !l.abort; i++ {
+		if i > 0 && l.opt.BatchSize > 0 && i%l.opt.BatchSize == 0 {
+			batchPacingMs := l.opt.MaxBatchPacing.Milliseconds()
+			batchPacingDelta := l.opt.MaxBatchPacing.Milliseconds() - l.opt.MinBatchPacing.Milliseconds()
+			if batchPacingDelta > 0 {
+				batchPacingMs = (rand.Int63() % batchPacingDelta) + l.opt.MinBatchPacing.Milliseconds()
+			}
+			logrus.Debug("sleeping %d ms for batch pacing", batchPacingMs)
+			time.Sleep(time.Duration(batchPacingMs) * time.Millisecond)
+		}
+
 		snapshot := NewSnapshot("public-proxy", l.id, uint64(i))
 
 		if i > 0 && i%l.opt.StatusInterval == 0 {
@@ -227,8 +237,8 @@ func (l *PublicHttpLooper) iterate() {
 		pacingDelta := l.opt.MaxPacing.Milliseconds() - l.opt.MinPacing.Milliseconds()
 		if pacingDelta > 0 {
 			pacingMs = (rand.Int63() % pacingDelta) + l.opt.MinPacing.Milliseconds()
-			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 
 		l.results.Loops++
 	}

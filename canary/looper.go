@@ -16,6 +16,9 @@ type LooperOptions struct {
 	MaxDwell       time.Duration
 	MinPacing      time.Duration
 	MaxPacing      time.Duration
+	BatchSize      uint
+	MinBatchPacing time.Duration
+	MaxBatchPacing time.Duration
 	TargetName     string
 	BindAddress    string
 	SnapshotQueue  chan *Snapshot
