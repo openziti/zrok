@@ -130,9 +130,6 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 	if sc != nil {
 		scCancel()
 		<-sc.Closed
-		//if err := sc.Store(); err != nil {
-		//	panic(err)
-		//}
 	}
 
 	results := make([]*canary.LooperResults, 0)
