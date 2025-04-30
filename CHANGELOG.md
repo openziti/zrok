@@ -10,6 +10,8 @@ FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` fram
 
 FEATURE: New `zrok test canary enabler` to validate `enable`/`disable` operations and gather performance metrics around how those paths are operating (https://github.com/openziti/zrok/issues/771)
 
+FEATURE: New `zrok test canary` infrastructure capable of supporting more complex testing scenarios; now capable of streaming canary metrics into an InfluxDB repository; new programming framework for developing additional types of streaming canary metrics (https://github.com/openziti/zrok/issues/948 https://github.com/openziti/zrok/issues/954)
+
 CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
 
 ## v1.0.2
