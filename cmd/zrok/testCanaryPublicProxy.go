@@ -23,12 +23,16 @@ type testCanaryPublicProxy struct {
 	iterations        uint
 	statusInterval    uint
 	timeout           time.Duration
+	payload           uint64
 	minPayload        uint64
 	maxPayload        uint64
+	preDelay          time.Duration
 	minPreDelay       time.Duration
 	maxPreDelay       time.Duration
+	dwell             time.Duration
 	minDwell          time.Duration
 	maxDwell          time.Duration
+	pacing            time.Duration
 	minPacing         time.Duration
 	maxPacing         time.Duration
 	batchSize         uint
@@ -51,12 +55,13 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().UintVarP(&command.iterations, "iterations", "i", 1, "Number of iterations")
 	cmd.Flags().UintVarP(&command.statusInterval, "status-interval", "S", 100, "Show status every # iterations")
 	cmd.Flags().DurationVarP(&command.timeout, "timeout", "T", 30*time.Second, "Timeout when sending HTTP requests")
+	cmd.Flags().Uint64Var(&command.payload, "payload", 0, "Fixed payload size")
 	cmd.Flags().Uint64Var(&command.minPayload, "min-payload", 64, "Minimum payload size in bytes")
 	cmd.Flags().Uint64Var(&command.maxPayload, "max-payload", 10240, "Maximum payload size in bytes")
-	cmd.Flags().DurationVar(&command.minPreDelay, "min-pre-delay", 0, "Minimum pre-delay before creating the next looper")
-	cmd.Flags().DurationVar(&command.maxPreDelay, "max-pre-delay", 0, "Maximum pre-delay before creating the next looper")
+	cmd.Flags().DurationVar(&command.dwell, "dwell", 1*time.Second, "Fixed dwell time")
 	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 1*time.Second, "Minimum dwell time")
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 1*time.Second, "Maximum dwell time")
+	cmd.Flags().DurationVar(&command.pacing, "pacing", 0, "Fixed pacing time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
 	cmd.Flags().UintVar(&command.batchSize, "batch-size", 0, "Iterate in batches of this size")
@@ -107,13 +112,28 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			Iterations:     cmd.iterations,
 			StatusInterval: cmd.statusInterval,
 			Timeout:        cmd.timeout,
-			MinPayload:     cmd.minPayload,
-			MaxPayload:     cmd.maxPayload,
-			MinDwell:       cmd.minDwell,
-			MaxDwell:       cmd.maxDwell,
-			MinPacing:      cmd.minPacing,
-			MaxPacing:      cmd.maxPacing,
 			BatchSize:      cmd.batchSize,
+		}
+		if cmd.payload > 0 {
+			looperOpts.MinPayload = cmd.payload
+			looperOpts.MaxPayload = cmd.payload
+		} else {
+			looperOpts.MinPayload = cmd.minPayload
+			looperOpts.MaxPayload = cmd.maxPayload
+		}
+		if cmd.dwell > 0 {
+			looperOpts.MinDwell = cmd.dwell
+			looperOpts.MaxDwell = cmd.dwell
+		} else {
+			looperOpts.MinDwell = cmd.minDwell
+			looperOpts.MaxDwell = cmd.maxDwell
+		}
+		if cmd.pacing > 0 {
+			looperOpts.MinPacing = cmd.pacing
+			looperOpts.MaxPacing = cmd.pacing
+		} else {
+			looperOpts.MinPacing = cmd.minPacing
+			looperOpts.MaxPacing = cmd.maxPacing
 		}
 		if cmd.batchPacing > 0 {
 			looperOpts.MinBatchPacing = cmd.batchPacing
