@@ -88,7 +88,7 @@ func (l *PublicHttpLooper) startup() error {
 	})
 	snapshotCreateShare.Complete()
 	if err != nil {
-		snapshotCreateShare.Failed(err).Send(l.opt.SnapshotQueue)
+		snapshotCreateShare.Failure(err).Send(l.opt.SnapshotQueue)
 		return err
 	}
 	snapshotCreateShare.Success().Send(l.opt.SnapshotQueue)
@@ -119,7 +119,7 @@ func (l *PublicHttpLooper) bind() error {
 
 	snapshotListen := NewSnapshot("listen", l.id, 0)
 	if l.listener, err = zctx.ListenWithOptions(l.shr.Token, &options); err != nil {
-		snapshotListen.Complete().Failed(err).Send(l.opt.SnapshotQueue)
+		snapshotListen.Complete().Failure(err).Send(l.opt.SnapshotQueue)
 		return errors.Wrapf(err, "#%d error binding listener", l.id)
 	}
 	snapshotListen.Complete().Success().Send(l.opt.SnapshotQueue)
@@ -193,7 +193,7 @@ func (l *PublicHttpLooper) iterate() {
 					logrus.Errorf("#%d: payload mismatch", l.id)
 					l.results.Mismatches++
 
-					snapshot.Complete().Failed(err)
+					snapshot.Complete().Failure(err)
 				} else {
 					l.results.Bytes += uint64(len(outBase64))
 					logrus.Debugf("#%d: payload match", l.id)

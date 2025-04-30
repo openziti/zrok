@@ -31,7 +31,7 @@ func (s *Snapshot) Success() *Snapshot {
 	return s
 }
 
-func (s *Snapshot) Failed(err error) *Snapshot {
+func (s *Snapshot) Failure(err error) *Snapshot {
 	s.Ok = false
 	s.Error = err
 	return s

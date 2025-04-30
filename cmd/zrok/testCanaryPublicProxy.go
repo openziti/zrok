@@ -79,6 +79,10 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 }
 
 func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
+	if err := canary.AcknowledgeDangerousCanary(); err != nil {
+		logrus.Fatal(err)
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)

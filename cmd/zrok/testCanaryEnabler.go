@@ -18,10 +18,13 @@ type testCanaryEnabler struct {
 	cmd          *cobra.Command
 	enablers     uint
 	iterations   uint
+	preDelay     time.Duration
 	minPreDelay  time.Duration
 	maxPreDelay  time.Duration
+	dwell        time.Duration
 	minDwell     time.Duration
 	maxDwell     time.Duration
+	pacing       time.Duration
 	minPacing    time.Duration
 	maxPacing    time.Duration
 	skipDisable  bool
@@ -38,8 +41,10 @@ func newTestCanaryEnabler() *testCanaryEnabler {
 	cmd.Run = command.run
 	cmd.Flags().UintVarP(&command.enablers, "enablers", "e", 1, "Number of concurrent enablers to start")
 	cmd.Flags().UintVarP(&command.iterations, "iterations", "i", 1, "Number of iterations")
+	cmd.Flags().DurationVar(&command.dwell, "dwell", 0, "Fixed dwell time")
 	cmd.Flags().DurationVar(&command.minDwell, "min-dwell", 0, "Minimum dwell time")
 	cmd.Flags().DurationVar(&command.maxDwell, "max-dwell", 0, "Maximum dwell time")
+	cmd.Flags().DurationVar(&command.pacing, "pacing", 0, "Fixed pacing time")
 	cmd.Flags().DurationVar(&command.minPacing, "min-pacing", 0, "Minimum pacing time")
 	cmd.Flags().DurationVar(&command.maxPacing, "max-pacing", 0, "Maximum pacing time")
 	cmd.Flags().BoolVar(&command.skipDisable, "skip-disable", false, "Disable (clean up) enabled environments")
@@ -57,17 +62,20 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		panic(err)
 	}
 
-	var sc *canary.SnapshotCollector
-	var scCtx context.Context
-	var scCancel context.CancelFunc
+	var sns *canary.SnapshotStreamer
+	var snsCtx context.Context
+	var snsCancel context.CancelFunc
 	if cmd.canaryConfig != "" {
 		cfg, err := canary.LoadConfig(cmd.canaryConfig)
 		if err != nil {
 			panic(err)
 		}
-		scCtx, scCancel = context.WithCancel(context.Background())
-		sc = canary.NewSnapshotCollector(scCtx, cfg)
-		go sc.Run()
+		snsCtx, snsCancel = context.WithCancel(context.Background())
+		sns, err = canary.NewSnapshotStreamer(snsCtx, cfg)
+		if err != nil {
+			panic(err)
+		}
+		go sns.Run()
 	}
 
 	var enablers []*canary.Enabler
@@ -76,8 +84,8 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		preDelayDelta := cmd.maxPreDelay.Milliseconds() - cmd.minPreDelay.Milliseconds()
 		if preDelayDelta > 0 {
 			preDelay = int64(rand.Intn(int(preDelayDelta))) + cmd.minPreDelay.Milliseconds()
-			time.Sleep(time.Duration(preDelay) * time.Millisecond)
 		}
+		time.Sleep(time.Duration(preDelay) * time.Millisecond)
 
 		enablerOpts := &canary.EnablerOptions{
 			Iterations: cmd.iterations,
@@ -86,8 +94,16 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			MinPacing:  cmd.minPacing,
 			MaxPacing:  cmd.maxPacing,
 		}
-		if sc != nil {
-			enablerOpts.SnapshotQueue = sc.InputQueue
+		if cmd.pacing > 0 {
+			enablerOpts.MinDwell = cmd.dwell
+			enablerOpts.MaxDwell = cmd.dwell
+		}
+		if cmd.pacing > 0 {
+			enablerOpts.MinPacing = cmd.pacing
+			enablerOpts.MaxPacing = cmd.pacing
+		}
+		if sns != nil {
+			enablerOpts.SnapshotQueue = sns.InputQueue
 		}
 		enabler := canary.NewEnabler(i, enablerOpts, root)
 		enablers = append(enablers, enabler)
@@ -100,8 +116,8 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			disablerOpts := &canary.DisablerOptions{
 				Environments: enablers[i].Environments,
 			}
-			if sc != nil {
-				disablerOpts.SnapshotQueue = sc.InputQueue
+			if sns != nil {
+				disablerOpts.SnapshotQueue = sns.InputQueue
 			}
 			disabler := canary.NewDisabler(i, disablerOpts, root)
 			disablers = append(disablers, disabler)
@@ -131,13 +147,10 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		<-enabler.Done
 	}
 
-	if sc != nil {
-		scCancel()
-		<-sc.Closed
-		if err := sc.Store(); err != nil {
-			panic(err)
-		}
+	if sns != nil {
+		snsCancel()
+		<-sns.Closed
 	}
 
-	logrus.Infof("complete")
+	logrus.Info("complete")
 }

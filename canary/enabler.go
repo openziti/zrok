@@ -63,31 +63,23 @@ func (e *Enabler) iterate() {
 			Description: "canary.Enabler",
 		})
 		if err == nil {
-			snapshot.Completed = time.Now()
-			snapshot.Ok = true
-
+			snapshot.Complete().Success()
 			e.Environments <- env
 			logrus.Infof("#%d enabled environment '%v'", e.Id, env.ZitiIdentity)
 
 		} else {
-			snapshot.Completed = time.Now()
-			snapshot.Ok = false
-			snapshot.Error = err
+			snapshot.Complete().Failure(err)
 
 			logrus.Errorf("error creating canary (#%d) environment: %v", e.Id, err)
 		}
 
-		if e.opt.SnapshotQueue != nil {
-			e.opt.SnapshotQueue <- snapshot
-		} else {
-			logrus.Info(snapshot)
-		}
+		snapshot.Send(e.opt.SnapshotQueue)
 
 		pacingMs := e.opt.MaxPacing.Milliseconds()
 		pacingDelta := e.opt.MaxPacing.Milliseconds() - e.opt.MinPacing.Milliseconds()
 		if pacingDelta > 0 {
 			pacingMs = (rand.Int63() % pacingDelta) + e.opt.MinPacing.Milliseconds()
-			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 	}
 }
