@@ -254,8 +254,8 @@ func (l *PrivateHttpLooper) iterate() {
 		pacingDelta := l.opt.MaxPacing.Milliseconds() - l.opt.MinPacing.Milliseconds()
 		if pacingDelta > 0 {
 			pacingMs = (rand.Int63() % pacingDelta) + l.opt.MinPacing.Milliseconds()
-			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 
 		l.results.Loops++
 	}
