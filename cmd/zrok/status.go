@@ -43,7 +43,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		tui.Warning(fmt.Sprintf("Your environment is out of date ('%v'), use '%v' to update (make a backup before updating!)\n", env.Metadata().V, tui.Code.Render("zrok update")))
 	}
 
-	_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Config")+":\n\n")
+	_, _ = fmt.Fprintln(os.Stdout, tui.Code.Render("Config")+":\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleColoredDark)
@@ -60,7 +60,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	if !env.IsEnabled() {
 		_, _ = fmt.Fprintf(os.Stderr, "To create a local environment use the %v command.\n", tui.Code.Render("zrok enable"))
 	} else {
-		_, _ = fmt.Fprintf(os.Stdout, tui.Code.Render("Environment")+":\n\n")
+		_, _ = fmt.Fprintln(os.Stdout, tui.Code.Render("Environment")+":\n")
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)

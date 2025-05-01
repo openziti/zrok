@@ -41,7 +41,7 @@ func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 	}
-	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
 	frontend, err := publicProxy.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {

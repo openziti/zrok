@@ -35,7 +35,7 @@ func (cmd *adminBootstrap) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof(cf.Dump(inCfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(inCfg, cf.DefaultOptions()))
 	if err := controller.Bootstrap(cmd.skipFrontend, inCfg); err != nil {
 		panic(err)
 	}

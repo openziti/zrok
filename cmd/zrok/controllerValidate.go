@@ -32,5 +32,5 @@ func (cmd *controllerValidateCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		tui.Error("controller config validation failed", err)
 	}
-	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
 }
