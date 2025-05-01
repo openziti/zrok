@@ -32,7 +32,7 @@ func (gc *adminGcCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
 	if err := controller.GC(cfg); err != nil {
 		panic(err)
 	}

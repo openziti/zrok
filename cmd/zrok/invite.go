@@ -87,7 +87,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		}
 
 		fmt.Printf("invitation sent to '%v'!\n\n", email)
-		fmt.Printf(fmt.Sprintf("%v\n\n", tui.Attention.Render("*** be sure to check your SPAM folder if you do not receive the invitation email!")))
+		fmt.Println(fmt.Sprintf("%v\n", tui.Attention.Render("*** be sure to check your SPAM folder if you do not receive the invitation email!")))
 	}
 }
 

@@ -33,5 +33,5 @@ func (cmd *accessPublicValidateCommand) run(_ *cobra.Command, args []string) {
 	if err := cfg.Load(args[0]); err != nil {
 		tui.Error(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
 	}
-	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
 }

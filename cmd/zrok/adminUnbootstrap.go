@@ -32,9 +32,9 @@ func (cmd *adminUnbootstrap) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
 	if err := controller.Unbootstrap(cfg); err != nil {
 		panic(err)
 	}
-	logrus.Infof("unbootstrap complete!")
+	logrus.Info("unbootstrap complete!")
 }
