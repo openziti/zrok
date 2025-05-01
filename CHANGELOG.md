@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.0.4
+
+REMOVED: The `websocket`-based OpenZiti metrics source has been removed. The preferred metrics sources are AMQP or file-based ingestion
+
+CHANGE: `github.com/openziti/sdk-golang` has been updated to `v1.1.0`. Related dependencies and indirects also updated
+
 ## v1.0.3
 
 FEATURE: `zrok agent console` now outputs the URL it is attempting to open. New `zrok agent console --headless` option to only emit the agent console URL (https://github.com/openziti/zrok/issues/944)
