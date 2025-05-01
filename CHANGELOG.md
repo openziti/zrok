@@ -10,6 +10,10 @@ FEATURE: New InfluxDB metrics capture infrastructure for `zrok test canary` fram
 
 FEATURE: New `zrok test canary enabler` to validate `enable`/`disable` operations and gather performance metrics around how those paths are operating (https://github.com/openziti/zrok/issues/771)
 
+FEATURE: New `zrok test canary` infrastructure capable of supporting more complex testing scenarios; now capable of streaming canary metrics into an InfluxDB repository; new programming framework for developing additional types of streaming canary metrics (https://github.com/openziti/zrok/issues/948 https://github.com/openziti/zrok/issues/954)
+
+FEATURE: All `zrok test canary` commands that have "min" and "max" values (`--min-pacing` and `--max-pacing` for example) now include a singular version of that flag for setting both "min" and "max" to the same value (`--pacing` for example). The singular version of the flag always overrides any `--min-*` or `--max-*` values that might be set
+
 CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
 
 ## v1.0.2

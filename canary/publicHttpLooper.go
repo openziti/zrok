@@ -73,16 +73,25 @@ func (l *PublicHttpLooper) Results() *LooperResults {
 }
 
 func (l *PublicHttpLooper) startup() error {
+	target := "canary.PublicHttpLooper"
+	if l.opt.TargetName != "" {
+		target = l.opt.TargetName
+	}
+
+	snapshotCreateShare := NewSnapshot("create-share", l.id, 0)
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
 		ShareMode:      sdk.PublicShareMode,
 		BackendMode:    sdk.ProxyBackendMode,
-		Target:         "canary.PublicHttpLooper",
+		Target:         target,
 		Frontends:      []string{l.frontend},
 		PermissionMode: sdk.ClosedPermissionMode,
 	})
+	snapshotCreateShare.Complete()
 	if err != nil {
+		snapshotCreateShare.Failure(err).Send(l.opt.SnapshotQueue)
 		return err
 	}
+	snapshotCreateShare.Success().Send(l.opt.SnapshotQueue)
 	l.shr = shr
 
 	logrus.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
@@ -108,9 +117,12 @@ func (l *PublicHttpLooper) bind() error {
 		return errors.Wrapf(err, "#%d error creating ziti context", l.id)
 	}
 
+	snapshotListen := NewSnapshot("listen", l.id, 0)
 	if l.listener, err = zctx.ListenWithOptions(l.shr.Token, &options); err != nil {
+		snapshotListen.Complete().Failure(err).Send(l.opt.SnapshotQueue)
 		return errors.Wrapf(err, "#%d error binding listener", l.id)
 	}
+	snapshotListen.Complete().Success().Send(l.opt.SnapshotQueue)
 
 	go func() {
 		if err := http.Serve(l.listener, l); err != nil {
@@ -141,6 +153,18 @@ func (l *PublicHttpLooper) iterate() {
 	defer func() { l.results.StopTime = time.Now() }()
 
 	for i := uint(0); i < l.opt.Iterations && !l.abort; i++ {
+		if i > 0 && l.opt.BatchSize > 0 && i%l.opt.BatchSize == 0 {
+			batchPacingMs := l.opt.MaxBatchPacing.Milliseconds()
+			batchPacingDelta := l.opt.MaxBatchPacing.Milliseconds() - l.opt.MinBatchPacing.Milliseconds()
+			if batchPacingDelta > 0 {
+				batchPacingMs = (rand.Int63() % batchPacingDelta) + l.opt.MinBatchPacing.Milliseconds()
+			}
+			logrus.Debugf("sleeping %d ms for batch pacing", batchPacingMs)
+			time.Sleep(time.Duration(batchPacingMs) * time.Millisecond)
+		}
+
+		snapshot := NewSnapshot("public-proxy", l.id, uint64(i))
+
 		if i > 0 && i%l.opt.StatusInterval == 0 {
 			logrus.Infof("#%d: iteration %d", l.id, i)
 		}
@@ -153,6 +177,7 @@ func (l *PublicHttpLooper) iterate() {
 		outPayload := make([]byte, payloadSize)
 		cryptorand.Read(outPayload)
 		outBase64 := base64.StdEncoding.EncodeToString(outPayload)
+		snapshot.Size = uint64(len(outBase64))
 
 		if req, err := http.NewRequest("POST", l.shr.FrontendEndpoints[0], bytes.NewBufferString(outBase64)); err == nil {
 			client := &http.Client{Timeout: l.opt.Timeout}
@@ -167,9 +192,13 @@ func (l *PublicHttpLooper) iterate() {
 				if inBase64 != outBase64 {
 					logrus.Errorf("#%d: payload mismatch", l.id)
 					l.results.Mismatches++
+
+					snapshot.Complete().Failure(err)
 				} else {
 					l.results.Bytes += uint64(len(outBase64))
 					logrus.Debugf("#%d: payload match", l.id)
+
+					snapshot.Complete().Success()
 				}
 			} else {
 				logrus.Errorf("#%d: error: %v", l.id, err)
@@ -180,12 +209,14 @@ func (l *PublicHttpLooper) iterate() {
 			l.results.Errors++
 		}
 
+		snapshot.Send(l.opt.SnapshotQueue)
+
 		pacingMs := l.opt.MaxPacing.Milliseconds()
 		pacingDelta := l.opt.MaxPacing.Milliseconds() - l.opt.MinPacing.Milliseconds()
 		if pacingDelta > 0 {
 			pacingMs = (rand.Int63() % pacingDelta) + l.opt.MinPacing.Milliseconds()
-			time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 		}
+		time.Sleep(time.Duration(pacingMs) * time.Millisecond)
 
 		l.results.Loops++
 	}

@@ -62,7 +62,8 @@ type Share struct {
 }
 
 type AccessRequest struct {
-	ShareToken string
+	ShareToken  string
+	BindAddress string
 }
 
 type Access struct {
