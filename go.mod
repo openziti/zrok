@@ -39,12 +39,12 @@ require (
 	github.com/net-byte/vtun v1.7.0
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
-	github.com/openziti/channel/v3 v3.0.6
+	github.com/openziti/channel/v3 v3.0.27
 	github.com/openziti/cobra-to-md v1.0.1
-	github.com/openziti/edge-api v0.26.34
-	github.com/openziti/identity v1.0.86
-	github.com/openziti/sdk-golang v0.23.44
-	github.com/openziti/transport/v2 v2.0.147
+	github.com/openziti/edge-api v0.26.38
+	github.com/openziti/identity v1.0.94
+	github.com/openziti/sdk-golang v0.24.0
+	github.com/openziti/transport/v2 v2.0.160
 	github.com/openziti/ziti v1.1.15
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
@@ -54,19 +54,19 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v2 v2.12.2
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.35.0
-	golang.org/x/net v0.29.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/net v0.34.0
+	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sys v0.30.0
 	golang.org/x/time v0.6.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142
 	google.golang.org/grpc v1.67.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.36.3
 	nhooyr.io/websocket v1.8.17
 )
 
@@ -129,7 +129,7 @@ require (
 	github.com/go-openapi/analysis v0.23.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
-	github.com/go-resty/resty/v2 v2.15.3 // indirect
+	github.com/go-resty/resty/v2 v2.16.4 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -193,9 +193,9 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/openziti/foundation/v2 v2.0.49 // indirect
-	github.com/openziti/metrics v1.2.58 // indirect
-	github.com/openziti/secretstream v0.1.25 // indirect
+	github.com/openziti/foundation/v2 v2.0.56 // indirect
+	github.com/openziti/metrics v1.2.65 // indirect
+	github.com/openziti/secretstream v0.1.28 // indirect
 	github.com/openziti/storage v0.3.2 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
