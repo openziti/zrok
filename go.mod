@@ -21,6 +21,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/greenpau/caddy-security v1.1.29
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/iancoleman/strcase v0.3.0
@@ -38,10 +39,13 @@ require (
 	github.com/net-byte/vtun v1.7.0
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
+	github.com/openziti/channel/v4 v4.0.6
 	github.com/openziti/cobra-to-md v1.0.1
-	github.com/openziti/edge-api v0.26.42
+	github.com/openziti/edge-api v0.26.43
+	github.com/openziti/identity v1.0.101
 	github.com/openziti/sdk-golang v1.1.0
 	github.com/openziti/transport/v2 v2.0.168
+	github.com/openziti/ziti v1.5.4
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/rabbitmq/amqp091-go v1.10.0
@@ -85,6 +89,7 @@ require (
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/beevik/etree v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/biogo/store v0.0.0-20200525035639-8c94ae1e7c9c // indirect
 	github.com/caddyserver/certmagic v0.21.3 // indirect
 	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
@@ -143,7 +148,6 @@ require (
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/greenpau/go-authcrunch v1.1.4 // indirect
 	github.com/greenpau/versioned v1.0.30 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
@@ -190,11 +194,13 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/openziti/channel/v4 v4.0.6 // indirect
+	github.com/openziti/channel/v3 v3.0.39 // indirect
+	github.com/openziti/foundation v0.17.22 // indirect
 	github.com/openziti/foundation/v2 v2.0.60 // indirect
-	github.com/openziti/identity v1.0.101 // indirect
 	github.com/openziti/metrics v1.4.1 // indirect
 	github.com/openziti/secretstream v0.1.32 // indirect
+	github.com/openziti/storage v0.4.7 // indirect
+	github.com/openziti/transport v0.1.5 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

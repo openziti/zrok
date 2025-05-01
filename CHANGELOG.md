@@ -2,8 +2,6 @@
 
 ## v1.0.4
 
-REMOVED: The `websocket`-based OpenZiti metrics source has been removed. The preferred metrics sources are AMQP or file-based ingestion
-
 CHANGE: `github.com/openziti/sdk-golang` has been updated to `v1.1.0`. Related dependencies and indirects also updated
 
 CHANGE: Updated to `golang` `v1.24` as the official build toolchain
