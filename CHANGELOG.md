@@ -16,6 +16,8 @@ FEATURE: All `zrok test canary` commands that have "min" and "max" values (`--mi
 
 CHANGE: New _guard_ to prevent users from running potentially dangerous `zrok test canary` commands inadvertently without understanding what they do (https://github.com/openziti/zrok/issues/947)
 
+CHANGE: Updated `npm` dependencies for `ui`, `agent/agentUi` and `website`. Updated `github.com/openziti/sdk-golang` to `v0.24.0`
+
 ## v1.0.2
 
 FEATURE: "Auto-rebase" for enabled environments where the `apiEndpoint` is set to `https://api.zrok.io`. This will automatically migrate existing environments to the new `apiEndpoint` for the `v1.0.x` series (https://github.com/openziti/zrok/issues/936)
