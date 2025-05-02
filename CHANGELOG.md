@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.5
+
+FEATURE: The public frontend now supports a `robots` configuration option for customizing `robots.txt` file (https://github.com/openziti/zrok/pull/961)
+
 ## v1.0.4
 
 FIX: `zrok admin bootstrap` and `zrok enable` functionality were broken in `v1.0.3`. A bad combination of dependencies caused issues with marshalling data from the associated controller endpoints
