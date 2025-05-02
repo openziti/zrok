@@ -31,6 +31,9 @@ type HttpFrontend struct {
 	handler http.Handler
 }
 
+const defaultRobotsTxt = "User-agent: *\nDisallow: /\n"
+
+
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	var key []byte
 	if cfg.Oauth != nil {
@@ -75,10 +78,23 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, err
 	}
 	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, key, zCtx)
+	// Wrap handler to serve /robots.txt
+	robotsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/robots.txt" {
+			w.Header().Set("Content-Type", "text/plain")
+			if cfg.Robots != "" {
+				fmt.Fprint(w, cfg.Robots)
+				return
+			}
+			fmt.Fprint(w, defaultRobotsTxt)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	})
 	return &HttpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
-		handler: handler,
+		handler: robotsHandler,
 	}, nil
 }
 

@@ -67,3 +67,8 @@ v: 3
 #tls:
 #  cert_path: "/Path/To/Cert/zrok.crt"
 #  key_path:  "/Path/To/Cert/zrok.key"
+
+# Example robots.txt override (default is shown below):
+#robots: |
+#  User-agent: *
+#  Disallow: /

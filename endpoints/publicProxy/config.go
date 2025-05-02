@@ -19,6 +19,7 @@ type Config struct {
 	Interstitial *InterstitialConfig
 	Oauth        *OauthConfig
 	Tls          *endpoints.TlsConfig
+	Robots       string
 }
 
 type InterstitialConfig struct {
