@@ -56,14 +56,15 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	var username string
-	user, err := user2.Current()
-	if err != nil {
-		username := os.Getenv("USER")
-		if username == "" {
-			logrus.Panicf("unable to determine the current user: %v", err)
-		}
+	userObj, err := user2.Current()
+	if err == nil && userObj.Username != "" {
+		username = userObj.Username
 	} else {
-		username = user.Username
+		username = os.Getenv("USER")
+		if username == "" {
+			username = fmt.Sprintf("user-%d", os.Geteuid())
+			logrus.Warnf("unable to determine the current user, using effective UID: %v", err)
+		}
 	}
 	hostDetail = fmt.Sprintf("%v; %v", username, hostDetail)
 	if cmd.description == "<user>@<hostname>" {

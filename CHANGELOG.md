@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.5
+
+FIX: `zrok enable` now handles the case where the user ID does not resolve to a username when generating the default environment description (https://github.com/openziti/zrok/issues/959)
+
 ## v1.0.4
 
 FIX: `zrok admin bootstrap` and `zrok enable` functionality were broken in `v1.0.3`. A bad combination of dependencies caused issues with marshalling data from the associated controller endpoints
