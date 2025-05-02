@@ -2,7 +2,9 @@
 
 ## v1.0.4
 
-CHANGE: `github.com/openziti/sdk-golang` has been updated to `v1.1.0`. Related dependencies and indirects also updated
+FIX: `zrok admin bootstrap` and `zrok enable` functionality were broken in `v1.0.3`. A bad combination of dependencies caused issues with marshalling data from the associated controller endpoints
+
+CHANGE: `github.com/openziti/sdk-golang` has been updated to `v1.1.0`, `github.com/openziti/ziti` has been updated to `v1.6.0`. Related dependencies and indirects also updated
 
 CHANGE: Updated to `golang` `v1.24` as the official build toolchain
 
