@@ -183,10 +183,24 @@ func bootstrapIdentity(name string, edge *rest_management_api_client.ZitiEdgeMan
 		return "", errors.Wrapf(rest_util.WrapErr(err), "error enrolling '%v' identity", name)
 	}
 
+	// Avoid marshaling function fields by creating a struct with only the serializable fields
+	serializableCfg := struct {
+		ZtAPI       string      `json:"ztAPI"`
+		ZtAPIs      []string    `json:"ztAPIs"`
+		ConfigTypes []string    `json:"configTypes"`
+		ID          interface{} `json:"id"`
+		EnableHa    bool        `json:"enableHa"`
+	}{
+		ZtAPI:       cfg.ZtAPI,
+		ZtAPIs:      cfg.ZtAPIs,
+		ConfigTypes: cfg.ConfigTypes,
+		ID:          cfg.ID,
+		EnableHa:    cfg.EnableHa,
+	}
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
 	enc.SetEscapeHTML(false)
-	err = enc.Encode(&cfg)
+	err = enc.Encode(&serializableCfg)
 	if err != nil {
 		return "", errors.Wrapf(err, "error encoding identity config '%v'", name)
 	}
