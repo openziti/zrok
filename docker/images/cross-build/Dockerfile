@@ -1,5 +1,3 @@
-FROM goreleaser/goreleaser AS goreleaser
-
 FROM golang:1.21 AS golang
 
 FROM debian:bookworm-slim
@@ -31,8 +29,6 @@ RUN wget -qO- https://deb.nodesource.com/setup_18.x | bash \
 
 
 COPY --from=golang /usr/local/go /usr/local/go
-
-COPY --from=goreleaser /usr/bin/goreleaser /usr/local/bin/goreleaser
 
 COPY ./linux-build.sh /usr/local/bin/linux-build.sh
 
