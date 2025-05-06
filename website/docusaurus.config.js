@@ -14,7 +14,7 @@ const config = {
   trailingSlash: true,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/space-ziggy.png',
+  favicon: 'img/zrok-favicon.png',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -115,8 +115,8 @@ const config = {
       navbar: {
         title: 'zrok',
         logo: {
-          alt: 'Ziggy Goes to Space',
-          src: 'img/space-ziggy.png',
+          alt: 'zrok Logo',
+          src: 'img/zrok-1.0.0-rocket-green.svg',
           href: 'https://zrok.io',
           target: '_self',
         },
