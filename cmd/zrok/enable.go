@@ -62,8 +62,9 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	} else {
 		username = os.Getenv("USER")
 		if username == "" {
-			username = fmt.Sprintf("user-%d", os.Geteuid())
-			logrus.Warnf("unable to determine the current user, using effective UID: %v", err)
+			euid := os.Geteuid()
+			username = fmt.Sprintf("user-%d", euid)
+			logrus.Warnf("unable to determine the current user, using effective UID: %v", euid)
 		}
 	}
 	hostDetail = fmt.Sprintf("%v; %v", username, hostDetail)
