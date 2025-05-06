@@ -7,6 +7,7 @@
  /* Import Fonts */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 /* You can override the default Infima variables here. */
 :root {
@@ -91,12 +92,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p {
-  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-family: 'Poppins', Consolas, 'Courier New', monospace;
   font-weight: 400;
 }
 
 html {
-  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-family: 'Poppins', Consolas, 'Courier New', monospace;
   font-weight: 400;
   letter-spacing: 1;
 }
