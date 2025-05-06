@@ -6,7 +6,6 @@
 
  /* Import Fonts */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 /* You can override the default Infima variables here. */
@@ -85,7 +84,7 @@
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--ifm-heading-color);
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 400;
   line-height: var(--ifm-heading-line-height);
   margin: var(--ifm-heading-margin-top) 0 var(--ifm-heading-margin-bottom) 0;
