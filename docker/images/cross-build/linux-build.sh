@@ -30,7 +30,8 @@ fi
     HOME=/tmp/builder
     # Navigate to the "ui" directory and run npm commands
     mkdir -p $HOME
-    npm config set cache /mnt/.npm
+    # pwd is probably /mnt mountpoint in the container
+    npm config set cache $(pwd)/.npm
     for UI in ./ui ./agent/agentUi
     do
         pushd ${UI}
