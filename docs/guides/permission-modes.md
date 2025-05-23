@@ -6,7 +6,7 @@ sidebar_label: Permission Modes
 # Permission Modes
 
 :::note
-As of `v1.0.5` zrok sharing new defaults to the `closed` permission mode. The `--closed` flag has been removed and has been replaced with a new `--open` flag for users who want to retain the open permission model. Otherwise, the closed permission mode works exactly the same.
+As of `v1.0.5` zrok sharing now defaults to the `closed` permission mode. The `--closed` flag has been removed and has been replaced with a new `--open` flag for users who want to retain the open permission model. Otherwise, the closed permission mode works exactly the same.
 :::
 
 Shares created in zrok `v0.4.26` and newer now include a choice of _permission mode_. 
