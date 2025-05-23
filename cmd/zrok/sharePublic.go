@@ -43,7 +43,7 @@ type sharePublicCommand struct {
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
 	oauthCheckInterval        time.Duration
-	closed                    bool
+	open                      bool
 	accessGrants              []string
 	cmd                       *cobra.Command
 }
@@ -73,7 +73,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
 	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
-	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().BoolVar(&command.open, "open", false, "Enable open permission mode")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
@@ -148,15 +148,16 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	req := &sdk.ShareRequest{
-		BackendMode: sdk.BackendMode(cmd.backendMode),
-		ShareMode:   sdk.PublicShareMode,
-		Frontends:   cmd.frontendSelection,
-		BasicAuth:   cmd.basicAuth,
-		Target:      target,
+		BackendMode:    sdk.BackendMode(cmd.backendMode),
+		ShareMode:      sdk.PublicShareMode,
+		Frontends:      cmd.frontendSelection,
+		BasicAuth:      cmd.basicAuth,
+		Target:         target,
+		PermissionMode: sdk.ClosedPermissionMode,
+		AccessGrants:   cmd.accessGrants,
 	}
-	if cmd.closed {
-		req.PermissionMode = sdk.ClosedPermissionMode
-		req.AccessGrants = cmd.accessGrants
+	if cmd.open {
+		req.PermissionMode = sdk.OpenPermissionMode
 	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
@@ -414,7 +415,7 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 		OauthProvider:             cmd.oauthProvider,
 		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
 		OauthCheckInterval:        cmd.oauthCheckInterval.String(),
-		Closed:                    cmd.closed,
+		Closed:                    !cmd.open,
 		AccessGrants:              cmd.accessGrants,
 	})
 	if err != nil {
