@@ -41,7 +41,7 @@ type sharePrivateCommand struct {
 	forceLocal   bool
 	forceAgent   bool
 	insecure     bool
-	closed       bool
+	open         bool
 	accessGrants []string
 	cmd          *cobra.Command
 }
@@ -65,7 +65,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
 	cmd.MarkFlagsMutuallyExclusive("force-local", "force-agent")
 	cmd.Flags().BoolVar(&command.insecure, "insecure", false, "Enable insecure TLS certificate validation for <target>")
-	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().BoolVar(&command.open, "open", false, "Enable open permission mode")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Run = command.run
 	return command
@@ -184,13 +184,14 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	req := &sdk.ShareRequest{
-		BackendMode: sdk.BackendMode(cmd.backendMode),
-		ShareMode:   sdk.PrivateShareMode,
-		Target:      target,
+		BackendMode:    sdk.BackendMode(cmd.backendMode),
+		ShareMode:      sdk.PrivateShareMode,
+		Target:         target,
+		PermissionMode: sdk.ClosedPermissionMode,
+		AccessGrants:   cmd.accessGrants,
 	}
-	if cmd.closed {
-		req.PermissionMode = sdk.ClosedPermissionMode
-		req.AccessGrants = cmd.accessGrants
+	if cmd.open {
+		req.PermissionMode = sdk.OpenPermissionMode
 	}
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
@@ -548,7 +549,7 @@ func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
 		Target:       target,
 		BackendMode:  cmd.backendMode,
 		Insecure:     cmd.insecure,
-		Closed:       cmd.closed,
+		Closed:       !cmd.open,
 		AccessGrants: cmd.accessGrants,
 	})
 	if err != nil {

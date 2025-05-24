@@ -28,7 +28,7 @@ type reserveCommand struct {
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
 	oauthCheckInterval        time.Duration
-	closed                    bool
+	open                      bool
 	accessGrants              []string
 	cmd                       *cobra.Command
 }
@@ -54,7 +54,7 @@ func newReserveCommand() *reserveCommand {
 	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domains to authenticate via OAuth")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
-	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enable closed permission mode (see --access-grant)")
+	cmd.Flags().BoolVar(&command.open, "open", false, "Enable open permission mode")
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 
 	cmd.Run = command.run
@@ -147,12 +147,14 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	req := &sdk.ShareRequest{
-		Reserved:    true,
-		UniqueName:  cmd.uniqueName,
-		BackendMode: sdk.BackendMode(cmd.backendMode),
-		ShareMode:   shareMode,
-		BasicAuth:   cmd.basicAuth,
-		Target:      target,
+		Reserved:       true,
+		UniqueName:     cmd.uniqueName,
+		BackendMode:    sdk.BackendMode(cmd.backendMode),
+		ShareMode:      shareMode,
+		BasicAuth:      cmd.basicAuth,
+		Target:         target,
+		PermissionMode: sdk.ClosedPermissionMode,
+		AccessGrants:   cmd.accessGrants,
 	}
 	if shareMode == sdk.PublicShareMode {
 		req.Frontends = cmd.frontendSelection
@@ -165,9 +167,8 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
 		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
 	}
-	if cmd.closed {
-		req.PermissionMode = sdk.ClosedPermissionMode
-		req.AccessGrants = cmd.accessGrants
+	if cmd.open {
+		req.PermissionMode = sdk.OpenPermissionMode
 	}
 	shr, err := sdk.CreateShare(env, req)
 	if err != nil {

@@ -2,6 +2,8 @@
 
 ## v1.0.5
 
+CHANGE: `zrok share public`, `zrok share private`, and `zrok reserve` all default to the "closed" permission mode (they previously defaulted to the "open" permission mode). The `--closed` flag has been replaced with a new `--open` flag. See the [Permission Modes](https://docs.zrok.io/docs/guides/permission-modes/) docs for details (https://github.com/openziti/zrok/issues/971)
+
 FIX: `zrok enable` now handles the case where the user ID does not resolve to a username when generating the default environment description (https://github.com/openziti/zrok/issues/959)
 
 FIX: Linux packages were optimized to avoid manage file revision conflicts (https://github.com/openziti/zrok/issues/817)

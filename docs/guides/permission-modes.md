@@ -5,6 +5,10 @@ sidebar_label: Permission Modes
 
 # Permission Modes
 
+:::note
+As of `v1.0.5` zrok sharing now defaults to the `closed` permission mode. The `--closed` flag has been removed and has been replaced with a new `--open` flag for users who want to retain the open permission model. Otherwise, the closed permission mode works exactly the same.
+:::
+
 Shares created in zrok `v0.4.26` and newer now include a choice of _permission mode_. 
 
 Shares created with zrok `v0.4.25` and older were created using what is now called the _open permission mode_. Whether _public_ or _private_, these shares can be accessed by any user of the zrok service instance, as long as they know the _share token_ of the share. Effectively shares with the _open permission mode_ are accessible by any user of the zrok service instance.
