@@ -201,6 +201,10 @@ func (r *Root) AgentRegistry() (string, error) {
 	return "", errors.Errorf("this environment version does not support the zrok Agent; please 'zrok update' this environment")
 }
 
+func (r *Root) AgentEnrollment() (string, error) {
+	return "", errors.Errorf("this environment version does not support the zrok Agent; please 'zrok update' this environment")
+}
+
 func (r *Root) Obliterate() error {
 	zrd, err := rootDir()
 	if err != nil {
