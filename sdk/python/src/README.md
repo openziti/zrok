@@ -114,7 +114,9 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
+*AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
+*AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
 *MetadataApi* | [**client_version_check**](docs/MetadataApi.md#client_version_check) | **POST** /clientVersionCheck | 
@@ -158,6 +160,8 @@ Class | Method | HTTP request | Description
  - [CreateOrganizationRequest](docs/CreateOrganizationRequest.md)
  - [DisableRequest](docs/DisableRequest.md)
  - [EnableRequest](docs/EnableRequest.md)
+ - [Enroll200Response](docs/Enroll200Response.md)
+ - [EnrollRequest](docs/EnrollRequest.md)
  - [Environment](docs/Environment.md)
  - [EnvironmentAndResources](docs/EnvironmentAndResources.md)
  - [Frontend](docs/Frontend.md)
@@ -177,7 +181,6 @@ Class | Method | HTTP request | Description
  - [MetricsSample](docs/MetricsSample.md)
  - [Overview](docs/Overview.md)
  - [Ping200Response](docs/Ping200Response.md)
- - [PingRequest](docs/PingRequest.md)
  - [Principal](docs/Principal.md)
  - [RegenerateAccountToken200Response](docs/RegenerateAccountToken200Response.md)
  - [RegenerateAccountTokenRequest](docs/RegenerateAccountTokenRequest.md)

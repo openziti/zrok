@@ -51,6 +51,8 @@ from zrok_api.models.create_organization201_response import CreateOrganization20
 from zrok_api.models.create_organization_request import CreateOrganizationRequest
 from zrok_api.models.disable_request import DisableRequest
 from zrok_api.models.enable_request import EnableRequest
+from zrok_api.models.enroll200_response import Enroll200Response
+from zrok_api.models.enroll_request import EnrollRequest
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.models.frontend import Frontend
@@ -70,7 +72,6 @@ from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
 from zrok_api.models.overview import Overview
 from zrok_api.models.ping200_response import Ping200Response
-from zrok_api.models.ping_request import PingRequest
 from zrok_api.models.principal import Principal
 from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
 from zrok_api.models.regenerate_account_token_request import RegenerateAccountTokenRequest

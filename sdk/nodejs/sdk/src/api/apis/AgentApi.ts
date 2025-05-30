@@ -15,18 +15,29 @@
 
 import * as runtime from '../runtime';
 import type {
+  Enroll200Response,
+  EnrollRequest,
   Ping200Response,
-  PingRequest,
 } from '../models/index';
 import {
+    Enroll200ResponseFromJSON,
+    Enroll200ResponseToJSON,
+    EnrollRequestFromJSON,
+    EnrollRequestToJSON,
     Ping200ResponseFromJSON,
     Ping200ResponseToJSON,
-    PingRequestFromJSON,
-    PingRequestToJSON,
 } from '../models/index';
 
-export interface PingOperationRequest {
-    body?: PingRequest;
+export interface EnrollOperationRequest {
+    body?: EnrollRequest;
+}
+
+export interface PingRequest {
+    body?: EnrollRequest;
+}
+
+export interface UnenrollRequest {
+    body?: EnrollRequest;
 }
 
 /**
@@ -36,7 +47,38 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async pingRaw(requestParameters: PingOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ping200Response>> {
+    async enrollRaw(requestParameters: EnrollOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Enroll200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/enroll`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EnrollRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => Enroll200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enroll(requestParameters: EnrollOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Enroll200Response> {
+        const response = await this.enrollRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async pingRaw(requestParameters: PingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ping200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -52,7 +94,7 @@ export class AgentApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PingRequestToJSON(requestParameters['body']),
+            body: EnrollRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => Ping200ResponseFromJSON(jsonValue));
@@ -60,9 +102,39 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async ping(requestParameters: PingOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ping200Response> {
+    async ping(requestParameters: PingRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ping200Response> {
         const response = await this.pingRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async unenrollRaw(requestParameters: UnenrollRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/unenroll`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EnrollRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async unenroll(requestParameters: UnenrollRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.unenrollRaw(requestParameters, initOverrides);
     }
 
 }

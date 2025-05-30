@@ -89,6 +89,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+		AgentEnrollHandler: agent.EnrollHandlerFunc(func(params agent.EnrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Enroll has not yet been implemented")
+		}),
 		MetadataGetAccountDetailHandler: metadata.GetAccountDetailHandlerFunc(func(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetAccountDetail has not yet been implemented")
 		}),
@@ -169,6 +172,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
+		}),
+		AgentUnenrollHandler: agent.UnenrollHandlerFunc(func(params agent.UnenrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Unenroll has not yet been implemented")
 		}),
 		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
@@ -267,6 +273,8 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
+	// AgentEnrollHandler sets the operation handler for the enroll operation
+	AgentEnrollHandler agent.EnrollHandler
 	// MetadataGetAccountDetailHandler sets the operation handler for the get account detail operation
 	MetadataGetAccountDetailHandler metadata.GetAccountDetailHandler
 	// MetadataGetAccountMetricsHandler sets the operation handler for the get account metrics operation
@@ -321,6 +329,8 @@ type ZrokAPI struct {
 	ShareShareHandler share.ShareHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
 	ShareUnaccessHandler share.UnaccessHandler
+	// AgentUnenrollHandler sets the operation handler for the unenroll operation
+	AgentUnenrollHandler agent.UnenrollHandler
 	// ShareUnshareHandler sets the operation handler for the unshare operation
 	ShareUnshareHandler share.UnshareHandler
 	// ShareUpdateAccessHandler sets the operation handler for the update access operation
@@ -455,6 +465,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
 	}
+	if o.AgentEnrollHandler == nil {
+		unregistered = append(unregistered, "agent.EnrollHandler")
+	}
 	if o.MetadataGetAccountDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetAccountDetailHandler")
 	}
@@ -535,6 +548,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareUnaccessHandler == nil {
 		unregistered = append(unregistered, "share.UnaccessHandler")
+	}
+	if o.AgentUnenrollHandler == nil {
+		unregistered = append(unregistered, "agent.UnenrollHandler")
 	}
 	if o.ShareUnshareHandler == nil {
 		unregistered = append(unregistered, "share.UnshareHandler")
@@ -708,6 +724,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/enroll"] = agent.NewEnroll(o.context, o.AgentEnrollHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -816,6 +836,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/unaccess"] = share.NewUnaccess(o.context, o.ShareUnaccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unenroll"] = agent.NewUnenroll(o.context, o.AgentUnenrollHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

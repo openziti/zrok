@@ -616,6 +616,58 @@ paths:
   #
   # agent
   #
+  /agent/enroll:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: enroll
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              token:
+                type: string
+        400:
+          description: bad request; already enrolled
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /agent/unenroll:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: unenroll
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: bad request; not enrolled
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   /agent/ping:
     post:
       tags:

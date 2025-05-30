@@ -26,8 +26,20 @@ class TestAgentApi(unittest.TestCase):
     def tearDown(self) -> None:
         pass
 
+    def test_enroll(self) -> None:
+        """Test case for enroll
+
+        """
+        pass
+
     def test_ping(self) -> None:
         """Test case for ping
+
+        """
+        pass
+
+    def test_unenroll(self) -> None:
+        """Test case for unenroll
 
         """
         pass

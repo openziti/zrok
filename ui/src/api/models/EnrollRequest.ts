@@ -16,29 +16,29 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PingRequest
+ * @interface EnrollRequest
  */
-export interface PingRequest {
+export interface EnrollRequest {
     /**
      * 
      * @type {string}
-     * @memberof PingRequest
+     * @memberof EnrollRequest
      */
     envZId?: string;
 }
 
 /**
- * Check if a given object implements the PingRequest interface.
+ * Check if a given object implements the EnrollRequest interface.
  */
-export function instanceOfPingRequest(value: object): value is PingRequest {
+export function instanceOfEnrollRequest(value: object): value is EnrollRequest {
     return true;
 }
 
-export function PingRequestFromJSON(json: any): PingRequest {
-    return PingRequestFromJSONTyped(json, false);
+export function EnrollRequestFromJSON(json: any): EnrollRequest {
+    return EnrollRequestFromJSONTyped(json, false);
 }
 
-export function PingRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PingRequest {
+export function EnrollRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): EnrollRequest {
     if (json == null) {
         return json;
     }
@@ -48,11 +48,11 @@ export function PingRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function PingRequestToJSON(json: any): PingRequest {
-    return PingRequestToJSONTyped(json, false);
+export function EnrollRequestToJSON(json: any): EnrollRequest {
+    return EnrollRequestToJSONTyped(json, false);
 }
 
-export function PingRequestToJSONTyped(value?: PingRequest | null, ignoreDiscriminator: boolean = false): any {
+export function EnrollRequestToJSONTyped(value?: EnrollRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

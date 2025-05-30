@@ -100,9 +100,52 @@ func WithAcceptApplicationZrokV1JSON(r *runtime.ClientOperation) {
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnrollOK, error)
+
 	Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PingOK, error)
 
+	Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnenrollOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+Enroll enroll API
+*/
+func (a *Client) Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnrollOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewEnrollParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "enroll",
+		Method:             "POST",
+		PathPattern:        "/agent/enroll",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &EnrollReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*EnrollOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for enroll: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -141,6 +184,45 @@ func (a *Client) Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter,
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for ping: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+Unenroll unenroll API
+*/
+func (a *Client) Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnenrollOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUnenrollParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "unenroll",
+		Method:             "POST",
+		PathPattern:        "/agent/unenroll",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UnenrollReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UnenrollOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for unenroll: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

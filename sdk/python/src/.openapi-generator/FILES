@@ -18,6 +18,8 @@ docs/CreateOrganization201Response.md
 docs/CreateOrganizationRequest.md
 docs/DisableRequest.md
 docs/EnableRequest.md
+docs/Enroll200Response.md
+docs/EnrollRequest.md
 docs/Environment.md
 docs/EnvironmentAndResources.md
 docs/EnvironmentApi.md
@@ -39,7 +41,6 @@ docs/Metrics.md
 docs/MetricsSample.md
 docs/Overview.md
 docs/Ping200Response.md
-docs/PingRequest.md
 docs/Principal.md
 docs/RegenerateAccountToken200Response.md
 docs/RegenerateAccountTokenRequest.md
@@ -80,6 +81,8 @@ test/test_create_organization201_response.py
 test/test_create_organization_request.py
 test/test_disable_request.py
 test/test_enable_request.py
+test/test_enroll200_response.py
+test/test_enroll_request.py
 test/test_environment.py
 test/test_environment_and_resources.py
 test/test_environment_api.py
@@ -101,7 +104,6 @@ test/test_metrics.py
 test/test_metrics_sample.py
 test/test_overview.py
 test/test_ping200_response.py
-test/test_ping_request.py
 test/test_principal.py
 test/test_regenerate_account_token200_response.py
 test/test_regenerate_account_token_request.py
@@ -149,6 +151,8 @@ zrok_api/models/create_organization201_response.py
 zrok_api/models/create_organization_request.py
 zrok_api/models/disable_request.py
 zrok_api/models/enable_request.py
+zrok_api/models/enroll200_response.py
+zrok_api/models/enroll_request.py
 zrok_api/models/environment.py
 zrok_api/models/environment_and_resources.py
 zrok_api/models/frontend.py
@@ -168,7 +172,6 @@ zrok_api/models/metrics.py
 zrok_api/models/metrics_sample.py
 zrok_api/models/overview.py
 zrok_api/models/ping200_response.py
-zrok_api/models/ping_request.py
 zrok_api/models/principal.py
 zrok_api/models/regenerate_account_token200_response.py
 zrok_api/models/regenerate_account_token_request.py

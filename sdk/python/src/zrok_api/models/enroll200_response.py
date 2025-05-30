@@ -17,17 +17,17 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class PingRequest(BaseModel):
+class Enroll200Response(BaseModel):
     """
-    PingRequest
+    Enroll200Response
     """ # noqa: E501
-    env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
-    __properties: ClassVar[List[str]] = ["envZId"]
+    token: Optional[StrictStr] = None
+    __properties: ClassVar[List[str]] = ["token"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -47,7 +47,7 @@ class PingRequest(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of PingRequest from a JSON string"""
+        """Create an instance of Enroll200Response from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,7 +72,7 @@ class PingRequest(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of PingRequest from a dict"""
+        """Create an instance of Enroll200Response from a dict"""
         if obj is None:
             return None
 
@@ -80,7 +80,7 @@ class PingRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "envZId": obj.get("envZId")
+            "token": obj.get("token")
         })
         return _obj
 

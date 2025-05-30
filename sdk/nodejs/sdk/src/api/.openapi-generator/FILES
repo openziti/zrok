@@ -21,6 +21,8 @@ models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
+models/Enroll200Response.ts
+models/EnrollRequest.ts
 models/Environment.ts
 models/EnvironmentAndResources.ts
 models/Frontend.ts
@@ -41,7 +43,6 @@ models/MetricsSample.ts
 models/ModelConfiguration.ts
 models/Overview.ts
 models/Ping200Response.ts
-models/PingRequest.ts
 models/Principal.ts
 models/RegenerateAccountToken200Response.ts
 models/RegenerateAccountTokenRequest.ts
