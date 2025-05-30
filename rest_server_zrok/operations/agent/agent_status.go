@@ -119,6 +119,9 @@ type AgentStatusOKBody struct {
 
 	// shares
 	Shares []*rest_model_zrok.Share `json:"shares"`
+
+	// version
+	Version string `json:"version,omitempty"`
 }
 
 // Validate validates this agent status o k body

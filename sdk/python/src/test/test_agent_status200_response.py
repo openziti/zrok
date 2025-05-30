@@ -35,6 +35,7 @@ class TestAgentStatus200Response(unittest.TestCase):
         model = AgentStatus200Response()
         if include_optional:
             return AgentStatus200Response(
+                version = '',
                 shares = [
                     zrok_api.models.share.share(
                         share_token = '', 

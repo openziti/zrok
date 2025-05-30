@@ -29,6 +29,12 @@ import {
 export interface AgentStatus200Response {
     /**
      * 
+     * @type {string}
+     * @memberof AgentStatus200Response
+     */
+    version?: string;
+    /**
+     * 
      * @type {Array<Share>}
      * @memberof AgentStatus200Response
      */
@@ -52,6 +58,7 @@ export function AgentStatus200ResponseFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'version': json['version'] == null ? undefined : json['version'],
         'shares': json['shares'] == null ? undefined : ((json['shares'] as Array<any>).map(ShareFromJSON)),
     };
 }
@@ -67,6 +74,7 @@ export function AgentStatus200ResponseToJSONTyped(value?: AgentStatus200Response
 
     return {
         
+        'version': value['version'],
         'shares': value['shares'] == null ? undefined : ((value['shares'] as Array<any>).map(ShareToJSON)),
     };
 }

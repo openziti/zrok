@@ -5,6 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**version** | **str** |  | [optional] 
 **shares** | [**List[Share]**](Share.md) |  | [optional] 
 
 ## Example

@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from zrok_api.models.share import Share
 from typing import Optional, Set
@@ -27,8 +27,9 @@ class AgentStatus200Response(BaseModel):
     """
     AgentStatus200Response
     """ # noqa: E501
+    version: Optional[StrictStr] = None
     shares: Optional[List[Share]] = None
-    __properties: ClassVar[List[str]] = ["shares"]
+    __properties: ClassVar[List[str]] = ["version", "shares"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -88,6 +89,7 @@ class AgentStatus200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "version": obj.get("version"),
             "shares": [Share.from_dict(_item) for _item in obj["shares"]] if obj.get("shares") is not None else None
         })
         return _obj

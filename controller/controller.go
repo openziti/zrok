@@ -65,6 +65,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
+	api.AgentAgentStatusHandler = newAgentStatusHandler(cfg)
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)

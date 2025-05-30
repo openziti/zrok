@@ -635,6 +635,8 @@ paths:
           description: ok
           schema:
             properties:
+              version:
+                type: string
               shares:
                 type: array
                 items:

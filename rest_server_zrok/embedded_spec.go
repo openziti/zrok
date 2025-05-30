@@ -219,6 +219,9 @@ func init() {
                   "items": {
                     "$ref": "#/definitions/share"
                   }
+                },
+                "version": {
+                  "type": "string"
                 }
               }
             }
@@ -2577,6 +2580,9 @@ func init() {
                   "items": {
                     "$ref": "#/definitions/share"
                   }
+                },
+                "version": {
+                  "type": "string"
                 }
               }
             }
