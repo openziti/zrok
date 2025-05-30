@@ -10,8 +10,6 @@ index.ts
 models/Access201Response.ts
 models/AccessRequest.ts
 models/AddOrganizationMemberRequest.ts
-models/AgentStatus200Response.ts
-models/AgentStatusRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts
@@ -42,6 +40,8 @@ models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
 models/Overview.ts
+models/Ping200Response.ts
+models/PingRequest.ts
 models/Principal.ts
 models/RegenerateAccountToken200Response.ts
 models/RegenerateAccountTokenRequest.ts

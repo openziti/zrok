@@ -39,8 +39,6 @@ from zrok_api.exceptions import ApiException
 from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest
-from zrok_api.models.agent_status200_response import AgentStatus200Response
-from zrok_api.models.agent_status_request import AgentStatusRequest
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
@@ -71,6 +69,8 @@ from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
 from zrok_api.models.overview import Overview
+from zrok_api.models.ping200_response import Ping200Response
+from zrok_api.models.ping_request import PingRequest
 from zrok_api.models.principal import Principal
 from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
 from zrok_api.models.regenerate_account_token_request import RegenerateAccountTokenRequest

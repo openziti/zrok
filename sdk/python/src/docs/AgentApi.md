@@ -4,11 +4,11 @@ All URIs are relative to */api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**agent_status**](AgentApi.md#agent_status) | **POST** /agent/status | 
+[**ping**](AgentApi.md#ping) | **POST** /agent/ping | 
 
 
-# **agent_status**
-> AgentStatus200Response agent_status(body=body)
+# **ping**
+> Ping200Response ping(body=body)
 
 ### Example
 
@@ -16,8 +16,8 @@ Method | HTTP request | Description
 
 ```python
 import zrok_api
-from zrok_api.models.agent_status200_response import AgentStatus200Response
-from zrok_api.models.agent_status_request import AgentStatusRequest
+from zrok_api.models.ping200_response import Ping200Response
+from zrok_api.models.ping_request import PingRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -42,14 +42,14 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.AgentApi(api_client)
-    body = zrok_api.AgentStatusRequest() # AgentStatusRequest |  (optional)
+    body = zrok_api.PingRequest() # PingRequest |  (optional)
 
     try:
-        api_response = api_instance.agent_status(body=body)
-        print("The response of AgentApi->agent_status:\n")
+        api_response = api_instance.ping(body=body)
+        print("The response of AgentApi->ping:\n")
         pprint(api_response)
     except Exception as e:
-        print("Exception when calling AgentApi->agent_status: %s\n" % e)
+        print("Exception when calling AgentApi->ping: %s\n" % e)
 ```
 
 
@@ -59,11 +59,11 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**AgentStatusRequest**](AgentStatusRequest.md)|  | [optional] 
+ **body** | [**PingRequest**](PingRequest.md)|  | [optional] 
 
 ### Return type
 
-[**AgentStatus200Response**](AgentStatus200Response.md)
+[**Ping200Response**](Ping200Response.md)
 
 ### Authorization
 
@@ -81,6 +81,7 @@ Name | Type | Description  | Notes
 **200** | ok |  -  |
 **401** | unauthorized |  -  |
 **500** | internal server error |  -  |
+**502** | bad gateway; agent not reachable |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

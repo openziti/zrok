@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.agent_status_request import AgentStatusRequest
+from zrok_api.models.ping200_response import Ping200Response
 
-class TestAgentStatusRequest(unittest.TestCase):
-    """AgentStatusRequest unit test stubs"""
+class TestPing200Response(unittest.TestCase):
+    """Ping200Response unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,25 +25,25 @@ class TestAgentStatusRequest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> AgentStatusRequest:
-        """Test AgentStatusRequest
+    def make_instance(self, include_optional) -> Ping200Response:
+        """Test Ping200Response
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `AgentStatusRequest`
+        # uncomment below to create an instance of `Ping200Response`
         """
-        model = AgentStatusRequest()
+        model = Ping200Response()
         if include_optional:
-            return AgentStatusRequest(
-                env_zid = ''
+            return Ping200Response(
+                version = ''
             )
         else:
-            return AgentStatusRequest(
+            return Ping200Response(
         )
         """
 
-    def testAgentStatusRequest(self):
-        """Test AgentStatusRequest"""
+    def testPing200Response(self):
+        """Test Ping200Response"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

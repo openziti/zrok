@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// AgentStatusURL generates an URL for the agent status operation
-type AgentStatusURL struct {
+// PingURL generates an URL for the ping operation
+type PingURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *AgentStatusURL) WithBasePath(bp string) *AgentStatusURL {
+func (o *PingURL) WithBasePath(bp string) *PingURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *AgentStatusURL) WithBasePath(bp string) *AgentStatusURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *AgentStatusURL) SetBasePath(bp string) {
+func (o *PingURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *AgentStatusURL) Build() (*url.URL, error) {
+func (o *PingURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/agent/status"
+	var _path = "/agent/ping"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -47,7 +47,7 @@ func (o *AgentStatusURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *AgentStatusURL) Must(u *url.URL, err error) *url.URL {
+func (o *PingURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *AgentStatusURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *AgentStatusURL) String() string {
+func (o *PingURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *AgentStatusURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *PingURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on AgentStatusURL")
+		return nil, errors.New("scheme is required for a full url on PingURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on AgentStatusURL")
+		return nil, errors.New("host is required for a full url on PingURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *AgentStatusURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *AgentStatusURL) StringFull(scheme, host string) string {
+func (o *PingURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

@@ -3,8 +3,6 @@
 export * from './Access201Response';
 export * from './AccessRequest';
 export * from './AddOrganizationMemberRequest';
-export * from './AgentStatus200Response';
-export * from './AgentStatusRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';
 export * from './ClientVersionCheckRequest';
@@ -35,6 +33,8 @@ export * from './Metrics';
 export * from './MetricsSample';
 export * from './ModelConfiguration';
 export * from './Overview';
+export * from './Ping200Response';
+export * from './PingRequest';
 export * from './Principal';
 export * from './RegenerateAccountToken200Response';
 export * from './RegenerateAccountTokenRequest';

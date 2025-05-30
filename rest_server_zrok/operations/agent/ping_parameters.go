@@ -14,19 +14,19 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NewAgentStatusParams creates a new AgentStatusParams object
+// NewPingParams creates a new PingParams object
 //
 // There are no default values defined in the spec.
-func NewAgentStatusParams() AgentStatusParams {
+func NewPingParams() PingParams {
 
-	return AgentStatusParams{}
+	return PingParams{}
 }
 
-// AgentStatusParams contains all the bound params for the agent status operation
+// PingParams contains all the bound params for the ping operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters agentStatus
-type AgentStatusParams struct {
+// swagger:parameters ping
+type PingParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -34,21 +34,21 @@ type AgentStatusParams struct {
 	/*
 	  In: body
 	*/
-	Body AgentStatusBody
+	Body PingBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewAgentStatusParams() beforehand.
-func (o *AgentStatusParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewPingParams() beforehand.
+func (o *PingParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body AgentStatusBody
+		var body PingBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

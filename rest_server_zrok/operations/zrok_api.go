@@ -56,9 +56,6 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
-		AgentAgentStatusHandler: agent.AgentStatusHandlerFunc(func(params agent.AgentStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation agent.AgentStatus has not yet been implemented")
-		}),
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
@@ -148,6 +145,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
+		}),
+		AgentPingHandler: agent.PingHandlerFunc(func(params agent.PingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Ping has not yet been implemented")
 		}),
 		AccountRegenerateAccountTokenHandler: account.RegenerateAccountTokenHandlerFunc(func(params account.RegenerateAccountTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.RegenerateAccountToken has not yet been implemented")
@@ -245,8 +245,6 @@ type ZrokAPI struct {
 	ShareAccessHandler share.AccessHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
-	// AgentAgentStatusHandler sets the operation handler for the agent status operation
-	AgentAgentStatusHandler agent.AgentStatusHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
@@ -307,6 +305,8 @@ type ZrokAPI struct {
 	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
+	// AgentPingHandler sets the operation handler for the ping operation
+	AgentPingHandler agent.PingHandler
 	// AccountRegenerateAccountTokenHandler sets the operation handler for the regenerate account token operation
 	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
@@ -422,9 +422,6 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
 	}
-	if o.AgentAgentStatusHandler == nil {
-		unregistered = append(unregistered, "agent.AgentStatusHandler")
-	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
 	}
@@ -514,6 +511,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
+	}
+	if o.AgentPingHandler == nil {
+		unregistered = append(unregistered, "agent.PingHandler")
 	}
 	if o.AccountRegenerateAccountTokenHandler == nil {
 		unregistered = append(unregistered, "account.RegenerateAccountTokenHandler")
@@ -667,10 +667,6 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/agent/status"] = agent.NewAgentStatus(o.context, o.AgentAgentStatusHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -788,6 +784,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/overview"] = metadata.NewOverview(o.context, o.MetadataOverviewHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/ping"] = agent.NewPing(o.context, o.AgentPingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -19,17 +19,15 @@ import json
 
 from pydantic import BaseModel, ConfigDict, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from zrok_api.models.share import Share
 from typing import Optional, Set
 from typing_extensions import Self
 
-class AgentStatus200Response(BaseModel):
+class Ping200Response(BaseModel):
     """
-    AgentStatus200Response
+    Ping200Response
     """ # noqa: E501
     version: Optional[StrictStr] = None
-    shares: Optional[List[Share]] = None
-    __properties: ClassVar[List[str]] = ["version", "shares"]
+    __properties: ClassVar[List[str]] = ["version"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +47,7 @@ class AgentStatus200Response(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of AgentStatus200Response from a JSON string"""
+        """Create an instance of Ping200Response from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,18 +68,11 @@ class AgentStatus200Response(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in shares (list)
-        _items = []
-        if self.shares:
-            for _item_shares in self.shares:
-                if _item_shares:
-                    _items.append(_item_shares.to_dict())
-            _dict['shares'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of AgentStatus200Response from a dict"""
+        """Create an instance of Ping200Response from a dict"""
         if obj is None:
             return None
 
@@ -89,8 +80,7 @@ class AgentStatus200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "version": obj.get("version"),
-            "shares": [Share.from_dict(_item) for _item in obj["shares"]] if obj.get("shares") is not None else None
+            "version": obj.get("version")
         })
         return _obj
 

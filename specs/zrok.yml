@@ -616,13 +616,13 @@ paths:
   #
   # agent
   #
-  /agent/status:
+  /agent/ping:
     post:
       tags:
         - agent
       security:
         - key: []
-      operationId: agentStatus
+      operationId: ping
       parameters:
         - name: body
           in: body
@@ -637,14 +637,12 @@ paths:
             properties:
               version:
                 type: string
-              shares:
-                type: array
-                items:
-                  $ref: "#/definitions/share"
         401:
           description: unauthorized
         500:
           description: internal server error
+        502:
+          description: bad gateway; agent not reachable
 
   #
   # environment

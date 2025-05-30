@@ -185,7 +185,7 @@ func init() {
         }
       }
     },
-    "/agent/status": {
+    "/agent/ping": {
       "post": {
         "security": [
           {
@@ -195,7 +195,7 @@ func init() {
         "tags": [
           "agent"
         ],
-        "operationId": "agentStatus",
+        "operationId": "ping",
         "parameters": [
           {
             "name": "body",
@@ -214,12 +214,6 @@ func init() {
             "description": "ok",
             "schema": {
               "properties": {
-                "shares": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/share"
-                  }
-                },
                 "version": {
                   "type": "string"
                 }
@@ -231,6 +225,9 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
           }
         }
       }
@@ -2546,7 +2543,7 @@ func init() {
         }
       }
     },
-    "/agent/status": {
+    "/agent/ping": {
       "post": {
         "security": [
           {
@@ -2556,7 +2553,7 @@ func init() {
         "tags": [
           "agent"
         ],
-        "operationId": "agentStatus",
+        "operationId": "ping",
         "parameters": [
           {
             "name": "body",
@@ -2575,12 +2572,6 @@ func init() {
             "description": "ok",
             "schema": {
               "properties": {
-                "shares": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/share"
-                  }
-                },
                 "version": {
                   "type": "string"
                 }
@@ -2592,6 +2583,9 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
           }
         }
       }

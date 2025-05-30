@@ -6,8 +6,6 @@ docs/AccountApi.md
 docs/AddOrganizationMemberRequest.md
 docs/AdminApi.md
 docs/AgentApi.md
-docs/AgentStatus200Response.md
-docs/AgentStatusRequest.md
 docs/AuthUser.md
 docs/ChangePasswordRequest.md
 docs/ClientVersionCheckRequest.md
@@ -40,6 +38,8 @@ docs/MetadataApi.md
 docs/Metrics.md
 docs/MetricsSample.md
 docs/Overview.md
+docs/Ping200Response.md
+docs/PingRequest.md
 docs/Principal.md
 docs/RegenerateAccountToken200Response.md
 docs/RegenerateAccountTokenRequest.md
@@ -68,8 +68,6 @@ test/test_account_api.py
 test/test_add_organization_member_request.py
 test/test_admin_api.py
 test/test_agent_api.py
-test/test_agent_status200_response.py
-test/test_agent_status_request.py
 test/test_auth_user.py
 test/test_change_password_request.py
 test/test_client_version_check_request.py
@@ -102,6 +100,8 @@ test/test_metadata_api.py
 test/test_metrics.py
 test/test_metrics_sample.py
 test/test_overview.py
+test/test_ping200_response.py
+test/test_ping_request.py
 test/test_principal.py
 test/test_regenerate_account_token200_response.py
 test/test_regenerate_account_token_request.py
@@ -137,8 +137,6 @@ zrok_api/models/__init__.py
 zrok_api/models/access201_response.py
 zrok_api/models/access_request.py
 zrok_api/models/add_organization_member_request.py
-zrok_api/models/agent_status200_response.py
-zrok_api/models/agent_status_request.py
 zrok_api/models/auth_user.py
 zrok_api/models/change_password_request.py
 zrok_api/models/client_version_check_request.py
@@ -169,6 +167,8 @@ zrok_api/models/login_request.py
 zrok_api/models/metrics.py
 zrok_api/models/metrics_sample.py
 zrok_api/models/overview.py
+zrok_api/models/ping200_response.py
+zrok_api/models/ping_request.py
 zrok_api/models/principal.py
 zrok_api/models/regenerate_account_token200_response.py
 zrok_api/models/regenerate_account_token_request.py

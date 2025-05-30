@@ -17,8 +17,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
 from typing import Optional
-from zrok_api.models.agent_status200_response import AgentStatus200Response
-from zrok_api.models.agent_status_request import AgentStatusRequest
+from zrok_api.models.ping200_response import Ping200Response
+from zrok_api.models.ping_request import PingRequest
 
 from zrok_api.api_client import ApiClient, RequestSerialized
 from zrok_api.api_response import ApiResponse
@@ -39,9 +39,9 @@ class AgentApi:
 
 
     @validate_call
-    def agent_status(
+    def ping(
         self,
-        body: Optional[AgentStatusRequest] = None,
+        body: Optional[PingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -54,12 +54,12 @@ class AgentApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> AgentStatus200Response:
-        """agent_status
+    ) -> Ping200Response:
+        """ping
 
 
         :param body:
-        :type body: AgentStatusRequest
+        :type body: PingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -82,7 +82,7 @@ class AgentApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._agent_status_serialize(
+        _param = self._ping_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -91,9 +91,10 @@ class AgentApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "AgentStatus200Response",
+            '200': "Ping200Response",
             '401': None,
             '500': None,
+            '502': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -107,9 +108,9 @@ class AgentApi:
 
 
     @validate_call
-    def agent_status_with_http_info(
+    def ping_with_http_info(
         self,
-        body: Optional[AgentStatusRequest] = None,
+        body: Optional[PingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -122,12 +123,12 @@ class AgentApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[AgentStatus200Response]:
-        """agent_status
+    ) -> ApiResponse[Ping200Response]:
+        """ping
 
 
         :param body:
-        :type body: AgentStatusRequest
+        :type body: PingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -150,7 +151,7 @@ class AgentApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._agent_status_serialize(
+        _param = self._ping_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -159,9 +160,10 @@ class AgentApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "AgentStatus200Response",
+            '200': "Ping200Response",
             '401': None,
             '500': None,
+            '502': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -175,9 +177,9 @@ class AgentApi:
 
 
     @validate_call
-    def agent_status_without_preload_content(
+    def ping_without_preload_content(
         self,
-        body: Optional[AgentStatusRequest] = None,
+        body: Optional[PingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -191,11 +193,11 @@ class AgentApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """agent_status
+        """ping
 
 
         :param body:
-        :type body: AgentStatusRequest
+        :type body: PingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -218,7 +220,7 @@ class AgentApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._agent_status_serialize(
+        _param = self._ping_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -227,9 +229,10 @@ class AgentApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "AgentStatus200Response",
+            '200': "Ping200Response",
             '401': None,
             '500': None,
+            '502': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -238,7 +241,7 @@ class AgentApi:
         return response_data.response
 
 
-    def _agent_status_serialize(
+    def _ping_serialize(
         self,
         body,
         _request_auth,
@@ -299,7 +302,7 @@ class AgentApi:
 
         return self.api_client.param_serialize(
             method='POST',
-            resource_path='/agent/status',
+            resource_path='/agent/ping',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

@@ -15,18 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  AgentStatus200Response,
-  AgentStatusRequest,
+  Ping200Response,
+  PingRequest,
 } from '../models/index';
 import {
-    AgentStatus200ResponseFromJSON,
-    AgentStatus200ResponseToJSON,
-    AgentStatusRequestFromJSON,
-    AgentStatusRequestToJSON,
+    Ping200ResponseFromJSON,
+    Ping200ResponseToJSON,
+    PingRequestFromJSON,
+    PingRequestToJSON,
 } from '../models/index';
 
-export interface AgentStatusOperationRequest {
-    body?: AgentStatusRequest;
+export interface PingOperationRequest {
+    body?: PingRequest;
 }
 
 /**
@@ -36,7 +36,7 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async agentStatusRaw(requestParameters: AgentStatusOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AgentStatus200Response>> {
+    async pingRaw(requestParameters: PingOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ping200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -48,20 +48,20 @@ export class AgentApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/agent/status`,
+            path: `/agent/ping`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AgentStatusRequestToJSON(requestParameters['body']),
+            body: PingRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AgentStatus200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => Ping200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async agentStatus(requestParameters: AgentStatusOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AgentStatus200Response> {
-        const response = await this.agentStatusRaw(requestParameters, initOverrides);
+    async ping(requestParameters: PingOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ping200Response> {
+        const response = await this.pingRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
