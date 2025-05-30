@@ -68,6 +68,11 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		return agent.NewEnrollInternalServerError()
 	}
 
+	if _, err := str.CreateAgentEnrollment(env.Id, token, trx); err != nil {
+		logrus.Errorf("error storing agent enrollment for '%v' (%v): %v", env.ZId, principal.Email, err)
+		return agent.NewEnrollInternalServerError()
+	}
+
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing agent enrollment record for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
