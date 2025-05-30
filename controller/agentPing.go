@@ -5,22 +5,19 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/controller/agentController"
-	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
 )
 
-type agentPingHandler struct {
-	cfg *config.Config
-}
+type agentPingHandler struct{}
 
-func newAgentPingHandler(cfg *config.Config) *agentPingHandler {
-	return &agentPingHandler{cfg: cfg}
+func newAgentPingHandler() *agentPingHandler {
+	return &agentPingHandler{}
 }
 
 func (h *agentPingHandler) Handle(params agent.PingParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	acli, aconn, err := agentController.NewAgentClient(params.Body.EnvZID, h.cfg.AgentController)
+	acli, aconn, err := agentController.NewAgentClient(params.Body.EnvZID, cfg.AgentController)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewPingInternalServerError()

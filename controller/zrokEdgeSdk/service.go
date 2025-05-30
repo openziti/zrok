@@ -41,7 +41,7 @@ func CreateShareService(envZId, shrToken, cfgZId string, edge *rest_management_a
 	return shrZId, nil
 }
 
-func CreateService(name string, cfgZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, err error) {
+func CreateService(name string, cfgZIds []string, addlTags map[string]interface{}, edge *rest_management_api_client.ZitiEdgeManagement) (zId string, err error) {
 	encryptionRequired := true
 	svc := &rest_model.ServiceCreate{
 		EncryptionRequired: &encryptionRequired,

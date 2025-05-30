@@ -19,6 +19,13 @@ func ZrokShareTags(shrToken string) *rest_model.Tags {
 	return tags
 }
 
+func ZrokAgentRemoteTags(enrollmentToken, envZId string) *rest_model.Tags {
+	tags := ZrokTags()
+	tags.SubTags["zrokAgentRemote"] = enrollmentToken
+	tags.SubTags["zrokEnvZId"] = envZId
+	return tags
+}
+
 func MergeTags(tags *rest_model.Tags, addl map[string]interface{}) *rest_model.Tags {
 	for k, v := range addl {
 		tags.SubTags[k] = v

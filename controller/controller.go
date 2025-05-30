@@ -66,7 +66,8 @@ func Run(inCfg *config.Config) error {
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	if cfg.AgentController != nil {
-		api.AgentPingHandler = newAgentPingHandler(cfg)
+		api.AgentEnrollHandler = newAgentEnrollHandler()
+		api.AgentPingHandler = newAgentPingHandler()
 	}
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
