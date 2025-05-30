@@ -97,13 +97,13 @@ func (h *disableHandler) removeSharesForEnvironment(envId int, tx *sqlx.Tx, edge
 		for _, shr := range shrs {
 			shrToken := shr.Token
 			logrus.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
-			if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(env.ZId, shrToken, edge); err != nil {
+			if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicyForShare(env.ZId, shrToken, edge); err != nil {
 				logrus.Error(err)
 			}
-			if err := zrokEdgeSdk.DeleteServicePoliciesDial(env.ZId, shrToken, edge); err != nil {
+			if err := zrokEdgeSdk.DeleteServicePoliciesDialForShare(env.ZId, shrToken, edge); err != nil {
 				logrus.Error(err)
 			}
-			if err := zrokEdgeSdk.DeleteServicePoliciesBind(env.ZId, shrToken, edge); err != nil {
+			if err := zrokEdgeSdk.DeleteServicePoliciesBindForShare(env.ZId, shrToken, edge); err != nil {
 				logrus.Error(err)
 			}
 			if err := zrokEdgeSdk.DeleteConfig(env.ZId, shrToken, edge); err != nil {

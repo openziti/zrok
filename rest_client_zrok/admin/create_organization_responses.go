@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -91,11 +92,13 @@ func (o *CreateOrganizationCreated) Code() int {
 }
 
 func (o *CreateOrganizationCreated) Error() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationCreated %s", 201, payload)
 }
 
 func (o *CreateOrganizationCreated) String() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationCreated %s", 201, payload)
 }
 
 func (o *CreateOrganizationCreated) GetPayload() *CreateOrganizationCreatedBody {
@@ -158,11 +161,11 @@ func (o *CreateOrganizationUnauthorized) Code() int {
 }
 
 func (o *CreateOrganizationUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationUnauthorized", 401)
 }
 
 func (o *CreateOrganizationUnauthorized) String() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationUnauthorized", 401)
 }
 
 func (o *CreateOrganizationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +217,11 @@ func (o *CreateOrganizationInternalServerError) Code() int {
 }
 
 func (o *CreateOrganizationInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationInternalServerError", 500)
 }
 
 func (o *CreateOrganizationInternalServerError) String() string {
-	return fmt.Sprintf("[POST /organization][%d] createOrganizationInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization][%d] createOrganizationInternalServerError", 500)
 }
 
 func (o *CreateOrganizationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

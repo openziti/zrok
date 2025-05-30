@@ -66,7 +66,8 @@ func (a *Agent) Run() error {
 	a.agentSocket = agentSocket
 
 	go a.manager()
-	go a.gateway(a.cfg)
+	go a.gateway()
+	go a.remoteAgent()
 
 	a.persistRegistry = false
 	if err := a.ReloadRegistry(); err != nil {
@@ -158,7 +159,36 @@ func (a *Agent) SaveRegistry() error {
 	return nil
 }
 
-func (a *Agent) gateway(cfg *AgentConfig) {
+func (a *Agent) remoteAgent() {
+	enrollmentPath, err := a.root.AgentEnrollment()
+	if err != nil {
+		logrus.Errorf("unable to get agent enrollment path: %v", err)
+		return
+	}
+
+	enrollment, err := LoadEnrollment(enrollmentPath)
+	if err != nil {
+		logrus.Warnf("unable to load agent enrollment: %v", err)
+		return
+	}
+
+	logrus.Infof("listening for remote agent at '%v'", enrollment.ServiceName)
+
+	l, err := sdk.NewListener(enrollment.ServiceName, a.root)
+	if err != nil {
+		logrus.Errorf("error listening for remote agent: %v", err)
+		return
+	}
+
+	srv := grpc.NewServer()
+	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
+	if err := srv.Serve(l); err != nil {
+		logrus.Errorf("error serving: %v", err)
+		return
+	}
+}
+
+func (a *Agent) gateway() {
 	logrus.Info("started")
 	defer logrus.Warn("exited")
 
@@ -173,7 +203,7 @@ func (a *Agent) gateway(cfg *AgentConfig) {
 		logrus.Fatalf("unable to register gateway: %v", err)
 	}
 
-	listener, err := util.AutoListener("tcp", cfg.ConsoleAddress, cfg.ConsoleStartPort, cfg.ConsoleEndPort)
+	listener, err := util.AutoListener("tcp", a.cfg.ConsoleAddress, a.cfg.ConsoleStartPort, a.cfg.ConsoleEndPort)
 	if err != nil {
 		logrus.Fatalf("unable to create a listener: %v", err)
 	}

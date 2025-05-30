@@ -7,6 +7,7 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -93,11 +94,13 @@ func (o *ListOrgMembersOK) Code() int {
 }
 
 func (o *ListOrgMembersOK) Error() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersOK %s", 200, payload)
 }
 
 func (o *ListOrgMembersOK) String() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersOK %s", 200, payload)
 }
 
 func (o *ListOrgMembersOK) GetPayload() *ListOrgMembersOKBody {
@@ -160,11 +163,11 @@ func (o *ListOrgMembersNotFound) Code() int {
 }
 
 func (o *ListOrgMembersNotFound) Error() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersNotFound ", 404)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersNotFound", 404)
 }
 
 func (o *ListOrgMembersNotFound) String() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersNotFound ", 404)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersNotFound", 404)
 }
 
 func (o *ListOrgMembersNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -216,11 +219,11 @@ func (o *ListOrgMembersInternalServerError) Code() int {
 }
 
 func (o *ListOrgMembersInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersInternalServerError ", 500)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersInternalServerError", 500)
 }
 
 func (o *ListOrgMembersInternalServerError) String() string {
-	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersInternalServerError ", 500)
+	return fmt.Sprintf("[GET /members/{organizationToken}][%d] listOrgMembersInternalServerError", 500)
 }
 
 func (o *ListOrgMembersInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

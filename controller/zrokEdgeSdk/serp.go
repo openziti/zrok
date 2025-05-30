@@ -47,8 +47,17 @@ func CreateServiceEdgeRouterPolicy(name, shrZId string, moreTags map[string]inte
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteServiceEdgeRouterPolicy(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func DeleteServiceEdgeRouterPolicyForAgentRemote(envZId, enrollmentToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\"", enrollmentToken)
+	return DeleteServiceEdgeRouterPolicy(envZId, filter, edge)
+}
+
+func DeleteServiceEdgeRouterPolicyForShare(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
+	return DeleteServiceEdgeRouterPolicy(envZId, filter, edge)
+}
+
+func DeleteServiceEdgeRouterPolicy(envZId, filter string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	limit := int64(1)
 	offset := int64(0)
 	listReq := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{

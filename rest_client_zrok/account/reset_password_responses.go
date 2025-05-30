@@ -7,6 +7,7 @@ package account
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -98,11 +99,11 @@ func (o *ResetPasswordOK) Code() int {
 }
 
 func (o *ResetPasswordOK) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK ", 200)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK", 200)
 }
 
 func (o *ResetPasswordOK) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK ", 200)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK", 200)
 }
 
 func (o *ResetPasswordOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -154,11 +155,11 @@ func (o *ResetPasswordNotFound) Code() int {
 }
 
 func (o *ResetPasswordNotFound) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound ", 404)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound", 404)
 }
 
 func (o *ResetPasswordNotFound) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound ", 404)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound", 404)
 }
 
 func (o *ResetPasswordNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -211,11 +212,13 @@ func (o *ResetPasswordUnprocessableEntity) Code() int {
 }
 
 func (o *ResetPasswordUnprocessableEntity) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity %s", 422, payload)
 }
 
 func (o *ResetPasswordUnprocessableEntity) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity %s", 422, payload)
 }
 
 func (o *ResetPasswordUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMessage {
@@ -276,11 +279,11 @@ func (o *ResetPasswordInternalServerError) Code() int {
 }
 
 func (o *ResetPasswordInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError ", 500)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError", 500)
 }
 
 func (o *ResetPasswordInternalServerError) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError ", 500)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError", 500)
 }
 
 func (o *ResetPasswordInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

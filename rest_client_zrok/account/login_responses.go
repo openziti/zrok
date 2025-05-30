@@ -7,6 +7,7 @@ package account
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -85,11 +86,13 @@ func (o *LoginOK) Code() int {
 }
 
 func (o *LoginOK) Error() string {
-	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginOK %s", 200, payload)
 }
 
 func (o *LoginOK) String() string {
-	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginOK %s", 200, payload)
 }
 
 func (o *LoginOK) GetPayload() string {
@@ -150,11 +153,11 @@ func (o *LoginUnauthorized) Code() int {
 }
 
 func (o *LoginUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
+	return fmt.Sprintf("[POST /login][%d] loginUnauthorized", 401)
 }
 
 func (o *LoginUnauthorized) String() string {
-	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
+	return fmt.Sprintf("[POST /login][%d] loginUnauthorized", 401)
 }
 
 func (o *LoginUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

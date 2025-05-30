@@ -7,6 +7,7 @@ package environment
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -97,11 +98,13 @@ func (o *EnableCreated) Code() int {
 }
 
 func (o *EnableCreated) Error() string {
-	return fmt.Sprintf("[POST /enable][%d] enableCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /enable][%d] enableCreated %s", 201, payload)
 }
 
 func (o *EnableCreated) String() string {
-	return fmt.Sprintf("[POST /enable][%d] enableCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /enable][%d] enableCreated %s", 201, payload)
 }
 
 func (o *EnableCreated) GetPayload() *EnableCreatedBody {
@@ -164,11 +167,11 @@ func (o *EnableUnauthorized) Code() int {
 }
 
 func (o *EnableUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
+	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized", 401)
 }
 
 func (o *EnableUnauthorized) String() string {
-	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized ", 401)
+	return fmt.Sprintf("[POST /enable][%d] enableUnauthorized", 401)
 }
 
 func (o *EnableUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +223,11 @@ func (o *EnableNotFound) Code() int {
 }
 
 func (o *EnableNotFound) Error() string {
-	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
+	return fmt.Sprintf("[POST /enable][%d] enableNotFound", 404)
 }
 
 func (o *EnableNotFound) String() string {
-	return fmt.Sprintf("[POST /enable][%d] enableNotFound ", 404)
+	return fmt.Sprintf("[POST /enable][%d] enableNotFound", 404)
 }
 
 func (o *EnableNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +279,11 @@ func (o *EnableInternalServerError) Code() int {
 }
 
 func (o *EnableInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError ", 500)
+	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError", 500)
 }
 
 func (o *EnableInternalServerError) String() string {
-	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError ", 500)
+	return fmt.Sprintf("[POST /enable][%d] enableInternalServerError", 500)
 }
 
 func (o *EnableInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

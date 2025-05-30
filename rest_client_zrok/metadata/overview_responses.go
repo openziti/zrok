@@ -6,6 +6,7 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -85,11 +86,13 @@ func (o *OverviewOK) Code() int {
 }
 
 func (o *OverviewOK) Error() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewOK %s", 200, payload)
 }
 
 func (o *OverviewOK) String() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewOK %s", 200, payload)
 }
 
 func (o *OverviewOK) GetPayload() *rest_model_zrok.Overview {
@@ -153,11 +156,13 @@ func (o *OverviewInternalServerError) Code() int {
 }
 
 func (o *OverviewInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError %s", 500, payload)
 }
 
 func (o *OverviewInternalServerError) String() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError %s", 500, payload)
 }
 
 func (o *OverviewInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {

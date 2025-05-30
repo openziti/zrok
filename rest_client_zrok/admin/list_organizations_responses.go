@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -93,11 +94,13 @@ func (o *ListOrganizationsOK) Code() int {
 }
 
 func (o *ListOrganizationsOK) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK %s", 200, payload)
 }
 
 func (o *ListOrganizationsOK) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK %s", 200, payload)
 }
 
 func (o *ListOrganizationsOK) GetPayload() *ListOrganizationsOKBody {
@@ -160,11 +163,11 @@ func (o *ListOrganizationsUnauthorized) Code() int {
 }
 
 func (o *ListOrganizationsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized", 401)
 }
 
 func (o *ListOrganizationsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized", 401)
 }
 
 func (o *ListOrganizationsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -216,11 +219,11 @@ func (o *ListOrganizationsInternalServerError) Code() int {
 }
 
 func (o *ListOrganizationsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError", 500)
 }
 
 func (o *ListOrganizationsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError", 500)
 }
 
 func (o *ListOrganizationsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

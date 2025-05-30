@@ -7,6 +7,7 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -84,11 +85,11 @@ func (o *ClientVersionCheckOK) Code() int {
 }
 
 func (o *ClientVersionCheckOK) Error() string {
-	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK ", 200)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK", 200)
 }
 
 func (o *ClientVersionCheckOK) String() string {
-	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK ", 200)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckOK", 200)
 }
 
 func (o *ClientVersionCheckOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -141,11 +142,13 @@ func (o *ClientVersionCheckBadRequest) Code() int {
 }
 
 func (o *ClientVersionCheckBadRequest) Error() string {
-	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest %s", 400, payload)
 }
 
 func (o *ClientVersionCheckBadRequest) String() string {
-	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /clientVersionCheck][%d] clientVersionCheckBadRequest %s", 400, payload)
 }
 
 func (o *ClientVersionCheckBadRequest) GetPayload() string {

@@ -1,38 +1,38 @@
 package config
 
 import (
-	"os"
-	"strconv"
-	"time"
-
+	"github.com/michaelquigley/cf"
+	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-
-	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
+	"os"
+	"strconv"
+	"time"
 )
 
 const ConfigVersion = 4
 
 type Config struct {
-	V             int
-	Admin         *AdminConfig
-	Bridge        *metrics.BridgeConfig
-	Endpoint      *EndpointConfig
-	Email         *emailUi.Config
-	Invites       *InvitesConfig
-	Limits        *limits.Config
-	Maintenance   *MaintenanceConfig
-	Metrics       *metrics.Config
-	Registration  *RegistrationConfig
-	ResetPassword *ResetPasswordConfig
-	Store         *store.Config
-	Ziti          *zrokEdgeSdk.Config
-	Tls           *TlsConfig
+	V               int
+	Admin           *AdminConfig
+	AgentController *agentController.Config
+	Bridge          *metrics.BridgeConfig
+	Endpoint        *EndpointConfig
+	Email           *emailUi.Config
+	Invites         *InvitesConfig
+	Limits          *limits.Config
+	Maintenance     *MaintenanceConfig
+	Metrics         *metrics.Config
+	Registration    *RegistrationConfig
+	ResetPassword   *ResetPasswordConfig
+	Store           *store.Config
+	Ziti            *zrokEdgeSdk.Config
+	Tls             *TlsConfig
 }
 
 type AdminConfig struct {

@@ -7,6 +7,7 @@ package share
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -97,11 +98,13 @@ func (o *AccessCreated) Code() int {
 }
 
 func (o *AccessCreated) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /access][%d] accessCreated %s", 201, payload)
 }
 
 func (o *AccessCreated) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /access][%d] accessCreated %s", 201, payload)
 }
 
 func (o *AccessCreated) GetPayload() *AccessCreatedBody {
@@ -164,11 +167,11 @@ func (o *AccessUnauthorized) Code() int {
 }
 
 func (o *AccessUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /access][%d] accessUnauthorized", 401)
 }
 
 func (o *AccessUnauthorized) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /access][%d] accessUnauthorized", 401)
 }
 
 func (o *AccessUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +223,11 @@ func (o *AccessNotFound) Code() int {
 }
 
 func (o *AccessNotFound) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+	return fmt.Sprintf("[POST /access][%d] accessNotFound", 404)
 }
 
 func (o *AccessNotFound) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+	return fmt.Sprintf("[POST /access][%d] accessNotFound", 404)
 }
 
 func (o *AccessNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +279,11 @@ func (o *AccessInternalServerError) Code() int {
 }
 
 func (o *AccessInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /access][%d] accessInternalServerError", 500)
 }
 
 func (o *AccessInternalServerError) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /access][%d] accessInternalServerError", 500)
 }
 
 func (o *AccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

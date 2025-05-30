@@ -7,6 +7,7 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -79,11 +80,13 @@ func (o *VersionInventoryOK) Code() int {
 }
 
 func (o *VersionInventoryOK) Error() string {
-	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK %s", 200, payload)
 }
 
 func (o *VersionInventoryOK) String() string {
-	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK %s", 200, payload)
 }
 
 func (o *VersionInventoryOK) GetPayload() *VersionInventoryOKBody {

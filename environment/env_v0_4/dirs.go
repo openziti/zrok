@@ -69,3 +69,11 @@ func agentRegistry() (string, error) {
 	}
 	return filepath.Join(zrd, "agent-registry.json"), nil
 }
+
+func agentEnrollment() (string, error) {
+	zrd, err := rootDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(zrd, "agent-enrollment.json"), nil
+}

@@ -7,6 +7,7 @@ package account
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -91,11 +92,13 @@ func (o *VerifyOK) Code() int {
 }
 
 func (o *VerifyOK) Error() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyOK %s", 200, payload)
 }
 
 func (o *VerifyOK) String() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /verify][%d] verifyOK %s", 200, payload)
 }
 
 func (o *VerifyOK) GetPayload() *VerifyOKBody {
@@ -158,11 +161,11 @@ func (o *VerifyNotFound) Code() int {
 }
 
 func (o *VerifyNotFound) Error() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyNotFound ", 404)
+	return fmt.Sprintf("[POST /verify][%d] verifyNotFound", 404)
 }
 
 func (o *VerifyNotFound) String() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyNotFound ", 404)
+	return fmt.Sprintf("[POST /verify][%d] verifyNotFound", 404)
 }
 
 func (o *VerifyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +217,11 @@ func (o *VerifyInternalServerError) Code() int {
 }
 
 func (o *VerifyInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError ", 500)
+	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError", 500)
 }
 
 func (o *VerifyInternalServerError) String() string {
-	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError ", 500)
+	return fmt.Sprintf("[POST /verify][%d] verifyInternalServerError", 500)
 }
 
 func (o *VerifyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
