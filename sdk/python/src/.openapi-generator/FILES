@@ -5,6 +5,9 @@ docs/AccessRequest.md
 docs/AccountApi.md
 docs/AddOrganizationMemberRequest.md
 docs/AdminApi.md
+docs/AgentApi.md
+docs/AgentStatus200Response.md
+docs/AgentStatusRequest.md
 docs/AuthUser.md
 docs/ChangePasswordRequest.md
 docs/ClientVersionCheckRequest.md
@@ -64,6 +67,9 @@ test/test_access_request.py
 test/test_account_api.py
 test/test_add_organization_member_request.py
 test/test_admin_api.py
+test/test_agent_api.py
+test/test_agent_status200_response.py
+test/test_agent_status_request.py
 test/test_auth_user.py
 test/test_change_password_request.py
 test/test_client_version_check_request.py
@@ -119,6 +125,7 @@ zrok_api/__init__.py
 zrok_api/api/__init__.py
 zrok_api/api/account_api.py
 zrok_api/api/admin_api.py
+zrok_api/api/agent_api.py
 zrok_api/api/environment_api.py
 zrok_api/api/metadata_api.py
 zrok_api/api/share_api.py
@@ -130,6 +137,8 @@ zrok_api/models/__init__.py
 zrok_api/models/access201_response.py
 zrok_api/models/access_request.py
 zrok_api/models/add_organization_member_request.py
+zrok_api/models/agent_status200_response.py
+zrok_api/models/agent_status_request.py
 zrok_api/models/auth_user.py
 zrok_api/models/change_password_request.py
 zrok_api/models/client_version_check_request.py

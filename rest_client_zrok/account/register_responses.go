@@ -7,6 +7,7 @@ package account
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *RegisterOK) Code() int {
 }
 
 func (o *RegisterOK) Error() string {
-	return fmt.Sprintf("[POST /register][%d] registerOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /register][%d] registerOK %s", 200, payload)
 }
 
 func (o *RegisterOK) String() string {
-	return fmt.Sprintf("[POST /register][%d] registerOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /register][%d] registerOK %s", 200, payload)
 }
 
 func (o *RegisterOK) GetPayload() *RegisterOKBody {
@@ -166,11 +169,11 @@ func (o *RegisterNotFound) Code() int {
 }
 
 func (o *RegisterNotFound) Error() string {
-	return fmt.Sprintf("[POST /register][%d] registerNotFound ", 404)
+	return fmt.Sprintf("[POST /register][%d] registerNotFound", 404)
 }
 
 func (o *RegisterNotFound) String() string {
-	return fmt.Sprintf("[POST /register][%d] registerNotFound ", 404)
+	return fmt.Sprintf("[POST /register][%d] registerNotFound", 404)
 }
 
 func (o *RegisterNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -223,11 +226,13 @@ func (o *RegisterUnprocessableEntity) Code() int {
 }
 
 func (o *RegisterUnprocessableEntity) Error() string {
-	return fmt.Sprintf("[POST /register][%d] registerUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /register][%d] registerUnprocessableEntity %s", 422, payload)
 }
 
 func (o *RegisterUnprocessableEntity) String() string {
-	return fmt.Sprintf("[POST /register][%d] registerUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /register][%d] registerUnprocessableEntity %s", 422, payload)
 }
 
 func (o *RegisterUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMessage {
@@ -288,11 +293,11 @@ func (o *RegisterInternalServerError) Code() int {
 }
 
 func (o *RegisterInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /register][%d] registerInternalServerError ", 500)
+	return fmt.Sprintf("[POST /register][%d] registerInternalServerError", 500)
 }
 
 func (o *RegisterInternalServerError) String() string {
-	return fmt.Sprintf("[POST /register][%d] registerInternalServerError ", 500)
+	return fmt.Sprintf("[POST /register][%d] registerInternalServerError", 500)
 }
 
 func (o *RegisterInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

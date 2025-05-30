@@ -1,6 +1,7 @@
 .openapi-generator-ignore
 apis/AccountApi.ts
 apis/AdminApi.ts
+apis/AgentApi.ts
 apis/EnvironmentApi.ts
 apis/MetadataApi.ts
 apis/ShareApi.ts
@@ -9,6 +10,8 @@ index.ts
 models/Access201Response.ts
 models/AccessRequest.ts
 models/AddOrganizationMemberRequest.ts
+models/AgentStatus200Response.ts
+models/AgentStatusRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts

@@ -114,6 +114,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
+*AgentApi* | [**agent_status**](docs/AgentApi.md#agent_status) | **POST** /agent/status | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
 *MetadataApi* | [**client_version_check**](docs/MetadataApi.md#client_version_check) | **POST** /clientVersionCheck | 
@@ -145,6 +146,8 @@ Class | Method | HTTP request | Description
  - [Access201Response](docs/Access201Response.md)
  - [AccessRequest](docs/AccessRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
+ - [AgentStatus200Response](docs/AgentStatus200Response.md)
+ - [AgentStatusRequest](docs/AgentStatusRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [ClientVersionCheckRequest](docs/ClientVersionCheckRequest.md)

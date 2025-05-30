@@ -22,6 +22,7 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
@@ -54,6 +55,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
+		}),
+		AgentAgentStatusHandler: agent.AgentStatusHandlerFunc(func(params agent.AgentStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.AgentStatus has not yet been implemented")
 		}),
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
@@ -241,6 +245,8 @@ type ZrokAPI struct {
 	ShareAccessHandler share.AccessHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
+	// AgentAgentStatusHandler sets the operation handler for the agent status operation
+	AgentAgentStatusHandler agent.AgentStatusHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
@@ -415,6 +421,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
+	}
+	if o.AgentAgentStatusHandler == nil {
+		unregistered = append(unregistered, "agent.AgentStatusHandler")
 	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
@@ -655,6 +664,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/organization/add"] = admin.NewAddOrganizationMember(o.context, o.AdminAddOrganizationMemberHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/status"] = agent.NewAgentStatus(o.context, o.AgentAgentStatusHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

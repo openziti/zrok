@@ -185,6 +185,53 @@ func init() {
         }
       }
     },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "agentStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/share"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -2483,6 +2530,53 @@ func init() {
               "properties": {
                 "accountToken": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "agentStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/share"
+                  }
                 }
               }
             }
