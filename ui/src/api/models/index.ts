@@ -40,6 +40,8 @@ export * from './Principal';
 export * from './RegenerateAccountToken200Response';
 export * from './RegenerateAccountTokenRequest';
 export * from './RegisterRequest';
+export * from './RemoteShare200Response';
+export * from './RemoteShareRequest';
 export * from './RemoveOrganizationMemberRequest';
 export * from './ResetPasswordRequest';
 export * from './Share';

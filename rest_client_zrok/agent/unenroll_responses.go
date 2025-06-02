@@ -227,7 +227,7 @@ func NewUnenrollInternalServerError() *UnenrollInternalServerError {
 /*
 UnenrollInternalServerError describes a response with status code 500, with default header values.
 
-internal server error
+internal server er
 */
 type UnenrollInternalServerError struct {
 }

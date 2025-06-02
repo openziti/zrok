@@ -666,7 +666,7 @@ paths:
         401:
           description: unauthorized
         500:
-          description: internal server error
+          description: internal server er
 
   /agent/ping:
     post:
@@ -689,6 +689,93 @@ paths:
             properties:
               version:
                 type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+          
+  /agent/share:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteShare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              shareMode:
+                type: string
+              token:
+                type: string
+              target:
+                type: string
+              basicAuth:
+                type: array
+                items:
+                  type: string
+              frontendSelection:
+                type: array
+                items:
+                  type: string
+              backendMode:
+                type: string
+                enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+              insecure:
+                type: boolean
+              oauthProvider:
+                type: string
+              oauthEmailAddressPatterns:
+                type: array
+                items:
+                  type: string
+              oauthCheckInterval:
+                type: string
+              open:
+                type: boolean
+              accessGrants:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              token:
+                type: string
+              frontendEndpoints:
+                type: array
+                items:
+                  type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/unshare:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteUnshare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              token:
+                type: string
+      responses:
+        200:
+          description: ok
         401:
           description: unauthorized
         500:

@@ -76,6 +76,8 @@ from zrok_api.models.principal import Principal
 from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
 from zrok_api.models.regenerate_account_token_request import RegenerateAccountTokenRequest
 from zrok_api.models.register_request import RegisterRequest
+from zrok_api.models.remote_share200_response import RemoteShare200Response
+from zrok_api.models.remote_share_request import RemoteShareRequest
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.models.share import Share

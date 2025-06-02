@@ -116,6 +116,8 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
+*AgentApi* | [**remote_share**](docs/AgentApi.md#remote_share) | **POST** /agent/share | 
+*AgentApi* | [**remote_unshare**](docs/AgentApi.md#remote_unshare) | **POST** /agent/unshare | 
 *AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
@@ -185,6 +187,8 @@ Class | Method | HTTP request | Description
  - [RegenerateAccountToken200Response](docs/RegenerateAccountToken200Response.md)
  - [RegenerateAccountTokenRequest](docs/RegenerateAccountTokenRequest.md)
  - [RegisterRequest](docs/RegisterRequest.md)
+ - [RemoteShare200Response](docs/RemoteShare200Response.md)
+ - [RemoteShareRequest](docs/RemoteShareRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)

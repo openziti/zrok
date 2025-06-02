@@ -158,6 +158,12 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
+		AgentRemoteShareHandler: agent.RemoteShareHandlerFunc(func(params agent.RemoteShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteShare has not yet been implemented")
+		}),
+		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
+		}),
 		AdminRemoveOrganizationMemberHandler: admin.RemoveOrganizationMemberHandlerFunc(func(params admin.RemoveOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.RemoveOrganizationMember has not yet been implemented")
 		}),
@@ -319,6 +325,10 @@ type ZrokAPI struct {
 	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
+	// AgentRemoteShareHandler sets the operation handler for the remote share operation
+	AgentRemoteShareHandler agent.RemoteShareHandler
+	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
+	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
 	AdminRemoveOrganizationMemberHandler admin.RemoveOrganizationMemberHandler
 	// AccountResetPasswordHandler sets the operation handler for the reset password operation
@@ -533,6 +543,12 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
+	}
+	if o.AgentRemoteShareHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteShareHandler")
+	}
+	if o.AgentRemoteUnshareHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
 	}
 	if o.AdminRemoveOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.RemoveOrganizationMemberHandler")
@@ -816,6 +832,14 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/share"] = agent.NewRemoteShare(o.context, o.AgentRemoteShareHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unshare"] = agent.NewRemoteUnshare(o.context, o.AgentRemoteUnshareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -47,6 +47,8 @@ models/Principal.ts
 models/RegenerateAccountToken200Response.ts
 models/RegenerateAccountTokenRequest.ts
 models/RegisterRequest.ts
+models/RemoteShare200Response.ts
+models/RemoteShareRequest.ts
 models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
 models/Share.ts

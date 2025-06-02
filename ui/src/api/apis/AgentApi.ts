@@ -18,6 +18,8 @@ import type {
   Enroll200Response,
   EnrollRequest,
   Ping200Response,
+  RemoteShare200Response,
+  RemoteShareRequest,
 } from '../models/index';
 import {
     Enroll200ResponseFromJSON,
@@ -26,6 +28,10 @@ import {
     EnrollRequestToJSON,
     Ping200ResponseFromJSON,
     Ping200ResponseToJSON,
+    RemoteShare200ResponseFromJSON,
+    RemoteShare200ResponseToJSON,
+    RemoteShareRequestFromJSON,
+    RemoteShareRequestToJSON,
 } from '../models/index';
 
 export interface EnrollOperationRequest {
@@ -34,6 +40,14 @@ export interface EnrollOperationRequest {
 
 export interface PingRequest {
     body?: EnrollRequest;
+}
+
+export interface RemoteShareOperationRequest {
+    body?: RemoteShareRequest;
+}
+
+export interface RemoteUnshareRequest {
+    body?: Enroll200Response;
 }
 
 export interface UnenrollRequest {
@@ -105,6 +119,67 @@ export class AgentApi extends runtime.BaseAPI {
     async ping(requestParameters: PingRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ping200Response> {
         const response = await this.pingRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async remoteShareRaw(requestParameters: RemoteShareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RemoteShare200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/share`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RemoteShareRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RemoteShare200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async remoteShare(requestParameters: RemoteShareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RemoteShare200Response> {
+        const response = await this.remoteShareRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async remoteUnshareRaw(requestParameters: RemoteUnshareRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/unshare`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Enroll200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async remoteUnshare(requestParameters: RemoteUnshareRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.remoteUnshareRaw(requestParameters, initOverrides);
     }
 
     /**

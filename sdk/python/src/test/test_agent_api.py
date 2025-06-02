@@ -38,6 +38,18 @@ class TestAgentApi(unittest.TestCase):
         """
         pass
 
+    def test_remote_share(self) -> None:
+        """Test case for remote_share
+
+        """
+        pass
+
+    def test_remote_unshare(self) -> None:
+        """Test case for remote_unshare
+
+        """
+        pass
+
     def test_unenroll(self) -> None:
         """Test case for unenroll
 

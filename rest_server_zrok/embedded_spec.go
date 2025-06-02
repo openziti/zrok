@@ -279,6 +279,114 @@ func init() {
         }
       }
     },
+    "/agent/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "accessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendMode": {
+                  "type": "string",
+                  "enum": [
+                    "proxy",
+                    "web",
+                    "tcpTunnel",
+                    "udpTunnel",
+                    "caddy",
+                    "drive",
+                    "socks",
+                    "vpn"
+                  ]
+                },
+                "basicAuth": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "frontendSelection": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "insecure": {
+                  "type": "boolean"
+                },
+                "oauthCheckInterval": {
+                  "type": "string"
+                },
+                "oauthEmailAddressPatterns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "oauthProvider": {
+                  "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "shareMode": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendEndpoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/unenroll": {
       "post": {
         "security": [
@@ -314,7 +422,47 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
+            "description": "internal server er"
+          }
+        }
+      }
+    },
+    "/agent/unshare": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
             "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
           }
         }
       }
@@ -2724,6 +2872,114 @@ func init() {
         }
       }
     },
+    "/agent/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "accessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendMode": {
+                  "type": "string",
+                  "enum": [
+                    "proxy",
+                    "web",
+                    "tcpTunnel",
+                    "udpTunnel",
+                    "caddy",
+                    "drive",
+                    "socks",
+                    "vpn"
+                  ]
+                },
+                "basicAuth": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "frontendSelection": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "insecure": {
+                  "type": "boolean"
+                },
+                "oauthCheckInterval": {
+                  "type": "string"
+                },
+                "oauthEmailAddressPatterns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "oauthProvider": {
+                  "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "shareMode": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendEndpoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/unenroll": {
       "post": {
         "security": [
@@ -2759,7 +3015,47 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
+            "description": "internal server er"
+          }
+        }
+      }
+    },
+    "/agent/unshare": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
             "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
           }
         }
       }
