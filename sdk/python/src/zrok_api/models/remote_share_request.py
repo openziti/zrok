@@ -26,6 +26,7 @@ class RemoteShareRequest(BaseModel):
     """
     RemoteShareRequest
     """ # noqa: E501
+    env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
     share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
     token: Optional[StrictStr] = None
     target: Optional[StrictStr] = None
@@ -38,7 +39,17 @@ class RemoteShareRequest(BaseModel):
     oauth_check_interval: Optional[StrictStr] = Field(default=None, alias="oauthCheckInterval")
     open: Optional[StrictBool] = None
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
-    __properties: ClassVar[List[str]] = ["shareMode", "token", "target", "basicAuth", "frontendSelection", "backendMode", "insecure", "oauthProvider", "oauthEmailAddressPatterns", "oauthCheckInterval", "open", "accessGrants"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "token", "target", "basicAuth", "frontendSelection", "backendMode", "insecure", "oauthProvider", "oauthEmailAddressPatterns", "oauthCheckInterval", "open", "accessGrants"]
+
+    @field_validator('share_mode')
+    def share_mode_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        if value not in set(['public', 'private', 'reserved']):
+            raise ValueError("must be one of enum values ('public', 'private', 'reserved')")
+        return value
 
     @field_validator('backend_mode')
     def backend_mode_validate_enum(cls, value):
@@ -101,6 +112,7 @@ class RemoteShareRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "envZId": obj.get("envZId"),
             "shareMode": obj.get("shareMode"),
             "token": obj.get("token"),
             "target": obj.get("target"),

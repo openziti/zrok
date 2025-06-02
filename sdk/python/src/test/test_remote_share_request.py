@@ -35,7 +35,8 @@ class TestRemoteShareRequest(unittest.TestCase):
         model = RemoteShareRequest()
         if include_optional:
             return RemoteShareRequest(
-                share_mode = '',
+                env_zid = '',
+                share_mode = 'public',
                 token = '',
                 target = '',
                 basic_auth = [

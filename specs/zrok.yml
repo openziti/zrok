@@ -644,30 +644,6 @@ paths:
         500:
           description: internal server error
 
-  /agent/unenroll:
-    post:
-      tags:
-        - agent
-      security:
-        - key: []
-      operationId: unenroll
-      parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              envZId:
-                type: string
-      responses:
-        200:
-          description: ok
-        400:
-          description: bad request; not enrolled
-        401:
-          description: unauthorized
-        500:
-          description: internal server er
-
   /agent/ping:
     post:
       tags:
@@ -708,8 +684,11 @@ paths:
           in: body
           schema:
             properties:
+              envZId:
+                type: string
               shareMode:
                 type: string
+                enum: ["public", "private", "reserved"]
               token:
                 type: string
               target:
@@ -758,6 +737,29 @@ paths:
           description: internal server error
         502:
           description: bad gateway; agent not reachable
+
+  /agent/unenroll:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: unenroll
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: bad request; not enrolled
+        401:
+          description: unauthorized
+        500:
 
   /agent/unshare:
     post:

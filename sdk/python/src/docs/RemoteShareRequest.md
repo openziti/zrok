@@ -5,6 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**env_zid** | **str** |  | [optional] 
 **share_mode** | **str** |  | [optional] 
 **token** | **str** |  | [optional] 
 **target** | **str** |  | [optional] 

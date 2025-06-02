@@ -90,7 +90,7 @@ func (o *UnenrollUnauthorized) WriteResponse(rw http.ResponseWriter, producer ru
 const UnenrollInternalServerErrorCode int = 500
 
 /*
-UnenrollInternalServerError internal server er
+UnenrollInternalServerError unenroll internal server error
 
 swagger:response unenrollInternalServerError
 */

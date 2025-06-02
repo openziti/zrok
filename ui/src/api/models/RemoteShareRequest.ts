@@ -24,7 +24,13 @@ export interface RemoteShareRequest {
      * @type {string}
      * @memberof RemoteShareRequest
      */
-    shareMode?: string;
+    envZId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RemoteShareRequest
+     */
+    shareMode?: RemoteShareRequestShareModeEnum;
     /**
      * 
      * @type {string}
@@ -97,6 +103,16 @@ export interface RemoteShareRequest {
 /**
  * @export
  */
+export const RemoteShareRequestShareModeEnum = {
+    Public: 'public',
+    Private: 'private',
+    Reserved: 'reserved'
+} as const;
+export type RemoteShareRequestShareModeEnum = typeof RemoteShareRequestShareModeEnum[keyof typeof RemoteShareRequestShareModeEnum];
+
+/**
+ * @export
+ */
 export const RemoteShareRequestBackendModeEnum = {
     Proxy: 'proxy',
     Web: 'web',
@@ -127,6 +143,7 @@ export function RemoteShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
+        'envZId': json['envZId'] == null ? undefined : json['envZId'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'token': json['token'] == null ? undefined : json['token'],
         'target': json['target'] == null ? undefined : json['target'],
@@ -153,6 +170,7 @@ export function RemoteShareRequestToJSONTyped(value?: RemoteShareRequest | null,
 
     return {
         
+        'envZId': value['envZId'],
         'shareMode': value['shareMode'],
         'token': value['token'],
         'target': value['target'],

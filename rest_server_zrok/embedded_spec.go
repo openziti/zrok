@@ -321,6 +321,9 @@ func init() {
                     "type": "string"
                   }
                 },
+                "envZId": {
+                  "type": "string"
+                },
                 "frontendSelection": {
                   "type": "array",
                   "items": {
@@ -346,7 +349,12 @@ func init() {
                   "type": "boolean"
                 },
                 "shareMode": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "private",
+                    "reserved"
+                  ]
                 },
                 "target": {
                   "type": "string"
@@ -422,7 +430,7 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
-            "description": "internal server er"
+            "description": ""
           }
         }
       }
@@ -2914,6 +2922,9 @@ func init() {
                     "type": "string"
                   }
                 },
+                "envZId": {
+                  "type": "string"
+                },
                 "frontendSelection": {
                   "type": "array",
                   "items": {
@@ -2939,7 +2950,12 @@ func init() {
                   "type": "boolean"
                 },
                 "shareMode": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "private",
+                    "reserved"
+                  ]
                 },
                 "target": {
                   "type": "string"
@@ -3015,7 +3031,7 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
-            "description": "internal server er"
+            "description": ""
           }
         }
       }

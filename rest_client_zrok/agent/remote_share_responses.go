@@ -309,6 +309,9 @@ type RemoteShareBody struct {
 	// basic auth
 	BasicAuth []string `json:"basicAuth"`
 
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
 	// frontend selection
 	FrontendSelection []string `json:"frontendSelection"`
 
@@ -328,6 +331,7 @@ type RemoteShareBody struct {
 	Open bool `json:"open,omitempty"`
 
 	// share mode
+	// Enum: ["public","private","reserved"]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
@@ -342,6 +346,10 @@ func (o *RemoteShareBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateBackendMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateShareMode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -405,6 +413,51 @@ func (o *RemoteShareBody) validateBackendMode(formats strfmt.Registry) error {
 
 	// value enum
 	if err := o.validateBackendModeEnum("body"+"."+"backendMode", "body", o.BackendMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var remoteShareBodyTypeShareModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["public","private","reserved"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		remoteShareBodyTypeShareModePropEnum = append(remoteShareBodyTypeShareModePropEnum, v)
+	}
+}
+
+const (
+
+	// RemoteShareBodyShareModePublic captures enum value "public"
+	RemoteShareBodyShareModePublic string = "public"
+
+	// RemoteShareBodyShareModePrivate captures enum value "private"
+	RemoteShareBodyShareModePrivate string = "private"
+
+	// RemoteShareBodyShareModeReserved captures enum value "reserved"
+	RemoteShareBodyShareModeReserved string = "reserved"
+)
+
+// prop value enum
+func (o *RemoteShareBody) validateShareModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, remoteShareBodyTypeShareModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *RemoteShareBody) validateShareMode(formats strfmt.Registry) error {
+	if swag.IsZero(o.ShareMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateShareModeEnum("body"+"."+"shareMode", "body", o.ShareMode); err != nil {
 		return err
 	}
 

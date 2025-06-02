@@ -47,8 +47,8 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	}
 	shr.insecure = req.Insecure
 
-	if req.Closed {
-		shrCmd = append(shrCmd, "--closed")
+	if !req.Closed {
+		shrCmd = append(shrCmd, "--open")
 	}
 	shr.closed = req.Closed
 
