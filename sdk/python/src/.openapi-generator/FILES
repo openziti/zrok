@@ -47,6 +47,9 @@ docs/RegenerateAccountTokenRequest.md
 docs/RegisterRequest.md
 docs/RemoteShare200Response.md
 docs/RemoteShareRequest.md
+docs/RemoteStatus200Response.md
+docs/RemoteStatus200ResponseAccessesInner.md
+docs/RemoteStatus200ResponseSharesInner.md
 docs/RemoteUnshareRequest.md
 docs/RemoveOrganizationMemberRequest.md
 docs/ResetPasswordRequest.md
@@ -113,6 +116,9 @@ test/test_regenerate_account_token_request.py
 test/test_register_request.py
 test/test_remote_share200_response.py
 test/test_remote_share_request.py
+test/test_remote_status200_response.py
+test/test_remote_status200_response_accesses_inner.py
+test/test_remote_status200_response_shares_inner.py
 test/test_remote_unshare_request.py
 test/test_remove_organization_member_request.py
 test/test_reset_password_request.py
@@ -184,6 +190,9 @@ zrok_api/models/regenerate_account_token_request.py
 zrok_api/models/register_request.py
 zrok_api/models/remote_share200_response.py
 zrok_api/models/remote_share_request.py
+zrok_api/models/remote_status200_response.py
+zrok_api/models/remote_status200_response_accesses_inner.py
+zrok_api/models/remote_status200_response_shares_inner.py
 zrok_api/models/remote_unshare_request.py
 zrok_api/models/remove_organization_member_request.py
 zrok_api/models/reset_password_request.py

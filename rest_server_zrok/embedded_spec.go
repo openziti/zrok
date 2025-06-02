@@ -395,6 +395,108 @@ func init() {
         }
       }
     },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "accesses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "bindAddress": {
+                        "type": "string"
+                      },
+                      "frontendToken": {
+                        "type": "string"
+                      },
+                      "responseHeaders": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "backendEndpoint": {
+                        "type": "string"
+                      },
+                      "backendMode": {
+                        "type": "string"
+                      },
+                      "frontendEndpoints": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "open": {
+                        "type": "boolean"
+                      },
+                      "reserved": {
+                        "type": "boolean"
+                      },
+                      "shareMode": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/unenroll": {
       "post": {
         "security": [
@@ -430,7 +532,7 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
-            "description": ""
+            "description": "internal server error"
           }
         }
       }
@@ -2999,6 +3101,62 @@ func init() {
         }
       }
     },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "accesses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/AccessesItems0"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SharesItems0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/unenroll": {
       "post": {
         "security": [
@@ -3034,7 +3192,7 @@ func init() {
             "description": "unauthorized"
           },
           "500": {
-            "description": ""
+            "description": "internal server error"
           }
         }
       }
@@ -4811,6 +4969,26 @@ func init() {
     }
   },
   "definitions": {
+    "AccessesItems0": {
+      "type": "object",
+      "properties": {
+        "bindAddress": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "responseHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
     "ListFrontendsOKBodyItems0": {
       "type": "object",
       "properties": {
@@ -4863,6 +5041,38 @@ func init() {
           "type": "string"
         },
         "organizationToken": {
+          "type": "string"
+        }
+      }
+    },
+    "SharesItems0": {
+      "type": "object",
+      "properties": {
+        "backendEndpoint": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         }
       }

@@ -117,6 +117,7 @@ Class | Method | HTTP request | Description
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
 *AgentApi* | [**remote_share**](docs/AgentApi.md#remote_share) | **POST** /agent/share | 
+*AgentApi* | [**remote_status**](docs/AgentApi.md#remote_status) | **POST** /agent/status | 
 *AgentApi* | [**remote_unshare**](docs/AgentApi.md#remote_unshare) | **POST** /agent/unshare | 
 *AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
@@ -189,6 +190,9 @@ Class | Method | HTTP request | Description
  - [RegisterRequest](docs/RegisterRequest.md)
  - [RemoteShare200Response](docs/RemoteShare200Response.md)
  - [RemoteShareRequest](docs/RemoteShareRequest.md)
+ - [RemoteStatus200Response](docs/RemoteStatus200Response.md)
+ - [RemoteStatus200ResponseAccessesInner](docs/RemoteStatus200ResponseAccessesInner.md)
+ - [RemoteStatus200ResponseSharesInner](docs/RemoteStatus200ResponseSharesInner.md)
  - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)

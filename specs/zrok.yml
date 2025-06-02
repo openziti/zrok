@@ -738,6 +738,70 @@ paths:
         502:
           description: bad gateway; agent not reachable
 
+  /agent/status:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteStatus
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              shares:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                    shareMode:
+                      type: string
+                    backendMode:
+                      type: string
+                    reserved:
+                      type: boolean
+                    frontendEndpoints:
+                      type: array
+                      items:
+                        type: string
+                    backendEndpoint:
+                      type: string
+                    open:
+                      type: boolean
+                    status:
+                      type: string
+              accesses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    frontendToken:
+                      type: string
+                    token:
+                      type: string
+                    bindAddress:
+                      type: string
+                    responseHeaders:
+                      type: array
+                      items:
+                        type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
   /agent/unenroll:
     post:
       tags:
@@ -760,6 +824,7 @@ paths:
         401:
           description: unauthorized
         500:
+          description: internal server error
 
   /agent/unshare:
     post:

@@ -161,6 +161,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AgentRemoteShareHandler: agent.RemoteShareHandlerFunc(func(params agent.RemoteShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteShare has not yet been implemented")
 		}),
+		AgentRemoteStatusHandler: agent.RemoteStatusHandlerFunc(func(params agent.RemoteStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteStatus has not yet been implemented")
+		}),
 		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
@@ -327,6 +330,8 @@ type ZrokAPI struct {
 	AccountRegisterHandler account.RegisterHandler
 	// AgentRemoteShareHandler sets the operation handler for the remote share operation
 	AgentRemoteShareHandler agent.RemoteShareHandler
+	// AgentRemoteStatusHandler sets the operation handler for the remote status operation
+	AgentRemoteStatusHandler agent.RemoteStatusHandler
 	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
 	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
@@ -546,6 +551,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AgentRemoteShareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteShareHandler")
+	}
+	if o.AgentRemoteStatusHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteStatusHandler")
 	}
 	if o.AgentRemoteUnshareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
@@ -836,6 +844,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/agent/share"] = agent.NewRemoteShare(o.context, o.AgentRemoteShareHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/status"] = agent.NewRemoteStatus(o.context, o.AgentRemoteStatusHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

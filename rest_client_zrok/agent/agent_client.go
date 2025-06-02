@@ -106,6 +106,8 @@ type ClientService interface {
 
 	RemoteShare(params *RemoteShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteShareOK, error)
 
+	RemoteStatus(params *RemoteStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteStatusOK, error)
+
 	RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnshareOK, error)
 
 	Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnenrollOK, error)
@@ -227,6 +229,45 @@ func (a *Client) RemoteShare(params *RemoteShareParams, authInfo runtime.ClientA
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteShare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RemoteStatus remote status API
+*/
+func (a *Client) RemoteStatus(params *RemoteStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteStatusOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoteStatusParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "remoteStatus",
+		Method:             "POST",
+		PathPattern:        "/agent/status",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoteStatusReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoteStatusOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for remoteStatus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

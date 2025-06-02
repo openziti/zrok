@@ -20,6 +20,7 @@ import type {
   Ping200Response,
   RemoteShare200Response,
   RemoteShareRequest,
+  RemoteStatus200Response,
   RemoteUnshareRequest,
 } from '../models/index';
 import {
@@ -33,6 +34,8 @@ import {
     RemoteShare200ResponseToJSON,
     RemoteShareRequestFromJSON,
     RemoteShareRequestToJSON,
+    RemoteStatus200ResponseFromJSON,
+    RemoteStatus200ResponseToJSON,
     RemoteUnshareRequestFromJSON,
     RemoteUnshareRequestToJSON,
 } from '../models/index';
@@ -47,6 +50,10 @@ export interface PingRequest {
 
 export interface RemoteShareOperationRequest {
     body?: RemoteShareRequest;
+}
+
+export interface RemoteStatusRequest {
+    body?: EnrollRequest;
 }
 
 export interface RemoteUnshareOperationRequest {
@@ -152,6 +159,37 @@ export class AgentApi extends runtime.BaseAPI {
      */
     async remoteShare(requestParameters: RemoteShareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RemoteShare200Response> {
         const response = await this.remoteShareRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async remoteStatusRaw(requestParameters: RemoteStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RemoteStatus200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/status`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EnrollRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RemoteStatus200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async remoteStatus(requestParameters: RemoteStatusRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RemoteStatus200Response> {
+        const response = await this.remoteStatusRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
