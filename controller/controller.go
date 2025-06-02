@@ -69,6 +69,7 @@ func Run(inCfg *config.Config) error {
 		api.AgentEnrollHandler = newAgentEnrollHandler()
 		api.AgentPingHandler = newAgentPingHandler()
 		api.AgentRemoteShareHandler = newAgentRemoteShareHandler()
+		api.AgentRemoteStatusHandler = newAgentRemoteStatusHandler()
 		api.AgentRemoteUnshareHandler = newAgentRemoteUnshareHandler()
 		api.AgentUnenrollHandler = newAgentUnenrollHandler()
 	}
