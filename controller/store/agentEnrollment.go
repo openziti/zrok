@@ -25,7 +25,7 @@ func (str *Store) CreateAgentEnrollment(envId int, token string, trx *sqlx.Tx) (
 
 func (str *Store) FindAgentEnrollmentForEnvironment(envId int, trx *sqlx.Tx) (*AgentEnrollment, error) {
 	ae := &AgentEnrollment{}
-	if err := trx.QueryRowx("select * from agent_enrollments where environment_id = $1", envId).StructScan(ae); err != nil {
+	if err := trx.QueryRowx("select * from agent_enrollments where environment_id = $1 and not deleted", envId).StructScan(ae); err != nil {
 		return nil, errors.Wrap(err, "error finding agent enrollment")
 	}
 	return ae, nil

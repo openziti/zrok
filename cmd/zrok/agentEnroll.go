@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent"
@@ -8,6 +9,7 @@ import (
 	agent2 "github.com/openziti/zrok/rest_client_zrok/agent"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func init() {
@@ -15,7 +17,8 @@ func init() {
 }
 
 type agentEnrollCommand struct {
-	cmd *cobra.Command
+	cmd      *cobra.Command
+	headless bool
 }
 
 func newAgentEnrollCommand() *agentEnrollCommand {
@@ -25,6 +28,7 @@ func newAgentEnrollCommand() *agentEnrollCommand {
 		Args:  cobra.NoArgs,
 	}
 	command := &agentEnrollCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.headless, "headless", false, "Run the agent enrollment in headless mode")
 	cmd.Run = command.run
 	return command
 }
@@ -43,6 +47,27 @@ func (cmd *agentEnrollCommand) run(_ *cobra.Command, _ []string) {
 	_, err = agent.LoadEnrollment(enrlPath)
 	if err == nil {
 		tui.Error("agent already enrolled; 'zrok agent unenroll' first", nil)
+	}
+
+	if !cmd.headless {
+		fmt.Println()
+		fmt.Println(tui.SeriousBusiness.Render("warning! proceeding will allow remote control of your zrok agent!"))
+		fmt.Println()
+		fmt.Println("your agent will accept remote commands from:")
+		fmt.Println()
+		fmt.Println(tui.Attention.Render(root.Environment().ApiEndpoint))
+		fmt.Println()
+		fmt.Println("you should only proceed if you understand the implications of this action!")
+		fmt.Println()
+		fmt.Print("to proceed, type 'yes': ")
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			text := scanner.Text()
+			if text != "yes" {
+				tui.Error("agent enrollment aborted!", nil)
+			}
+		}
+		fmt.Println()
 	}
 
 	zrok, err := root.Client()
@@ -64,4 +89,9 @@ func (cmd *agentEnrollCommand) run(_ *cobra.Command, _ []string) {
 	}
 
 	fmt.Printf("agent enrolled with token '%v'\n", enrl.Token)
+	if !cmd.headless {
+		fmt.Println()
+		fmt.Println(tui.SeriousBusiness.Render("restart your zrok agent to enable remote control"))
+		fmt.Println()
+	}
 }
