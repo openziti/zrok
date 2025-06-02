@@ -9,8 +9,12 @@ import (
 const EnrollmentV = "1"
 
 type Enrollment struct {
-	V           string `json:"v"`
-	ServiceName string `json:"service_name"`
+	V     string `json:"v"`
+	Token string `json:"token"`
+}
+
+func NewEnrollment(token string) *Enrollment {
+	return &Enrollment{Token: token}
 }
 
 func LoadEnrollment(path string) (*Enrollment, error) {

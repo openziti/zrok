@@ -172,9 +172,9 @@ func (a *Agent) remoteAgent() {
 		return
 	}
 
-	logrus.Infof("listening for remote agent at '%v'", enrollment.ServiceName)
+	logrus.Infof("listening for remote agent at '%v'", enrollment.Token)
 
-	l, err := sdk.NewListener(enrollment.ServiceName, a.root)
+	l, err := sdk.NewListener(enrollment.Token, a.root)
 	if err != nil {
 		logrus.Errorf("error listening for remote agent: %v", err)
 		return
