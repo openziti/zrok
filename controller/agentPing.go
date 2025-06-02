@@ -17,7 +17,26 @@ func newAgentPingHandler() *agentPingHandler {
 }
 
 func (h *agentPingHandler) Handle(params agent.PingParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	acli, aconn, err := agentController.NewAgentClient(params.Body.EnvZID, cfg.AgentController)
+	trx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		return agent.NewPingInternalServerError()
+	}
+	defer trx.Rollback()
+
+	env, err := str.FindEnvironmentForAccount(params.Body.EnvZID, int(principal.ID), trx)
+	if err != nil {
+		logrus.Errorf("error finding environment '%v' for '%v': %v", params.Body.EnvZID, principal.Email, err)
+		return agent.NewPingUnauthorized()
+	}
+
+	ae, err := str.FindAgentEnrollmentForEnvironment(env.Id, trx)
+	if err != nil {
+		logrus.Errorf("error finding agent enrollment for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
+		return agent.NewPingBadGateway()
+	}
+
+	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewPingInternalServerError()
