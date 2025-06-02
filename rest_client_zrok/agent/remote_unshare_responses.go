@@ -281,6 +281,9 @@ swagger:model RemoteUnshareBody
 */
 type RemoteUnshareBody struct {
 
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
 	// token
 	Token string `json:"token,omitempty"`
 }

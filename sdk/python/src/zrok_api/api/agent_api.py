@@ -22,6 +22,7 @@ from zrok_api.models.enroll_request import EnrollRequest
 from zrok_api.models.ping200_response import Ping200Response
 from zrok_api.models.remote_share200_response import RemoteShare200Response
 from zrok_api.models.remote_share_request import RemoteShareRequest
+from zrok_api.models.remote_unshare_request import RemoteUnshareRequest
 
 from zrok_api.api_client import ApiClient, RequestSerialized
 from zrok_api.api_response import ApiResponse
@@ -884,7 +885,7 @@ class AgentApi:
     @validate_call
     def remote_unshare(
         self,
-        body: Optional[Enroll200Response] = None,
+        body: Optional[RemoteUnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -902,7 +903,7 @@ class AgentApi:
 
 
         :param body:
-        :type body: Enroll200Response
+        :type body: RemoteUnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -953,7 +954,7 @@ class AgentApi:
     @validate_call
     def remote_unshare_with_http_info(
         self,
-        body: Optional[Enroll200Response] = None,
+        body: Optional[RemoteUnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -971,7 +972,7 @@ class AgentApi:
 
 
         :param body:
-        :type body: Enroll200Response
+        :type body: RemoteUnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1022,7 +1023,7 @@ class AgentApi:
     @validate_call
     def remote_unshare_without_preload_content(
         self,
-        body: Optional[Enroll200Response] = None,
+        body: Optional[RemoteUnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1040,7 +1041,7 @@ class AgentApi:
 
 
         :param body:
-        :type body: Enroll200Response
+        :type body: RemoteUnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of

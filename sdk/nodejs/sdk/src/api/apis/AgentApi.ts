@@ -20,6 +20,7 @@ import type {
   Ping200Response,
   RemoteShare200Response,
   RemoteShareRequest,
+  RemoteUnshareRequest,
 } from '../models/index';
 import {
     Enroll200ResponseFromJSON,
@@ -32,6 +33,8 @@ import {
     RemoteShare200ResponseToJSON,
     RemoteShareRequestFromJSON,
     RemoteShareRequestToJSON,
+    RemoteUnshareRequestFromJSON,
+    RemoteUnshareRequestToJSON,
 } from '../models/index';
 
 export interface EnrollOperationRequest {
@@ -46,8 +49,8 @@ export interface RemoteShareOperationRequest {
     body?: RemoteShareRequest;
 }
 
-export interface RemoteUnshareRequest {
-    body?: Enroll200Response;
+export interface RemoteUnshareOperationRequest {
+    body?: RemoteUnshareRequest;
 }
 
 export interface UnenrollRequest {
@@ -154,7 +157,7 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async remoteUnshareRaw(requestParameters: RemoteUnshareRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async remoteUnshareRaw(requestParameters: RemoteUnshareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -170,7 +173,7 @@ export class AgentApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: Enroll200ResponseToJSON(requestParameters['body']),
+            body: RemoteUnshareRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -178,7 +181,7 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async remoteUnshare(requestParameters: RemoteUnshareRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async remoteUnshare(requestParameters: RemoteUnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.remoteUnshareRaw(requestParameters, initOverrides);
     }
 

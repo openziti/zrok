@@ -35,7 +35,7 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 		logrus.Errorf("error finding agent enrollment for environment '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteShareBadGateway()
 	}
-	_ = trx.Rollback()
+	_ = trx.Rollback() // ...or will block share trx on sqlite
 
 	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
 	if err != nil {

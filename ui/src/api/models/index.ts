@@ -42,6 +42,7 @@ export * from './RegenerateAccountTokenRequest';
 export * from './RegisterRequest';
 export * from './RemoteShare200Response';
 export * from './RemoteShareRequest';
+export * from './RemoteUnshareRequest';
 export * from './RemoveOrganizationMemberRequest';
 export * from './ResetPasswordRequest';
 export * from './Share';

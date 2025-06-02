@@ -254,7 +254,7 @@ Name | Type | Description  | Notes
 
 ```python
 import zrok_api
-from zrok_api.models.enroll200_response import Enroll200Response
+from zrok_api.models.remote_unshare_request import RemoteUnshareRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -279,7 +279,7 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.AgentApi(api_client)
-    body = zrok_api.Enroll200Response() # Enroll200Response |  (optional)
+    body = zrok_api.RemoteUnshareRequest() # RemoteUnshareRequest |  (optional)
 
     try:
         api_instance.remote_unshare(body=body)
@@ -294,7 +294,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Enroll200Response**](Enroll200Response.md)|  | [optional] 
+ **body** | [**RemoteUnshareRequest**](RemoteUnshareRequest.md)|  | [optional] 
 
 ### Return type
 

@@ -452,6 +452,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "envZId": {
+                  "type": "string"
+                },
                 "token": {
                   "type": "string"
                 }
@@ -3053,6 +3056,9 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
+                "envZId": {
+                  "type": "string"
+                },
                 "token": {
                   "type": "string"
                 }

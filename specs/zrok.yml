@@ -773,6 +773,8 @@ paths:
           in: body
           schema:
             properties:
+              envZId:
+                type: string
               token:
                 type: string
       responses:

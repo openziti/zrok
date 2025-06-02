@@ -189,6 +189,7 @@ Class | Method | HTTP request | Description
  - [RegisterRequest](docs/RegisterRequest.md)
  - [RemoteShare200Response](docs/RemoteShare200Response.md)
  - [RemoteShareRequest](docs/RemoteShareRequest.md)
+ - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)
