@@ -185,6 +185,77 @@ func init() {
         }
       }
     },
+    "/agent/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "autoAddress": {
+                  "type": "string"
+                },
+                "autoEndPort": {
+                  "type": "integer"
+                },
+                "autoMode": {
+                  "type": "boolean"
+                },
+                "autoStartPort": {
+                  "type": "integer"
+                },
+                "bindAddress": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "responseHeaders": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/enroll": {
       "post": {
         "security": [
@@ -484,6 +555,49 @@ func init() {
                 }
               }
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unaccess": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
           },
           "401": {
             "description": "unauthorized"
@@ -2891,6 +3005,77 @@ func init() {
         }
       }
     },
+    "/agent/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "autoAddress": {
+                  "type": "string"
+                },
+                "autoEndPort": {
+                  "type": "integer"
+                },
+                "autoMode": {
+                  "type": "boolean"
+                },
+                "autoStartPort": {
+                  "type": "integer"
+                },
+                "bindAddress": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "responseHeaders": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/enroll": {
       "post": {
         "security": [
@@ -3144,6 +3329,49 @@ func init() {
                 }
               }
             }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unaccess": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
           },
           "401": {
             "description": "unauthorized"

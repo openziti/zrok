@@ -616,6 +616,50 @@ paths:
   #
   # agent
   #
+  /agent/access:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              token:
+                type: string
+              bindAddress:
+                type: string
+              autoMode:
+                type: boolean
+              autoAddress:
+                type: string
+              autoStartPort:
+                type: integer
+              autoEndPort:
+                type: integer
+              responseHeaders:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              frontendToken:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
   /agent/enroll:
     post:
       tags:
@@ -795,6 +839,32 @@ paths:
                       type: array
                       items:
                         type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/unaccess:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteUnaccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              frontendToken:
+                type: string
+      responses:
+        200:
+          description: ok
         401:
           description: unauthorized
         500:

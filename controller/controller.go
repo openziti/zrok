@@ -68,6 +68,7 @@ func Run(inCfg *config.Config) error {
 	if cfg.AgentController != nil {
 		api.AgentEnrollHandler = newAgentEnrollHandler()
 		api.AgentPingHandler = newAgentPingHandler()
+		api.AgentRemoteAccessHandler = newAgentRemoteAccessHandler()
 		api.AgentRemoteShareHandler = newAgentRemoteShareHandler()
 		api.AgentRemoteStatusHandler = newAgentRemoteStatusHandler()
 		api.AgentRemoteUnshareHandler = newAgentRemoteUnshareHandler()

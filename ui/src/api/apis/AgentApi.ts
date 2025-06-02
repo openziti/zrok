@@ -15,27 +15,36 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateFrontend201Response,
   Enroll200Response,
   EnrollRequest,
   Ping200Response,
+  RemoteAccessRequest,
   RemoteShare200Response,
   RemoteShareRequest,
   RemoteStatus200Response,
+  RemoteUnaccessRequest,
   RemoteUnshareRequest,
 } from '../models/index';
 import {
+    CreateFrontend201ResponseFromJSON,
+    CreateFrontend201ResponseToJSON,
     Enroll200ResponseFromJSON,
     Enroll200ResponseToJSON,
     EnrollRequestFromJSON,
     EnrollRequestToJSON,
     Ping200ResponseFromJSON,
     Ping200ResponseToJSON,
+    RemoteAccessRequestFromJSON,
+    RemoteAccessRequestToJSON,
     RemoteShare200ResponseFromJSON,
     RemoteShare200ResponseToJSON,
     RemoteShareRequestFromJSON,
     RemoteShareRequestToJSON,
     RemoteStatus200ResponseFromJSON,
     RemoteStatus200ResponseToJSON,
+    RemoteUnaccessRequestFromJSON,
+    RemoteUnaccessRequestToJSON,
     RemoteUnshareRequestFromJSON,
     RemoteUnshareRequestToJSON,
 } from '../models/index';
@@ -48,12 +57,20 @@ export interface PingRequest {
     body?: EnrollRequest;
 }
 
+export interface RemoteAccessOperationRequest {
+    body?: RemoteAccessRequest;
+}
+
 export interface RemoteShareOperationRequest {
     body?: RemoteShareRequest;
 }
 
 export interface RemoteStatusRequest {
     body?: EnrollRequest;
+}
+
+export interface RemoteUnaccessOperationRequest {
+    body?: RemoteUnaccessRequest;
 }
 
 export interface RemoteUnshareOperationRequest {
@@ -133,6 +150,37 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
+    async remoteAccessRaw(requestParameters: RemoteAccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateFrontend201Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/access`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RemoteAccessRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateFrontend201ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async remoteAccess(requestParameters: RemoteAccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateFrontend201Response> {
+        const response = await this.remoteAccessRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async remoteShareRaw(requestParameters: RemoteShareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RemoteShare200Response>> {
         const queryParameters: any = {};
 
@@ -191,6 +239,36 @@ export class AgentApi extends runtime.BaseAPI {
     async remoteStatus(requestParameters: RemoteStatusRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RemoteStatus200Response> {
         const response = await this.remoteStatusRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async remoteUnaccessRaw(requestParameters: RemoteUnaccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/agent/unaccess`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RemoteUnaccessRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async remoteUnaccess(requestParameters: RemoteUnaccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.remoteUnaccessRaw(requestParameters, initOverrides);
     }
 
     /**

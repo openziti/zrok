@@ -158,11 +158,17 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
+		AgentRemoteAccessHandler: agent.RemoteAccessHandlerFunc(func(params agent.RemoteAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteAccess has not yet been implemented")
+		}),
 		AgentRemoteShareHandler: agent.RemoteShareHandlerFunc(func(params agent.RemoteShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteShare has not yet been implemented")
 		}),
 		AgentRemoteStatusHandler: agent.RemoteStatusHandlerFunc(func(params agent.RemoteStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteStatus has not yet been implemented")
+		}),
+		AgentRemoteUnaccessHandler: agent.RemoteUnaccessHandlerFunc(func(params agent.RemoteUnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteUnaccess has not yet been implemented")
 		}),
 		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
@@ -328,10 +334,14 @@ type ZrokAPI struct {
 	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
+	// AgentRemoteAccessHandler sets the operation handler for the remote access operation
+	AgentRemoteAccessHandler agent.RemoteAccessHandler
 	// AgentRemoteShareHandler sets the operation handler for the remote share operation
 	AgentRemoteShareHandler agent.RemoteShareHandler
 	// AgentRemoteStatusHandler sets the operation handler for the remote status operation
 	AgentRemoteStatusHandler agent.RemoteStatusHandler
+	// AgentRemoteUnaccessHandler sets the operation handler for the remote unaccess operation
+	AgentRemoteUnaccessHandler agent.RemoteUnaccessHandler
 	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
 	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
@@ -549,11 +559,17 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
 	}
+	if o.AgentRemoteAccessHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteAccessHandler")
+	}
 	if o.AgentRemoteShareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteShareHandler")
 	}
 	if o.AgentRemoteStatusHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteStatusHandler")
+	}
+	if o.AgentRemoteUnaccessHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteUnaccessHandler")
 	}
 	if o.AgentRemoteUnshareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
@@ -843,11 +859,19 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/agent/access"] = agent.NewRemoteAccess(o.context, o.AgentRemoteAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/agent/share"] = agent.NewRemoteShare(o.context, o.AgentRemoteShareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/agent/status"] = agent.NewRemoteStatus(o.context, o.AgentRemoteStatusHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unaccess"] = agent.NewRemoteUnaccess(o.context, o.AgentRemoteUnaccessHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

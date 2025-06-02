@@ -116,8 +116,10 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
+*AgentApi* | [**remote_access**](docs/AgentApi.md#remote_access) | **POST** /agent/access | 
 *AgentApi* | [**remote_share**](docs/AgentApi.md#remote_share) | **POST** /agent/share | 
 *AgentApi* | [**remote_status**](docs/AgentApi.md#remote_status) | **POST** /agent/status | 
+*AgentApi* | [**remote_unaccess**](docs/AgentApi.md#remote_unaccess) | **POST** /agent/unaccess | 
 *AgentApi* | [**remote_unshare**](docs/AgentApi.md#remote_unshare) | **POST** /agent/unshare | 
 *AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
@@ -188,11 +190,13 @@ Class | Method | HTTP request | Description
  - [RegenerateAccountToken200Response](docs/RegenerateAccountToken200Response.md)
  - [RegenerateAccountTokenRequest](docs/RegenerateAccountTokenRequest.md)
  - [RegisterRequest](docs/RegisterRequest.md)
+ - [RemoteAccessRequest](docs/RemoteAccessRequest.md)
  - [RemoteShare200Response](docs/RemoteShare200Response.md)
  - [RemoteShareRequest](docs/RemoteShareRequest.md)
  - [RemoteStatus200Response](docs/RemoteStatus200Response.md)
  - [RemoteStatus200ResponseAccessesInner](docs/RemoteStatus200ResponseAccessesInner.md)
  - [RemoteStatus200ResponseSharesInner](docs/RemoteStatus200ResponseSharesInner.md)
+ - [RemoteUnaccessRequest](docs/RemoteUnaccessRequest.md)
  - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)

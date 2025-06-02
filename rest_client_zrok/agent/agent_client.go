@@ -104,9 +104,13 @@ type ClientService interface {
 
 	Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PingOK, error)
 
+	RemoteAccess(params *RemoteAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteAccessOK, error)
+
 	RemoteShare(params *RemoteShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteShareOK, error)
 
 	RemoteStatus(params *RemoteStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteStatusOK, error)
+
+	RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnaccessOK, error)
 
 	RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnshareOK, error)
 
@@ -194,6 +198,45 @@ func (a *Client) Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter,
 }
 
 /*
+RemoteAccess remote access API
+*/
+func (a *Client) RemoteAccess(params *RemoteAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteAccessOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoteAccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "remoteAccess",
+		Method:             "POST",
+		PathPattern:        "/agent/access",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoteAccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoteAccessOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for remoteAccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 RemoteShare remote share API
 */
 func (a *Client) RemoteShare(params *RemoteShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteShareOK, error) {
@@ -268,6 +311,45 @@ func (a *Client) RemoteStatus(params *RemoteStatusParams, authInfo runtime.Clien
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteStatus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RemoteUnaccess remote unaccess API
+*/
+func (a *Client) RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnaccessOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoteUnaccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "remoteUnaccess",
+		Method:             "POST",
+		PathPattern:        "/agent/unaccess",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoteUnaccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoteUnaccessOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for remoteUnaccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

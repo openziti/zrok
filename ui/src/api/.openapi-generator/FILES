@@ -47,11 +47,13 @@ models/Principal.ts
 models/RegenerateAccountToken200Response.ts
 models/RegenerateAccountTokenRequest.ts
 models/RegisterRequest.ts
+models/RemoteAccessRequest.ts
 models/RemoteShare200Response.ts
 models/RemoteShareRequest.ts
 models/RemoteStatus200Response.ts
 models/RemoteStatus200ResponseAccessesInner.ts
 models/RemoteStatus200ResponseSharesInner.ts
+models/RemoteUnaccessRequest.ts
 models/RemoteUnshareRequest.ts
 models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
