@@ -64,14 +64,14 @@ func (cmd *agentUnenrollCommand) run(_ *cobra.Command, _ []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 	_, err = zrok.Agent.Unenroll(req, auth)
 	if err != nil {
-		tui.Warning("error unenrolling agent from service (ignoring)", err)
+		fmt.Printf("%v: error unenrolling agent remote from '%v'; ignoring\n", tui.Attention.Render("WARNING"), root.Environment().ApiEndpoint)
 	} else {
-		fmt.Printf("%v: unenrolled agent from '%v'\n", tui.Attention.Render("SUCCESS"), root.Environment().ApiEndpoint)
+		fmt.Printf("%v: unenrolled agent from '%v'\n", tui.SeriousBusiness.Render("SUCCESS"), root.Environment().ApiEndpoint)
 	}
 
 	if err := os.Remove(enrlPath); err != nil {
 		tui.Error("error removing agent enrollment", err)
 	} else {
-		fmt.Printf("%v: removed agent-enrollment.json\n", tui.Attention.Render("SUCCESS"))
+		fmt.Printf("%v: removed agent-enrollment.json\n", tui.SeriousBusiness.Render("SUCCESS"))
 	}
 }
