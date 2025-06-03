@@ -4,4 +4,68 @@ sidebar_label: Remoting
 sidebar_position: 20
 ---
 
-As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote control for creating shares and accesses.
+As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote control for creating shares and accesses through the central zrok API.
+
+## Enrolling an Agent
+
+Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok agent enroll` command from an enabled environment to enroll your agent:
+
+```
+$ zrok agent enroll
+
+warning! proceeding will allow remote control of your zrok agent!
+
+your agent will accept remote commands from:
+
+https://api-v1.zrok.io
+
+you should only proceed if you understand the implications of this action!
+
+to proceed, type 'yes': yes
+
+agent enrolled with token 'yC9atRbCOskz'
+
+restart your zrok agent to enable remote control
+
+```
+
+When you restart your agent, you will notice the following message in the Agent's log:
+
+```
+[   0.001]    INFO zrok/agent.(*Agent).remoteAgent: listening for remote commands at 'yC9atRbCOskz'
+```
+
+## The Agent Remoting API
+
+:::note
+See the [zrok OpenAPI spec](https://github.com/openziti/zrok/blob/main/specs/zrok.yml) for complete details of `/agent` endpoints.
+:::
+
+### Create A Remote Share
+
+:::note
+The `apiEndpoint` `http://localhost:18080` is a zrok controller in a local development environment. All of the credentials in this document are local to that instance and already invalid as of publication of this document. It's just an example.
+:::
+
+You can call the `/agent/share` endpoint to create a share on a remote Agent through the API:
+
+```
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v1/agent/share | jq
+{
+  "frontendEndpoints": [
+    "http://51bnatug7ua3.zrok.quigley.com:8080"
+  ],
+  "token": "51bnatug7ua3"
+}
+```
+
+## Unenrolling an Agent
+
+The `zrok agent unenroll` command will remove all remote control access from an Agent in an environment:
+
+```
+$ zrok agent unenroll
+SUCCESS: unenrolled agent from 'https://api-v1.zrok.io'
+SUCCESS: removed agent-enrollment.json
+```
+
