@@ -6,6 +6,28 @@ sidebar_position: 20
 
 As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote control for creating shares and accesses through the central zrok API.
 
+## Enabling Agent Remoting in the zrok Controller
+
+Create an identity for your zrok controller to use for interacting with remote agents:
+
+```
+$ zrok admin create identity agentremoting
+zrok identity 'agentremoting' created with ziti id 'WEfGMIx-e4'
+```
+:::note
+The indentity can be named anything; I chose `agentremoting` just for this example.
+:::
+
+Next, you'll need to configure remoting in your controller config like this:
+
+```yaml
+agent_controller:
+  z_id:             WEfGMIx-e4
+  identity_path:    /home/michael/.zrok/identities/agentremoting.json
+```
+
+Restart your controller with this configuration and the agent remoting endpoints will become available.
+
 ## Enrolling an Agent
 
 Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok agent enroll` command from an enabled environment to enroll your agent:
@@ -58,6 +80,45 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
   "token": "51bnatug7ua3"
 }
 ```
+
+### Query the Status of the Remote Agent
+
+```
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   233  100   209  100    24   3337    383 --:--:-- --:--:-- --:--:--  3758
+{
+  "accesses": null,
+  "shares": [
+    {
+      "backendEndpoint": "/home/michael/Repos/nf/zrok",
+      "backendMode": "web",
+      "frontendEndpoints": [
+        "http://51bnatug7ua3.zrok.quigley.com:8080"
+      ],
+      "shareMode": "public",
+      "token": "51bnatug7ua3"
+    }
+  ]
+}
+```
+
+### Remove the Remote Share
+
+```
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v1/agent/unshare
+
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+{
+  "accesses": null,
+  "shares": null
+}
+```
+
+### Creating and Removing Private Access
+
+The `/agent/access` and `/agent/unaccess` endpoints also exist and allow for creating and removing private access frontends remotely.
 
 ## Unenrolling an Agent
 
