@@ -63,7 +63,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		return agent.NewEnrollInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateShareServiceEdgeRouterPolicy(env.ZId, token, zId, client); err != nil {
+	if err := zrokEdgeSdk.CreateAgentRemoteServiceEdgeRouterPolicy(env.ZId, token, zId, client); err != nil {
 		logrus.Errorf("error creating agent remoting serp for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}

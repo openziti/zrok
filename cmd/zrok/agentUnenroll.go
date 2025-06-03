@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent"
 	"github.com/openziti/zrok/environment"
@@ -35,9 +36,17 @@ func (cmd *agentUnenrollCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error loading zrokdir", err)
 	}
 
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
 	enrlPath, err := root.AgentEnrollment()
 	if err != nil {
 		tui.Error("error getting agent enrollment path", err)
+	}
+
+	if _, err := os.Stat(enrlPath); os.IsNotExist(err) {
+		tui.Error("agent not enrolled; use 'zrok agent enroll' to enroll", nil)
 	}
 
 	_, err = agent.LoadEnrollment(enrlPath)
@@ -55,10 +64,14 @@ func (cmd *agentUnenrollCommand) run(_ *cobra.Command, _ []string) {
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 	_, err = zrok.Agent.Unenroll(req, auth)
 	if err != nil {
-		tui.Error("error unenrolling agent", err)
+		tui.Warning("error unenrolling agent from service (ignoring)", err)
+	} else {
+		fmt.Printf("%v: unenrolled agent from '%v'\n", tui.Attention.Render("SUCCESS"), root.Environment().ApiEndpoint)
 	}
 
 	if err := os.Remove(enrlPath); err != nil {
 		tui.Error("error removing agent enrollment", err)
+	} else {
+		fmt.Printf("%v: removed agent-enrollment.json\n", tui.Attention.Render("SUCCESS"))
 	}
 }

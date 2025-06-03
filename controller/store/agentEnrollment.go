@@ -28,7 +28,7 @@ func (str *Store) IsAgentEnrolledForEnvironment(envId int, trx *sqlx.Tx) (bool, 
 	if err := trx.QueryRowx("select count(0) from agent_enrollments where environment_id = $1 and not deleted", envId).Scan(&count); err != nil {
 		return false, err
 	}
-	return count == 0, nil
+	return count > 0, nil
 }
 
 func (str *Store) FindAgentEnrollmentForEnvironment(envId int, trx *sqlx.Tx) (*AgentEnrollment, error) {

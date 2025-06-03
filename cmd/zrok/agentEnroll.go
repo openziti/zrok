@@ -39,6 +39,10 @@ func (cmd *agentEnrollCommand) run(_ *cobra.Command, _ []string) {
 		tui.Error("error loading zrokdir", err)
 	}
 
+	if !root.IsEnabled() {
+		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
+	}
+
 	enrlPath, err := root.AgentEnrollment()
 	if err != nil {
 		tui.Error("error getting agent enrollment path", err)

@@ -11,6 +11,15 @@ import (
 	"time"
 )
 
+func CreateAgentRemoteServiceEdgeRouterPolicy(envZId, enrollmentToken, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	serpZId, err := CreateServiceEdgeRouterPolicy(enrollmentToken, zId, ZrokAgentRemoteTags(enrollmentToken, envZId).SubTags, edge)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("created service edge router policy '%v' for service '%v' (%v) for environment '%v'", serpZId, zId, enrollmentToken, envZId)
+	return nil
+}
+
 func CreateShareServiceEdgeRouterPolicy(envZId, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	serpZId, err := CreateServiceEdgeRouterPolicy(shrToken, shrZId, ZrokShareTags(shrToken).SubTags, edge)
 	if err != nil {

@@ -144,7 +144,12 @@ func (h *disableHandler) removeAgentRemoteForEnvironment(env *store.Environment,
 		if err != nil {
 			return err
 		}
-		aeZId := *(listResp.Payload.Data[0].ID)
+		aeZId := ""
+		if len(listResp.Payload.Data) > 0 {
+			aeZId = *(listResp.Payload.Data[0].ID)
+		} else {
+			return errors.New("no agent remoting identity found")
+		}
 		if err := zrokEdgeSdk.DeleteService(env.ZId, aeZId, edge); err != nil {
 			return err
 		}
