@@ -9,7 +9,7 @@ import (
 var rootDirName = ".zrok"
 
 func SetRootDirName(name string) {
-	rootDirName = ".zrok"
+	rootDirName = name
 }
 
 func rootDir() (string, error) {
