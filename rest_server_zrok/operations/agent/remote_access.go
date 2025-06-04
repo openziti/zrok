@@ -9,9 +9,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -82,12 +84,16 @@ type RemoteAccessBody struct {
 	AutoAddress string `json:"autoAddress,omitempty"`
 
 	// auto end port
+	// Maximum: 65535
+	// Minimum: 1
 	AutoEndPort int64 `json:"autoEndPort,omitempty"`
 
 	// auto mode
 	AutoMode bool `json:"autoMode,omitempty"`
 
 	// auto start port
+	// Maximum: 65535
+	// Minimum: 1
 	AutoStartPort int64 `json:"autoStartPort,omitempty"`
 
 	// bind address
@@ -105,6 +111,51 @@ type RemoteAccessBody struct {
 
 // Validate validates this remote access body
 func (o *RemoteAccessBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateAutoEndPort(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateAutoStartPort(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *RemoteAccessBody) validateAutoEndPort(formats strfmt.Registry) error {
+	if swag.IsZero(o.AutoEndPort) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("body"+"."+"autoEndPort", "body", o.AutoEndPort, 1, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("body"+"."+"autoEndPort", "body", o.AutoEndPort, 65535, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *RemoteAccessBody) validateAutoStartPort(formats strfmt.Registry) error {
+	if swag.IsZero(o.AutoStartPort) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("body"+"."+"autoStartPort", "body", o.AutoStartPort, 1, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("body"+"."+"autoStartPort", "body", o.AutoStartPort, 65535, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 

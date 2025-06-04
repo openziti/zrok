@@ -206,13 +206,17 @@ func init() {
                   "type": "string"
                 },
                 "autoEndPort": {
-                  "type": "integer"
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
                 },
                 "autoMode": {
                   "type": "boolean"
                 },
                 "autoStartPort": {
-                  "type": "integer"
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
                 },
                 "bindAddress": {
                   "type": "string"
@@ -3026,13 +3030,17 @@ func init() {
                   "type": "string"
                 },
                 "autoEndPort": {
-                  "type": "integer"
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
                 },
                 "autoMode": {
                   "type": "boolean"
                 },
                 "autoStartPort": {
-                  "type": "integer"
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
                 },
                 "bindAddress": {
                   "type": "string"

@@ -40,8 +40,8 @@ class TestRemoteAccessRequest(unittest.TestCase):
                 bind_address = '',
                 auto_mode = True,
                 auto_address = '',
-                auto_start_port = 56,
-                auto_end_port = 56,
+                auto_start_port = 1,
+                auto_end_port = 1,
                 response_headers = [
                     ''
                     ]

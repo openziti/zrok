@@ -17,8 +17,9 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -31,8 +32,8 @@ class RemoteAccessRequest(BaseModel):
     bind_address: Optional[StrictStr] = Field(default=None, alias="bindAddress")
     auto_mode: Optional[StrictBool] = Field(default=None, alias="autoMode")
     auto_address: Optional[StrictStr] = Field(default=None, alias="autoAddress")
-    auto_start_port: Optional[StrictInt] = Field(default=None, alias="autoStartPort")
-    auto_end_port: Optional[StrictInt] = Field(default=None, alias="autoEndPort")
+    auto_start_port: Optional[Annotated[int, Field(le=65535, strict=True, ge=1)]] = Field(default=None, alias="autoStartPort")
+    auto_end_port: Optional[Annotated[int, Field(le=65535, strict=True, ge=1)]] = Field(default=None, alias="autoEndPort")
     response_headers: Optional[List[StrictStr]] = Field(default=None, alias="responseHeaders")
     __properties: ClassVar[List[str]] = ["envZId", "token", "bindAddress", "autoMode", "autoAddress", "autoStartPort", "autoEndPort", "responseHeaders"]
 

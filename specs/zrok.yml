@@ -640,8 +640,12 @@ paths:
                 type: string
               autoStartPort:
                 type: integer
+                minimum: 1
+                maximum: 65535
               autoEndPort:
                 type: integer
+                minimum: 1
+                maximum: 65535
               responseHeaders:
                 type: array
                 items:
