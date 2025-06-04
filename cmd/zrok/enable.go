@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -9,12 +12,9 @@ import (
 	"github.com/openziti/zrok/environment/env_core"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	user2 "os/user"
-	"time"
 )
 
 func init() {
@@ -51,26 +51,12 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		tui.Error(fmt.Sprintf("you already have an enabled environment, %v first before you %v", tui.Code.Render("zrok disable"), tui.Code.Render("zrok enable")), nil)
 	}
 
-	hostName, hostDetail, err := getHost()
+	hostName, hostDetail, username, err := util.GetHostDetails()
 	if err != nil {
 		panic(err)
 	}
-	var username string
-	userObj, err := user2.Current()
-	if err == nil && userObj.Username != "" {
-		username = userObj.Username
-	} else {
-		username = os.Getenv("USER")
-		if username == "" {
-			euid := os.Geteuid()
-			username = fmt.Sprintf("user-%d", euid)
-			logrus.Warnf("unable to determine the current user, using effective UID: %v", euid)
-		}
-	}
-	hostDetail = fmt.Sprintf("%v; %v", username, hostDetail)
-	if cmd.description == "<user>@<hostname>" {
-		cmd.description = fmt.Sprintf("%v@%v", username, hostName)
-	}
+	hostDetail, cmd.description = util.FormatHostDetailsWithUser(username, hostName, hostDetail, cmd.description)
+
 	zrok, err := env.Client()
 	if err != nil {
 		cmd.endpointError(env.ApiEndpoint())
@@ -167,16 +153,6 @@ func (cmd *enableCommand) endpointError(apiEndpoint, _ string) {
 	fmt.Printf("you can change your zrok service endpoint using this command:\n\n")
 	fmt.Printf("%v\n\n", tui.Code.Render("$ zrok config set apiEndpoint <newEndpoint>"))
 	fmt.Printf("(where newEndpoint is something like: %v)\n\n", tui.Code.Render("https://some.zrok.io"))
-}
-
-func getHost() (string, string, error) {
-	info, err := host.Info()
-	if err != nil {
-		return "", "", err
-	}
-	thisHost := fmt.Sprintf("%v; %v; %v; %v; %v; %v; %v",
-		info.Hostname, info.OS, info.Platform, info.PlatformFamily, info.PlatformVersion, info.KernelVersion, info.KernelArch)
-	return info.Hostname, thisHost, nil
 }
 
 type enableTuiModel struct {
