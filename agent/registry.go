@@ -24,7 +24,7 @@ func LoadRegistry(path string) (*Registry, error) {
 		return nil, err
 	}
 	if r.V != RegistryV {
-		return nil, fmt.Errorf("invalid registry version '%v'; expected '%v", r.V, RegistryV)
+		return nil, fmt.Errorf("invalid registry version '%v'; expected '%v'", r.V, RegistryV)
 	}
 	return r, nil
 }

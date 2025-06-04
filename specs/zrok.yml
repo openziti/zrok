@@ -614,6 +614,319 @@ paths:
           description: internal server error
 
   #
+  # agent
+  #
+  /agent/access:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              token:
+                type: string
+              bindAddress:
+                type: string
+              autoMode:
+                type: boolean
+              autoAddress:
+                type: string
+              autoStartPort:
+                type: integer
+                minimum: 1
+                maximum: 65535
+              autoEndPort:
+                type: integer
+                minimum: 1
+                maximum: 65535
+              responseHeaders:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              frontendToken:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/enroll:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: enroll
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              token:
+                type: string
+        400:
+          description: bad request; already enrolled
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /agent/ping:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: ping
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              version:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+          
+  /agent/share:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteShare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              shareMode:
+                type: string
+                enum: ["public", "private", "reserved"]
+              token:
+                type: string
+              target:
+                type: string
+              basicAuth:
+                type: array
+                items:
+                  type: string
+              frontendSelection:
+                type: array
+                items:
+                  type: string
+              backendMode:
+                type: string
+                enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+              insecure:
+                type: boolean
+              oauthProvider:
+                type: string
+              oauthEmailAddressPatterns:
+                type: array
+                items:
+                  type: string
+              oauthCheckInterval:
+                type: string
+              open:
+                type: boolean
+              accessGrants:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              token:
+                type: string
+              frontendEndpoints:
+                type: array
+                items:
+                  type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/status:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteStatus
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              shares:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                    shareMode:
+                      type: string
+                    backendMode:
+                      type: string
+                    reserved:
+                      type: boolean
+                    frontendEndpoints:
+                      type: array
+                      items:
+                        type: string
+                    backendEndpoint:
+                      type: string
+                    open:
+                      type: boolean
+                    status:
+                      type: string
+              accesses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    frontendToken:
+                      type: string
+                    token:
+                      type: string
+                    bindAddress:
+                      type: string
+                    responseHeaders:
+                      type: array
+                      items:
+                        type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/unaccess:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteUnaccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              frontendToken:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  /agent/unenroll:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: unenroll
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: bad request; not enrolled
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /agent/unshare:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: remoteUnshare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              token:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
+  #
   # environment
   #
   /enable:

@@ -22,6 +22,7 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
@@ -88,6 +89,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+		AgentEnrollHandler: agent.EnrollHandlerFunc(func(params agent.EnrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Enroll has not yet been implemented")
+		}),
 		MetadataGetAccountDetailHandler: metadata.GetAccountDetailHandlerFunc(func(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.GetAccountDetail has not yet been implemented")
 		}),
@@ -145,11 +149,29 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
+		AgentPingHandler: agent.PingHandlerFunc(func(params agent.PingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Ping has not yet been implemented")
+		}),
 		AccountRegenerateAccountTokenHandler: account.RegenerateAccountTokenHandlerFunc(func(params account.RegenerateAccountTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.RegenerateAccountToken has not yet been implemented")
 		}),
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
+		}),
+		AgentRemoteAccessHandler: agent.RemoteAccessHandlerFunc(func(params agent.RemoteAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteAccess has not yet been implemented")
+		}),
+		AgentRemoteShareHandler: agent.RemoteShareHandlerFunc(func(params agent.RemoteShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteShare has not yet been implemented")
+		}),
+		AgentRemoteStatusHandler: agent.RemoteStatusHandlerFunc(func(params agent.RemoteStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteStatus has not yet been implemented")
+		}),
+		AgentRemoteUnaccessHandler: agent.RemoteUnaccessHandlerFunc(func(params agent.RemoteUnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteUnaccess has not yet been implemented")
+		}),
+		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
 		AdminRemoveOrganizationMemberHandler: admin.RemoveOrganizationMemberHandlerFunc(func(params admin.RemoveOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.RemoveOrganizationMember has not yet been implemented")
@@ -165,6 +187,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
+		}),
+		AgentUnenrollHandler: agent.UnenrollHandlerFunc(func(params agent.UnenrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.Unenroll has not yet been implemented")
 		}),
 		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
@@ -263,6 +288,8 @@ type ZrokAPI struct {
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
 	EnvironmentEnableHandler environment.EnableHandler
+	// AgentEnrollHandler sets the operation handler for the enroll operation
+	AgentEnrollHandler agent.EnrollHandler
 	// MetadataGetAccountDetailHandler sets the operation handler for the get account detail operation
 	MetadataGetAccountDetailHandler metadata.GetAccountDetailHandler
 	// MetadataGetAccountMetricsHandler sets the operation handler for the get account metrics operation
@@ -301,10 +328,22 @@ type ZrokAPI struct {
 	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
 	MetadataOverviewHandler metadata.OverviewHandler
+	// AgentPingHandler sets the operation handler for the ping operation
+	AgentPingHandler agent.PingHandler
 	// AccountRegenerateAccountTokenHandler sets the operation handler for the regenerate account token operation
 	AccountRegenerateAccountTokenHandler account.RegenerateAccountTokenHandler
 	// AccountRegisterHandler sets the operation handler for the register operation
 	AccountRegisterHandler account.RegisterHandler
+	// AgentRemoteAccessHandler sets the operation handler for the remote access operation
+	AgentRemoteAccessHandler agent.RemoteAccessHandler
+	// AgentRemoteShareHandler sets the operation handler for the remote share operation
+	AgentRemoteShareHandler agent.RemoteShareHandler
+	// AgentRemoteStatusHandler sets the operation handler for the remote status operation
+	AgentRemoteStatusHandler agent.RemoteStatusHandler
+	// AgentRemoteUnaccessHandler sets the operation handler for the remote unaccess operation
+	AgentRemoteUnaccessHandler agent.RemoteUnaccessHandler
+	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
+	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
 	AdminRemoveOrganizationMemberHandler admin.RemoveOrganizationMemberHandler
 	// AccountResetPasswordHandler sets the operation handler for the reset password operation
@@ -315,6 +354,8 @@ type ZrokAPI struct {
 	ShareShareHandler share.ShareHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
 	ShareUnaccessHandler share.UnaccessHandler
+	// AgentUnenrollHandler sets the operation handler for the unenroll operation
+	AgentUnenrollHandler agent.UnenrollHandler
 	// ShareUnshareHandler sets the operation handler for the unshare operation
 	ShareUnshareHandler share.UnshareHandler
 	// ShareUpdateAccessHandler sets the operation handler for the update access operation
@@ -449,6 +490,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.EnvironmentEnableHandler == nil {
 		unregistered = append(unregistered, "environment.EnableHandler")
 	}
+	if o.AgentEnrollHandler == nil {
+		unregistered = append(unregistered, "agent.EnrollHandler")
+	}
 	if o.MetadataGetAccountDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetAccountDetailHandler")
 	}
@@ -506,11 +550,29 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OverviewHandler")
 	}
+	if o.AgentPingHandler == nil {
+		unregistered = append(unregistered, "agent.PingHandler")
+	}
 	if o.AccountRegenerateAccountTokenHandler == nil {
 		unregistered = append(unregistered, "account.RegenerateAccountTokenHandler")
 	}
 	if o.AccountRegisterHandler == nil {
 		unregistered = append(unregistered, "account.RegisterHandler")
+	}
+	if o.AgentRemoteAccessHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteAccessHandler")
+	}
+	if o.AgentRemoteShareHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteShareHandler")
+	}
+	if o.AgentRemoteStatusHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteStatusHandler")
+	}
+	if o.AgentRemoteUnaccessHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteUnaccessHandler")
+	}
+	if o.AgentRemoteUnshareHandler == nil {
+		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
 	}
 	if o.AdminRemoveOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.RemoveOrganizationMemberHandler")
@@ -526,6 +588,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareUnaccessHandler == nil {
 		unregistered = append(unregistered, "share.UnaccessHandler")
+	}
+	if o.AgentUnenrollHandler == nil {
+		unregistered = append(unregistered, "agent.UnenrollHandler")
 	}
 	if o.ShareUnshareHandler == nil {
 		unregistered = append(unregistered, "share.UnshareHandler")
@@ -699,6 +764,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/enable"] = environment.NewEnable(o.context, o.EnvironmentEnableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/enroll"] = agent.NewEnroll(o.context, o.AgentEnrollHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -778,11 +847,35 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/agent/ping"] = agent.NewPing(o.context, o.AgentPingHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/regenerateAccountToken"] = account.NewRegenerateAccountToken(o.context, o.AccountRegenerateAccountTokenHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/register"] = account.NewRegister(o.context, o.AccountRegisterHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/access"] = agent.NewRemoteAccess(o.context, o.AgentRemoteAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/share"] = agent.NewRemoteShare(o.context, o.AgentRemoteShareHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/status"] = agent.NewRemoteStatus(o.context, o.AgentRemoteStatusHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unaccess"] = agent.NewRemoteUnaccess(o.context, o.AgentRemoteUnaccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unshare"] = agent.NewRemoteUnshare(o.context, o.AgentRemoteUnshareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -803,6 +896,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/unaccess"] = share.NewUnaccess(o.context, o.ShareUnaccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/unenroll"] = agent.NewUnenroll(o.context, o.AgentUnenrollHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

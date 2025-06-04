@@ -30,6 +30,7 @@ type Root interface {
 
 	AgentSocket() (string, error)
 	AgentRegistry() (string, error)
+	AgentEnrollment() (string, error)
 }
 
 type Environment struct {

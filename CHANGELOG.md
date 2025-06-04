@@ -2,6 +2,8 @@
 
 ## v1.0.5
 
+FEATURE: Initial support for zrok Agent remoting; new `zrok agent enroll` and `zrok agent unenroll` commands that establish opt-in remote Agent management facilities on a per-environment basis. The central API has been augmented to allow for remote control (creating shares and private access instances) of these agents; see the [remoting guide](https://docs.zrok.io/docs/guides/agent/remoting) for details (https://github.com/openziti/zrok/issues/967)
+
 CHANGE: `zrok share public`, `zrok share private`, and `zrok reserve` all default to the "closed" permission mode (they previously defaulted to the "open" permission mode). The `--closed` flag has been replaced with a new `--open` flag. See the [Permission Modes](https://docs.zrok.io/docs/guides/permission-modes/) docs for details (https://github.com/openziti/zrok/issues/971)
 
 FIX: `zrok enable` now handles the case where the user ID does not resolve to a username when generating the default environment description (https://github.com/openziti/zrok/issues/959)

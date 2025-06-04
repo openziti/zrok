@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -91,11 +92,13 @@ func (o *ListFrontendsOK) Code() int {
 }
 
 func (o *ListFrontendsOK) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK %s", 200, payload)
 }
 
 func (o *ListFrontendsOK) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK %s", 200, payload)
 }
 
 func (o *ListFrontendsOK) GetPayload() []*ListFrontendsOKBodyItems0 {
@@ -156,11 +159,11 @@ func (o *ListFrontendsUnauthorized) Code() int {
 }
 
 func (o *ListFrontendsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized", 401)
 }
 
 func (o *ListFrontendsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized", 401)
 }
 
 func (o *ListFrontendsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -212,11 +215,11 @@ func (o *ListFrontendsInternalServerError) Code() int {
 }
 
 func (o *ListFrontendsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError", 500)
 }
 
 func (o *ListFrontendsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError", 500)
 }
 
 func (o *ListFrontendsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -200,6 +200,10 @@ func (r *Root) AgentRegistry() (string, error) {
 	return agentRegistry()
 }
 
+func (r *Root) AgentEnrollment() (string, error) {
+	return agentEnrollment()
+}
+
 func (r *Root) Obliterate() error {
 	zrd, err := rootDir()
 	if err != nil {

@@ -7,6 +7,7 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -87,11 +88,13 @@ func (o *ListMembershipsOK) Code() int {
 }
 
 func (o *ListMembershipsOK) Error() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK %s", 200, payload)
 }
 
 func (o *ListMembershipsOK) String() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK %s", 200, payload)
 }
 
 func (o *ListMembershipsOK) GetPayload() *ListMembershipsOKBody {
@@ -154,11 +157,11 @@ func (o *ListMembershipsInternalServerError) Code() int {
 }
 
 func (o *ListMembershipsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError", 500)
 }
 
 func (o *ListMembershipsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError", 500)
 }
 
 func (o *ListMembershipsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

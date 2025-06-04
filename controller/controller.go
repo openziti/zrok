@@ -65,6 +65,16 @@ func Run(inCfg *config.Config) error {
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
+	if cfg.AgentController != nil {
+		api.AgentEnrollHandler = newAgentEnrollHandler()
+		api.AgentPingHandler = newAgentPingHandler()
+		api.AgentRemoteAccessHandler = newAgentRemoteAccessHandler()
+		api.AgentRemoteShareHandler = newAgentRemoteShareHandler()
+		api.AgentRemoteStatusHandler = newAgentRemoteStatusHandler()
+		api.AgentRemoteUnaccessHandler = newAgentRemoteUnaccessHandler()
+		api.AgentRemoteUnshareHandler = newAgentRemoteUnshareHandler()
+		api.AgentUnenrollHandler = newAgentUnenrollHandler()
+	}
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)

@@ -71,8 +71,8 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 		shrCmd = append(shrCmd, "--oauth-check-interval", req.OauthCheckInterval)
 	}
 
-	if req.Closed {
-		shrCmd = append(shrCmd, "--closed")
+	if !req.Closed {
+		shrCmd = append(shrCmd, "--open")
 	}
 	shr.closed = req.Closed
 

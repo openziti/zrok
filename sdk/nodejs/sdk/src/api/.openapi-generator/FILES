@@ -1,6 +1,7 @@
 .openapi-generator-ignore
 apis/AccountApi.ts
 apis/AdminApi.ts
+apis/AgentApi.ts
 apis/EnvironmentApi.ts
 apis/MetadataApi.ts
 apis/ShareApi.ts
@@ -20,6 +21,8 @@ models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
+models/Enroll200Response.ts
+models/EnrollRequest.ts
 models/Environment.ts
 models/EnvironmentAndResources.ts
 models/Frontend.ts
@@ -39,10 +42,19 @@ models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
 models/Overview.ts
+models/Ping200Response.ts
 models/Principal.ts
 models/RegenerateAccountToken200Response.ts
 models/RegenerateAccountTokenRequest.ts
 models/RegisterRequest.ts
+models/RemoteAccessRequest.ts
+models/RemoteShare200Response.ts
+models/RemoteShareRequest.ts
+models/RemoteStatus200Response.ts
+models/RemoteStatus200ResponseAccessesInner.ts
+models/RemoteStatus200ResponseSharesInner.ts
+models/RemoteUnaccessRequest.ts
+models/RemoteUnshareRequest.ts
 models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
 models/Share.ts

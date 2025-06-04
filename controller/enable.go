@@ -20,7 +20,6 @@ func newEnableHandler() *enableHandler {
 }
 
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	// start transaction early; if it fails, don't bother creating ziti resources
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)

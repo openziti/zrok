@@ -6,6 +6,7 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -97,11 +98,13 @@ func (o *GetShareDetailOK) Code() int {
 }
 
 func (o *GetShareDetailOK) Error() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailOK %s", 200, payload)
 }
 
 func (o *GetShareDetailOK) String() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailOK %s", 200, payload)
 }
 
 func (o *GetShareDetailOK) GetPayload() *rest_model_zrok.Share {
@@ -164,11 +167,11 @@ func (o *GetShareDetailUnauthorized) Code() int {
 }
 
 func (o *GetShareDetailUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailUnauthorized", 401)
 }
 
 func (o *GetShareDetailUnauthorized) String() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailUnauthorized", 401)
 }
 
 func (o *GetShareDetailUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +223,11 @@ func (o *GetShareDetailNotFound) Code() int {
 }
 
 func (o *GetShareDetailNotFound) Error() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailNotFound", 404)
 }
 
 func (o *GetShareDetailNotFound) String() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailNotFound", 404)
 }
 
 func (o *GetShareDetailNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +279,11 @@ func (o *GetShareDetailInternalServerError) Code() int {
 }
 
 func (o *GetShareDetailInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailInternalServerError", 500)
 }
 
 func (o *GetShareDetailInternalServerError) String() string {
-	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/share/{shareToken}][%d] getShareDetailInternalServerError", 500)
 }
 
 func (o *GetShareDetailInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

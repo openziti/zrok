@@ -121,13 +121,13 @@ func (h *unshareHandler) findShareZId(shrToken string, edge *rest_management_api
 }
 
 func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) {
-	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicy(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicyForShare(senv.ZId, shrToken, edge); err != nil {
 		logrus.Warnf("error deleting service edge router policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
-	if err := zrokEdgeSdk.DeleteServicePoliciesDial(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesDialForShare(senv.ZId, shrToken, edge); err != nil {
 		logrus.Warnf("error deleting dial service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
-	if err := zrokEdgeSdk.DeleteServicePoliciesBind(senv.ZId, shrToken, edge); err != nil {
+	if err := zrokEdgeSdk.DeleteServicePoliciesBindForShare(senv.ZId, shrToken, edge); err != nil {
 		logrus.Warnf("error deleting bind service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
 	}
 	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {

@@ -185,6 +185,519 @@ func init() {
         }
       }
     },
+    "/agent/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "autoAddress": {
+                  "type": "string"
+                },
+                "autoEndPort": {
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
+                },
+                "autoMode": {
+                  "type": "boolean"
+                },
+                "autoStartPort": {
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
+                },
+                "bindAddress": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "responseHeaders": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/enroll": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "enroll",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request; already enrolled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/agent/ping": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "ping",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "version": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "accessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendMode": {
+                  "type": "string",
+                  "enum": [
+                    "proxy",
+                    "web",
+                    "tcpTunnel",
+                    "udpTunnel",
+                    "caddy",
+                    "drive",
+                    "socks",
+                    "vpn"
+                  ]
+                },
+                "basicAuth": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendSelection": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "insecure": {
+                  "type": "boolean"
+                },
+                "oauthCheckInterval": {
+                  "type": "string"
+                },
+                "oauthEmailAddressPatterns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "oauthProvider": {
+                  "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "shareMode": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "private",
+                    "reserved"
+                  ]
+                },
+                "target": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendEndpoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "accesses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "bindAddress": {
+                        "type": "string"
+                      },
+                      "frontendToken": {
+                        "type": "string"
+                      },
+                      "responseHeaders": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "backendEndpoint": {
+                        "type": "string"
+                      },
+                      "backendMode": {
+                        "type": "string"
+                      },
+                      "frontendEndpoints": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "open": {
+                        "type": "boolean"
+                      },
+                      "reserved": {
+                        "type": "boolean"
+                      },
+                      "shareMode": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unaccess": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unenroll": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "unenroll",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "bad request; not enrolled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/agent/unshare": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -2496,6 +3009,473 @@ func init() {
         }
       }
     },
+    "/agent/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "autoAddress": {
+                  "type": "string"
+                },
+                "autoEndPort": {
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
+                },
+                "autoMode": {
+                  "type": "boolean"
+                },
+                "autoStartPort": {
+                  "type": "integer",
+                  "maximum": 65535,
+                  "minimum": 1
+                },
+                "bindAddress": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "responseHeaders": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/enroll": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "enroll",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request; already enrolled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/agent/ping": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "ping",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "version": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "accessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backendMode": {
+                  "type": "string",
+                  "enum": [
+                    "proxy",
+                    "web",
+                    "tcpTunnel",
+                    "udpTunnel",
+                    "caddy",
+                    "drive",
+                    "socks",
+                    "vpn"
+                  ]
+                },
+                "basicAuth": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendSelection": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "insecure": {
+                  "type": "boolean"
+                },
+                "oauthCheckInterval": {
+                  "type": "string"
+                },
+                "oauthEmailAddressPatterns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "oauthProvider": {
+                  "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "shareMode": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "private",
+                    "reserved"
+                  ]
+                },
+                "target": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "frontendEndpoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/status": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteStatus",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "accesses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/AccessesItems0"
+                  }
+                },
+                "shares": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SharesItems0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unaccess": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnaccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "frontendToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/unenroll": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "unenroll",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "bad request; not enrolled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/agent/unshare": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "remoteUnshare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "envZId": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -4225,6 +5205,26 @@ func init() {
     }
   },
   "definitions": {
+    "AccessesItems0": {
+      "type": "object",
+      "properties": {
+        "bindAddress": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "responseHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
     "ListFrontendsOKBodyItems0": {
       "type": "object",
       "properties": {
@@ -4277,6 +5277,38 @@ func init() {
           "type": "string"
         },
         "organizationToken": {
+          "type": "string"
+        }
+      }
+    },
+    "SharesItems0": {
+      "type": "object",
+      "properties": {
+        "backendEndpoint": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "token": {
           "type": "string"
         }
       }

@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -99,11 +100,13 @@ func (o *ListOrganizationMembersOK) Code() int {
 }
 
 func (o *ListOrganizationMembersOK) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK %s", 200, payload)
 }
 
 func (o *ListOrganizationMembersOK) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK %s", 200, payload)
 }
 
 func (o *ListOrganizationMembersOK) GetPayload() *ListOrganizationMembersOKBody {
@@ -166,11 +169,11 @@ func (o *ListOrganizationMembersUnauthorized) Code() int {
 }
 
 func (o *ListOrganizationMembersUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -222,11 +225,11 @@ func (o *ListOrganizationMembersNotFound) Code() int {
 }
 
 func (o *ListOrganizationMembersNotFound) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound", 404)
 }
 
 func (o *ListOrganizationMembersNotFound) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound", 404)
 }
 
 func (o *ListOrganizationMembersNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -278,11 +281,11 @@ func (o *ListOrganizationMembersInternalServerError) Code() int {
 }
 
 func (o *ListOrganizationMembersInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

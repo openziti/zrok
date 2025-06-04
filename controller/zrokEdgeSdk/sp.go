@@ -78,11 +78,19 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 	return resp.Payload.Data.ID, nil
 }
 
-func DeleteServicePoliciesBind(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func DeleteServicePoliciesBindForAgentRemote(envZId, enrollmentToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=%d", enrollmentToken, servicePolicyBind), edge)
+}
+
+func DeleteServicePoliciesDialForAgentRemote(envZId, enrollmentToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=%d", enrollmentToken, servicePolicyDial), edge)
+}
+
+func DeleteServicePoliciesBindForShare(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyBind), edge)
 }
 
-func DeleteServicePoliciesDial(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func DeleteServicePoliciesDialForShare(envZId, shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=%d", shrToken, servicePolicyDial), edge)
 }
 

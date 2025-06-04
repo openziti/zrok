@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -91,11 +92,13 @@ func (o *CreateIdentityCreated) Code() int {
 }
 
 func (o *CreateIdentityCreated) Error() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityCreated %s", 201, payload)
 }
 
 func (o *CreateIdentityCreated) String() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityCreated %s", 201, payload)
 }
 
 func (o *CreateIdentityCreated) GetPayload() *CreateIdentityCreatedBody {
@@ -158,11 +161,11 @@ func (o *CreateIdentityUnauthorized) Code() int {
 }
 
 func (o *CreateIdentityUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityUnauthorized ", 401)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityUnauthorized", 401)
 }
 
 func (o *CreateIdentityUnauthorized) String() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityUnauthorized ", 401)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityUnauthorized", 401)
 }
 
 func (o *CreateIdentityUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +217,11 @@ func (o *CreateIdentityInternalServerError) Code() int {
 }
 
 func (o *CreateIdentityInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityInternalServerError ", 500)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityInternalServerError", 500)
 }
 
 func (o *CreateIdentityInternalServerError) String() string {
-	return fmt.Sprintf("[POST /identity][%d] createIdentityInternalServerError ", 500)
+	return fmt.Sprintf("[POST /identity][%d] createIdentityInternalServerError", 500)
 }
 
 func (o *CreateIdentityInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
