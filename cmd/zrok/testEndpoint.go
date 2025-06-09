@@ -15,6 +15,7 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/cmd/zrok/endpointUi"
 	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -200,7 +201,7 @@ func newEndpointData(r *http.Request) *endpointData {
 }
 
 func (ed *endpointData) getHostInfo() {
-	host, hostDetail, err := getHost()
+	host, hostDetail, _, err := util.GetHostDetails()
 	if err != nil {
 		logrus.Errorf("error getting host detail: %v", err)
 	}

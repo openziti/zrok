@@ -2,6 +2,10 @@ package agent
 
 import (
 	"context"
+	"net"
+	"net/http"
+	"os"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/agentUi"
@@ -13,9 +17,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"net"
-	"net/http"
-	"os"
 )
 
 type Agent struct {
@@ -66,7 +67,9 @@ func (a *Agent) Run() error {
 	a.agentSocket = agentSocket
 
 	go a.manager()
-	go a.gateway()
+	if a.cfg.ConsoleEnabled {
+		go a.gateway()
+	}
 	go a.remoteAgent()
 
 	a.persistRegistry = false

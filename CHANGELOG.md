@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.6
+
+CHANGE: Adjusted core framework entry points to support changing zrokdir, and host interrogation functions to better support embedded zrok functionality (https://github.com/openziti/zrok/issues/976)
+
 ## v1.0.5
 
 FEATURE: Initial support for zrok Agent remoting; new `zrok agent enroll` and `zrok agent unenroll` commands that establish opt-in remote Agent management facilities on a per-environment basis. The central API has been augmented to allow for remote control (creating shares and private access instances) of these agents; see the [remoting guide](https://docs.zrok.io/docs/guides/agent/remoting) for details (https://github.com/openziti/zrok/issues/967)
