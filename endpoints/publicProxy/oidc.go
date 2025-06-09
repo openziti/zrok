@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -12,40 +18,41 @@ import (
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
-	githubOAuth "golang.org/x/oauth2/github"
-	"io"
-	"net/http"
-	"net/url"
-	"time"
 )
 
-func configureGithubOauth(cfg *OauthConfig, tls bool) error {
-	scheme := "http"
-	if tls {
-		scheme = "https"
+type OIDCProvider struct {
+	name          string
+	config        *oauth2.Config
+	relyingParty  rp.RelyingParty
+	emailEndpoint string
+	emailPath     string
+}
+
+type IntermediateJWT struct {
+	State                      string `json:"state"`
+	Host                       string `json:"host"`
+	AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
+	jwt.RegisteredClaims
+}
+
+func configureOIDCProvider(cfg *OauthConfig, providerCfg *OauthProviderConfig, tls bool) (*OIDCProvider, error) {
+	if providerCfg == nil {
+		return nil, errors.New("provider configuration is required")
 	}
 
-	providerCfg := cfg.GetProvider("github")
-	if providerCfg == nil {
-		logrus.Info("unable to find provider config for github; skipping")
-		return nil
-	}
-	clientID := providerCfg.ClientId
 	rpConfig := &oauth2.Config{
-		ClientID:     clientID,
+		ClientID:     providerCfg.ClientId,
 		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/github/oauth", cfg.RedirectUrl),
-		Scopes:       []string{"user:email"},
-		Endpoint:     githubOAuth.Endpoint,
+		RedirectURL:  fmt.Sprintf("%v/%s/oauth", cfg.RedirectUrl, providerCfg.Name),
+		Scopes:       providerCfg.Scopes,
+		Endpoint:     providerCfg.GetEndpoint(),
 	}
 
 	hash := md5.New()
-	n, err := hash.Write([]byte(cfg.HashKey))
-	if err != nil {
-		return err
-	}
-	if n != len(cfg.HashKey) {
-		return errors.New("short hash")
+	if n, err := hash.Write([]byte(cfg.HashKey)); err != nil {
+		return nil, err
+	} else if n != len(cfg.HashKey) {
+		return nil, errors.New("short hash")
 	}
 	key := hash.Sum(nil)
 
@@ -54,26 +61,30 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 	options := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
-		//rp.WithPKCE(cookieHandler), //Github currently doesn't support pkce. Update when that changes.
+	}
+
+	if providerCfg.SupportsPKCE {
+		options = append(options, rp.WithPKCE(cookieHandler))
 	}
 
 	relyingParty, err := rp.NewRelyingPartyOAuth(rpConfig, options...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	type IntermediateJWT struct {
-		State                      string `json:"state"`
-		Host                       string `json:"host"`
-		AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
-		jwt.RegisteredClaims
-	}
+	return &OIDCProvider{
+		name:          providerCfg.Name,
+		config:        rpConfig,
+		relyingParty:  relyingParty,
+		emailEndpoint: providerCfg.EmailEndpoint,
+		emailPath:     providerCfg.EmailPath,
+	}, nil
+}
 
-	type githubUserResp struct {
-		Email      string
-		Primary    bool
-		Verified   bool
-		Visibility string
+func (p *OIDCProvider) setupHandlers(cfg *OauthConfig, key []byte, tls bool) {
+	scheme := "http"
+	if tls {
+		scheme = "https"
 	}
 
 	authHandlerWithQueryState := func(party rp.RelyingParty) http.HandlerFunc {
@@ -106,9 +117,8 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		}
 	}
 
-	http.Handle("/github/login", authHandlerWithQueryState(relyingParty))
 	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
-		parsedUrl, err := url.Parse("https://api.github.com/user/emails")
+		parsedUrl, err := url.Parse(p.emailEndpoint)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -121,33 +131,24 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens.AccessToken))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			logrus.Errorf("error getting user info from github: %v", err)
+			logrus.Errorf("error getting user info from %s: %v", p.name, err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer func() {
-			_ = resp.Body.Close()
-		}()
+		defer func() { _ = resp.Body.Close() }()
+
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
 			logrus.Errorf("error reading response body: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		var rDat []githubUserResp
-		err = json.Unmarshal(response, &rDat)
+
+		email, err := p.extractEmail(response)
 		if err != nil {
-			logrus.Errorf("error unmarshalling google oauth response: %v", err)
+			logrus.Errorf("error extracting email: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
-		}
-
-		primaryEmail := ""
-		for _, email := range rDat {
-			if email.Primary {
-				primaryEmail = email.Email
-				break
-			}
 		}
 
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
@@ -165,10 +166,60 @@ func configureGithubOauth(cfg *OauthConfig, tls bool) error {
 		} else {
 			authCheckInterval = i
 		}
-		SetZrokCookie(w, cfg.CookieDomain, primaryEmail, tokens.AccessToken, "github", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
+
+		SetZrokCookie(w, cfg.CookieDomain, email, tokens.AccessToken, p.name, authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 
-	http.Handle("/github/oauth", rp.CodeExchangeHandler(getEmail, relyingParty))
-	return nil
+	http.Handle(fmt.Sprintf("/%s/login", p.name), authHandlerWithQueryState(p.relyingParty))
+	http.Handle(fmt.Sprintf("/%s/oauth", p.name), rp.CodeExchangeHandler(getEmail, p.relyingParty))
+}
+
+func (p *OIDCProvider) extractEmail(response []byte) (string, error) {
+	var data interface{}
+	if err := json.Unmarshal(response, &data); err != nil {
+		return "", err
+	}
+
+	// handle array response (like GitHub's email endpoint)
+	if arr, ok := data.([]interface{}); ok {
+		for _, item := range arr {
+			if email, found := p.findEmailInMap(item.(map[string]interface{})); found {
+				return email, nil
+			}
+		}
+		return "", errors.New("no primary email found in array response")
+	}
+
+	// handle single object response (like Google's userinfo endpoint)
+	if obj, ok := data.(map[string]interface{}); ok {
+		if email, found := p.findEmailInMap(obj); found {
+			return email, nil
+		}
+		return "", errors.New("no email found in object response")
+	}
+
+	return "", errors.New("unexpected response format")
+}
+
+func (p *OIDCProvider) findEmailInMap(obj map[string]interface{}) (string, bool) {
+	paths := strings.Split(p.emailPath, ".")
+	current := obj
+
+	for i, path := range paths {
+		if i == len(paths)-1 {
+			if email, ok := current[path].(string); ok {
+				return email, true
+			}
+			return "", false
+		}
+
+		if next, ok := current[path].(map[string]interface{}); ok {
+			current = next
+		} else {
+			return "", false
+		}
+	}
+
+	return "", false
 }

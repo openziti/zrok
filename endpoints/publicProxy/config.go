@@ -2,11 +2,14 @@ package publicProxy
 
 import (
 	"context"
+	"crypto/md5"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
+	"golang.org/x/oauth2"
 )
 
 const V = 3
@@ -35,19 +38,23 @@ type OauthConfig struct {
 	Providers    []*OauthProviderConfig
 }
 
-func (oc *OauthConfig) GetProvider(name string) *OauthProviderConfig {
-	for _, provider := range oc.Providers {
-		if provider.Name == name {
-			return provider
-		}
-	}
-	return nil
+type OauthProviderConfig struct {
+	Name          string
+	ClientId      string
+	ClientSecret  string `cf:"+secret"`
+	Scopes        []string
+	AuthURL       string
+	TokenURL      string
+	EmailEndpoint string
+	EmailPath     string
+	SupportsPKCE  bool
 }
 
-type OauthProviderConfig struct {
-	Name         string
-	ClientId     string
-	ClientSecret string `cf:"+secret"`
+func (p *OauthProviderConfig) GetEndpoint() oauth2.Endpoint {
+	return oauth2.Endpoint{
+		AuthURL:  p.AuthURL,
+		TokenURL: p.TokenURL,
+	}
 }
 
 func DefaultConfig() *Config {
@@ -72,12 +79,24 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 		logrus.Info("no oauth configuration; skipping oauth handler startup")
 		return nil
 	}
-	if err := configureGoogleOauth(cfg.Oauth, tls); err != nil {
+
+	hash := md5.New()
+	if n, err := hash.Write([]byte(cfg.Oauth.HashKey)); err != nil {
 		return err
+	} else if n != len(cfg.Oauth.HashKey) {
+		return errors.New("short hash")
 	}
-	if err := configureGithubOauth(cfg.Oauth, tls); err != nil {
-		return err
+	key := hash.Sum(nil)
+
+	for _, providerCfg := range cfg.Oauth.Providers {
+		provider, err := configureOIDCProvider(cfg.Oauth, providerCfg, tls)
+		if err != nil {
+			logrus.Warnf("failed to configure provider %s: %v", providerCfg.Name, err)
+			continue
+		}
+		provider.setupHandlers(cfg.Oauth, key, tls)
 	}
+
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)
 	return nil
 }
