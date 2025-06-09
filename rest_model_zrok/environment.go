@@ -36,6 +36,9 @@ type Environment struct {
 	// limited
 	Limited bool `json:"limited,omitempty"`
 
+	// remote agent
+	RemoteAgent bool `json:"remoteAgent,omitempty"`
+
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
 

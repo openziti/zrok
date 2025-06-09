@@ -6,7 +6,6 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -110,13 +109,11 @@ func (o *ShareCreated) Code() int {
 }
 
 func (o *ShareCreated) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /share][%d] shareCreated %s", 201, payload)
+	return fmt.Sprintf("[POST /share][%d] shareCreated  %+v", 201, o.Payload)
 }
 
 func (o *ShareCreated) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /share][%d] shareCreated %s", 201, payload)
+	return fmt.Sprintf("[POST /share][%d] shareCreated  %+v", 201, o.Payload)
 }
 
 func (o *ShareCreated) GetPayload() *rest_model_zrok.ShareResponse {
@@ -179,11 +176,11 @@ func (o *ShareUnauthorized) Code() int {
 }
 
 func (o *ShareUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnauthorized", 401)
+	return fmt.Sprintf("[POST /share][%d] shareUnauthorized ", 401)
 }
 
 func (o *ShareUnauthorized) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnauthorized", 401)
+	return fmt.Sprintf("[POST /share][%d] shareUnauthorized ", 401)
 }
 
 func (o *ShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -235,11 +232,11 @@ func (o *ShareNotFound) Code() int {
 }
 
 func (o *ShareNotFound) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareNotFound", 404)
+	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
 }
 
 func (o *ShareNotFound) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareNotFound", 404)
+	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
 }
 
 func (o *ShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -291,11 +288,11 @@ func (o *ShareConflict) Code() int {
 }
 
 func (o *ShareConflict) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict", 409)
+	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
 }
 
 func (o *ShareConflict) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict", 409)
+	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
 }
 
 func (o *ShareConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -347,11 +344,11 @@ func (o *ShareUnprocessableEntity) Code() int {
 }
 
 func (o *ShareUnprocessableEntity) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity", 422)
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
 }
 
 func (o *ShareUnprocessableEntity) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity", 422)
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
 }
 
 func (o *ShareUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -404,13 +401,11 @@ func (o *ShareInternalServerError) Code() int {
 }
 
 func (o *ShareInternalServerError) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /share][%d] shareInternalServerError %s", 500, payload)
+	return fmt.Sprintf("[POST /share][%d] shareInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *ShareInternalServerError) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /share][%d] shareInternalServerError %s", 500, payload)
+	return fmt.Sprintf("[POST /share][%d] shareInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *ShareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {

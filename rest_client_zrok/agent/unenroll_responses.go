@@ -95,11 +95,11 @@ func (o *UnenrollOK) Code() int {
 }
 
 func (o *UnenrollOK) Error() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollOK", 200)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollOK ", 200)
 }
 
 func (o *UnenrollOK) String() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollOK", 200)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollOK ", 200)
 }
 
 func (o *UnenrollOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *UnenrollBadRequest) Code() int {
 }
 
 func (o *UnenrollBadRequest) Error() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollBadRequest", 400)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollBadRequest ", 400)
 }
 
 func (o *UnenrollBadRequest) String() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollBadRequest", 400)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollBadRequest ", 400)
 }
 
 func (o *UnenrollBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *UnenrollUnauthorized) Code() int {
 }
 
 func (o *UnenrollUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollUnauthorized ", 401)
 }
 
 func (o *UnenrollUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollUnauthorized ", 401)
 }
 
 func (o *UnenrollUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *UnenrollInternalServerError) Code() int {
 }
 
 func (o *UnenrollInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollInternalServerError ", 500)
 }
 
 func (o *UnenrollInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/unenroll][%d] unenrollInternalServerError ", 500)
 }
 
 func (o *UnenrollInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

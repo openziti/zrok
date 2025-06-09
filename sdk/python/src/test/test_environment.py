@@ -39,6 +39,7 @@ class TestEnvironment(unittest.TestCase):
                 host = '',
                 address = '',
                 z_id = '',
+                remote_agent = True,
                 activity = [
                     zrok_api.models.spark_data_sample.sparkDataSample(
                         rx = 1.337, 

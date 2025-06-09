@@ -89,11 +89,11 @@ func (o *DisableOK) Code() int {
 }
 
 func (o *DisableOK) Error() string {
-	return fmt.Sprintf("[POST /disable][%d] disableOK", 200)
+	return fmt.Sprintf("[POST /disable][%d] disableOK ", 200)
 }
 
 func (o *DisableOK) String() string {
-	return fmt.Sprintf("[POST /disable][%d] disableOK", 200)
+	return fmt.Sprintf("[POST /disable][%d] disableOK ", 200)
 }
 
 func (o *DisableOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -145,11 +145,11 @@ func (o *DisableUnauthorized) Code() int {
 }
 
 func (o *DisableUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /disable][%d] disableUnauthorized", 401)
+	return fmt.Sprintf("[POST /disable][%d] disableUnauthorized ", 401)
 }
 
 func (o *DisableUnauthorized) String() string {
-	return fmt.Sprintf("[POST /disable][%d] disableUnauthorized", 401)
+	return fmt.Sprintf("[POST /disable][%d] disableUnauthorized ", 401)
 }
 
 func (o *DisableUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -201,11 +201,11 @@ func (o *DisableInternalServerError) Code() int {
 }
 
 func (o *DisableInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /disable][%d] disableInternalServerError", 500)
+	return fmt.Sprintf("[POST /disable][%d] disableInternalServerError ", 500)
 }
 
 func (o *DisableInternalServerError) String() string {
-	return fmt.Sprintf("[POST /disable][%d] disableInternalServerError", 500)
+	return fmt.Sprintf("[POST /disable][%d] disableInternalServerError ", 500)
 }
 
 func (o *DisableInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

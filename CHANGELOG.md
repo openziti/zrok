@@ -2,6 +2,8 @@
 
 ## v1.0.6
 
+CHANGE: The `/overview` endpoint has been adjusted to include a new `remoteAgent` `boolean` on the `environment` instances, indicating whether or not the environment has an enrolled remote agent (https://github.com/openziti/zrok/issues/977)
+
 CHANGE: Adjusted core framework entry points to support changing zrokdir, and host interrogation functions to better support embedded zrok functionality (https://github.com/openziti/zrok/issues/976)
 
 ## v1.0.5

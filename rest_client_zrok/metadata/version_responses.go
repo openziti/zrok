@@ -6,7 +6,6 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -80,13 +79,11 @@ func (o *VersionOK) Code() int {
 }
 
 func (o *VersionOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /version][%d] versionOK %s", 200, payload)
+	return fmt.Sprintf("[GET /version][%d] versionOK  %+v", 200, o.Payload)
 }
 
 func (o *VersionOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /version][%d] versionOK %s", 200, payload)
+	return fmt.Sprintf("[GET /version][%d] versionOK  %+v", 200, o.Payload)
 }
 
 func (o *VersionOK) GetPayload() rest_model_zrok.Version {

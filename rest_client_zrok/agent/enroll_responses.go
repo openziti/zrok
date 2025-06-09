@@ -7,7 +7,6 @@ package agent
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -98,13 +97,11 @@ func (o *EnrollOK) Code() int {
 }
 
 func (o *EnrollOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK  %+v", 200, o.Payload)
 }
 
 func (o *EnrollOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK  %+v", 200, o.Payload)
 }
 
 func (o *EnrollOK) GetPayload() *EnrollOKBody {
@@ -167,11 +164,11 @@ func (o *EnrollBadRequest) Code() int {
 }
 
 func (o *EnrollBadRequest) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest", 400)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest ", 400)
 }
 
 func (o *EnrollBadRequest) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest", 400)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest ", 400)
 }
 
 func (o *EnrollBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -223,11 +220,11 @@ func (o *EnrollUnauthorized) Code() int {
 }
 
 func (o *EnrollUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized ", 401)
 }
 
 func (o *EnrollUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized ", 401)
 }
 
 func (o *EnrollUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -279,11 +276,11 @@ func (o *EnrollInternalServerError) Code() int {
 }
 
 func (o *EnrollInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError ", 500)
 }
 
 func (o *EnrollInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError ", 500)
 }
 
 func (o *EnrollInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

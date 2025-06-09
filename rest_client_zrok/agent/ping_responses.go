@@ -7,7 +7,6 @@ package agent
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -98,13 +97,11 @@ func (o *PingOK) Code() int {
 }
 
 func (o *PingOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/ping][%d] pingOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingOK  %+v", 200, o.Payload)
 }
 
 func (o *PingOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/ping][%d] pingOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingOK  %+v", 200, o.Payload)
 }
 
 func (o *PingOK) GetPayload() *PingOKBody {
@@ -167,11 +164,11 @@ func (o *PingUnauthorized) Code() int {
 }
 
 func (o *PingUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingUnauthorized ", 401)
 }
 
 func (o *PingUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingUnauthorized ", 401)
 }
 
 func (o *PingUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -223,11 +220,11 @@ func (o *PingInternalServerError) Code() int {
 }
 
 func (o *PingInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingInternalServerError ", 500)
 }
 
 func (o *PingInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingInternalServerError ", 500)
 }
 
 func (o *PingInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -279,11 +276,11 @@ func (o *PingBadGateway) Code() int {
 }
 
 func (o *PingBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingBadGateway ", 502)
 }
 
 func (o *PingBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/ping][%d] pingBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/ping][%d] pingBadGateway ", 502)
 }
 
 func (o *PingBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

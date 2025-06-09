@@ -101,11 +101,11 @@ func (o *UpdateShareOK) Code() int {
 }
 
 func (o *UpdateShareOK) Error() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareOK", 200)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareOK ", 200)
 }
 
 func (o *UpdateShareOK) String() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareOK", 200)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareOK ", 200)
 }
 
 func (o *UpdateShareOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -157,11 +157,11 @@ func (o *UpdateShareBadRequest) Code() int {
 }
 
 func (o *UpdateShareBadRequest) Error() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest", 400)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest ", 400)
 }
 
 func (o *UpdateShareBadRequest) String() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest", 400)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareBadRequest ", 400)
 }
 
 func (o *UpdateShareBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -213,11 +213,11 @@ func (o *UpdateShareUnauthorized) Code() int {
 }
 
 func (o *UpdateShareUnauthorized) Error() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareUnauthorized", 401)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareUnauthorized ", 401)
 }
 
 func (o *UpdateShareUnauthorized) String() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareUnauthorized", 401)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareUnauthorized ", 401)
 }
 
 func (o *UpdateShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -269,11 +269,11 @@ func (o *UpdateShareNotFound) Code() int {
 }
 
 func (o *UpdateShareNotFound) Error() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareNotFound", 404)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareNotFound ", 404)
 }
 
 func (o *UpdateShareNotFound) String() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareNotFound", 404)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareNotFound ", 404)
 }
 
 func (o *UpdateShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -325,11 +325,11 @@ func (o *UpdateShareInternalServerError) Code() int {
 }
 
 func (o *UpdateShareInternalServerError) Error() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareInternalServerError", 500)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareInternalServerError ", 500)
 }
 
 func (o *UpdateShareInternalServerError) String() string {
-	return fmt.Sprintf("[PATCH /share][%d] updateShareInternalServerError", 500)
+	return fmt.Sprintf("[PATCH /share][%d] updateShareInternalServerError ", 500)
 }
 
 func (o *UpdateShareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

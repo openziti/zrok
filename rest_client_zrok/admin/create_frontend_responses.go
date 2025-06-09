@@ -106,13 +106,11 @@ func (o *CreateFrontendCreated) Code() int {
 }
 
 func (o *CreateFrontendCreated) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated %s", 201, payload)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated  %+v", 201, o.Payload)
 }
 
 func (o *CreateFrontendCreated) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated %s", 201, payload)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated  %+v", 201, o.Payload)
 }
 
 func (o *CreateFrontendCreated) GetPayload() *CreateFrontendCreatedBody {
@@ -175,11 +173,11 @@ func (o *CreateFrontendBadRequest) Code() int {
 }
 
 func (o *CreateFrontendBadRequest) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest", 400)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
 }
 
 func (o *CreateFrontendBadRequest) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest", 400)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
 }
 
 func (o *CreateFrontendBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -231,11 +229,11 @@ func (o *CreateFrontendUnauthorized) Code() int {
 }
 
 func (o *CreateFrontendUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized", 401)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized ", 401)
 }
 
 func (o *CreateFrontendUnauthorized) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized", 401)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized ", 401)
 }
 
 func (o *CreateFrontendUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -287,11 +285,11 @@ func (o *CreateFrontendNotFound) Code() int {
 }
 
 func (o *CreateFrontendNotFound) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound", 404)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
 }
 
 func (o *CreateFrontendNotFound) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound", 404)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
 }
 
 func (o *CreateFrontendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -343,11 +341,11 @@ func (o *CreateFrontendInternalServerError) Code() int {
 }
 
 func (o *CreateFrontendInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError", 500)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError ", 500)
 }
 
 func (o *CreateFrontendInternalServerError) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError", 500)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError ", 500)
 }
 
 func (o *CreateFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -362,7 +360,7 @@ swagger:model CreateFrontendBody
 type CreateFrontendBody struct {
 
 	// permission mode
-	// Enum: ["open","closed"]
+	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name

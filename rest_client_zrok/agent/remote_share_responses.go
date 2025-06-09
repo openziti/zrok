@@ -100,13 +100,11 @@ func (o *RemoteShareOK) Code() int {
 }
 
 func (o *RemoteShareOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK  %+v", 200, o.Payload)
 }
 
 func (o *RemoteShareOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK  %+v", 200, o.Payload)
 }
 
 func (o *RemoteShareOK) GetPayload() *RemoteShareOKBody {
@@ -169,11 +167,11 @@ func (o *RemoteShareUnauthorized) Code() int {
 }
 
 func (o *RemoteShareUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized ", 401)
 }
 
 func (o *RemoteShareUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized ", 401)
 }
 
 func (o *RemoteShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -225,11 +223,11 @@ func (o *RemoteShareInternalServerError) Code() int {
 }
 
 func (o *RemoteShareInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError ", 500)
 }
 
 func (o *RemoteShareInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError ", 500)
 }
 
 func (o *RemoteShareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -281,11 +279,11 @@ func (o *RemoteShareBadGateway) Code() int {
 }
 
 func (o *RemoteShareBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway ", 502)
 }
 
 func (o *RemoteShareBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway ", 502)
 }
 
 func (o *RemoteShareBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -303,7 +301,7 @@ type RemoteShareBody struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// backend mode
-	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks","vpn"]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks vpn]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth
@@ -331,7 +329,7 @@ type RemoteShareBody struct {
 	Open bool `json:"open,omitempty"`
 
 	// share mode
-	// Enum: ["public","private","reserved"]
+	// Enum: [public private reserved]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target

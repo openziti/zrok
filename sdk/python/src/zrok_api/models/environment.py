@@ -31,11 +31,12 @@ class Environment(BaseModel):
     host: Optional[StrictStr] = None
     address: Optional[StrictStr] = None
     z_id: Optional[StrictStr] = Field(default=None, alias="zId")
+    remote_agent: Optional[StrictBool] = Field(default=None, alias="remoteAgent")
     activity: Optional[List[SparkDataSample]] = None
     limited: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
     updated_at: Optional[StrictInt] = Field(default=None, alias="updatedAt")
-    __properties: ClassVar[List[str]] = ["description", "host", "address", "zId", "activity", "limited", "createdAt", "updatedAt"]
+    __properties: ClassVar[List[str]] = ["description", "host", "address", "zId", "remoteAgent", "activity", "limited", "createdAt", "updatedAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -99,6 +100,7 @@ class Environment(BaseModel):
             "host": obj.get("host"),
             "address": obj.get("address"),
             "zId": obj.get("zId"),
+            "remoteAgent": obj.get("remoteAgent"),
             "activity": [SparkDataSample.from_dict(_item) for _item in obj["activity"]] if obj.get("activity") is not None else None,
             "limited": obj.get("limited"),
             "createdAt": obj.get("createdAt"),

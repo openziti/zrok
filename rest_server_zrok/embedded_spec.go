@@ -2533,6 +2533,9 @@ func init() {
         "limited": {
           "type": "boolean"
         },
+        "remoteAgent": {
+          "type": "boolean"
+        },
         "updatedAt": {
           "type": "integer"
         },
@@ -5366,6 +5369,9 @@ func init() {
           "type": "string"
         },
         "limited": {
+          "type": "boolean"
+        },
+        "remoteAgent": {
           "type": "boolean"
         },
         "updatedAt": {

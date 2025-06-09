@@ -95,11 +95,11 @@ func (o *DeleteFrontendOK) Code() int {
 }
 
 func (o *DeleteFrontendOK) Error() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendOK", 200)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendOK ", 200)
 }
 
 func (o *DeleteFrontendOK) String() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendOK", 200)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendOK ", 200)
 }
 
 func (o *DeleteFrontendOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *DeleteFrontendUnauthorized) Code() int {
 }
 
 func (o *DeleteFrontendUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendUnauthorized ", 401)
 }
 
 func (o *DeleteFrontendUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendUnauthorized ", 401)
 }
 
 func (o *DeleteFrontendUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *DeleteFrontendNotFound) Code() int {
 }
 
 func (o *DeleteFrontendNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendNotFound", 404)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendNotFound ", 404)
 }
 
 func (o *DeleteFrontendNotFound) String() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendNotFound", 404)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendNotFound ", 404)
 }
 
 func (o *DeleteFrontendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *DeleteFrontendInternalServerError) Code() int {
 }
 
 func (o *DeleteFrontendInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendInternalServerError", 500)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendInternalServerError ", 500)
 }
 
 func (o *DeleteFrontendInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendInternalServerError", 500)
+	return fmt.Sprintf("[DELETE /frontend][%d] deleteFrontendInternalServerError ", 500)
 }
 
 func (o *DeleteFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

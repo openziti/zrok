@@ -7,7 +7,6 @@ package share
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +98,11 @@ func (o *UnshareOK) Code() int {
 }
 
 func (o *UnshareOK) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK", 200)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK ", 200)
 }
 
 func (o *UnshareOK) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK", 200)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK ", 200)
 }
 
 func (o *UnshareOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -155,11 +154,11 @@ func (o *UnshareUnauthorized) Code() int {
 }
 
 func (o *UnshareUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized ", 401)
 }
 
 func (o *UnshareUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized ", 401)
 }
 
 func (o *UnshareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -211,11 +210,11 @@ func (o *UnshareNotFound) Code() int {
 }
 
 func (o *UnshareNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound", 404)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound ", 404)
 }
 
 func (o *UnshareNotFound) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound", 404)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound ", 404)
 }
 
 func (o *UnshareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -268,13 +267,11 @@ func (o *UnshareInternalServerError) Code() int {
 }
 
 func (o *UnshareInternalServerError) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError %s", 500, payload)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *UnshareInternalServerError) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError %s", 500, payload)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *UnshareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {

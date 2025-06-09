@@ -1562,6 +1562,8 @@ definitions:
         type: string
       zId:
         type: string
+      remoteAgent:
+        type: boolean
       activity:
         $ref: "#/definitions/sparkData"
       limited:

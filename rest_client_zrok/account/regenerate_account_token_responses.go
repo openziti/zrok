@@ -7,7 +7,6 @@ package account
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -92,13 +91,11 @@ func (o *RegenerateAccountTokenOK) Code() int {
 }
 
 func (o *RegenerateAccountTokenOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK %s", 200, payload)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK  %+v", 200, o.Payload)
 }
 
 func (o *RegenerateAccountTokenOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK %s", 200, payload)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK  %+v", 200, o.Payload)
 }
 
 func (o *RegenerateAccountTokenOK) GetPayload() *RegenerateAccountTokenOKBody {
@@ -161,11 +158,11 @@ func (o *RegenerateAccountTokenNotFound) Code() int {
 }
 
 func (o *RegenerateAccountTokenNotFound) Error() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound", 404)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound ", 404)
 }
 
 func (o *RegenerateAccountTokenNotFound) String() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound", 404)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound ", 404)
 }
 
 func (o *RegenerateAccountTokenNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -217,11 +214,11 @@ func (o *RegenerateAccountTokenInternalServerError) Code() int {
 }
 
 func (o *RegenerateAccountTokenInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError", 500)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError ", 500)
 }
 
 func (o *RegenerateAccountTokenInternalServerError) String() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError", 500)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError ", 500)
 }
 
 func (o *RegenerateAccountTokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
