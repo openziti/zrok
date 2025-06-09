@@ -7,6 +7,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// SetRootDirName allows setting a custom name for the root directory.
+// This should be called before any other environment operations.
+func SetRootDirName(name string) {
+	env_v0_4.SetRootDirName(name)
+}
+
 func LoadRoot() (env_core.Root, error) {
 	if assert, err := env_v0_4.Assert(); assert && err == nil {
 		return env_v0_4.Load()

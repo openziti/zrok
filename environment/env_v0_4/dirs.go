@@ -6,12 +6,18 @@ import (
 	"path/filepath"
 )
 
+var rootDirName = ".zrok"
+
+func SetRootDirName(name string) {
+	rootDirName = name
+}
+
 func rootDir() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".zrok"), nil
+	return filepath.Join(home, rootDirName), nil
 }
 
 func metadataFile() (string, error) {
