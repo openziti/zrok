@@ -95,11 +95,11 @@ func (o *AddOrganizationMemberCreated) Code() int {
 }
 
 func (o *AddOrganizationMemberCreated) Error() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberCreated", 201)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberCreated ", 201)
 }
 
 func (o *AddOrganizationMemberCreated) String() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberCreated", 201)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberCreated ", 201)
 }
 
 func (o *AddOrganizationMemberCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *AddOrganizationMemberUnauthorized) Code() int {
 }
 
 func (o *AddOrganizationMemberUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberUnauthorized", 401)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberUnauthorized ", 401)
 }
 
 func (o *AddOrganizationMemberUnauthorized) String() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberUnauthorized", 401)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberUnauthorized ", 401)
 }
 
 func (o *AddOrganizationMemberUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *AddOrganizationMemberNotFound) Code() int {
 }
 
 func (o *AddOrganizationMemberNotFound) Error() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound", 404)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound ", 404)
 }
 
 func (o *AddOrganizationMemberNotFound) String() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound", 404)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberNotFound ", 404)
 }
 
 func (o *AddOrganizationMemberNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *AddOrganizationMemberInternalServerError) Code() int {
 }
 
 func (o *AddOrganizationMemberInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberInternalServerError", 500)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberInternalServerError ", 500)
 }
 
 func (o *AddOrganizationMemberInternalServerError) String() string {
-	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberInternalServerError", 500)
+	return fmt.Sprintf("[POST /organization/add][%d] addOrganizationMemberInternalServerError ", 500)
 }
 
 func (o *AddOrganizationMemberInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

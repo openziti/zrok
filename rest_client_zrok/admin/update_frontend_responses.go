@@ -95,11 +95,11 @@ func (o *UpdateFrontendOK) Code() int {
 }
 
 func (o *UpdateFrontendOK) Error() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendOK", 200)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendOK ", 200)
 }
 
 func (o *UpdateFrontendOK) String() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendOK", 200)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendOK ", 200)
 }
 
 func (o *UpdateFrontendOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *UpdateFrontendUnauthorized) Code() int {
 }
 
 func (o *UpdateFrontendUnauthorized) Error() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendUnauthorized", 401)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendUnauthorized ", 401)
 }
 
 func (o *UpdateFrontendUnauthorized) String() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendUnauthorized", 401)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendUnauthorized ", 401)
 }
 
 func (o *UpdateFrontendUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *UpdateFrontendNotFound) Code() int {
 }
 
 func (o *UpdateFrontendNotFound) Error() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendNotFound", 404)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendNotFound ", 404)
 }
 
 func (o *UpdateFrontendNotFound) String() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendNotFound", 404)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendNotFound ", 404)
 }
 
 func (o *UpdateFrontendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *UpdateFrontendInternalServerError) Code() int {
 }
 
 func (o *UpdateFrontendInternalServerError) Error() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendInternalServerError", 500)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendInternalServerError ", 500)
 }
 
 func (o *UpdateFrontendInternalServerError) String() string {
-	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendInternalServerError", 500)
+	return fmt.Sprintf("[PATCH /frontend][%d] updateFrontendInternalServerError ", 500)
 }
 
 func (o *UpdateFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

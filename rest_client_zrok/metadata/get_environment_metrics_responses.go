@@ -6,7 +6,6 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -98,13 +97,11 @@ func (o *GetEnvironmentMetricsOK) Code() int {
 }
 
 func (o *GetEnvironmentMetricsOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsOK %s", 200, payload)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetEnvironmentMetricsOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsOK %s", 200, payload)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetEnvironmentMetricsOK) GetPayload() *rest_model_zrok.Metrics {
@@ -167,11 +164,11 @@ func (o *GetEnvironmentMetricsBadRequest) Code() int {
 }
 
 func (o *GetEnvironmentMetricsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest", 400)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest ", 400)
 }
 
 func (o *GetEnvironmentMetricsBadRequest) String() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest", 400)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsBadRequest ", 400)
 }
 
 func (o *GetEnvironmentMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -223,11 +220,11 @@ func (o *GetEnvironmentMetricsUnauthorized) Code() int {
 }
 
 func (o *GetEnvironmentMetricsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsUnauthorized", 401)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsUnauthorized ", 401)
 }
 
 func (o *GetEnvironmentMetricsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsUnauthorized", 401)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsUnauthorized ", 401)
 }
 
 func (o *GetEnvironmentMetricsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -279,11 +276,11 @@ func (o *GetEnvironmentMetricsInternalServerError) Code() int {
 }
 
 func (o *GetEnvironmentMetricsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError", 500)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError ", 500)
 }
 
 func (o *GetEnvironmentMetricsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError", 500)
+	return fmt.Sprintf("[GET /metrics/environment/{envId}][%d] getEnvironmentMetricsInternalServerError ", 500)
 }
 
 func (o *GetEnvironmentMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

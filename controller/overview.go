@@ -36,12 +36,19 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
+		remoteAgent, err := str.IsAgentEnrolledForEnvironment(env.Id, trx)
+		if err != nil {
+			logrus.Errorf("error checking agent enrollment for environment '%v' (%v): %v", env.ZId, principal.Email, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+
 		ear := &rest_model_zrok.EnvironmentAndResources{
 			Environment: &rest_model_zrok.Environment{
 				Address:     env.Address,
 				Description: env.Description,
 				Host:        env.Host,
 				ZID:         env.ZId,
+				RemoteAgent: remoteAgent,
 				Limited:     accountLimited,
 				CreatedAt:   env.CreatedAt.UnixMilli(),
 				UpdatedAt:   env.UpdatedAt.UnixMilli(),

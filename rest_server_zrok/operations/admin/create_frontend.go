@@ -82,7 +82,7 @@ func (o *CreateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 type CreateFrontendBody struct {
 
 	// permission mode
-	// Enum: ["open","closed"]
+	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name

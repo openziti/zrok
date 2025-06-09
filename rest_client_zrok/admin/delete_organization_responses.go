@@ -95,11 +95,11 @@ func (o *DeleteOrganizationOK) Code() int {
 }
 
 func (o *DeleteOrganizationOK) Error() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationOK", 200)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationOK ", 200)
 }
 
 func (o *DeleteOrganizationOK) String() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationOK", 200)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationOK ", 200)
 }
 
 func (o *DeleteOrganizationOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *DeleteOrganizationUnauthorized) Code() int {
 }
 
 func (o *DeleteOrganizationUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationUnauthorized ", 401)
 }
 
 func (o *DeleteOrganizationUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationUnauthorized", 401)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationUnauthorized ", 401)
 }
 
 func (o *DeleteOrganizationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *DeleteOrganizationNotFound) Code() int {
 }
 
 func (o *DeleteOrganizationNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound", 404)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound ", 404)
 }
 
 func (o *DeleteOrganizationNotFound) String() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound", 404)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationNotFound ", 404)
 }
 
 func (o *DeleteOrganizationNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *DeleteOrganizationInternalServerError) Code() int {
 }
 
 func (o *DeleteOrganizationInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationInternalServerError", 500)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationInternalServerError ", 500)
 }
 
 func (o *DeleteOrganizationInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationInternalServerError", 500)
+	return fmt.Sprintf("[DELETE /organization][%d] deleteOrganizationInternalServerError ", 500)
 }
 
 func (o *DeleteOrganizationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

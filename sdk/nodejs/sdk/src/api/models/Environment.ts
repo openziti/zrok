@@ -53,6 +53,12 @@ export interface Environment {
     zId?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof Environment
+     */
+    remoteAgent?: boolean;
+    /**
+     * 
      * @type {Array<SparkDataSample>}
      * @memberof Environment
      */
@@ -98,6 +104,7 @@ export function EnvironmentFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'host': json['host'] == null ? undefined : json['host'],
         'address': json['address'] == null ? undefined : json['address'],
         'zId': json['zId'] == null ? undefined : json['zId'],
+        'remoteAgent': json['remoteAgent'] == null ? undefined : json['remoteAgent'],
         'activity': json['activity'] == null ? undefined : ((json['activity'] as Array<any>).map(SparkDataSampleFromJSON)),
         'limited': json['limited'] == null ? undefined : json['limited'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
@@ -120,6 +127,7 @@ export function EnvironmentToJSONTyped(value?: Environment | null, ignoreDiscrim
         'host': value['host'],
         'address': value['address'],
         'zId': value['zId'],
+        'remoteAgent': value['remoteAgent'],
         'activity': value['activity'] == null ? undefined : ((value['activity'] as Array<any>).map(SparkDataSampleToJSON)),
         'limited': value['limited'],
         'createdAt': value['createdAt'],

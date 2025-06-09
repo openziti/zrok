@@ -89,11 +89,11 @@ func (o *ResetPasswordRequestCreated) Code() int {
 }
 
 func (o *ResetPasswordRequestCreated) Error() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestCreated", 201)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestCreated ", 201)
 }
 
 func (o *ResetPasswordRequestCreated) String() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestCreated", 201)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestCreated ", 201)
 }
 
 func (o *ResetPasswordRequestCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -145,11 +145,11 @@ func (o *ResetPasswordRequestBadRequest) Code() int {
 }
 
 func (o *ResetPasswordRequestBadRequest) Error() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestBadRequest", 400)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestBadRequest ", 400)
 }
 
 func (o *ResetPasswordRequestBadRequest) String() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestBadRequest", 400)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestBadRequest ", 400)
 }
 
 func (o *ResetPasswordRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -201,11 +201,11 @@ func (o *ResetPasswordRequestInternalServerError) Code() int {
 }
 
 func (o *ResetPasswordRequestInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestInternalServerError", 500)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestInternalServerError ", 500)
 }
 
 func (o *ResetPasswordRequestInternalServerError) String() string {
-	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestInternalServerError", 500)
+	return fmt.Sprintf("[POST /resetPasswordRequest][%d] resetPasswordRequestInternalServerError ", 500)
 }
 
 func (o *ResetPasswordRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

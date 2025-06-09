@@ -95,11 +95,11 @@ func (o *InviteTokenGenerateCreated) Code() int {
 }
 
 func (o *InviteTokenGenerateCreated) Error() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateCreated", 201)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateCreated ", 201)
 }
 
 func (o *InviteTokenGenerateCreated) String() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateCreated", 201)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateCreated ", 201)
 }
 
 func (o *InviteTokenGenerateCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *InviteTokenGenerateBadRequest) Code() int {
 }
 
 func (o *InviteTokenGenerateBadRequest) Error() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateBadRequest", 400)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateBadRequest ", 400)
 }
 
 func (o *InviteTokenGenerateBadRequest) String() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateBadRequest", 400)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateBadRequest ", 400)
 }
 
 func (o *InviteTokenGenerateBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *InviteTokenGenerateUnauthorized) Code() int {
 }
 
 func (o *InviteTokenGenerateUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateUnauthorized", 401)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateUnauthorized ", 401)
 }
 
 func (o *InviteTokenGenerateUnauthorized) String() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateUnauthorized", 401)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateUnauthorized ", 401)
 }
 
 func (o *InviteTokenGenerateUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *InviteTokenGenerateInternalServerError) Code() int {
 }
 
 func (o *InviteTokenGenerateInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateInternalServerError", 500)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateInternalServerError ", 500)
 }
 
 func (o *InviteTokenGenerateInternalServerError) String() string {
-	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateInternalServerError", 500)
+	return fmt.Sprintf("[POST /invite/token/generate][%d] inviteTokenGenerateInternalServerError ", 500)
 }
 
 func (o *InviteTokenGenerateInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -31,7 +31,7 @@ type ShareRequest struct {
 	AuthUsers []*AuthUser `json:"authUsers"`
 
 	// backend mode
-	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks","vpn"]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks vpn]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// backend proxy endpoint
@@ -50,18 +50,18 @@ type ShareRequest struct {
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
 
 	// oauth provider
-	// Enum: ["github","google"]
+	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
 	// permission mode
-	// Enum: ["open","closed"]
+	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// reserved
 	Reserved bool `json:"reserved,omitempty"`
 
 	// share mode
-	// Enum: ["public","private"]
+	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// unique name

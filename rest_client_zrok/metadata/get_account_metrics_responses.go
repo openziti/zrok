@@ -6,7 +6,6 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -92,13 +91,11 @@ func (o *GetAccountMetricsOK) Code() int {
 }
 
 func (o *GetAccountMetricsOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK %s", 200, payload)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetAccountMetricsOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK %s", 200, payload)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetAccountMetricsOK) GetPayload() *rest_model_zrok.Metrics {
@@ -161,11 +158,11 @@ func (o *GetAccountMetricsBadRequest) Code() int {
 }
 
 func (o *GetAccountMetricsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest", 400)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest ", 400)
 }
 
 func (o *GetAccountMetricsBadRequest) String() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest", 400)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest ", 400)
 }
 
 func (o *GetAccountMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -217,11 +214,11 @@ func (o *GetAccountMetricsInternalServerError) Code() int {
 }
 
 func (o *GetAccountMetricsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError", 500)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError ", 500)
 }
 
 func (o *GetAccountMetricsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError", 500)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError ", 500)
 }
 
 func (o *GetAccountMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

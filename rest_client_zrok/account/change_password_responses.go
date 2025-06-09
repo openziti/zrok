@@ -7,7 +7,6 @@ package account
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -105,11 +104,11 @@ func (o *ChangePasswordOK) Code() int {
 }
 
 func (o *ChangePasswordOK) Error() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordOK", 200)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordOK ", 200)
 }
 
 func (o *ChangePasswordOK) String() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordOK", 200)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordOK ", 200)
 }
 
 func (o *ChangePasswordOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -161,11 +160,11 @@ func (o *ChangePasswordBadRequest) Code() int {
 }
 
 func (o *ChangePasswordBadRequest) Error() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordBadRequest", 400)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordBadRequest ", 400)
 }
 
 func (o *ChangePasswordBadRequest) String() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordBadRequest", 400)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordBadRequest ", 400)
 }
 
 func (o *ChangePasswordBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -217,11 +216,11 @@ func (o *ChangePasswordUnauthorized) Code() int {
 }
 
 func (o *ChangePasswordUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnauthorized", 401)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnauthorized ", 401)
 }
 
 func (o *ChangePasswordUnauthorized) String() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnauthorized", 401)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnauthorized ", 401)
 }
 
 func (o *ChangePasswordUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -274,13 +273,11 @@ func (o *ChangePasswordUnprocessableEntity) Code() int {
 }
 
 func (o *ChangePasswordUnprocessableEntity) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnprocessableEntity %s", 422, payload)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnprocessableEntity  %+v", 422, o.Payload)
 }
 
 func (o *ChangePasswordUnprocessableEntity) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnprocessableEntity %s", 422, payload)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordUnprocessableEntity  %+v", 422, o.Payload)
 }
 
 func (o *ChangePasswordUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMessage {
@@ -341,11 +338,11 @@ func (o *ChangePasswordInternalServerError) Code() int {
 }
 
 func (o *ChangePasswordInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordInternalServerError", 500)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordInternalServerError ", 500)
 }
 
 func (o *ChangePasswordInternalServerError) String() string {
-	return fmt.Sprintf("[POST /changePassword][%d] changePasswordInternalServerError", 500)
+	return fmt.Sprintf("[POST /changePassword][%d] changePasswordInternalServerError ", 500)
 }
 
 func (o *ChangePasswordInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

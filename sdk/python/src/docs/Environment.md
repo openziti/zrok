@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **host** | **str** |  | [optional] 
 **address** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
+**remote_agent** | **bool** |  | [optional] 
 **activity** | [**List[SparkDataSample]**](SparkDataSample.md) |  | [optional] 
 **limited** | **bool** |  | [optional] 
 **created_at** | **int** |  | [optional] 

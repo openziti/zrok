@@ -6,7 +6,6 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -98,13 +97,11 @@ func (o *GetFrontendDetailOK) Code() int {
 }
 
 func (o *GetFrontendDetailOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailOK %s", 200, payload)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailOK  %+v", 200, o.Payload)
 }
 
 func (o *GetFrontendDetailOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailOK %s", 200, payload)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailOK  %+v", 200, o.Payload)
 }
 
 func (o *GetFrontendDetailOK) GetPayload() *rest_model_zrok.Frontend {
@@ -167,11 +164,11 @@ func (o *GetFrontendDetailUnauthorized) Code() int {
 }
 
 func (o *GetFrontendDetailUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailUnauthorized", 401)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailUnauthorized ", 401)
 }
 
 func (o *GetFrontendDetailUnauthorized) String() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailUnauthorized", 401)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailUnauthorized ", 401)
 }
 
 func (o *GetFrontendDetailUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -223,11 +220,11 @@ func (o *GetFrontendDetailNotFound) Code() int {
 }
 
 func (o *GetFrontendDetailNotFound) Error() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailNotFound", 404)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailNotFound ", 404)
 }
 
 func (o *GetFrontendDetailNotFound) String() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailNotFound", 404)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailNotFound ", 404)
 }
 
 func (o *GetFrontendDetailNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -279,11 +276,11 @@ func (o *GetFrontendDetailInternalServerError) Code() int {
 }
 
 func (o *GetFrontendDetailInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailInternalServerError", 500)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailInternalServerError ", 500)
 }
 
 func (o *GetFrontendDetailInternalServerError) String() string {
-	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailInternalServerError", 500)
+	return fmt.Sprintf("[GET /detail/frontend/{frontendId}][%d] getFrontendDetailInternalServerError ", 500)
 }
 
 func (o *GetFrontendDetailInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

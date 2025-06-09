@@ -7,7 +7,6 @@ package agent
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 
@@ -100,13 +99,11 @@ func (o *RemoteAccessOK) Code() int {
 }
 
 func (o *RemoteAccessOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK  %+v", 200, o.Payload)
 }
 
 func (o *RemoteAccessOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK %s", 200, payload)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK  %+v", 200, o.Payload)
 }
 
 func (o *RemoteAccessOK) GetPayload() *RemoteAccessOKBody {
@@ -169,11 +166,11 @@ func (o *RemoteAccessUnauthorized) Code() int {
 }
 
 func (o *RemoteAccessUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized ", 401)
 }
 
 func (o *RemoteAccessUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized", 401)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized ", 401)
 }
 
 func (o *RemoteAccessUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -225,11 +222,11 @@ func (o *RemoteAccessInternalServerError) Code() int {
 }
 
 func (o *RemoteAccessInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError ", 500)
 }
 
 func (o *RemoteAccessInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError", 500)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError ", 500)
 }
 
 func (o *RemoteAccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -281,11 +278,11 @@ func (o *RemoteAccessBadGateway) Code() int {
 }
 
 func (o *RemoteAccessBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway ", 502)
 }
 
 func (o *RemoteAccessBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway", 502)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway ", 502)
 }
 
 func (o *RemoteAccessBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

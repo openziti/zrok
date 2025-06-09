@@ -7,7 +7,6 @@ package metadata
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -96,13 +95,11 @@ func (o *GetSparklinesOK) Code() int {
 }
 
 func (o *GetSparklinesOK) Error() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesOK %s", 200, payload)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesOK  %+v", 200, o.Payload)
 }
 
 func (o *GetSparklinesOK) String() string {
-	payload, _ := json.Marshal(o.Payload)
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesOK %s", 200, payload)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesOK  %+v", 200, o.Payload)
 }
 
 func (o *GetSparklinesOK) GetPayload() *GetSparklinesOKBody {
@@ -165,11 +162,11 @@ func (o *GetSparklinesUnauthorized) Code() int {
 }
 
 func (o *GetSparklinesUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesUnauthorized", 401)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesUnauthorized ", 401)
 }
 
 func (o *GetSparklinesUnauthorized) String() string {
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesUnauthorized", 401)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesUnauthorized ", 401)
 }
 
 func (o *GetSparklinesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -221,11 +218,11 @@ func (o *GetSparklinesInternalServerError) Code() int {
 }
 
 func (o *GetSparklinesInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesInternalServerError", 500)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesInternalServerError ", 500)
 }
 
 func (o *GetSparklinesInternalServerError) String() string {
-	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesInternalServerError", 500)
+	return fmt.Sprintf("[POST /sparklines][%d] getSparklinesInternalServerError ", 500)
 }
 
 func (o *GetSparklinesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

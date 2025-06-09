@@ -85,7 +85,7 @@ type RemoteShareBody struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// backend mode
-	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks","vpn"]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks vpn]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth
@@ -113,7 +113,7 @@ type RemoteShareBody struct {
 	Open bool `json:"open,omitempty"`
 
 	// share mode
-	// Enum: ["public","private","reserved"]
+	// Enum: [public private reserved]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
