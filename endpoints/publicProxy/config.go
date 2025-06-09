@@ -12,7 +12,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const V = 3
+const V = 4
 
 type Config struct {
 	V            int
