@@ -4,6 +4,13 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
@@ -17,12 +24,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type HttpFrontend struct {
@@ -435,7 +436,19 @@ func basicAuthRequired(w http.ResponseWriter, realm string) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targethost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	targetHost := r.Host
+	if targetHost == "" {
+		logrus.Error("request host is empty")
+		http.Error(w, "Invalid request host", http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("%s/oauth/%s/login?targethost=%s&checkInterval=%s",
+		cfg.RedirectUrl,
+		provider,
+		url.QueryEscape(targetHost),
+		authCheckInterval.String()),
+		http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {
