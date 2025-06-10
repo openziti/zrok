@@ -99,7 +99,6 @@ func (p *OIDCProvider) setupHandlers(cfg *OauthConfig, key []byte, tls bool) {
 				return
 			}
 
-			// Clean up the host value
 			host = strings.TrimSpace(host)
 			if host == "" {
 				logrus.Error("target host is empty")
@@ -108,13 +107,11 @@ func (p *OIDCProvider) setupHandlers(cfg *OauthConfig, key []byte, tls bool) {
 				return
 			}
 
-			// Remove any scheme, path, or query parameters
 			if strings.Contains(host, "://") {
 				if parsedURL, err := url.Parse(host); err == nil && parsedURL.Host != "" {
 					host = parsedURL.Host
 				}
 			}
-			// If there's still a path component, take only the first part
 			host = strings.Split(host, "/")[0]
 
 			if host == "" {
