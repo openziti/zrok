@@ -8,7 +8,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	zhttp "github.com/zitadel/oidc/v2/pkg/http"
+	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 	"golang.org/x/oauth2"
 )
 
