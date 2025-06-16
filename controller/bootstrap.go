@@ -51,6 +51,10 @@ func Bootstrap(bootCfg *BootstrapConfig, ctrlCfg *config.Config) error {
 		return err
 	}
 
+	if err := assertSecretsListener(bootCfg, ctrlCfg, env, edge); err != nil {
+		return err
+	}
+
 	if err := assertZrokProxyConfigType(edge); err != nil {
 		return err
 	}
@@ -98,6 +102,45 @@ func assertFrontendIdentity(cfg *BootstrapConfig, env env_core.Root, edge *rest_
 		}
 	} else {
 		logrus.Warnf("skipping frontend identity bootstrap")
+	}
+	return nil
+}
+
+func assertSecretsListener(bCfg *BootstrapConfig, ctrlCfg *config.Config, env env_core.Root, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	if !bCfg.SkipSecretsListener || ctrlCfg == nil || ctrlCfg.Secrets == nil {
+		logrus.Info("bootstrapping secrets listener")
+
+		if ctrlCfg.Secrets.ServiceName == "" {
+			return errors.New("no secrets service name provided")
+		}
+
+		var secretsZId string
+		var err error
+		if ctrlCfg.Secrets.IdentityPath == "" || ctrlCfg.Secrets.ZId == "" {
+			logrus.Warnf("no secrets identity path or ziti id provided; allocating a new identity")
+
+			secretsZId, err = bootstrapIdentity("secrets", edge)
+			if err != nil {
+				return errors.Wrap(err, "error bootstrapping secrets identity")
+			}
+			logrus.Infof("created secrets identity '%v' (configure this into the 'secrets > z_id' field in the controller config)", secretsZId)
+
+		} else {
+			logrus.Infof("asserting existing secrets identity '%v'", ctrlCfg.Secrets.ZId)
+
+			if err := assertIdentity(ctrlCfg.Secrets.ZId, edge); err != nil {
+				return errors.Wrapf(err, "error asserting existing secrets identity '%v'", ctrlCfg.Secrets.ZId)
+			}
+			secretsZId = ctrlCfg.Secrets.ZId
+			logrus.Infof("asserted secrets identity '%v'", ctrlCfg.Secrets.ZId)
+		}
+
+		if err := assertErpForIdentity("secrets", secretsZId, edge); err != nil {
+			return errors.Wrapf(err, "error asserting erp for secrets identity (secrets) '%v'", secretsZId)
+		}
+
+	} else {
+		logrus.Warnf("skipping secrets listener bootstrap")
 	}
 	return nil
 }
