@@ -30,6 +30,7 @@ func startSecretsListener(cfg *config.Config) {
 
 		srv := grpc.NewServer()
 		secretsGrpc.RegisterSecretsServer(srv, &secretsGrpcImpl{})
+		logrus.Infof("starting secrets listener")
 		if err := srv.Serve(l); err != nil {
 			logrus.Errorf("error serving '%v': %v", cfg.Secrets.ServiceName, err)
 			return
