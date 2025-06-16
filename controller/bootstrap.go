@@ -11,6 +11,9 @@ import (
 	restMgmtEdgeConfig "github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/identity"
+	"github.com/openziti/edge-api/rest_management_api_client/service"
+	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
+	"github.com/openziti/edge-api/rest_model"
 	restModelEdge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/edge-api/rest_util"
 	"github.com/openziti/sdk-golang/ziti"
@@ -119,7 +122,7 @@ func assertSecretsListener(bCfg *BootstrapConfig, ctrlCfg *config.Config, env en
 		if ctrlCfg.Secrets.IdentityPath == "" || ctrlCfg.Secrets.ZId == "" {
 			logrus.Warnf("no secrets identity path or ziti id provided; allocating a new identity")
 
-			secretsZId, err = bootstrapIdentity("secrets", edge)
+			secretsZId, err = bootstrapIdentity("secretsListener", edge)
 			if err != nil {
 				return errors.Wrap(err, "error bootstrapping secrets identity")
 			}
@@ -135,8 +138,16 @@ func assertSecretsListener(bCfg *BootstrapConfig, ctrlCfg *config.Config, env en
 			logrus.Infof("asserted secrets identity '%v'", ctrlCfg.Secrets.ZId)
 		}
 
-		if err := assertErpForIdentity("secrets", secretsZId, edge); err != nil {
+		if err := assertErpForIdentity("secretsListener", secretsZId, edge); err != nil {
 			return errors.Wrapf(err, "error asserting erp for secrets identity (secrets) '%v'", secretsZId)
+		}
+
+		if err := assertSecretsService(ctrlCfg, edge); err != nil {
+			return errors.Wrapf(err, "error asserting secrets service '%v'", ctrlCfg.Secrets.ServiceName)
+		}
+
+		if err := assertBindPolicyForIdentityAndService(ctrlCfg.Secrets.ServiceName, secretsZId, edge); err != nil {
+			return errors.Wrapf(err, "error asserting bind policy for '@%v' -> '@%v'", ctrlCfg.Secrets.ServiceName, secretsZId)
 		}
 
 	} else {
@@ -278,4 +289,96 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 	}
 	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
 	return nil
+}
+
+func assertSecretsService(ctrlCfg *config.Config, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	filter := fmt.Sprintf("name=\"%v\"", ctrlCfg.Secrets.ServiceName)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service.ListServicesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Service.ListServices(listReq, nil)
+	if err != nil {
+		return errors.Wrapf(err, "error listing services for '%v'", ctrlCfg.Secrets.ServiceName)
+	}
+	if len(listResp.Payload.Data) == 1 {
+		logrus.Infof("found service '%v' with zId '%v'", ctrlCfg.Secrets.ServiceName, listResp.Payload.Data[0].ID)
+
+	} else if len(listResp.Payload.Data) < 1 {
+		serviceZId, err := zrokEdgeSdk.CreateService(ctrlCfg.Secrets.ServiceName, nil, nil, edge)
+		if err != nil {
+			return errors.Wrapf(err, "error creating service '%v'", ctrlCfg.Secrets.ServiceName)
+		}
+		logrus.Infof("created service '%v' with zId '%v'", ctrlCfg.Secrets.ServiceName, serviceZId)
+
+	} else if len(listResp.Payload.Data) > 1 {
+		return errors.Errorf("found %d services for '%v'", len(listResp.Payload.Data), ctrlCfg.Secrets.ServiceName)
+	}
+	return nil
+}
+
+func assertBindPolicyForIdentityAndService(serviceName, zId string, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	serviceZId, err := getZIdForService(serviceName, edge)
+	if err != nil {
+		return errors.Wrapf(err, "error getting ziti id for service '%v'", serviceName)
+	}
+	spZId, err := getZIdForServicePolicy(serviceZId, zId, rest_model.DialBindBind, edge)
+	if err != nil {
+		logrus.Warnf("no existing bind policy for '@%v' -> '@%v'; creating one", zId, serviceName)
+		if err := zrokEdgeSdk.CreateServicePolicyBind(fmt.Sprintf("service-listener-bind-%v", zId), serviceZId, zId, nil, edge); err != nil {
+			return errors.Wrapf(err, "error creating bind policy for '%v' -> '%v'", zId, serviceName)
+		}
+		logrus.Infof("created bind policy for '@%v' -> '@%v' with zId '%v'", zId, serviceName, spZId)
+	} else {
+		logrus.Infof("found existing bind policy for '@%v' -> '@%v' with zId '%v'", zId, serviceName, spZId)
+	}
+	return nil
+}
+
+func getZIdForServicePolicy(serviceZId, zId string, dialBind rest_model.DialBind, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+	dialBindValue := 1
+	if dialBind == "Bind" {
+		dialBindValue = 2
+	}
+	filter := fmt.Sprintf("allOf(serviceRoles)=\"@%v\" and allOf(identityRoles)=\"@%v\" and type=%d", serviceZId, zId, dialBindValue)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service_policy.ListServicePoliciesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.ServicePolicy.ListServicePolicies(listReq, nil)
+	if err != nil {
+		return "", errors.Wrapf(err, "error listing service policies for '%v' (%v) and '%v'", serviceZId, zId, dialBind)
+	}
+	if len(listResp.Payload.Data) != 1 {
+		return "", errors.Errorf("found %d service policies for '%v' (%v) and '%v'", len(listResp.Payload.Data), serviceZId, zId, dialBind)
+	}
+	return *listResp.Payload.Data[0].ID, nil
+}
+
+func getZIdForService(serviceName string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
+	filter := fmt.Sprintf("name=\"%v\"", serviceName)
+	limit := int64(0)
+	offset := int64(0)
+	listReq := &service.ListServicesParams{
+		Filter: &filter,
+		Limit:  &limit,
+		Offset: &offset,
+	}
+	listReq.SetTimeout(30 * time.Second)
+	listResp, err := edge.Service.ListServices(listReq, nil)
+	if err != nil {
+		return "", errors.Wrapf(err, "error listing services for '%v'", serviceName)
+	}
+	if len(listResp.Payload.Data) != 1 {
+		return "", errors.Errorf("found %d services for '%v'", len(listResp.Payload.Data), serviceName)
+	}
+	return *listResp.Payload.Data[0].ID, nil
 }
