@@ -136,7 +136,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if !cmd.headless && prg != nil {
-		prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
+		prg.Send("the zrok environment was successfully enabled...")
 		prg.Quit()
 	} else {
 		logrus.Infof("the zrok environment was successfully enabled...")

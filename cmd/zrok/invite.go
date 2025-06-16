@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,8 +14,6 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 func init() {
@@ -87,7 +88,7 @@ func (cmd *inviteCommand) run(_ *cobra.Command, _ []string) {
 		}
 
 		fmt.Printf("invitation sent to '%v'!\n\n", email)
-		fmt.Println(fmt.Sprintf("%v\n", tui.Attention.Render("*** be sure to check your SPAM folder if you do not receive the invitation email!")))
+		fmt.Printf("%v\n", tui.Attention.Render("*** be sure to check your SPAM folder if you do not receive the invitation email!"))
 	}
 }
 
@@ -104,7 +105,6 @@ type inviteTui struct {
 	msg                string
 	emailInputs        []textinput.Model
 	tokenInput         textinput.Model
-	cursorMode         textinput.CursorMode
 	done               bool
 	invitesOpen        bool
 	requireInviteToken bool

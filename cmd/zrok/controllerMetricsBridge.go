@@ -1,16 +1,17 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -47,7 +48,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
