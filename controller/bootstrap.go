@@ -60,11 +60,12 @@ func Bootstrap(bootCfg *BootstrapConfig, ctrlCfg *config.Config) error {
 
 func assertFrontendIdentity(cfg *BootstrapConfig, env env_core.Root, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var frontendZId string
+	var err error
 	if !cfg.SkipFrontend {
-		logrus.Info("creating identity for public frontend access")
+		logrus.Info("bootstrapping identity for public frontend access")
 
-		if frontendZId, err := getIdentityId(env.PublicIdentityName()); err == nil {
-			logrus.Infof("frontend identity: %v", frontendZId)
+		if frontendZId, err = getIdentityId(env.PublicIdentityName()); err == nil {
+			logrus.Infof("existing frontend identity: %v", frontendZId)
 		} else {
 			frontendZId, err = bootstrapIdentity(env.PublicIdentityName(), edge)
 			if err != nil {
@@ -79,13 +80,14 @@ func assertFrontendIdentity(cfg *BootstrapConfig, env env_core.Root, edge *rest_
 			panic(err)
 		}
 
-		tx, err := str.Begin()
+		trx, err := str.Begin()
 		if err != nil {
 			panic(err)
 		}
-		defer func() { _ = tx.Rollback() }()
-		publicFe, err := str.FindFrontendWithZId(frontendZId, tx)
+		defer trx.Rollback()
+		publicFe, err := str.FindFrontendWithZId(frontendZId, trx)
 		if err != nil {
+			logrus.Error(err)
 			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{token}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
 		} else {
 			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
