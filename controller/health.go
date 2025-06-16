@@ -3,8 +3,9 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 func HealthCheckHTTP(w http.ResponseWriter, _ *http.Request) {
@@ -42,7 +43,7 @@ func healthCheckMetrics(w http.ResponseWriter) error {
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		queryApi := idb.QueryAPI(cfg.Metrics.Influx.Org)
 		query := fmt.Sprintf("from(bucket: \"%v\")\n", cfg.Metrics.Influx.Bucket) +
-			fmt.Sprintf("|> range(start: -5s)\n") +
+			"|> range(start: -5s)\n" +
 			"|> filter(fn: (r) => r[\"_measurement\"] == \"xfer\")\n" +
 			"|> filter(fn: (r) => r[\"_field\"] == \"rx\" or r[\"_field\"] == \"tx\")\n" +
 			"|> filter(fn: (r) => r[\"namespace\"] == \"backend\")\n" +
