@@ -2,6 +2,10 @@ package controller
 
 import (
 	"context"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
+
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/jessevdk/go-flags"
@@ -15,9 +19,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"log"
-	"net/http"
-	_ "net/http/pprof"
 )
 
 var (
@@ -152,6 +153,8 @@ func Run(inCfg *config.Config) error {
 			go newMaintenanceResetPasswordAgent(ctx, cfg.Maintenance.ResetPassword).run()
 		}
 	}
+
+	go startSecretsListener(cfg)
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()
