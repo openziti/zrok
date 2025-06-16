@@ -1,4 +1,4 @@
--- migrate Up
+-- +migrate Up
 
 create table secrets (
     id                  integer                 primary key,
