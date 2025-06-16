@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/openziti/edge-api/rest_management_api_client"
 	restMgmtEdgeConfig "github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
@@ -16,23 +18,26 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
-	cfg = inCfg
+type BootstrapConfig struct {
+	SkipFrontend        bool
+	SkipSecretsListener bool
+}
 
-	if v, err := store.Open(cfg.Store); err == nil {
+func Bootstrap(bootCfg *BootstrapConfig, ctrlCfg *config.Config) error {
+	if v, err := store.Open(ctrlCfg.Store); err == nil {
 		str = v
 	} else {
 		return errors.Wrap(err, "error opening store")
 	}
 
 	logrus.Info("connecting to the ziti edge management api")
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	edge, err := zrokEdgeSdk.Client(ctrlCfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}
@@ -42,17 +47,30 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		return err
 	}
 
+	if err := assertFrontendIdentity(bootCfg, env, edge); err != nil {
+		return err
+	}
+
+	if err := assertZrokProxyConfigType(edge); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func assertFrontendIdentity(cfg *BootstrapConfig, env env_core.Root, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	var frontendZId string
-	if !skipFrontend {
+	if !cfg.SkipFrontend {
 		logrus.Info("creating identity for public frontend access")
 
-		if frontendZId, err = getIdentityId(env.PublicIdentityName()); err == nil {
+		if frontendZId, err := getIdentityId(env.PublicIdentityName()); err == nil {
 			logrus.Infof("frontend identity: %v", frontendZId)
 		} else {
 			frontendZId, err = bootstrapIdentity(env.PublicIdentityName(), edge)
 			if err != nil {
 				panic(err)
 			}
+			logrus.Infof("created frontend identity (%v) '%v'", env.PublicIdentityName(), frontendZId)
 		}
 		if err := assertIdentity(frontendZId, edge); err != nil {
 			panic(err)
@@ -76,12 +94,9 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 				logrus.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template", frontendZId)
 			}
 		}
+	} else {
+		logrus.Warnf("skipping frontend identity bootstrap")
 	}
-
-	if err := assertZrokProxyConfigType(edge); err != nil {
-		return err
-	}
-
 	return nil
 }
 

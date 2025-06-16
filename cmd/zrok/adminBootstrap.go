@@ -13,8 +13,9 @@ func init() {
 }
 
 type adminBootstrap struct {
-	cmd          *cobra.Command
-	skipFrontend bool
+	cmd                 *cobra.Command
+	skipFrontend        bool
+	skipSecretsListener bool
 }
 
 func newAdminBootstrap() *adminBootstrap {
@@ -26,6 +27,7 @@ func newAdminBootstrap() *adminBootstrap {
 	command := &adminBootstrap{cmd: cmd}
 	cmd.Run = command.run
 	cmd.Flags().BoolVar(&command.skipFrontend, "skip-frontend", false, "Skip frontend identity bootstrapping")
+	cmd.Flags().BoolVar(&command.skipSecretsListener, "skip-secrets-listener", false, "Skip secrets listener bootstrapping")
 	return command
 }
 
@@ -36,7 +38,11 @@ func (cmd *adminBootstrap) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	logrus.Info(cf.Dump(inCfg, cf.DefaultOptions()))
-	if err := controller.Bootstrap(cmd.skipFrontend, inCfg); err != nil {
+	bootCfg := &controller.BootstrapConfig{
+		SkipFrontend:        cmd.skipFrontend,
+		SkipSecretsListener: cmd.skipSecretsListener,
+	}
+	if err := controller.Bootstrap(bootCfg, inCfg); err != nil {
 		panic(err)
 	}
 	logrus.Info("bootstrap complete!")
