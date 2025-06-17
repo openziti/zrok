@@ -32,6 +32,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_add_secrets_access(self) -> None:
+        """Test case for add_secrets_access
+
+        """
+        pass
+
     def test_create_account(self) -> None:
         """Test case for create_account
 
@@ -64,6 +70,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_delete_organization(self) -> None:
         """Test case for delete_organization
+
+        """
+        pass
+
+    def test_delete_secrets_access(self) -> None:
+        """Test case for delete_secrets_access
 
         """
         pass

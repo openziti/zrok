@@ -3,6 +3,7 @@
 export * from './Access201Response';
 export * from './AccessRequest';
 export * from './AddOrganizationMemberRequest';
+export * from './AddSecretsAccessRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';
 export * from './ClientVersionCheckRequest';
