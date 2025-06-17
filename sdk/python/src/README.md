@@ -107,6 +107,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
 *AdminApi* | [**create_organization**](docs/AdminApi.md#create_organization) | **POST** /organization | 
 *AdminApi* | [**delete_frontend**](docs/AdminApi.md#delete_frontend) | **DELETE** /frontend | 
+*AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**delete_secrets_access**](docs/AdminApi.md#delete_secrets_access) | **DELETE** /secrets/access | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
