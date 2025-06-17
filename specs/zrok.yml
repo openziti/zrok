@@ -514,7 +514,7 @@ paths:
           in: body
           schema:
             properties:
-              name:
+              zId:
                 type: string
       responses: 
         200:
