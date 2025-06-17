@@ -23,6 +23,7 @@ import type {
   CreateIdentityRequest,
   CreateOrganization201Response,
   CreateOrganizationRequest,
+  DeleteIdentityRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
   ListOrganizationMembers200Response,
@@ -50,6 +51,8 @@ import {
     CreateOrganization201ResponseToJSON,
     CreateOrganizationRequestFromJSON,
     CreateOrganizationRequestToJSON,
+    DeleteIdentityRequestFromJSON,
+    DeleteIdentityRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
@@ -98,8 +101,8 @@ export interface DeleteFrontendRequest {
     body?: CreateFrontend201Response;
 }
 
-export interface DeleteIdentityRequest {
-    body?: CreateIdentityRequest;
+export interface DeleteIdentityOperationRequest {
+    body?: DeleteIdentityRequest;
 }
 
 export interface DeleteOrganizationRequest {
@@ -351,7 +354,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async deleteIdentityRaw(requestParameters: DeleteIdentityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteIdentityRaw(requestParameters: DeleteIdentityOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -367,7 +370,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateIdentityRequestToJSON(requestParameters['body']),
+            body: DeleteIdentityRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -375,7 +378,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async deleteIdentity(requestParameters: DeleteIdentityRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async deleteIdentity(requestParameters: DeleteIdentityOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteIdentityRaw(requestParameters, initOverrides);
     }
 

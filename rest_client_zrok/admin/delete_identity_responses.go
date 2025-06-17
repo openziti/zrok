@@ -281,8 +281,8 @@ swagger:model DeleteIdentityBody
 */
 type DeleteIdentityBody struct {
 
-	// name
-	Name string `json:"name,omitempty"`
+	// z Id
+	ZID string `json:"zId,omitempty"`
 }
 
 // Validate validates this delete identity body

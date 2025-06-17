@@ -13,6 +13,7 @@ export * from './CreateIdentity201Response';
 export * from './CreateIdentityRequest';
 export * from './CreateOrganization201Response';
 export * from './CreateOrganizationRequest';
+export * from './DeleteIdentityRequest';
 export * from './DisableRequest';
 export * from './EnableRequest';
 export * from './Enroll200Response';

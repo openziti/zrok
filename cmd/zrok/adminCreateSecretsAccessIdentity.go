@@ -21,7 +21,7 @@ type adminCreateSecretsAccessIdentityCommand struct {
 
 func newAdminCreateSecretsIdentityCommand() *adminCreateSecretsAccessIdentityCommand {
 	cmd := &cobra.Command{
-		Use:     "secrets-access-identity <name>",
+		Use:     "secrets-access-identity <secretsAccessIdentityName>",
 		Aliases: []string{"sai"},
 		Short:   "Create a secrets access identity for accessing the secrets listener",
 		Args:    cobra.ExactArgs(1),
@@ -32,18 +32,18 @@ func newAdminCreateSecretsIdentityCommand() *adminCreateSecretsAccessIdentityCom
 }
 
 func (cmd *adminCreateSecretsAccessIdentityCommand) run(_ *cobra.Command, args []string) {
-	name := args[0]
+	secretsAccessIdentityName := args[0]
 
 	env, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
-	zif, err := env.ZitiIdentityNamed(name)
+	zif, err := env.ZitiIdentityNamed(secretsAccessIdentityName)
 	if err != nil {
 		panic(err)
 	}
 	if _, err := os.Stat(zif); err == nil {
-		logrus.Errorf("identity '%v' already exists at '%v'", name, zif)
+		logrus.Errorf("identity '%v' already exists at '%v'", secretsAccessIdentityName, zif)
 		os.Exit(1)
 	}
 
@@ -52,11 +52,11 @@ func (cmd *adminCreateSecretsAccessIdentityCommand) run(_ *cobra.Command, args [
 		panic(err)
 	}
 
-	secretsAccessIdentityZId, err := cmd.createIdentity(name, env, zrok)
+	secretsAccessIdentityZId, err := cmd.createIdentity(secretsAccessIdentityName, env, zrok)
 	if err != nil {
 		panic(err)
 	}
-	logrus.Infof("created identity '%v' with ziti id '%v'", name, secretsAccessIdentityZId)
+	logrus.Infof("created identity '%v' with ziti id '%v'", secretsAccessIdentityName, secretsAccessIdentityZId)
 
 	if err := cmd.createDialPolicy(secretsAccessIdentityZId, zrok); err != nil {
 		panic(err)
