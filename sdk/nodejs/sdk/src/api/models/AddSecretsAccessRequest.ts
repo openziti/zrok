@@ -24,7 +24,7 @@ export interface AddSecretsAccessRequest {
      * @type {string}
      * @memberof AddSecretsAccessRequest
      */
-    secretsIdentityZId?: string;
+    secretsAccessIdentityZId?: string;
 }
 
 /**
@@ -44,7 +44,7 @@ export function AddSecretsAccessRequestFromJSONTyped(json: any, ignoreDiscrimina
     }
     return {
         
-        'secretsIdentityZId': json['secretsIdentityZId'] == null ? undefined : json['secretsIdentityZId'],
+        'secretsAccessIdentityZId': json['secretsAccessIdentityZId'] == null ? undefined : json['secretsAccessIdentityZId'],
     };
 }
 
@@ -59,7 +59,7 @@ export function AddSecretsAccessRequestToJSONTyped(value?: AddSecretsAccessReque
 
     return {
         
-        'secretsIdentityZId': value['secretsIdentityZId'],
+        'secretsAccessIdentityZId': value['secretsAccessIdentityZId'],
     };
 }
 

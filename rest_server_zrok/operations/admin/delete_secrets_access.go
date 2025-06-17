@@ -78,8 +78,8 @@ func (o *DeleteSecretsAccess) ServeHTTP(rw http.ResponseWriter, r *http.Request)
 // swagger:model DeleteSecretsAccessBody
 type DeleteSecretsAccessBody struct {
 
-	// secrets identity z Id
-	SecretsIdentityZID string `json:"secretsIdentityZId,omitempty"`
+	// secrets access identity z Id
+	SecretsAccessIdentityZID string `json:"secretsAccessIdentityZId,omitempty"`
 }
 
 // Validate validates this delete secrets access body

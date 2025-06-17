@@ -26,8 +26,8 @@ class AddSecretsAccessRequest(BaseModel):
     """
     AddSecretsAccessRequest
     """ # noqa: E501
-    secrets_identity_zid: Optional[StrictStr] = Field(default=None, alias="secretsIdentityZId")
-    __properties: ClassVar[List[str]] = ["secretsIdentityZId"]
+    secrets_access_identity_zid: Optional[StrictStr] = Field(default=None, alias="secretsAccessIdentityZId")
+    __properties: ClassVar[List[str]] = ["secretsAccessIdentityZId"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -80,7 +80,7 @@ class AddSecretsAccessRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "secretsIdentityZId": obj.get("secretsIdentityZId")
+            "secretsAccessIdentityZId": obj.get("secretsAccessIdentityZId")
         })
         return _obj
 

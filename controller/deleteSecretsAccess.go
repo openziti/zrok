@@ -20,7 +20,7 @@ func newDeleteSecretsAccessHandler() *deleteSecretsAccessHandler {
 }
 
 func (h *deleteSecretsAccessHandler) Handle(params admin.DeleteSecretsAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	secretsAccessIdentityZId := params.Body.SecretsIdentityZID
+	secretsAccessIdentityZId := params.Body.SecretsAccessIdentityZID
 
 	if !principal.Admin {
 		logrus.Errorf("invalid admin principal")

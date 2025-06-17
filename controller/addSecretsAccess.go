@@ -18,7 +18,7 @@ func newAddSecretsAccessHandler() *addSecretsAccessHandler {
 }
 
 func (h *addSecretsAccessHandler) Handle(params admin.AddSecretsAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	secretsAccessIdentityZId := params.Body.SecretsIdentityZID
+	secretsAccessIdentityZId := params.Body.SecretsAccessIdentityZID
 
 	if !principal.Admin {
 		logrus.Errorf("invalid admin principal")

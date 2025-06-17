@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**secrets_identity_zid** | **str** |  | [optional] 
+**secrets_access_identity_zid** | **str** |  | [optional] 
 
 ## Example
 

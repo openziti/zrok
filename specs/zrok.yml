@@ -625,7 +625,7 @@ paths:
           in: body
           schema:
             properties:
-              secretsIdentityZId:
+              secretsAccessIdentityZId:
                 type: string
       responses:
         200:
@@ -647,7 +647,7 @@ paths:
           in: body
           schema:
             properties:
-              secretsIdentityZId:
+              secretsAccessIdentityZId:
                 type: string
       responses:
         200:

@@ -2160,7 +2160,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "secretsIdentityZId": {
+                "secretsAccessIdentityZId": {
                   "type": "string"
                 }
               }
@@ -2198,7 +2198,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "secretsIdentityZId": {
+                "secretsAccessIdentityZId": {
                   "type": "string"
                 }
               }
@@ -4968,7 +4968,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "secretsIdentityZId": {
+                "secretsAccessIdentityZId": {
                   "type": "string"
                 }
               }
@@ -5006,7 +5006,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "secretsIdentityZId": {
+                "secretsAccessIdentityZId": {
                   "type": "string"
                 }
               }

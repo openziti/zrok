@@ -78,8 +78,8 @@ func (o *AddSecretsAccess) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model AddSecretsAccessBody
 type AddSecretsAccessBody struct {
 
-	// secrets identity z Id
-	SecretsIdentityZID string `json:"secretsIdentityZId,omitempty"`
+	// secrets access identity z Id
+	SecretsAccessIdentityZID string `json:"secretsAccessIdentityZId,omitempty"`
 }
 
 // Validate validates this add secrets access body

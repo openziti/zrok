@@ -35,7 +35,7 @@ class TestAddSecretsAccessRequest(unittest.TestCase):
         model = AddSecretsAccessRequest()
         if include_optional:
             return AddSecretsAccessRequest(
-                secrets_identity_zid = ''
+                secrets_access_identity_zid = ''
             )
         else:
             return AddSecretsAccessRequest(
