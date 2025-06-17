@@ -332,7 +332,7 @@ func assertBindPolicyForIdentityAndService(serviceName, zId string, edge *rest_m
 		if err := zrokEdgeSdk.CreateServicePolicyBind(fmt.Sprintf("service-listener-bind-%v", zId), serviceZId, zId, nil, edge); err != nil {
 			return errors.Wrapf(err, "error creating bind policy for '%v' -> '%v'", zId, serviceName)
 		}
-		logrus.Infof("created bind policy for '@%v' -> '@%v' with zId '%v'", zId, serviceName, spZId)
+		logrus.Infof("created bind policy for '@%v' -> '@%v'", zId, serviceName)
 	} else {
 		logrus.Infof("found existing bind policy for '@%v' -> '@%v' with zId '%v'", zId, serviceName, spZId)
 	}
