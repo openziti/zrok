@@ -3,6 +3,7 @@ package publicProxy
 import (
 	"context"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -189,8 +190,42 @@ func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Contex
 						}
 					}
 
-					if scheme, found := proxyConfig["auth_scheme"]; found {
-						switch scheme {
+					logrus.Infof("proxyConfig: %v", proxyConfig)
+
+					authSecrets := false
+					if v, found := proxyConfig["secrets_auth"]; found {
+						authSecrets = v.(bool)
+					}
+					var secrets map[string]string
+					if authSecrets {
+						secrets = make(map[string]string)
+						secretsArr, err := GetSecrets(shrToken, cfg)
+						if err != nil {
+							logrus.Infof("error getting secrets for '%v': %v", shrToken, err)
+							notFoundUi.WriteNotFound(w)
+							return
+						}
+						for _, secret := range secretsArr {
+							secrets[secret.Key] = secret.Value
+						}
+					}
+
+					authScheme := "none"
+					if secrets != nil {
+						if v, found := secrets["auth_scheme"]; found {
+							authScheme = v
+						}
+					} else {
+						if v, found := proxyConfig["auth_scheme"]; found {
+							authScheme = v.(string)
+						}
+					}
+
+					logrus.Infof("authScheme: %v", authScheme)
+					logrus.Infof("secrets: %v", secrets)
+
+					if authScheme != "none" {
+						switch authScheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
 							// ensure cookies from other shares are not sent to this share, in case it's malicious
@@ -206,32 +241,16 @@ func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Contex
 								return
 							}
 							authed := false
-							if v, found := proxyConfig["basic_auth"]; found {
-								if basicAuth, ok := v.(map[string]interface{}); ok {
-									if v, found := basicAuth["users"]; found {
-										if arr, ok := v.([]interface{}); ok {
-											for _, v := range arr {
-												if um, ok := v.(map[string]interface{}); ok {
-													username := ""
-													if v, found := um["username"]; found {
-														if un, ok := v.(string); ok {
-															username = un
-														}
-													}
-													password := ""
-													if v, found := um["password"]; found {
-														if pw, ok := v.(string); ok {
-															password = pw
-														}
-													}
-													if username == inUser && password == inPass {
-														authed = true
-														break
-													}
-												}
-											}
-										}
-									}
+							var authUsers map[string]string
+							if v, found := secrets["auth_users"]; found {
+								if err := json.Unmarshal([]byte(v), &authUsers); err != nil {
+									basicAuthRequired(w, shrToken)
+									return
+								}
+							}
+							if password, found := authUsers[inUser]; found {
+								if inPass == password {
+									authed = true
 								}
 							}
 
@@ -344,7 +363,7 @@ func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Contex
 								notFoundUi.WriteNotFound(w)
 							}
 						default:
-							logrus.Infof("invalid auth scheme '%v'", scheme)
+							logrus.Infof("invalid auth scheme '%v'", authScheme)
 							basicAuthRequired(w, shrToken)
 							return
 						}

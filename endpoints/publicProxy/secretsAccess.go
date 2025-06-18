@@ -7,6 +7,7 @@ import (
 
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/secretsGrpc"
+	"github.com/sirupsen/logrus"
 	"github.com/viccon/sturdyc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,8 +20,10 @@ type Secret struct {
 }
 
 func GetSecrets(shareToken string, cfg *Config) ([]Secret, error) {
+	logrus.Infof("getting secrets")
 	cacheClient := sturdyc.New[[]Secret](cfg.SecretsCache.Capacity, cfg.SecretsCache.Shards, cfg.SecretsCache.TTL, cfg.SecretsCache.EvictionPercentage)
 	fetch := func(ctx context.Context) ([]Secret, error) {
+		logrus.Infof("fetching '%v'", shareToken)
 		opts := []grpc.DialOption{
 			grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
 				zcfg, err := ziti.NewConfigFromFile(cfg.SecretsAccess.IdentityPath)
