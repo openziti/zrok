@@ -1,14 +1,16 @@
 package sdk
 
 import (
-	"github.com/pkg/errors"
 	"reflect"
+
+	"github.com/pkg/errors"
 )
 
 const ZrokProxyConfig = "zrok.proxy.v1"
 
 type FrontendConfig struct {
 	Interstitial bool             `json:"interstitial"`
+	AuthSecrets  bool             `json:"secrets_auth"` // v1.0.7+ delegates to secrets storage for auth config
 	AuthScheme   AuthScheme       `json:"auth_scheme"`
 	BasicAuth    *BasicAuthConfig `json:"basic_auth"`
 	OauthAuth    *OauthConfig     `json:"oauth"`
