@@ -12,16 +12,17 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const V = 4
+const V = 5
 
 type Config struct {
-	V            int
-	Identity     string
-	Address      string
-	HostMatch    string
-	Interstitial *InterstitialConfig
-	Oauth        *OauthConfig
-	Tls          *endpoints.TlsConfig
+	V             int
+	Identity      string
+	Address       string
+	HostMatch     string
+	Interstitial  *InterstitialConfig
+	Oauth         *OauthConfig
+	SecretsAccess *SecretsAccessConfig
+	Tls           *endpoints.TlsConfig
 }
 
 type InterstitialConfig struct {
@@ -48,6 +49,12 @@ type OauthProviderConfig struct {
 	EmailEndpoint string
 	EmailPath     string
 	SupportsPKCE  bool
+}
+
+type SecretsAccessConfig struct {
+	IdentityZId  string
+	IdentityPath string
+	ServiceName  string
 }
 
 func (p *OauthProviderConfig) GetEndpoint() oauth2.Endpoint {
