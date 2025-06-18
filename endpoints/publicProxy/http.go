@@ -192,12 +192,12 @@ func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Contex
 
 					logrus.Infof("proxyConfig: %v", proxyConfig)
 
-					authSecrets := false
+					secretsAuth := false
 					if v, found := proxyConfig["secrets_auth"]; found {
-						authSecrets = v.(bool)
+						secretsAuth = v.(bool)
 					}
 					var secrets map[string]string
-					if authSecrets {
+					if secretsAuth {
 						secrets = make(map[string]string)
 						secretsArr, err := GetSecrets(shrToken, cfg)
 						if err != nil {
@@ -208,23 +208,24 @@ func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Contex
 						for _, secret := range secretsArr {
 							secrets[secret.Key] = secret.Value
 						}
+					} else {
+						logrus.Info("no secrets auth")
 					}
 
 					authScheme := "none"
-					if secrets != nil {
-						if v, found := secrets["auth_scheme"]; found {
-							authScheme = v
-						}
-					} else {
-						if v, found := proxyConfig["auth_scheme"]; found {
-							authScheme = v.(string)
+					if v, found := secrets["auth_scheme"]; secretsAuth && found {
+						authScheme = v
+					} else if v, found := proxyConfig["auth_scheme"]; found {
+						proxyAuthScheme := v.(string)
+						if proxyAuthScheme != "" {
+							authScheme = proxyAuthScheme
 						}
 					}
 
 					logrus.Infof("authScheme: %v", authScheme)
 					logrus.Infof("secrets: %v", secrets)
 
-					if authScheme != "none" {
+					if authScheme != "" {
 						switch authScheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
