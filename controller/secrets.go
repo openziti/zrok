@@ -47,5 +47,27 @@ type secretsGrpcImpl struct {
 
 func (i *secretsGrpcImpl) FetchSecrets(_ context.Context, req *secretsGrpc.SecretsRequest) (*secretsGrpc.SecretsResponse, error) {
 	logrus.Infof("request for secrets for '%v'", req.ShareToken)
-	return nil, nil
+
+	trx, err := str.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer trx.Rollback()
+
+	shr, err := str.FindShareWithToken(req.ShareToken, trx)
+	if err != nil {
+		return nil, err
+	}
+
+	secrets, err := str.GetSecrets(shr.Id, trx)
+	if err != nil {
+		return nil, err
+	}
+
+	out := &secretsGrpc.SecretsResponse{}
+	for _, secret := range secrets.Secrets {
+		out.Secrets = append(out.Secrets, &secretsGrpc.Secret{Key: secret.Key, Value: secret.Value})
+	}
+
+	return out, nil
 }

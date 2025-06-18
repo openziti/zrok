@@ -32,7 +32,7 @@ func (str *Store) CreateSecrets(secrets Secrets, trx *sqlx.Tx) error {
 
 func (str *Store) GetSecrets(shareId int, trx *sqlx.Tx) (Secrets, error) {
 	secrets := Secrets{}
-	rows, err := trx.Queryx("select * from secrets where share_id = $1 and not deleted", shareId)
+	rows, err := trx.Queryx("select key, value from secrets where share_id = $1 and not deleted", shareId)
 	if err != nil {
 		return Secrets{}, errors.Wrap(err, "error getting all from secrets")
 	}
