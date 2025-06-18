@@ -4,6 +4,7 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +42,7 @@ func (cmd *adminDeleteSecretsAccessIdentityCommand) run(_ *cobra.Command, args [
 	}
 
 	if err := cmd.deleteDialPolicy(secretsAccessIdentityZId, zrok); err != nil {
-		panic(err)
+		logrus.Warnf("could not delete dial service policy for secrets access identity: %v", err)
 	}
 
 	if err := cmd.deleteIdentity(secretsAccessIdentityZId, zrok); err != nil {
