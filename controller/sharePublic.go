@@ -23,14 +23,12 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 		return "", nil, err
 	}
 	options := &zrokEdgeSdk.FrontendOptions{
-		Interstitial:   interstitial,
-		AuthScheme:     authScheme,
-		BasicAuthUsers: authUsers,
-		Oauth: &sdk.OauthConfig{
-			Provider:                   params.Body.OauthProvider,
-			EmailDomains:               params.Body.OauthEmailDomains,
-			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
-		},
+		Interstitial: interstitial,
+		AuthSecrets:  false,
+	}
+	switch authScheme {
+	case sdk.Basic:
+		options.AuthSecrets = true
 	}
 	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, options, edge)
 	if err != nil {

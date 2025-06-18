@@ -12,8 +12,8 @@ type Secrets struct {
 }
 
 type Secret struct {
-	Key   string
-	Value string
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func (str *Store) CreateSecrets(secrets Secrets, trx *sqlx.Tx) error {

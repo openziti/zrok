@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/store"
@@ -127,12 +129,13 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 					return share.NewShareNotFound()
 				}
 			}
-			if sfe != nil && sfe.UrlTemplate != nil {
+			if sfe.UrlTemplate != nil {
 				frontendZIds = append(frontendZIds, sfe.ZId)
 				frontendTemplates = append(frontendTemplates, *sfe.UrlTemplate)
 				logrus.Infof("added frontend selection '%v' with ziti identity '%v' for share '%v'", frontendSelection, sfe.ZId, shrToken)
 			}
 		}
+
 		var skipInterstitial bool
 		if backendMode != sdk.DriveBackendMode {
 			skipInterstitial, err = str.IsAccountGrantedSkipInterstitial(int(principal.ID), trx)
@@ -143,6 +146,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		} else {
 			skipInterstitial = true
 		}
+
 		shrZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, !skipInterstitial, edge)
 		if err != nil {
 			logrus.Error(err)
@@ -199,6 +203,31 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 				return share.NewShareInternalServerError()
 			}
 		}
+	}
+
+	if sshr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Basic) {
+		logrus.Infof("writing basic auth secrets for '%v'", sshr.Token)
+		authUsersMap := make(map[string]string)
+		for _, authUser := range params.Body.AuthUsers {
+			authUsersMap[authUser.Username] = authUser.Password
+		}
+		authUsersMapJson, err := json.Marshal(authUsersMap)
+		if err != nil {
+			logrus.Errorf("error marshalling auth secrets for '%v': %v", sshr.Token, err)
+			return share.NewShareInternalServerError()
+		}
+		secrets := store.Secrets{
+			ShareId: sid,
+			Secrets: []store.Secret{
+				{Key: "auth_scheme", Value: string(sdk.Basic)},
+				{Key: "auth_users", Value: string(authUsersMapJson)},
+			},
+		}
+		if err := str.CreateSecrets(secrets, trx); err != nil {
+			logrus.Errorf("error creating secrets for '%v': %v", principal.Email, err)
+			return share.NewShareInternalServerError()
+		}
+		logrus.Infof("wrote auth secrets for '%v'", sshr.Token)
 	}
 
 	if err := trx.Commit(); err != nil {

@@ -3,17 +3,19 @@ package zrokEdgeSdk
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"time"
+
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
-	"reflect"
-	"time"
 )
 
 type FrontendOptions struct {
 	Interstitial   bool
+	AuthSecrets    bool
 	AuthScheme     sdk.AuthScheme
 	BasicAuthUsers []*sdk.AuthUserConfig
 	Oauth          *sdk.OauthConfig
@@ -22,6 +24,7 @@ type FrontendOptions struct {
 func CreateConfig(cfgTypeZId, envZId, shrToken string, options *FrontendOptions, edge *rest_management_api_client.ZitiEdgeManagement) (cfgZId string, err error) {
 	cfg := &sdk.FrontendConfig{
 		Interstitial: options.Interstitial,
+		AuthSecrets:  options.AuthSecrets,
 		AuthScheme:   options.AuthScheme,
 	}
 	if cfg.AuthScheme == sdk.Basic {
