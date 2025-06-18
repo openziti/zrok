@@ -3,6 +3,7 @@ package publicProxy
 import (
 	"context"
 	"crypto/md5"
+	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
@@ -22,6 +23,7 @@ type Config struct {
 	Interstitial  *InterstitialConfig
 	Oauth         *OauthConfig
 	SecretsAccess *SecretsAccessConfig
+	SecretsCache  *SecretsCacheConfig
 	Tls           *endpoints.TlsConfig
 }
 
@@ -57,6 +59,13 @@ type SecretsAccessConfig struct {
 	ServiceName  string
 }
 
+type SecretsCacheConfig struct {
+	Capacity           int
+	Shards             int
+	TTL                time.Duration
+	EvictionPercentage int
+}
+
 func (p *OauthProviderConfig) GetEndpoint() oauth2.Endpoint {
 	return oauth2.Endpoint{
 		AuthURL:  p.AuthURL,
@@ -68,6 +77,12 @@ func DefaultConfig() *Config {
 	return &Config{
 		Identity: "public",
 		Address:  "0.0.0.0:8080",
+		SecretsCache: &SecretsCacheConfig{
+			Capacity:           10000,
+			Shards:             10,
+			TTL:                2 * time.Hour,
+			EvictionPercentage: 10,
+		},
 	}
 }
 

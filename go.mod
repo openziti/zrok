@@ -55,6 +55,7 @@ require (
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
+	github.com/viccon/sturdyc v1.1.5
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v3 v3.39.0
 	go.uber.org/zap v1.27.0

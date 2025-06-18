@@ -153,18 +153,18 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
+func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		shrToken := resolveService(pcfg.HostMatch, r.Host)
+		shrToken := resolveService(cfg.HostMatch, r.Host)
 		if shrToken != "" {
 			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
-				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-					if r.Method != http.MethodOptions && (pcfg.Interstitial != nil && pcfg.Interstitial.Enabled) {
+				if proxyConfig, found := svc.Config[sdk.ZrokProxyConfig]; found {
+					if r.Method != http.MethodOptions && (cfg.Interstitial != nil && cfg.Interstitial.Enabled) {
 						sendInterstitial := true
-						if len(pcfg.Interstitial.UserAgentPrefixes) > 0 {
+						if len(cfg.Interstitial.UserAgentPrefixes) > 0 {
 							ua := r.Header.Get("User-Agent")
 							matched := false
-							for _, prefix := range pcfg.Interstitial.UserAgentPrefixes {
+							for _, prefix := range cfg.Interstitial.UserAgentPrefixes {
 								if strings.HasPrefix(ua, prefix) {
 									matched = true
 									break
@@ -175,13 +175,13 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 							}
 						}
 						if sendInterstitial {
-							if v, istlFound := cfg["interstitial"]; istlFound {
+							if v, istlFound := proxyConfig["interstitial"]; istlFound {
 								if istlEnabled, ok := v.(bool); ok && istlEnabled {
 									skip := r.Header.Get("skip_zrok_interstitial")
 									_, zrokOkErr := r.Cookie("zrok_interstitial")
 									if skip == "" && zrokOkErr != nil {
 										logrus.Debugf("forcing interstitial for '%v'", r.URL)
-										interstitialUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
+										interstitialUi.WriteInterstitialAnnounce(w, cfg.Interstitial.HtmlPath)
 										return
 									}
 								}
@@ -189,7 +189,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 						}
 					}
 
-					if scheme, found := cfg["auth_scheme"]; found {
+					if scheme, found := proxyConfig["auth_scheme"]; found {
 						switch scheme {
 						case string(sdk.None):
 							logrus.Debugf("auth scheme none '%v'", shrToken)
@@ -206,7 +206,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 								return
 							}
 							authed := false
-							if v, found := cfg["basic_auth"]; found {
+							if v, found := proxyConfig["basic_auth"]; found {
 								if basicAuth, ok := v.(map[string]interface{}); ok {
 									if v, found := basicAuth["users"]; found {
 										if arr, ok := v.([]interface{}); ok {
@@ -247,7 +247,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 						case string(sdk.Oauth):
 							logrus.Debugf("auth scheme oauth '%v'", shrToken)
 
-							if oauthCfg, found := cfg["oauth"]; found {
+							if oauthCfg, found := proxyConfig["oauth"]; found {
 								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
 									var authCheckInterval time.Duration
 									if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
@@ -268,34 +268,34 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 									cookie, err := r.Cookie("zrok-access")
 									if err != nil {
 										logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, cfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-										if pcfg.Oauth == nil {
+										if cfg.Oauth == nil {
 											return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
 										}
 										return key, nil
 									})
 									if err != nil {
 										logrus.Errorf("unable to parse jwt: %v", err)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, cfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									claims := tkn.Claims.(*ZrokClaims)
 									if claims.Provider != provider {
 										logrus.Error("provider mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, cfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									if claims.AuthorizationCheckInterval != authCheckInterval {
 										logrus.Error("authorization check interval mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, cfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 									if claims.Audience != r.Host {
 										logrus.Errorf("audience claim '%s' does not match requested host '%s'; restarting auth flow", claims.Audience, r.Host)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
+										oauthLoginRequired(w, r, cfg.Oauth, provider.(string), target, authCheckInterval)
 										return
 									}
 
