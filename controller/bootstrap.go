@@ -282,7 +282,7 @@ func assertErpForIdentity(name, zId string, edge *rest_management_api_client.Zit
 		return errors.Wrapf(err, "error listing edge router policies for '%v' (%v)", name, zId)
 	}
 	if len(listResp.Payload.Data) != 1 {
-		logrus.Infof("creating erp for '%v' (%v)", name, zId)
+		logrus.Infof("creating edge router policy for '%v' (%v)", name, zId)
 		if err := zrokEdgeSdk.CreateEdgeRouterPolicy(name, zId, edge); err != nil {
 			return errors.Wrapf(err, "error creating erp for '%v' (%v)", name, zId)
 		}
