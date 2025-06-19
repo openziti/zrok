@@ -229,7 +229,7 @@ const Register = () => {
         if(error) {
             setComponent(<InvalidToken />);
         } else {
-            if(!error &&email && touLink) {
+            if(!error && email && touLink) {
                 setComponent(<SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />);
             } else {
                 console.error(`Cannot render registration form, both "email" and "touLink" are required but got: email "${email}", touLink "${touLink}"`);
