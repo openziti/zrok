@@ -226,11 +226,13 @@ const Register = () => {
     }, [email]);
 
     useEffect(() => {
-        if(!error && email && touLink) {
-            setComponent(<SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />);
+        if(error) {
+            setComponent(<InvalidToken />);
         } else {
-            if(error) {
-                setComponent(<InvalidToken />);
+            if(!error &&email && touLink) {
+                setComponent(<SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />);
+            } else {
+                console.error(`Cannot render registration form, both "email" and "touLink" are required but got: email "${email}", touLink "${touLink}"`);
             }
         }
     }, [touLink, error]);
