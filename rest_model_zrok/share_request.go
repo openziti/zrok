@@ -25,6 +25,7 @@ type ShareRequest struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// auth scheme
+	// Enum: [none basic oidc]
 	AuthScheme string `json:"authScheme,omitempty"`
 
 	// auth users
@@ -72,6 +73,10 @@ type ShareRequest struct {
 func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAuthScheme(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateAuthUsers(formats); err != nil {
 		res = append(res, err)
 	}
@@ -95,6 +100,51 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var shareRequestTypeAuthSchemePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["none","basic","oidc"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypeAuthSchemePropEnum = append(shareRequestTypeAuthSchemePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestAuthSchemeNone captures enum value "none"
+	ShareRequestAuthSchemeNone string = "none"
+
+	// ShareRequestAuthSchemeBasic captures enum value "basic"
+	ShareRequestAuthSchemeBasic string = "basic"
+
+	// ShareRequestAuthSchemeOidc captures enum value "oidc"
+	ShareRequestAuthSchemeOidc string = "oidc"
+)
+
+// prop value enum
+func (m *ShareRequest) validateAuthSchemeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeAuthSchemePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validateAuthScheme(formats strfmt.Registry) error {
+	if swag.IsZero(m.AuthScheme) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAuthSchemeEnum("authScheme", "body", m.AuthScheme); err != nil {
+		return err
+	}
+
 	return nil
 }
 

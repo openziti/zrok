@@ -62,7 +62,7 @@ export interface ShareRequest {
      * @type {string}
      * @memberof ShareRequest
      */
-    authScheme?: string;
+    authScheme?: ShareRequestAuthSchemeEnum;
     /**
      * 
      * @type {Array<AuthUser>}
@@ -137,6 +137,16 @@ export const ShareRequestBackendModeEnum = {
     Vpn: 'vpn'
 } as const;
 export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[keyof typeof ShareRequestBackendModeEnum];
+
+/**
+ * @export
+ */
+export const ShareRequestAuthSchemeEnum = {
+    None: 'none',
+    Basic: 'basic',
+    Oidc: 'oidc'
+} as const;
+export type ShareRequestAuthSchemeEnum = typeof ShareRequestAuthSchemeEnum[keyof typeof ShareRequestAuthSchemeEnum];
 
 /**
  * @export

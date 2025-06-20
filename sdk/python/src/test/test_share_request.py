@@ -42,7 +42,7 @@ class TestShareRequest(unittest.TestCase):
                     ],
                 backend_mode = 'proxy',
                 backend_proxy_endpoint = '',
-                auth_scheme = '',
+                auth_scheme = 'none',
                 auth_users = [
                     zrok_api.models.auth_user.authUser(
                         username = '', 

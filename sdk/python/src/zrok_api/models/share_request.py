@@ -63,6 +63,16 @@ class ShareRequest(BaseModel):
             raise ValueError("must be one of enum values ('proxy', 'web', 'tcpTunnel', 'udpTunnel', 'caddy', 'drive', 'socks', 'vpn')")
         return value
 
+    @field_validator('auth_scheme')
+    def auth_scheme_validate_enum(cls, value):
+        """Validates the enum"""
+        if value is None:
+            return value
+
+        if value not in set(['none', 'basic', 'oidc']):
+            raise ValueError("must be one of enum values ('none', 'basic', 'oidc')")
+        return value
+
     @field_validator('oauth_provider')
     def oauth_provider_validate_enum(cls, value):
         """Validates the enum"""

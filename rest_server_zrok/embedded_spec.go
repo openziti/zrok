@@ -2840,7 +2840,12 @@ func init() {
           }
         },
         "authScheme": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "oidc"
+          ]
         },
         "authUsers": {
           "type": "array",
@@ -5794,7 +5799,12 @@ func init() {
           }
         },
         "authScheme": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "oidc"
+          ]
         },
         "authUsers": {
           "type": "array",
