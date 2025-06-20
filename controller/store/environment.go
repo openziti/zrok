@@ -1,6 +1,8 @@
 package store
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -81,4 +83,9 @@ func (str *Store) DeleteEnvironment(id int, tx *sqlx.Tx) error {
 		return errors.Wrap(err, "error executing environments delete statement")
 	}
 	return nil
+}
+
+func (env *Environment) String() string {
+	return fmt.Sprintf("Environment{Id: %d, AccountId: %v, Description: %q, Host: %q, Address: %q, ZId: %q, CreatedAt: %v, UpdatedAt: %v, Deleted: %t}",
+		env.Id, env.AccountId, env.Description, env.Host, env.Address, env.ZId, env.CreatedAt, env.UpdatedAt, env.Deleted)
 }

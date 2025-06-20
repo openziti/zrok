@@ -1,6 +1,8 @@
 package store
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -147,4 +149,9 @@ func (str *Store) DeleteShare(id int, tx *sqlx.Tx) error {
 		return errors.Wrap(err, "error executing shares delete statement")
 	}
 	return nil
+}
+
+func (shr *Share) String() string {
+	return fmt.Sprintf("Share{Id: %d, EnvironmentId: %d, ZId: %q, Token: %q, ShareMode: %q, BackendMode: %q, FrontendSelection: %v, FrontendEndpoint: %v, BackendProxyEndpoint: %v, Reserved: %t, UniqueName: %t, PermissionMode: %q, CreatedAt: %v, UpdatedAt: %v, Deleted: %t}",
+		shr.Id, shr.EnvironmentId, shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.UniqueName, shr.PermissionMode, shr.CreatedAt, shr.UpdatedAt, shr.Deleted)
 }

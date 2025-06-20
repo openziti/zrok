@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/edge-api/rest_management_api_client"
 	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
@@ -12,7 +14,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type unshareHandler struct{}
@@ -22,6 +23,8 @@ func newUnshareHandler() *unshareHandler {
 }
 
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	logrus.Infof("envZId='%v', shareToken='%v', reserved='%v'", params.Body.EnvZID, params.Body.ShareToken, params.Body.Reserved)
+
 	tx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
@@ -56,6 +59,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return share.NewUnshareNotFound()
 	}
+	logrus.Infof("environment = %v", senv.String())
 
 	var sshr *store.Share
 	if shrs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
@@ -73,11 +77,14 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		logrus.Errorf("error finding shares for account '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
+	logrus.Infof("share = %v", sshr.String())
 
 	if sshr.Reserved == params.Body.Reserved {
+		logrus.Info("share reserved matches requested reserved")
+
 		// single tag-based share deallocator; should work regardless of sharing mode
 		h.deallocateResources(senv, shrToken, shrZId, edge)
-		logrus.Debugf("deallocated share '%v'", shrToken)
+		logrus.Infof("deallocated share '%v'", shrToken)
 
 		if err := str.DeleteAccessGrantsForShare(sshr.Id, tx); err != nil {
 			logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
