@@ -1786,6 +1786,7 @@ definitions:
         type: string
       authScheme:
         type: string
+        enum: ["none", "basic", "oidc"]
       authUsers:
         type: array
         items:
