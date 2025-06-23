@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -26,17 +26,17 @@ class OidcConfig(BaseModel):
     """
     OidcConfig
     """ # noqa: E501
-    provider_name: Optional[StrictStr] = Field(default=None, alias="providerName")
+    provider_id: Optional[StrictStr] = Field(default=None, alias="providerId")
+    issuer_url: Optional[StrictStr] = Field(default=None, alias="issuerUrl")
+    authz_url_params: Optional[List[StrictStr]] = Field(default=None, alias="authzUrlParams")
+    cookie_domain: Optional[StrictStr] = Field(default=None, alias="cookieDomain")
     client_id: Optional[StrictStr] = Field(default=None, alias="clientId")
+    client_secret: Optional[StrictStr] = Field(default=None, alias="clientSecret")
     scopes: Optional[List[StrictStr]] = None
-    auth_url: Optional[StrictStr] = Field(default=None, alias="authUrl")
-    token_url: Optional[StrictStr] = Field(default=None, alias="tokenUrl")
-    email_endpoint: Optional[StrictStr] = Field(default=None, alias="emailEndpoint")
-    email_path: Optional[StrictStr] = Field(default=None, alias="emailPath")
-    supports_pkce: Optional[StrictBool] = Field(default=None, alias="supportsPkce")
-    allowed_email_filters: Optional[List[StrictStr]] = Field(default=None, alias="allowedEmailFilters")
-    auth_timeout: Optional[StrictStr] = Field(default=None, alias="authTimeout")
-    __properties: ClassVar[List[str]] = ["providerName", "clientId", "scopes", "authUrl", "tokenUrl", "emailEndpoint", "emailPath", "supportsPkce", "allowedEmailFilters", "authTimeout"]
+    max_session_duration: Optional[StrictStr] = Field(default=None, alias="maxSessionDuration")
+    idle_session_duration: Optional[StrictStr] = Field(default=None, alias="idleSessionDuration")
+    userinfo_refresh_interval: Optional[StrictStr] = Field(default=None, alias="userinfoRefreshInterval")
+    __properties: ClassVar[List[str]] = ["providerId", "issuerUrl", "authzUrlParams", "cookieDomain", "clientId", "clientSecret", "scopes", "maxSessionDuration", "idleSessionDuration", "userinfoRefreshInterval"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -89,16 +89,16 @@ class OidcConfig(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "providerName": obj.get("providerName"),
+            "providerId": obj.get("providerId"),
+            "issuerUrl": obj.get("issuerUrl"),
+            "authzUrlParams": obj.get("authzUrlParams"),
+            "cookieDomain": obj.get("cookieDomain"),
             "clientId": obj.get("clientId"),
+            "clientSecret": obj.get("clientSecret"),
             "scopes": obj.get("scopes"),
-            "authUrl": obj.get("authUrl"),
-            "tokenUrl": obj.get("tokenUrl"),
-            "emailEndpoint": obj.get("emailEndpoint"),
-            "emailPath": obj.get("emailPath"),
-            "supportsPkce": obj.get("supportsPkce"),
-            "allowedEmailFilters": obj.get("allowedEmailFilters"),
-            "authTimeout": obj.get("authTimeout")
+            "maxSessionDuration": obj.get("maxSessionDuration"),
+            "idleSessionDuration": obj.get("idleSessionDuration"),
+            "userinfoRefreshInterval": obj.get("userinfoRefreshInterval")
         })
         return _obj
 

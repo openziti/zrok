@@ -54,20 +54,20 @@ class TestShareRequest(unittest.TestCase):
                     ],
                 oauth_authorization_check_interval = '',
                 oidc_config = zrok_api.models.oidc_config.oidcConfig(
-                    provider_name = '', 
+                    provider_id = '', 
+                    issuer_url = '', 
+                    authz_url_params = [
+                        ''
+                        ], 
+                    cookie_domain = '', 
                     client_id = '', 
+                    client_secret = '', 
                     scopes = [
                         ''
                         ], 
-                    auth_url = '', 
-                    token_url = '', 
-                    email_endpoint = '', 
-                    email_path = '', 
-                    supports_pkce = True, 
-                    allowed_email_filters = [
-                        ''
-                        ], 
-                    auth_timeout = '', ),
+                    max_session_duration = '', 
+                    idle_session_duration = '', 
+                    userinfo_refresh_interval = '', ),
                 reserved = True,
                 permission_mode = 'open',
                 access_grants = [

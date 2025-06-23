@@ -17,35 +17,35 @@ import (
 // swagger:model oidcConfig
 type OidcConfig struct {
 
-	// allowed email filters
-	AllowedEmailFilters []string `json:"allowedEmailFilters"`
-
-	// auth timeout
-	AuthTimeout string `json:"authTimeout,omitempty"`
-
-	// auth Url
-	AuthURL string `json:"authUrl,omitempty"`
+	// authz Url params
+	AuthzURLParams []string `json:"authzUrlParams"`
 
 	// client Id
 	ClientID string `json:"clientId,omitempty"`
 
-	// email endpoint
-	EmailEndpoint string `json:"emailEndpoint,omitempty"`
+	// client secret
+	ClientSecret string `json:"clientSecret,omitempty"`
 
-	// email path
-	EmailPath string `json:"emailPath,omitempty"`
+	// cookie domain
+	CookieDomain string `json:"cookieDomain,omitempty"`
 
-	// provider name
-	ProviderName string `json:"providerName,omitempty"`
+	// idle session duration
+	IdleSessionDuration string `json:"idleSessionDuration,omitempty"`
+
+	// issuer Url
+	IssuerURL string `json:"issuerUrl,omitempty"`
+
+	// max session duration
+	MaxSessionDuration string `json:"maxSessionDuration,omitempty"`
+
+	// provider Id
+	ProviderID string `json:"providerId,omitempty"`
 
 	// scopes
 	Scopes []string `json:"scopes"`
 
-	// supports pkce
-	SupportsPkce bool `json:"supportsPkce,omitempty"`
-
-	// token Url
-	TokenURL string `json:"tokenUrl,omitempty"`
+	// userinfo refresh interval
+	UserinfoRefreshInterval string `json:"userinfoRefreshInterval,omitempty"`
 }
 
 // Validate validates this oidc config

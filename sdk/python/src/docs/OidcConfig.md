@@ -5,16 +5,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**provider_name** | **str** |  | [optional] 
+**provider_id** | **str** |  | [optional] 
+**issuer_url** | **str** |  | [optional] 
+**authz_url_params** | **List[str]** |  | [optional] 
+**cookie_domain** | **str** |  | [optional] 
 **client_id** | **str** |  | [optional] 
+**client_secret** | **str** |  | [optional] 
 **scopes** | **List[str]** |  | [optional] 
-**auth_url** | **str** |  | [optional] 
-**token_url** | **str** |  | [optional] 
-**email_endpoint** | **str** |  | [optional] 
-**email_path** | **str** |  | [optional] 
-**supports_pkce** | **bool** |  | [optional] 
-**allowed_email_filters** | **List[str]** |  | [optional] 
-**auth_timeout** | **str** |  | [optional] 
+**max_session_duration** | **str** |  | [optional] 
+**idle_session_duration** | **str** |  | [optional] 
+**userinfo_refresh_interval** | **str** |  | [optional] 
 
 ## Example
 

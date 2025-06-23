@@ -2758,28 +2758,31 @@ func init() {
     "oidcConfig": {
       "type": "object",
       "properties": {
-        "allowedEmailFilters": {
+        "authzUrlParams": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "authTimeout": {
-          "type": "string"
-        },
-        "authUrl": {
-          "type": "string"
-        },
         "clientId": {
           "type": "string"
         },
-        "emailEndpoint": {
+        "clientSecret": {
           "type": "string"
         },
-        "emailPath": {
+        "cookieDomain": {
           "type": "string"
         },
-        "providerName": {
+        "idleSessionDuration": {
+          "type": "string"
+        },
+        "issuerUrl": {
+          "type": "string"
+        },
+        "maxSessionDuration": {
+          "type": "string"
+        },
+        "providerId": {
           "type": "string"
         },
         "scopes": {
@@ -2788,10 +2791,7 @@ func init() {
             "type": "string"
           }
         },
-        "supportsPkce": {
-          "type": "boolean"
-        },
-        "tokenUrl": {
+        "userinfoRefreshInterval": {
           "type": "string"
         }
       }
@@ -5762,28 +5762,31 @@ func init() {
     "oidcConfig": {
       "type": "object",
       "properties": {
-        "allowedEmailFilters": {
+        "authzUrlParams": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "authTimeout": {
-          "type": "string"
-        },
-        "authUrl": {
-          "type": "string"
-        },
         "clientId": {
           "type": "string"
         },
-        "emailEndpoint": {
+        "clientSecret": {
           "type": "string"
         },
-        "emailPath": {
+        "cookieDomain": {
           "type": "string"
         },
-        "providerName": {
+        "idleSessionDuration": {
+          "type": "string"
+        },
+        "issuerUrl": {
+          "type": "string"
+        },
+        "maxSessionDuration": {
+          "type": "string"
+        },
+        "providerId": {
           "type": "string"
         },
         "scopes": {
@@ -5792,10 +5795,7 @@ func init() {
             "type": "string"
           }
         },
-        "supportsPkce": {
-          "type": "boolean"
-        },
-        "tokenUrl": {
+        "userinfoRefreshInterval": {
           "type": "string"
         }
       }

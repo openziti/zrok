@@ -1713,29 +1713,29 @@ definitions:
   oidcConfig:
     type: object
     properties:
-      providerName:
+      providerId:
+        type: string
+      issuerUrl:
+        type: string
+      authzUrlParams:
+        type: array
+        items:
+          type: string
+      cookieDomain:
         type: string
       clientId:
+        type: string
+      clientSecret:
         type: string
       scopes:
         type: array
         items:
           type: string
-      authUrl:
+      maxSessionDuration:
         type: string
-      tokenUrl:
+      idleSessionDuration:
         type: string
-      emailEndpoint:
-        type: string
-      emailPath:
-        type: string
-      supportsPkce:
-        type: boolean
-      allowedEmailFilters:
-        type: array
-        items:
-          type: string
-      authTimeout:
+      userinfoRefreshInterval:
         type: string
 
   overview:

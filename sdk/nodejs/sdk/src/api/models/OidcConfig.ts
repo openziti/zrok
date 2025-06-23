@@ -24,13 +24,37 @@ export interface OidcConfig {
      * @type {string}
      * @memberof OidcConfig
      */
-    providerName?: string;
+    providerId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OidcConfig
+     */
+    issuerUrl?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof OidcConfig
+     */
+    authzUrlParams?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof OidcConfig
+     */
+    cookieDomain?: string;
     /**
      * 
      * @type {string}
      * @memberof OidcConfig
      */
     clientId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OidcConfig
+     */
+    clientSecret?: string;
     /**
      * 
      * @type {Array<string>}
@@ -42,43 +66,19 @@ export interface OidcConfig {
      * @type {string}
      * @memberof OidcConfig
      */
-    authUrl?: string;
+    maxSessionDuration?: string;
     /**
      * 
      * @type {string}
      * @memberof OidcConfig
      */
-    tokenUrl?: string;
+    idleSessionDuration?: string;
     /**
      * 
      * @type {string}
      * @memberof OidcConfig
      */
-    emailEndpoint?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OidcConfig
-     */
-    emailPath?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof OidcConfig
-     */
-    supportsPkce?: boolean;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof OidcConfig
-     */
-    allowedEmailFilters?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof OidcConfig
-     */
-    authTimeout?: string;
+    userinfoRefreshInterval?: string;
 }
 
 /**
@@ -98,16 +98,16 @@ export function OidcConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'providerName': json['providerName'] == null ? undefined : json['providerName'],
+        'providerId': json['providerId'] == null ? undefined : json['providerId'],
+        'issuerUrl': json['issuerUrl'] == null ? undefined : json['issuerUrl'],
+        'authzUrlParams': json['authzUrlParams'] == null ? undefined : json['authzUrlParams'],
+        'cookieDomain': json['cookieDomain'] == null ? undefined : json['cookieDomain'],
         'clientId': json['clientId'] == null ? undefined : json['clientId'],
+        'clientSecret': json['clientSecret'] == null ? undefined : json['clientSecret'],
         'scopes': json['scopes'] == null ? undefined : json['scopes'],
-        'authUrl': json['authUrl'] == null ? undefined : json['authUrl'],
-        'tokenUrl': json['tokenUrl'] == null ? undefined : json['tokenUrl'],
-        'emailEndpoint': json['emailEndpoint'] == null ? undefined : json['emailEndpoint'],
-        'emailPath': json['emailPath'] == null ? undefined : json['emailPath'],
-        'supportsPkce': json['supportsPkce'] == null ? undefined : json['supportsPkce'],
-        'allowedEmailFilters': json['allowedEmailFilters'] == null ? undefined : json['allowedEmailFilters'],
-        'authTimeout': json['authTimeout'] == null ? undefined : json['authTimeout'],
+        'maxSessionDuration': json['maxSessionDuration'] == null ? undefined : json['maxSessionDuration'],
+        'idleSessionDuration': json['idleSessionDuration'] == null ? undefined : json['idleSessionDuration'],
+        'userinfoRefreshInterval': json['userinfoRefreshInterval'] == null ? undefined : json['userinfoRefreshInterval'],
     };
 }
 
@@ -122,16 +122,16 @@ export function OidcConfigToJSONTyped(value?: OidcConfig | null, ignoreDiscrimin
 
     return {
         
-        'providerName': value['providerName'],
+        'providerId': value['providerId'],
+        'issuerUrl': value['issuerUrl'],
+        'authzUrlParams': value['authzUrlParams'],
+        'cookieDomain': value['cookieDomain'],
         'clientId': value['clientId'],
+        'clientSecret': value['clientSecret'],
         'scopes': value['scopes'],
-        'authUrl': value['authUrl'],
-        'tokenUrl': value['tokenUrl'],
-        'emailEndpoint': value['emailEndpoint'],
-        'emailPath': value['emailPath'],
-        'supportsPkce': value['supportsPkce'],
-        'allowedEmailFilters': value['allowedEmailFilters'],
-        'authTimeout': value['authTimeout'],
+        'maxSessionDuration': value['maxSessionDuration'],
+        'idleSessionDuration': value['idleSessionDuration'],
+        'userinfoRefreshInterval': value['userinfoRefreshInterval'],
     };
 }
 
