@@ -382,6 +382,7 @@ class ShareApi:
             '404': None,
             '409': None,
             '422': None,
+            '429': None,
             '500': "str",
         }
         response_data = self.api_client.call_api(
@@ -453,6 +454,7 @@ class ShareApi:
             '404': None,
             '409': None,
             '422': None,
+            '429': None,
             '500': "str",
         }
         response_data = self.api_client.call_api(
@@ -524,6 +526,7 @@ class ShareApi:
             '404': None,
             '409': None,
             '422': None,
+            '429': None,
             '500': "str",
         }
         response_data = self.api_client.call_api(

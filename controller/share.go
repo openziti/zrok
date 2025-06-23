@@ -34,17 +34,19 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	envId, err := h.validateEnvironment(params.Body.EnvZID, principal, trx)
 	if err != nil {
-		return h.handleEnvironmentError(err)
-	}
-
-	if err := h.checkLimits(envId, principal, params.Body.Reserved, params.Body.UniqueName != "", sdk.ShareMode(params.Body.ShareMode), sdk.BackendMode(params.Body.BackendMode), trx); err != nil {
-		logrus.Errorf("limits error: %v", err)
+		logrus.Errorf("error validating environment '%v' for '%v': %v", params.Body.EnvZID, principal.Email, err)
 		return share.NewShareUnauthorized()
 	}
 
-	accessGrantAcctIds, responder := h.processAccessGrants(params, principal, trx)
-	if responder != nil {
-		return responder
+	if err := h.checkLimits(envId, principal, params.Body.Reserved, params.Body.UniqueName != "", sdk.ShareMode(params.Body.ShareMode), sdk.BackendMode(params.Body.BackendMode), trx); err != nil {
+		logrus.Errorf("limits error for '%v': %v", principal.Email, err)
+		return share.NewShareTooManyRequests()
+	}
+
+	accessGrantAcctIds, err := h.processAccessGrants(params, principal, trx)
+	if err != nil {
+		logrus.Errorf("error processing access grants: %v", err)
+		return share.NewShareInternalServerError()
 	}
 
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
@@ -53,25 +55,29 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	shrToken, responder := h.createShareToken(params.Body.Reserved, params.Body.UniqueName, trx)
-	if responder != nil {
-		return responder
+	shrToken, err := h.createShareToken(params.Body.Reserved, params.Body.UniqueName, trx)
+	if err != nil {
+		logrus.Errorf("error creating share token: %v", err)
+		return share.NewShareInternalServerError()
 	}
 
-	shrZId, frontendEndpoints, responder := h.allocateResources(params, principal, edge, shrToken, trx)
-	if responder != nil {
-		return responder
+	shrZId, frontendEndpoints, err := h.allocateResources(params, principal, edge, shrToken, trx)
+	if err != nil {
+		logrus.Errorf("error allocating resources: %v", err)
+		return share.NewShareInternalServerError()
 	}
 
 	sshr := h.createShareRecord(shrZId, shrToken, params, frontendEndpoints)
 
-	sid, responder := h.saveShareAndGrants(sshr, envId, accessGrantAcctIds, trx)
-	if responder != nil {
-		return responder
+	sid, err := h.saveShareAndGrants(sshr, envId, accessGrantAcctIds, trx)
+	if err != nil {
+		logrus.Errorf("error saving share and grants: %v", err)
+		return share.NewShareInternalServerError()
 	}
 
-	if responder := h.handleAuthSecrets(params, sid, sshr, trx); responder != nil {
-		return responder
+	if err := h.handleAuthSecrets(params, sid, sshr, trx); err != nil {
+		logrus.Errorf("error handling auth secrets: %v", err)
+		return share.NewShareInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
@@ -104,21 +110,14 @@ func (h *shareHandler) validateEnvironment(envZId string, principal *rest_model_
 	return 0, errors.New("environment not found")
 }
 
-func (h *shareHandler) handleEnvironmentError(err error) middleware.Responder {
-	if err.Error() == "environment not found" {
-		return share.NewShareUnauthorized()
-	}
-	return share.NewShareInternalServerError()
-}
-
-func (h *shareHandler) processAccessGrants(params share.ShareParams, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]int, middleware.Responder) {
+func (h *shareHandler) processAccessGrants(params share.ShareParams, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]int, error) {
 	var accessGrantAcctIds []int
 	if store.PermissionMode(params.Body.PermissionMode) == store.ClosedPermissionMode {
 		for _, email := range params.Body.AccessGrants {
 			acct, err := str.FindAccountWithEmail(email, trx)
 			if err != nil {
 				logrus.Errorf("unable to find account '%v' for share request from '%v'", email, principal.Email)
-				return nil, share.NewShareNotFound()
+				return nil, err
 			}
 			logrus.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
 			accessGrantAcctIds = append(accessGrantAcctIds, acct.Id)
@@ -127,35 +126,35 @@ func (h *shareHandler) processAccessGrants(params share.ShareParams, principal *
 	return accessGrantAcctIds, nil
 }
 
-func (h *shareHandler) createShareToken(reserved bool, uniqueName string, trx *sqlx.Tx) (string, middleware.Responder) {
+func (h *shareHandler) createShareToken(reserved bool, uniqueName string, trx *sqlx.Tx) (string, error) {
 	if !reserved || uniqueName == "" {
 		token, err := createShareToken()
 		if err != nil {
 			logrus.Error(err)
-			return "", share.NewShareInternalServerError()
+			return "", err
 		}
 		return token, nil
 	}
 
 	if !util.IsValidUniqueName(uniqueName) {
 		logrus.Errorf("invalid unique name '%v'", uniqueName)
-		return "", share.NewShareUnprocessableEntity()
+		return "", errors.New("invalid unique name")
 	}
 
 	shareExists, err := str.ShareWithTokenExists(uniqueName, trx)
 	if err != nil {
 		logrus.Errorf("error checking share for token collision: %v", err)
-		return "", share.NewUpdateShareInternalServerError()
+		return "", err
 	}
 	if shareExists {
 		logrus.Errorf("token '%v' already exists; cannot create share", uniqueName)
-		return "", share.NewShareConflict()
+		return "", errors.New("token already exists")
 	}
 
 	return uniqueName, nil
 }
 
-func (h *shareHandler) allocateResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, middleware.Responder) {
+func (h *shareHandler) allocateResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, error) {
 	var shrZId string
 	var frontendEndpoints []string
 	var err error
@@ -167,12 +166,12 @@ func (h *shareHandler) allocateResources(params share.ShareParams, principal *re
 		shrZId, frontendEndpoints, err = h.allocatePrivateResources(params, edge, shrToken)
 	default:
 		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
-		return "", nil, share.NewShareInternalServerError()
+		return "", nil, errors.New("unknown share mode")
 	}
 
 	if err != nil {
 		logrus.Error(err)
-		return "", nil, share.NewShareInternalServerError()
+		return "", nil, err
 	}
 
 	return shrZId, frontendEndpoints, nil
@@ -257,11 +256,11 @@ func (h *shareHandler) createShareRecord(shrZId string, shrToken string, params 
 	return sshr
 }
 
-func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGrantAcctIds []int, trx *sqlx.Tx) (int, middleware.Responder) {
+func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGrantAcctIds []int, trx *sqlx.Tx) (int, error) {
 	sid, err := str.CreateShare(envId, sshr, trx)
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
-		return 0, share.NewShareInternalServerError()
+		return 0, err
 	}
 
 	if sshr.PermissionMode == store.ClosedPermissionMode {
@@ -269,7 +268,7 @@ func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGr
 			_, err := str.CreateAccessGrant(sid, acctId, trx)
 			if err != nil {
 				logrus.Errorf("error creating access grant: %v", err)
-				return 0, share.NewShareInternalServerError()
+				return 0, err
 			}
 		}
 	}
@@ -277,7 +276,7 @@ func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGr
 	return sid, nil
 }
 
-func (h *shareHandler) handleAuthSecrets(params share.ShareParams, sid int, sshr *store.Share, trx *sqlx.Tx) middleware.Responder {
+func (h *shareHandler) handleAuthSecrets(params share.ShareParams, sid int, sshr *store.Share, trx *sqlx.Tx) error {
 	if sshr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Basic) {
 		logrus.Infof("writing basic auth secrets for '%v'", sshr.Token)
 		authUsersMap := make(map[string]string)
@@ -287,7 +286,7 @@ func (h *shareHandler) handleAuthSecrets(params share.ShareParams, sid int, sshr
 		authUsersMapJson, err := json.Marshal(authUsersMap)
 		if err != nil {
 			logrus.Errorf("error marshalling auth secrets for '%v': %v", sshr.Token, err)
-			return share.NewShareInternalServerError()
+			return err
 		}
 		secrets := store.Secrets{
 			ShareId: sid,
@@ -298,7 +297,7 @@ func (h *shareHandler) handleAuthSecrets(params share.ShareParams, sid int, sshr
 		}
 		if err := str.CreateSecrets(secrets, trx); err != nil {
 			logrus.Errorf("error creating secrets: %v", err)
-			return share.NewShareInternalServerError()
+			return err
 		}
 		logrus.Infof("wrote auth secrets for '%v'", sshr.Token)
 	}

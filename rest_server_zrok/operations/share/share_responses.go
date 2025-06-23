@@ -158,6 +158,31 @@ func (o *ShareUnprocessableEntity) WriteResponse(rw http.ResponseWriter, produce
 	rw.WriteHeader(422)
 }
 
+// ShareTooManyRequestsCode is the HTTP code returned for type ShareTooManyRequests
+const ShareTooManyRequestsCode int = 429
+
+/*
+ShareTooManyRequests over limit
+
+swagger:response shareTooManyRequests
+*/
+type ShareTooManyRequests struct {
+}
+
+// NewShareTooManyRequests creates ShareTooManyRequests with default headers values
+func NewShareTooManyRequests() *ShareTooManyRequests {
+
+	return &ShareTooManyRequests{}
+}
+
+// WriteResponse to the client
+func (o *ShareTooManyRequests) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(429)
+}
+
 // ShareInternalServerErrorCode is the HTTP code returned for type ShareInternalServerError
 const ShareInternalServerErrorCode int = 500
 

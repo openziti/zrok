@@ -53,6 +53,12 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 			return nil, err
 		}
 		return nil, result
+	case 429:
+		result := NewShareTooManyRequests()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewShareInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -352,6 +358,62 @@ func (o *ShareUnprocessableEntity) String() string {
 }
 
 func (o *ShareUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewShareTooManyRequests creates a ShareTooManyRequests with default headers values
+func NewShareTooManyRequests() *ShareTooManyRequests {
+	return &ShareTooManyRequests{}
+}
+
+/*
+ShareTooManyRequests describes a response with status code 429, with default header values.
+
+over limit
+*/
+type ShareTooManyRequests struct {
+}
+
+// IsSuccess returns true when this share too many requests response has a 2xx status code
+func (o *ShareTooManyRequests) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this share too many requests response has a 3xx status code
+func (o *ShareTooManyRequests) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this share too many requests response has a 4xx status code
+func (o *ShareTooManyRequests) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this share too many requests response has a 5xx status code
+func (o *ShareTooManyRequests) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this share too many requests response a status code equal to that given
+func (o *ShareTooManyRequests) IsCode(code int) bool {
+	return code == 429
+}
+
+// Code gets the status code for the share too many requests response
+func (o *ShareTooManyRequests) Code() int {
+	return 429
+}
+
+func (o *ShareTooManyRequests) Error() string {
+	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests ", 429)
+}
+
+func (o *ShareTooManyRequests) String() string {
+	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests ", 429)
+}
+
+func (o *ShareTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

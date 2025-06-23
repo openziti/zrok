@@ -2298,6 +2298,9 @@ func init() {
           "422": {
             "description": "unprocessable"
           },
+          "429": {
+            "description": "over limit"
+          },
           "500": {
             "description": "internal server error",
             "schema": {
@@ -5193,6 +5196,9 @@ func init() {
           },
           "422": {
             "description": "unprocessable"
+          },
+          "429": {
+            "description": "over limit"
           },
           "500": {
             "description": "internal server error",
