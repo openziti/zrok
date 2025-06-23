@@ -42,7 +42,7 @@ func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
-	frontend, err := publicProxy.NewHTTP(cfg)
+	frontend, err := publicProxy.NewHttpFrontend(cfg)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("unable to create http frontend", err)

@@ -198,7 +198,7 @@ func (p *OIDCProvider) setupHandlers(cfg *OauthConfig, key []byte, tls bool) {
 		targetHost := token.Claims.(*IntermediateJWT).Host
 		logrus.Infof("setting cookie and redirecting to host: %s", targetHost)
 
-		SetZrokCookie(w, cfg.CookieDomain, email, tokens.AccessToken, p.name, authCheckInterval, key, targetHost)
+		setZrokCookie(w, cfg.CookieDomain, email, tokens.AccessToken, p.name, authCheckInterval, key, targetHost)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, targetHost), http.StatusFound)
 	}
 
