@@ -36,6 +36,7 @@ export * from './LoginRequest';
 export * from './Metrics';
 export * from './MetricsSample';
 export * from './ModelConfiguration';
+export * from './OidcConfig';
 export * from './Overview';
 export * from './Ping200Response';
 export * from './Principal';

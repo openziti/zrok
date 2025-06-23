@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { OidcConfig } from './OidcConfig';
+import {
+    OidcConfigFromJSON,
+    OidcConfigFromJSONTyped,
+    OidcConfigToJSON,
+    OidcConfigToJSONTyped,
+} from './OidcConfig';
 import type { AuthUser } from './AuthUser';
 import {
     AuthUserFromJSON,
@@ -89,6 +96,12 @@ export interface ShareRequest {
     oauthAuthorizationCheckInterval?: string;
     /**
      * 
+     * @type {OidcConfig}
+     * @memberof ShareRequest
+     */
+    oidcConfig?: OidcConfig;
+    /**
+     * 
      * @type {boolean}
      * @memberof ShareRequest
      */
@@ -144,7 +157,8 @@ export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[key
 export const ShareRequestAuthSchemeEnum = {
     None: 'none',
     Basic: 'basic',
-    Oauth: 'oauth'
+    Oauth: 'oauth',
+    Oidc: 'oidc'
 } as const;
 export type ShareRequestAuthSchemeEnum = typeof ShareRequestAuthSchemeEnum[keyof typeof ShareRequestAuthSchemeEnum];
 
@@ -194,6 +208,7 @@ export function ShareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'oauthProvider': json['oauthProvider'] == null ? undefined : json['oauthProvider'],
         'oauthEmailDomains': json['oauthEmailDomains'] == null ? undefined : json['oauthEmailDomains'],
         'oauthAuthorizationCheckInterval': json['oauthAuthorizationCheckInterval'] == null ? undefined : json['oauthAuthorizationCheckInterval'],
+        'oidcConfig': json['oidcConfig'] == null ? undefined : OidcConfigFromJSON(json['oidcConfig']),
         'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'permissionMode': json['permissionMode'] == null ? undefined : json['permissionMode'],
         'accessGrants': json['accessGrants'] == null ? undefined : json['accessGrants'],
@@ -222,6 +237,7 @@ export function ShareRequestToJSONTyped(value?: ShareRequest | null, ignoreDiscr
         'oauthProvider': value['oauthProvider'],
         'oauthEmailDomains': value['oauthEmailDomains'],
         'oauthAuthorizationCheckInterval': value['oauthAuthorizationCheckInterval'],
+        'oidcConfig': OidcConfigToJSON(value['oidcConfig']),
         'reserved': value['reserved'],
         'permissionMode': value['permissionMode'],
         'accessGrants': value['accessGrants'],

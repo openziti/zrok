@@ -50,6 +50,7 @@ from zrok_api.models.list_organizations200_response_organizations_inner import L
 from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
+from zrok_api.models.oidc_config import OidcConfig
 from zrok_api.models.overview import Overview
 from zrok_api.models.ping200_response import Ping200Response
 from zrok_api.models.principal import Principal

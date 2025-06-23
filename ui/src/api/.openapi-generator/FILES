@@ -43,6 +43,7 @@ models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
+models/OidcConfig.ts
 models/Overview.ts
 models/Ping200Response.ts
 models/Principal.ts

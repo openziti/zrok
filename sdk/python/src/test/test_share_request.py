@@ -53,6 +53,21 @@ class TestShareRequest(unittest.TestCase):
                     ''
                     ],
                 oauth_authorization_check_interval = '',
+                oidc_config = zrok_api.models.oidc_config.oidcConfig(
+                    provider_name = '', 
+                    client_id = '', 
+                    scopes = [
+                        ''
+                        ], 
+                    auth_url = '', 
+                    token_url = '', 
+                    email_endpoint = '', 
+                    email_path = '', 
+                    supports_pkce = True, 
+                    allowed_email_filters = [
+                        ''
+                        ], 
+                    auth_timeout = '', ),
                 reserved = True,
                 permission_mode = 'open',
                 access_grants = [

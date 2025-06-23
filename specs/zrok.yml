@@ -1710,6 +1710,34 @@ definitions:
       timestamp:
         type: number
 
+  oidcConfig:
+    type: object
+    properties:
+      providerName:
+        type: string
+      clientId:
+        type: string
+      scopes:
+        type: array
+        items:
+          type: string
+      authUrl:
+        type: string
+      tokenUrl:
+        type: string
+      emailEndpoint:
+        type: string
+      emailPath:
+        type: string
+      supportsPkce:
+        type: boolean
+      allowedEmailFilters:
+        type: array
+        items:
+          type: string
+      authTimeout:
+        type: string
+
   overview:
     type: object
     properties:
@@ -1786,7 +1814,7 @@ definitions:
         type: string
       authScheme:
         type: string
-        enum: ["none", "basic", "oauth"]
+        enum: ["none", "basic", "oauth", "oidc"]
       authUsers:
         type: array
         items:
@@ -1800,6 +1828,8 @@ definitions:
           type: string
       oauthAuthorizationCheckInterval:
         type: string
+      oidcConfig:
+        $ref: "#/definitions/oidcConfig"
       reserved:
         type: boolean
       permissionMode:

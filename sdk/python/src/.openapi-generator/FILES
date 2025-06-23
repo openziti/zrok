@@ -41,6 +41,7 @@ docs/LoginRequest.md
 docs/MetadataApi.md
 docs/Metrics.md
 docs/MetricsSample.md
+docs/OidcConfig.md
 docs/Overview.md
 docs/Ping200Response.md
 docs/Principal.md
@@ -114,6 +115,7 @@ test/test_login_request.py
 test/test_metadata_api.py
 test/test_metrics.py
 test/test_metrics_sample.py
+test/test_oidc_config.py
 test/test_overview.py
 test/test_ping200_response.py
 test/test_principal.py
@@ -192,6 +194,7 @@ zrok_api/models/list_organizations200_response_organizations_inner.py
 zrok_api/models/login_request.py
 zrok_api/models/metrics.py
 zrok_api/models/metrics_sample.py
+zrok_api/models/oidc_config.py
 zrok_api/models/overview.py
 zrok_api/models/ping200_response.py
 zrok_api/models/principal.py

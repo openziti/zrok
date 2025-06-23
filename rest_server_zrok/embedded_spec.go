@@ -2755,6 +2755,47 @@ func init() {
         }
       }
     },
+    "oidcConfig": {
+      "type": "object",
+      "properties": {
+        "allowedEmailFilters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authTimeout": {
+          "type": "string"
+        },
+        "authUrl": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "emailEndpoint": {
+          "type": "string"
+        },
+        "emailPath": {
+          "type": "string"
+        },
+        "providerName": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supportsPkce": {
+          "type": "boolean"
+        },
+        "tokenUrl": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -2844,7 +2885,8 @@ func init() {
           "enum": [
             "none",
             "basic",
-            "oauth"
+            "oauth",
+            "oidc"
           ]
         },
         "authUsers": {
@@ -2893,6 +2935,9 @@ func init() {
             "github",
             "google"
           ]
+        },
+        "oidcConfig": {
+          "$ref": "#/definitions/oidcConfig"
         },
         "permissionMode": {
           "type": "string",
@@ -5714,6 +5759,47 @@ func init() {
         }
       }
     },
+    "oidcConfig": {
+      "type": "object",
+      "properties": {
+        "allowedEmailFilters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authTimeout": {
+          "type": "string"
+        },
+        "authUrl": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "emailEndpoint": {
+          "type": "string"
+        },
+        "emailPath": {
+          "type": "string"
+        },
+        "providerName": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supportsPkce": {
+          "type": "boolean"
+        },
+        "tokenUrl": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -5803,7 +5889,8 @@ func init() {
           "enum": [
             "none",
             "basic",
-            "oauth"
+            "oauth",
+            "oidc"
           ]
         },
         "authUsers": {
@@ -5852,6 +5939,9 @@ func init() {
             "github",
             "google"
           ]
+        },
+        "oidcConfig": {
+          "$ref": "#/definitions/oidcConfig"
         },
         "permissionMode": {
           "type": "string",

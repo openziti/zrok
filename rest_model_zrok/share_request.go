@@ -25,7 +25,7 @@ type ShareRequest struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// auth scheme
-	// Enum: [none basic oauth]
+	// Enum: [none basic oauth oidc]
 	AuthScheme string `json:"authScheme,omitempty"`
 
 	// auth users
@@ -53,6 +53,9 @@ type ShareRequest struct {
 	// oauth provider
 	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
+
+	// oidc config
+	OidcConfig *OidcConfig `json:"oidcConfig,omitempty"`
 
 	// permission mode
 	// Enum: [open closed]
@@ -89,6 +92,10 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateOidcConfig(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validatePermissionMode(formats); err != nil {
 		res = append(res, err)
 	}
@@ -107,7 +114,7 @@ var shareRequestTypeAuthSchemePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["none","basic","oauth"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["none","basic","oauth","oidc"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -125,6 +132,9 @@ const (
 
 	// ShareRequestAuthSchemeOauth captures enum value "oauth"
 	ShareRequestAuthSchemeOauth string = "oauth"
+
+	// ShareRequestAuthSchemeOidc captures enum value "oidc"
+	ShareRequestAuthSchemeOidc string = "oidc"
 )
 
 // prop value enum
@@ -276,6 +286,25 @@ func (m *ShareRequest) validateOauthProvider(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ShareRequest) validateOidcConfig(formats strfmt.Registry) error {
+	if swag.IsZero(m.OidcConfig) { // not required
+		return nil
+	}
+
+	if m.OidcConfig != nil {
+		if err := m.OidcConfig.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidcConfig")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidcConfig")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 var shareRequestTypePermissionModePropEnum []interface{}
 
 func init() {
@@ -368,6 +397,10 @@ func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Regis
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateOidcConfig(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -394,6 +427,27 @@ func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats str
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *ShareRequest) contextValidateOidcConfig(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OidcConfig != nil {
+
+		if swag.IsZero(m.OidcConfig) { // not required
+			return nil
+		}
+
+		if err := m.OidcConfig.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidcConfig")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidcConfig")
+			}
+			return err
+		}
 	}
 
 	return nil

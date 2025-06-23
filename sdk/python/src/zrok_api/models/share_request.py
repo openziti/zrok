@@ -20,6 +20,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from zrok_api.models.auth_user import AuthUser
+from zrok_api.models.oidc_config import OidcConfig
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -37,11 +38,12 @@ class ShareRequest(BaseModel):
     oauth_provider: Optional[StrictStr] = Field(default=None, alias="oauthProvider")
     oauth_email_domains: Optional[List[StrictStr]] = Field(default=None, alias="oauthEmailDomains")
     oauth_authorization_check_interval: Optional[StrictStr] = Field(default=None, alias="oauthAuthorizationCheckInterval")
+    oidc_config: Optional[OidcConfig] = Field(default=None, alias="oidcConfig")
     reserved: Optional[StrictBool] = None
     permission_mode: Optional[StrictStr] = Field(default=None, alias="permissionMode")
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
     unique_name: Optional[StrictStr] = Field(default=None, alias="uniqueName")
-    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "frontendSelection", "backendMode", "backendProxyEndpoint", "authScheme", "authUsers", "oauthProvider", "oauthEmailDomains", "oauthAuthorizationCheckInterval", "reserved", "permissionMode", "accessGrants", "uniqueName"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "frontendSelection", "backendMode", "backendProxyEndpoint", "authScheme", "authUsers", "oauthProvider", "oauthEmailDomains", "oauthAuthorizationCheckInterval", "oidcConfig", "reserved", "permissionMode", "accessGrants", "uniqueName"]
 
     @field_validator('share_mode')
     def share_mode_validate_enum(cls, value):
@@ -69,8 +71,8 @@ class ShareRequest(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['none', 'basic', 'oauth']):
-            raise ValueError("must be one of enum values ('none', 'basic', 'oauth')")
+        if value not in set(['none', 'basic', 'oauth', 'oidc']):
+            raise ValueError("must be one of enum values ('none', 'basic', 'oauth', 'oidc')")
         return value
 
     @field_validator('oauth_provider')
@@ -139,6 +141,9 @@ class ShareRequest(BaseModel):
                 if _item_auth_users:
                     _items.append(_item_auth_users.to_dict())
             _dict['authUsers'] = _items
+        # override the default output from pydantic by calling `to_dict()` of oidc_config
+        if self.oidc_config:
+            _dict['oidcConfig'] = self.oidc_config.to_dict()
         return _dict
 
     @classmethod
@@ -161,6 +166,7 @@ class ShareRequest(BaseModel):
             "oauthProvider": obj.get("oauthProvider"),
             "oauthEmailDomains": obj.get("oauthEmailDomains"),
             "oauthAuthorizationCheckInterval": obj.get("oauthAuthorizationCheckInterval"),
+            "oidcConfig": OidcConfig.from_dict(obj["oidcConfig"]) if obj.get("oidcConfig") is not None else None,
             "reserved": obj.get("reserved"),
             "permissionMode": obj.get("permissionMode"),
             "accessGrants": obj.get("accessGrants"),

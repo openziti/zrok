@@ -189,6 +189,7 @@ Class | Method | HTTP request | Description
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)
+ - [OidcConfig](docs/OidcConfig.md)
  - [Overview](docs/Overview.md)
  - [Ping200Response](docs/Ping200Response.md)
  - [Principal](docs/Principal.md)
