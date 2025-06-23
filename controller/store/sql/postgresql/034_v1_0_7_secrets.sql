@@ -8,8 +8,7 @@ create table secrets (
     value               text                    not null,
 
     created_at          timestamptz             not null default(current_timestamp),
-    updated_at          timestamptz             not null default(current_timestamp),
-    deleted             boolean                 not null default(false)
+    updated_at          timestamptz             not null default(current_timestamp)
 );
 
 create index secrets_share_id_idx on secrets(share_id);

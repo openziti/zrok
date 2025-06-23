@@ -32,7 +32,7 @@ func (str *Store) CreateSecrets(secrets Secrets, trx *sqlx.Tx) error {
 
 func (str *Store) GetSecrets(shareId int, trx *sqlx.Tx) (Secrets, error) {
 	secrets := Secrets{}
-	rows, err := trx.Queryx("select key, value from secrets where share_id = $1 and not deleted", shareId)
+	rows, err := trx.Queryx("select key, value from secrets where share_id = $1", shareId)
 	if err != nil {
 		return Secrets{}, errors.Wrap(err, "error getting all from secrets")
 	}
@@ -44,4 +44,11 @@ func (str *Store) GetSecrets(shareId int, trx *sqlx.Tx) (Secrets, error) {
 		secrets.Secrets = append(secrets.Secrets, secret)
 	}
 	return secrets, nil
+}
+
+func (str *Store) DeleteSecrets(shareId int, trx *sqlx.Tx) error {
+	if _, err := trx.Exec("delete from secrets where share_id = $1", shareId); err != nil {
+		return errors.Wrapf(err, "error deleting secrets for share_id = '%v'", shareId)
+	}
+	return nil
 }

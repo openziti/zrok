@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/edge-api/rest_management_api_client"
 	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
@@ -12,7 +14,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type unshareHandler struct{}
@@ -22,12 +23,12 @@ func newUnshareHandler() *unshareHandler {
 }
 
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
@@ -41,7 +42,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		return share.NewUnshareNotFound()
 	}
 	var senv *store.Environment
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
+	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx); err == nil {
 		for _, env := range envs {
 			if env.ZId == params.Body.EnvZID {
 				senv = env
@@ -58,7 +59,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 
 	var sshr *store.Share
-	if shrs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
+	if shrs, err := str.FindSharesForEnvironment(senv.Id, trx); err == nil {
 		for _, shr := range shrs {
 			if shr.ZId == shrZId {
 				sshr = shr
@@ -79,15 +80,19 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		h.deallocateResources(senv, shrToken, shrZId, edge)
 		logrus.Debugf("deallocated share '%v'", shrToken)
 
-		if err := str.DeleteAccessGrantsForShare(sshr.Id, tx); err != nil {
+		if err := str.DeleteSecrets(sshr.Id, trx); err != nil {
+			logrus.Errorf("error deleting secrets for share '%v': %v", shrToken, err)
+			return share.NewUnshareInternalServerError()
+		}
+		if err := str.DeleteAccessGrantsForShare(sshr.Id, trx); err != nil {
 			logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
 			return share.NewUnshareInternalServerError()
 		}
-		if err := str.DeleteShare(sshr.Id, tx); err != nil {
+		if err := str.DeleteShare(sshr.Id, trx); err != nil {
 			logrus.Errorf("error deleting share '%v': %v", shrToken, err)
 			return share.NewUnshareInternalServerError()
 		}
-		if err := tx.Commit(); err != nil {
+		if err := trx.Commit(); err != nil {
 			logrus.Errorf("error committing transaction for '%v': %v", shrZId, err)
 			return share.NewUnshareInternalServerError()
 		}

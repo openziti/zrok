@@ -8,8 +8,7 @@ create table secrets (
     value               text                    not null,
 
     created_at          datetime                not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-    updated_at          datetime                not null default(strftime('%Y-%m-%d %H:%M:%f', 'now')),
-    deleted             boolean                 not null default(false)
+    updated_at          datetime                not null default(strftime('%Y-%m-%d %H:%M:%f', 'now'))
 );
 
 create index secrets_share_id_idx on secrets(share_id);
