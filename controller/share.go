@@ -22,6 +22,8 @@ func newShareHandler() *shareHandler {
 }
 
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	logrus.Info("handling")
+
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
@@ -146,6 +148,8 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		} else {
 			skipInterstitial = true
 		}
+
+		logrus.Infof("allocating public resources for '%v'", shrToken)
 
 		shrZId, frontendEndpoints, err = newPublicResourceAllocator().allocate(envZId, shrToken, frontendZIds, frontendTemplates, params, !skipInterstitial, edge)
 		if err != nil {

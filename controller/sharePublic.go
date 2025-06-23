@@ -29,6 +29,13 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 	switch authScheme {
 	case sdk.Basic:
 		options.AuthSecrets = true
+
+	case sdk.Oauth:
+		options.AuthScheme = authScheme
+		options.Oauth = &sdk.OauthConfig{
+			Provider:     params.Body.OauthProvider,
+			EmailDomains: params.Body.OauthEmailDomains,
+		}
 	}
 	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, options, edge)
 	if err != nil {

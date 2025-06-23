@@ -2844,7 +2844,7 @@ func init() {
           "enum": [
             "none",
             "basic",
-            "oidc"
+            "oauth"
           ]
         },
         "authUsers": {
@@ -5803,7 +5803,7 @@ func init() {
           "enum": [
             "none",
             "basic",
-            "oidc"
+            "oauth"
           ]
         },
         "authUsers": {

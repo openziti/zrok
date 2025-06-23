@@ -25,7 +25,7 @@ type ShareRequest struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// auth scheme
-	// Enum: [none basic oidc]
+	// Enum: [none basic oauth]
 	AuthScheme string `json:"authScheme,omitempty"`
 
 	// auth users
@@ -107,7 +107,7 @@ var shareRequestTypeAuthSchemePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["none","basic","oidc"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["none","basic","oauth"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -123,8 +123,8 @@ const (
 	// ShareRequestAuthSchemeBasic captures enum value "basic"
 	ShareRequestAuthSchemeBasic string = "basic"
 
-	// ShareRequestAuthSchemeOidc captures enum value "oidc"
-	ShareRequestAuthSchemeOidc string = "oidc"
+	// ShareRequestAuthSchemeOauth captures enum value "oauth"
+	ShareRequestAuthSchemeOauth string = "oauth"
 )
 
 // prop value enum

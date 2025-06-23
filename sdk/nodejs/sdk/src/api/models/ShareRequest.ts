@@ -144,7 +144,7 @@ export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[key
 export const ShareRequestAuthSchemeEnum = {
     None: 'none',
     Basic: 'basic',
-    Oidc: 'oidc'
+    Oauth: 'oauth'
 } as const;
 export type ShareRequestAuthSchemeEnum = typeof ShareRequestAuthSchemeEnum[keyof typeof ShareRequestAuthSchemeEnum];
 

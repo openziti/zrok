@@ -69,8 +69,8 @@ class ShareRequest(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['none', 'basic', 'oidc']):
-            raise ValueError("must be one of enum values ('none', 'basic', 'oidc')")
+        if value not in set(['none', 'basic', 'oauth']):
+            raise ValueError("must be one of enum values ('none', 'basic', 'oauth')")
         return value
 
     @field_validator('oauth_provider')

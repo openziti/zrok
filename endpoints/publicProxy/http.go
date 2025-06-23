@@ -232,6 +232,7 @@ func (h *httpHandler) handleBasicAuth(w http.ResponseWriter, r *http.Request, sh
 }
 
 func (h *httpHandler) handleOAuthAuth(w http.ResponseWriter, r *http.Request, shrToken string, proxyConfig map[string]interface{}) bool {
+	logrus.Infof("handling '%v'", shrToken)
 	if oauthCfg, found := proxyConfig["oauth"]; found {
 		if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
 			authCheckInterval := h.getAuthCheckInterval(oauthCfg)
@@ -311,6 +312,8 @@ func (h *httpHandler) validateOAuthCookie(w http.ResponseWriter, r *http.Request
 		return false
 	}
 
+	logrus.Infof("validated oauth cookie for '%v'", target)
+
 	return true
 }
 
@@ -383,6 +386,8 @@ func (h *httpHandler) handleAuth(w http.ResponseWriter, r *http.Request, shrToke
 		}
 	}
 
+	logrus.Infof("authScheme = %v", authScheme)
+
 	if authScheme != "" {
 		switch authScheme {
 		case string(sdk.None):
@@ -392,7 +397,7 @@ func (h *httpHandler) handleAuth(w http.ResponseWriter, r *http.Request, shrToke
 			logrus.Debugf("auth scheme basic '%v", shrToken)
 			return h.handleBasicAuth(w, r, shrToken, secrets)
 		case string(sdk.Oauth):
-			logrus.Debugf("auth scheme oauth '%v'", shrToken)
+			logrus.Infof("auth scheme oauth '%v'", shrToken)
 			return h.handleOAuthAuth(w, r, shrToken, proxyConfig)
 		default:
 			logrus.Infof("invalid auth scheme '%v'", authScheme)
@@ -427,6 +432,8 @@ func (h *httpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		notFoundUi.WriteNotFound(w)
 		return
 	}
+
+	logrus.Infof("proxyConfig = %v", proxyConfig)
 
 	if h.handleInterstitial(w, r, proxyConfig) {
 		return
