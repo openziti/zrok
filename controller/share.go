@@ -2,14 +2,12 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/zrok/controller/shareOidc"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -21,23 +19,6 @@ import (
 )
 
 type shareHandler struct{}
-
-type oidcMetadata struct {
-	Issuer                string   `json:"issuer"`
-	AuthorizationEndpoint string   `json:"authorization_endpoint"`
-	TokenEndpoint         string   `json:"token_endpoint"`
-	UserinfoEndpoint      string   `json:"userinfo_endpoint"`
-	JwksURI               string   `json:"jwks_uri"`
-	ScopesSupported       []string `json:"scopes_supported"`
-}
-
-func (m *oidcMetadata) String() string {
-	jsonBytes, err := json.MarshalIndent(m, "", "  ")
-	if err != nil {
-		return fmt.Sprintf("error marshaling OIDC metadata: %v", err)
-	}
-	return string(jsonBytes)
-}
 
 func newShareHandler() *shareHandler {
 	return &shareHandler{}
@@ -355,39 +336,9 @@ func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.Oid
 		return errors.New("issuer URL is required")
 	}
 
-	// fetch the OIDC configuration from the well-known endpoint
-	wellKnownURL := oidcConfig.IssuerURL
-	if !strings.HasSuffix(wellKnownURL, "/") {
-		wellKnownURL += "/"
-	}
-	wellKnownURL += ".well-known/openid-configuration"
-
-	resp, err := http.Get(wellKnownURL)
+	metadata, err := shareOidc.FetchAndValidateIssuerMetadata(oidcConfig.IssuerURL)
 	if err != nil {
-		return errors.Wrapf(err, "error fetching OIDC configuration from %s", wellKnownURL)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("received non-200 status code (%d) from OIDC configuration endpoint '%v'", resp.StatusCode, wellKnownURL)
-	}
-
-	var metadata oidcMetadata
-	if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
-		return errors.Wrap(err, "error decoding OIDC configuration")
-	}
-
-	if metadata.Issuer == "" {
-		return errors.New("issuer not found in OIDC configuration")
-	}
-	if metadata.AuthorizationEndpoint == "" {
-		return errors.New("authorization_endpoint not found in OIDC configuration")
-	}
-	if metadata.TokenEndpoint == "" {
-		return errors.New("token_endpoint not found in OIDC configuration")
-	}
-	if metadata.UserinfoEndpoint == "" {
-		return errors.New("userinfo_endpoint not found in OIDC configuration")
+		return err
 	}
 
 	if oidcConfig.ClientID == "" {
@@ -429,7 +380,7 @@ func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.Oid
 		}
 	}
 
-	logrus.Infof("validated OIDC metadata: %s", &metadata)
+	logrus.Infof("validated OIDC metadata: %s", metadata)
 
 	return nil
 }
