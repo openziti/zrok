@@ -53,6 +53,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
+		AdminAddFrontendGrantHandler: admin.AddFrontendGrantHandlerFunc(func(params admin.AddFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.AddFrontendGrant has not yet been implemented")
+		}),
 		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
@@ -79,6 +82,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
+		}),
+		AdminDeleteFrontendGrantHandler: admin.DeleteFrontendGrantHandlerFunc(func(params admin.DeleteFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteFrontendGrant has not yet been implemented")
 		}),
 		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
@@ -264,6 +270,8 @@ type ZrokAPI struct {
 
 	// ShareAccessHandler sets the operation handler for the access operation
 	ShareAccessHandler share.AccessHandler
+	// AdminAddFrontendGrantHandler sets the operation handler for the add frontend grant operation
+	AdminAddFrontendGrantHandler admin.AddFrontendGrantHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
@@ -282,6 +290,8 @@ type ZrokAPI struct {
 	AdminCreateOrganizationHandler admin.CreateOrganizationHandler
 	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
 	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
+	// AdminDeleteFrontendGrantHandler sets the operation handler for the delete frontend grant operation
+	AdminDeleteFrontendGrantHandler admin.DeleteFrontendGrantHandler
 	// AdminDeleteOrganizationHandler sets the operation handler for the delete organization operation
 	AdminDeleteOrganizationHandler admin.DeleteOrganizationHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
@@ -454,6 +464,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.ShareAccessHandler == nil {
 		unregistered = append(unregistered, "share.AccessHandler")
 	}
+	if o.AdminAddFrontendGrantHandler == nil {
+		unregistered = append(unregistered, "admin.AddFrontendGrantHandler")
+	}
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
 	}
@@ -480,6 +493,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminDeleteFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteFrontendHandler")
+	}
+	if o.AdminDeleteFrontendGrantHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteFrontendGrantHandler")
 	}
 	if o.AdminDeleteOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteOrganizationHandler")
@@ -719,6 +735,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/frontend/grant"] = admin.NewAddFrontendGrant(o.context, o.AdminAddFrontendGrantHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/organization/add"] = admin.NewAddOrganizationMember(o.context, o.AdminAddOrganizationMemberHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -752,6 +772,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/frontend"] = admin.NewDeleteFrontend(o.context, o.AdminDeleteFrontendHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/frontend/grant"] = admin.NewDeleteFrontendGrant(o.context, o.AdminDeleteFrontendGrantHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

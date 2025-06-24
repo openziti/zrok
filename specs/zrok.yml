@@ -341,6 +341,54 @@ paths:
         500:
           description: internal server error
 
+  /frontend/grant:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addFrontendGrant
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              frontendToken:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteFrontendGrant
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              frontendToken:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   /frontends:
     get:
       tags:
