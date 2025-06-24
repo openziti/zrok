@@ -251,6 +251,28 @@ paths:
           description: unauthorized
         500:
           description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteAccount
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorizer
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   /frontend:
     post:

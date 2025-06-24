@@ -94,6 +94,10 @@ export interface CreateOrganizationOperationRequest {
     body?: CreateOrganizationRequest;
 }
 
+export interface DeleteAccountRequest {
+    body?: Verify200Response;
+}
+
 export interface DeleteFrontendRequest {
     body?: CreateFrontend201Response;
 }
@@ -313,6 +317,36 @@ export class AdminApi extends runtime.BaseAPI {
     async createOrganization(requestParameters: CreateOrganizationOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateOrganization201Response> {
         const response = await this.createOrganizationRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async deleteAccountRaw(requestParameters: DeleteAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/account`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Verify200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteAccount(requestParameters: DeleteAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteAccountRaw(requestParameters, initOverrides);
     }
 
     /**

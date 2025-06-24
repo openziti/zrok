@@ -62,6 +62,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_account(self) -> None:
+        """Test case for delete_account
+
+        """
+        pass
+
     def test_delete_frontend(self) -> None:
         """Test case for delete_frontend
 

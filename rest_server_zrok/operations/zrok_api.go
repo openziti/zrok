@@ -80,6 +80,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminCreateOrganizationHandler: admin.CreateOrganizationHandlerFunc(func(params admin.CreateOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateOrganization has not yet been implemented")
 		}),
+		AdminDeleteAccountHandler: admin.DeleteAccountHandlerFunc(func(params admin.DeleteAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteAccount has not yet been implemented")
+		}),
 		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
 		}),
@@ -288,6 +291,8 @@ type ZrokAPI struct {
 	AdminCreateIdentityHandler admin.CreateIdentityHandler
 	// AdminCreateOrganizationHandler sets the operation handler for the create organization operation
 	AdminCreateOrganizationHandler admin.CreateOrganizationHandler
+	// AdminDeleteAccountHandler sets the operation handler for the delete account operation
+	AdminDeleteAccountHandler admin.DeleteAccountHandler
 	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
 	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
 	// AdminDeleteFrontendGrantHandler sets the operation handler for the delete frontend grant operation
@@ -490,6 +495,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminCreateOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.CreateOrganizationHandler")
+	}
+	if o.AdminDeleteAccountHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteAccountHandler")
 	}
 	if o.AdminDeleteFrontendHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteFrontendHandler")
@@ -768,6 +776,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/organization"] = admin.NewCreateOrganization(o.context, o.AdminCreateOrganizationHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/account"] = admin.NewDeleteAccount(o.context, o.AdminDeleteAccountHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
