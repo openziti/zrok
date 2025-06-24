@@ -7,13 +7,13 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
-type privateResourceAllocator struct{}
+type privateShareZitiAllocator struct{}
 
-func newPrivateResourceAllocator() *privateResourceAllocator {
-	return &privateResourceAllocator{}
+func newPrivateShareZitiAllocator() *privateShareZitiAllocator {
+	return &privateShareZitiAllocator{}
 }
 
-func (a *privateResourceAllocator) allocate(envZId, shrToken string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
+func (a *privateShareZitiAllocator) allocate(envZId, shrToken string, params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
 	var authUsers []*sdk.AuthUserConfig
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})

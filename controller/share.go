@@ -61,13 +61,13 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	shrZId, frontendEndpoints, err := h.allocateResources(params, principal, edge, shrToken, trx)
+	shrZId, frontendEndpoints, err := h.allocateZitiResources(params, principal, edge, shrToken, trx)
 	if err != nil {
 		logrus.Errorf("error allocating resources: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
-	sshr := h.createShareRecord(shrZId, shrToken, params, frontendEndpoints)
+	sshr := h.buildShareModel(shrZId, shrToken, params, frontendEndpoints)
 
 	sid, err := h.saveShareAndGrants(sshr, envId, accessGrantAcctIds, trx)
 	if err != nil {
@@ -75,7 +75,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	if err := h.handleAuthSecrets(params, sid, sshr, trx); err != nil {
+	if err := h.storeAuthSecrets(params, sid, sshr, trx); err != nil {
 		logrus.Errorf("error handling auth secrets: %v", err)
 		return share.NewShareInternalServerError()
 	}
@@ -154,16 +154,16 @@ func (h *shareHandler) createShareToken(reserved bool, uniqueName string, trx *s
 	return uniqueName, nil
 }
 
-func (h *shareHandler) allocateResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, error) {
+func (h *shareHandler) allocateZitiResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, error) {
 	var shrZId string
 	var frontendEndpoints []string
 	var err error
 
 	switch params.Body.ShareMode {
 	case string(sdk.PublicShareMode):
-		shrZId, frontendEndpoints, err = h.allocatePublicResources(params, principal, edge, shrToken, trx)
+		shrZId, frontendEndpoints, err = h.allocatePublicShareZitiResources(params, principal, edge, shrToken, trx)
 	case string(sdk.PrivateShareMode):
-		shrZId, frontendEndpoints, err = h.allocatePrivateResources(params, edge, shrToken)
+		shrZId, frontendEndpoints, err = h.allocatePrivateShareZitiResources(params, edge, shrToken)
 	default:
 		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
 		return "", nil, errors.New("unknown share mode")
@@ -177,7 +177,7 @@ func (h *shareHandler) allocateResources(params share.ShareParams, principal *re
 	return shrZId, frontendEndpoints, nil
 }
 
-func (h *shareHandler) allocatePublicResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, error) {
+func (h *shareHandler) allocatePublicShareZitiResources(params share.ShareParams, principal *rest_model_zrok.Principal, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string, trx *sqlx.Tx) (string, []string, error) {
 	if len(params.Body.FrontendSelection) < 1 {
 		logrus.Info("no frontend selection provided")
 		return "", nil, errors.New("no frontend selection")
@@ -212,7 +212,7 @@ func (h *shareHandler) allocatePublicResources(params share.ShareParams, princip
 	}
 
 	logrus.Infof("allocating public resources for '%v'", shrToken)
-	return newPublicResourceAllocator().allocate(params.Body.EnvZID, shrToken, frontendZIds, frontendTemplates, params, !skipInterstitial, edge)
+	return newPublicShareZitiAllocator().allocate(params.Body.EnvZID, shrToken, frontendZIds, frontendTemplates, params, !skipInterstitial, edge)
 }
 
 func (h *shareHandler) determineSkipInterstitial(params share.ShareParams, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
@@ -227,11 +227,11 @@ func (h *shareHandler) determineSkipInterstitial(params share.ShareParams, princ
 	return true, nil
 }
 
-func (h *shareHandler) allocatePrivateResources(params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string) (string, []string, error) {
-	return newPrivateResourceAllocator().allocate(params.Body.EnvZID, shrToken, params, edge)
+func (h *shareHandler) allocatePrivateShareZitiResources(params share.ShareParams, edge *rest_management_api_client.ZitiEdgeManagement, shrToken string) (string, []string, error) {
+	return newPrivateShareZitiAllocator().allocate(params.Body.EnvZID, shrToken, params, edge)
 }
 
-func (h *shareHandler) createShareRecord(shrZId string, shrToken string, params share.ShareParams, frontendEndpoints []string) *store.Share {
+func (h *shareHandler) buildShareModel(shrZId string, shrToken string, params share.ShareParams, frontendEndpoints []string) *store.Share {
 	sshr := &store.Share{
 		ZId:                  shrZId,
 		Token:                shrToken,
@@ -276,7 +276,7 @@ func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGr
 	return sid, nil
 }
 
-func (h *shareHandler) handleAuthSecrets(params share.ShareParams, sid int, sshr *store.Share, trx *sqlx.Tx) error {
+func (h *shareHandler) storeAuthSecrets(params share.ShareParams, sid int, sshr *store.Share, trx *sqlx.Tx) error {
 	if sshr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Basic) {
 		logrus.Infof("writing basic auth secrets for '%v'", sshr.Token)
 		authUsersMap := make(map[string]string)
