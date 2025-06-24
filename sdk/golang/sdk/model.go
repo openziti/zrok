@@ -89,4 +89,5 @@ const (
 	None  AuthScheme = "none"
 	Basic AuthScheme = "basic"
 	Oauth AuthScheme = "oauth"
+	Oidc  AuthScheme = "oidc"
 )

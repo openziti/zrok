@@ -2,6 +2,10 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
@@ -17,6 +21,23 @@ import (
 )
 
 type shareHandler struct{}
+
+type oidcMetadata struct {
+	Issuer                string   `json:"issuer"`
+	AuthorizationEndpoint string   `json:"authorization_endpoint"`
+	TokenEndpoint         string   `json:"token_endpoint"`
+	UserinfoEndpoint      string   `json:"userinfo_endpoint"`
+	JwksURI               string   `json:"jwks_uri"`
+	ScopesSupported       []string `json:"scopes_supported"`
+}
+
+func (m *oidcMetadata) String() string {
+	jsonBytes, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return fmt.Sprintf("error marshaling OIDC metadata: %v", err)
+	}
+	return string(jsonBytes)
+}
 
 func newShareHandler() *shareHandler {
 	return &shareHandler{}
@@ -41,9 +62,17 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareTooManyRequests().WithPayload("too many shares; account limit exceeded")
 	}
 
-	accessGrantAcctIds, err := h.processAccessGrants(params, principal, trx)
+	accessGrantAcctIds, err := h.findAccountsForAccessGrants(params, principal, trx)
 	if err != nil {
 		logrus.Errorf("error processing access grants: %v", err)
+		return share.NewShareInternalServerError()
+	}
+
+	if params.Body.AuthScheme == string(sdk.Oidc) {
+		if err := h.validateOidcConfiguration(params.Body.OidcConfig); err != nil {
+			logrus.Errorf("error validating OIDC configuration: %v", err)
+			return share.NewShareUnprocessableEntity()
+		}
 		return share.NewShareInternalServerError()
 	}
 
@@ -108,7 +137,7 @@ func (h *shareHandler) validateEnvironment(envZId string, principal *rest_model_
 	return 0, errors.New("environment not found")
 }
 
-func (h *shareHandler) processAccessGrants(params share.ShareParams, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]int, error) {
+func (h *shareHandler) findAccountsForAccessGrants(params share.ShareParams, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]int, error) {
 	var accessGrantAcctIds []int
 	if store.PermissionMode(params.Body.PermissionMode) == store.ClosedPermissionMode {
 		for _, email := range params.Body.AccessGrants {
@@ -314,5 +343,93 @@ func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Princip
 			}
 		}
 	}
+	return nil
+}
+
+func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.OidcConfig) error {
+	if oidcConfig == nil {
+		return errors.New("oidc configuration is required")
+	}
+
+	if oidcConfig.IssuerURL == "" {
+		return errors.New("issuer URL is required")
+	}
+
+	// fetch the OIDC configuration from the well-known endpoint
+	wellKnownURL := oidcConfig.IssuerURL
+	if !strings.HasSuffix(wellKnownURL, "/") {
+		wellKnownURL += "/"
+	}
+	wellKnownURL += ".well-known/openid-configuration"
+
+	resp, err := http.Get(wellKnownURL)
+	if err != nil {
+		return errors.Wrapf(err, "error fetching OIDC configuration from %s", wellKnownURL)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.Errorf("received non-200 status code (%d) from OIDC configuration endpoint '%v'", resp.StatusCode, wellKnownURL)
+	}
+
+	var metadata oidcMetadata
+	if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
+		return errors.Wrap(err, "error decoding OIDC configuration")
+	}
+
+	if metadata.Issuer == "" {
+		return errors.New("issuer not found in OIDC configuration")
+	}
+	if metadata.AuthorizationEndpoint == "" {
+		return errors.New("authorization_endpoint not found in OIDC configuration")
+	}
+	if metadata.TokenEndpoint == "" {
+		return errors.New("token_endpoint not found in OIDC configuration")
+	}
+	if metadata.UserinfoEndpoint == "" {
+		return errors.New("userinfo_endpoint not found in OIDC configuration")
+	}
+
+	if oidcConfig.ClientID == "" {
+		return errors.New("client ID is required")
+	}
+	if oidcConfig.ClientSecret == "" {
+		return errors.New("client secret is required")
+	}
+
+	if len(oidcConfig.Scopes) == 0 {
+		return errors.New("at least one scope is required")
+	}
+
+	// ensure 'openid' scope is included
+	hasOpenIDScope := false
+	for _, scope := range oidcConfig.Scopes {
+		if scope == "openid" {
+			hasOpenIDScope = true
+			break
+		}
+	}
+	if !hasOpenIDScope {
+		return errors.New("'openid' scope is required for OIDC authentication")
+	}
+
+	if oidcConfig.MaxSessionDuration != "" {
+		if _, err := time.ParseDuration(oidcConfig.MaxSessionDuration); err != nil {
+			return errors.Wrap(err, "invalid max session duration")
+		}
+	}
+	if oidcConfig.IdleSessionDuration != "" {
+		if _, err := time.ParseDuration(oidcConfig.IdleSessionDuration); err != nil {
+			return errors.Wrap(err, "invalid idle session duration")
+		}
+	}
+	if oidcConfig.UserinfoRefreshInterval != "" {
+		if _, err := time.ParseDuration(oidcConfig.UserinfoRefreshInterval); err != nil {
+			return errors.Wrap(err, "invalid userinfo refresh interval")
+		}
+	}
+
+	logrus.Infof("validated OIDC metadata: %s", &metadata)
+
 	return nil
 }
