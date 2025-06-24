@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.7
+
+FEATURE: `zrok share`, `zrok reserve`, and `zrok enable` all return better HTTP 429 error messages indicating that the request is over the configured limit, when the request would exceed the configured limit
+
 ## v1.0.6
 
 CHANGE: The `/overview` endpoint has been adjusted to include a new `remoteAgent` `boolean` on the `environment` instances, indicating whether or not the environment has an enrolled remote agent (https://github.com/openziti/zrok/issues/977)
