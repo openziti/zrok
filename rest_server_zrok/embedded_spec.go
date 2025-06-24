@@ -1020,6 +1020,12 @@ func init() {
           "404": {
             "description": "account not found"
           },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -2299,7 +2305,10 @@ func init() {
             "description": "unprocessable"
           },
           "429": {
-            "description": "over limit"
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",
@@ -3970,6 +3979,12 @@ func init() {
           "404": {
             "description": "account not found"
           },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -5198,7 +5213,10 @@ func init() {
             "description": "unprocessable"
           },
           "429": {
-            "description": "over limit"
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",

@@ -156,6 +156,7 @@ Name | Type | Description  | Notes
 **201** | environment enabled |  -  |
 **401** | unauthorized |  -  |
 **404** | account not found |  -  |
+**429** | over limit |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

@@ -373,6 +373,7 @@ ShareTooManyRequests describes a response with status code 429, with default hea
 over limit
 */
 type ShareTooManyRequests struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 // IsSuccess returns true when this share too many requests response has a 2xx status code
@@ -406,14 +407,23 @@ func (o *ShareTooManyRequests) Code() int {
 }
 
 func (o *ShareTooManyRequests) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests ", 429)
+	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests  %+v", 429, o.Payload)
 }
 
 func (o *ShareTooManyRequests) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests ", 429)
+	return fmt.Sprintf("[POST /share][%d] shareTooManyRequests  %+v", 429, o.Payload)
+}
+
+func (o *ShareTooManyRequests) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *ShareTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

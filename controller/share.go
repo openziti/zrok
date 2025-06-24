@@ -23,8 +23,6 @@ func newShareHandler() *shareHandler {
 }
 
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	logrus.Info("handling")
-
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
@@ -40,7 +38,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	if err := h.checkLimits(envId, principal, params.Body.Reserved, params.Body.UniqueName != "", sdk.ShareMode(params.Body.ShareMode), sdk.BackendMode(params.Body.BackendMode), trx); err != nil {
 		logrus.Errorf("limits error for '%v': %v", principal.Email, err)
-		return share.NewShareTooManyRequests()
+		return share.NewShareTooManyRequests().WithPayload("too many shares; account limit exceeded")
 	}
 
 	accessGrantAcctIds, err := h.processAccessGrants(params, principal, trx)
@@ -51,7 +49,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error getting ziti management client: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
