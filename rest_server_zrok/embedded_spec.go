@@ -212,7 +212,7 @@ func init() {
             "description": "ok"
           },
           "401": {
-            "description": "unauthorizer"
+            "description": "unauthorized"
           },
           "404": {
             "description": "not found"
@@ -3169,7 +3169,7 @@ func init() {
             "description": "ok"
           },
           "401": {
-            "description": "unauthorizer"
+            "description": "unauthorized"
           },
           "404": {
             "description": "not found"

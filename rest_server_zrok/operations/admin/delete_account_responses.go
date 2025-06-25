@@ -40,7 +40,7 @@ func (o *DeleteAccountOK) WriteResponse(rw http.ResponseWriter, producer runtime
 const DeleteAccountUnauthorizedCode int = 401
 
 /*
-DeleteAccountUnauthorized unauthorizer
+DeleteAccountUnauthorized unauthorized
 
 swagger:response deleteAccountUnauthorized
 */

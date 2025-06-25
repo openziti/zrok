@@ -115,7 +115,7 @@ func NewDeleteAccountUnauthorized() *DeleteAccountUnauthorized {
 /*
 DeleteAccountUnauthorized describes a response with status code 401, with default header values.
 
-unauthorizer
+unauthorized
 */
 type DeleteAccountUnauthorized struct {
 }

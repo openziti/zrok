@@ -552,7 +552,7 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | ok |  -  |
-**401** | unauthorizer |  -  |
+**401** | unauthorized |  -  |
 **404** | not found |  -  |
 **500** | internal server error |  -  |
 
