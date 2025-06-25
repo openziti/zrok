@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.7
+
+FEATURE: New add and delete API endpoints for frontend grants. New `zrok admin create frontend-grant` and `zrok admin delete frontend-grant` CLI for invoking these API endpoints from the command line (https://github.com/openziti/zrok/issues/992)
+
 ## v1.0.6
 
 CHANGE: The `/overview` endpoint has been adjusted to include a new `remoteAgent` `boolean` on the `environment` instances, indicating whether or not the environment has an enrolled remote agent (https://github.com/openziti/zrok/issues/977)
