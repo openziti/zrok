@@ -51,6 +51,11 @@ func (h *deleteFrontendGrantHandler) Handle(params admin.DeleteFrontendGrantPara
 		}
 		logrus.Infof("deleted '%v' access to frontend '%v'", acct.Email, fe.Token)
 
+		if err := trx.Commit(); err != nil {
+			logrus.Errorf("error committing transaction: %v", err)
+			return admin.NewAddFrontendGrantInternalServerError()
+		}
+
 	} else {
 		logrus.Infof("account '%v' not granted access to frontend '%v'", acct.Email, fe.Token)
 	}

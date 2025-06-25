@@ -50,7 +50,12 @@ func (h *addFrontendGrantHandler) Handle(params admin.AddFrontendGrantParams, pr
 			return admin.NewAddFrontendGrantInternalServerError()
 		}
 		logrus.Infof("granted '%v' access to frontend '%v'", acct.Email, fe.Token)
-		
+
+		if err := trx.Commit(); err != nil {
+			logrus.Errorf("error committing transaction: %v", err)
+			return admin.NewAddFrontendGrantInternalServerError()
+		}
+
 	} else {
 		logrus.Infof("account '%v' already granted access to frontend '%v'", acct.Email, fe.Token)
 	}
