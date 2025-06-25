@@ -134,7 +134,7 @@ func (h *accessHandler) checkAccessGrants(shr *store.Share, ownerAccountId int, 
 		logrus.Infof("accessing own share '%v' for '%v'", shr.Token, principal.Email)
 		return nil
 	}
-	count, err := str.CheckAccessGrantForShareAndAccount(shr.Id, int(principal.ID), trx)
+	count, err := str.IsAccessGrantedToAccountForShare(shr.Id, int(principal.ID), trx)
 	if err != nil {
 		logrus.Infof("error checking access grants for '%v': %v", shr.Token, err)
 		return err

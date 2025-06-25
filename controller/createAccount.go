@@ -16,7 +16,7 @@ func newCreateAccountHandler() *createAccountHandler {
 
 func (h *createAccountHandler) Handle(params admin.CreateAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		logrus.Error("invalid admin principal")
 		return admin.NewCreateAccountUnauthorized()
 	}
 
@@ -36,9 +36,8 @@ func (h *createAccountHandler) Handle(params admin.CreateAccountParams, principa
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewCreateAccountInternalServerError()
 	}
-	defer func() {
-		_ = trx.Rollback()
-	}()
+	defer trx.Rollback()
+	
 	a := &store.Account{
 		Email:    params.Body.Email,
 		Salt:     hpwd.Salt,

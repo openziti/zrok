@@ -7,7 +7,6 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -36,12 +35,12 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	publicName := args[1]
 	urlTemplate := args[2]
 
-	env, err := environment.LoadRoot()
+	root, err := environment.LoadRoot()
 	if err != nil {
 		panic(err)
 	}
 
-	zrok, err := env.Client()
+	zrok, err := root.Client()
 	if err != nil {
 		panic(err)
 	}
@@ -61,10 +60,8 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		switch err.(type) {
 		case *admin.CreateFrontendBadRequest:
 			tui.Error("create frontend request failed: name already exists", err)
-			os.Exit(1)
 		default:
 			tui.Error("create frontend request failed", err)
-			os.Exit(1)
 		}
 	}
 

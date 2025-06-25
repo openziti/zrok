@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/edge-api/rest_management_api_client"
@@ -13,7 +15,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type disableHandler struct{}
@@ -29,48 +30,55 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		return environment.NewDisableInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
+
 	env, err := str.FindEnvironmentForAccount(params.Body.Identity, int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("identity check failed for user '%v': %v", principal.Email, err)
 		return environment.NewDisableUnauthorized()
 	}
+
 	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := h.removeSharesForEnvironment(env, trx, edge); err != nil {
-		logrus.Errorf("error removing shares for environment for user '%v': %v", principal.Email, err)
+
+	if err := disableEnvironment(env, trx, edge); err != nil {
+		logrus.Errorf("error disabling environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
-	if err := h.removeFrontendsForEnvironment(env, trx, edge); err != nil {
-		logrus.Errorf("error removing frontends for environment for user '%v': %v", principal.Email, err)
-		return environment.NewDisableInternalServerError()
-	}
-	if err := h.removeAgentRemoteForEnvironment(env, trx, edge); err != nil {
-		logrus.Errorf("error removing agent remote for '%v' (%v): %v", env.ZId, principal.Email, err)
-		return environment.NewDisableInternalServerError()
-	}
-	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
-		logrus.Errorf("error deleting edge router policy for user '%v': %v", principal.Email, err)
-		return environment.NewDisableInternalServerError()
-	}
-	if err := zrokEdgeSdk.DeleteIdentity(env.ZId, edge); err != nil {
-		logrus.Errorf("error deleting identity for user '%v': %v", principal.Email, err)
-		return environment.NewDisableInternalServerError()
-	}
-	if err := h.removeEnvironmentFromStore(env, trx); err != nil {
-		logrus.Errorf("error removing environment for user '%v': %v", principal.Email, err)
-		return environment.NewDisableInternalServerError()
-	}
+
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
+
 	return environment.NewDisableOK()
 }
 
-func (h *disableHandler) removeSharesForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func disableEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+	if err := removeSharesForEnvironment(env, trx, edge); err != nil {
+		return errors.Wrapf(err, "error removing shares for environment '%v'", env.ZId)
+	}
+	if err := removeFrontendsForEnvironment(env, trx, edge); err != nil {
+		return errors.Wrapf(err, "error removing frontends for environment '%v'", env.ZId)
+	}
+	if err := removeAgentRemoteForEnvironment(env, trx, edge); err != nil {
+		return errors.Wrapf(err, "error removing agent remote for '%v'", env.ZId)
+	}
+	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(env.ZId, edge); err != nil {
+		return errors.Wrapf(err, "error deleting edge router policy for environment '%v'", env.ZId)
+	}
+	if err := zrokEdgeSdk.DeleteIdentity(env.ZId, edge); err != nil {
+		return errors.Wrapf(err, "error deleting identity for environment '%v'", env.ZId)
+	}
+	if err := removeEnvironmentFromStore(env, trx); err != nil {
+		return errors.Wrapf(err, "error removing environment '%v' from store", env.ZId)
+	}
+	return nil
+}
+
+func removeSharesForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 	if err != nil {
 		return err
@@ -98,7 +106,7 @@ func (h *disableHandler) removeSharesForEnvironment(env *store.Environment, trx 
 	return nil
 }
 
-func (h *disableHandler) removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 	if err != nil {
 		return err
@@ -111,7 +119,7 @@ func (h *disableHandler) removeFrontendsForEnvironment(env *store.Environment, t
 	return nil
 }
 
-func (h *disableHandler) removeAgentRemoteForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
+func removeAgentRemoteForEnvironment(env *store.Environment, trx *sqlx.Tx, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	enrolled, err := str.IsAgentEnrolledForEnvironment(env.Id, trx)
 	if err != nil {
 		return err
@@ -160,7 +168,7 @@ func (h *disableHandler) removeAgentRemoteForEnvironment(env *store.Environment,
 	return nil
 }
 
-func (h *disableHandler) removeEnvironmentFromStore(env *store.Environment, trx *sqlx.Tx) error {
+func removeEnvironmentFromStore(env *store.Environment, trx *sqlx.Tx) error {
 	shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding shares for environment '%d'", env.Id)

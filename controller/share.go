@@ -199,7 +199,7 @@ func (h *shareHandler) allocatePublicShareZitiResources(params share.ShareParams
 			return "", nil, err
 		}
 		if sfe.PermissionMode == store.ClosedPermissionMode {
-			granted, err := str.IsFrontendGrantedToAccount(int(principal.ID), sfe.Id, trx)
+			granted, err := str.IsFrontendGrantedToAccount(sfe.Id, int(principal.ID), trx)
 			if err != nil {
 				return "", nil, err
 			}

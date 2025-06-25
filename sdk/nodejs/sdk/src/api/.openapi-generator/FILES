@@ -9,6 +9,7 @@ apis/index.ts
 index.ts
 models/Access201Response.ts
 models/AccessRequest.ts
+models/AddFrontendGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
 models/AddSecretsAccessRequest.ts
 models/AuthUser.ts
