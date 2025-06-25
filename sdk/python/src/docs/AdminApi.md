@@ -4,13 +4,16 @@ All URIs are relative to */api/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**add_frontend_grant**](AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
 [**add_organization_member**](AdminApi.md#add_organization_member) | **POST** /organization/add | 
 [**add_secrets_access**](AdminApi.md#add_secrets_access) | **POST** /secrets/access | 
 [**create_account**](AdminApi.md#create_account) | **POST** /account | 
 [**create_frontend**](AdminApi.md#create_frontend) | **POST** /frontend | 
 [**create_identity**](AdminApi.md#create_identity) | **POST** /identity | 
 [**create_organization**](AdminApi.md#create_organization) | **POST** /organization | 
+[**delete_account**](AdminApi.md#delete_account) | **DELETE** /account | 
 [**delete_frontend**](AdminApi.md#delete_frontend) | **DELETE** /frontend | 
+[**delete_frontend_grant**](AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
 [**delete_identity**](AdminApi.md#delete_identity) | **DELETE** /identity | 
 [**delete_organization**](AdminApi.md#delete_organization) | **DELETE** /organization | 
 [**delete_secrets_access**](AdminApi.md#delete_secrets_access) | **DELETE** /secrets/access | 
@@ -22,6 +25,81 @@ Method | HTTP request | Description
 [**remove_organization_member**](AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 [**update_frontend**](AdminApi.md#update_frontend) | **PATCH** /frontend | 
 
+
+# **add_frontend_grant**
+> add_frontend_grant(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.AddFrontendGrantRequest() # AddFrontendGrantRequest |  (optional)
+
+    try:
+        api_instance.add_frontend_grant(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->add_frontend_grant: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**AddFrontendGrantRequest**](AddFrontendGrantRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **add_organization_member**
 > add_organization_member(body=body)
@@ -483,6 +561,81 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **delete_account**
+> delete_account(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.verify200_response import Verify200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.Verify200Response() # Verify200Response |  (optional)
+
+    try:
+        api_instance.delete_account(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->delete_account: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Verify200Response**](Verify200Response.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **delete_frontend**
 > delete_frontend(body=body)
 
@@ -552,6 +705,81 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | frontend deleted |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **delete_frontend_grant**
+> delete_frontend_grant(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.AddFrontendGrantRequest() # AddFrontendGrantRequest |  (optional)
+
+    try:
+        api_instance.delete_frontend_grant(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->delete_frontend_grant: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**AddFrontendGrantRequest**](AddFrontendGrantRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
 **401** | unauthorized |  -  |
 **404** | not found |  -  |
 **500** | internal server error |  -  |

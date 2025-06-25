@@ -100,13 +100,16 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**reset_password**](docs/AccountApi.md#reset_password) | **POST** /resetPassword | 
 *AccountApi* | [**reset_password_request**](docs/AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
 *AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
+*AdminApi* | [**add_frontend_grant**](docs/AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
 *AdminApi* | [**add_secrets_access**](docs/AdminApi.md#add_secrets_access) | **POST** /secrets/access | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
 *AdminApi* | [**create_organization**](docs/AdminApi.md#create_organization) | **POST** /organization | 
+*AdminApi* | [**delete_account**](docs/AdminApi.md#delete_account) | **DELETE** /account | 
 *AdminApi* | [**delete_frontend**](docs/AdminApi.md#delete_frontend) | **DELETE** /frontend | 
+*AdminApi* | [**delete_frontend_grant**](docs/AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**delete_secrets_access**](docs/AdminApi.md#delete_secrets_access) | **DELETE** /secrets/access | 
@@ -155,6 +158,7 @@ Class | Method | HTTP request | Description
 
  - [Access201Response](docs/Access201Response.md)
  - [AccessRequest](docs/AccessRequest.md)
+ - [AddFrontendGrantRequest](docs/AddFrontendGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
  - [AddSecretsAccessRequest](docs/AddSecretsAccessRequest.md)
  - [AuthUser](docs/AuthUser.md)
