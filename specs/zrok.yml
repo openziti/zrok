@@ -385,6 +385,10 @@ paths:
           description: ok
         401:
           description: unauthorized
+        404:
+          description: not found
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
     delete:
@@ -408,6 +412,10 @@ paths:
           description: ok
         401:
           description: unauthorized
+        404:
+          description: not found
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
 

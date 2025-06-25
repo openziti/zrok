@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // AddFrontendGrantOKCode is the HTTP code returned for type AddFrontendGrantOK
@@ -59,6 +61,49 @@ func (o *AddFrontendGrantUnauthorized) WriteResponse(rw http.ResponseWriter, pro
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
+}
+
+// AddFrontendGrantNotFoundCode is the HTTP code returned for type AddFrontendGrantNotFound
+const AddFrontendGrantNotFoundCode int = 404
+
+/*
+AddFrontendGrantNotFound not found
+
+swagger:response addFrontendGrantNotFound
+*/
+type AddFrontendGrantNotFound struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewAddFrontendGrantNotFound creates AddFrontendGrantNotFound with default headers values
+func NewAddFrontendGrantNotFound() *AddFrontendGrantNotFound {
+
+	return &AddFrontendGrantNotFound{}
+}
+
+// WithPayload adds the payload to the add frontend grant not found response
+func (o *AddFrontendGrantNotFound) WithPayload(payload rest_model_zrok.ErrorMessage) *AddFrontendGrantNotFound {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the add frontend grant not found response
+func (o *AddFrontendGrantNotFound) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *AddFrontendGrantNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(404)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // AddFrontendGrantInternalServerErrorCode is the HTTP code returned for type AddFrontendGrantInternalServerError

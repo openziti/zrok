@@ -8,10 +8,13 @@ package admin
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // DeleteFrontendGrantReader is a Reader for the DeleteFrontendGrant structure.
@@ -30,6 +33,12 @@ func (o *DeleteFrontendGrantReader) ReadResponse(response runtime.ClientResponse
 		return result, nil
 	case 401:
 		result := NewDeleteFrontendGrantUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 404:
+		result := NewDeleteFrontendGrantNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -153,6 +162,72 @@ func (o *DeleteFrontendGrantUnauthorized) String() string {
 }
 
 func (o *DeleteFrontendGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewDeleteFrontendGrantNotFound creates a DeleteFrontendGrantNotFound with default headers values
+func NewDeleteFrontendGrantNotFound() *DeleteFrontendGrantNotFound {
+	return &DeleteFrontendGrantNotFound{}
+}
+
+/*
+DeleteFrontendGrantNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type DeleteFrontendGrantNotFound struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+// IsSuccess returns true when this delete frontend grant not found response has a 2xx status code
+func (o *DeleteFrontendGrantNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete frontend grant not found response has a 3xx status code
+func (o *DeleteFrontendGrantNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete frontend grant not found response has a 4xx status code
+func (o *DeleteFrontendGrantNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete frontend grant not found response has a 5xx status code
+func (o *DeleteFrontendGrantNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete frontend grant not found response a status code equal to that given
+func (o *DeleteFrontendGrantNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the delete frontend grant not found response
+func (o *DeleteFrontendGrantNotFound) Code() int {
+	return 404
+}
+
+func (o *DeleteFrontendGrantNotFound) Error() string {
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound  %+v", 404, o.Payload)
+}
+
+func (o *DeleteFrontendGrantNotFound) String() string {
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound  %+v", 404, o.Payload)
+}
+
+func (o *DeleteFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *DeleteFrontendGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

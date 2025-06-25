@@ -1248,6 +1248,12 @@ func init() {
           "401": {
             "description": "unauthorized"
           },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -1286,6 +1292,12 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"
@@ -4147,6 +4159,12 @@ func init() {
           "401": {
             "description": "unauthorized"
           },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -4185,6 +4203,12 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"

@@ -8,10 +8,13 @@ package admin
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // AddFrontendGrantReader is a Reader for the AddFrontendGrant structure.
@@ -30,6 +33,12 @@ func (o *AddFrontendGrantReader) ReadResponse(response runtime.ClientResponse, c
 		return result, nil
 	case 401:
 		result := NewAddFrontendGrantUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 404:
+		result := NewAddFrontendGrantNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -153,6 +162,72 @@ func (o *AddFrontendGrantUnauthorized) String() string {
 }
 
 func (o *AddFrontendGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewAddFrontendGrantNotFound creates a AddFrontendGrantNotFound with default headers values
+func NewAddFrontendGrantNotFound() *AddFrontendGrantNotFound {
+	return &AddFrontendGrantNotFound{}
+}
+
+/*
+AddFrontendGrantNotFound describes a response with status code 404, with default header values.
+
+not found
+*/
+type AddFrontendGrantNotFound struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+// IsSuccess returns true when this add frontend grant not found response has a 2xx status code
+func (o *AddFrontendGrantNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this add frontend grant not found response has a 3xx status code
+func (o *AddFrontendGrantNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this add frontend grant not found response has a 4xx status code
+func (o *AddFrontendGrantNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this add frontend grant not found response has a 5xx status code
+func (o *AddFrontendGrantNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this add frontend grant not found response a status code equal to that given
+func (o *AddFrontendGrantNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
+// Code gets the status code for the add frontend grant not found response
+func (o *AddFrontendGrantNotFound) Code() int {
+	return 404
+}
+
+func (o *AddFrontendGrantNotFound) Error() string {
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound  %+v", 404, o.Payload)
+}
+
+func (o *AddFrontendGrantNotFound) String() string {
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound  %+v", 404, o.Payload)
+}
+
+func (o *AddFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *AddFrontendGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
