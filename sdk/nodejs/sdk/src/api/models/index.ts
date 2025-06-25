@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './Access201Response';
 export * from './AccessRequest';
+export * from './AddFrontendGrantRequest';
 export * from './AddOrganizationMemberRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';

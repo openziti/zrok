@@ -26,6 +26,12 @@ class TestAdminApi(unittest.TestCase):
     def tearDown(self) -> None:
         pass
 
+    def test_add_frontend_grant(self) -> None:
+        """Test case for add_frontend_grant
+
+        """
+        pass
+
     def test_add_organization_member(self) -> None:
         """Test case for add_organization_member
 
@@ -56,8 +62,20 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_account(self) -> None:
+        """Test case for delete_account
+
+        """
+        pass
+
     def test_delete_frontend(self) -> None:
         """Test case for delete_frontend
+
+        """
+        pass
+
+    def test_delete_frontend_grant(self) -> None:
+        """Test case for delete_frontend_grant
 
         """
         pass

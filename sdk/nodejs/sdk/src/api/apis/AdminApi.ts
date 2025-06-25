@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  AddFrontendGrantRequest,
   AddOrganizationMemberRequest,
   CreateFrontend201Response,
   CreateFrontendRequest,
@@ -33,6 +34,8 @@ import type {
   Verify200Response,
 } from '../models/index';
 import {
+    AddFrontendGrantRequestFromJSON,
+    AddFrontendGrantRequestToJSON,
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
     CreateFrontend201ResponseFromJSON,
@@ -67,6 +70,10 @@ import {
     Verify200ResponseToJSON,
 } from '../models/index';
 
+export interface AddFrontendGrantOperationRequest {
+    body?: AddFrontendGrantRequest;
+}
+
 export interface AddOrganizationMemberOperationRequest {
     body?: AddOrganizationMemberRequest;
 }
@@ -87,8 +94,16 @@ export interface CreateOrganizationOperationRequest {
     body?: CreateOrganizationRequest;
 }
 
+export interface DeleteAccountRequest {
+    body?: Verify200Response;
+}
+
 export interface DeleteFrontendRequest {
     body?: CreateFrontend201Response;
+}
+
+export interface DeleteFrontendGrantRequest {
+    body?: AddFrontendGrantRequest;
 }
 
 export interface DeleteOrganizationRequest {
@@ -119,6 +134,36 @@ export interface UpdateFrontendOperationRequest {
  * 
  */
 export class AdminApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async addFrontendGrantRaw(requestParameters: AddFrontendGrantOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/frontend/grant`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddFrontendGrantRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async addFrontendGrant(requestParameters: AddFrontendGrantOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addFrontendGrantRaw(requestParameters, initOverrides);
+    }
 
     /**
      */
@@ -276,6 +321,36 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async deleteAccountRaw(requestParameters: DeleteAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/account`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Verify200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteAccount(requestParameters: DeleteAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteAccountRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async deleteFrontendRaw(requestParameters: DeleteFrontendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -302,6 +377,36 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteFrontend(requestParameters: DeleteFrontendRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteFrontendRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteFrontendGrantRaw(requestParameters: DeleteFrontendGrantRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/frontend/grant`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddFrontendGrantRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteFrontendGrant(requestParameters: DeleteFrontendGrantRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteFrontendGrantRaw(requestParameters, initOverrides);
     }
 
     /**

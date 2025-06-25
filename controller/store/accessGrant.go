@@ -14,16 +14,16 @@ type AccessGrant struct {
 func (str *Store) CreateAccessGrant(shareId, accountId int, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into access_grants (share_id, account_id) values ($1, $2) returning id")
 	if err != nil {
-		return 0, errors.Wrap(err, "error preparing access_grant insert statement")
+		return 0, errors.Wrap(err, "error preparing access_grants insert statement")
 	}
 	var id int
 	if err := stmt.QueryRow(shareId, accountId).Scan(&id); err != nil {
-		return 0, errors.Wrap(err, "error executing access_grant insert statement")
+		return 0, errors.Wrap(err, "error executing access_grants insert statement")
 	}
 	return id, nil
 }
 
-func (str *Store) CheckAccessGrantForShareAndAccount(shrId, acctId int, tx *sqlx.Tx) (int, error) {
+func (str *Store) IsAccessGrantedToAccountForShare(shrId, acctId int, tx *sqlx.Tx) (int, error) {
 	count := 0
 	err := tx.QueryRowx("select count(0) from access_grants where share_id = $1 and account_id = $2 and not deleted", shrId, acctId).Scan(&count)
 	if err != nil {

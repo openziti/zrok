@@ -70,3 +70,14 @@ func (str *Store) UpdateAccount(a *Account, tx *sqlx.Tx) (int, error) {
 	}
 	return id, nil
 }
+
+func (str *Store) DeleteAccount(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update accounts set deleted = true where id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing accounts delete statement")
+	}
+	if _, err := stmt.Exec(id); err != nil {
+		return errors.Wrap(err, "error executing accounts delete statement")
+	}
+	return nil
+}

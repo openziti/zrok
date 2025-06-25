@@ -42,8 +42,7 @@ func (cmd *adminDeleteFrontendCommand) run(_ *cobra.Command, args []string) {
 	req := admin.NewDeleteFrontendParams()
 	req.Body.FrontendToken = feToken
 
-	_, err = zrok.Admin.DeleteFrontend(req, mustGetAdminAuth())
-	if err != nil {
+	if _, err := zrok.Admin.DeleteFrontend(req, mustGetAdminAuth()); err != nil {
 		panic(err)
 	}
 

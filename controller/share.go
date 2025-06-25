@@ -117,7 +117,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 				return share.NewShareNotFound()
 			}
 			if sfe.PermissionMode == store.ClosedPermissionMode {
-				granted, err := str.IsFrontendGrantedToAccount(int(principal.ID), sfe.Id, trx)
+				granted, err := str.IsFrontendGrantedToAccount(sfe.Id, int(principal.ID), trx)
 				if err != nil {
 					logrus.Error(err)
 					return share.NewShareInternalServerError()
