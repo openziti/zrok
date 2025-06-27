@@ -6,6 +6,8 @@ FEATURE: New add and delete API endpoints for frontend grants. New `zrok admin c
 
 FEATURE: New admin endpoint for deleting accounts. New `zrok admin delete account` CLI for invoking the API endpoint from the command line (https://github.com/openziti/zrok/issues/993)
 
+FEATURE: New API endpoint (`/overview/public-frontends`) that returns the public frontends available to authenticated account. The public frontends include those marked with the `open` permission mode, and those marked `closed` where the user has a frontend grant allowing them to access the frontend (https://github.com/openziti/zrok/issues/996)
+
 ## v1.0.6
 
 CHANGE: The `/overview` endpoint has been adjusted to include a new `remoteAgent` `boolean` on the `environment` instances, indicating whether or not the environment has an enrolled remote agent (https://github.com/openziti/zrok/issues/977)
