@@ -7,13 +7,13 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
-type publicResourceAllocator struct{}
+type publicShareZitiAllocator struct{}
 
-func newPublicResourceAllocator() *publicResourceAllocator {
-	return &publicResourceAllocator{}
+func newPublicShareZitiAllocator() *publicShareZitiAllocator {
+	return &publicShareZitiAllocator{}
 }
 
-func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, interstitial bool, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
+func (a *publicShareZitiAllocator) allocate(envZId, shrToken string, frontendZIds, frontendTemplates []string, params share.ShareParams, interstitial bool, edge *rest_management_api_client.ZitiEdgeManagement) (shrZId string, frontendEndpoints []string, err error) {
 	var authUsers []*sdk.AuthUserConfig
 	for _, authUser := range params.Body.AuthUsers {
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
@@ -23,14 +23,19 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 		return "", nil, err
 	}
 	options := &zrokEdgeSdk.FrontendOptions{
-		Interstitial:   interstitial,
-		AuthScheme:     authScheme,
-		BasicAuthUsers: authUsers,
-		Oauth: &sdk.OauthConfig{
-			Provider:                   params.Body.OauthProvider,
-			EmailDomains:               params.Body.OauthEmailDomains,
-			AuthorizationCheckInterval: params.Body.OauthAuthorizationCheckInterval,
-		},
+		Interstitial: interstitial,
+		AuthSecrets:  false,
+	}
+	switch authScheme {
+	case sdk.Basic:
+		options.AuthSecrets = true
+
+	case sdk.Oauth:
+		options.AuthScheme = authScheme
+		options.Oauth = &sdk.OauthConfig{
+			Provider:     params.Body.OauthProvider,
+			EmailDomains: params.Body.OauthEmailDomains,
+		}
 	}
 	cfgId, err := zrokEdgeSdk.CreateConfig(zrokProxyConfigId, envZId, shrToken, options, edge)
 	if err != nil {

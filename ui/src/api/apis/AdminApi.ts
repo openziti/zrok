@@ -17,12 +17,14 @@ import * as runtime from '../runtime';
 import type {
   AddFrontendGrantRequest,
   AddOrganizationMemberRequest,
+  AddSecretsAccessRequest,
   CreateFrontend201Response,
   CreateFrontendRequest,
   CreateIdentity201Response,
   CreateIdentityRequest,
   CreateOrganization201Response,
   CreateOrganizationRequest,
+  DeleteIdentityRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
   ListOrganizationMembers200Response,
@@ -38,6 +40,8 @@ import {
     AddFrontendGrantRequestToJSON,
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
+    AddSecretsAccessRequestFromJSON,
+    AddSecretsAccessRequestToJSON,
     CreateFrontend201ResponseFromJSON,
     CreateFrontend201ResponseToJSON,
     CreateFrontendRequestFromJSON,
@@ -50,6 +54,8 @@ import {
     CreateOrganization201ResponseToJSON,
     CreateOrganizationRequestFromJSON,
     CreateOrganizationRequestToJSON,
+    DeleteIdentityRequestFromJSON,
+    DeleteIdentityRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
@@ -76,6 +82,10 @@ export interface AddFrontendGrantOperationRequest {
 
 export interface AddOrganizationMemberOperationRequest {
     body?: AddOrganizationMemberRequest;
+}
+
+export interface AddSecretsAccessOperationRequest {
+    body?: AddSecretsAccessRequest;
 }
 
 export interface CreateAccountRequest {
@@ -106,8 +116,16 @@ export interface DeleteFrontendGrantRequest {
     body?: AddFrontendGrantRequest;
 }
 
+export interface DeleteIdentityOperationRequest {
+    body?: DeleteIdentityRequest;
+}
+
 export interface DeleteOrganizationRequest {
     body?: CreateOrganization201Response;
+}
+
+export interface DeleteSecretsAccessRequest {
+    body?: AddSecretsAccessRequest;
 }
 
 export interface GrantsRequest {
@@ -193,6 +211,36 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async addOrganizationMember(requestParameters: AddOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.addOrganizationMemberRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async addSecretsAccessRaw(requestParameters: AddSecretsAccessOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/secrets/access`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddSecretsAccessRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async addSecretsAccess(requestParameters: AddSecretsAccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addSecretsAccessRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -411,6 +459,36 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async deleteIdentityRaw(requestParameters: DeleteIdentityOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/identity`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DeleteIdentityRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteIdentity(requestParameters: DeleteIdentityOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteIdentityRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async deleteOrganizationRaw(requestParameters: DeleteOrganizationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -437,6 +515,36 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteOrganization(requestParameters: DeleteOrganizationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteOrganizationRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteSecretsAccessRaw(requestParameters: DeleteSecretsAccessRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/secrets/access`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddSecretsAccessRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteSecretsAccess(requestParameters: DeleteSecretsAccessRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteSecretsAccessRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -13,6 +13,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // EnableReader is a Reader for the Enable structure.
@@ -37,6 +39,12 @@ func (o *EnableReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		return nil, result
 	case 404:
 		result := NewEnableNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 429:
+		result := NewEnableTooManyRequests()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -228,6 +236,72 @@ func (o *EnableNotFound) String() string {
 }
 
 func (o *EnableNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewEnableTooManyRequests creates a EnableTooManyRequests with default headers values
+func NewEnableTooManyRequests() *EnableTooManyRequests {
+	return &EnableTooManyRequests{}
+}
+
+/*
+EnableTooManyRequests describes a response with status code 429, with default header values.
+
+over limit
+*/
+type EnableTooManyRequests struct {
+	Payload rest_model_zrok.ErrorMessage
+}
+
+// IsSuccess returns true when this enable too many requests response has a 2xx status code
+func (o *EnableTooManyRequests) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this enable too many requests response has a 3xx status code
+func (o *EnableTooManyRequests) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this enable too many requests response has a 4xx status code
+func (o *EnableTooManyRequests) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this enable too many requests response has a 5xx status code
+func (o *EnableTooManyRequests) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this enable too many requests response a status code equal to that given
+func (o *EnableTooManyRequests) IsCode(code int) bool {
+	return code == 429
+}
+
+// Code gets the status code for the enable too many requests response
+func (o *EnableTooManyRequests) Code() int {
+	return 429
+}
+
+func (o *EnableTooManyRequests) Error() string {
+	return fmt.Sprintf("[POST /enable][%d] enableTooManyRequests  %+v", 429, o.Payload)
+}
+
+func (o *EnableTooManyRequests) String() string {
+	return fmt.Sprintf("[POST /enable][%d] enableTooManyRequests  %+v", 429, o.Payload)
+}
+
+func (o *EnableTooManyRequests) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
+}
+
+func (o *EnableTooManyRequests) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

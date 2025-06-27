@@ -34,6 +34,8 @@ type ClientService interface {
 
 	AddOrganizationMember(params *AddOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddOrganizationMemberCreated, error)
 
+	AddSecretsAccess(params *AddSecretsAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddSecretsAccessOK, error)
+
 	CreateAccount(params *CreateAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateAccountCreated, error)
 
 	CreateFrontend(params *CreateFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateFrontendCreated, error)
@@ -48,7 +50,11 @@ type ClientService interface {
 
 	DeleteFrontendGrant(params *DeleteFrontendGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteFrontendGrantOK, error)
 
+	DeleteIdentity(params *DeleteIdentityParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteIdentityOK, error)
+
 	DeleteOrganization(params *DeleteOrganizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteOrganizationOK, error)
+
+	DeleteSecretsAccess(params *DeleteSecretsAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteSecretsAccessOK, error)
 
 	Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantsOK, error)
 
@@ -142,6 +148,45 @@ func (a *Client) AddOrganizationMember(params *AddOrganizationMemberParams, auth
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for addOrganizationMember: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+AddSecretsAccess add secrets access API
+*/
+func (a *Client) AddSecretsAccess(params *AddSecretsAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddSecretsAccessOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAddSecretsAccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "addSecretsAccess",
+		Method:             "POST",
+		PathPattern:        "/secrets/access",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &AddSecretsAccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AddSecretsAccessOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for addSecretsAccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -419,6 +464,45 @@ func (a *Client) DeleteFrontendGrant(params *DeleteFrontendGrantParams, authInfo
 }
 
 /*
+DeleteIdentity delete identity API
+*/
+func (a *Client) DeleteIdentity(params *DeleteIdentityParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteIdentityOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteIdentityParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteIdentity",
+		Method:             "DELETE",
+		PathPattern:        "/identity",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DeleteIdentityReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteIdentityOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteIdentity: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 DeleteOrganization delete organization API
 */
 func (a *Client) DeleteOrganization(params *DeleteOrganizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteOrganizationOK, error) {
@@ -454,6 +538,45 @@ func (a *Client) DeleteOrganization(params *DeleteOrganizationParams, authInfo r
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteOrganization: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+DeleteSecretsAccess delete secrets access API
+*/
+func (a *Client) DeleteSecretsAccess(params *DeleteSecretsAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteSecretsAccessOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteSecretsAccessParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteSecretsAccess",
+		Method:             "DELETE",
+		PathPattern:        "/secrets/access",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DeleteSecretsAccessReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteSecretsAccessOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteSecretsAccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

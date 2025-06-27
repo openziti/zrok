@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **oauth_provider** | **str** |  | [optional] 
 **oauth_email_domains** | **List[str]** |  | [optional] 
 **oauth_authorization_check_interval** | **str** |  | [optional] 
+**oidc_config** | [**OidcConfig**](OidcConfig.md) |  | [optional] 
 **reserved** | **bool** |  | [optional] 
 **permission_mode** | **str** |  | [optional] 
 **access_grants** | **List[str]** |  | [optional] 

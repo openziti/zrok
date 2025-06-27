@@ -503,6 +503,28 @@ paths:
           description: unauthorized
         500:
           description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteIdentity
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              zId:
+                type: string
+      responses: 
+        200:
+          description: deleted
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   /invite/token/generate:
     post:
@@ -686,6 +708,52 @@ paths:
                       type: string
                     description:
                       type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /secrets/access:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addSecretsAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              secretsAccessIdentityZId:
+                type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: access not added
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteSecretsAccess
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              secretsAccessIdentityZId:
+                type: string
+      responses:
+        200:
+          description: ok
+        400:
+          description: access not removed
         401:
           description: unauthorized
         500:
@@ -1036,6 +1104,10 @@ paths:
           description: unauthorized
         404:
           description: account not found
+        429:
+          description: over limit
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
 
@@ -1533,6 +1605,10 @@ paths:
           description: conflict
         422:
           description: unprocessable
+        429:
+          description: over limit
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
           schema:
@@ -1746,6 +1822,34 @@ definitions:
       timestamp:
         type: number
 
+  oidcConfig:
+    type: object
+    properties:
+      providerId:
+        type: string
+      issuerUrl:
+        type: string
+      authzUrlParams:
+        type: array
+        items:
+          type: string
+      cookieDomain:
+        type: string
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      scopes:
+        type: array
+        items:
+          type: string
+      maxSessionDuration:
+        type: string
+      idleSessionDuration:
+        type: string
+      userinfoRefreshInterval:
+        type: string
+
   overview:
     type: object
     properties:
@@ -1822,6 +1926,7 @@ definitions:
         type: string
       authScheme:
         type: string
+        enum: ["none", "basic", "oauth", "oidc"]
       authUsers:
         type: array
         items:
@@ -1835,6 +1940,8 @@ definitions:
           type: string
       oauthAuthorizationCheckInterval:
         type: string
+      oidcConfig:
+        $ref: "#/definitions/oidcConfig"
       reserved:
         type: boolean
       permissionMode:

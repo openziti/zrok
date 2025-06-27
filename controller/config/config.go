@@ -1,6 +1,10 @@
 package config
 
 import (
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/emailUi"
@@ -10,9 +14,6 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
-	"os"
-	"strconv"
-	"time"
 )
 
 const ConfigVersion = 4
@@ -30,6 +31,7 @@ type Config struct {
 	Metrics         *metrics.Config
 	Registration    *RegistrationConfig
 	ResetPassword   *ResetPasswordConfig
+	Secrets         *SecretsConfig
 	Store           *store.Config
 	Ziti            *zrokEdgeSdk.Config
 	Tls             *TlsConfig
@@ -76,6 +78,12 @@ type ResetPasswordMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
+}
+
+type SecretsConfig struct {
+	ZId          string
+	IdentityPath string
+	ServiceName  string
 }
 
 type TlsConfig struct {
