@@ -31,6 +31,8 @@ export * from './ListOrganizationMembers200Response';
 export * from './ListOrganizationMembers200ResponseMembersInner';
 export * from './ListOrganizations200Response';
 export * from './ListOrganizations200ResponseOrganizationsInner';
+export * from './ListPublicFrontendsForAccount200Response';
+export * from './ListPublicFrontendsForAccount200ResponsePublicFrontendsInner';
 export * from './LoginRequest';
 export * from './Metrics';
 export * from './MetricsSample';

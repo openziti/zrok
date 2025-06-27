@@ -1254,6 +1254,32 @@ paths:
           schema:
             $ref: "#/definitions/errorMessage"
 
+  /overview/public-frontends:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: listPublicFrontendsForAccount
+      responses:
+        200:
+          description: public frontends list returned
+          schema:
+            properties:
+              publicFrontends:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    publicName:
+                      type: string
+                    urlTemplate:
+                      type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   /overview/{organizationToken}/{accountEmail}:
       get:
         tags:

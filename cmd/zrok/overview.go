@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
 )
 
+var overviewCmd *cobra.Command
+
 func init() {
-	rootCmd.AddCommand(newOverviewCommand().cmd)
+	overviewCmd = newOverviewCommand().cmd
+	rootCmd.AddCommand(overviewCmd)
 }
 
 type overviewCommand struct {
