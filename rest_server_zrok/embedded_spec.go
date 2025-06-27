@@ -2083,11 +2083,19 @@ func init() {
             "description": "public frontends list returned",
             "schema": {
               "properties": {
-                "publicName": {
-                  "type": "string"
-                },
-                "urlTemplate": {
-                  "type": "string"
+                "publicFrontends": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "publicName": {
+                        "type": "string"
+                      },
+                      "urlTemplate": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -4977,11 +4985,11 @@ func init() {
             "description": "public frontends list returned",
             "schema": {
               "properties": {
-                "publicName": {
-                  "type": "string"
-                },
-                "urlTemplate": {
-                  "type": "string"
+                "publicFrontends": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicFrontendsItems0"
+                  }
                 }
               }
             }
@@ -5608,6 +5616,17 @@ func init() {
           "type": "string"
         },
         "organizationToken": {
+          "type": "string"
+        }
+      }
+    },
+    "PublicFrontendsItems0": {
+      "type": "object",
+      "properties": {
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
           "type": "string"
         }
       }

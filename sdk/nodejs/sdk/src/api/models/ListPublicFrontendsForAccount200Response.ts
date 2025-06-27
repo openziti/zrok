@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ListPublicFrontendsForAccount200ResponsePublicFrontendsInner } from './ListPublicFrontendsForAccount200ResponsePublicFrontendsInner';
+import {
+    ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerFromJSON,
+    ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerFromJSONTyped,
+    ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerToJSON,
+    ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerToJSONTyped,
+} from './ListPublicFrontendsForAccount200ResponsePublicFrontendsInner';
+
 /**
  * 
  * @export
@@ -21,16 +29,10 @@ import { mapValues } from '../runtime';
 export interface ListPublicFrontendsForAccount200Response {
     /**
      * 
-     * @type {string}
+     * @type {Array<ListPublicFrontendsForAccount200ResponsePublicFrontendsInner>}
      * @memberof ListPublicFrontendsForAccount200Response
      */
-    publicName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListPublicFrontendsForAccount200Response
-     */
-    urlTemplate?: string;
+    publicFrontends?: Array<ListPublicFrontendsForAccount200ResponsePublicFrontendsInner>;
 }
 
 /**
@@ -50,8 +52,7 @@ export function ListPublicFrontendsForAccount200ResponseFromJSONTyped(json: any,
     }
     return {
         
-        'publicName': json['publicName'] == null ? undefined : json['publicName'],
-        'urlTemplate': json['urlTemplate'] == null ? undefined : json['urlTemplate'],
+        'publicFrontends': json['publicFrontends'] == null ? undefined : ((json['publicFrontends'] as Array<any>).map(ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerFromJSON)),
     };
 }
 
@@ -66,8 +67,7 @@ export function ListPublicFrontendsForAccount200ResponseToJSONTyped(value?: List
 
     return {
         
-        'publicName': value['publicName'],
-        'urlTemplate': value['urlTemplate'],
+        'publicFrontends': value['publicFrontends'] == null ? undefined : ((value['publicFrontends'] as Array<any>).map(ListPublicFrontendsForAccount200ResponsePublicFrontendsInnerToJSON)),
     };
 }
 

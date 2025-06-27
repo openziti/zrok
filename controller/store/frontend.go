@@ -107,6 +107,46 @@ func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
 	return frontends, nil
 }
 
+func (str *Store) FindOpenPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := tx.Queryx("select frontends.* from frontends where environment_id is null and permission_mode = 'open' and reserved = true and not deleted")
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting open public frontends")
+	}
+	var frontends []*Frontend
+	for rows.Next() {
+		frontend := &Frontend{}
+		if err := rows.StructScan(frontend); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend")
+		}
+		frontends = append(frontends, frontend)
+	}
+	return frontends, nil
+}
+
+func (str *Store) FindClosedPublicFrontendsGrantedToAccount(accountId int, tx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := tx.Queryx(`
+		select frontends.* from frontends 
+		inner join frontend_grants on frontends.id = frontend_grants.frontend_id 
+		where frontend_grants.account_id = $1 
+		and frontends.environment_id is null 
+		and frontends.permission_mode = 'closed' 
+		and frontends.reserved = true 
+		and not frontends.deleted 
+		and not frontend_grants.deleted`, accountId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting closed public frontends granted to account")
+	}
+	var frontends []*Frontend
+	for rows.Next() {
+		frontend := &Frontend{}
+		if err := rows.StructScan(frontend); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend")
+		}
+		frontends = append(frontends, frontend)
+	}
+	return frontends, nil
+}
+
 func (str *Store) FindFrontendsForPrivateShare(shrId int, tx *sqlx.Tx) ([]*Frontend, error) {
 	rows, err := tx.Queryx("select frontends.* from frontends where private_share_id = $1 and not deleted", shrId)
 	if err != nil {

@@ -16,7 +16,7 @@ func newListMembershipsHandler() *listMembershipsHandler {
 func (h *listMembershipsHandler) Handle(_ metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error startin transaction: %v", err)
+		logrus.Errorf("error starting transaction: %v", err)
 		return metadata.NewListMembershipsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()

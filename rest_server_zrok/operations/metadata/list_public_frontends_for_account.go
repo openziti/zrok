@@ -8,7 +8,9 @@ package metadata
 import (
 	"context"
 	"net/http"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -78,20 +80,86 @@ func (o *ListPublicFrontendsForAccount) ServeHTTP(rw http.ResponseWriter, r *htt
 // swagger:model ListPublicFrontendsForAccountOKBody
 type ListPublicFrontendsForAccountOKBody struct {
 
-	// public name
-	PublicName string `json:"publicName,omitempty"`
-
-	// url template
-	URLTemplate string `json:"urlTemplate,omitempty"`
+	// public frontends
+	PublicFrontends []*ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0 `json:"publicFrontends"`
 }
 
 // Validate validates this list public frontends for account o k body
 func (o *ListPublicFrontendsForAccountOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validatePublicFrontends(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this list public frontends for account o k body based on context it is used
+func (o *ListPublicFrontendsForAccountOKBody) validatePublicFrontends(formats strfmt.Registry) error {
+	if swag.IsZero(o.PublicFrontends) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.PublicFrontends); i++ {
+		if swag.IsZero(o.PublicFrontends[i]) { // not required
+			continue
+		}
+
+		if o.PublicFrontends[i] != nil {
+			if err := o.PublicFrontends[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listPublicFrontendsForAccountOK" + "." + "publicFrontends" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("listPublicFrontendsForAccountOK" + "." + "publicFrontends" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this list public frontends for account o k body based on the context it is used
 func (o *ListPublicFrontendsForAccountOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidatePublicFrontends(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *ListPublicFrontendsForAccountOKBody) contextValidatePublicFrontends(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.PublicFrontends); i++ {
+
+		if o.PublicFrontends[i] != nil {
+
+			if swag.IsZero(o.PublicFrontends[i]) { // not required
+				return nil
+			}
+
+			if err := o.PublicFrontends[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listPublicFrontendsForAccountOK" + "." + "publicFrontends" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("listPublicFrontendsForAccountOK" + "." + "publicFrontends" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -106,6 +174,46 @@ func (o *ListPublicFrontendsForAccountOKBody) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *ListPublicFrontendsForAccountOKBody) UnmarshalBinary(b []byte) error {
 	var res ListPublicFrontendsForAccountOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0 list public frontends for account o k body public frontends items0
+//
+// swagger:model ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0
+type ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0 struct {
+
+	// public name
+	PublicName string `json:"publicName,omitempty"`
+
+	// url template
+	URLTemplate string `json:"urlTemplate,omitempty"`
+}
+
+// Validate validates this list public frontends for account o k body public frontends items0
+func (o *ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this list public frontends for account o k body public frontends items0 based on context it is used
+func (o *ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0) UnmarshalBinary(b []byte) error {
+	var res ListPublicFrontendsForAccountOKBodyPublicFrontendsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

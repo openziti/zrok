@@ -17,18 +17,18 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from zrok_api.models.list_public_frontends_for_account200_response_public_frontends_inner import ListPublicFrontendsForAccount200ResponsePublicFrontendsInner
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ListPublicFrontendsForAccount200Response(BaseModel):
+class ListPublicFrontendsForAccount200ResponsePublicFrontendsInner(BaseModel):
     """
-    ListPublicFrontendsForAccount200Response
+    ListPublicFrontendsForAccount200ResponsePublicFrontendsInner
     """ # noqa: E501
-    public_frontends: Optional[List[ListPublicFrontendsForAccount200ResponsePublicFrontendsInner]] = Field(default=None, alias="publicFrontends")
-    __properties: ClassVar[List[str]] = ["publicFrontends"]
+    public_name: Optional[StrictStr] = Field(default=None, alias="publicName")
+    url_template: Optional[StrictStr] = Field(default=None, alias="urlTemplate")
+    __properties: ClassVar[List[str]] = ["publicName", "urlTemplate"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -48,7 +48,7 @@ class ListPublicFrontendsForAccount200Response(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ListPublicFrontendsForAccount200Response from a JSON string"""
+        """Create an instance of ListPublicFrontendsForAccount200ResponsePublicFrontendsInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -69,18 +69,11 @@ class ListPublicFrontendsForAccount200Response(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in public_frontends (list)
-        _items = []
-        if self.public_frontends:
-            for _item_public_frontends in self.public_frontends:
-                if _item_public_frontends:
-                    _items.append(_item_public_frontends.to_dict())
-            _dict['publicFrontends'] = _items
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ListPublicFrontendsForAccount200Response from a dict"""
+        """Create an instance of ListPublicFrontendsForAccount200ResponsePublicFrontendsInner from a dict"""
         if obj is None:
             return None
 
@@ -88,7 +81,8 @@ class ListPublicFrontendsForAccount200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "publicFrontends": [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.from_dict(_item) for _item in obj["publicFrontends"]] if obj.get("publicFrontends") is not None else None
+            "publicName": obj.get("publicName"),
+            "urlTemplate": obj.get("urlTemplate")
         })
         return _obj
 

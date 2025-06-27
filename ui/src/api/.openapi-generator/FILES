@@ -39,6 +39,7 @@ models/ListOrganizationMembers200ResponseMembersInner.ts
 models/ListOrganizations200Response.ts
 models/ListOrganizations200ResponseOrganizationsInner.ts
 models/ListPublicFrontendsForAccount200Response.ts
+models/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.ts
 models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts

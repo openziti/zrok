@@ -187,6 +187,7 @@ Class | Method | HTTP request | Description
  - [ListOrganizations200Response](docs/ListOrganizations200Response.md)
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
+ - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)

@@ -1266,10 +1266,15 @@ paths:
           description: public frontends list returned
           schema:
             properties:
-              publicName:
-                type: string
-              urlTemplate:
-                type: string
+              publicFrontends:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    publicName:
+                      type: string
+                    urlTemplate:
+                      type: string
         401:
           description: unauthorized
         500:

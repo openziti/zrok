@@ -35,8 +35,11 @@ class TestListPublicFrontendsForAccount200Response(unittest.TestCase):
         model = ListPublicFrontendsForAccount200Response()
         if include_optional:
             return ListPublicFrontendsForAccount200Response(
-                public_name = '',
-                url_template = ''
+                public_frontends = [
+                    zrok_api.models.list_public_frontends_for_account_200_response_public_frontends_inner.listPublicFrontendsForAccount_200_response_publicFrontends_inner(
+                        public_name = '', 
+                        url_template = '', )
+                    ]
             )
         else:
             return ListPublicFrontendsForAccount200Response(

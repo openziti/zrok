@@ -5,8 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**public_name** | **str** |  | [optional] 
-**url_template** | **str** |  | [optional] 
+**public_frontends** | [**List[ListPublicFrontendsForAccount200ResponsePublicFrontendsInner]**](ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md) |  | [optional] 
 
 ## Example
 
