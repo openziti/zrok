@@ -12,25 +12,26 @@ import (
 )
 
 func init() {
-	organizationCmd.AddCommand(newOrgMembershipsCommand().cmd)
+	overviewCmd.AddCommand(newOverviewFrontendsCommand().cmd)
 }
 
-type orgMembershipsCommand struct {
+type overviewPublicFrontendsCommand struct {
 	cmd *cobra.Command
 }
 
-func newOrgMembershipsCommand() *orgMembershipsCommand {
+func newOverviewFrontendsCommand() *overviewPublicFrontendsCommand {
 	cmd := &cobra.Command{
-		Use:   "memberships",
-		Short: "List the organization memberships for my account",
-		Args:  cobra.NoArgs,
+		Use:     "public-frontends",
+		Short:   "Show the available public frontends",
+		Aliases: []string{"pf"},
+		Args:    cobra.NoArgs,
 	}
-	command := &orgMembershipsCommand{cmd}
+	command := &overviewPublicFrontendsCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
+func (cmd *overviewPublicFrontendsCommand) run(_ *cobra.Command, _ []string) {
 	root, err := environment.LoadRoot()
 	if err != nil {
 		if !panicInstead {
@@ -50,28 +51,28 @@ func (c *orgMembershipsCommand) run(_ *cobra.Command, _ []string) {
 		}
 		panic(err)
 	}
-	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
-	in, err := zrok.Metadata.ListMemberships(nil, auth)
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
+	resp, err := zrok.Metadata.ListPublicFrontendsForAccount(nil, auth)
 	if err != nil {
 		if !panicInstead {
-			tui.Error("error listing memberships", err)
+			tui.Error("error listing public frontends", err)
 		}
 		panic(err)
 	}
 
-	if len(in.Payload.Memberships) > 0 {
+	if len(resp.Payload.PublicFrontends) > 0 {
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleColoredDark)
-		t.AppendHeader(table.Row{"Organization Token", "Description", "Admin?"})
-		for _, i := range in.Payload.Memberships {
-			t.AppendRow(table.Row{i.OrganizationToken, i.Description, i.Admin})
+		t.AppendHeader(table.Row{"Frontend Name", "URL Template"})
+		for _, i := range resp.Payload.PublicFrontends {
+			t.AppendRow(table.Row{i.PublicName, i.URLTemplate})
 		}
 		t.Render()
 		fmt.Println()
 	} else {
-		fmt.Println("no organization memberships.")
+		fmt.Println("no public frontends found")
 	}
 }
