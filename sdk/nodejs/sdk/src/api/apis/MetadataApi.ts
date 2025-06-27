@@ -23,6 +23,7 @@ import type {
   GetSparklinesRequest,
   ListMemberships200Response,
   ListOrganizationMembers200Response,
+  ListPublicFrontendsForAccount200Response,
   Metrics,
   ModelConfiguration,
   Overview,
@@ -46,6 +47,8 @@ import {
     ListMemberships200ResponseToJSON,
     ListOrganizationMembers200ResponseFromJSON,
     ListOrganizationMembers200ResponseToJSON,
+    ListPublicFrontendsForAccount200ResponseFromJSON,
+    ListPublicFrontendsForAccount200ResponseToJSON,
     MetricsFromJSON,
     MetricsToJSON,
     ModelConfigurationFromJSON,
@@ -490,6 +493,34 @@ export class MetadataApi extends runtime.BaseAPI {
      */
     async listOrgMembers(requestParameters: ListOrgMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizationMembers200Response> {
         const response = await this.listOrgMembersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listPublicFrontendsForAccountRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListPublicFrontendsForAccount200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+        const response = await this.request({
+            path: `/overview/public-frontends`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListPublicFrontendsForAccount200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listPublicFrontendsForAccount(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListPublicFrontendsForAccount200Response> {
+        const response = await this.listPublicFrontendsForAccountRaw(initOverrides);
         return await response.value();
     }
 

@@ -2111,6 +2111,48 @@ func init() {
         }
       }
     },
+    "/overview/public-frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listPublicFrontendsForAccount",
+        "responses": {
+          "200": {
+            "description": "public frontends list returned",
+            "schema": {
+              "properties": {
+                "publicFrontends": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "publicName": {
+                        "type": "string"
+                      },
+                      "urlTemplate": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview/{organizationToken}/{accountEmail}": {
       "get": {
         "security": [
@@ -5149,6 +5191,40 @@ func init() {
         }
       }
     },
+    "/overview/public-frontends": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listPublicFrontendsForAccount",
+        "responses": {
+          "200": {
+            "description": "public frontends list returned",
+            "schema": {
+              "properties": {
+                "publicFrontends": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicFrontendsItems0"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/overview/{organizationToken}/{accountEmail}": {
       "get": {
         "security": [
@@ -5846,6 +5922,17 @@ func init() {
           "type": "string"
         },
         "organizationToken": {
+          "type": "string"
+        }
+      }
+    },
+    "PublicFrontendsItems0": {
+      "type": "object",
+      "properties": {
+        "publicName": {
+          "type": "string"
+        },
+        "urlTemplate": {
           "type": "string"
         }
       }

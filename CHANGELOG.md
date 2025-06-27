@@ -6,6 +6,8 @@ FEATURE: New add and delete API endpoints for frontend grants. New `zrok admin c
 
 FEATURE: New admin endpoint for deleting accounts. New `zrok admin delete account` CLI for invoking the API endpoint from the command line (https://github.com/openziti/zrok/issues/993)
 
+FEATURE: New API endpoint (`/overview/public-frontends`) that returns the public frontends available to authenticated account. The public frontends include those marked with the `open` permission mode, and those marked `closed` where the user has a frontend grant allowing them to access the frontend. New CLI command `zrok overview public-frontends` to allow end users to list the public frontends their account can use (https://github.com/openziti/zrok/issues/996)
+
 FEATURE: `zrok share`, `zrok reserve`, and `zrok enable` all return better HTTP 429 error messages indicating that the request is over the configured limit, when the request would exceed the configured limit
 
 ## v1.0.6
