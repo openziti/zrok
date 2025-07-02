@@ -20,8 +20,8 @@ type Secrets struct {
 	JwksUri               string
 }
 
-func NewSecrets(clientId, clientSecret string, meta *IssuerMetadata) *Secrets {
-	secrets := &Secrets{
+func NewSecrets(clientId, clientSecret string, meta *IssuerMetadata) Secrets {
+	secrets := Secrets{
 		ClientId:              clientId,
 		ClientSecret:          clientSecret,
 		Scopes:                meta.ScopesSupported,
@@ -34,13 +34,13 @@ func NewSecrets(clientId, clientSecret string, meta *IssuerMetadata) *Secrets {
 	return secrets
 }
 
-func FromGrpc(in *secretsGrpc.SecretsResponse) (*Secrets, error) {
-	secrets := &Secrets{}
+func FromGrpc(in *secretsGrpc.SecretsResponse) (Secrets, error) {
+	secrets := Secrets{}
 	for _, secret := range in.Secrets {
 		switch secret.Key {
 		case "auth_scheme":
 			if secret.Value != string(sdk.Oidc) {
-				return nil, errors.Errorf("expected 'oidc' auth_scheme, got '%v'", secret.Value)
+				return Secrets{}, errors.Errorf("expected 'oidc' auth_scheme, got '%v'", secret.Value)
 			}
 		case "oidc_client_id":
 			secrets.ClientId = secret.Value
@@ -63,7 +63,7 @@ func FromGrpc(in *secretsGrpc.SecretsResponse) (*Secrets, error) {
 	return secrets, nil
 }
 
-func (s *Secrets) ToStore(shareId int) *store.Secrets {
+func (s Secrets) ToStore(shareId int) store.Secrets {
 	var secrets []store.Secret
 	secrets = append(secrets, store.Secret{Key: "auth_scheme", Value: "oidc"})
 	secrets = append(secrets, store.Secret{Key: "oidc_client_id", Value: s.ClientId})
@@ -74,5 +74,5 @@ func (s *Secrets) ToStore(shareId int) *store.Secrets {
 	secrets = append(secrets, store.Secret{Key: "oidc_token_endpoint", Value: s.TokenEndpoint})
 	secrets = append(secrets, store.Secret{Key: "oidc_userinfo_endpoint", Value: s.UserinfoEndpoint})
 	secrets = append(secrets, store.Secret{Key: "oidc_jwks_uri", Value: s.JwksUri})
-	return &store.Secrets{ShareId: shareId, Secrets: secrets}
+	return store.Secrets{ShareId: shareId, Secrets: secrets}
 }

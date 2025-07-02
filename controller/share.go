@@ -49,8 +49,10 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
+	var oidcIssuerMetadata *shareOidc.IssuerMetadata
 	if params.Body.AuthScheme == string(sdk.Oidc) {
-		if err := h.validateOidcConfiguration(params.Body.OidcConfig); err != nil {
+		oidcIssuerMetadata, err = h.validateOidcConfiguration(params.Body.OidcConfig)
+		if err != nil {
 			logrus.Errorf("error validating OIDC configuration: %v", err)
 			return share.NewShareUnprocessableEntity()
 		}
@@ -83,7 +85,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	if err := h.storeAuthSecrets(params, sid, sshr, trx); err != nil {
+	if err := h.storeAuthSecrets(params, oidcIssuerMetadata, sshr, trx); err != nil {
 		logrus.Errorf("error handling auth secrets: %v", err)
 		return share.NewShareInternalServerError()
 	}
@@ -284,20 +286,31 @@ func (h *shareHandler) saveShareAndGrants(sshr *store.Share, envId int, accessGr
 	return sid, nil
 }
 
-func (h *shareHandler) storeAuthSecrets(params share.ShareParams, sid int, sshr *store.Share, trx *sqlx.Tx) error {
-	if sshr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Basic) {
-		logrus.Infof("writing basic auth secrets for '%v'", sshr.Token)
+func (h *shareHandler) storeAuthSecrets(params share.ShareParams, oidcIssuerMetadata *shareOidc.IssuerMetadata, shr *store.Share, trx *sqlx.Tx) error {
+	if shr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Oidc) && params.Body.OidcConfig != nil {
+		logrus.Infof("writing oidc auth secrets for '%v'", shr.Token)
+		secrets := shareOidc.NewSecrets(
+			params.Body.OidcConfig.ClientID,
+			params.Body.OidcConfig.ClientSecret,
+			oidcIssuerMetadata,
+		)
+		if err := str.CreateSecrets(secrets.ToStore(shr.Id), trx); err != nil {
+			return err
+		}
+
+	} else if shr.ShareMode == string(sdk.PublicShareMode) && params.Body.AuthScheme == string(sdk.Basic) {
+		logrus.Infof("writing basic auth secrets for '%v'", shr.Token)
 		authUsersMap := make(map[string]string)
 		for _, authUser := range params.Body.AuthUsers {
 			authUsersMap[authUser.Username] = authUser.Password
 		}
 		authUsersMapJson, err := json.Marshal(authUsersMap)
 		if err != nil {
-			logrus.Errorf("error marshalling auth secrets for '%v': %v", sshr.Token, err)
+			logrus.Errorf("error marshalling auth secrets for '%v': %v", shr.Token, err)
 			return err
 		}
 		secrets := store.Secrets{
-			ShareId: sid,
+			ShareId: shr.Id,
 			Secrets: []store.Secret{
 				{Key: "auth_scheme", Value: string(sdk.Basic)},
 				{Key: "auth_users", Value: string(authUsersMapJson)},
@@ -307,7 +320,7 @@ func (h *shareHandler) storeAuthSecrets(params share.ShareParams, sid int, sshr 
 			logrus.Errorf("error creating secrets: %v", err)
 			return err
 		}
-		logrus.Infof("wrote auth secrets for '%v'", sshr.Token)
+		logrus.Infof("wrote auth secrets for '%v'", shr.Token)
 	}
 	return nil
 }
@@ -327,29 +340,29 @@ func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Princip
 	return nil
 }
 
-func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.OidcConfig) error {
+func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.OidcConfig) (*shareOidc.IssuerMetadata, error) {
 	if oidcConfig == nil {
-		return errors.New("oidc configuration is required")
+		return nil, errors.New("oidc configuration is required")
 	}
 
 	if oidcConfig.IssuerURL == "" {
-		return errors.New("issuer URL is required")
+		return nil, errors.New("issuer URL is required")
 	}
 
 	metadata, err := shareOidc.FetchAndValidateIssuerMetadata(oidcConfig.IssuerURL)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if oidcConfig.ClientID == "" {
-		return errors.New("client ID is required")
+		return nil, errors.New("client ID is required")
 	}
 	if oidcConfig.ClientSecret == "" {
-		return errors.New("client secret is required")
+		return nil, errors.New("client secret is required")
 	}
 
 	if len(oidcConfig.Scopes) == 0 {
-		return errors.New("at least one scope is required")
+		return nil, errors.New("at least one scope is required")
 	}
 
 	// ensure 'openid' scope is included
@@ -361,26 +374,26 @@ func (h *shareHandler) validateOidcConfiguration(oidcConfig *rest_model_zrok.Oid
 		}
 	}
 	if !hasOpenIDScope {
-		return errors.New("'openid' scope is required for OIDC authentication")
+		return nil, errors.New("'openid' scope is required for OIDC authentication")
 	}
 
 	if oidcConfig.MaxSessionDuration != "" {
 		if _, err := time.ParseDuration(oidcConfig.MaxSessionDuration); err != nil {
-			return errors.Wrap(err, "invalid max session duration")
+			return nil, errors.Wrap(err, "invalid max session duration")
 		}
 	}
 	if oidcConfig.IdleSessionDuration != "" {
 		if _, err := time.ParseDuration(oidcConfig.IdleSessionDuration); err != nil {
-			return errors.Wrap(err, "invalid idle session duration")
+			return nil, errors.Wrap(err, "invalid idle session duration")
 		}
 	}
 	if oidcConfig.UserinfoRefreshInterval != "" {
 		if _, err := time.ParseDuration(oidcConfig.UserinfoRefreshInterval); err != nil {
-			return errors.Wrap(err, "invalid userinfo refresh interval")
+			return nil, errors.Wrap(err, "invalid userinfo refresh interval")
 		}
 	}
 
 	logrus.Infof("validated OIDC metadata: %s", metadata)
 
-	return nil
+	return metadata, nil
 }
