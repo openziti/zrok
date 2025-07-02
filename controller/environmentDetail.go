@@ -70,6 +70,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		es.Shares = append(es.Shares, &rest_model_zrok.Share{
 			ShareToken:           shr.Token,
 			ZID:                  shr.ZId,
+			EnvZID:               senv.ZId,
 			ShareMode:            shr.ShareMode,
 			BackendMode:          shr.BackendMode,
 			FrontendSelection:    feSelection,

@@ -30,6 +30,9 @@ type Share struct {
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
+	// env z Id
+	EnvZID string `json:"envZId,omitempty"`
+
 	// frontend endpoint
 	FrontendEndpoint string `json:"frontendEndpoint,omitempty"`
 

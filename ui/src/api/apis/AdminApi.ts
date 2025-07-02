@@ -166,8 +166,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontend/grant`;
+
         const response = await this.request({
-            path: `/frontend/grant`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -196,8 +199,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organization/add`;
+
         const response = await this.request({
-            path: `/organization/add`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -226,8 +232,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/secrets/access`;
+
         const response = await this.request({
-            path: `/secrets/access`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -256,8 +265,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/account`;
+
         const response = await this.request({
-            path: `/account`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -287,8 +299,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontend`;
+
         const response = await this.request({
-            path: `/frontend`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -318,8 +333,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/identity`;
+
         const response = await this.request({
-            path: `/identity`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -349,8 +367,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organization`;
+
         const response = await this.request({
-            path: `/organization`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -380,8 +401,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/account`;
+
         const response = await this.request({
-            path: `/account`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -410,8 +434,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontend`;
+
         const response = await this.request({
-            path: `/frontend`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -440,8 +467,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontend/grant`;
+
         const response = await this.request({
-            path: `/frontend/grant`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -470,8 +500,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/identity`;
+
         const response = await this.request({
-            path: `/identity`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -500,8 +533,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organization`;
+
         const response = await this.request({
-            path: `/organization`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -530,8 +566,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/secrets/access`;
+
         const response = await this.request({
-            path: `/secrets/access`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -560,8 +599,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/grants`;
+
         const response = await this.request({
-            path: `/grants`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -590,8 +632,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/invite/token/generate`;
+
         const response = await this.request({
-            path: `/invite/token/generate`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -618,8 +663,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontends`;
+
         const response = await this.request({
-            path: `/frontends`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -648,8 +696,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organization/list`;
+
         const response = await this.request({
-            path: `/organization/list`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -677,8 +728,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organizations`;
+
         const response = await this.request({
-            path: `/organizations`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -707,8 +761,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/organization/remove`;
+
         const response = await this.request({
-            path: `/organization/remove`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -737,8 +794,11 @@ export class AdminApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/frontend`;
+
         const response = await this.request({
-            path: `/frontend`,
+            path: urlPath,
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,

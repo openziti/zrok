@@ -37,6 +37,7 @@ class TestShare(unittest.TestCase):
             return Share(
                 share_token = '',
                 z_id = '',
+                env_zid = '',
                 share_mode = '',
                 backend_mode = '',
                 frontend_selection = '',

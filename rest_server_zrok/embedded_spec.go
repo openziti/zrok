@@ -3029,6 +3029,9 @@ func init() {
         "createdAt": {
           "type": "integer"
         },
+        "envZId": {
+          "type": "string"
+        },
         "frontendEndpoint": {
           "type": "string"
         },
@@ -6219,6 +6222,9 @@ func init() {
         },
         "createdAt": {
           "type": "integer"
+        },
+        "envZId": {
+          "type": "string"
         },
         "frontendEndpoint": {
           "type": "string"

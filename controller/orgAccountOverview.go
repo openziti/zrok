@@ -101,6 +101,7 @@ func (h *orgAccountOverviewHandler) Handle(params metadata.OrgAccountOverviewPar
 			envShr := &rest_model_zrok.Share{
 				ShareToken:           shr.Token,
 				ZID:                  shr.ZId,
+				EnvZID:               env.ZId,
 				ShareMode:            shr.ShareMode,
 				BackendMode:          shr.BackendMode,
 				FrontendSelection:    feSelection,
