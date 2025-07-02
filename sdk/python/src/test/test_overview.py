@@ -68,6 +68,7 @@ class TestOverview(unittest.TestCase):
                             zrok_api.models.share.share(
                                 share_token = '', 
                                 z_id = '', 
+                                env_zid = '', 
                                 share_mode = '', 
                                 backend_mode = '', 
                                 frontend_selection = '', 

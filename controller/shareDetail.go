@@ -32,8 +32,10 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		return metadata.NewGetShareDetailInternalServerError()
 	}
 	found := false
+	var shrEnv *store.Environment
 	for _, env := range envs {
 		if shr.EnvironmentId == env.Id {
+			shrEnv = env
 			found = true
 			break
 		}
@@ -71,6 +73,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 	return metadata.NewGetShareDetailOK().WithPayload(&rest_model_zrok.Share{
 		ShareToken:           shr.Token,
 		ZID:                  shr.ZId,
+		EnvZID:               shrEnv.ZId,
 		ShareMode:            shr.ShareMode,
 		BackendMode:          shr.BackendMode,
 		FrontendSelection:    feSelection,

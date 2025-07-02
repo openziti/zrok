@@ -76,6 +76,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			envShr := &rest_model_zrok.Share{
 				ShareToken:           shr.Token,
 				ZID:                  shr.ZId,
+				EnvZID:               env.ZId,
 				ShareMode:            shr.ShareMode,
 				BackendMode:          shr.BackendMode,
 				FrontendSelection:    feSelection,

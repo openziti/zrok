@@ -116,8 +116,11 @@ export class MetadataApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/configuration`;
+
         const response = await this.request({
-            path: `/configuration`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -142,8 +145,11 @@ export class MetadataApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/clientVersionCheck`;
+
         const response = await this.request({
-            path: `/clientVersionCheck`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -170,8 +176,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/detail/account`;
+
         const response = await this.request({
-            path: `/detail/account`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -202,8 +211,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/metrics/account`;
+
         const response = await this.request({
-            path: `/metrics/account`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -237,8 +249,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/detail/environment/{envZId}`;
+        urlPath = urlPath.replace(`{${"envZId"}}`, encodeURIComponent(String(requestParameters['envZId'])));
+
         const response = await this.request({
-            path: `/detail/environment/{envZId}`.replace(`{${"envZId"}}`, encodeURIComponent(String(requestParameters['envZId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -276,8 +292,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/metrics/environment/{envId}`;
+        urlPath = urlPath.replace(`{${"envId"}}`, encodeURIComponent(String(requestParameters['envId'])));
+
         const response = await this.request({
-            path: `/metrics/environment/{envId}`.replace(`{${"envId"}}`, encodeURIComponent(String(requestParameters['envId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -311,8 +331,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/detail/frontend/{frontendId}`;
+        urlPath = urlPath.replace(`{${"frontendId"}}`, encodeURIComponent(String(requestParameters['frontendId'])));
+
         const response = await this.request({
-            path: `/detail/frontend/{frontendId}`.replace(`{${"frontendId"}}`, encodeURIComponent(String(requestParameters['frontendId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -346,8 +370,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/detail/share/{shareToken}`;
+        urlPath = urlPath.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken'])));
+
         const response = await this.request({
-            path: `/detail/share/{shareToken}`.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -385,8 +413,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/metrics/share/{shareToken}`;
+        urlPath = urlPath.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken'])));
+
         const response = await this.request({
-            path: `/metrics/share/{shareToken}`.replace(`{${"shareToken"}}`, encodeURIComponent(String(requestParameters['shareToken']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -415,8 +447,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/sparklines`;
+
         const response = await this.request({
-            path: `/sparklines`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -444,8 +479,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/memberships`;
+
         const response = await this.request({
-            path: `/memberships`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -479,8 +517,12 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/members/{organizationToken}`;
+        urlPath = urlPath.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken'])));
+
         const response = await this.request({
-            path: `/members/{organizationToken}`.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -507,8 +549,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/overview/public-frontends`;
+
         const response = await this.request({
-            path: `/overview/public-frontends`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -549,8 +594,13 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/overview/{organizationToken}/{accountEmail}`;
+        urlPath = urlPath.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken'])));
+        urlPath = urlPath.replace(`{${"accountEmail"}}`, encodeURIComponent(String(requestParameters['accountEmail'])));
+
         const response = await this.request({
-            path: `/overview/{organizationToken}/{accountEmail}`.replace(`{${"organizationToken"}}`, encodeURIComponent(String(requestParameters['organizationToken']))).replace(`{${"accountEmail"}}`, encodeURIComponent(String(requestParameters['accountEmail']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -577,8 +627,11 @@ export class MetadataApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/overview`;
+
         const response = await this.request({
-            path: `/overview`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -601,8 +654,11 @@ export class MetadataApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/version`;
+
         const response = await this.request({
-            path: `/version`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -629,8 +685,11 @@ export class MetadataApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/versions`;
+
         const response = await this.request({
-            path: `/versions`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
