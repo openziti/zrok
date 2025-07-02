@@ -37,6 +37,7 @@ __all__ = [
     "AccessRequest",
     "AddFrontendGrantRequest",
     "AddOrganizationMemberRequest",
+    "AddSecretsAccessRequest",
     "AuthUser",
     "ChangePasswordRequest",
     "ClientVersionCheckRequest",
@@ -47,6 +48,7 @@ __all__ = [
     "CreateIdentityRequest",
     "CreateOrganization201Response",
     "CreateOrganizationRequest",
+    "DeleteIdentityRequest",
     "DisableRequest",
     "EnableRequest",
     "Enroll200Response",
@@ -70,6 +72,7 @@ __all__ = [
     "LoginRequest",
     "Metrics",
     "MetricsSample",
+    "OidcConfig",
     "Overview",
     "Ping200Response",
     "Principal",
@@ -124,6 +127,7 @@ from zrok_api.models.access201_response import Access201Response as Access201Res
 from zrok_api.models.access_request import AccessRequest as AccessRequest
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest as AddFrontendGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest as AddOrganizationMemberRequest
+from zrok_api.models.add_secrets_access_request import AddSecretsAccessRequest as AddSecretsAccessRequest
 from zrok_api.models.auth_user import AuthUser as AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest as ChangePasswordRequest
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest as ClientVersionCheckRequest
@@ -134,6 +138,7 @@ from zrok_api.models.create_identity201_response import CreateIdentity201Respons
 from zrok_api.models.create_identity_request import CreateIdentityRequest as CreateIdentityRequest
 from zrok_api.models.create_organization201_response import CreateOrganization201Response as CreateOrganization201Response
 from zrok_api.models.create_organization_request import CreateOrganizationRequest as CreateOrganizationRequest
+from zrok_api.models.delete_identity_request import DeleteIdentityRequest as DeleteIdentityRequest
 from zrok_api.models.disable_request import DisableRequest as DisableRequest
 from zrok_api.models.enable_request import EnableRequest as EnableRequest
 from zrok_api.models.enroll200_response import Enroll200Response as Enroll200Response
@@ -157,6 +162,7 @@ from zrok_api.models.list_public_frontends_for_account200_response_public_fronte
 from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample
+from zrok_api.models.oidc_config import OidcConfig as OidcConfig
 from zrok_api.models.overview import Overview as Overview
 from zrok_api.models.ping200_response import Ping200Response as Ping200Response
 from zrok_api.models.principal import Principal as Principal

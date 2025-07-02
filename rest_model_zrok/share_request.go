@@ -25,6 +25,7 @@ type ShareRequest struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// auth scheme
+	// Enum: [none basic oauth oidc]
 	AuthScheme string `json:"authScheme,omitempty"`
 
 	// auth users
@@ -53,6 +54,9 @@ type ShareRequest struct {
 	// Enum: [github google]
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
+	// oidc config
+	OidcConfig *OidcConfig `json:"oidcConfig,omitempty"`
+
 	// permission mode
 	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
@@ -72,6 +76,10 @@ type ShareRequest struct {
 func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAuthScheme(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateAuthUsers(formats); err != nil {
 		res = append(res, err)
 	}
@@ -81,6 +89,10 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOauthProvider(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOidcConfig(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -95,6 +107,54 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var shareRequestTypeAuthSchemePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["none","basic","oauth","oidc"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		shareRequestTypeAuthSchemePropEnum = append(shareRequestTypeAuthSchemePropEnum, v)
+	}
+}
+
+const (
+
+	// ShareRequestAuthSchemeNone captures enum value "none"
+	ShareRequestAuthSchemeNone string = "none"
+
+	// ShareRequestAuthSchemeBasic captures enum value "basic"
+	ShareRequestAuthSchemeBasic string = "basic"
+
+	// ShareRequestAuthSchemeOauth captures enum value "oauth"
+	ShareRequestAuthSchemeOauth string = "oauth"
+
+	// ShareRequestAuthSchemeOidc captures enum value "oidc"
+	ShareRequestAuthSchemeOidc string = "oidc"
+)
+
+// prop value enum
+func (m *ShareRequest) validateAuthSchemeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeAuthSchemePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ShareRequest) validateAuthScheme(formats strfmt.Registry) error {
+	if swag.IsZero(m.AuthScheme) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateAuthSchemeEnum("authScheme", "body", m.AuthScheme); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -226,6 +286,25 @@ func (m *ShareRequest) validateOauthProvider(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ShareRequest) validateOidcConfig(formats strfmt.Registry) error {
+	if swag.IsZero(m.OidcConfig) { // not required
+		return nil
+	}
+
+	if m.OidcConfig != nil {
+		if err := m.OidcConfig.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidcConfig")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidcConfig")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 var shareRequestTypePermissionModePropEnum []interface{}
 
 func init() {
@@ -318,6 +397,10 @@ func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Regis
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateOidcConfig(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -344,6 +427,27 @@ func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats str
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *ShareRequest) contextValidateOidcConfig(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OidcConfig != nil {
+
+		if swag.IsZero(m.OidcConfig) { // not required
+			return nil
+		}
+
+		if err := m.OidcConfig.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidcConfig")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidcConfig")
+			}
+			return err
+		}
 	}
 
 	return nil

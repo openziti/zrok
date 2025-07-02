@@ -11,6 +11,7 @@ models/Access201Response.ts
 models/AccessRequest.ts
 models/AddFrontendGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
+models/AddSecretsAccessRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts
@@ -20,6 +21,7 @@ models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
 models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
+models/DeleteIdentityRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
 models/Enroll200Response.ts
@@ -44,6 +46,7 @@ models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
+models/OidcConfig.ts
 models/Overview.ts
 models/Ping200Response.ts
 models/Principal.ts

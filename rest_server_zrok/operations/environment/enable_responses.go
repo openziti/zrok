@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // EnableCreatedCode is the HTTP code returned for type EnableCreated
@@ -104,6 +106,49 @@ func (o *EnableNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
+}
+
+// EnableTooManyRequestsCode is the HTTP code returned for type EnableTooManyRequests
+const EnableTooManyRequestsCode int = 429
+
+/*
+EnableTooManyRequests over limit
+
+swagger:response enableTooManyRequests
+*/
+type EnableTooManyRequests struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewEnableTooManyRequests creates EnableTooManyRequests with default headers values
+func NewEnableTooManyRequests() *EnableTooManyRequests {
+
+	return &EnableTooManyRequests{}
+}
+
+// WithPayload adds the payload to the enable too many requests response
+func (o *EnableTooManyRequests) WithPayload(payload rest_model_zrok.ErrorMessage) *EnableTooManyRequests {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the enable too many requests response
+func (o *EnableTooManyRequests) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *EnableTooManyRequests) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(429)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // EnableInternalServerErrorCode is the HTTP code returned for type EnableInternalServerError

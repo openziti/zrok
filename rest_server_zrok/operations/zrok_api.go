@@ -59,6 +59,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
+		AdminAddSecretsAccessHandler: admin.AddSecretsAccessHandlerFunc(func(params admin.AddSecretsAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.AddSecretsAccess has not yet been implemented")
+		}),
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
@@ -89,8 +92,14 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminDeleteFrontendGrantHandler: admin.DeleteFrontendGrantHandlerFunc(func(params admin.DeleteFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteFrontendGrant has not yet been implemented")
 		}),
+		AdminDeleteIdentityHandler: admin.DeleteIdentityHandlerFunc(func(params admin.DeleteIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteIdentity has not yet been implemented")
+		}),
 		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
+		}),
+		AdminDeleteSecretsAccessHandler: admin.DeleteSecretsAccessHandlerFunc(func(params admin.DeleteSecretsAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteSecretsAccess has not yet been implemented")
 		}),
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
@@ -280,6 +289,8 @@ type ZrokAPI struct {
 	AdminAddFrontendGrantHandler admin.AddFrontendGrantHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
+	// AdminAddSecretsAccessHandler sets the operation handler for the add secrets access operation
+	AdminAddSecretsAccessHandler admin.AddSecretsAccessHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
@@ -300,8 +311,12 @@ type ZrokAPI struct {
 	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
 	// AdminDeleteFrontendGrantHandler sets the operation handler for the delete frontend grant operation
 	AdminDeleteFrontendGrantHandler admin.DeleteFrontendGrantHandler
+	// AdminDeleteIdentityHandler sets the operation handler for the delete identity operation
+	AdminDeleteIdentityHandler admin.DeleteIdentityHandler
 	// AdminDeleteOrganizationHandler sets the operation handler for the delete organization operation
 	AdminDeleteOrganizationHandler admin.DeleteOrganizationHandler
+	// AdminDeleteSecretsAccessHandler sets the operation handler for the delete secrets access operation
+	AdminDeleteSecretsAccessHandler admin.DeleteSecretsAccessHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
@@ -480,6 +495,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
 	}
+	if o.AdminAddSecretsAccessHandler == nil {
+		unregistered = append(unregistered, "admin.AddSecretsAccessHandler")
+	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
 	}
@@ -510,8 +528,14 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminDeleteFrontendGrantHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteFrontendGrantHandler")
 	}
+	if o.AdminDeleteIdentityHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteIdentityHandler")
+	}
 	if o.AdminDeleteOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteOrganizationHandler")
+	}
+	if o.AdminDeleteSecretsAccessHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteSecretsAccessHandler")
 	}
 	if o.EnvironmentDisableHandler == nil {
 		unregistered = append(unregistered, "environment.DisableHandler")
@@ -759,6 +783,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/secrets/access"] = admin.NewAddSecretsAccess(o.context, o.AdminAddSecretsAccessHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -799,7 +827,15 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/identity"] = admin.NewDeleteIdentity(o.context, o.AdminDeleteIdentityHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/organization"] = admin.NewDeleteOrganization(o.context, o.AdminDeleteOrganizationHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/secrets/access"] = admin.NewDeleteSecretsAccess(o.context, o.AdminDeleteSecretsAccessHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

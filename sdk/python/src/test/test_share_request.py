@@ -42,7 +42,7 @@ class TestShareRequest(unittest.TestCase):
                     ],
                 backend_mode = 'proxy',
                 backend_proxy_endpoint = '',
-                auth_scheme = '',
+                auth_scheme = 'none',
                 auth_users = [
                     zrok_api.models.auth_user.authUser(
                         username = '', 
@@ -53,6 +53,21 @@ class TestShareRequest(unittest.TestCase):
                     ''
                     ],
                 oauth_authorization_check_interval = '',
+                oidc_config = zrok_api.models.oidc_config.oidcConfig(
+                    provider_id = '', 
+                    issuer_url = '', 
+                    authz_url_params = [
+                        ''
+                        ], 
+                    cookie_domain = '', 
+                    client_id = '', 
+                    client_secret = '', 
+                    scopes = [
+                        ''
+                        ], 
+                    max_session_duration = '', 
+                    idle_session_duration = '', 
+                    userinfo_refresh_interval = '', ),
                 reserved = True,
                 permission_mode = 'open',
                 access_grants = [

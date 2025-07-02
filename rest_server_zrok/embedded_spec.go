@@ -1058,6 +1058,12 @@ func init() {
           "404": {
             "description": "account not found"
           },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -1435,6 +1441,44 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "zId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"
@@ -2315,6 +2359,84 @@ func init() {
         }
       }
     },
+    "/secrets/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "addSecretsAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "secretsAccessIdentityZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "access not added"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteSecretsAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "secretsAccessIdentityZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "access not removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -2353,6 +2475,12 @@ func init() {
           },
           "422": {
             "description": "unprocessable"
+          },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",
@@ -2811,6 +2939,47 @@ func init() {
         }
       }
     },
+    "oidcConfig": {
+      "type": "object",
+      "properties": {
+        "authzUrlParams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientSecret": {
+          "type": "string"
+        },
+        "cookieDomain": {
+          "type": "string"
+        },
+        "idleSessionDuration": {
+          "type": "string"
+        },
+        "issuerUrl": {
+          "type": "string"
+        },
+        "maxSessionDuration": {
+          "type": "string"
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "userinfoRefreshInterval": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -2899,7 +3068,13 @@ func init() {
           }
         },
         "authScheme": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "oauth",
+            "oidc"
+          ]
         },
         "authUsers": {
           "type": "array",
@@ -2947,6 +3122,9 @@ func init() {
             "github",
             "google"
           ]
+        },
+        "oidcConfig": {
+          "$ref": "#/definitions/oidcConfig"
         },
         "permissionMode": {
           "type": "string",
@@ -4014,6 +4192,12 @@ func init() {
           "404": {
             "description": "account not found"
           },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
           "500": {
             "description": "internal server error"
           }
@@ -4371,6 +4555,44 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteIdentity",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "zId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"
@@ -5212,6 +5434,84 @@ func init() {
         }
       }
     },
+    "/secrets/access": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "addSecretsAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "secretsAccessIdentityZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "access not added"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "deleteSecretsAccess",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "secretsAccessIdentityZId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "access not removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share": {
       "post": {
         "security": [
@@ -5250,6 +5550,12 @@ func init() {
           },
           "422": {
             "description": "unprocessable"
+          },
+          "429": {
+            "description": "over limit",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error",
@@ -5827,6 +6133,47 @@ func init() {
         }
       }
     },
+    "oidcConfig": {
+      "type": "object",
+      "properties": {
+        "authzUrlParams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "clientSecret": {
+          "type": "string"
+        },
+        "cookieDomain": {
+          "type": "string"
+        },
+        "idleSessionDuration": {
+          "type": "string"
+        },
+        "issuerUrl": {
+          "type": "string"
+        },
+        "maxSessionDuration": {
+          "type": "string"
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "userinfoRefreshInterval": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -5915,7 +6262,13 @@ func init() {
           }
         },
         "authScheme": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "oauth",
+            "oidc"
+          ]
         },
         "authUsers": {
           "type": "array",
@@ -5963,6 +6316,9 @@ func init() {
             "github",
             "google"
           ]
+        },
+        "oidcConfig": {
+          "$ref": "#/definitions/oidcConfig"
         },
         "permissionMode": {
           "type": "string",

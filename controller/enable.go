@@ -29,7 +29,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 
 	if err := h.checkLimits(principal, trx); err != nil {
 		logrus.Errorf("limits error for user '%v': %v", principal.Email, err)
-		return environment.NewEnableUnauthorized()
+		return environment.NewEnableTooManyRequests().WithPayload("too many environments; account limit exceeded")
 	}
 
 	client, err := zrokEdgeSdk.Client(cfg.Ziti)
