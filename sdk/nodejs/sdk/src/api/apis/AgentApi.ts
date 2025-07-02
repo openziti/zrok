@@ -99,8 +99,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/enroll`;
+
         const response = await this.request({
-            path: `/agent/enroll`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -130,8 +133,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/ping`;
+
         const response = await this.request({
-            path: `/agent/ping`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -161,8 +167,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/access`;
+
         const response = await this.request({
-            path: `/agent/access`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -192,8 +201,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/share`;
+
         const response = await this.request({
-            path: `/agent/share`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -223,8 +235,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/status`;
+
         const response = await this.request({
-            path: `/agent/status`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -254,8 +269,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/unaccess`;
+
         const response = await this.request({
-            path: `/agent/unaccess`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -284,8 +302,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/unshare`;
+
         const response = await this.request({
-            path: `/agent/unshare`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -314,8 +335,11 @@ export class AgentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/agent/unenroll`;
+
         const response = await this.request({
-            path: `/agent/unenroll`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

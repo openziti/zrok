@@ -29,6 +29,7 @@ class Share(BaseModel):
     """ # noqa: E501
     share_token: Optional[StrictStr] = Field(default=None, alias="shareToken")
     z_id: Optional[StrictStr] = Field(default=None, alias="zId")
+    env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
     share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
     frontend_selection: Optional[StrictStr] = Field(default=None, alias="frontendSelection")
@@ -39,7 +40,7 @@ class Share(BaseModel):
     limited: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
     updated_at: Optional[StrictInt] = Field(default=None, alias="updatedAt")
-    __properties: ClassVar[List[str]] = ["shareToken", "zId", "shareMode", "backendMode", "frontendSelection", "frontendEndpoint", "backendProxyEndpoint", "reserved", "activity", "limited", "createdAt", "updatedAt"]
+    __properties: ClassVar[List[str]] = ["shareToken", "zId", "envZId", "shareMode", "backendMode", "frontendSelection", "frontendEndpoint", "backendProxyEndpoint", "reserved", "activity", "limited", "createdAt", "updatedAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -101,6 +102,7 @@ class Share(BaseModel):
         _obj = cls.model_validate({
             "shareToken": obj.get("shareToken"),
             "zId": obj.get("zId"),
+            "envZId": obj.get("envZId"),
             "shareMode": obj.get("shareMode"),
             "backendMode": obj.get("backendMode"),
             "frontendSelection": obj.get("frontendSelection"),

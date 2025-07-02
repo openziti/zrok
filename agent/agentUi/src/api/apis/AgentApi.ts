@@ -116,8 +116,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/accessPrivate`;
+
         const response = await this.request({
-            path: `/v1/agent/accessPrivate`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -144,8 +147,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/releaseAccess`;
+
         const response = await this.request({
-            path: `/v1/agent/releaseAccess`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -172,8 +178,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/releaseShare`;
+
         const response = await this.request({
-            path: `/v1/agent/releaseShare`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -216,8 +225,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/sharePrivate`;
+
         const response = await this.request({
-            path: `/v1/agent/sharePrivate`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -280,8 +292,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/sharePublic`;
+
         const response = await this.request({
-            path: `/v1/agent/sharePublic`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -304,8 +319,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/status`;
+
         const response = await this.request({
-            path: `/v1/agent/status`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -328,8 +346,11 @@ export class AgentApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/v1/agent/version`;
+
         const response = await this.request({
-            path: `/v1/agent/version`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

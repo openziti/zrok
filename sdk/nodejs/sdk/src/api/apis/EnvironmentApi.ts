@@ -54,8 +54,11 @@ export class EnvironmentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/disable`;
+
         const response = await this.request({
-            path: `/disable`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -84,8 +87,11 @@ export class EnvironmentApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/enable`;
+
         const response = await this.request({
-            path: `/enable`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

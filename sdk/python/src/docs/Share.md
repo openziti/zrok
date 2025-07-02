@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **share_token** | **str** |  | [optional] 
 **z_id** | **str** |  | [optional] 
+**env_zid** | **str** |  | [optional] 
 **share_mode** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 
 **frontend_selection** | **str** |  | [optional] 

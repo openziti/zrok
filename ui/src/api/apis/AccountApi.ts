@@ -96,8 +96,11 @@ export class AccountApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/changePassword`;
+
         const response = await this.request({
-            path: `/changePassword`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -122,8 +125,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/invite`;
+
         const response = await this.request({
-            path: `/invite`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -148,8 +154,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/login`;
+
         const response = await this.request({
-            path: `/login`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -183,8 +192,11 @@ export class AccountApi extends runtime.BaseAPI {
             headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
         }
 
+
+        let urlPath = `/regenerateAccountToken`;
+
         const response = await this.request({
-            path: `/regenerateAccountToken`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -210,8 +222,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/register`;
+
         const response = await this.request({
-            path: `/register`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -237,8 +252,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/resetPassword`;
+
         const response = await this.request({
-            path: `/resetPassword`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -263,8 +281,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/resetPasswordRequest`;
+
         const response = await this.request({
-            path: `/resetPasswordRequest`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -289,8 +310,11 @@ export class AccountApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/zrok.v1+json';
 
+
+        let urlPath = `/verify`;
+
         const response = await this.request({
-            path: `/verify`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

@@ -1777,6 +1777,8 @@ definitions:
         type: string
       zId:
         type: string
+      envZId:
+        type: string
       shareMode:
         type: string
       backendMode:

@@ -44,6 +44,12 @@ export interface Share {
      * @type {string}
      * @memberof Share
      */
+    envZId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Share
+     */
     shareMode?: string;
     /**
      * 
@@ -120,6 +126,7 @@ export function ShareFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sha
         
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'zId': json['zId'] == null ? undefined : json['zId'],
+        'envZId': json['envZId'] == null ? undefined : json['envZId'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'frontendSelection': json['frontendSelection'] == null ? undefined : json['frontendSelection'],
@@ -146,6 +153,7 @@ export function ShareToJSONTyped(value?: Share | null, ignoreDiscriminator: bool
         
         'shareToken': value['shareToken'],
         'zId': value['zId'],
+        'envZId': value['envZId'],
         'shareMode': value['shareMode'],
         'backendMode': value['backendMode'],
         'frontendSelection': value['frontendSelection'],
