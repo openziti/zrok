@@ -2,6 +2,8 @@
 
 ## v1.0.7
 
+FEATURE: `/overview`, `/detail/share`, `/detail/environment`, and `/overview/{organizationToken}/{accountEmail}` all adjusted to include `envZId` in share detail output (https://github.com/openziti/zrok/issues/998)
+
 FEATURE: New add and delete API endpoints for frontend grants. New `zrok admin create frontend-grant` and `zrok admin delete frontend-grant` CLI for invoking these API endpoints from the command line (https://github.com/openziti/zrok/issues/992)
 
 FEATURE: New admin endpoint for deleting accounts. New `zrok admin delete account` CLI for invoking the API endpoint from the command line (https://github.com/openziti/zrok/issues/993)
