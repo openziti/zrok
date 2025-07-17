@@ -39,7 +39,7 @@ func (h *deleteIdentityHandler) Handle(params admin.DeleteIdentityParams, princi
 	req.SetTimeout(30 * time.Second)
 	if _, err := edge.Identity.DeleteIdentity(req, nil); err != nil {
 		logrus.Errorf("error deleting identity '%v': %v", identityZId, err)
-		return admin.NewDeleteSecretsAccessInternalServerError()
+		return admin.NewDeleteIdentityInternalServerError()
 	}
 
 	return admin.NewDeleteIdentityOK()
