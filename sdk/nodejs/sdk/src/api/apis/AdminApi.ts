@@ -106,6 +106,10 @@ export interface DeleteFrontendGrantRequest {
     body?: AddFrontendGrantRequest;
 }
 
+export interface DeleteIdentityRequest {
+    body?: CreateIdentityRequest;
+}
+
 export interface DeleteOrganizationRequest {
     body?: CreateOrganization201Response;
 }
@@ -434,6 +438,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteFrontendGrant(requestParameters: DeleteFrontendGrantRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteFrontendGrantRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteIdentityRaw(requestParameters: DeleteIdentityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/identity`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateIdentityRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteIdentity(requestParameters: DeleteIdentityRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteIdentityRaw(requestParameters, initOverrides);
     }
 
     /**

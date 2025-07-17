@@ -109,6 +109,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**delete_account**](docs/AdminApi.md#delete_account) | **DELETE** /account | 
 *AdminApi* | [**delete_frontend**](docs/AdminApi.md#delete_frontend) | **DELETE** /frontend | 
 *AdminApi* | [**delete_frontend_grant**](docs/AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
+*AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
