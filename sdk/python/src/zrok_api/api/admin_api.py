@@ -25,6 +25,7 @@ from zrok_api.models.create_identity201_response import CreateIdentity201Respons
 from zrok_api.models.create_identity_request import CreateIdentityRequest
 from zrok_api.models.create_organization201_response import CreateOrganization201Response
 from zrok_api.models.create_organization_request import CreateOrganizationRequest
+from zrok_api.models.delete_identity_request import DeleteIdentityRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner
 from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response
@@ -2549,7 +2550,7 @@ class AdminApi:
     @validate_call
     def delete_identity(
         self,
-        body: Optional[CreateIdentityRequest] = None,
+        body: Optional[DeleteIdentityRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2567,7 +2568,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: CreateIdentityRequest
+        :type body: DeleteIdentityRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2618,7 +2619,7 @@ class AdminApi:
     @validate_call
     def delete_identity_with_http_info(
         self,
-        body: Optional[CreateIdentityRequest] = None,
+        body: Optional[DeleteIdentityRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2636,7 +2637,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: CreateIdentityRequest
+        :type body: DeleteIdentityRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2687,7 +2688,7 @@ class AdminApi:
     @validate_call
     def delete_identity_without_preload_content(
         self,
-        body: Optional[CreateIdentityRequest] = None,
+        body: Optional[DeleteIdentityRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2705,7 +2706,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: CreateIdentityRequest
+        :type body: DeleteIdentityRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of

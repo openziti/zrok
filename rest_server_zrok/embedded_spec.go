@@ -1457,7 +1457,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "name": {
+                "zId": {
                   "type": "string"
                 }
               }
@@ -4431,7 +4431,7 @@ func init() {
             "in": "body",
             "schema": {
               "properties": {
-                "name": {
+                "zId": {
                   "type": "string"
                 }
               }

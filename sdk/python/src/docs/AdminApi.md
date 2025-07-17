@@ -718,7 +718,7 @@ void (empty response body)
 
 ```python
 import zrok_api
-from zrok_api.models.create_identity_request import CreateIdentityRequest
+from zrok_api.models.delete_identity_request import DeleteIdentityRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -743,7 +743,7 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.AdminApi(api_client)
-    body = zrok_api.CreateIdentityRequest() # CreateIdentityRequest |  (optional)
+    body = zrok_api.DeleteIdentityRequest() # DeleteIdentityRequest |  (optional)
 
     try:
         api_instance.delete_identity(body=body)
@@ -758,7 +758,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**CreateIdentityRequest**](CreateIdentityRequest.md)|  | [optional] 
+ **body** | [**DeleteIdentityRequest**](DeleteIdentityRequest.md)|  | [optional] 
 
 ### Return type
 

@@ -169,6 +169,7 @@ Class | Method | HTTP request | Description
  - [CreateIdentityRequest](docs/CreateIdentityRequest.md)
  - [CreateOrganization201Response](docs/CreateOrganization201Response.md)
  - [CreateOrganizationRequest](docs/CreateOrganizationRequest.md)
+ - [DeleteIdentityRequest](docs/DeleteIdentityRequest.md)
  - [DisableRequest](docs/DisableRequest.md)
  - [EnableRequest](docs/EnableRequest.md)
  - [Enroll200Response](docs/Enroll200Response.md)
