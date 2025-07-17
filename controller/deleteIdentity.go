@@ -32,6 +32,11 @@ func (h *deleteIdentityHandler) Handle(params admin.DeleteIdentityParams, princi
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 
+	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(identityZId, edge); err != nil {
+		logrus.Errorf("error deleting edge router policy: %v", err)
+		return admin.NewDeleteIdentityInternalServerError()
+	}
+
 	req := &identity.DeleteIdentityParams{
 		ID:      identityZId,
 		Context: context.Background(),
