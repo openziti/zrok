@@ -23,6 +23,7 @@ import type {
   CreateIdentityRequest,
   CreateOrganization201Response,
   CreateOrganizationRequest,
+  DeleteIdentityRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
   ListOrganizationMembers200Response,
@@ -50,6 +51,8 @@ import {
     CreateOrganization201ResponseToJSON,
     CreateOrganizationRequestFromJSON,
     CreateOrganizationRequestToJSON,
+    DeleteIdentityRequestFromJSON,
+    DeleteIdentityRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
@@ -104,6 +107,10 @@ export interface DeleteFrontendRequest {
 
 export interface DeleteFrontendGrantRequest {
     body?: AddFrontendGrantRequest;
+}
+
+export interface DeleteIdentityOperationRequest {
+    body?: DeleteIdentityRequest;
 }
 
 export interface DeleteOrganizationRequest {
@@ -434,6 +441,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteFrontendGrant(requestParameters: DeleteFrontendGrantRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteFrontendGrantRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteIdentityRaw(requestParameters: DeleteIdentityOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/identity`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: DeleteIdentityRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteIdentity(requestParameters: DeleteIdentityOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteIdentityRaw(requestParameters, initOverrides);
     }
 
     /**

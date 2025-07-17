@@ -89,6 +89,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminDeleteFrontendGrantHandler: admin.DeleteFrontendGrantHandlerFunc(func(params admin.DeleteFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteFrontendGrant has not yet been implemented")
 		}),
+		AdminDeleteIdentityHandler: admin.DeleteIdentityHandlerFunc(func(params admin.DeleteIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.DeleteIdentity has not yet been implemented")
+		}),
 		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
 		}),
@@ -300,6 +303,8 @@ type ZrokAPI struct {
 	AdminDeleteFrontendHandler admin.DeleteFrontendHandler
 	// AdminDeleteFrontendGrantHandler sets the operation handler for the delete frontend grant operation
 	AdminDeleteFrontendGrantHandler admin.DeleteFrontendGrantHandler
+	// AdminDeleteIdentityHandler sets the operation handler for the delete identity operation
+	AdminDeleteIdentityHandler admin.DeleteIdentityHandler
 	// AdminDeleteOrganizationHandler sets the operation handler for the delete organization operation
 	AdminDeleteOrganizationHandler admin.DeleteOrganizationHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
@@ -509,6 +514,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminDeleteFrontendGrantHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteFrontendGrantHandler")
+	}
+	if o.AdminDeleteIdentityHandler == nil {
+		unregistered = append(unregistered, "admin.DeleteIdentityHandler")
 	}
 	if o.AdminDeleteOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteOrganizationHandler")
@@ -796,6 +804,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/frontend/grant"] = admin.NewDeleteFrontendGrant(o.context, o.AdminDeleteFrontendGrantHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/identity"] = admin.NewDeleteIdentity(o.context, o.AdminDeleteIdentityHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

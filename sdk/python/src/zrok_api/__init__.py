@@ -47,6 +47,7 @@ __all__ = [
     "CreateIdentityRequest",
     "CreateOrganization201Response",
     "CreateOrganizationRequest",
+    "DeleteIdentityRequest",
     "DisableRequest",
     "EnableRequest",
     "Enroll200Response",
@@ -134,6 +135,7 @@ from zrok_api.models.create_identity201_response import CreateIdentity201Respons
 from zrok_api.models.create_identity_request import CreateIdentityRequest as CreateIdentityRequest
 from zrok_api.models.create_organization201_response import CreateOrganization201Response as CreateOrganization201Response
 from zrok_api.models.create_organization_request import CreateOrganizationRequest as CreateOrganizationRequest
+from zrok_api.models.delete_identity_request import DeleteIdentityRequest as DeleteIdentityRequest
 from zrok_api.models.disable_request import DisableRequest as DisableRequest
 from zrok_api.models.enable_request import EnableRequest as EnableRequest
 from zrok_api.models.enroll200_response import Enroll200Response as Enroll200Response

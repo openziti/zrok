@@ -61,6 +61,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminDeleteAccountHandler = newDeleteAccountHandler()
 	api.AdminDeleteFrontendGrantHandler = newDeleteFrontendGrantHandler()
 	api.AdminDeleteFrontendHandler = newDeleteFrontendHandler()
+	api.AdminDeleteIdentityHandler = newDeleteIdentityHandler()
 	api.AdminDeleteOrganizationHandler = newDeleteOrganizationHandler()
 	api.AdminGrantsHandler = newGrantsHandler()
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()

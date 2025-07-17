@@ -20,6 +20,7 @@ models/CreateIdentity201Response.ts
 models/CreateIdentityRequest.ts
 models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
+models/DeleteIdentityRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
 models/Enroll200Response.ts

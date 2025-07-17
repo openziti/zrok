@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/go-openapi/runtime/middleware"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
@@ -44,7 +45,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(name, zId, edge); err != nil {
+	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(zId, zId, edge); err != nil {
 		logrus.Errorf("error creating edge router policy for identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
