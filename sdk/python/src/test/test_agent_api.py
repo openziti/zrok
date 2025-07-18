@@ -68,6 +68,12 @@ class TestAgentApi(unittest.TestCase):
         """
         pass
 
+    def test_share_http_healthcheck(self) -> None:
+        """Test case for share_http_healthcheck
+
+        """
+        pass
+
     def test_unenroll(self) -> None:
         """Test case for unenroll
 

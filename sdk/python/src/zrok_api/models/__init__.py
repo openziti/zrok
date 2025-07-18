@@ -71,6 +71,8 @@ from zrok_api.models.remote_unshare_request import RemoteUnshareRequest
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.models.share import Share
+from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response
+from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample

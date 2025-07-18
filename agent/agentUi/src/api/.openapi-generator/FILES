@@ -4,6 +4,7 @@ apis/index.ts
 index.ts
 models/AccessDetail.ts
 models/AccessPrivateResponse.ts
+models/HttpShareHealthcheckResponse.ts
 models/ProtobufAny.ts
 models/RpcStatus.ts
 models/ShareDetail.ts

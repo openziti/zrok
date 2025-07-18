@@ -64,6 +64,8 @@ models/RemoteUnshareRequest.ts
 models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
 models/Share.ts
+models/ShareHttpHealthcheck200Response.ts
+models/ShareHttpHealthcheckRequest.ts
 models/ShareRequest.ts
 models/ShareResponse.ts
 models/SparkDataSample.ts

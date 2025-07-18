@@ -88,6 +88,62 @@
         ]
       }
     },
+    "/v1/agent/httpShareHealthcheck": {
+      "post": {
+        "operationId": "Agent_ShareHttpHealthcheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ShareHttpHealthcheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "httpVerb",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endpoint",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "expectedHttpResponse",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "timeoutMs",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
     "/v1/agent/releaseAccess": {
       "post": {
         "operationId": "Agent_ReleaseAccess",
@@ -414,6 +470,17 @@
           "type": "boolean"
         },
         "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ShareHttpHealthcheckResponse": {
+      "type": "object",
+      "properties": {
+        "healthy": {
+          "type": "boolean"
+        },
+        "error": {
           "type": "string"
         }
       }

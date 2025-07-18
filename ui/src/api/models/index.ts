@@ -57,6 +57,8 @@ export * from './RemoteUnshareRequest';
 export * from './RemoveOrganizationMemberRequest';
 export * from './ResetPasswordRequest';
 export * from './Share';
+export * from './ShareHttpHealthcheck200Response';
+export * from './ShareHttpHealthcheckRequest';
 export * from './ShareRequest';
 export * from './ShareResponse';
 export * from './SparkDataSample';
