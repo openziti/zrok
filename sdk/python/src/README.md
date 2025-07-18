@@ -102,6 +102,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
 *AdminApi* | [**add_frontend_grant**](docs/AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
+*AdminApi* | [**add_secrets_access**](docs/AdminApi.md#add_secrets_access) | **POST** /secrets/access | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
@@ -111,6 +112,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**delete_frontend_grant**](docs/AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
+*AdminApi* | [**delete_secrets_access**](docs/AdminApi.md#delete_secrets_access) | **DELETE** /secrets/access | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
@@ -160,6 +162,7 @@ Class | Method | HTTP request | Description
  - [AccessRequest](docs/AccessRequest.md)
  - [AddFrontendGrantRequest](docs/AddFrontendGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
+ - [AddSecretsAccessRequest](docs/AddSecretsAccessRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [ClientVersionCheckRequest](docs/ClientVersionCheckRequest.md)
@@ -194,6 +197,7 @@ Class | Method | HTTP request | Description
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)
+ - [OidcConfig](docs/OidcConfig.md)
  - [Overview](docs/Overview.md)
  - [Ping200Response](docs/Ping200Response.md)
  - [Principal](docs/Principal.md)

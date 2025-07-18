@@ -70,7 +70,11 @@ func Run(inCfg *config.Config) error {
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
-	if cfg.AgentController != nil {
+	if cfg.Secrets != nil && cfg.Secrets.ZId != "" && cfg.Secrets.ServiceName != "" && cfg.Secrets.IdentityPath != "" {
+		api.AdminAddSecretsAccessHandler = newAddSecretsAccessHandler()
+		api.AdminDeleteSecretsAccessHandler = newDeleteSecretsAccessHandler()
+	}
+	if cfg.AgentController != nil && cfg.AgentController.ZId != "" && cfg.AgentController.IdentityPath != "" {
 		api.AgentEnrollHandler = newAgentEnrollHandler()
 		api.AgentPingHandler = newAgentPingHandler()
 		api.AgentRemoteAccessHandler = newAgentRemoteAccessHandler()
@@ -159,6 +163,8 @@ func Run(inCfg *config.Config) error {
 			go newMaintenanceResetPasswordAgent(ctx, cfg.Maintenance.ResetPassword).run()
 		}
 	}
+
+	go startSecretsListener(cfg)
 
 	server := rest_server_zrok.NewServer(api)
 	defer func() { _ = server.Shutdown() }()

@@ -18,6 +18,7 @@ from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest
+from zrok_api.models.add_secrets_access_request import AddSecretsAccessRequest
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
@@ -52,6 +53,7 @@ from zrok_api.models.list_public_frontends_for_account200_response_public_fronte
 from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
+from zrok_api.models.oidc_config import OidcConfig
 from zrok_api.models.overview import Overview
 from zrok_api.models.ping200_response import Ping200Response
 from zrok_api.models.principal import Principal

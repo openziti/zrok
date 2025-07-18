@@ -365,6 +365,7 @@ class EnvironmentApi:
             '201': "CreateIdentity201Response",
             '401': None,
             '404': None,
+            '429': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(
@@ -434,6 +435,7 @@ class EnvironmentApi:
             '201': "CreateIdentity201Response",
             '401': None,
             '404': None,
+            '429': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(
@@ -503,6 +505,7 @@ class EnvironmentApi:
             '201': "CreateIdentity201Response",
             '401': None,
             '404': None,
+            '429': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(

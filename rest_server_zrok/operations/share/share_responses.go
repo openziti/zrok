@@ -158,6 +158,49 @@ func (o *ShareUnprocessableEntity) WriteResponse(rw http.ResponseWriter, produce
 	rw.WriteHeader(422)
 }
 
+// ShareTooManyRequestsCode is the HTTP code returned for type ShareTooManyRequests
+const ShareTooManyRequestsCode int = 429
+
+/*
+ShareTooManyRequests over limit
+
+swagger:response shareTooManyRequests
+*/
+type ShareTooManyRequests struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
+}
+
+// NewShareTooManyRequests creates ShareTooManyRequests with default headers values
+func NewShareTooManyRequests() *ShareTooManyRequests {
+
+	return &ShareTooManyRequests{}
+}
+
+// WithPayload adds the payload to the share too many requests response
+func (o *ShareTooManyRequests) WithPayload(payload rest_model_zrok.ErrorMessage) *ShareTooManyRequests {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the share too many requests response
+func (o *ShareTooManyRequests) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *ShareTooManyRequests) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(429)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // ShareInternalServerErrorCode is the HTTP code returned for type ShareInternalServerError
 const ShareInternalServerErrorCode int = 500
 

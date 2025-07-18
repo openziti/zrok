@@ -3,7 +3,15 @@ package publicProxy
 import (
 	"context"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
@@ -17,12 +25,7 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
+	"github.com/viccon/sturdyc"
 )
 
 type HttpFrontend struct {
@@ -31,7 +34,7 @@ type HttpFrontend struct {
 	handler http.Handler
 }
 
-func NewHTTP(cfg *Config) (*HttpFrontend, error) {
+func NewHttpFrontend(cfg *Config) (*HttpFrontend, error) {
 	var key []byte
 	if cfg.Oauth != nil {
 		hash := md5.New()
@@ -65,6 +68,8 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	zDialCtx := zitiDialContext{ctx: zCtx}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
+
+	secretsCache = sturdyc.New[[]Secret](cfg.SecretsCache.Capacity, cfg.SecretsCache.Shards, cfg.SecretsCache.TTL, cfg.SecretsCache.EvictionPercentage)
 
 	proxy, err := newServiceProxy(cfg, zCtx)
 	if err != nil {
@@ -152,221 +157,323 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		shrToken := resolveService(pcfg.HostMatch, r.Host)
-		if shrToken != "" {
-			if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
-				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-					if r.Method != http.MethodOptions && (pcfg.Interstitial != nil && pcfg.Interstitial.Enabled) {
-						sendInterstitial := true
-						if len(pcfg.Interstitial.UserAgentPrefixes) > 0 {
-							ua := r.Header.Get("User-Agent")
-							matched := false
-							for _, prefix := range pcfg.Interstitial.UserAgentPrefixes {
-								if strings.HasPrefix(ua, prefix) {
-									matched = true
-									break
-								}
-							}
-							if !matched {
-								sendInterstitial = false
-							}
-						}
-						if sendInterstitial {
-							if v, istlFound := cfg["interstitial"]; istlFound {
-								if istlEnabled, ok := v.(bool); ok && istlEnabled {
-									skip := r.Header.Get("skip_zrok_interstitial")
-									_, zrokOkErr := r.Cookie("zrok_interstitial")
-									if skip == "" && zrokOkErr != nil {
-										logrus.Debugf("forcing interstitial for '%v'", r.URL)
-										interstitialUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
-										return
-									}
-								}
-							}
-						}
-					}
+type httpHandler struct {
+	handler http.Handler
+	cfg     *Config
+	key     []byte
+	ctx     ziti.Context
+}
 
-					if scheme, found := cfg["auth_scheme"]; found {
-						switch scheme {
-						case string(sdk.None):
-							logrus.Debugf("auth scheme none '%v'", shrToken)
-							// ensure cookies from other shares are not sent to this share, in case it's malicious
-							deleteZrokCookies(w, r)
-							handler.ServeHTTP(w, r)
-							return
-
-						case string(sdk.Basic):
-							logrus.Debugf("auth scheme basic '%v", shrToken)
-							inUser, inPass, ok := r.BasicAuth()
-							if !ok {
-								basicAuthRequired(w, shrToken)
-								return
-							}
-							authed := false
-							if v, found := cfg["basic_auth"]; found {
-								if basicAuth, ok := v.(map[string]interface{}); ok {
-									if v, found := basicAuth["users"]; found {
-										if arr, ok := v.([]interface{}); ok {
-											for _, v := range arr {
-												if um, ok := v.(map[string]interface{}); ok {
-													username := ""
-													if v, found := um["username"]; found {
-														if un, ok := v.(string); ok {
-															username = un
-														}
-													}
-													password := ""
-													if v, found := um["password"]; found {
-														if pw, ok := v.(string); ok {
-															password = pw
-														}
-													}
-													if username == inUser && password == inPass {
-														authed = true
-														break
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-
-							if !authed {
-								basicAuthRequired(w, shrToken)
-								return
-							}
-
-							// ensure cookies from other shares are not sent to this share, in case it's malicious
-							deleteZrokCookies(w, r)
-							handler.ServeHTTP(w, r)
-
-						case string(sdk.Oauth):
-							logrus.Debugf("auth scheme oauth '%v'", shrToken)
-
-							if oauthCfg, found := cfg["oauth"]; found {
-								if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
-									var authCheckInterval time.Duration
-									if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
-										logrus.Errorf("missing authorization check interval in share config. Defaulting to 3 hours")
-										authCheckInterval = 3 * time.Hour
-									} else {
-										i, err := time.ParseDuration(checkInterval.(string))
-										if err != nil {
-											logrus.Errorf("unable to parse authorization check interval in share config (%v). Defaulting to 3 hours", checkInterval)
-											authCheckInterval = 3 * time.Hour
-										} else {
-											authCheckInterval = i
-										}
-									}
-
-									target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
-
-									cookie, err := r.Cookie("zrok-access")
-									if err != nil {
-										logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
-										return
-									}
-									tkn, err := jwt.ParseWithClaims(cookie.Value, &ZrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-										if pcfg.Oauth == nil {
-											return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
-										}
-										return key, nil
-									})
-									if err != nil {
-										logrus.Errorf("unable to parse jwt: %v", err)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
-										return
-									}
-									claims := tkn.Claims.(*ZrokClaims)
-									if claims.Provider != provider {
-										logrus.Error("provider mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
-										return
-									}
-									if claims.AuthorizationCheckInterval != authCheckInterval {
-										logrus.Error("authorization check interval mismatch; restarting auth flow")
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
-										return
-									}
-									if claims.Audience != r.Host {
-										logrus.Errorf("audience claim '%s' does not match requested host '%s'; restarting auth flow", claims.Audience, r.Host)
-										oauthLoginRequired(w, r, pcfg.Oauth, provider.(string), target, authCheckInterval)
-										return
-									}
-
-									if validEmailAddressPatterns, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
-										if castedPatterns, ok := validEmailAddressPatterns.([]interface{}); !ok {
-											logrus.Error("invalid email pattern array format")
-											return
-										} else {
-											if len(castedPatterns) > 0 {
-												found := false
-												for _, pattern := range castedPatterns {
-													if castedPattern, ok := pattern.(string); ok {
-														match, err := glob.Compile(castedPattern)
-														if err != nil {
-															logrus.Errorf("invalid email address pattern glob '%v': %v", pattern.(string), err)
-															unauthorizedUi.WriteUnauthorized(w)
-															return
-														}
-														if match.Match(claims.Email) {
-															found = true
-															break
-														}
-													} else {
-														logrus.Errorf("invalid email address pattern '%v'", pattern)
-														unauthorizedUi.WriteUnauthorized(w)
-														return
-													}
-												}
-												if !found {
-													logrus.Warnf("unauthorized email '%v' for '%v'", claims.Email, shrToken)
-													unauthorizedUi.WriteUnauthorized(w)
-													return
-												}
-											}
-										}
-									}
-									handler.ServeHTTP(w, r)
-									return
-
-								} else {
-									logrus.Warnf("%v -> no provider for '%v'", r.RemoteAddr, provider)
-									notFoundUi.WriteNotFound(w)
-								}
-							} else {
-								logrus.Warnf("%v -> no oauth cfg for '%v'", r.RemoteAddr, shrToken)
-								notFoundUi.WriteNotFound(w)
-							}
-						default:
-							logrus.Infof("invalid auth scheme '%v'", scheme)
-							basicAuthRequired(w, shrToken)
-							return
-						}
-					} else {
-						logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-						notFoundUi.WriteNotFound(w)
-					}
-				} else {
-					logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-					notFoundUi.WriteNotFound(w)
-				}
-			} else {
-				logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-				notFoundUi.WriteNotFound(w)
-			}
-		} else {
-			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			healthUi.WriteHealthOk(w)
-		}
+func newHttpHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Context) *httpHandler {
+	return &httpHandler{
+		handler: handler,
+		cfg:     cfg,
+		key:     key,
+		ctx:     ctx,
 	}
 }
 
-type ZrokClaims struct {
+func (h *httpHandler) handleInterstitial(w http.ResponseWriter, r *http.Request, proxyConfig map[string]interface{}) bool {
+	if r.Method != http.MethodOptions && (h.cfg.Interstitial != nil && h.cfg.Interstitial.Enabled) {
+		sendInterstitial := true
+		if len(h.cfg.Interstitial.UserAgentPrefixes) > 0 {
+			ua := r.Header.Get("User-Agent")
+			matched := false
+			for _, prefix := range h.cfg.Interstitial.UserAgentPrefixes {
+				if strings.HasPrefix(ua, prefix) {
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				sendInterstitial = false
+			}
+		}
+		if sendInterstitial {
+			if v, istlFound := proxyConfig["interstitial"]; istlFound {
+				if istlEnabled, ok := v.(bool); ok && istlEnabled {
+					skip := r.Header.Get("skip_zrok_interstitial")
+					_, zrokOkErr := r.Cookie("zrok_interstitial")
+					if skip == "" && zrokOkErr != nil {
+						logrus.Debugf("forcing interstitial for '%v'", r.URL)
+						interstitialUi.WriteInterstitialAnnounce(w, h.cfg.Interstitial.HtmlPath)
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (h *httpHandler) handleBasicAuth(w http.ResponseWriter, r *http.Request, shrToken string, secrets map[string]string) bool {
+	inUser, inPass, ok := r.BasicAuth()
+	if !ok {
+		basicAuthRequired(w, shrToken)
+		return false
+	}
+
+	var authUsers map[string]string
+	if v, found := secrets["auth_users"]; found {
+		if err := json.Unmarshal([]byte(v), &authUsers); err != nil {
+			basicAuthRequired(w, shrToken)
+			return false
+		}
+	}
+
+	if password, found := authUsers[inUser]; found {
+		if inPass == password {
+			return true
+		}
+	}
+
+	basicAuthRequired(w, shrToken)
+	return false
+}
+
+func (h *httpHandler) handleOAuthAuth(w http.ResponseWriter, r *http.Request, shrToken string, proxyConfig map[string]interface{}) bool {
+	logrus.Infof("handling '%v'", shrToken)
+	if oauthCfg, found := proxyConfig["oauth"]; found {
+		if provider, found := oauthCfg.(map[string]interface{})["provider"]; found {
+			authCheckInterval := h.getAuthCheckInterval(oauthCfg)
+			target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
+
+			if !h.validateOAuthCookie(w, r, provider.(string), target, authCheckInterval) {
+				return false
+			}
+
+			if !h.validateEmailDomains(w, r, oauthCfg, shrToken) {
+				return false
+			}
+
+			return true
+		} else {
+			logrus.Warnf("%v -> no provider for '%v'", r.RemoteAddr, provider)
+			notFoundUi.WriteNotFound(w)
+		}
+	} else {
+		logrus.Warnf("%v -> no oauth cfg for '%v'", r.RemoteAddr, shrToken)
+		notFoundUi.WriteNotFound(w)
+	}
+	return false
+}
+
+func (h *httpHandler) getAuthCheckInterval(oauthCfg interface{}) time.Duration {
+	var authCheckInterval time.Duration
+	if checkInterval, found := oauthCfg.(map[string]interface{})["authorization_check_interval"]; !found {
+		logrus.Errorf("missing authorization check interval in share config. Defaulting to 3 hours")
+		authCheckInterval = 3 * time.Hour
+	} else {
+		i, err := time.ParseDuration(checkInterval.(string))
+		if err != nil {
+			logrus.Errorf("unable to parse authorization check interval in share config (%v). Defaulting to 3 hours", checkInterval)
+			authCheckInterval = 3 * time.Hour
+		} else {
+			authCheckInterval = i
+		}
+	}
+	return authCheckInterval
+}
+
+func (h *httpHandler) validateOAuthCookie(w http.ResponseWriter, r *http.Request, provider string, target string, authCheckInterval time.Duration) bool {
+	cookie, err := r.Cookie("zrok-access")
+	if err != nil {
+		logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+
+	tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if h.cfg.Oauth == nil {
+			return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
+		}
+		return h.key, nil
+	})
+	if err != nil {
+		logrus.Errorf("unable to parse jwt: %v", err)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+
+	claims := tkn.Claims.(*zrokClaims)
+	if claims.Provider != provider {
+		logrus.Error("provider mismatch; restarting auth flow")
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+	if claims.AuthorizationCheckInterval != authCheckInterval {
+		logrus.Error("authorization check interval mismatch; restarting auth flow")
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+	if claims.Audience != r.Host {
+		logrus.Errorf("audience claim '%s' does not match requested host '%s'; restarting auth flow", claims.Audience, r.Host)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+
+	logrus.Infof("validated oauth cookie for '%v'", target)
+
+	return true
+}
+
+func (h *httpHandler) validateEmailDomains(w http.ResponseWriter, r *http.Request, oauthCfg interface{}, shrToken string) bool {
+	if validEmailAddressPatterns, found := oauthCfg.(map[string]interface{})["email_domains"]; found {
+		if castedPatterns, ok := validEmailAddressPatterns.([]interface{}); !ok {
+			logrus.Error("invalid email pattern array format")
+			return false
+		} else {
+			if len(castedPatterns) > 0 {
+				claims := h.getOAuthClaims(r)
+				if claims == nil {
+					return false
+				}
+
+				found := false
+				for _, pattern := range castedPatterns {
+					if castedPattern, ok := pattern.(string); ok {
+						match, err := glob.Compile(castedPattern)
+						if err != nil {
+							logrus.Errorf("invalid email address pattern glob '%v': %v", pattern.(string), err)
+							unauthorizedUi.WriteUnauthorized(w)
+							return false
+						}
+						if match.Match(claims.Email) {
+							found = true
+							break
+						}
+					} else {
+						logrus.Errorf("invalid email address pattern '%v'", pattern)
+						unauthorizedUi.WriteUnauthorized(w)
+						return false
+					}
+				}
+				if !found {
+					logrus.Warnf("unauthorized email '%v' for '%v'", claims.Email, shrToken)
+					unauthorizedUi.WriteUnauthorized(w)
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func (h *httpHandler) getOAuthClaims(r *http.Request) *zrokClaims {
+	cookie, err := r.Cookie("zrok-access")
+	if err != nil {
+		return nil
+	}
+
+	tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return h.key, nil
+	})
+	if err != nil {
+		return nil
+	}
+
+	return tkn.Claims.(*zrokClaims)
+}
+
+func (h *httpHandler) handleAuth(w http.ResponseWriter, r *http.Request, shrToken string, proxyConfig map[string]interface{}, secrets map[string]string) bool {
+	authScheme := "none"
+	if v, found := secrets["auth_scheme"]; found {
+		authScheme = v
+	} else if v, found := proxyConfig["auth_scheme"]; found {
+		proxyAuthScheme := v.(string)
+		if proxyAuthScheme != "" {
+			authScheme = proxyAuthScheme
+		}
+	}
+
+	logrus.Infof("authScheme = %v", authScheme)
+
+	if authScheme != "" {
+		switch authScheme {
+		case string(sdk.None):
+			logrus.Debugf("auth scheme none '%v'", shrToken)
+			return true
+		case string(sdk.Basic):
+			logrus.Debugf("auth scheme basic '%v", shrToken)
+			return h.handleBasicAuth(w, r, shrToken, secrets)
+		case string(sdk.Oauth):
+			logrus.Infof("auth scheme oauth '%v'", shrToken)
+			return h.handleOAuthAuth(w, r, shrToken, proxyConfig)
+		default:
+			logrus.Infof("invalid auth scheme '%v'", authScheme)
+			basicAuthRequired(w, shrToken)
+			return false
+		}
+	} else {
+		logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
+		notFoundUi.WriteNotFound(w)
+		return false
+	}
+}
+
+func (h *httpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	shrToken := resolveService(h.cfg.HostMatch, r.Host)
+	if shrToken == "" {
+		logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
+		healthUi.WriteHealthOk(w)
+		return
+	}
+
+	svc, found := endpoints.GetRefreshedService(shrToken, h.ctx)
+	if !found {
+		logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
+		notFoundUi.WriteNotFound(w)
+		return
+	}
+
+	proxyConfig, found := svc.Config[sdk.ZrokProxyConfig]
+	if !found {
+		logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
+		notFoundUi.WriteNotFound(w)
+		return
+	}
+
+	logrus.Infof("proxyConfig = %v", proxyConfig)
+
+	if h.handleInterstitial(w, r, proxyConfig) {
+		return
+	}
+
+	secretsAuth := false
+	if v, found := proxyConfig["secrets_auth"]; found {
+		secretsAuth = v.(bool)
+	}
+
+	var secrets map[string]string
+	if secretsAuth {
+		logrus.Infof("secrets auth enabled")
+		secrets = make(map[string]string)
+		secretsArr, err := GetSecrets(shrToken, h.cfg)
+		if err != nil {
+			logrus.Infof("error getting secrets for '%v': %v", shrToken, err)
+			notFoundUi.WriteNotFound(w)
+			return
+		}
+		for _, secret := range secretsArr {
+			secrets[secret.Key] = secret.Value
+		}
+	}
+
+	if !h.handleAuth(w, r, shrToken, proxyConfig, secrets) {
+		return
+	}
+
+	// ensure cookies from other shares are not sent to this share, in case it's malicious
+	deleteZrokCookies(w, r)
+	h.handler.ServeHTTP(w, r)
+}
+
+func shareHandler(handler http.Handler, cfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
+	h := newHttpHandler(handler, cfg, key, ctx)
+	return h.ServeHTTP
+}
+
+type zrokClaims struct {
 	Email                      string        `json:"email"`
 	AccessToken                string        `json:"accessToken"`
 	Provider                   string        `json:"provider"`
@@ -375,7 +482,7 @@ type ZrokClaims struct {
 	jwt.RegisteredClaims
 }
 
-func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
+func setZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
 	targetHost = strings.TrimSpace(targetHost)
 	if targetHost == "" {
 		logrus.Error("host claim must not be empty")
@@ -385,7 +492,7 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 	targetHost = strings.Split(targetHost, "/")[0]
 	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
 
-	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, ZrokClaims{
+	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, zrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
 		Provider:                   provider,
@@ -435,7 +542,19 @@ func basicAuthRequired(w http.ResponseWriter, realm string) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targethost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	targetHost := r.Host
+	if targetHost == "" {
+		logrus.Error("request host is empty")
+		http.Error(w, "Invalid request host", http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("%s/oauth/%s/login?targethost=%s&checkInterval=%s",
+		cfg.RedirectUrl,
+		provider,
+		url.QueryEscape(targetHost),
+		authCheckInterval.String()),
+		http.StatusFound)
 }
 
 func resolveService(hostMatch string, host string) string {

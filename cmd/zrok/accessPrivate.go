@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -24,11 +30,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/url"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -259,7 +260,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		}()
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	go func() {
 		<-c
@@ -281,27 +282,21 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	if cmd.headless {
 		logrus.Infof("access the zrok share at the following endpoint: %v", endpointUrl.String())
-		for {
-			select {
-			case req := <-requests:
-				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
-			}
+		for req := range requests {
+			logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 		}
 	} else if cmd.subordinate {
-		for {
-			select {
-			case req := <-requests:
-				data := make(map[string]interface{})
-				data[subordinate.MessageKey] = "access"
-				data["remote-address"] = req.RemoteAddr
-				data["method"] = req.Method
-				data["path"] = req.Path
-				jsonData, err := json.Marshal(data)
-				if err != nil {
-					fmt.Println(err)
-				}
-				fmt.Println(string(jsonData))
+		for req := range requests {
+			data := make(map[string]interface{})
+			data[subordinate.MessageKey] = "access"
+			data["remote-address"] = req.RemoteAddr
+			data["method"] = req.Method
+			data["path"] = req.Path
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				fmt.Println(err)
 			}
+			fmt.Println(string(jsonData))
 		}
 	} else {
 		mdl := newAccessModel(shrToken, endpointUrl.String())

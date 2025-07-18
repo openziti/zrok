@@ -11,6 +11,7 @@ models/Access201Response.ts
 models/AccessRequest.ts
 models/AddFrontendGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
+models/AddSecretsAccessRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts
@@ -45,6 +46,7 @@ models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
+models/OidcConfig.ts
 models/Overview.ts
 models/Ping200Response.ts
 models/Principal.ts
