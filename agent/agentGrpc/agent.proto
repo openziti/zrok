@@ -10,6 +10,11 @@ service Agent {
 			post: "/v1/agent/accessPrivate"
 		};
 	}
+	rpc HttpShareHealthcheck(HttpShareHealthcheckRequest) returns (HttpShareHealthcheckResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/httpShareHealthcheck"
+		};
+	}
 	rpc ReleaseAccess(ReleaseAccessRequest) returns (ReleaseAccessResponse) {
 		option(google.api.http) = {
 			post: "/v1/agent/releaseAccess"
@@ -62,6 +67,19 @@ message AccessPrivateRequest{
 	uint32 autoStartPort = 5;
 	uint32 autoEndPort = 6;
 	repeated string responseHeaders = 7;
+}
+
+message HttpShareHealthcheckRequest{
+	string token = 1;
+	string endpoint = 2;
+	string httpVerb = 3;
+	string expectedHttpResponse = 4;
+	uint32 timeoutMs = 5;
+}
+
+message HttpShareHealthcheckResponse{
+	bool healthy = 1;
+	string error = 2;
 }
 
 message ReleaseAccessRequest {
