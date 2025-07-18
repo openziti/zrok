@@ -2,7 +2,7 @@
 
 ## v1.0.7
 
-FEATURE: zrok Agent now supports health checks (against the target endpoint) for `proxy` backend shares using the `zrok agent share http-healthcheck` command. The zrok API now includes an `/agent/share/http-healthcheck` for remotely performing these checks against remoted Agents (https://github.com/openziti/zrok/issues/1002)
+FEATURE: zrok Agent now supports health checks (against the target endpoint) for `proxy` backend shares using the `zrok agent share http-healthcheck` command. The zrok API now includes an `/agent/share/http-healthcheck` for remotely performing these checks against remoted Agents. See the guide for using the feature at https://docs.zrok.io/guides/agent/http-healthcheck/ (https://github.com/openziti/zrok/issues/1002)
 
 FEATURE: `/overview`, `/detail/share`, `/detail/environment`, and `/overview/{organizationToken}/{accountEmail}` all adjusted to include `envZId` in share detail output (https://github.com/openziti/zrok/issues/998)
 
