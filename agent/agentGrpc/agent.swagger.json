@@ -113,13 +113,13 @@
             "type": "string"
           },
           {
-            "name": "endpoint",
+            "name": "httpVerb",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "httpVerb",
+            "name": "endpoint",
             "in": "query",
             "required": false,
             "type": "string"
@@ -134,8 +134,8 @@
             "name": "timeoutMs",
             "in": "query",
             "required": false,
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uint64"
           }
         ],
         "tags": [

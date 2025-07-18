@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/cobra-to-md"
 	"github.com/openziti/transport/v2"
@@ -10,9 +14,6 @@ import (
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 func init() {
@@ -26,6 +27,7 @@ func init() {
 	adminCmd.AddCommand(adminUpdateCmd)
 	rootCmd.AddCommand(agentCmd)
 	agentCmd.AddCommand(agentReleaseCmd)
+	agentCmd.AddCommand(agentShareCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(modifyCmd)
@@ -91,6 +93,11 @@ var agentCmd = &cobra.Command{
 var agentReleaseCmd = &cobra.Command{
 	Use:   "release",
 	Short: "zrok Agent release commands",
+}
+
+var agentShareCmd = &cobra.Command{
+	Use:   "share",
+	Short: "zrok Agent share commands",
 }
 
 var configCmd = &cobra.Command{

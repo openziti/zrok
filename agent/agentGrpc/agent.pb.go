@@ -229,10 +229,10 @@ func (x *AccessPrivateRequest) GetResponseHeaders() []string {
 type HttpShareHealthcheckRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Token                string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	Endpoint             string                 `protobuf:"bytes,2,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	HttpVerb             string                 `protobuf:"bytes,3,opt,name=httpVerb,proto3" json:"httpVerb,omitempty"`
+	HttpVerb             string                 `protobuf:"bytes,2,opt,name=httpVerb,proto3" json:"httpVerb,omitempty"`
+	Endpoint             string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	ExpectedHttpResponse string                 `protobuf:"bytes,4,opt,name=expectedHttpResponse,proto3" json:"expectedHttpResponse,omitempty"`
-	TimeoutMs            uint32                 `protobuf:"varint,5,opt,name=timeoutMs,proto3" json:"timeoutMs,omitempty"`
+	TimeoutMs            uint64                 `protobuf:"varint,5,opt,name=timeoutMs,proto3" json:"timeoutMs,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -274,16 +274,16 @@ func (x *HttpShareHealthcheckRequest) GetToken() string {
 	return ""
 }
 
-func (x *HttpShareHealthcheckRequest) GetEndpoint() string {
+func (x *HttpShareHealthcheckRequest) GetHttpVerb() string {
 	if x != nil {
-		return x.Endpoint
+		return x.HttpVerb
 	}
 	return ""
 }
 
-func (x *HttpShareHealthcheckRequest) GetHttpVerb() string {
+func (x *HttpShareHealthcheckRequest) GetEndpoint() string {
 	if x != nil {
-		return x.HttpVerb
+		return x.Endpoint
 	}
 	return ""
 }
@@ -295,7 +295,7 @@ func (x *HttpShareHealthcheckRequest) GetExpectedHttpResponse() string {
 	return ""
 }
 
-func (x *HttpShareHealthcheckRequest) GetTimeoutMs() uint32 {
+func (x *HttpShareHealthcheckRequest) GetTimeoutMs() uint64 {
 	if x != nil {
 		return x.TimeoutMs
 	}
@@ -1236,10 +1236,10 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"\xbd\x01\n" +
 	"\x1bHttpShareHealthcheckRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
-	"\bendpoint\x18\x02 \x01(\tR\bendpoint\x12\x1a\n" +
-	"\bhttpVerb\x18\x03 \x01(\tR\bhttpVerb\x122\n" +
+	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +
+	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x122\n" +
 	"\x14expectedHttpResponse\x18\x04 \x01(\tR\x14expectedHttpResponse\x12\x1c\n" +
-	"\ttimeoutMs\x18\x05 \x01(\rR\ttimeoutMs\"N\n" +
+	"\ttimeoutMs\x18\x05 \x01(\x04R\ttimeoutMs\"N\n" +
 	"\x1cHttpShareHealthcheckResponse\x12\x18\n" +
 	"\ahealthy\x18\x01 \x01(\bR\ahealthy\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\"<\n" +

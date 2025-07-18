@@ -71,10 +71,10 @@ message AccessPrivateRequest{
 
 message HttpShareHealthcheckRequest{
 	string token = 1;
-	string endpoint = 2;
-	string httpVerb = 3;
+	string httpVerb = 2;
+	string endpoint = 3;
 	string expectedHttpResponse = 4;
-	uint32 timeoutMs = 5;
+	uint64 timeoutMs = 5;
 }
 
 message HttpShareHealthcheckResponse{

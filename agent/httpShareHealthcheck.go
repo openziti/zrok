@@ -33,8 +33,12 @@ func (a *Agent) doHealthcheckRequest(shr *share, endpoint, httpVerb, expectedHtt
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
+	timeout := 5 * time.Second
+	if timeoutMs > 0 {
+		timeout = time.Duration(timeoutMs) * time.Millisecond
+	}
 	client := &http.Client{
-		Timeout: time.Duration(timeoutMs) * time.Millisecond,
+		Timeout: timeout,
 	}
 	resp, err := client.Do(req)
 	if err != nil {
