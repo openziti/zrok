@@ -30,6 +30,8 @@ models/EnvironmentAndResources.ts
 models/Frontend.ts
 models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
+models/HttpHealthcheck200Response.ts
+models/HttpHealthcheckRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
 models/ListFrontends200ResponseInner.ts

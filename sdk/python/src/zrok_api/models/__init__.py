@@ -38,6 +38,8 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.models.frontend import Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest
+from zrok_api.models.http_healthcheck200_response import HttpHealthcheck200Response
+from zrok_api.models.http_healthcheck_request import HttpHealthcheckRequest
 from zrok_api.models.invite_request import InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner

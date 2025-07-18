@@ -119,6 +119,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
+*AgentApi* | [**http_healthcheck**](docs/AgentApi.md#http_healthcheck) | **POST** /agent/share/http-healthcheck | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
 *AgentApi* | [**remote_access**](docs/AgentApi.md#remote_access) | **POST** /agent/access | 
 *AgentApi* | [**remote_share**](docs/AgentApi.md#remote_share) | **POST** /agent/share | 
@@ -179,6 +180,8 @@ Class | Method | HTTP request | Description
  - [Frontend](docs/Frontend.md)
  - [GetSparklines200Response](docs/GetSparklines200Response.md)
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
+ - [HttpHealthcheck200Response](docs/HttpHealthcheck200Response.md)
+ - [HttpHealthcheckRequest](docs/HttpHealthcheckRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)

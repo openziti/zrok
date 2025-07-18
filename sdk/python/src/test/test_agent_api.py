@@ -32,6 +32,12 @@ class TestAgentApi(unittest.TestCase):
         """
         pass
 
+    def test_http_healthcheck(self) -> None:
+        """Test case for http_healthcheck
+
+        """
+        pass
+
     def test_ping(self) -> None:
         """Test case for ping
 

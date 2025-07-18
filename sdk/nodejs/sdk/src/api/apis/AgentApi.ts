@@ -18,6 +18,8 @@ import type {
   CreateFrontend201Response,
   Enroll200Response,
   EnrollRequest,
+  HttpHealthcheck200Response,
+  HttpHealthcheckRequest,
   Ping200Response,
   RemoteAccessRequest,
   RemoteShare200Response,
@@ -33,6 +35,10 @@ import {
     Enroll200ResponseToJSON,
     EnrollRequestFromJSON,
     EnrollRequestToJSON,
+    HttpHealthcheck200ResponseFromJSON,
+    HttpHealthcheck200ResponseToJSON,
+    HttpHealthcheckRequestFromJSON,
+    HttpHealthcheckRequestToJSON,
     Ping200ResponseFromJSON,
     Ping200ResponseToJSON,
     RemoteAccessRequestFromJSON,
@@ -51,6 +57,10 @@ import {
 
 export interface EnrollOperationRequest {
     body?: EnrollRequest;
+}
+
+export interface HttpHealthcheckOperationRequest {
+    body?: HttpHealthcheckRequest;
 }
 
 export interface PingRequest {
@@ -117,6 +127,40 @@ export class AgentApi extends runtime.BaseAPI {
      */
     async enroll(requestParameters: EnrollOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Enroll200Response> {
         const response = await this.enrollRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async httpHealthcheckRaw(requestParameters: HttpHealthcheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HttpHealthcheck200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/agent/share/http-healthcheck`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: HttpHealthcheckRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => HttpHealthcheck200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async httpHealthcheck(requestParameters: HttpHealthcheckOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HttpHealthcheck200Response> {
+        const response = await this.httpHealthcheckRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

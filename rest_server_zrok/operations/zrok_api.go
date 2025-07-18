@@ -131,6 +131,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
 		}),
+		AgentHTTPHealthcheckHandler: agent.HTTPHealthcheckHandlerFunc(func(params agent.HTTPHealthcheckParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.HTTPHealthcheck has not yet been implemented")
+		}),
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
 		}),
@@ -331,6 +334,8 @@ type ZrokAPI struct {
 	MetadataGetSparklinesHandler metadata.GetSparklinesHandler
 	// AdminGrantsHandler sets the operation handler for the grants operation
 	AdminGrantsHandler admin.GrantsHandler
+	// AgentHTTPHealthcheckHandler sets the operation handler for the http healthcheck operation
+	AgentHTTPHealthcheckHandler agent.HTTPHealthcheckHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -556,6 +561,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminGrantsHandler == nil {
 		unregistered = append(unregistered, "admin.GrantsHandler")
+	}
+	if o.AgentHTTPHealthcheckHandler == nil {
+		unregistered = append(unregistered, "agent.HTTPHealthcheckHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -860,6 +868,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/grants"] = admin.NewGrants(o.context, o.AdminGrantsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/share/http-healthcheck"] = agent.NewHTTPHealthcheck(o.context, o.AgentHTTPHealthcheckHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

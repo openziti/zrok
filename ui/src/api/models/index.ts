@@ -23,6 +23,8 @@ export * from './EnvironmentAndResources';
 export * from './Frontend';
 export * from './GetSparklines200Response';
 export * from './GetSparklinesRequest';
+export * from './HttpHealthcheck200Response';
+export * from './HttpHealthcheckRequest';
 export * from './InviteRequest';
 export * from './InviteTokenGenerateRequest';
 export * from './ListFrontends200ResponseInner';

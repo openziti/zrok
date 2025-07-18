@@ -57,6 +57,8 @@ __all__ = [
     "Frontend",
     "GetSparklines200Response",
     "GetSparklinesRequest",
+    "HttpHealthcheck200Response",
+    "HttpHealthcheckRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
     "ListFrontends200ResponseInner",
@@ -145,6 +147,8 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources as
 from zrok_api.models.frontend import Frontend as Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response as GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
+from zrok_api.models.http_healthcheck200_response import HttpHealthcheck200Response as HttpHealthcheck200Response
+from zrok_api.models.http_healthcheck_request import HttpHealthcheckRequest as HttpHealthcheckRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
