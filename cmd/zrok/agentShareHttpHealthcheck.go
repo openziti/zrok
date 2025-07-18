@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/openziti/zrok/agent/agentClient"
@@ -36,6 +37,11 @@ func newAgentShareHttpHealthcheckCommand() *agentShareHttpHealthcheckCommand {
 }
 
 func (cmd *agentShareHttpHealthcheckCommand) run(_ *cobra.Command, args []string) {
+	expectedHttpStatus, err := strconv.Atoi(args[3])
+	if err != nil {
+		tui.Error(fmt.Sprintf("'%v' is not a valid HTTP status", args[3]), err)
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		tui.Error("unable to load environment", err)
@@ -47,11 +53,11 @@ func (cmd *agentShareHttpHealthcheckCommand) run(_ *cobra.Command, args []string
 	}
 	defer conn.Close()
 
-	resp, err := client.HttpShareHealthcheck(context.Background(), &agentGrpc.HttpShareHealthcheckRequest{
+	resp, err := client.ShareHttpHealthcheck(context.Background(), &agentGrpc.ShareHttpHealthcheckRequest{
 		Token:                args[0],
 		HttpVerb:             args[1],
 		Endpoint:             args[2],
-		ExpectedHttpResponse: args[3],
+		ExpectedHttpResponse: uint32(expectedHttpStatus),
 		TimeoutMs:            uint64(cmd.timeout.Milliseconds()),
 	})
 	if err != nil {

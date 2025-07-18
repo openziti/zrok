@@ -90,12 +90,12 @@
     },
     "/v1/agent/httpShareHealthcheck": {
       "post": {
-        "operationId": "Agent_HttpShareHealthcheck",
+        "operationId": "Agent_ShareHttpHealthcheck",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/HttpShareHealthcheckResponse"
+              "$ref": "#/definitions/ShareHttpHealthcheckResponse"
             }
           },
           "default": {
@@ -128,7 +128,8 @@
             "name": "expectedHttpResponse",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "integer",
+            "format": "int64"
           },
           {
             "name": "timeoutMs",
@@ -435,17 +436,6 @@
         }
       }
     },
-    "HttpShareHealthcheckResponse": {
-      "type": "object",
-      "properties": {
-        "healthy": {
-          "type": "boolean"
-        },
-        "error": {
-          "type": "string"
-        }
-      }
-    },
     "ReleaseAccessResponse": {
       "type": "object"
     },
@@ -480,6 +470,17 @@
           "type": "boolean"
         },
         "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ShareHttpHealthcheckResponse": {
+      "type": "object",
+      "properties": {
+        "healthy": {
+          "type": "boolean"
+        },
+        "error": {
           "type": "string"
         }
       }

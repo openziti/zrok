@@ -20,9 +20,9 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Agent_AccessPrivate_FullMethodName        = "/Agent/AccessPrivate"
-	Agent_HttpShareHealthcheck_FullMethodName = "/Agent/HttpShareHealthcheck"
 	Agent_ReleaseAccess_FullMethodName        = "/Agent/ReleaseAccess"
 	Agent_ReleaseShare_FullMethodName         = "/Agent/ReleaseShare"
+	Agent_ShareHttpHealthcheck_FullMethodName = "/Agent/ShareHttpHealthcheck"
 	Agent_ShareReserved_FullMethodName        = "/Agent/ShareReserved"
 	Agent_SharePrivate_FullMethodName         = "/Agent/SharePrivate"
 	Agent_SharePublic_FullMethodName          = "/Agent/SharePublic"
@@ -35,9 +35,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentClient interface {
 	AccessPrivate(ctx context.Context, in *AccessPrivateRequest, opts ...grpc.CallOption) (*AccessPrivateResponse, error)
-	HttpShareHealthcheck(ctx context.Context, in *HttpShareHealthcheckRequest, opts ...grpc.CallOption) (*HttpShareHealthcheckResponse, error)
 	ReleaseAccess(ctx context.Context, in *ReleaseAccessRequest, opts ...grpc.CallOption) (*ReleaseAccessResponse, error)
 	ReleaseShare(ctx context.Context, in *ReleaseShareRequest, opts ...grpc.CallOption) (*ReleaseShareResponse, error)
+	ShareHttpHealthcheck(ctx context.Context, in *ShareHttpHealthcheckRequest, opts ...grpc.CallOption) (*ShareHttpHealthcheckResponse, error)
 	ShareReserved(ctx context.Context, in *ShareReservedRequest, opts ...grpc.CallOption) (*ShareReservedResponse, error)
 	SharePrivate(ctx context.Context, in *SharePrivateRequest, opts ...grpc.CallOption) (*SharePrivateResponse, error)
 	SharePublic(ctx context.Context, in *SharePublicRequest, opts ...grpc.CallOption) (*SharePublicResponse, error)
@@ -63,16 +63,6 @@ func (c *agentClient) AccessPrivate(ctx context.Context, in *AccessPrivateReques
 	return out, nil
 }
 
-func (c *agentClient) HttpShareHealthcheck(ctx context.Context, in *HttpShareHealthcheckRequest, opts ...grpc.CallOption) (*HttpShareHealthcheckResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HttpShareHealthcheckResponse)
-	err := c.cc.Invoke(ctx, Agent_HttpShareHealthcheck_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *agentClient) ReleaseAccess(ctx context.Context, in *ReleaseAccessRequest, opts ...grpc.CallOption) (*ReleaseAccessResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ReleaseAccessResponse)
@@ -87,6 +77,16 @@ func (c *agentClient) ReleaseShare(ctx context.Context, in *ReleaseShareRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ReleaseShareResponse)
 	err := c.cc.Invoke(ctx, Agent_ReleaseShare_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentClient) ShareHttpHealthcheck(ctx context.Context, in *ShareHttpHealthcheckRequest, opts ...grpc.CallOption) (*ShareHttpHealthcheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareHttpHealthcheckResponse)
+	err := c.cc.Invoke(ctx, Agent_ShareHttpHealthcheck_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,9 +148,9 @@ func (c *agentClient) Version(ctx context.Context, in *VersionRequest, opts ...g
 // for forward compatibility.
 type AgentServer interface {
 	AccessPrivate(context.Context, *AccessPrivateRequest) (*AccessPrivateResponse, error)
-	HttpShareHealthcheck(context.Context, *HttpShareHealthcheckRequest) (*HttpShareHealthcheckResponse, error)
 	ReleaseAccess(context.Context, *ReleaseAccessRequest) (*ReleaseAccessResponse, error)
 	ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareResponse, error)
+	ShareHttpHealthcheck(context.Context, *ShareHttpHealthcheckRequest) (*ShareHttpHealthcheckResponse, error)
 	ShareReserved(context.Context, *ShareReservedRequest) (*ShareReservedResponse, error)
 	SharePrivate(context.Context, *SharePrivateRequest) (*SharePrivateResponse, error)
 	SharePublic(context.Context, *SharePublicRequest) (*SharePublicResponse, error)
@@ -169,14 +169,14 @@ type UnimplementedAgentServer struct{}
 func (UnimplementedAgentServer) AccessPrivate(context.Context, *AccessPrivateRequest) (*AccessPrivateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AccessPrivate not implemented")
 }
-func (UnimplementedAgentServer) HttpShareHealthcheck(context.Context, *HttpShareHealthcheckRequest) (*HttpShareHealthcheckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HttpShareHealthcheck not implemented")
-}
 func (UnimplementedAgentServer) ReleaseAccess(context.Context, *ReleaseAccessRequest) (*ReleaseAccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseAccess not implemented")
 }
 func (UnimplementedAgentServer) ReleaseShare(context.Context, *ReleaseShareRequest) (*ReleaseShareResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseShare not implemented")
+}
+func (UnimplementedAgentServer) ShareHttpHealthcheck(context.Context, *ShareHttpHealthcheckRequest) (*ShareHttpHealthcheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShareHttpHealthcheck not implemented")
 }
 func (UnimplementedAgentServer) ShareReserved(context.Context, *ShareReservedRequest) (*ShareReservedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ShareReserved not implemented")
@@ -232,24 +232,6 @@ func _Agent_AccessPrivate_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_HttpShareHealthcheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HttpShareHealthcheckRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServer).HttpShareHealthcheck(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Agent_HttpShareHealthcheck_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).HttpShareHealthcheck(ctx, req.(*HttpShareHealthcheckRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Agent_ReleaseAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReleaseAccessRequest)
 	if err := dec(in); err != nil {
@@ -282,6 +264,24 @@ func _Agent_ReleaseShare_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AgentServer).ReleaseShare(ctx, req.(*ReleaseShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Agent_ShareHttpHealthcheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareHttpHealthcheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).ShareHttpHealthcheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_ShareHttpHealthcheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).ShareHttpHealthcheck(ctx, req.(*ShareHttpHealthcheckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -388,16 +388,16 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Agent_AccessPrivate_Handler,
 		},
 		{
-			MethodName: "HttpShareHealthcheck",
-			Handler:    _Agent_HttpShareHealthcheck_Handler,
-		},
-		{
 			MethodName: "ReleaseAccess",
 			Handler:    _Agent_ReleaseAccess_Handler,
 		},
 		{
 			MethodName: "ReleaseShare",
 			Handler:    _Agent_ReleaseShare_Handler,
+		},
+		{
+			MethodName: "ShareHttpHealthcheck",
+			Handler:    _Agent_ShareHttpHealthcheck_Handler,
 		},
 		{
 			MethodName: "ShareReserved",

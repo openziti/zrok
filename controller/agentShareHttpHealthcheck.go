@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -46,14 +45,14 @@ func (h *agentShareHttpHealthcheckHandler) Handle(params agent.ShareHTTPHealthch
 	}
 	defer aconn.Close()
 
-	req := &agentGrpc.HttpShareHealthcheckRequest{
+	req := &agentGrpc.ShareHttpHealthcheckRequest{
 		Token:                params.Body.ShareToken,
 		HttpVerb:             params.Body.HTTPVerb,
 		Endpoint:             params.Body.Endpoint,
-		ExpectedHttpResponse: fmt.Sprintf("%v", params.Body.ExpectedHTTPResponse),
+		ExpectedHttpResponse: uint32(params.Body.ExpectedHTTPResponse),
 		TimeoutMs:            uint64(params.Body.TimeoutMs),
 	}
-	resp, err := acli.HttpShareHealthcheck(context.Background(), req)
+	resp, err := acli.ShareHttpHealthcheck(context.Background(), req)
 	if err != nil {
 		logrus.Infof("error invoking remoted share '%v' http healthcheck for '%v': %v", params.Body.ShareToken, params.Body.EnvZID, err)
 		return agent.NewShareHTTPHealthcheckBadGateway()

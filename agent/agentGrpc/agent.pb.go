@@ -226,134 +226,6 @@ func (x *AccessPrivateRequest) GetResponseHeaders() []string {
 	return nil
 }
 
-type HttpShareHealthcheckRequest struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	Token                string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	HttpVerb             string                 `protobuf:"bytes,2,opt,name=httpVerb,proto3" json:"httpVerb,omitempty"`
-	Endpoint             string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	ExpectedHttpResponse string                 `protobuf:"bytes,4,opt,name=expectedHttpResponse,proto3" json:"expectedHttpResponse,omitempty"`
-	TimeoutMs            uint64                 `protobuf:"varint,5,opt,name=timeoutMs,proto3" json:"timeoutMs,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *HttpShareHealthcheckRequest) Reset() {
-	*x = HttpShareHealthcheckRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *HttpShareHealthcheckRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HttpShareHealthcheckRequest) ProtoMessage() {}
-
-func (x *HttpShareHealthcheckRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HttpShareHealthcheckRequest.ProtoReflect.Descriptor instead.
-func (*HttpShareHealthcheckRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *HttpShareHealthcheckRequest) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-func (x *HttpShareHealthcheckRequest) GetHttpVerb() string {
-	if x != nil {
-		return x.HttpVerb
-	}
-	return ""
-}
-
-func (x *HttpShareHealthcheckRequest) GetEndpoint() string {
-	if x != nil {
-		return x.Endpoint
-	}
-	return ""
-}
-
-func (x *HttpShareHealthcheckRequest) GetExpectedHttpResponse() string {
-	if x != nil {
-		return x.ExpectedHttpResponse
-	}
-	return ""
-}
-
-func (x *HttpShareHealthcheckRequest) GetTimeoutMs() uint64 {
-	if x != nil {
-		return x.TimeoutMs
-	}
-	return 0
-}
-
-type HttpShareHealthcheckResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Healthy       bool                   `protobuf:"varint,1,opt,name=healthy,proto3" json:"healthy,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *HttpShareHealthcheckResponse) Reset() {
-	*x = HttpShareHealthcheckResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *HttpShareHealthcheckResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HttpShareHealthcheckResponse) ProtoMessage() {}
-
-func (x *HttpShareHealthcheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HttpShareHealthcheckResponse.ProtoReflect.Descriptor instead.
-func (*HttpShareHealthcheckResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *HttpShareHealthcheckResponse) GetHealthy() bool {
-	if x != nil {
-		return x.Healthy
-	}
-	return false
-}
-
-func (x *HttpShareHealthcheckResponse) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
 type ReleaseAccessRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	FrontendToken string                 `protobuf:"bytes,1,opt,name=frontendToken,proto3" json:"frontendToken,omitempty"`
@@ -363,7 +235,7 @@ type ReleaseAccessRequest struct {
 
 func (x *ReleaseAccessRequest) Reset() {
 	*x = ReleaseAccessRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -375,7 +247,7 @@ func (x *ReleaseAccessRequest) String() string {
 func (*ReleaseAccessRequest) ProtoMessage() {}
 
 func (x *ReleaseAccessRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -388,7 +260,7 @@ func (x *ReleaseAccessRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseAccessRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseAccessRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{5}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ReleaseAccessRequest) GetFrontendToken() string {
@@ -406,7 +278,7 @@ type ReleaseAccessResponse struct {
 
 func (x *ReleaseAccessResponse) Reset() {
 	*x = ReleaseAccessResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -418,7 +290,7 @@ func (x *ReleaseAccessResponse) String() string {
 func (*ReleaseAccessResponse) ProtoMessage() {}
 
 func (x *ReleaseAccessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -431,7 +303,7 @@ func (x *ReleaseAccessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseAccessResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseAccessResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{6}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{4}
 }
 
 type ReleaseShareRequest struct {
@@ -443,7 +315,7 @@ type ReleaseShareRequest struct {
 
 func (x *ReleaseShareRequest) Reset() {
 	*x = ReleaseShareRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -455,7 +327,7 @@ func (x *ReleaseShareRequest) String() string {
 func (*ReleaseShareRequest) ProtoMessage() {}
 
 func (x *ReleaseShareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,7 +340,7 @@ func (x *ReleaseShareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseShareRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseShareRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{7}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ReleaseShareRequest) GetToken() string {
@@ -486,7 +358,7 @@ type ReleaseShareResponse struct {
 
 func (x *ReleaseShareResponse) Reset() {
 	*x = ReleaseShareResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -498,7 +370,7 @@ func (x *ReleaseShareResponse) String() string {
 func (*ReleaseShareResponse) ProtoMessage() {}
 
 func (x *ReleaseShareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -511,7 +383,7 @@ func (x *ReleaseShareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseShareResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseShareResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{8}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{6}
 }
 
 type ShareDetail struct {
@@ -530,7 +402,7 @@ type ShareDetail struct {
 
 func (x *ShareDetail) Reset() {
 	*x = ShareDetail{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -542,7 +414,7 @@ func (x *ShareDetail) String() string {
 func (*ShareDetail) ProtoMessage() {}
 
 func (x *ShareDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -555,7 +427,7 @@ func (x *ShareDetail) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareDetail.ProtoReflect.Descriptor instead.
 func (*ShareDetail) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{9}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ShareDetail) GetToken() string {
@@ -610,6 +482,134 @@ func (x *ShareDetail) GetClosed() bool {
 func (x *ShareDetail) GetStatus() string {
 	if x != nil {
 		return x.Status
+	}
+	return ""
+}
+
+type ShareHttpHealthcheckRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Token                string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	HttpVerb             string                 `protobuf:"bytes,2,opt,name=httpVerb,proto3" json:"httpVerb,omitempty"`
+	Endpoint             string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	ExpectedHttpResponse uint32                 `protobuf:"varint,4,opt,name=expectedHttpResponse,proto3" json:"expectedHttpResponse,omitempty"`
+	TimeoutMs            uint64                 `protobuf:"varint,5,opt,name=timeoutMs,proto3" json:"timeoutMs,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *ShareHttpHealthcheckRequest) Reset() {
+	*x = ShareHttpHealthcheckRequest{}
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ShareHttpHealthcheckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareHttpHealthcheckRequest) ProtoMessage() {}
+
+func (x *ShareHttpHealthcheckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareHttpHealthcheckRequest.ProtoReflect.Descriptor instead.
+func (*ShareHttpHealthcheckRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ShareHttpHealthcheckRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *ShareHttpHealthcheckRequest) GetHttpVerb() string {
+	if x != nil {
+		return x.HttpVerb
+	}
+	return ""
+}
+
+func (x *ShareHttpHealthcheckRequest) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *ShareHttpHealthcheckRequest) GetExpectedHttpResponse() uint32 {
+	if x != nil {
+		return x.ExpectedHttpResponse
+	}
+	return 0
+}
+
+func (x *ShareHttpHealthcheckRequest) GetTimeoutMs() uint64 {
+	if x != nil {
+		return x.TimeoutMs
+	}
+	return 0
+}
+
+type ShareHttpHealthcheckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Healthy       bool                   `protobuf:"varint,1,opt,name=healthy,proto3" json:"healthy,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ShareHttpHealthcheckResponse) Reset() {
+	*x = ShareHttpHealthcheckResponse{}
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ShareHttpHealthcheckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareHttpHealthcheckResponse) ProtoMessage() {}
+
+func (x *ShareHttpHealthcheckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareHttpHealthcheckResponse.ProtoReflect.Descriptor instead.
+func (*ShareHttpHealthcheckResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ShareHttpHealthcheckResponse) GetHealthy() bool {
+	if x != nil {
+		return x.Healthy
+	}
+	return false
+}
+
+func (x *ShareHttpHealthcheckResponse) GetError() string {
+	if x != nil {
+		return x.Error
 	}
 	return ""
 }
@@ -1233,16 +1233,7 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\vautoAddress\x18\x04 \x01(\tR\vautoAddress\x12$\n" +
 	"\rautoStartPort\x18\x05 \x01(\rR\rautoStartPort\x12 \n" +
 	"\vautoEndPort\x18\x06 \x01(\rR\vautoEndPort\x12(\n" +
-	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"\xbd\x01\n" +
-	"\x1bHttpShareHealthcheckRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
-	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +
-	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x122\n" +
-	"\x14expectedHttpResponse\x18\x04 \x01(\tR\x14expectedHttpResponse\x12\x1c\n" +
-	"\ttimeoutMs\x18\x05 \x01(\x04R\ttimeoutMs\"N\n" +
-	"\x1cHttpShareHealthcheckResponse\x12\x18\n" +
-	"\ahealthy\x18\x01 \x01(\bR\ahealthy\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"<\n" +
+	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"<\n" +
 	"\x14ReleaseAccessRequest\x12$\n" +
 	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\"\x17\n" +
 	"\x15ReleaseAccessResponse\"+\n" +
@@ -1257,7 +1248,16 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x10frontendEndpoint\x18\x05 \x03(\tR\x10frontendEndpoint\x12(\n" +
 	"\x0fbackendEndpoint\x18\x06 \x01(\tR\x0fbackendEndpoint\x12\x16\n" +
 	"\x06closed\x18\a \x01(\bR\x06closed\x12\x16\n" +
-	"\x06status\x18\b \x01(\tR\x06status\"\xa7\x01\n" +
+	"\x06status\x18\b \x01(\tR\x06status\"\xbd\x01\n" +
+	"\x1bShareHttpHealthcheckRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
+	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +
+	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x122\n" +
+	"\x14expectedHttpResponse\x18\x04 \x01(\rR\x14expectedHttpResponse\x12\x1c\n" +
+	"\ttimeoutMs\x18\x05 \x01(\x04R\ttimeoutMs\"N\n" +
+	"\x1cShareHttpHealthcheckResponse\x12\x18\n" +
+	"\ahealthy\x18\x01 \x01(\bR\ahealthy\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\xa7\x01\n" +
 	"\x13SharePrivateRequest\x12\x16\n" +
 	"\x06target\x18\x01 \x01(\tR\x06target\x12 \n" +
 	"\vbackendMode\x18\x02 \x01(\tR\vbackendMode\x12\x1a\n" +
@@ -1300,10 +1300,10 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x01v\x18\x01 \x01(\tR\x01v\x12(\n" +
 	"\x0fconsoleEndpoint\x18\x02 \x01(\tR\x0fconsoleEndpoint2\xa9\x06\n" +
 	"\x05Agent\x12_\n" +
-	"\rAccessPrivate\x12\x15.AccessPrivateRequest\x1a\x16.AccessPrivateResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/accessPrivate\x12{\n" +
-	"\x14HttpShareHealthcheck\x12\x1c.HttpShareHealthcheckRequest\x1a\x1d.HttpShareHealthcheckResponse\"&\x82\xd3\xe4\x93\x02 \"\x1e/v1/agent/httpShareHealthcheck\x12_\n" +
+	"\rAccessPrivate\x12\x15.AccessPrivateRequest\x1a\x16.AccessPrivateResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/accessPrivate\x12_\n" +
 	"\rReleaseAccess\x12\x15.ReleaseAccessRequest\x1a\x16.ReleaseAccessResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/releaseAccess\x12[\n" +
-	"\fReleaseShare\x12\x14.ReleaseShareRequest\x1a\x15.ReleaseShareResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\"\x16/v1/agent/releaseShare\x12@\n" +
+	"\fReleaseShare\x12\x14.ReleaseShareRequest\x1a\x15.ReleaseShareResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\"\x16/v1/agent/releaseShare\x12{\n" +
+	"\x14ShareHttpHealthcheck\x12\x1c.ShareHttpHealthcheckRequest\x1a\x1d.ShareHttpHealthcheckResponse\"&\x82\xd3\xe4\x93\x02 \"\x1e/v1/agent/httpShareHealthcheck\x12@\n" +
 	"\rShareReserved\x12\x15.ShareReservedRequest\x1a\x16.ShareReservedResponse\"\x00\x12[\n" +
 	"\fSharePrivate\x12\x14.SharePrivateRequest\x1a\x15.SharePrivateResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\"\x16/v1/agent/sharePrivate\x12W\n" +
 	"\vSharePublic\x12\x13.SharePublicRequest\x1a\x14.SharePublicResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\"\x15/v1/agent/sharePublic\x12C\n" +
@@ -1327,13 +1327,13 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*AccessDetail)(nil),                 // 0: AccessDetail
 	(*AccessPrivateResponse)(nil),        // 1: AccessPrivateResponse
 	(*AccessPrivateRequest)(nil),         // 2: AccessPrivateRequest
-	(*HttpShareHealthcheckRequest)(nil),  // 3: HttpShareHealthcheckRequest
-	(*HttpShareHealthcheckResponse)(nil), // 4: HttpShareHealthcheckResponse
-	(*ReleaseAccessRequest)(nil),         // 5: ReleaseAccessRequest
-	(*ReleaseAccessResponse)(nil),        // 6: ReleaseAccessResponse
-	(*ReleaseShareRequest)(nil),          // 7: ReleaseShareRequest
-	(*ReleaseShareResponse)(nil),         // 8: ReleaseShareResponse
-	(*ShareDetail)(nil),                  // 9: ShareDetail
+	(*ReleaseAccessRequest)(nil),         // 3: ReleaseAccessRequest
+	(*ReleaseAccessResponse)(nil),        // 4: ReleaseAccessResponse
+	(*ReleaseShareRequest)(nil),          // 5: ReleaseShareRequest
+	(*ReleaseShareResponse)(nil),         // 6: ReleaseShareResponse
+	(*ShareDetail)(nil),                  // 7: ShareDetail
+	(*ShareHttpHealthcheckRequest)(nil),  // 8: ShareHttpHealthcheckRequest
+	(*ShareHttpHealthcheckResponse)(nil), // 9: ShareHttpHealthcheckResponse
 	(*SharePrivateRequest)(nil),          // 10: SharePrivateRequest
 	(*SharePrivateResponse)(nil),         // 11: SharePrivateResponse
 	(*SharePublicRequest)(nil),           // 12: SharePublicRequest
@@ -1347,20 +1347,20 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 }
 var file_agent_agentGrpc_agent_proto_depIdxs = []int32{
 	0,  // 0: StatusResponse.accesses:type_name -> AccessDetail
-	9,  // 1: StatusResponse.shares:type_name -> ShareDetail
+	7,  // 1: StatusResponse.shares:type_name -> ShareDetail
 	2,  // 2: Agent.AccessPrivate:input_type -> AccessPrivateRequest
-	3,  // 3: Agent.HttpShareHealthcheck:input_type -> HttpShareHealthcheckRequest
-	5,  // 4: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
-	7,  // 5: Agent.ReleaseShare:input_type -> ReleaseShareRequest
+	3,  // 3: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
+	5,  // 4: Agent.ReleaseShare:input_type -> ReleaseShareRequest
+	8,  // 5: Agent.ShareHttpHealthcheck:input_type -> ShareHttpHealthcheckRequest
 	14, // 6: Agent.ShareReserved:input_type -> ShareReservedRequest
 	10, // 7: Agent.SharePrivate:input_type -> SharePrivateRequest
 	12, // 8: Agent.SharePublic:input_type -> SharePublicRequest
 	16, // 9: Agent.Status:input_type -> StatusRequest
 	18, // 10: Agent.Version:input_type -> VersionRequest
 	1,  // 11: Agent.AccessPrivate:output_type -> AccessPrivateResponse
-	4,  // 12: Agent.HttpShareHealthcheck:output_type -> HttpShareHealthcheckResponse
-	6,  // 13: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
-	8,  // 14: Agent.ReleaseShare:output_type -> ReleaseShareResponse
+	4,  // 12: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
+	6,  // 13: Agent.ReleaseShare:output_type -> ReleaseShareResponse
+	9,  // 14: Agent.ShareHttpHealthcheck:output_type -> ShareHttpHealthcheckResponse
 	15, // 15: Agent.ShareReserved:output_type -> ShareReservedResponse
 	11, // 16: Agent.SharePrivate:output_type -> SharePrivateResponse
 	13, // 17: Agent.SharePublic:output_type -> SharePublicResponse
