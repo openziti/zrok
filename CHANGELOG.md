@@ -2,6 +2,8 @@
 
 ## v1.0.7
 
+FEATURE: zrok Agent now supports health checks (against the target endpoint) for `proxy` backend shares using the `zrok agent share http-healthcheck` command. The zrok API now includes an `/agent/share/http-healthcheck` for remotely performing these checks against remoted Agents (https://github.com/openziti/zrok/issues/1002)
+
 FEATURE: `/overview`, `/detail/share`, `/detail/environment`, and `/overview/{organizationToken}/{accountEmail}` all adjusted to include `envZId` in share detail output (https://github.com/openziti/zrok/issues/998)
 
 FEATURE: New add and delete API endpoints for frontend grants. New `zrok admin create frontend-grant` and `zrok admin delete frontend-grant` CLI for invoking these API endpoints from the command line (https://github.com/openziti/zrok/issues/992)
