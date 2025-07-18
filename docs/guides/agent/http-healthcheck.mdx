@@ -45,10 +45,7 @@ unhealthy; failed to execute request: Get "http://127.1.1.1:9090/": dial tcp 127
 When your Agent is remoted and accessible through the zrok API, you can use the `/agent/share/http-healthcheck` endpoint to remotely check your Agent's connectivity to the backend target:
 
 ```
-$ curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/", "expectedHttpResponse": 200}' http://localhost:18080/api/v1/agent/share/http-healthcheck | jq
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   136  100    17  100   119    267   1870 --:--:-- --:--:-- --:--:--  2158
+$ curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/", "expectedHttpResponse": 200}' http://localhost:18080/api/v1/agent/share/http-healthcheck
 {
   "healthy": true
 }
@@ -56,9 +53,7 @@ $ curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+j
 
 A non-existent health check URL will return a non-`200` response:
 ```
-$ curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/non-existent", "expectedHttpResponse": 200}' http://localhost:18080/api/v1/agent/share/http-healthcheck | jq  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   189  100    58  100   131    866   1956 --:--:-- --:--:-- --:--:--  2863
+$ curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/non-existent", "expectedHttpResponse": 200}' http://localhost:18080/api/v1/agent/share/http-healthcheck
 {
   "error": "unexpected status code; got '202', want '200'"
 }
