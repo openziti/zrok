@@ -32,12 +32,6 @@ class TestAgentApi(unittest.TestCase):
         """
         pass
 
-    def test_http_healthcheck(self) -> None:
-        """Test case for http_healthcheck
-
-        """
-        pass
-
     def test_ping(self) -> None:
         """Test case for ping
 
@@ -70,6 +64,12 @@ class TestAgentApi(unittest.TestCase):
 
     def test_remote_unshare(self) -> None:
         """Test case for remote_unshare
+
+        """
+        pass
+
+    def test_share_http_healthcheck(self) -> None:
+        """Test case for share_http_healthcheck
 
         """
         pass

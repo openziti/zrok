@@ -892,7 +892,7 @@ paths:
         - agent
       security:
         - key: []
-      operationId: httpHealthcheck
+      operationId: shareHttpHealthcheck
       parameters:
         - name: body
           in: body

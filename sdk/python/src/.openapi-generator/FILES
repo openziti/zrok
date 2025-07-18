@@ -28,8 +28,6 @@ docs/EnvironmentApi.md
 docs/Frontend.md
 docs/GetSparklines200Response.md
 docs/GetSparklinesRequest.md
-docs/HttpHealthcheck200Response.md
-docs/HttpHealthcheckRequest.md
 docs/InviteRequest.md
 docs/InviteTokenGenerateRequest.md
 docs/ListFrontends200ResponseInner.md
@@ -63,6 +61,8 @@ docs/RemoveOrganizationMemberRequest.md
 docs/ResetPasswordRequest.md
 docs/Share.md
 docs/ShareApi.md
+docs/ShareHttpHealthcheck200Response.md
+docs/ShareHttpHealthcheckRequest.md
 docs/ShareRequest.md
 docs/ShareResponse.md
 docs/SparkDataSample.md
@@ -105,8 +105,6 @@ test/test_environment_api.py
 test/test_frontend.py
 test/test_get_sparklines200_response.py
 test/test_get_sparklines_request.py
-test/test_http_healthcheck200_response.py
-test/test_http_healthcheck_request.py
 test/test_invite_request.py
 test/test_invite_token_generate_request.py
 test/test_list_frontends200_response_inner.py
@@ -140,6 +138,8 @@ test/test_remove_organization_member_request.py
 test/test_reset_password_request.py
 test/test_share.py
 test/test_share_api.py
+test/test_share_http_healthcheck200_response.py
+test/test_share_http_healthcheck_request.py
 test/test_share_request.py
 test/test_share_response.py
 test/test_spark_data_sample.py
@@ -188,8 +188,6 @@ zrok_api/models/environment_and_resources.py
 zrok_api/models/frontend.py
 zrok_api/models/get_sparklines200_response.py
 zrok_api/models/get_sparklines_request.py
-zrok_api/models/http_healthcheck200_response.py
-zrok_api/models/http_healthcheck_request.py
 zrok_api/models/invite_request.py
 zrok_api/models/invite_token_generate_request.py
 zrok_api/models/list_frontends200_response_inner.py
@@ -221,6 +219,8 @@ zrok_api/models/remote_unshare_request.py
 zrok_api/models/remove_organization_member_request.py
 zrok_api/models/reset_password_request.py
 zrok_api/models/share.py
+zrok_api/models/share_http_healthcheck200_response.py
+zrok_api/models/share_http_healthcheck_request.py
 zrok_api/models/share_request.py
 zrok_api/models/share_response.py
 zrok_api/models/spark_data_sample.py

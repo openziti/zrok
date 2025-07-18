@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.http_healthcheck_request import HttpHealthcheckRequest
+from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest
 
-class TestHttpHealthcheckRequest(unittest.TestCase):
-    """HttpHealthcheckRequest unit test stubs"""
+class TestShareHttpHealthcheckRequest(unittest.TestCase):
+    """ShareHttpHealthcheckRequest unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,16 +25,16 @@ class TestHttpHealthcheckRequest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> HttpHealthcheckRequest:
-        """Test HttpHealthcheckRequest
+    def make_instance(self, include_optional) -> ShareHttpHealthcheckRequest:
+        """Test ShareHttpHealthcheckRequest
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `HttpHealthcheckRequest`
+        # uncomment below to create an instance of `ShareHttpHealthcheckRequest`
         """
-        model = HttpHealthcheckRequest()
+        model = ShareHttpHealthcheckRequest()
         if include_optional:
-            return HttpHealthcheckRequest(
+            return ShareHttpHealthcheckRequest(
                 env_zid = '',
                 share_token = '',
                 http_verb = '',
@@ -43,12 +43,12 @@ class TestHttpHealthcheckRequest(unittest.TestCase):
                 timeout_ms = 1.337
             )
         else:
-            return HttpHealthcheckRequest(
+            return ShareHttpHealthcheckRequest(
         )
         """
 
-    def testHttpHealthcheckRequest(self):
-        """Test HttpHealthcheckRequest"""
+    def testShareHttpHealthcheckRequest(self):
+        """Test ShareHttpHealthcheckRequest"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

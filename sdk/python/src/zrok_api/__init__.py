@@ -57,8 +57,6 @@ __all__ = [
     "Frontend",
     "GetSparklines200Response",
     "GetSparklinesRequest",
-    "HttpHealthcheck200Response",
-    "HttpHealthcheckRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
     "ListFrontends200ResponseInner",
@@ -90,6 +88,8 @@ __all__ = [
     "RemoveOrganizationMemberRequest",
     "ResetPasswordRequest",
     "Share",
+    "ShareHttpHealthcheck200Response",
+    "ShareHttpHealthcheckRequest",
     "ShareRequest",
     "ShareResponse",
     "SparkDataSample",
@@ -147,8 +147,6 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources as
 from zrok_api.models.frontend import Frontend as Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response as GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
-from zrok_api.models.http_healthcheck200_response import HttpHealthcheck200Response as HttpHealthcheck200Response
-from zrok_api.models.http_healthcheck_request import HttpHealthcheckRequest as HttpHealthcheckRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
@@ -180,6 +178,8 @@ from zrok_api.models.remote_unshare_request import RemoteUnshareRequest as Remot
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest as RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest as ResetPasswordRequest
 from zrok_api.models.share import Share as Share
+from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response as ShareHttpHealthcheck200Response
+from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest as ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest as ShareRequest
 from zrok_api.models.share_response import ShareResponse as ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample

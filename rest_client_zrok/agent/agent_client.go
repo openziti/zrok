@@ -32,8 +32,6 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnrollOK, error)
 
-	HTTPHealthcheck(params *HTTPHealthcheckParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*HTTPHealthcheckOK, error)
-
 	Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PingOK, error)
 
 	RemoteAccess(params *RemoteAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteAccessOK, error)
@@ -45,6 +43,8 @@ type ClientService interface {
 	RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnaccessOK, error)
 
 	RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnshareOK, error)
+
+	ShareHTTPHealthcheck(params *ShareHTTPHealthcheckParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareHTTPHealthcheckOK, error)
 
 	Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnenrollOK, error)
 
@@ -87,45 +87,6 @@ func (a *Client) Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWri
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for enroll: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-HTTPHealthcheck http healthcheck API
-*/
-func (a *Client) HTTPHealthcheck(params *HTTPHealthcheckParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*HTTPHealthcheckOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewHTTPHealthcheckParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "httpHealthcheck",
-		Method:             "POST",
-		PathPattern:        "/agent/share/http-healthcheck",
-		ProducesMediaTypes: []string{"application/zrok.v1+json"},
-		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &HTTPHealthcheckReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*HTTPHealthcheckOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for httpHealthcheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -360,6 +321,45 @@ func (a *Client) RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.Cli
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteUnshare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ShareHTTPHealthcheck share Http healthcheck API
+*/
+func (a *Client) ShareHTTPHealthcheck(params *ShareHTTPHealthcheckParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareHTTPHealthcheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewShareHTTPHealthcheckParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "shareHttpHealthcheck",
+		Method:             "POST",
+		PathPattern:        "/agent/share/http-healthcheck",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ShareHTTPHealthcheckReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ShareHTTPHealthcheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for shareHttpHealthcheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

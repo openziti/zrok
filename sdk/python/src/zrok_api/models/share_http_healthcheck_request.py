@@ -17,18 +17,22 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List, Optional, Union
 from typing import Optional, Set
 from typing_extensions import Self
 
-class HttpHealthcheck200Response(BaseModel):
+class ShareHttpHealthcheckRequest(BaseModel):
     """
-    HttpHealthcheck200Response
+    ShareHttpHealthcheckRequest
     """ # noqa: E501
-    healthy: Optional[StrictBool] = None
-    error: Optional[StrictStr] = None
-    __properties: ClassVar[List[str]] = ["healthy", "error"]
+    env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
+    share_token: Optional[StrictStr] = Field(default=None, alias="shareToken")
+    http_verb: Optional[StrictStr] = Field(default=None, alias="httpVerb")
+    endpoint: Optional[StrictStr] = None
+    expected_http_response: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, alias="expectedHttpResponse")
+    timeout_ms: Optional[Union[StrictFloat, StrictInt]] = Field(default=None, alias="timeoutMs")
+    __properties: ClassVar[List[str]] = ["envZId", "shareToken", "httpVerb", "endpoint", "expectedHttpResponse", "timeoutMs"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -48,7 +52,7 @@ class HttpHealthcheck200Response(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of HttpHealthcheck200Response from a JSON string"""
+        """Create an instance of ShareHttpHealthcheckRequest from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -73,7 +77,7 @@ class HttpHealthcheck200Response(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of HttpHealthcheck200Response from a dict"""
+        """Create an instance of ShareHttpHealthcheckRequest from a dict"""
         if obj is None:
             return None
 
@@ -81,8 +85,12 @@ class HttpHealthcheck200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "healthy": obj.get("healthy"),
-            "error": obj.get("error")
+            "envZId": obj.get("envZId"),
+            "shareToken": obj.get("shareToken"),
+            "httpVerb": obj.get("httpVerb"),
+            "endpoint": obj.get("endpoint"),
+            "expectedHttpResponse": obj.get("expectedHttpResponse"),
+            "timeoutMs": obj.get("timeoutMs")
         })
         return _obj
 

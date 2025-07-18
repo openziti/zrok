@@ -16,59 +16,59 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface HttpHealthcheckRequest
+ * @interface ShareHttpHealthcheckRequest
  */
-export interface HttpHealthcheckRequest {
+export interface ShareHttpHealthcheckRequest {
     /**
      * 
      * @type {string}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     envZId?: string;
     /**
      * 
      * @type {string}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     shareToken?: string;
     /**
      * 
      * @type {string}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     httpVerb?: string;
     /**
      * 
      * @type {string}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     endpoint?: string;
     /**
      * 
      * @type {number}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     expectedHttpResponse?: number;
     /**
      * 
      * @type {number}
-     * @memberof HttpHealthcheckRequest
+     * @memberof ShareHttpHealthcheckRequest
      */
     timeoutMs?: number;
 }
 
 /**
- * Check if a given object implements the HttpHealthcheckRequest interface.
+ * Check if a given object implements the ShareHttpHealthcheckRequest interface.
  */
-export function instanceOfHttpHealthcheckRequest(value: object): value is HttpHealthcheckRequest {
+export function instanceOfShareHttpHealthcheckRequest(value: object): value is ShareHttpHealthcheckRequest {
     return true;
 }
 
-export function HttpHealthcheckRequestFromJSON(json: any): HttpHealthcheckRequest {
-    return HttpHealthcheckRequestFromJSONTyped(json, false);
+export function ShareHttpHealthcheckRequestFromJSON(json: any): ShareHttpHealthcheckRequest {
+    return ShareHttpHealthcheckRequestFromJSONTyped(json, false);
 }
 
-export function HttpHealthcheckRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): HttpHealthcheckRequest {
+export function ShareHttpHealthcheckRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ShareHttpHealthcheckRequest {
     if (json == null) {
         return json;
     }
@@ -83,11 +83,11 @@ export function HttpHealthcheckRequestFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function HttpHealthcheckRequestToJSON(json: any): HttpHealthcheckRequest {
-    return HttpHealthcheckRequestToJSONTyped(json, false);
+export function ShareHttpHealthcheckRequestToJSON(json: any): ShareHttpHealthcheckRequest {
+    return ShareHttpHealthcheckRequestToJSONTyped(json, false);
 }
 
-export function HttpHealthcheckRequestToJSONTyped(value?: HttpHealthcheckRequest | null, ignoreDiscriminator: boolean = false): any {
+export function ShareHttpHealthcheckRequestToJSONTyped(value?: ShareHttpHealthcheckRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

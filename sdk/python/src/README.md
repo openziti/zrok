@@ -119,13 +119,13 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
-*AgentApi* | [**http_healthcheck**](docs/AgentApi.md#http_healthcheck) | **POST** /agent/share/http-healthcheck | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
 *AgentApi* | [**remote_access**](docs/AgentApi.md#remote_access) | **POST** /agent/access | 
 *AgentApi* | [**remote_share**](docs/AgentApi.md#remote_share) | **POST** /agent/share | 
 *AgentApi* | [**remote_status**](docs/AgentApi.md#remote_status) | **POST** /agent/status | 
 *AgentApi* | [**remote_unaccess**](docs/AgentApi.md#remote_unaccess) | **POST** /agent/unaccess | 
 *AgentApi* | [**remote_unshare**](docs/AgentApi.md#remote_unshare) | **POST** /agent/unshare | 
+*AgentApi* | [**share_http_healthcheck**](docs/AgentApi.md#share_http_healthcheck) | **POST** /agent/share/http-healthcheck | 
 *AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
@@ -180,8 +180,6 @@ Class | Method | HTTP request | Description
  - [Frontend](docs/Frontend.md)
  - [GetSparklines200Response](docs/GetSparklines200Response.md)
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
- - [HttpHealthcheck200Response](docs/HttpHealthcheck200Response.md)
- - [HttpHealthcheckRequest](docs/HttpHealthcheckRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
@@ -213,6 +211,8 @@ Class | Method | HTTP request | Description
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)
+ - [ShareHttpHealthcheck200Response](docs/ShareHttpHealthcheck200Response.md)
+ - [ShareHttpHealthcheckRequest](docs/ShareHttpHealthcheckRequest.md)
  - [ShareRequest](docs/ShareRequest.md)
  - [ShareResponse](docs/ShareResponse.md)
  - [SparkDataSample](docs/SparkDataSample.md)

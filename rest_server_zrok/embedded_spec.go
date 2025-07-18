@@ -518,7 +518,7 @@ func init() {
         "tags": [
           "agent"
         ],
-        "operationId": "httpHealthcheck",
+        "operationId": "shareHttpHealthcheck",
         "parameters": [
           {
             "name": "body",
@@ -3623,7 +3623,7 @@ func init() {
         "tags": [
           "agent"
         ],
-        "operationId": "httpHealthcheck",
+        "operationId": "shareHttpHealthcheck",
         "parameters": [
           {
             "name": "body",

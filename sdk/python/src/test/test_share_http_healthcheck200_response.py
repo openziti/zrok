@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.http_healthcheck200_response import HttpHealthcheck200Response
+from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response
 
-class TestHttpHealthcheck200Response(unittest.TestCase):
-    """HttpHealthcheck200Response unit test stubs"""
+class TestShareHttpHealthcheck200Response(unittest.TestCase):
+    """ShareHttpHealthcheck200Response unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,26 +25,26 @@ class TestHttpHealthcheck200Response(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> HttpHealthcheck200Response:
-        """Test HttpHealthcheck200Response
+    def make_instance(self, include_optional) -> ShareHttpHealthcheck200Response:
+        """Test ShareHttpHealthcheck200Response
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `HttpHealthcheck200Response`
+        # uncomment below to create an instance of `ShareHttpHealthcheck200Response`
         """
-        model = HttpHealthcheck200Response()
+        model = ShareHttpHealthcheck200Response()
         if include_optional:
-            return HttpHealthcheck200Response(
+            return ShareHttpHealthcheck200Response(
                 healthy = True,
                 error = ''
             )
         else:
-            return HttpHealthcheck200Response(
+            return ShareHttpHealthcheck200Response(
         )
         """
 
-    def testHttpHealthcheck200Response(self):
-        """Test HttpHealthcheck200Response"""
+    def testShareHttpHealthcheck200Response(self):
+        """Test ShareHttpHealthcheck200Response"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 
