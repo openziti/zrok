@@ -508,6 +508,71 @@ func init() {
         }
       }
     },
+    "/agent/share/http-healthcheck": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "shareHttpHealthcheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "expectedHttpResponse": {
+                  "type": "number"
+                },
+                "httpVerb": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                },
+                "timeoutMs": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "healthy": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
     "/agent/status": {
       "post": {
         "security": [
@@ -3532,6 +3597,71 @@ func init() {
                 },
                 "token": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          },
+          "502": {
+            "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/agent/share/http-healthcheck": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "agent"
+        ],
+        "operationId": "shareHttpHealthcheck",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "envZId": {
+                  "type": "string"
+                },
+                "expectedHttpResponse": {
+                  "type": "number"
+                },
+                "httpVerb": {
+                  "type": "string"
+                },
+                "shareToken": {
+                  "type": "string"
+                },
+                "timeoutMs": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "healthy": {
+                  "type": "boolean"
                 }
               }
             }

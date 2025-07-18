@@ -125,6 +125,7 @@ Class | Method | HTTP request | Description
 *AgentApi* | [**remote_status**](docs/AgentApi.md#remote_status) | **POST** /agent/status | 
 *AgentApi* | [**remote_unaccess**](docs/AgentApi.md#remote_unaccess) | **POST** /agent/unaccess | 
 *AgentApi* | [**remote_unshare**](docs/AgentApi.md#remote_unshare) | **POST** /agent/unshare | 
+*AgentApi* | [**share_http_healthcheck**](docs/AgentApi.md#share_http_healthcheck) | **POST** /agent/share/http-healthcheck | 
 *AgentApi* | [**unenroll**](docs/AgentApi.md#unenroll) | **POST** /agent/unenroll | 
 *EnvironmentApi* | [**disable**](docs/EnvironmentApi.md#disable) | **POST** /disable | 
 *EnvironmentApi* | [**enable**](docs/EnvironmentApi.md#enable) | **POST** /enable | 
@@ -210,6 +211,8 @@ Class | Method | HTTP request | Description
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)
+ - [ShareHttpHealthcheck200Response](docs/ShareHttpHealthcheck200Response.md)
+ - [ShareHttpHealthcheckRequest](docs/ShareHttpHealthcheckRequest.md)
  - [ShareRequest](docs/ShareRequest.md)
  - [ShareResponse](docs/ShareResponse.md)
  - [SparkDataSample](docs/SparkDataSample.md)

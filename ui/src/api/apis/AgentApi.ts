@@ -25,6 +25,8 @@ import type {
   RemoteStatus200Response,
   RemoteUnaccessRequest,
   RemoteUnshareRequest,
+  ShareHttpHealthcheck200Response,
+  ShareHttpHealthcheckRequest,
 } from '../models/index';
 import {
     CreateFrontend201ResponseFromJSON,
@@ -47,6 +49,10 @@ import {
     RemoteUnaccessRequestToJSON,
     RemoteUnshareRequestFromJSON,
     RemoteUnshareRequestToJSON,
+    ShareHttpHealthcheck200ResponseFromJSON,
+    ShareHttpHealthcheck200ResponseToJSON,
+    ShareHttpHealthcheckRequestFromJSON,
+    ShareHttpHealthcheckRequestToJSON,
 } from '../models/index';
 
 export interface EnrollOperationRequest {
@@ -75,6 +81,10 @@ export interface RemoteUnaccessOperationRequest {
 
 export interface RemoteUnshareOperationRequest {
     body?: RemoteUnshareRequest;
+}
+
+export interface ShareHttpHealthcheckOperationRequest {
+    body?: ShareHttpHealthcheckRequest;
 }
 
 export interface UnenrollRequest {
@@ -320,6 +330,40 @@ export class AgentApi extends runtime.BaseAPI {
      */
     async remoteUnshare(requestParameters: RemoteUnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.remoteUnshareRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async shareHttpHealthcheckRaw(requestParameters: ShareHttpHealthcheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareHttpHealthcheck200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/agent/share/http-healthcheck`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ShareHttpHealthcheckRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ShareHttpHealthcheck200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async shareHttpHealthcheck(requestParameters: ShareHttpHealthcheckOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareHttpHealthcheck200Response> {
+        const response = await this.shareHttpHealthcheckRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

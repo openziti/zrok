@@ -200,6 +200,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
+		AgentShareHTTPHealthcheckHandler: agent.ShareHTTPHealthcheckHandlerFunc(func(params agent.ShareHTTPHealthcheckParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation agent.ShareHTTPHealthcheck has not yet been implemented")
+		}),
 		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
 		}),
@@ -377,6 +380,8 @@ type ZrokAPI struct {
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
+	// AgentShareHTTPHealthcheckHandler sets the operation handler for the share Http healthcheck operation
+	AgentShareHTTPHealthcheckHandler agent.ShareHTTPHealthcheckHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
 	ShareUnaccessHandler share.UnaccessHandler
 	// AgentUnenrollHandler sets the operation handler for the unenroll operation
@@ -625,6 +630,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
+	}
+	if o.AgentShareHTTPHealthcheckHandler == nil {
+		unregistered = append(unregistered, "agent.ShareHTTPHealthcheckHandler")
 	}
 	if o.ShareUnaccessHandler == nil {
 		unregistered = append(unregistered, "share.UnaccessHandler")
@@ -952,6 +960,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/share"] = share.NewShare(o.context, o.ShareShareHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/agent/share/http-healthcheck"] = agent.NewShareHTTPHealthcheck(o.context, o.AgentShareHTTPHealthcheckHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

@@ -88,6 +88,8 @@ __all__ = [
     "RemoveOrganizationMemberRequest",
     "ResetPasswordRequest",
     "Share",
+    "ShareHttpHealthcheck200Response",
+    "ShareHttpHealthcheckRequest",
     "ShareRequest",
     "ShareResponse",
     "SparkDataSample",
@@ -176,6 +178,8 @@ from zrok_api.models.remote_unshare_request import RemoteUnshareRequest as Remot
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest as RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest as ResetPasswordRequest
 from zrok_api.models.share import Share as Share
+from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response as ShareHttpHealthcheck200Response
+from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest as ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest as ShareRequest
 from zrok_api.models.share_response import ShareResponse as ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample

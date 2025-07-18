@@ -20,6 +20,11 @@ service Agent {
 			post: "/v1/agent/releaseShare"
 		};
 	}
+	rpc ShareHttpHealthcheck(ShareHttpHealthcheckRequest) returns (ShareHttpHealthcheckResponse) {
+		option(google.api.http) = {
+			post: "/v1/agent/httpShareHealthcheck"
+		};
+	}
 	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
 	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {
 		option(google.api.http) = {
@@ -87,6 +92,19 @@ message ShareDetail {
 	string backendEndpoint = 6;
 	bool closed = 7;
 	string status = 8;
+}
+
+message ShareHttpHealthcheckRequest{
+	string token = 1;
+	string httpVerb = 2;
+	string endpoint = 3;
+	uint32 expectedHttpResponse = 4;
+	uint64 timeoutMs = 5;
+}
+
+message ShareHttpHealthcheckResponse{
+	bool healthy = 1;
+	string error = 2;
 }
 
 message SharePrivateRequest {

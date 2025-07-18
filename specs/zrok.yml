@@ -886,6 +886,46 @@ paths:
         502:
           description: bad gateway; agent not reachable
 
+  /agent/share/http-healthcheck:
+    post:
+      tags:
+        - agent
+      security:
+        - key: []
+      operationId: shareHttpHealthcheck
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              envZId:
+                type: string
+              shareToken:
+                type: string
+              httpVerb:
+                type: string
+              endpoint:
+                type: string
+              expectedHttpResponse:
+                type: number
+              timeoutMs:
+                type: number
+      responses:
+        200:
+          description: ok
+          schema:
+            properties:
+              healthy:
+                type: boolean
+              error:
+                type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+        502:
+          description: bad gateway; agent not reachable
+
   /agent/status:
     post:
       tags:
