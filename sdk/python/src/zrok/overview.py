@@ -6,7 +6,6 @@ import urllib3
 from zrok.environment.root import Root
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
-from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner
 from zrok_api.models.share import Share
 
 
