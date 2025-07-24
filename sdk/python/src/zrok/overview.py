@@ -71,7 +71,7 @@ class Overview:
             env_resources = EnvironmentAndResources(
                 environment=environment,
                 shares=share_list,
-                frontends=ListFrontends200ResponseInner()  # Empty frontends for now as it's not in the input data
+                frontends=[]
             )
             overview.environments.append(env_resources)
 
