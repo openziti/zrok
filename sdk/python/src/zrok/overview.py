@@ -52,7 +52,7 @@ class Overview:
             share_list = []
             for share_data in env_data.get('shares', []):
                 share = Share(
-                    token=share_data.get('token'),
+                    share_token=share_data.get('shareToken'),
                     z_id=share_data.get('zId'),
                     share_mode=share_data.get('shareMode'),
                     backend_mode=share_data.get('backendMode'),
