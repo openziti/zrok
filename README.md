@@ -1,13 +1,5 @@
 ![zrok logo](docs/images/zrok_cover.png)
 
-**Note: If you upgrade to `v1.0.0` and you receive an error message like this:**
-
-```
-[ERROR]: unable to create share (error getting zrok client: client version error accessing api endpoint 'https://api.zrok.io': [POST /clientVersionCheck] clientVersionCheck (status 404): {}: [POST /clientVersionCheck] clientVersionCheck (status 404): {})
-```
-
-Use the command `zrok rebase apiEndpoint https://api-v1.zrok.io/` to update your environment for the `v1.0.0` release.
-
 ## Your Secure Internet Sharing Perimeter
 
 `zrok` is a next-generation, peer-to-peer sharing platform built on top of [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. `zrok` is a _Ziti Native Application_.
