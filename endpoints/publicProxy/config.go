@@ -2,6 +2,7 @@ package publicProxy
 
 import (
 	"context"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
@@ -73,9 +74,6 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 		return nil
 	}
 	if err := configureGoogleOauth(cfg.Oauth, tls); err != nil {
-		return err
-	}
-	if err := configureGithubOauth(cfg.Oauth, tls); err != nil {
 		return err
 	}
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)

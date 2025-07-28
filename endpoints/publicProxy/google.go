@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -13,10 +18,6 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 	googleOauth "golang.org/x/oauth2/google"
-	"io"
-	"net/http"
-	"net/url"
-	"time"
 )
 
 func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
@@ -35,7 +36,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/google/oauth", cfg.RedirectUrl),
+		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", cfg.RedirectUrl),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}
@@ -103,8 +104,8 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 			}, party, rp.WithURLParam("access_type", "offline"))(w, r)
 		}
 	}
-
 	http.Handle("/google/login", authHandlerWithQueryState(relyingParty))
+
 	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + url.QueryEscape(tokens.AccessToken))
 		if err != nil {
@@ -148,7 +149,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 		SetZrokCookie(w, cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
+	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
 
-	http.Handle("/google/oauth", rp.CodeExchangeHandler(getEmail, relyingParty))
 	return nil
 }
