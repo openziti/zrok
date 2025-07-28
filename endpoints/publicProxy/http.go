@@ -263,6 +263,12 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 										}
 									}
 
+									// start of delegated share-login handling
+									if r.URL.Path == "/zrok/login" {
+										w.Write([]byte(fmt.Sprintf("login '%v'", r.URL.RawQuery)))
+										return
+									}
+
 									target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
 									cookie, err := r.Cookie("zrok-access")
