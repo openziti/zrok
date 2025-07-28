@@ -101,7 +101,7 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 					logrus.Errorf("unable to sign intermediate JWT: %v", err)
 				}
 				return s
-			}, party, rp.WithURLParam("access_type", "offline"))(w, r)
+			}, party, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
 		}
 	}
 	http.Handle("/google/login", authHandlerWithQueryState(relyingParty))
