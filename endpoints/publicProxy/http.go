@@ -64,6 +64,10 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 	zDialCtx := zitiDialContext{ctx: zCtx}
+	superNetwork, _ := root.SuperNetwork()
+	if superNetwork {
+		util.EnableSuperNetwork(zCfg)
+	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 

@@ -4,6 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"strings"
+	"syscall"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
 	"github.com/openziti/zrok/agent/agentClient"
@@ -19,12 +26,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"strings"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -120,6 +121,8 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
+	superNetwork, _ := root.SuperNetwork()
+
 	switch cmd.backendMode {
 	case "proxy":
 		v, err := parseUrl(args[0])
@@ -199,6 +202,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
 			Requests:        requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := proxy.NewBackend(cfg)
@@ -256,6 +260,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			DriveRoot:    target,
 			ShrToken:     shr.Token,
 			Requests:     requests,
+			SuperNetwork: superNetwork,
 		}
 
 		be, err := drive.NewBackend(cfg)

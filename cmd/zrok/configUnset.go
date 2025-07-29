@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -49,6 +50,9 @@ func (cmd *configUnsetCommand) run(_ *cobra.Command, args []string) {
 
 		case "headless":
 			cfg.Headless = false
+
+		case "superNetwork":
+			cfg.SuperNetwork = false
 
 		default:
 			fmt.Printf("unknown config name '%v'\n", configName)

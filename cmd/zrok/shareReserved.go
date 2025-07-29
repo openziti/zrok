@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent/agentClient"
@@ -25,7 +27,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 func init() {
@@ -101,6 +102,8 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	shrToken := args[0]
 	var target string
 
+	superNetwork, _ := root.SuperNetwork()
+
 	zrok, err := root.Client()
 	if err != nil {
 		cmd.error("unable to create zrok client", err)
@@ -169,6 +172,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			ShrToken:        shrToken,
 			Insecure:        cmd.insecure,
 			Requests:        requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := proxy.NewBackend(cfg)
@@ -207,6 +211,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := tcpTunnel.NewBackend(cfg)
@@ -226,6 +231,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := udpTunnel.NewBackend(cfg)
@@ -263,6 +269,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			DriveRoot:    target,
 			ShrToken:     shrToken,
 			Requests:     requests,
+			SuperNetwork: superNetwork,
 		}
 
 		be, err := drive.NewBackend(cfg)
@@ -281,6 +288,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			IdentityPath: zif,
 			ShrToken:     shrToken,
 			Requests:     requests,
+			SuperNetwork: superNetwork,
 		}
 
 		be, err := socks.NewBackend(cfg)
@@ -300,6 +308,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shrToken,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := vpn.NewBackend(cfg)
