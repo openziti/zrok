@@ -18,7 +18,7 @@ require (
 	github.com/go-openapi/swag v0.23.1
 	github.com/go-openapi/validate v0.24.0
 	github.com/gobwas/glob v0.2.3
-	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/golang-jwt/jwt/v5 v5.2.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
@@ -39,12 +39,12 @@ require (
 	github.com/net-byte/vtun v1.7.0
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
-	github.com/openziti/channel/v4 v4.0.6
+	github.com/openziti/channel/v4 v4.2.18
 	github.com/openziti/cobra-to-md v1.0.1
-	github.com/openziti/edge-api v0.26.43
-	github.com/openziti/identity v1.0.101
-	github.com/openziti/sdk-golang v1.1.0
-	github.com/openziti/transport/v2 v2.0.168
+	github.com/openziti/edge-api v0.26.46
+	github.com/openziti/identity v1.0.109
+	github.com/openziti/sdk-golang v1.2.1
+	github.com/openziti/transport/v2 v2.0.182
 	github.com/openziti/ziti v1.6.0
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
@@ -58,10 +58,10 @@ require (
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v2 v2.12.2
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.37.0
-	golang.org/x/net v0.39.0
-	golang.org/x/oauth2 v0.29.0
-	golang.org/x/sys v0.32.0
+	golang.org/x/crypto v0.40.0
+	golang.org/x/net v0.42.0
+	golang.org/x/oauth2 v0.30.0
+	golang.org/x/sys v0.34.0
 	golang.org/x/time v0.6.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142
 	google.golang.org/grpc v1.67.1
@@ -117,9 +117,10 @@ require (
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa // indirect
 	github.com/fxamacker/cbor/v2 v2.6.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
-	github.com/go-chi/chi/v5 v5.0.12 // indirect
+	github.com/go-chi/chi/v5 v5.2.2 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-kit/kit v0.13.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-ldap/ldap/v3 v3.4.7 // indirect
@@ -194,9 +195,9 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/openziti/foundation/v2 v2.0.60 // indirect
-	github.com/openziti/metrics v1.4.1 // indirect
-	github.com/openziti/secretstream v0.1.32 // indirect
+	github.com/openziti/foundation/v2 v2.0.70 // indirect
+	github.com/openziti/metrics v1.4.2 // indirect
+	github.com/openziti/secretstream v0.1.37 // indirect
 	github.com/openziti/storage v0.4.7 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
@@ -237,6 +238,9 @@ require (
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/blake3 v0.2.3 // indirect
+	github.com/zitadel/logging v0.6.2 // indirect
+	github.com/zitadel/oidc/v3 v3.42.0 // indirect
+	github.com/zitadel/schema v1.3.1 // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
 	go.mozilla.org/pkcs7 v0.9.0 // indirect
@@ -263,11 +267,11 @@ require (
 	go.uber.org/zap/exp v0.2.0 // indirect
 	golang.org/x/crypto/x509roots/fallback v0.0.0-20240507223354-67b13616a595 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/term v0.31.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/tools v0.31.0 // indirect
+	golang.org/x/mod v0.25.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/term v0.33.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/tools v0.34.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20220703234212-c31a7b1ab478 // indirect
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect

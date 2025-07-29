@@ -2,6 +2,12 @@ package vpn
 
 import (
 	"encoding/json"
+	"io"
+	"net"
+	"strconv"
+	"sync/atomic"
+	"time"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/net-byte/vtun/common/config"
 	"github.com/net-byte/vtun/tun"
@@ -10,15 +16,11 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/util"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/songgao/water/waterutil"
-	"io"
-	"net"
-	"strconv"
-	"sync/atomic"
-	"time"
 )
 
 type BackendConfig struct {
@@ -26,6 +28,7 @@ type BackendConfig struct {
 	EndpointAddress string
 	ShrToken        string
 	RequestsChan    chan *endpoints.Request
+	SuperNetwork    bool
 }
 
 type client struct {
@@ -48,7 +51,6 @@ type Backend struct {
 }
 
 func NewBackend(cfg *BackendConfig) (*Backend, error) {
-
 	options := ziti.ListenOptions{
 		ConnectTimeout:               5 * time.Minute,
 		WaitForNEstablishedListeners: 1,
@@ -56,6 +58,9 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	zcfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
+	}
+	if cfg.SuperNetwork {
+		util.EnableSuperNetwork(zcfg)
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {

@@ -15,6 +15,7 @@ type Root interface {
 	ApiEndpoint() (string, string)
 	DefaultFrontend() (string, string)
 	Headless() (bool, string)
+	SuperNetwork() (bool, string)
 
 	IsEnabled() bool
 	Environment() *Environment
@@ -43,6 +44,7 @@ type Config struct {
 	ApiEndpoint     string
 	DefaultFrontend string
 	Headless        bool
+	SuperNetwork    bool
 }
 
 type Metadata struct {

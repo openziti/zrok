@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -54,6 +55,8 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	t.AppendRow(table.Row{"defaultFrontend", defaultFrontend, defaultFrontendFrom})
 	headless, headlessFrom := env.Headless()
 	t.AppendRow(table.Row{"headless", headless, headlessFrom})
+	superNetwork, superNetworkFrom := env.SuperNetwork()
+	t.AppendRow(table.Row{"superNetwork", superNetwork, superNetworkFrom})
 	t.Render()
 	_, _ = fmt.Fprintf(os.Stderr, "\n")
 

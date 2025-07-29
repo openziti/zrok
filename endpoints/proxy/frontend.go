@@ -3,6 +3,13 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
@@ -11,12 +18,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type FrontendConfig struct {
@@ -26,6 +27,7 @@ type FrontendConfig struct {
 	ResponseHeaders []string
 	Tls             *endpoints.TlsConfig
 	RequestsChan    chan *endpoints.Request
+	SuperNetwork    bool
 }
 
 func DefaultFrontendConfig(identityName string) *FrontendConfig {
@@ -56,6 +58,9 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
+	if cfg.SuperNetwork {
+		util.EnableSuperNetwork(zCfg)
+	}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")

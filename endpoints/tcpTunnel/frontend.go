@@ -1,14 +1,16 @@
 package tcpTunnel
 
 import (
+	"net"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"time"
 )
 
 type FrontendConfig struct {
@@ -16,6 +18,7 @@ type FrontendConfig struct {
 	IdentityName string
 	ShrToken     string
 	RequestsChan chan *endpoints.Request
+	SuperNetwork bool
 }
 
 type Frontend struct {
@@ -42,6 +45,10 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
+	superNetwork, _ := env.SuperNetwork()
+	if superNetwork {
+		util.EnableSuperNetwork(zCfg)
+	}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")

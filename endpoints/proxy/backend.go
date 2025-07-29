@@ -3,16 +3,17 @@ package proxy
 import (
 	"crypto/tls"
 	"fmt"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"time"
 )
 
 type BackendConfig struct {
@@ -21,6 +22,7 @@ type BackendConfig struct {
 	ShrToken        string
 	Insecure        bool
 	Requests        chan *endpoints.Request
+	SuperNetwork    bool
 }
 
 type Backend struct {
@@ -37,6 +39,9 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	zcfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading config")
+	}
+	if cfg.SuperNetwork {
+		util.EnableSuperNetwork(zcfg)
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {

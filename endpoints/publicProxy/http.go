@@ -4,6 +4,13 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/sdk-golang/ziti"
@@ -17,12 +24,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type HttpFrontend struct {
@@ -63,6 +64,10 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 	zDialCtx := zitiDialContext{ctx: zCtx}
+	superNetwork, _ := root.SuperNetwork()
+	if superNetwork {
+		util.EnableSuperNetwork(zCfg)
+	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 

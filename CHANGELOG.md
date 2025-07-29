@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.0.8
+
+FEATURE: New opt-in configuration item `superNetwork` which enables multiple data plane connections to the OpenZiti underlay, a separate control plane connection, enabling SDK-based flow control. To opt-in use `zrok config set superNetwork true` in each environment, or set the `ZROK_SUPER_NETWORK` environment variable to `true` (https://github.com/openziti/zrok/issues/1010)
+
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.1` (https://github.com/openziti/zrok/issues/1010)
+
 ## v1.0.7
 
 FEATURE: zrok Agent now supports health checks (against the target endpoint) for `proxy` backend shares using the `zrok agent share http-healthcheck` command. The zrok API now includes an `/agent/share/http-healthcheck` endpoint for remotely performing these checks against remoted Agents. See the guide for using the feature at https://docs.zrok.io/guides/agent/http-healthcheck/ (https://github.com/openziti/zrok/issues/1002)
