@@ -1,6 +1,11 @@
 package env_v0_4
 
 import (
+	"net/url"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -9,10 +14,6 @@ import (
 	"github.com/openziti/zrok/rest_client_zrok"
 	metadata2 "github.com/openziti/zrok/rest_client_zrok/metadata"
 	"github.com/pkg/errors"
-	"net/url"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 func (r *Root) Metadata() *env_core.Metadata {
@@ -119,6 +120,26 @@ func (r *Root) Headless() (bool, string) {
 	}
 
 	return headless, from
+}
+
+func (r *Root) SuperNetwork() (bool, string) {
+	superNetwork := false
+	from := "binary"
+
+	if r.Config() != nil {
+		superNetwork = r.Config().SuperNetwork
+		from = "config"
+	}
+
+	env := os.Getenv("ZROK_SUPER_NETWORK")
+	if env != "" {
+		if v, err := strconv.ParseBool(env); err == nil {
+			superNetwork = v
+			from = "ZROK_SUPER_NETWORK"
+		}
+	}
+
+	return superNetwork, from
 }
 
 func (r *Root) Environment() *env_core.Environment {
