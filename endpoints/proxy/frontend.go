@@ -66,7 +66,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		if env.Config().SuperNetwork {
 			zCfg.MaxDefaultConnections = 2
 			zCfg.MaxControlConnections = 1
-			logrus.Infof("super networking enabled")
+			logrus.Warnf("super networking enabled")
 		}
 	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
