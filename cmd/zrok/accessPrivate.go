@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -24,11 +30,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/url"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -111,6 +112,8 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) {
 	shrToken := args[0]
 
+	superNetwork, _ := root.SuperNetwork()
+
 	zrok, err := root.Client()
 	if err != nil {
 		cmd.error(err)
@@ -171,6 +174,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
+			SuperNetwork: superNetwork,
 		})
 		if err != nil {
 			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
@@ -190,6 +194,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			ShrToken:     args[0],
 			RequestsChan: requests,
 			IdleTime:     time.Minute,
+			SuperNetwork: superNetwork,
 		})
 		if err != nil {
 			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
@@ -208,6 +213,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
+			SuperNetwork: superNetwork,
 		})
 		if err != nil {
 			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
@@ -228,6 +234,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,
+			SuperNetwork: superNetwork,
 		})
 		if err != nil {
 			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
@@ -246,6 +253,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		cfg.Address = bindAddress
 		cfg.ResponseHeaders = cmd.responseHeaders
 		cfg.RequestsChan = requests
+		cfg.SuperNetwork = superNetwork
 		fe, err := proxy.NewFrontend(cfg)
 		if err != nil {
 			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)

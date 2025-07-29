@@ -27,6 +27,7 @@ type FrontendConfig struct {
 	ResponseHeaders []string
 	Tls             *endpoints.TlsConfig
 	RequestsChan    chan *endpoints.Request
+	SuperNetwork    bool
 }
 
 func DefaultFrontendConfig(identityName string) *FrontendConfig {
@@ -57,6 +58,11 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
+	if cfg.SuperNetwork {
+		zCfg.MaxDefaultConnections = 2
+		zCfg.MaxControlConnections = 1
+		logrus.Warnf("super networking enabled")
+	}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")

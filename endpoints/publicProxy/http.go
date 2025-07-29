@@ -64,12 +64,11 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 	zDialCtx := zitiDialContext{ctx: zCtx}
-	if root.Config() != nil {
-		if root.Config().SuperNetwork {
-			zCfg.MaxDefaultConnections = 2
-			zCfg.MaxControlConnections = 1
-			logrus.Warnf("super networking enabled")
-		}
+	superNetwork, _ := root.SuperNetwork()
+	if superNetwork {
+		zCfg.MaxDefaultConnections = 2
+		zCfg.MaxControlConnections = 1
+		logrus.Warnf("super networking enabled")
 	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial

@@ -102,10 +102,7 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 	shrToken := args[0]
 	var target string
 
-	superNetwork := false
-	if root.Config() != nil {
-		superNetwork = root.Config().SuperNetwork
-	}
+	superNetwork, _ := root.SuperNetwork()
 
 	zrok, err := root.Client()
 	if err != nil {

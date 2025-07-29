@@ -107,10 +107,7 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
 
-	superNetwork := false
-	if root.Config() != nil {
-		superNetwork = root.Config().SuperNetwork
-	}
+	superNetwork, _ := root.SuperNetwork()
 
 	switch cmd.backendMode {
 	case "proxy":
