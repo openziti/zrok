@@ -1,17 +1,20 @@
 package socks
 
 import (
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/pkg/errors"
-	"time"
+	"github.com/sirupsen/logrus"
 )
 
 type BackendConfig struct {
 	IdentityPath string
 	ShrToken     string
 	Requests     chan *endpoints.Request
+	SuperNetwork bool
 }
 
 type Backend struct {
@@ -28,6 +31,11 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 	zcfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti identity")
+	}
+	if cfg.SuperNetwork {
+		zcfg.MaxDefaultConnections = 2
+		zcfg.MaxControlConnections = 1
+		logrus.Warnf("super networking enabled")
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {

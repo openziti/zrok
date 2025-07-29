@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+	"os"
+	"strconv"
+
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/tui"
 	"github.com/spf13/cobra"
-	"net/url"
-	"os"
-	"strconv"
 )
 
 func init() {
@@ -91,6 +92,24 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 		} else {
 			cfg := env.Config()
 			cfg.Headless = headless
+			if err := env.SetConfig(cfg); err != nil {
+				tui.Error("unable to save config", err)
+			}
+		}
+		fmt.Println("zrok configuration updated")
+
+	case "superNetwork":
+		superNetwork, err := strconv.ParseBool(value)
+		if err != nil {
+			tui.Error("unable to parse value for 'superNetwork': %v", err)
+		}
+		if env.Config() == nil {
+			if err := env.SetConfig(&env_core.Config{SuperNetwork: superNetwork}); err != nil {
+				tui.Error("unable to save config", err)
+			}
+		} else {
+			cfg := env.Config()
+			cfg.SuperNetwork = superNetwork
 			if err := env.SetConfig(cfg); err != nil {
 				tui.Error("unable to save config", err)
 			}

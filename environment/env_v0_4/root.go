@@ -3,13 +3,14 @@ package env_v0_4
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 const V = "v0.4"
@@ -228,6 +229,7 @@ func loadConfig() (*env_core.Config, error) {
 		ApiEndpoint:     cfg.ApiEndpoint,
 		DefaultFrontend: cfg.DefaultFrontend,
 		Headless:        cfg.Headless,
+		SuperNetwork:    cfg.SuperNetwork,
 	}
 	return out, nil
 }
@@ -237,6 +239,7 @@ func saveConfig(cfg *env_core.Config) error {
 		ApiEndpoint:     cfg.ApiEndpoint,
 		DefaultFrontend: cfg.DefaultFrontend,
 		Headless:        cfg.Headless,
+		SuperNetwork:    cfg.SuperNetwork,
 	}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
@@ -341,6 +344,7 @@ type config struct {
 	ApiEndpoint     string `json:"api_endpoint"`
 	DefaultFrontend string `json:"default_frontend"`
 	Headless        bool   `json:"headless"`
+	SuperNetwork    bool   `json:"super_network"`
 }
 
 type environment struct {

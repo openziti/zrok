@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/openziti/zrok/environment"
 	"github.com/spf13/cobra"
 )
@@ -52,6 +53,12 @@ func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 			fmt.Printf("headless = %v\n", env.Config().Headless)
 		} else {
 			fmt.Println("headless = <unset>")
+		}
+	case "superNetwork":
+		if env.Config() != nil {
+			fmt.Printf("superNetwork = %v\n", env.Config().SuperNetwork)
+		} else {
+			fmt.Println("superNetwork = <unset>")
 		}
 	default:
 		fmt.Printf("unknown config name '%v'\n", configName)

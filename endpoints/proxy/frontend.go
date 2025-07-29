@@ -3,6 +3,13 @@ package proxy
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
@@ -11,12 +18,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type FrontendConfig struct {
@@ -61,6 +62,13 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 	zDialCtx := zitiDialContext{ctx: zCtx, shrToken: cfg.ShrToken}
+	if env.Config() != nil {
+		if env.Config().SuperNetwork {
+			zCfg.MaxDefaultConnections = 2
+			zCfg.MaxControlConnections = 1
+			logrus.Infof("super networking enabled")
+		}
+	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 

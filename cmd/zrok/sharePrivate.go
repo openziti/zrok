@@ -4,6 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -22,12 +29,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"syscall"
-	"time"
 )
 
 func init() {
@@ -105,6 +106,11 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 
 func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	var target string
+
+	superNetwork := false
+	if root.Config() != nil {
+		superNetwork = root.Config().SuperNetwork
+	}
 
 	switch cmd.backendMode {
 	case "proxy":
@@ -222,6 +228,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
 			Requests:        requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := proxy.NewBackend(cfg)
@@ -260,6 +267,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shr.Token,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := tcpTunnel.NewBackend(cfg)
@@ -279,6 +287,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shr.Token,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := udpTunnel.NewBackend(cfg)
@@ -317,6 +326,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			DriveRoot:    target,
 			ShrToken:     shr.Token,
 			Requests:     requests,
+			SuperNetwork: superNetwork,
 		}
 
 		be, err := drive.NewBackend(cfg)
@@ -335,6 +345,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			IdentityPath: zif,
 			ShrToken:     shr.Token,
 			Requests:     requests,
+			SuperNetwork: superNetwork,
 		}
 
 		be, err := socks.NewBackend(cfg)
@@ -354,6 +365,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			EndpointAddress: target,
 			ShrToken:        shr.Token,
 			RequestsChan:    requests,
+			SuperNetwork:    superNetwork,
 		}
 
 		be, err := vpn.NewBackend(cfg)
