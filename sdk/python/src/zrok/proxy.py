@@ -124,8 +124,8 @@ class ProxyShare:
         for env in overview.environments:
             if env.environment.z_id == root.env.ZitiIdentity:
                 for share in env.shares:
-                    if share.token == unique_name:
-                        return Share(Token=share.token, FrontendEndpoints=[share.frontend_endpoint])
+                    if share.share_token == unique_name:
+                        return Share(Token=share.share_token, FrontendEndpoints=[share.frontend_endpoint])
         return None
 
     def register_cleanup(self):
