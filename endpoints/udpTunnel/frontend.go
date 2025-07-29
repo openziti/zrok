@@ -9,6 +9,7 @@ import (
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -116,9 +117,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
 	superNetwork, _ := env.SuperNetwork()
 	if superNetwork {
-		zCfg.MaxDefaultConnections = 2
-		zCfg.MaxControlConnections = 1
-		logrus.Warnf("super networking enabled")
+		util.EnableSuperNetwork(zCfg)
 	}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {

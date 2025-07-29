@@ -59,22 +59,13 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	}
 	zCfg.ConfigTypes = []string{sdk.ZrokProxyConfig}
 	if cfg.SuperNetwork {
-		zCfg.MaxDefaultConnections = 2
-		zCfg.MaxControlConnections = 1
-		logrus.Warnf("super networking enabled")
+		util.EnableSuperNetwork(zCfg)
 	}
 	zCtx, err := ziti.NewContext(zCfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
 	zDialCtx := zitiDialContext{ctx: zCtx, shrToken: cfg.ShrToken}
-	if env.Config() != nil {
-		if env.Config().SuperNetwork {
-			zCfg.MaxDefaultConnections = 2
-			zCfg.MaxControlConnections = 1
-			logrus.Warnf("super networking enabled")
-		}
-	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 

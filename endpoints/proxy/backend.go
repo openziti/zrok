@@ -41,9 +41,7 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, errors.Wrap(err, "error loading config")
 	}
 	if cfg.SuperNetwork {
-		zcfg.MaxDefaultConnections = 2
-		zcfg.MaxControlConnections = 1
-		logrus.Warnf("super networking enabled")
+		util.EnableSuperNetwork(zcfg)
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {

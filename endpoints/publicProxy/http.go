@@ -66,9 +66,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	zDialCtx := zitiDialContext{ctx: zCtx}
 	superNetwork, _ := root.SuperNetwork()
 	if superNetwork {
-		zCfg.MaxDefaultConnections = 2
-		zCfg.MaxControlConnections = 1
-		logrus.Warnf("super networking enabled")
+		util.EnableSuperNetwork(zCfg)
 	}
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial

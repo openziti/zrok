@@ -6,8 +6,8 @@ import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type BackendConfig struct {
@@ -33,9 +33,7 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, errors.Wrap(err, "error loading ziti identity")
 	}
 	if cfg.SuperNetwork {
-		zcfg.MaxDefaultConnections = 2
-		zcfg.MaxControlConnections = 1
-		logrus.Warnf("super networking enabled")
+		util.EnableSuperNetwork(zcfg)
 	}
 	zctx, err := ziti.NewContext(zcfg)
 	if err != nil {
