@@ -78,7 +78,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
-	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domain globs to authenticate via OAuth")
+	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-pattern", []string{}, "Allow only email addresses matching this glob to access")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
