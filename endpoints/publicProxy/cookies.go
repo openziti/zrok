@@ -20,7 +20,7 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 	targetHost = strings.Split(targetHost, "/")[0]
 	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
 
-	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &ZrokClaims{
+	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
 		Provider:                   provider,

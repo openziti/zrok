@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
@@ -20,38 +21,70 @@ import (
 	googleOauth "golang.org/x/oauth2/google"
 )
 
-func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
+type googleOauthConfigurer struct {
+	cfg      *OauthConfig
+	oauthCfg *googleOauthConfig
+	tls      bool
+}
+
+func newGoogleOauthConfigurer(cfg *OauthConfig, tls bool, v map[string]interface{}) (*googleOauthConfigurer, error) {
+	c := &googleOauthConfigurer{cfg: cfg}
+	oauthCfg, err := newGoogleOauthConfig(v)
+	if err != nil {
+		return nil, err
+	}
+	c.oauthCfg = oauthCfg
+	c.tls = tls
+	return c, nil
+}
+
+type googleOauthConfig struct {
+	Name          string   `mapstructure:"name"`
+	ClientId      string   `mapstructure:"client_id"`
+	ClientSecret  string   `mapstructure:"client_secret"`
+	Scopes        []string `mapstructure:"scopes"`
+	AuthUrl       string   `mapstructure:"auth_url"`
+	TokenUrl      string   `mapstructure:"token_url"`
+	EmailEndpoint string   `mapstructure:"email_endpoint"`
+	EmailPath     string   `mapstructure:"email_path"`
+	SupportsPkce  bool     `mapstructure:"supports_pkce"`
+}
+
+func newGoogleOauthConfig(v map[string]interface{}) (*googleOauthConfig, error) {
+	cfg := &googleOauthConfig{}
+	err := mapstructure.Decode(v, cfg)
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+func (c *googleOauthConfigurer) configure() error {
 	scheme := "http"
-	if tls {
+	if c.tls {
 		scheme = "https"
 	}
 
-	providerCfg := cfg.GetProvider("google")
-	if providerCfg == nil {
-		logrus.Info("unable to find provider config for google. Skipping.")
-		return nil
-	}
-
-	clientID := providerCfg.ClientId
+	clientID := c.oauthCfg.ClientId
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
-		ClientSecret: providerCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", cfg.RedirectUrl),
+		ClientSecret: c.oauthCfg.ClientSecret,
+		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", c.cfg.RedirectUrl),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}
 
 	hash := md5.New()
-	n, err := hash.Write([]byte(cfg.HashKey))
+	n, err := hash.Write([]byte(c.cfg.HashKey))
 	if err != nil {
 		return err
 	}
-	if n != len(cfg.HashKey) {
+	if n != len(c.cfg.HashKey) {
 		return errors.New("short hash")
 	}
 	key := hash.Sum(nil)
 
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
+	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
 
 	options := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
@@ -146,10 +179,12 @@ func configureGoogleOauth(cfg *OauthConfig, tls bool) error {
 		} else {
 			authCheckInterval = i
 		}
-		SetZrokCookie(w, cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
+		SetZrokCookie(w, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
 
+	logrus.Infof("configured google provider with name '%v'", c.oauthCfg.Name)
+	
 	return nil
 }

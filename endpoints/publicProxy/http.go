@@ -153,7 +153,7 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 }
 
 func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
-	auth := newAuthHandler(pcfg, key, handler)
+	auth := newAuthHandler(pcfg, key)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		shrToken := resolveService(pcfg.HostMatch, r.Host)
