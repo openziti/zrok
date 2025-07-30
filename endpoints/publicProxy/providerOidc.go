@@ -199,7 +199,7 @@ func (c *oidcConfigurer) configure() error {
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
 
-	logrus.Infof("configured oidc provider '%v'", c.oidcCfg.Name)
+	logrus.Infof("configured oidc provider at '/%v'", c.oidcCfg.Name)
 
 	return nil
 }

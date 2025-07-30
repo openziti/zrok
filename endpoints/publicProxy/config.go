@@ -66,6 +66,12 @@ func (c *Config) Load(path string) error {
 
 func cfOptions() *cf.Options {
 	cfOpts := cf.DefaultOptions()
+	cfOpts.AddFlexibleSetter("github", func(v interface{}, opt *cf.Options) (interface{}, error) {
+		if vm, ok := v.(map[string]interface{}); ok {
+			return vm, nil
+		}
+		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
+	})
 	cfOpts.AddFlexibleSetter("google", func(v interface{}, opt *cf.Options) (interface{}, error) {
 		if vm, ok := v.(map[string]interface{}); ok {
 			return vm, nil
@@ -91,8 +97,17 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 		if mv, ok := v.(map[string]interface{}); ok {
 			if t, found := mv["type"]; found {
 				switch t {
+				case "github":
+					cfger, err := newGithubConfigurer(cfg.Oauth, tls, mv)
+					if err != nil {
+						return err
+					}
+					if err := cfger.configure(); err != nil {
+						return err
+					}
+					
 				case "google":
-					cfger, err := newGoogleOauthConfigurer(cfg.Oauth, tls, mv)
+					cfger, err := newGoogleConfigurer(cfg.Oauth, tls, mv)
 					if err != nil {
 						return err
 					}
