@@ -165,7 +165,7 @@ func (c *googleOauthConfigurer) configure() error {
 		} else {
 			authCheckInterval = i
 		}
-		setSessionCookie(w, false, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, c.cfg, false, rDat.Email, tokens.AccessToken, "google", authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))

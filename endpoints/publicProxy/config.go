@@ -3,6 +3,7 @@ package publicProxy
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
@@ -30,12 +31,14 @@ type InterstitialConfig struct {
 }
 
 type OauthConfig struct {
-	BindAddress   string
-	EndpointUrl   string
-	CookieDomain  string
-	SigningKey    string        `cf:"+secret"`
-	EncryptionKey string        `cf:"+secret"`
-	Providers     []interface{} `cf:"+secret"`
+	BindAddress     string
+	EndpointUrl     string
+	CookieName      string
+	CookieDomain    string
+	SessionLifetime time.Duration
+	SigningKey      string        `cf:"+secret"`
+	EncryptionKey   string        `cf:"+secret"`
+	Providers       []interface{} `cf:"+secret"`
 }
 
 type OauthProviderConfig struct {

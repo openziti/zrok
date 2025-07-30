@@ -143,11 +143,11 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func shareHandler(handler http.Handler, pcfg *Config, signingKey []byte, ctx ziti.Context) http.HandlerFunc {
-	auth := newAuthHandler(pcfg, signingKey)
+func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti.Context) http.HandlerFunc {
+	auth := newAuthHandler(cfg, signingKey)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		shrToken := resolveService(pcfg.HostMatch, r.Host)
+		shrToken := resolveService(cfg.HostMatch, r.Host)
 		if shrToken == "" {
 			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
 			proxyUi.WriteHealthOk(w)
@@ -161,18 +161,18 @@ func shareHandler(handler http.Handler, pcfg *Config, signingKey []byte, ctx zit
 			return
 		}
 
-		cfg, found := svc.Config[sdk.ZrokProxyConfig]
+		svcCfg, found := svc.Config[sdk.ZrokProxyConfig]
 		if !found {
 			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
 			proxyUi.WriteNotFound(w)
 			return
 		}
 
-		if handleInterstitial(w, r, pcfg, cfg) {
+		if handleInterstitial(w, r, cfg, svcCfg) {
 			return
 		}
 
-		authScheme, found := cfg["auth_scheme"]
+		authScheme, found := svcCfg["auth_scheme"]
 		if !found {
 			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
 			proxyUi.WriteNotFound(w)
@@ -182,19 +182,19 @@ func shareHandler(handler http.Handler, pcfg *Config, signingKey []byte, ctx zit
 		switch authScheme {
 		case string(sdk.None):
 			logrus.Debugf("auth scheme none '%v'", shrToken)
-			filterSessionCookies(w, r)
+			filterSessionCookies(w, r, cfg)
 			handler.ServeHTTP(w, r)
 
 		case string(sdk.Basic):
 			logrus.Debugf("auth scheme basic '%v'", shrToken)
-			if auth.handleBasicAuth(w, r, cfg, shrToken) {
-				filterSessionCookies(w, r)
+			if auth.handleBasicAuth(w, r, svcCfg, shrToken) {
+				filterSessionCookies(w, r, cfg)
 				handler.ServeHTTP(w, r)
 			}
 
 		case string(sdk.Oauth):
 			logrus.Debugf("auth scheme oauth '%v'", shrToken)
-			if auth.handleOAuth(w, r, cfg, shrToken) {
+			if auth.handleOAuth(w, r, svcCfg, shrToken) {
 				handler.ServeHTTP(w, r)
 			}
 

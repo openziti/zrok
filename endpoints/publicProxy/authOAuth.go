@@ -19,6 +19,7 @@ type zrokClaims struct {
 	Provider                   string        `json:"pr"`
 	TargetHost                 string        `json:"th"`
 	AuthorizationCheckInterval time.Duration `json:"aci"`
+	NextRefresh                time.Time     `json:"nr"`
 	jwt.RegisteredClaims
 }
 
@@ -46,7 +47,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	authCheckInterval := getAuthCheckInterval(oauthMap)
 	target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
-	cookie, err := r.Cookie("zrok-access")
+	cookie, err := r.Cookie(h.cfg.Oauth.CookieName)
 	if err != nil {
 		logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
@@ -84,7 +85,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 		return false
 	}
 
-	if claims.ExpiresAt != nil && time.Now().Add(30*time.Second).After((*claims.ExpiresAt).Time) {
+	if time.Now().After(claims.NextRefresh) {
 		if claims.SupportsRefresh {
 			logrus.Warnf("oauth session expired; refreshing tokens (target: '%v')", target)
 			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
@@ -93,10 +94,12 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
 		}
 		return false
+	} else {
+		logrus.Infof("%v until next refresh", time.Until(claims.NextRefresh))
 	}
 
 	r.Header.Set("zrok-auth-email", claims.Email)
-	r.Header.Set("zrok-auth-expires", (*claims.ExpiresAt).Format(time.RFC3339))
+	r.Header.Set("zrok-auth-expires", claims.NextRefresh.Format(time.RFC3339))
 
 	return true
 }

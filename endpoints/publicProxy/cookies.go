@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
+func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh bool, email, accessToken, provider string, checkInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
 	targetHost = strings.TrimSpace(targetHost)
 	if targetHost == "" {
 		logrus.Error("targetHost claim must not be empty")
@@ -34,8 +34,9 @@ func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain,
 		Provider:                   provider,
 		TargetHost:                 targetHost,
 		AuthorizationCheckInterval: checkInterval,
+		NextRefresh:                time.Now().Add(checkInterval),
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(checkInterval).Add(30 * time.Second)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.SessionLifetime)),
 		},
 	})
 	sTkn, err := tkn.SignedString(signingKey)
@@ -46,19 +47,19 @@ func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain,
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "zrok-access",
+		Name:    cfg.CookieName,
 		Value:   sTkn,
-		MaxAge:  int(30 + checkInterval.Seconds()),
-		Domain:  cookieDomain,
+		MaxAge:  int(cfg.SessionLifetime.Seconds()),
+		Domain:  cfg.CookieDomain,
 		Path:    "/",
-		Expires: time.Now().Add(checkInterval).Add(30 * time.Second),
+		Expires: time.Now().Add(cfg.SessionLifetime),
 		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
 }
 
-func filterSessionCookies(w http.ResponseWriter, r *http.Request) {
+func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *Config) {
 	// Get all cookies from the request
 	cookies := r.Cookies()
 	// Clear the Cookie header
@@ -69,8 +70,12 @@ func filterSessionCookies(w http.ResponseWriter, r *http.Request) {
 	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
 	// match.
 	for _, cookie := range cookies {
-		if cookie.Name != "zrok-access" && cookie.Name != "pkce" {
-			r.AddCookie(cookie)
+		if cfg.Oauth != nil && cfg.Oauth.CookieName == cookie.Name {
+			continue
 		}
+		if cookie.Name == "pkce" {
+			continue
+		}
+		r.AddCookie(cookie)
 	}
 }
