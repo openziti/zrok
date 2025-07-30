@@ -3,7 +3,7 @@ import {
     AuthUser,
     ShareApi,
     ShareRequest as ApiShareRequest,
-    ShareRequestBackendModeEnum, ShareRequestOauthProviderEnum,
+    ShareRequestBackendModeEnum,
     ShareRequestShareModeEnum,
     UnshareRequest
 } from "../api";
