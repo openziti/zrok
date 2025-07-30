@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
+func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
 	targetHost = strings.TrimSpace(targetHost)
 	if targetHost == "" {
 		logrus.Error("host claim must not be empty")
@@ -23,9 +23,13 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
 		Email:                      email,
 		AccessToken:                accessToken,
+		SupportsRefresh:            supportsRefresh,
 		Provider:                   provider,
-		Audience:                   targetHost,
+		TargetHost:                 targetHost,
 		AuthorizationCheckInterval: checkInterval,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(checkInterval).Add(30 * time.Second)),
+		},
 	})
 	sTkn, err := tkn.SignedString(key)
 	if err != nil {
@@ -36,17 +40,17 @@ func SetZrokCookie(w http.ResponseWriter, cookieDomain, email, accessToken, prov
 	http.SetCookie(w, &http.Cookie{
 		Name:    "zrok-access",
 		Value:   sTkn,
-		MaxAge:  int(checkInterval.Seconds()),
+		MaxAge:  int(30 + checkInterval.Seconds()),
 		Domain:  cookieDomain,
 		Path:    "/",
-		Expires: time.Now().Add(checkInterval),
+		Expires: time.Now().Add(checkInterval).Add(30 * time.Second),
 		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
 }
 
-func deleteZrokCookies(w http.ResponseWriter, r *http.Request) {
+func filterSessionCookies(w http.ResponseWriter, r *http.Request) {
 	// Get all cookies from the request
 	cookies := r.Cookies()
 	// Clear the Cookie header

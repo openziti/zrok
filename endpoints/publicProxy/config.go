@@ -30,11 +30,12 @@ type InterstitialConfig struct {
 }
 
 type OauthConfig struct {
-	BindAddress  string
-	RedirectUrl  string
-	CookieDomain string
-	HashKey      string `cf:"+secret"`
-	Providers    []interface{}
+	BindAddress   string
+	EndpointUrl   string
+	CookieDomain  string
+	SigningKey    string        `cf:"+secret"`
+	EncryptionKey string        `cf:"+secret"`
+	Providers     []interface{} `cf:"+secret"`
 }
 
 type OauthProviderConfig struct {
@@ -77,7 +78,7 @@ func cfOptions() *cf.Options {
 	return cfOpts
 }
 
-func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
+func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	if cfg.Oauth == nil {
 		logrus.Info("no oauth configuration; skipping oauth handler startup")
 		return nil

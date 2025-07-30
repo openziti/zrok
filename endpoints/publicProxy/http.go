@@ -27,7 +27,7 @@ type HttpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
-	key, err := DeriveKey(cfg.Oauth.HashKey, 32)
+	key, err := DeriveKey(cfg.Oauth.SigningKey, 32)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, err
 	}
 	proxy.Transport = zTransport
-	if err := configureOauthHandlers(context.Background(), cfg, cfg.Tls != nil); err != nil {
+	if err := configureOauth(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
 	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, key, zCtx)
@@ -182,13 +182,13 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 		switch authScheme {
 		case string(sdk.None):
 			logrus.Debugf("auth scheme none '%v'", shrToken)
-			deleteZrokCookies(w, r)
+			filterSessionCookies(w, r)
 			handler.ServeHTTP(w, r)
 
 		case string(sdk.Basic):
 			logrus.Debugf("auth scheme basic '%v'", shrToken)
 			if auth.handleBasicAuth(w, r, cfg, shrToken) {
-				deleteZrokCookies(w, r)
+				filterSessionCookies(w, r)
 				handler.ServeHTTP(w, r)
 			}
 
@@ -200,7 +200,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 
 		default:
 			logrus.Infof("invalid auth scheme '%v'", authScheme)
-			proxyUi.WriteNotFound(w)
+			proxyUi.WriteUnauthorized(w)
 		}
 	}
 }

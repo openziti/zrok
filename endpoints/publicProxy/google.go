@@ -65,25 +65,23 @@ func (c *googleOauthConfigurer) configure() error {
 	rpConfig := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: c.oauthCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", c.cfg.RedirectUrl),
+		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", c.cfg.EndpointUrl),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}
 
-	key, err := DeriveKey(c.cfg.HashKey, 32)
+	key, err := DeriveKey(c.cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
 
 	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
-
-	options := []rp.Option{
+	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
 		rp.WithPKCE(cookieHandler),
 	}
-
-	relyingParty, err := rp.NewRelyingPartyOAuth(rpConfig, options...)
+	provider, err := rp.NewRelyingPartyOAuth(rpConfig, providerOptions...)
 	if err != nil {
 		return err
 	}
@@ -92,7 +90,7 @@ func (c *googleOauthConfigurer) configure() error {
 		Email string
 	}
 
-	authHandlerWithQueryState := func(party rp.RelyingParty) http.HandlerFunc {
+	auth := func(party rp.RelyingParty) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			host, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
@@ -121,7 +119,7 @@ func (c *googleOauthConfigurer) configure() error {
 			}, party, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
 		}
 	}
-	http.Handle("/google/login", authHandlerWithQueryState(relyingParty))
+	http.Handle("/google/login", auth(provider))
 
 	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + url.QueryEscape(tokens.AccessToken))
@@ -163,10 +161,10 @@ func (c *googleOauthConfigurer) configure() error {
 		} else {
 			authCheckInterval = i
 		}
-		SetZrokCookie(w, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, false, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
-	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
+	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))
 
 	logrus.Info("configured google provider at '/google'")
 

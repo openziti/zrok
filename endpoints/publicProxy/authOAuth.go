@@ -13,20 +13,25 @@ import (
 )
 
 type zrokClaims struct {
-	Email                      string        `json:"email"`
-	AccessToken                string        `json:"accessToken"`
-	Provider                   string        `json:"provider"`
-	Audience                   string        `json:"aud"`
-	AuthorizationCheckInterval time.Duration `json:"authorizationCheckInterval"`
+	Email                      string        `json:"em"`
+	AccessToken                string        `json:"acc"`
+	SupportsRefresh            bool          `json:"rf"`
+	Provider                   string        `json:"pr"`
+	TargetHost                 string        `json:"th"`
+	AuthorizationCheckInterval time.Duration `json:"aci"`
 	jwt.RegisteredClaims
 }
 
-func (c *zrokClaims) GetAudience() (jwt.ClaimStrings, error) {
-	return jwt.ClaimStrings{c.Audience}, nil
+func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
+	return jwt.ClaimStrings{c.TargetHost}, nil
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&checkInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+}
+
+func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string) {
+	http.Redirect(w, r, fmt.Sprintf("%s/%s/refresh?targetHost=%s", cfg.EndpointUrl, provider, url.QueryEscape(target)), http.StatusFound)
 }
 
 func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg map[string]interface{}, shrToken string) bool {
@@ -73,10 +78,20 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
-	logrus.Infof("claims: %v", claims)
-	if claims.Provider != provider || claims.AuthorizationCheckInterval != authCheckInterval || claims.Audience != r.Host {
+	if claims.Provider != provider || claims.AuthorizationCheckInterval != authCheckInterval || claims.TargetHost != r.Host {
 		logrus.Error("token validation failed; restarting auth flow")
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		return false
+	}
+
+	if claims.ExpiresAt != nil && time.Now().Add(30*time.Second).After((*claims.ExpiresAt).Time) {
+		if claims.SupportsRefresh {
+			logrus.Warnf("oauth session expired; refreshing tokens (target: '%v')", target)
+			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
+		} else {
+			logrus.Warnf("oauth session expired; re-login (target: '%v')", target)
+			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		}
 		return false
 	}
 
