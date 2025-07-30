@@ -3,10 +3,12 @@ package publicProxy
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
@@ -105,7 +107,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 					if err := cfger.configure(); err != nil {
 						return err
 					}
-					
+
 				case "google":
 					cfger, err := newGoogleConfigurer(cfg.Oauth, tls, mv)
 					if err != nil {
@@ -134,6 +136,10 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 			return errors.Errorf("invalid oauth provider configuration data type")
 		}
 	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		proxyUi.WriteUnauthorized(w)
+	})
 
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)
 
