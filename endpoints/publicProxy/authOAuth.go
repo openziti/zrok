@@ -98,6 +98,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 		logrus.Infof("%v until next refresh", time.Until(claims.NextRefresh))
 	}
 
+	r.Header.Set("zrok-auth-provider", provider)
 	r.Header.Set("zrok-auth-email", claims.Email)
 	r.Header.Set("zrok-auth-expires", claims.NextRefresh.Format(time.RFC3339))
 

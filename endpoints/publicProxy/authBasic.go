@@ -21,7 +21,8 @@ func (h *authHandler) handleBasicAuth(w http.ResponseWriter, r *http.Request, cf
 				for _, v := range users {
 					if um, ok := v.(map[string]interface{}); ok {
 						if um["username"] == inUser && um["password"] == inPass {
-							r.Header.Set("zrok-auth-basic", inUser)
+							r.Header.Set("zrok-auth-provider", "basic")
+							r.Header.Set("zrok-auth-user", inUser)
 							return true
 						}
 					}
