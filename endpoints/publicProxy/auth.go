@@ -8,7 +8,7 @@ import (
 
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/openziti/zrok/endpoints/publicProxy/unauthorizedUi"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 )
 
@@ -118,9 +118,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	}
 
 	claims := tkn.Claims.(*ZrokClaims)
-	if claims.Provider != provider ||
-		claims.AuthorizationCheckInterval != authCheckInterval ||
-		claims.Audience != r.Host {
+	if claims.Provider != provider || claims.AuthorizationCheckInterval != authCheckInterval || claims.Audience != r.Host {
 		logrus.Error("token validation failed; restarting auth flow")
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
 		return false
@@ -141,7 +139,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 				match, err := glob.Compile(castedPattern)
 				if err != nil {
 					logrus.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
-					unauthorizedUi.WriteUnauthorized(w)
+					proxyUi.WriteUnauthorized(w)
 					return false
 				}
 				if match.Match(claims.Email) {
@@ -150,7 +148,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 			}
 		}
 		logrus.Warnf("unauthorized email '%v'", claims.Email)
-		unauthorizedUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w)
 		return false
 	}
 	return true

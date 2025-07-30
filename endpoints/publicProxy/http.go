@@ -13,9 +13,7 @@ import (
 
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/publicProxy/healthUi"
-	"github.com/openziti/zrok/endpoints/publicProxy/interstitialUi"
-	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
@@ -116,7 +114,7 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
-		notFoundUi.WriteNotFound(w)
+		proxyUi.WriteNotFound(w)
 	}
 	return proxy, nil
 }
@@ -161,21 +159,21 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 		shrToken := resolveService(pcfg.HostMatch, r.Host)
 		if shrToken == "" {
 			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			healthUi.WriteHealthOk(w)
+			proxyUi.WriteHealthOk(w)
 			return
 		}
 
 		svc, found := endpoints.GetRefreshedService(shrToken, ctx)
 		if !found {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			notFoundUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w)
 			return
 		}
 
 		cfg, found := svc.Config[sdk.ZrokProxyConfig]
 		if !found {
 			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-			notFoundUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w)
 			return
 		}
 
@@ -186,7 +184,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 		authScheme, found := cfg["auth_scheme"]
 		if !found {
 			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-			notFoundUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w)
 			return
 		}
 
@@ -211,7 +209,7 @@ func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Conte
 
 		default:
 			logrus.Infof("invalid auth scheme '%v'", authScheme)
-			notFoundUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w)
 		}
 	}
 }
@@ -240,7 +238,7 @@ func handleInterstitial(w http.ResponseWriter, r *http.Request, pcfg *Config, cf
 				_, zrokOkErr := r.Cookie("zrok_interstitial")
 				if skip == "" && zrokOkErr != nil {
 					logrus.Debugf("forcing interstitial for '%v'", r.URL)
-					interstitialUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
+					proxyUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
 					return true
 				}
 			}

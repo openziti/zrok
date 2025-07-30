@@ -1,12 +1,13 @@
-package notFoundUi
+package proxyUi
 
 import (
-	"github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
-func WriteNotFound(w http.ResponseWriter) {
-	if data, err := FS.ReadFile("index.html"); err == nil {
+func WriteUnauthorized(w http.ResponseWriter) {
+	if data, err := FS.ReadFile("unauthorized.html"); err == nil {
 		w.WriteHeader(http.StatusNotFound)
 		n, err := w.Write(data)
 		if n != len(data) {

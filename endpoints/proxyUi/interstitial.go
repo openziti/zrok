@@ -1,9 +1,10 @@
-package interstitialUi
+package proxyUi
 
 import (
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 var externalFile []byte
@@ -18,7 +19,7 @@ func WriteInterstitialAnnounce(w http.ResponseWriter, htmlPath string) {
 	}
 	var htmlData = externalFile
 	if htmlData == nil {
-		if data, err := FS.ReadFile("index.html"); err == nil {
+		if data, err := FS.ReadFile("interstitial.html"); err == nil {
 			htmlData = data
 		} else {
 			logrus.Errorf("error reading embedded interstitial html 'index.html': %v", err)
