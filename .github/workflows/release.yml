@@ -24,19 +24,13 @@ jobs:
           - goreleaser: amd64
             deb: amd64
             rpm: x86_64
-            gcc: gcc g++
           - goreleaser: arm64
             deb: arm64
             rpm: aarch64
-            gcc: gcc-aarch64-linux-gnu
           - goreleaser: armhf
             deb: armhf
             rpm: armv7hl
-            gcc: gcc-arm-linux-gnueabihf
     steps:
-      # skipped because ziti-builder image provides the multi-arch, multi-lib build toolchain
-      # - run: apt-get update
-      # - run: apt-get --yes --quiet install ${{ matrix.arch.gcc }}
 
       - uses: actions/checkout@v4
         with:
