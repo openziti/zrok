@@ -162,7 +162,7 @@ func (c *oidcConfigurer) configure() error {
 
 		accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
 		if err != nil {
-			logrus.Error("unable to decrypt access token: %v", err)
+			logrus.Errorf("unable to decrypt access token: %v", err)
 			proxyUi.WriteUnauthorized(w)
 			return
 		}
