@@ -95,6 +95,9 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 		return false
 	}
 
+	r.Header.Set("zrok-auth-email", claims.Email)
+	r.Header.Set("zrok-auth-expires", (*claims.ExpiresAt).Format(time.RFC3339))
+
 	return true
 }
 
