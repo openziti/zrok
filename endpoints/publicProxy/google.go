@@ -52,8 +52,7 @@ type googleOauthConfig struct {
 
 func newGoogleOauthConfig(v map[string]interface{}) (*googleOauthConfig, error) {
 	cfg := &googleOauthConfig{}
-	err := mapstructure.Decode(v, cfg)
-	if err != nil {
+	if err := mapstructure.Decode(v, cfg); err != nil {
 		return nil, err
 	}
 	return cfg, nil
@@ -97,20 +96,13 @@ func (c *googleOauthConfigurer) configure() error {
 		return err
 	}
 
-	type IntermediateJWT struct {
-		State                      string `json:"state"`
-		Host                       string `json:"host"`
-		AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
-		jwt.RegisteredClaims
-	}
-
 	type googleOauthEmailResp struct {
 		Email string
 	}
 
 	authHandlerWithQueryState := func(party rp.RelyingParty) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			host, err := url.QueryUnescape(r.URL.Query().Get("targethost"))
+			host, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
 				logrus.Errorf("unable to unescape target host: %v", err)
 			}
@@ -184,7 +176,7 @@ func (c *googleOauthConfigurer) configure() error {
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
 
-	logrus.Infof("configured google provider with name '%v'", c.oauthCfg.Name)
+	logrus.Infof("configured google provider '%v'", c.oauthCfg.Name)
 
 	return nil
 }

@@ -68,6 +68,12 @@ func cfOptions() *cf.Options {
 		}
 		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
 	})
+	cfOpts.AddFlexibleSetter("oidc", func(v interface{}, opt *cf.Options) (interface{}, error) {
+		if vm, ok := v.(map[string]interface{}); ok {
+			return vm, nil
+		}
+		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
+	})
 	return cfOpts
 }
 
@@ -102,5 +108,6 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 	}
 
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)
+
 	return nil
 }
