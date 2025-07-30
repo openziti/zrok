@@ -16,35 +16,35 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface HttpShareHealthcheckResponse
+ * @interface ShareHttpHealthcheckResponse
  */
-export interface HttpShareHealthcheckResponse {
+export interface ShareHttpHealthcheckResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof HttpShareHealthcheckResponse
+     * @memberof ShareHttpHealthcheckResponse
      */
     healthy?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof HttpShareHealthcheckResponse
+     * @memberof ShareHttpHealthcheckResponse
      */
     error?: string;
 }
 
 /**
- * Check if a given object implements the HttpShareHealthcheckResponse interface.
+ * Check if a given object implements the ShareHttpHealthcheckResponse interface.
  */
-export function instanceOfHttpShareHealthcheckResponse(value: object): value is HttpShareHealthcheckResponse {
+export function instanceOfShareHttpHealthcheckResponse(value: object): value is ShareHttpHealthcheckResponse {
     return true;
 }
 
-export function HttpShareHealthcheckResponseFromJSON(json: any): HttpShareHealthcheckResponse {
-    return HttpShareHealthcheckResponseFromJSONTyped(json, false);
+export function ShareHttpHealthcheckResponseFromJSON(json: any): ShareHttpHealthcheckResponse {
+    return ShareHttpHealthcheckResponseFromJSONTyped(json, false);
 }
 
-export function HttpShareHealthcheckResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): HttpShareHealthcheckResponse {
+export function ShareHttpHealthcheckResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ShareHttpHealthcheckResponse {
     if (json == null) {
         return json;
     }
@@ -55,11 +55,11 @@ export function HttpShareHealthcheckResponseFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-export function HttpShareHealthcheckResponseToJSON(json: any): HttpShareHealthcheckResponse {
-    return HttpShareHealthcheckResponseToJSONTyped(json, false);
+export function ShareHttpHealthcheckResponseToJSON(json: any): ShareHttpHealthcheckResponse {
+    return ShareHttpHealthcheckResponseToJSONTyped(json, false);
 }
 
-export function HttpShareHealthcheckResponseToJSONTyped(value?: HttpShareHealthcheckResponse | null, ignoreDiscriminator: boolean = false): any {
+export function ShareHttpHealthcheckResponseToJSONTyped(value?: ShareHttpHealthcheckResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

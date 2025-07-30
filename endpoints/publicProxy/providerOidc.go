@@ -174,7 +174,7 @@ func (c *oidcConfigurer) configure() error {
 			return
 		}
 
-		setSessionCookie(w, c.cfg, true, claims.Email, newTokens.AccessToken, "oidc/"+c.oidcCfg.Name, claims.AuthorizationCheckInterval, signingKey, encryptionKey, targetHost)
+		setSessionCookie(w, c.cfg, true, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.AuthorizationCheckInterval, signingKey, encryptionKey, targetHost)
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.oidcCfg.Name), refresh)
@@ -194,7 +194,7 @@ func (c *oidcConfigurer) configure() error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		setSessionCookie(w, c.cfg, true, info.Email, tokens.AccessToken, "oidc/"+c.oidcCfg.Name, authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, c.cfg, true, info.Email, tokens.AccessToken, c.oidcCfg.Name, authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))

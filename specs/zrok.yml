@@ -1892,7 +1892,6 @@ definitions:
           $ref: "#/definitions/authUser"
       oauthProvider:
         type: string
-        enum: ["github", "google"]
       oauthEmailDomains:
         type: array
         items:
