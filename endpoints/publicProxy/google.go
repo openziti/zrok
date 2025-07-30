@@ -168,7 +168,7 @@ func (c *googleOauthConfigurer) configure() error {
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
 
-	logrus.Infof("configured google provider at '/google')
+	logrus.Info("configured google provider at '/google'")
 
 	return nil
 }
