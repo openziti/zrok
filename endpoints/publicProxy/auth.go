@@ -39,6 +39,12 @@ func newAuthHandler(cfg *Config, key []byte, handler http.Handler) *authHandler 
 	}
 }
 
+func basicAuthRequired(w http.ResponseWriter, realm string) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+	w.WriteHeader(401)
+	_, _ = w.Write([]byte("No Authorization\n"))
+}
+
 func (h *authHandler) handleBasicAuth(w http.ResponseWriter, r *http.Request, cfg map[string]interface{}, shrToken string) bool {
 	inUser, inPass, ok := r.BasicAuth()
 	if !ok {
@@ -62,6 +68,10 @@ func (h *authHandler) handleBasicAuth(w http.ResponseWriter, r *http.Request, cf
 
 	basicAuthRequired(w, shrToken)
 	return false
+}
+
+func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
+	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targethost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
 
 func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg map[string]interface{}, shrToken string) bool {
@@ -158,14 +168,4 @@ func getAuthCheckInterval(oauthCfg map[string]interface{}) time.Duration {
 		}
 		return i
 	}
-}
-
-func basicAuthRequired(w http.ResponseWriter, realm string) {
-	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
-	w.WriteHeader(401)
-	_, _ = w.Write([]byte("No Authorization\n"))
-}
-
-func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targethost=%s&checkInterval=%s", cfg.RedirectUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
 }
