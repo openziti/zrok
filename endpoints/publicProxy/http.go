@@ -27,7 +27,7 @@ type HttpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
-	key, err := DeriveKey(cfg.Oauth.SigningKey, 32)
+	signingKey, err := deriveKey(cfg.Oauth.SigningKey, 32)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	if err := configureOauth(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
-	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, key, zCtx)
+	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, signingKey, zCtx)
 	return &HttpFrontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -143,8 +143,8 @@ func hostTargetReverseProxy(cfg *Config, ctx ziti.Context) *httputil.ReverseProx
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func shareHandler(handler http.Handler, pcfg *Config, key []byte, ctx ziti.Context) http.HandlerFunc {
-	auth := newAuthHandler(pcfg, key)
+func shareHandler(handler http.Handler, pcfg *Config, signingKey []byte, ctx ziti.Context) http.HandlerFunc {
+	auth := newAuthHandler(pcfg, signingKey)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		shrToken := resolveService(pcfg.HostMatch, r.Host)

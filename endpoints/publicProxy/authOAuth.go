@@ -69,7 +69,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 		if h.cfg.Oauth == nil {
 			return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
 		}
-		return h.key, nil
+		return h.signingKey, nil
 	})
 	if err != nil {
 		logrus.Errorf("unable to parse jwt: %v", err)
@@ -101,7 +101,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie) bool {
 	if patterns, found := oauthCfg["email_domains"].([]interface{}); found && len(patterns) > 0 {
 		tkn, _ := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-			return h.key, nil
+			return h.signingKey, nil
 		})
 		claims := tkn.Claims.(*zrokClaims)
 

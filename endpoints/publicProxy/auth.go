@@ -3,14 +3,14 @@ package publicProxy
 import "github.com/golang-jwt/jwt/v5"
 
 type authHandler struct {
-	cfg *Config
-	key []byte
+	cfg        *Config
+	signingKey []byte
 }
 
-func newAuthHandler(cfg *Config, key []byte) *authHandler {
+func newAuthHandler(cfg *Config, signingKey []byte) *authHandler {
 	return &authHandler{
-		cfg: cfg,
-		key: key,
+		cfg:        cfg,
+		signingKey: signingKey,
 	}
 }
 

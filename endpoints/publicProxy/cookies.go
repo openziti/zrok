@@ -1,28 +1,35 @@
 package publicProxy
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 )
 
-func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, key []byte, targetHost string) {
+func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain, email, accessToken, provider string, checkInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
 	targetHost = strings.TrimSpace(targetHost)
 	if targetHost == "" {
-		logrus.Error("host claim must not be empty")
-		http.Error(w, "host claim must not be empty", http.StatusBadRequest)
+		logrus.Error("targetHost claim must not be empty")
+		proxyUi.WriteUnauthorized(w)
 		return
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
 	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
 
+	encryptedAccessToken, err := encryptToken(accessToken, encryptionKey)
+	if err != nil {
+		logrus.Errorf("failed to encrypt access token: %v", err)
+		proxyUi.WriteUnauthorized(w)
+		return
+	}
+
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
 		Email:                      email,
-		AccessToken:                accessToken,
+		AccessToken:                encryptedAccessToken,
 		SupportsRefresh:            supportsRefresh,
 		Provider:                   provider,
 		TargetHost:                 targetHost,
@@ -31,9 +38,10 @@ func setSessionCookie(w http.ResponseWriter, supportsRefresh bool, cookieDomain,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(checkInterval).Add(30 * time.Second)),
 		},
 	})
-	sTkn, err := tkn.SignedString(key)
+	sTkn, err := tkn.SignedString(signingKey)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("after signing cookie token: %v", err.Error()), http.StatusInternalServerError)
+		logrus.Errorf("error signing jwt: %v", err)
+		proxyUi.WriteUnauthorized(w)
 		return
 	}
 

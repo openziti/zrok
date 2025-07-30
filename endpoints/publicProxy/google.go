@@ -70,12 +70,16 @@ func (c *googleOauthConfigurer) configure() error {
 		Endpoint:     googleOauth.Endpoint,
 	}
 
-	key, err := DeriveKey(c.cfg.SigningKey, 32)
+	signingKey, err := deriveKey(c.cfg.SigningKey, 32)
+	if err != nil {
+		return err
+	}
+	encryptionKey, err := deriveKey(c.cfg.EncryptionKey, 32)
 	if err != nil {
 		return err
 	}
 
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
 	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
@@ -111,7 +115,7 @@ func (c *googleOauthConfigurer) configure() error {
 						ID:        id,
 					},
 				})
-				s, err := t.SignedString(key)
+				s, err := t.SignedString(signingKey)
 				if err != nil {
 					logrus.Errorf("unable to sign intermediate JWT: %v", err)
 				}
@@ -147,7 +151,7 @@ func (c *googleOauthConfigurer) configure() error {
 		}
 
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
-			return key, nil
+			return signingKey, nil
 		})
 		if err != nil {
 			http.Error(w, fmt.Sprintf("After intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
@@ -161,7 +165,7 @@ func (c *googleOauthConfigurer) configure() error {
 		} else {
 			authCheckInterval = i
 		}
-		setSessionCookie(w, false, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, false, c.cfg.CookieDomain, rDat.Email, tokens.AccessToken, "google", authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))

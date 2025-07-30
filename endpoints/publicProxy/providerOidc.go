@@ -57,11 +57,15 @@ func (c *oidcConfigurer) configure() error {
 		scheme = "https"
 	}
 
-	key, err := DeriveKey(c.cfg.SigningKey, 32)
+	signingKey, err := deriveKey(c.cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
-	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
+	encryptionKey, err := deriveKey(c.cfg.EncryptionKey, 32)
+	if err != nil {
+		return err
+	}
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
 	redirectUrl := fmt.Sprintf("%v/%v/auth/callback", c.cfg.EndpointUrl, c.oidcCfg.Name)
 	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
@@ -102,7 +106,7 @@ func (c *oidcConfigurer) configure() error {
 					ID:        id,
 				},
 			})
-			s, err := t.SignedString(key)
+			s, err := t.SignedString(signingKey)
 			if err != nil {
 				logrus.Errorf("unable to sign intermediate JWT: %v", err)
 			}
@@ -140,15 +144,8 @@ func (c *oidcConfigurer) configure() error {
 			return
 		}
 
-		key, err := DeriveKey(c.cfg.SigningKey, 32)
-		if err != nil {
-			logrus.Errorf("unable to derive key: %v", err)
-			proxyUi.WriteUnauthorized(w)
-			return
-		}
-
 		tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-			return key, nil
+			return signingKey, nil
 		})
 		if err != nil {
 			logrus.Errorf("unable to parse jwt: %v", err)
@@ -163,21 +160,28 @@ func (c *oidcConfigurer) configure() error {
 			return
 		}
 
-		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), provider, claims.AccessToken, "", "")
+		accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
+		if err != nil {
+			logrus.Error("unable to decrypt access token: %v", err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
+		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), provider, accessToken, "", "")
 		if err != nil {
 			logrus.Errorf("unable to refresh tokens: %v", err)
 			proxyUi.WriteUnauthorized(w)
 			return
 		}
 
-		setSessionCookie(w, true, c.cfg.CookieDomain, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.AuthorizationCheckInterval, key, targetHost)
+		setSessionCookie(w, true, c.cfg.CookieDomain, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.AuthorizationCheckInterval, signingKey, encryptionKey, targetHost)
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.oidcCfg.Name), refresh)
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, provider rp.RelyingParty, info *oidc.UserInfo) {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
-			return key, nil
+			return signingKey, nil
 		})
 		authCheckInterval := 3 * time.Hour
 		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).AuthorizationCheckInterval)
@@ -190,7 +194,7 @@ func (c *oidcConfigurer) configure() error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		setSessionCookie(w, true, c.cfg.CookieDomain, info.Email, tokens.AccessToken, c.oidcCfg.Name, authCheckInterval, key, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, true, c.cfg.CookieDomain, info.Email, tokens.AccessToken, c.oidcCfg.Name, authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))

@@ -8,7 +8,7 @@ import (
 
 func WriteUnauthorized(w http.ResponseWriter) {
 	if data, err := FS.ReadFile("unauthorized.html"); err == nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusUnauthorized)
 		n, err := w.Write(data)
 		if n != len(data) {
 			logrus.Errorf("short write")
