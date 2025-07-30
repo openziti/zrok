@@ -37,7 +37,6 @@ func newGoogleOauthConfigurer(cfg *OauthConfig, tls bool, v map[string]interface
 }
 
 type googleOauthConfig struct {
-	Name          string   `mapstructure:"name"`
 	ClientId      string   `mapstructure:"client_id"`
 	ClientSecret  string   `mapstructure:"client_secret"`
 	Scopes        []string `mapstructure:"scopes"`
@@ -169,7 +168,7 @@ func (c *googleOauthConfigurer) configure() error {
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, relyingParty))
 
-	logrus.Infof("configured google provider '%v'", c.oauthCfg.Name)
+	logrus.Infof("configured google provider at '/google')
 
 	return nil
 }
