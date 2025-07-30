@@ -82,7 +82,7 @@ func (c *oidcConfigurer) configure() error {
 	authHandler := func(w http.ResponseWriter, r *http.Request) {
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
-			logrus.Errorf("unable to unescape 'targethost': %v", err)
+			logrus.Errorf("unable to unescape 'targetHost': %v", err)
 			http.Error(w, "invalid url format", http.StatusBadRequest)
 			return
 		}
@@ -112,7 +112,8 @@ func (c *oidcConfigurer) configure() error {
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}
-		rp.AuthURLHandler(state, provider, urlOptions...)
+		logrus.Infof("invoking auth handler")
+		rp.AuthURLHandler(state, provider, urlOptions...).ServeHTTP(w, r)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/login", c.oidcCfg.Name), authHandler)
 

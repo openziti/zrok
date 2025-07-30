@@ -73,6 +73,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
+	logrus.Infof("claims: %v", claims)
 	if claims.Provider != provider || claims.AuthorizationCheckInterval != authCheckInterval || claims.Audience != r.Host {
 		logrus.Error("token validation failed; restarting auth flow")
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)

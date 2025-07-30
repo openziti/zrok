@@ -2,7 +2,6 @@ package publicProxy
 
 import (
 	"context"
-	"crypto/md5"
 	"fmt"
 	"net"
 	"net/http"
@@ -28,17 +27,9 @@ type HttpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
-	var key []byte
-	if cfg.Oauth != nil {
-		hash := md5.New()
-		n, err := hash.Write([]byte(cfg.Oauth.HashKey))
-		if err != nil {
-			return nil, err
-		}
-		if n != len(cfg.Oauth.HashKey) {
-			return nil, errors.New("short hash")
-		}
-		key = hash.Sum(nil)
+	key, err := DeriveKey(cfg.Oauth.HashKey, 32)
+	if err != nil {
+		return nil, err
 	}
 
 	root, err := environment.LoadRoot()

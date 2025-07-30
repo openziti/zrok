@@ -96,6 +96,15 @@ func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
 						return err
 					}
 
+				case "oidc":
+					cfger, err := newOidcConfigurer(cfg.Oauth, tls, mv)
+					if err != nil {
+						return err
+					}
+					if err := cfger.configure(); err != nil {
+						return err
+					}
+
 				default:
 					return errors.Errorf("invalid oauth provider type '%v'", t)
 				}

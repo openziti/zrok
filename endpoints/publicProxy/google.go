@@ -1,9 +1,7 @@
 package publicProxy
 
 import (
-	"crypto/md5"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -73,15 +71,10 @@ func (c *googleOauthConfigurer) configure() error {
 		Endpoint:     googleOauth.Endpoint,
 	}
 
-	hash := md5.New()
-	n, err := hash.Write([]byte(c.cfg.HashKey))
+	key, err := DeriveKey(c.cfg.HashKey, 32)
 	if err != nil {
 		return err
 	}
-	if n != len(c.cfg.HashKey) {
-		return errors.New("short hash")
-	}
-	key := hash.Sum(nil)
 
 	cookieHandler := zhttp.NewCookieHandler(key, key, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
 
