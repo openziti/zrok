@@ -49,7 +49,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 
 	cookie, err := r.Cookie(h.cfg.Oauth.CookieName)
 	if err != nil {
-		logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
+		logrus.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
 		return false
 	}
