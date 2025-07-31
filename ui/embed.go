@@ -1,3 +1,5 @@
+//go:build !no_zrok_ui
+
 package ui
 
 import "embed"
