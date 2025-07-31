@@ -96,7 +96,7 @@ func (c *oidcConfigurer) configure() error {
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 				id,
 				targetHost,
-				r.URL.Query().Get("checkInterval"),
+				r.URL.Query().Get("refreshInterval"),
 				jwt.RegisteredClaims{
 					ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 					IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -174,7 +174,7 @@ func (c *oidcConfigurer) configure() error {
 			return
 		}
 
-		setSessionCookie(w, c.cfg, true, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.AuthorizationCheckInterval, signingKey, encryptionKey, targetHost)
+		setSessionCookie(w, c.cfg, true, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.RefreshInterval, signingKey, encryptionKey, targetHost)
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.oidcCfg.Name), refresh)
@@ -183,18 +183,18 @@ func (c *oidcConfigurer) configure() error {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
 			return signingKey, nil
 		})
-		authCheckInterval := 3 * time.Hour
-		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).AuthorizationCheckInterval)
+		refreshInterval := 3 * time.Hour
+		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval)
 		if err != nil {
 			logrus.Errorf("unable to parse authorization check interval: %v. Defaulting to 3 hours", err)
 		} else {
-			authCheckInterval = i
+			refreshInterval = i
 		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		setSessionCookie(w, c.cfg, true, info.Email, tokens.AccessToken, c.oidcCfg.Name, authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, c.cfg, true, info.Email, tokens.AccessToken, c.oidcCfg.Name, refreshInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))

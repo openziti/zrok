@@ -15,8 +15,8 @@ func newAuthHandler(cfg *Config, signingKey []byte) *authHandler {
 }
 
 type IntermediateJWT struct {
-	State                      string `json:"state"`
-	Host                       string `json:"host"`
-	AuthorizationCheckInterval string `json:"authorizationCheckInterval"`
+	State           string `json:"state"`
+	Host            string `json:"host"`
+	RefreshInterval string `json:"refresh"`
 	jwt.RegisteredClaims
 }

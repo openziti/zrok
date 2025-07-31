@@ -99,7 +99,7 @@ func (c *githubConfigurer) configure() error {
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 					id,
 					host,
-					r.URL.Query().Get("checkInterval"),
+					r.URL.Query().Get("refreshInterval"),
 					jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -170,14 +170,14 @@ func (c *githubConfigurer) configure() error {
 			return
 		}
 
-		authCheckInterval := 3 * time.Hour
-		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).AuthorizationCheckInterval)
+		refreshInterval := 3 * time.Hour
+		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval)
 		if err != nil {
 			logrus.Errorf("unable to parse authorization check interval: %v. Defaulting to 3 hours", err)
 		} else {
-			authCheckInterval = i
+			refreshInterval = i
 		}
-		setSessionCookie(w, c.cfg, false, primaryEmail, tokens.AccessToken, "github", authCheckInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, c.cfg, false, primaryEmail, tokens.AccessToken, "github", refreshInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(getEmail, provider))

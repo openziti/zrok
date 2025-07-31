@@ -13,13 +13,13 @@ import (
 )
 
 type zrokClaims struct {
-	Email                      string        `json:"em"`
-	AccessToken                string        `json:"acc"`
-	SupportsRefresh            bool          `json:"rf"`
-	Provider                   string        `json:"pr"`
-	TargetHost                 string        `json:"th"`
-	AuthorizationCheckInterval time.Duration `json:"aci"`
-	NextRefresh                time.Time     `json:"nr"`
+	Email           string        `json:"em"`
+	AccessToken     string        `json:"acc"`
+	SupportsRefresh bool          `json:"srf"`
+	Provider        string        `json:"pr"`
+	TargetHost      string        `json:"th"`
+	RefreshInterval time.Duration `json:"rfi"`
+	NextRefresh     time.Time     `json:"nr"`
 	jwt.RegisteredClaims
 }
 
@@ -27,8 +27,8 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 	return jwt.ClaimStrings{c.TargetHost}, nil
 }
 
-func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, authCheckInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&checkInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), authCheckInterval.String()), http.StatusFound)
+func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, refreshInterval time.Duration) {
+	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String()), http.StatusFound)
 }
 
 func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string) {
@@ -44,17 +44,17 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 
 	oauthMap := oauthCfg.(map[string]interface{})
 	provider := oauthMap["provider"].(string)
-	authCheckInterval := getAuthCheckInterval(oauthMap)
+	refreshInterval := getRefreshInterval(oauthMap)
 	target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
 	cookie, err := r.Cookie(h.cfg.Oauth.CookieName)
 	if err != nil {
 		logrus.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
-	if !h.validateOAuthToken(w, r, cookie, provider, authCheckInterval, target) {
+	if !h.validateOAuthToken(w, r, cookie, provider, refreshInterval, target) {
 		return false
 	}
 
@@ -65,7 +65,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	return true
 }
 
-func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, cookie *http.Cookie, provider string, authCheckInterval time.Duration, target string) bool {
+func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, cookie *http.Cookie, provider string, refreshInterval time.Duration, target string) bool {
 	tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if h.cfg.Oauth == nil {
 			return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
@@ -74,14 +74,14 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	})
 	if err != nil {
 		logrus.Errorf("unable to parse jwt: %v", err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
-	if claims.Provider != provider || claims.AuthorizationCheckInterval != authCheckInterval || claims.TargetHost != r.Host {
+	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
 		logrus.Error("token validation failed; restarting auth flow")
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
@@ -91,7 +91,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
 		} else {
 			logrus.Warnf("oauth session expired; re-login (target: '%v')", target)
-			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, authCheckInterval)
+			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
 		return false
 	} else {
@@ -132,14 +132,14 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 	return true
 }
 
-func getAuthCheckInterval(oauthCfg map[string]interface{}) time.Duration {
-	if checkInterval, found := oauthCfg["authorization_check_interval"]; !found {
-		logrus.Error("missing authorization check interval, defaulting to 3 hours")
+func getRefreshInterval(oauthCfg map[string]interface{}) time.Duration {
+	if refreshInterval, found := oauthCfg["authorization_check_interval"]; !found {
+		logrus.Error("missing 'authorization_check_interval', defaulting to 3 hours")
 		return 3 * time.Hour
 	} else {
-		i, err := time.ParseDuration(checkInterval.(string))
+		i, err := time.ParseDuration(refreshInterval.(string))
 		if err != nil {
-			logrus.Errorf("invalid check interval '%v', defaulting to 3 hours", checkInterval)
+			logrus.Errorf("invalid refresh interval '%v', defaulting to 3 hours", refreshInterval)
 			return 3 * time.Hour
 		}
 		return i

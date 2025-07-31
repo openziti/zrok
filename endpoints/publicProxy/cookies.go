@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh bool, email, accessToken, provider string, checkInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
+func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh bool, email, accessToken, provider string, refreshInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
 	targetHost = strings.TrimSpace(targetHost)
 	if targetHost == "" {
 		logrus.Error("targetHost claim must not be empty")
@@ -28,13 +28,13 @@ func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh b
 	}
 
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
-		Email:                      email,
-		AccessToken:                encryptedAccessToken,
-		SupportsRefresh:            supportsRefresh,
-		Provider:                   provider,
-		TargetHost:                 targetHost,
-		AuthorizationCheckInterval: checkInterval,
-		NextRefresh:                time.Now().Add(checkInterval),
+		Email:           email,
+		AccessToken:     encryptedAccessToken,
+		SupportsRefresh: supportsRefresh,
+		Provider:        provider,
+		TargetHost:      targetHost,
+		RefreshInterval: refreshInterval,
+		NextRefresh:     time.Now().Add(refreshInterval),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.SessionLifetime)),
 		},
