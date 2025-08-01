@@ -1,0 +1,17 @@
+#    _____ __ ___ | | __
+#   |_  / '__/ _ \| |/ /
+#    / /| | | (_) |   <
+#   /___|_|  \___/|_|\_\
+# controller configuration
+
+endpoint:
+  host:             0.0.0.0
+  port:             8080
+
+store:
+  path:             /home/ubuntu/local/etc/zrok.io/db/zrok-ctrl.db
+
+ziti:
+  api_endpoint:     "https://10.0.0.41:1280"
+  username:         admin
+  password:         admin

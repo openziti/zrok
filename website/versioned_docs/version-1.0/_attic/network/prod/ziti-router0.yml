@@ -1,0 +1,69 @@
+v: 3
+
+identity:
+  cert:                 "/home/ubuntu/local/etc/zrok.io/pki/intermediate/certs/router0-client.cert"
+  server_cert:          "/home/ubuntu/local/etc/zrok.io/pki/intermediate/certs/router0-server.cert"
+  key:                  "/home/ubuntu/local/etc/zrok.io/pki/intermediate/keys/router0-server.key"
+  ca:                   "/home/ubuntu/local/etc/zrok.io/pki/cas.cert"
+
+ctrl:
+  endpoint:             tls:0.0.0.0:6262
+
+link:
+  dialers:
+    - binding: transport
+  listeners:
+    - binding:          transport
+      bind:             tls:0.0.0.0:10080
+      advertise:        tls:api.zrok.io:10080
+      options:
+        outQueueSize:   4
+
+listeners:
+# bindings of edge and tunnel requires an "edge" section below
+  - binding: edge
+    address: tls:0.0.0.0:3022
+    options:
+      advertise: ziti.zrok.io:3022
+      connectTimeoutMs: 1000
+      getSessionTimeout: 60s
+  - binding: tunnel
+    options:
+      mode: host #tproxy|host
+
+
+edge:
+  csr:
+    country: US
+    province: NC
+    locality: Charlotte
+    organization: NetFoundry
+    organizationalUnit: Ziti
+    sans:
+      dns:
+        - ziti.zrok.io
+        - localhost
+      ip:
+        - "10.0.0.41"
+        - "127.0.0.1"
+
+#transport:
+#  ws:
+#    writeTimeout: 10
+#    readTimeout: 5
+#    idleTimeout: 5
+#    pongTimeout: 60
+#    pingInterval: 54
+#    handshakeTimeout: 10
+#    readBufferSize: 4096
+#    writeBufferSize: 4096
+#    enableCompression: true
+#    server_cert: /home/ubuntu/.ziti/quickstart/zrok-ctrl-01/pki/routers/zrok-ctrl-01-edge-router/server.cert
+#    key: /home/ubuntu/.ziti/quickstart/zrok-ctrl-01/pki/routers/zrok-ctrl-01-edge-router/server.key
+
+forwarder:
+  latencyProbeInterval: 10
+  xgressDialQueueLength: 1000
+  xgressDialWorkerCount: 128
+  linkDialQueueLength: 1000
+  linkDialWorkerCount: 32

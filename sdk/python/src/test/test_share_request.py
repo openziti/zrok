@@ -48,7 +48,7 @@ class TestShareRequest(unittest.TestCase):
                         username = '', 
                         password = '', )
                     ],
-                oauth_provider = 'github',
+                oauth_provider = '',
                 oauth_email_domains = [
                     ''
                     ],

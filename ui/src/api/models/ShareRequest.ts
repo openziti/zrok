@@ -74,7 +74,7 @@ export interface ShareRequest {
      * @type {string}
      * @memberof ShareRequest
      */
-    oauthProvider?: ShareRequestOauthProviderEnum;
+    oauthProvider?: string;
     /**
      * 
      * @type {Array<string>}
@@ -137,15 +137,6 @@ export const ShareRequestBackendModeEnum = {
     Vpn: 'vpn'
 } as const;
 export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[keyof typeof ShareRequestBackendModeEnum];
-
-/**
- * @export
- */
-export const ShareRequestOauthProviderEnum = {
-    Github: 'github',
-    Google: 'google'
-} as const;
-export type ShareRequestOauthProviderEnum = typeof ShareRequestOauthProviderEnum[keyof typeof ShareRequestOauthProviderEnum];
 
 /**
  * @export

@@ -2,10 +2,10 @@
 /* eslint-disable */
 export * from './AccessDetail';
 export * from './AccessPrivateResponse';
-export * from './HttpShareHealthcheckResponse';
 export * from './ProtobufAny';
 export * from './RpcStatus';
 export * from './ShareDetail';
+export * from './ShareHttpHealthcheckResponse';
 export * from './SharePrivateResponse';
 export * from './SharePublicResponse';
 export * from './ShareReservedResponse';

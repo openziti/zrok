@@ -16,8 +16,8 @@
 import * as runtime from '../runtime';
 import type {
   AccessPrivateResponse,
-  HttpShareHealthcheckResponse,
   RpcStatus,
+  ShareHttpHealthcheckResponse,
   SharePrivateResponse,
   SharePublicResponse,
   StatusResponse,
@@ -26,10 +26,10 @@ import type {
 import {
     AccessPrivateResponseFromJSON,
     AccessPrivateResponseToJSON,
-    HttpShareHealthcheckResponseFromJSON,
-    HttpShareHealthcheckResponseToJSON,
     RpcStatusFromJSON,
     RpcStatusToJSON,
+    ShareHttpHealthcheckResponseFromJSON,
+    ShareHttpHealthcheckResponseToJSON,
     SharePrivateResponseFromJSON,
     SharePrivateResponseToJSON,
     SharePublicResponseFromJSON,
@@ -50,20 +50,20 @@ export interface AgentAccessPrivateRequest {
     responseHeaders?: Array<string>;
 }
 
-export interface AgentHttpShareHealthcheckRequest {
-    token?: string;
-    httpVerb?: string;
-    endpoint?: string;
-    expectedHttpResponse?: string;
-    timeoutMs?: string;
-}
-
 export interface AgentReleaseAccessRequest {
     frontendToken?: string;
 }
 
 export interface AgentReleaseShareRequest {
     token?: string;
+}
+
+export interface AgentShareHttpHealthcheckRequest {
+    token?: string;
+    httpVerb?: string;
+    endpoint?: string;
+    expectedHttpResponse?: number;
+    timeoutMs?: string;
 }
 
 export interface AgentSharePrivateRequest {
@@ -149,53 +149,6 @@ export class AgentApi extends runtime.BaseAPI {
 
     /**
      */
-    async agentHttpShareHealthcheckRaw(requestParameters: AgentHttpShareHealthcheckRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HttpShareHealthcheckResponse>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['token'] != null) {
-            queryParameters['token'] = requestParameters['token'];
-        }
-
-        if (requestParameters['httpVerb'] != null) {
-            queryParameters['httpVerb'] = requestParameters['httpVerb'];
-        }
-
-        if (requestParameters['endpoint'] != null) {
-            queryParameters['endpoint'] = requestParameters['endpoint'];
-        }
-
-        if (requestParameters['expectedHttpResponse'] != null) {
-            queryParameters['expectedHttpResponse'] = requestParameters['expectedHttpResponse'];
-        }
-
-        if (requestParameters['timeoutMs'] != null) {
-            queryParameters['timeoutMs'] = requestParameters['timeoutMs'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-
-        let urlPath = `/v1/agent/httpShareHealthcheck`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => HttpShareHealthcheckResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async agentHttpShareHealthcheck(requestParameters: AgentHttpShareHealthcheckRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HttpShareHealthcheckResponse> {
-        const response = await this.agentHttpShareHealthcheckRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
     async agentReleaseAccessRaw(requestParameters: AgentReleaseAccessRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
@@ -253,6 +206,53 @@ export class AgentApi extends runtime.BaseAPI {
      */
     async agentReleaseShare(requestParameters: AgentReleaseShareRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.agentReleaseShareRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async agentShareHttpHealthcheckRaw(requestParameters: AgentShareHttpHealthcheckRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareHttpHealthcheckResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        if (requestParameters['httpVerb'] != null) {
+            queryParameters['httpVerb'] = requestParameters['httpVerb'];
+        }
+
+        if (requestParameters['endpoint'] != null) {
+            queryParameters['endpoint'] = requestParameters['endpoint'];
+        }
+
+        if (requestParameters['expectedHttpResponse'] != null) {
+            queryParameters['expectedHttpResponse'] = requestParameters['expectedHttpResponse'];
+        }
+
+        if (requestParameters['timeoutMs'] != null) {
+            queryParameters['timeoutMs'] = requestParameters['timeoutMs'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/v1/agent/httpShareHealthcheck`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ShareHttpHealthcheckResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async agentShareHttpHealthcheck(requestParameters: AgentShareHttpHealthcheckRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareHttpHealthcheckResponse> {
+        const response = await this.agentShareHttpHealthcheckRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

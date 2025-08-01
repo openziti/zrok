@@ -4,10 +4,10 @@ apis/index.ts
 index.ts
 models/AccessDetail.ts
 models/AccessPrivateResponse.ts
-models/HttpShareHealthcheckResponse.ts
 models/ProtobufAny.ts
 models/RpcStatus.ts
 models/ShareDetail.ts
+models/ShareHttpHealthcheckResponse.ts
 models/SharePrivateResponse.ts
 models/SharePublicResponse.ts
 models/ShareReservedResponse.ts

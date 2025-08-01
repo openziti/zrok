@@ -1,0 +1,55 @@
+- name: Set up zrok Package Repo
+  gather_facts: true
+  hosts: all 
+  become: true
+  tasks:
+  - name: Set up apt repo
+    when: ansible_os_family == "Debian"
+    block:
+    - name: Install playbook dependencies
+      ansible.builtin.package:
+        name:
+        - gnupg
+        state: present
+
+    - name: Fetch armored pubkey
+      ansible.builtin.uri:
+        url: https://get.openziti.io/tun/package-repos.gpg
+        return_content: yes
+      register: armored_pubkey
+
+    - name: Dearmor pubkey
+      ansible.builtin.shell: |
+        gpg --dearmor --output /usr/share/keyrings/openziti.gpg <<< "{{ armored_pubkey.content }}"
+      args:
+        creates: /usr/share/keyrings/openziti.gpg
+        executable: /bin/bash
+    
+    - name: Set pubkey filemode
+      ansible.builtin.file:
+        path: /usr/share/keyrings/openziti.gpg
+        mode: 'a+rX'
+
+    - name: Install OpenZiti repo deb source
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/openziti-release.list
+        content: |
+          deb [signed-by=/usr/share/keyrings/openziti.gpg] https://packages.openziti.org/zitipax-openziti-deb-stable debian main
+    
+    - name: Refresh Repo Sources
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  - name: Set up yum repo
+    when: ansible_os_family == "RedHat"
+    block:
+    - name: Install OpenZiti repo rpm source
+      ansible.builtin.yum_repository:
+        name: OpenZitiRelease
+        description: OpenZiti Release
+        baseurl: https://packages.openziti.org/zitipax-openziti-rpm-stable/redhat/$basearch
+        enabled: yes
+        gpgkey: https://packages.openziti.org/zitipax-openziti-rpm-stable/redhat/$basearch/repodata/repomd.xml.key
+        repo_gpgcheck: yes
+        gpgcheck: no

@@ -12,7 +12,7 @@ import (
 
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/publicProxy/notFoundUi"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
@@ -131,7 +131,7 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
-		notFoundUi.WriteNotFound(w)
+		proxyUi.WriteNotFound(w)
 	}
 	return proxy, nil
 }
@@ -231,15 +231,15 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 					}
 				} else {
 					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-					notFoundUi.WriteNotFound(w)
+					proxyUi.WriteNotFound(w)
 				}
 			} else {
 				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-				notFoundUi.WriteNotFound(w)
+				proxyUi.WriteNotFound(w)
 			}
 		} else {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			notFoundUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w)
 		}
 	}
 }

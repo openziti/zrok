@@ -3,6 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net"
+	"slices"
+	"time"
+
 	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -10,9 +14,6 @@ import (
 	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net"
-	"slices"
-	"time"
 )
 
 func init() {
@@ -50,8 +51,8 @@ func newReserveCommand() *reserveCommand {
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel, socks, vpn)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
-	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Enable OAuth provider [google, github]")
-	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-patterns", []string{}, "Allow only these email domains to authenticate via OAuth")
+	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
+	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-pattern", []string{}, "Allow only email addresses matching this glob to access")
 	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; reauthenticate after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 	cmd.Flags().BoolVar(&command.open, "open", false, "Enable open permission mode")

@@ -3,7 +3,7 @@ import {
     AuthUser,
     ShareApi,
     ShareRequest as ApiShareRequest,
-    ShareRequestBackendModeEnum, ShareRequestOauthProviderEnum,
+    ShareRequestBackendModeEnum,
     ShareRequestShareModeEnum,
     UnshareRequest
 } from "../api";
@@ -21,10 +21,6 @@ export type AuthScheme = string;
 export const AUTH_SCHEME_NONE = "none";
 export const AUTH_SCHEME_BASIC = "basic";
 export const AUTH_SCHEME_OAUTH = "oauth";
-
-export type OauthProvider = string;
-export const OAUTH_PROVIDER_GOOGLE = "google";
-export const OAUTH_PROVIDER_GITHUB = "github";
 
 export type PermissionMode = string;
 export const OPEN_PERMISSION_MODE = "open";
@@ -132,7 +128,7 @@ const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareReq
 
     if(request.oauthProvider !== undefined) {
         out.authScheme = AUTH_SCHEME_OAUTH;
-        out.oauthProvider = toApiOauthProvider(request.oauthProvider);
+        out.oauthProvider = request.oauthProvider;
         out.oauthEmailDomains = request.oauthEmailAddressPatterns;
         out.oauthAuthorizationCheckInterval = request.oauthAuthorizationCheckInterval;
 
@@ -160,17 +156,6 @@ const toApiBackendMode = (mode: BackendMode): ShareRequestBackendModeEnum | unde
             return ShareRequestBackendModeEnum.TcpTunnel;
         case UDP_TUNNEL_BACKEND_MODE:
             return ShareRequestBackendModeEnum.UdpTunnel;
-        default:
-            return undefined;
-    }
-}
-
-const toApiOauthProvider = (provider: OauthProvider): ShareRequestOauthProviderEnum | undefined => {
-    switch(provider) {
-        case OAUTH_PROVIDER_GITHUB:
-            return ShareRequestOauthProviderEnum.Github;
-        case OAUTH_PROVIDER_GOOGLE:
-            return ShareRequestOauthProviderEnum.Google;
         default:
             return undefined;
     }

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.0
+
+FEATURE: Rewritten and improved `publicProxy` package (`zrok access public`), with support for extensible OAuth-compliant identity providers. The `publicProxy` configuration now supports any number of configured OAuth-compliant providers (rather than just a single `google` provider and/or a single `github` provider). Also includes a new OIDC-compliant generic IDP provider integration. Improvements to authentication flows and security all around. See the updated guide on using OAuth-based identity providers with the zrok public frontend (https://github.com/openziti/zrok/issues/968)
+
 ## v1.0.8
 
 FEATURE: New opt-in configuration item `superNetwork` which enables multiple data plane connections to the OpenZiti underlay, a separate control plane connection, enabling SDK-based flow control. To opt-in use `zrok config set superNetwork true` in each environment, or set the `ZROK_SUPER_NETWORK` environment variable to `true` (https://github.com/openziti/zrok/issues/1010)

@@ -1,0 +1,15 @@
+[Unit]
+Description=zrok-ctrl
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/home/ubuntu/local/zrok/bin/zrok ctrl /home/ubuntu/local/etc/zrok.io/zrok-ctrl.yml
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+Environment="PFXLOG_NO_JSON=true"
+
+[Install]
+WantedBy=multi-user.target
