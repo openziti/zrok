@@ -1,3 +1,7 @@
+---
+sidebar_position: 10
+---
+
 # OAuth Public Frontend Configuration
 
 As of `v0.4.7`, `zrok` includes OAuth integration for both Google and GitHub for `zrok access public` public frontends. 
