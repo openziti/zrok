@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/hkdf"
 )
 
+// deriveKey uses HKDF to expand a "password" into a []byte to be used as a key; better than just a raw hash
 func deriveKey(keyString string, sz int) ([]byte, error) {
 	out := hkdf.New(sha256.New, []byte(keyString), nil, []byte("derived-key"))
 	key := make([]byte, sz)
@@ -18,6 +19,8 @@ func deriveKey(keyString string, sz int) ([]byte, error) {
 	return key, nil
 }
 
+// encryptToken uses AES-GCM (256) to encrypt tokens for inclusion in session tokens so that they're opaque outside of
+// the auth subsystem
 func encryptToken(token string, key []byte) (string, error) {
 	enc, err := jose.NewEncrypter(
 		jose.A256GCM,
