@@ -177,7 +177,17 @@ func (c *githubConfigurer) configure() error {
 		} else {
 			refreshInterval = i
 		}
-		setSessionCookie(w, c.cfg, false, primaryEmail, tokens.AccessToken, "github", refreshInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, sessionCookieRequest{
+			cfg:             c.cfg,
+			supportsRefresh: false,
+			email:           primaryEmail,
+			accessToken:     tokens.AccessToken,
+			provider:        "github",
+			refreshInterval: refreshInterval,
+			signingKey:      signingKey,
+			encryptionKey:   encryptionKey,
+			targetHost:      token.Claims.(*IntermediateJWT).Host,
+		})
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(getEmail, provider))

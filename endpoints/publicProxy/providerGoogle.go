@@ -157,7 +157,17 @@ func (c *googleConfigurer) configure() error {
 		} else {
 			refreshInterval = i
 		}
-		setSessionCookie(w, c.cfg, false, rDat.Email, tokens.AccessToken, "google", refreshInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, sessionCookieRequest{
+			cfg:             c.cfg,
+			supportsRefresh: false,
+			email:           rDat.Email,
+			accessToken:     tokens.AccessToken,
+			provider:        "google",
+			refreshInterval: refreshInterval,
+			signingKey:      signingKey,
+			encryptionKey:   encryptionKey,
+			targetHost:      token.Claims.(*IntermediateJWT).Host,
+		})
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))

@@ -117,7 +117,6 @@ func (c *oidcConfigurer) configure() error {
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}
-		logrus.Infof("invoking auth handler")
 		rp.AuthURLHandler(state, provider, urlOptions...).ServeHTTP(w, r)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/login", c.oidcCfg.Name), auth)
@@ -134,8 +133,6 @@ func (c *oidcConfigurer) configure() error {
 			proxyUi.WriteUnauthorized(w)
 			return
 		}
-
-		logrus.Infof("refreshing for '%v'", targetHost)
 
 		cookie, err := r.Cookie(c.cfg.CookieName)
 		if err != nil {
@@ -174,7 +171,18 @@ func (c *oidcConfigurer) configure() error {
 			return
 		}
 
-		setSessionCookie(w, c.cfg, true, claims.Email, newTokens.AccessToken, c.oidcCfg.Name, claims.RefreshInterval, signingKey, encryptionKey, targetHost)
+		setSessionCookie(w, sessionCookieRequest{
+			cfg:             c.cfg,
+			supportsRefresh: true,
+			email:           claims.Email,
+			accessToken:     newTokens.AccessToken,
+			provider:        c.oidcCfg.Name,
+			refreshInterval: claims.RefreshInterval,
+			signingKey:      signingKey,
+			encryptionKey:   encryptionKey,
+			targetHost:      targetHost,
+		})
+
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.oidcCfg.Name), refresh)
@@ -194,7 +202,17 @@ func (c *oidcConfigurer) configure() error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		setSessionCookie(w, c.cfg, true, info.Email, tokens.AccessToken, c.oidcCfg.Name, refreshInterval, signingKey, encryptionKey, token.Claims.(*IntermediateJWT).Host)
+		setSessionCookie(w, sessionCookieRequest{
+			cfg:             c.cfg,
+			supportsRefresh: true,
+			email:           info.Email,
+			accessToken:     tokens.AccessToken,
+			provider:        c.oidcCfg.Name,
+			refreshInterval: refreshInterval,
+			signingKey:      signingKey,
+			encryptionKey:   encryptionKey,
+			targetHost:      token.Claims.(*IntermediateJWT).Host,
+		})
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))

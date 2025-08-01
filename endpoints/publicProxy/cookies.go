@@ -10,17 +10,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh bool, email, accessToken, provider string, refreshInterval time.Duration, signingKey []byte, encryptionKey []byte, targetHost string) {
-	targetHost = strings.TrimSpace(targetHost)
+type sessionCookieRequest struct {
+	cfg             *OauthConfig
+	supportsRefresh bool
+	email           string
+	accessToken     string
+	provider        string
+	refreshInterval time.Duration
+	signingKey      []byte
+	encryptionKey   []byte
+	targetHost      string
+}
+
+func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
+	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
 		logrus.Error("targetHost claim must not be empty")
 		proxyUi.WriteUnauthorized(w)
 		return
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
-	logrus.Debugf("setting zrok-access cookie JWT audience '%s'", targetHost)
 
-	encryptedAccessToken, err := encryptToken(accessToken, encryptionKey)
+	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
 		logrus.Errorf("failed to encrypt access token: %v", err)
 		proxyUi.WriteUnauthorized(w)
@@ -28,18 +39,18 @@ func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh b
 	}
 
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
-		Email:           email,
+		Email:           req.email,
 		AccessToken:     encryptedAccessToken,
-		SupportsRefresh: supportsRefresh,
-		Provider:        provider,
+		SupportsRefresh: req.supportsRefresh,
+		Provider:        req.provider,
 		TargetHost:      targetHost,
-		RefreshInterval: refreshInterval,
-		NextRefresh:     time.Now().Add(refreshInterval),
+		RefreshInterval: req.refreshInterval,
+		NextRefresh:     time.Now().Add(req.refreshInterval),
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.SessionLifetime)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(req.cfg.SessionLifetime)),
 		},
 	})
-	sTkn, err := tkn.SignedString(signingKey)
+	sTkn, err := tkn.SignedString(req.signingKey)
 	if err != nil {
 		logrus.Errorf("error signing jwt: %v", err)
 		proxyUi.WriteUnauthorized(w)
@@ -47,28 +58,22 @@ func setSessionCookie(w http.ResponseWriter, cfg *OauthConfig, supportsRefresh b
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    cfg.CookieName,
+		Name:    req.cfg.CookieName,
 		Value:   sTkn,
-		MaxAge:  int(cfg.SessionLifetime.Seconds()),
-		Domain:  cfg.CookieDomain,
+		MaxAge:  int(req.cfg.SessionLifetime.Seconds()),
+		Domain:  req.cfg.CookieDomain,
 		Path:    "/",
-		Expires: time.Now().Add(cfg.SessionLifetime),
+		Expires: time.Now().Add(req.cfg.SessionLifetime),
 		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	})
 }
 
+// filterSessionCookies strips out the configured session cookie and also any `pkce` cookie
 func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *Config) {
-	// Get all cookies from the request
 	cookies := r.Cookies()
-	// Clear the Cookie header
 	r.Header.Del("Cookie")
-	// Save cookies not in the list of cookies to delete, the pkce cookie might be okay to pass along to the HTTP
-	// backend, but zrok-access is not because it can contain the accessToken from any other OAuth enabled shares, so we
-	// delete it here when the current share is not OAuth-enabled. OAuth-enabled shares check the audience claim in the
-	// JWT to ensure it matches the requested share and will send the client back to the OAuth provider if it does not
-	// match.
 	for _, cookie := range cookies {
 		if cfg.Oauth != nil && cfg.Oauth.CookieName == cookie.Name {
 			continue

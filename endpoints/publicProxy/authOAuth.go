@@ -80,22 +80,22 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 
 	claims := tkn.Claims.(*zrokClaims)
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
-		logrus.Error("token validation failed; restarting auth flow")
+		logrus.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
 	if time.Now().After(claims.NextRefresh) {
 		if claims.SupportsRefresh {
-			logrus.Warnf("oauth session expired; refreshing tokens (target: '%v')", target)
+			logrus.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
 			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
 		} else {
-			logrus.Warnf("oauth session expired; re-login (target: '%v')", target)
+			logrus.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
 		return false
 	} else {
-		logrus.Infof("%v until next refresh", time.Until(claims.NextRefresh))
+		logrus.Debugf("%v until next refresh", time.Until(claims.NextRefresh))
 	}
 
 	r.Header.Set("zrok-auth-provider", provider)
