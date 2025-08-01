@@ -88,7 +88,7 @@ const config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: '1.0',
+              label: '1.1',
             },
           },
 
