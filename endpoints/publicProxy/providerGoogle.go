@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
@@ -88,17 +89,19 @@ func (c *googleConfigurer) configure() error {
 
 	auth := func(provider rp.RelyingParty) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			host, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
+			targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
-				logrus.Errorf("unable to unescape target host: %v", err)
+				logrus.Errorf("unable to unescape targetHost: %v", err)
+				proxyUi.WriteUnauthorized(w)
+				return
 			}
 			rp.AuthURLHandler(func() string {
 				id := uuid.New().String()
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
-					id,
-					host,
-					r.URL.Query().Get("refreshInterval"),
-					jwt.RegisteredClaims{
+					State:           id,
+					TargetHost:      targetHost,
+					RefreshInterval: r.URL.Query().Get("refreshInterval"),
+					RegisteredClaims: jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
 						NotBefore: jwt.NewNumericDate(time.Now()),
@@ -117,11 +120,29 @@ func (c *googleConfigurer) configure() error {
 	}
 	http.Handle("/google/login", auth(provider))
 
-	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
+	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
+		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
+			return signingKey, nil
+		})
+		if err != nil {
+			logrus.Errorf("after intermediate token parse: %v", err.Error())
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
+		var refreshInterval time.Duration
+		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
+			refreshInterval = v
+		} else {
+			logrus.Errorf("unable to parse authorization check interval: %v", err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
 		resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + url.QueryEscape(tokens.AccessToken))
 		if err != nil {
 			logrus.Errorf("error getting user info from google: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
 		defer func() {
@@ -130,32 +151,16 @@ func (c *googleConfigurer) configure() error {
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
 			logrus.Errorf("error reading response body: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
-		logrus.Infof("response from google userinfo endpoint: %s", string(response))
+		logrus.Debugf("response from google userinfo endpoint: %s", string(response))
 		data := googleOauthEmailResp{}
 		err = json.Unmarshal(response, &data)
 		if err != nil {
 			logrus.Errorf("error unmarshalling google oauth response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
-		}
-
-		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
-			return signingKey, nil
-		})
-		if err != nil {
-			http.Error(w, fmt.Sprintf("After intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
-			return
-		}
-
-		refreshInterval := 3 * time.Hour
-		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval)
-		if err != nil {
-			logrus.Errorf("unable to parse authorization check interval: %v. Defaulting to 3 hours", err)
-		} else {
-			refreshInterval = i
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
@@ -167,12 +172,12 @@ func (c *googleConfigurer) configure() error {
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).Host,
+			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
 		})
 
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
-	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))
+	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(login, provider))
 
 	logrus.Info("configured google provider at '/google'")
 

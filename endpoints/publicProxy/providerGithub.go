@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v3/pkg/http"
@@ -90,17 +91,19 @@ func (c *githubConfigurer) configure() error {
 
 	auth := func(provider rp.RelyingParty) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			host, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
+			targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
-				logrus.Errorf("unable to unescape target host: %v", err)
+				logrus.Errorf("unable to unescape targetHost: %v", err)
+				proxyUi.WriteUnauthorized(w)
+				return
 			}
 			rp.AuthURLHandler(func() string {
 				id := uuid.New().String()
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
-					id,
-					host,
-					r.URL.Query().Get("refreshInterval"),
-					jwt.RegisteredClaims{
+					State:           id,
+					TargetHost:      targetHost,
+					RefreshInterval: r.URL.Query().Get("refreshInterval"),
+					RegisteredClaims: jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
 						NotBefore: jwt.NewNumericDate(time.Now()),
@@ -120,9 +123,28 @@ func (c *githubConfigurer) configure() error {
 	http.Handle("/github/login", auth(provider))
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
+		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
+			return signingKey, nil
+		})
+		if err != nil {
+			logrus.Errorf("error parsing intermediate token: %v", err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
+		var refreshInterval time.Duration
+		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
+			refreshInterval = v
+		} else {
+			logrus.Errorf("unable to parse authorization check interval: %v", err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
 		parsedUrl, err := url.Parse("https://api.github.com/user/emails")
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logrus.Errorf("unable to parse api.github.com url: %v", err)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
 		req := &http.Request{
@@ -134,7 +156,7 @@ func (c *githubConfigurer) configure() error {
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			logrus.Errorf("error getting user info from github: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
 		defer func() {
@@ -143,14 +165,14 @@ func (c *githubConfigurer) configure() error {
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
 			logrus.Errorf("error reading response body: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
 		var rDat []githubUserResp
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
 			logrus.Errorf("error unmarshalling github oauth response: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			proxyUi.WriteUnauthorized(w)
 			return
 		}
 
@@ -162,22 +184,6 @@ func (c *githubConfigurer) configure() error {
 			}
 		}
 
-		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
-			return signingKey, nil
-		})
-		if err != nil {
-			http.Error(w, fmt.Sprintf("after intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
-			return
-		}
-
-		refreshInterval := 3 * time.Hour
-		i, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval)
-		if err != nil {
-			logrus.Errorf("unable to parse authorization check interval: %v. Defaulting to 3 hours", err)
-		} else {
-			refreshInterval = i
-		}
-
 		setSessionCookie(w, sessionCookieRequest{
 			cfg:             c.cfg,
 			supportsRefresh: false,
@@ -187,10 +193,10 @@ func (c *githubConfigurer) configure() error {
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).Host,
+			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
 		})
 
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
 	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(login, provider))
 
