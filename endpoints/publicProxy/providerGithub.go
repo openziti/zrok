@@ -38,6 +38,7 @@ func newGithubConfigurer(cfg *OauthConfig, tls bool, v map[string]interface{}) (
 }
 
 type githubConfig struct {
+	Name         string `mapstructure:"name"`
 	ClientId     string `mapstructure:"client_id"`
 	ClientSecret string `mapstructure:"client_secret"`
 }
@@ -69,7 +70,7 @@ func (c *githubConfigurer) configure() error {
 	rpConfig := &oauth2.Config{
 		ClientID:     c.githubCfg.ClientId,
 		ClientSecret: c.githubCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/github/auth/callback", c.cfg.EndpointUrl),
+		RedirectURL:  fmt.Sprintf("%v/%v/auth/callback", c.cfg.EndpointUrl, c.githubCfg.Name),
 		Scopes:       []string{"user:email"},
 		Endpoint:     githubOAuth.Endpoint,
 	}
@@ -120,7 +121,7 @@ func (c *githubConfigurer) configure() error {
 			}, provider, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
 		}
 	}
-	http.Handle("/github/login", auth(provider))
+	http.Handle(fmt.Sprintf("/%v/login", c.githubCfg.Name), auth(provider))
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
@@ -189,7 +190,7 @@ func (c *githubConfigurer) configure() error {
 			supportsRefresh: false,
 			email:           primaryEmail,
 			accessToken:     tokens.AccessToken,
-			provider:        "github",
+			provider:        c.githubCfg.Name,
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
@@ -198,9 +199,9 @@ func (c *githubConfigurer) configure() error {
 
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
-	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(login, provider))
+	http.Handle(fmt.Sprintf("/%v/auth/callback", c.githubCfg.Name), rp.CodeExchangeHandler(login, provider))
 
-	logrus.Info("configured github provider at '/github")
+	logrus.Infof("configured github provider at '/%v", c.githubCfg.Name)
 
 	return nil
 }

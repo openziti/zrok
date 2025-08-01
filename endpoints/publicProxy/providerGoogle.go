@@ -38,6 +38,7 @@ func newGoogleConfigurer(cfg *OauthConfig, tls bool, v map[string]interface{}) (
 }
 
 type googleConfig struct {
+	Name         string `mapstructure:"name"`
 	ClientId     string `mapstructure:"client_id"`
 	ClientSecret string `mapstructure:"client_secret"`
 }
@@ -69,7 +70,7 @@ func (c *googleConfigurer) configure() error {
 	rpConfig := &oauth2.Config{
 		ClientID:     c.googleCfg.ClientId,
 		ClientSecret: c.googleCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/google/auth/callback", c.cfg.EndpointUrl),
+		RedirectURL:  fmt.Sprintf("%v/%v/auth/callback", c.cfg.EndpointUrl, c.googleCfg.Name),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     googleOauth.Endpoint,
 	}
@@ -118,7 +119,7 @@ func (c *googleConfigurer) configure() error {
 			}, provider, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
 		}
 	}
-	http.Handle("/google/login", auth(provider))
+	http.Handle(fmt.Sprintf("/%v/login", c.googleCfg.Name), auth(provider))
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
@@ -168,7 +169,7 @@ func (c *googleConfigurer) configure() error {
 			supportsRefresh: false,
 			email:           data.Email,
 			accessToken:     tokens.AccessToken,
-			provider:        "google",
+			provider:        c.googleCfg.Name,
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
@@ -177,9 +178,9 @@ func (c *googleConfigurer) configure() error {
 
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
-	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(login, provider))
+	http.Handle(fmt.Sprintf("/%v/auth/callback", c.googleCfg.Name), rp.CodeExchangeHandler(login, provider))
 
-	logrus.Info("configured google provider at '/google'")
+	logrus.Infof("configured google provider at '/%v'", c.googleCfg.Name)
 
 	return nil
 }
