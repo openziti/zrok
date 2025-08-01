@@ -119,7 +119,7 @@ func (c *githubConfigurer) configure() error {
 	}
 	http.Handle("/github/login", auth(provider))
 
-	getEmail := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
+	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		parsedUrl, err := url.Parse("https://api.github.com/user/emails")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -166,7 +166,7 @@ func (c *githubConfigurer) configure() error {
 			return signingKey, nil
 		})
 		if err != nil {
-			http.Error(w, fmt.Sprintf("After intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("after intermediate token parse: %v", err.Error()), http.StatusInternalServerError)
 			return
 		}
 
@@ -177,6 +177,7 @@ func (c *githubConfigurer) configure() error {
 		} else {
 			refreshInterval = i
 		}
+
 		setSessionCookie(w, sessionCookieRequest{
 			cfg:             c.cfg,
 			supportsRefresh: false,
@@ -188,9 +189,10 @@ func (c *githubConfigurer) configure() error {
 			encryptionKey:   encryptionKey,
 			targetHost:      token.Claims.(*IntermediateJWT).Host,
 		})
+
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
-	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(getEmail, provider))
+	http.Handle("/github/auth/callback", rp.CodeExchangeHandler(login, provider))
 
 	logrus.Info("configured github provider at '/github")
 

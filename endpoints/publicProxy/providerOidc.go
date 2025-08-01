@@ -40,6 +40,7 @@ type oidcConfig struct {
 	ClientSecret string   `mapstructure:"client_secret"`
 	Scopes       []string `mapstructure:"scopes"`
 	Issuer       string   `mapstructure:"issuer"`
+	DiscoveryURL string   `mapstructure:"discovery_url"`
 	Pkce         bool     `mapstructure:"pkce"`
 }
 
@@ -70,6 +71,9 @@ func (c *oidcConfigurer) configure() error {
 	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
+	}
+	if c.oidcCfg.DiscoveryURL != "" {
+		rp.WithCustomDiscoveryUrl(c.oidcCfg.DiscoveryURL)
 	}
 	provider, err := rp.NewRelyingPartyOIDC(
 		context.TODO(),
@@ -202,6 +206,7 @@ func (c *oidcConfigurer) configure() error {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		setSessionCookie(w, sessionCookieRequest{
 			cfg:             c.cfg,
 			supportsRefresh: true,
@@ -213,6 +218,7 @@ func (c *oidcConfigurer) configure() error {
 			encryptionKey:   encryptionKey,
 			targetHost:      token.Claims.(*IntermediateJWT).Host,
 		})
+
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))

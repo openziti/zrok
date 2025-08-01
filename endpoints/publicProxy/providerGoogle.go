@@ -134,8 +134,8 @@ func (c *googleConfigurer) configure() error {
 			return
 		}
 		logrus.Infof("response from google userinfo endpoint: %s", string(response))
-		rDat := googleOauthEmailResp{}
-		err = json.Unmarshal(response, &rDat)
+		data := googleOauthEmailResp{}
+		err = json.Unmarshal(response, &data)
 		if err != nil {
 			logrus.Errorf("error unmarshalling google oauth response: %v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -157,10 +157,11 @@ func (c *googleConfigurer) configure() error {
 		} else {
 			refreshInterval = i
 		}
+
 		setSessionCookie(w, sessionCookieRequest{
 			cfg:             c.cfg,
 			supportsRefresh: false,
-			email:           rDat.Email,
+			email:           data.Email,
 			accessToken:     tokens.AccessToken,
 			provider:        "google",
 			refreshInterval: refreshInterval,
@@ -168,6 +169,7 @@ func (c *googleConfigurer) configure() error {
 			encryptionKey:   encryptionKey,
 			targetHost:      token.Claims.(*IntermediateJWT).Host,
 		})
+
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).Host), http.StatusFound)
 	}
 	http.Handle("/google/auth/callback", rp.CodeExchangeHandler(getEmail, provider))
