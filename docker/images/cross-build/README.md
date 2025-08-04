@@ -21,8 +21,16 @@ Executing the following `docker run` command will:
 3. Deposit built executable in `./dist/`
 
 ```bash
-# cross-build for arm64/aarch64 architecture on Linux
-docker run --user "${UID}" --rm --volume=${HOME}/.cache/go-build:/usr/share/go --volume "${PWD}:/mnt" zrok-builder arm64
+# cross-build for arm64/aarch64 architecture on Linux with module and build caches from host
+docker run \
+--user $(id -u):$(id -g) \
+--rm \
+--volume $PWD:/mnt \
+--env="GOCACHE=/.cache/go-build" \
+--volume="${HOME}/.cache/go-build:/.cache/go-build" \
+--env="GOMODCACHE=/go/pkg/mod" \
+--volume="${HOME}/go/pkg/mod:/go/pkg/mod" \
+zrok-builder arm64
 ```
 
 You will find the built artifacts in `./dist/`.
