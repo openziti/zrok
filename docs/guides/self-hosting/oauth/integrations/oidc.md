@@ -16,7 +16,7 @@ Your OIDC provider must support:
 ## Configure OIDC Provider
 
 1. Create a new OAuth/OIDC client in your provider's admin interface
-2. Set the **redirect URI** to: `https://your-oauth-frontend-domain:port/oidc/oauth`
+2. Set the **redirect URI** to: `https://your-oauth-frontend-domain:port/<provider-name>/auth/callback`
 3. Configure required scopes: `openid`, `email`, `profile`
 4. Note the **client ID**, **client secret**, and **issuer URL**
 
@@ -70,7 +70,12 @@ issuer: "https://your-domain.okta.com/oauth2/default"
 
 ## Redirect URL Format
 
-For OIDC providers, the redirect URL should be:
+For OIDC providers, the redirect URL should use your configured provider name:
 ```
-https://your-oauth-frontend-domain:port/oidc/oauth
+https://your-oauth-frontend-domain:port/<provider-name>/auth/callback
+```
+
+For example, with the provider name `"my-oidc-provider"`:
+```
+https://your-oauth-frontend-domain:port/my-oidc-provider/auth/callback
 ```

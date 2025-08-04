@@ -42,7 +42,7 @@ Choose **Web Application**:
 
 ![](../images/google_create_credentials_3.png)
 
-Configure the **Authorized redirect URIs** to match your OAuth frontend address with `/google/oauth` appended:
+Configure the **Authorized redirect URIs** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended:
 
 ![](../images/google_create_credentials_4.png)
 
@@ -63,7 +63,12 @@ oauth:
 
 ## Redirect URL Format
 
-For Google OAuth, the redirect URL should be:
+For Google OAuth with the provider name `"google"`, the redirect URL should be:
 ```
-https://your-oauth-frontend-domain:port/google/oauth
+https://your-oauth-frontend-domain:port/google/auth/callback
+```
+
+If you use a different provider name (e.g., `"google-corp"`), the URL would be:
+```
+https://your-oauth-frontend-domain:port/google-corp/auth/callback
 ```

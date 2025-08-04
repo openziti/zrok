@@ -71,6 +71,64 @@ For detailed setup instructions for each provider type, see:
 - [GitHub OAuth Setup](integrations/github.md)  
 - [Generic OIDC Setup](integrations/oidc.md)
 
+## OAuth Identity Flow
+
+When a user accesses a zrok public share protected with OAuth, the following flow occurs:
+
+```mermaid
+sequenceDiagram
+    participant User as User Browser
+    participant Share as zrok Public Share
+    participant OAuth as zrok OAuth Frontend
+    participant Provider as OAuth Provider<br/>(Google/GitHub/OIDC)
+
+    Note over User, Provider: OAuth Identity Flow for zrok Public Shares
+
+    User->>Share: 1. Initial Access<br/>GET /share-url
+    Share->>Share: 2. Authentication Check<br/>Validate session cookie
+    
+    alt No valid session
+        Share->>User: 3. Redirect to Provider<br/>302 to OAuth provider login
+        User->>Provider: 4. User Authentication<br/>Login with credentials
+        Provider->>OAuth: 5. Provider Callback<br/>GET /<provider-name>/auth/callback?code=xyz
+        OAuth->>Provider: 6. Token Exchange<br/>POST /token (exchange code for tokens)
+        Provider->>OAuth: Return access token + user info
+        OAuth->>OAuth: 7. Email Validation<br/>Check email against patterns
+        
+        alt Email validation passes
+            OAuth->>OAuth: 8. Session Creation<br/>Create session + set cookie
+            OAuth->>User: 9. Final Redirect<br/>302 back to original share URL
+            User->>Share: 10. Access Granted<br/>GET /share-url (with valid session)
+            Share->>User: Return protected content
+        else Email validation fails
+            OAuth->>User: Access Denied<br/>403 Forbidden
+        end
+    else Valid session exists
+        Share->>User: Direct Access<br/>Return protected content
+    end
+
+    Note over User, Provider: Session remains valid for configured session_lifetime
+```
+
+### Flow Steps
+
+1. **Initial Access**: User visits the zrok public share URL
+2. **Authentication Check**: zrok checks for a valid authentication session cookie
+3. **Redirect to Provider**: If no valid session exists, user is redirected to the configured OAuth provider's login page
+4. **User Authentication**: User authenticates with their OAuth provider (Google, GitHub, etc.)
+5. **Provider Callback**: OAuth provider redirects back to zrok's OAuth frontend at `/<provider-name>/auth/callback`
+6. **Token Exchange**: zrok exchanges the authorization code for access tokens and retrieves user information
+7. **Email Validation**: zrok validates the user's email address against any configured `--oauth-email-address-patterns`
+8. **Session Creation**: If validation passes, zrok creates an authenticated session and sets a session cookie
+9. **Final Redirect**: User is redirected back to the original zrok share URL
+10. **Access Granted**: User can now access the protected resource
+
+### Session Management
+
+- **Session Duration**: Controlled by the `session_lifetime` configuration (default: 6h)
+- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached
+- **Cross-Domain**: Sessions work across all shares within the same `cookie_domain`
+
 ## Using OAuth with Public Shares
 
 Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these command line options:

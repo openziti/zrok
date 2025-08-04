@@ -14,7 +14,7 @@ Navigate to your GitHub account settings: **Settings > Developer Settings > OAut
 
 ![](../images/github_create_oauth_application_2.png)
 
-Configure the **Authorization callback URL** to match your OAuth frontend address with `/github/oauth` appended:
+Configure the **Authorization callback URL** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended:
 
 ![](../images/github_create_oauth_application_3.png)
 
@@ -39,7 +39,12 @@ oauth:
 
 ## Redirect URL Format
 
-For GitHub OAuth, the redirect URL should be:
+For GitHub OAuth with the provider name `"github"`, the redirect URL should be:
 ```
-https://your-oauth-frontend-domain:port/github/oauth
+https://your-oauth-frontend-domain:port/github/auth/callback
+```
+
+If you use a different provider name (e.g., `"gh-enterprise"`), the URL would be:
+```
+https://your-oauth-frontend-domain:port/gh-enterprise/auth/callback
 ```
