@@ -126,8 +126,8 @@ sequenceDiagram
 ### Session Management
 
 - **Session Duration**: Controlled by the `session_lifetime` configuration (default: 6h)
-- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached
-- **Cross-Domain**: Sessions work across all shares within the same `cookie_domain`
+- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than provoking the user to re-authenticate
+- **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider 
 
 ## Using OAuth with Public Shares
 
