@@ -118,7 +118,7 @@ sequenceDiagram
 4. **User Authentication**: User authenticates with their OAuth provider (Google, GitHub, etc.)
 5. **Provider Callback**: OAuth provider redirects back to zrok's OAuth frontend at `/<provider-name>/auth/callback`
 6. **Token Exchange**: zrok exchanges the authorization code for access tokens and retrieves user information
-7. **Email Validation**: zrok validates the user's email address against any configured `--oauth-email-address-patterns`
+7. **Email Validation**: zrok validates the user's email address against any configured `--oauth-email-address-pattern` instances
 8. **Session Creation**: If validation passes, zrok creates an authenticated session and sets a session cookie
 9. **Final Redirect**: User is redirected back to the original zrok share URL
 10. **Access Granted**: User can now access the protected resource
@@ -134,7 +134,7 @@ sequenceDiagram
 Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these command line options:
 
 - **`--oauth-provider <name>`**: Enable OAuth using the specified provider name from your configuration
-- **`--oauth-email-address-patterns <pattern>`**: Restrict access to email addresses matching the glob pattern (use multiple times for multiple patterns)
+- **`--oauth-email-address-pattern <pattern>`**: Restrict access to email addresses matching the glob pattern (use multiple times for multiple patterns)
 - **`--oauth-check-interval <duration>`**: How often to re-verify authentication (default: 3h)
 
 ### Example
@@ -142,8 +142,8 @@ Once your public frontend is configured with OAuth providers, you can enable aut
 ```bash
 zrok share public --backend-mode web \
   --oauth-provider google \
-  --oauth-email-address-patterns '*@example.com' \
-  --oauth-email-address-patterns 'admin@*' \
+  --oauth-email-address-pattern '*@example.com' \
+  --oauth-email-address-pattern 'admin@*' \
   ~/public
 ```
 
