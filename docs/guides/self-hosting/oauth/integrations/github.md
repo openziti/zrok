@@ -10,17 +10,17 @@ This guide covers setting up GitHub OAuth for your zrok public frontend.
 
 Navigate to your GitHub account settings: **Settings > Developer Settings > OAuth Apps > Register a new application**
 
-![](../images/github_create_oauth_application_1.png)
+![](images/github_create_oauth_application_1.png)
 
-![](../images/github_create_oauth_application_2.png)
+![](images/github_create_oauth_application_2.png)
 
 Configure the **Authorization callback URL** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended:
 
-![](../images/github_create_oauth_application_3.png)
+![](images/github_create_oauth_application_3.png)
 
 Create a new client secret:
 
-![](../images/github_create_oauth_application_4.png)
+![](images/github_create_oauth_application_4.png)
 
 Save the client ID and client secret for your frontend configuration.
 

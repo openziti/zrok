@@ -12,39 +12,39 @@ Before configuring an OAuth Client ID, you must configure the "OAuth consent scr
 
 Navigate to: **APIs & Services > Credentials > OAuth consent screen**
 
-![](../images/google_oauth_content_screen_2.png)
+![](images/google_oauth_content_screen_2.png)
 
 Configure your zrok public frontend's identity and branding:
 
-![](../images/google_oauth_content_screen_3.png)
+![](images/google_oauth_content_screen_3.png)
 
 Add authorized domains and contact information:
 
-![](../images/google_oauth_content_screen_4.png)
+![](images/google_oauth_content_screen_4.png)
 
 Add the `../auth/userinfo.email` scope (required for zrok to receive user email addresses):
 
-![](../images/google_oauth_content_screen_5.png)
+![](images/google_oauth_content_screen_5.png)
 
-![](../images/google_oauth_content_screen_6.png)
+![](images/google_oauth_content_screen_6.png)
 
 ## Create OAuth 2.0 Client ID
 
 Navigate to: **APIs & Services > Credentials > + Create Credentials**
 
-![](../images/google_create_credentials_1.png)
+![](images/google_create_credentials_1.png)
 
 Select **OAuth client ID**:
 
-![](../images/google_create_credentials_2.png)
+![](images/google_create_credentials_2.png)
 
 Choose **Web Application**:
 
-![](../images/google_create_credentials_3.png)
+![](images/google_create_credentials_3.png)
 
 Configure the **Authorized redirect URIs** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended:
 
-![](../images/google_create_credentials_4.png)
+![](images/google_create_credentials_4.png)
 
 Save the client ID and client secret for your frontend configuration.
 
