@@ -18,8 +18,8 @@ Add an `oauth` section to your frontend configuration:
 
 ```yaml
 oauth:
-  bind_address:               "127.0.0.1:8181"
-  endpoint_url:               "https://oauth.your-domain.com:8181"
+  bind_address:               "192.168.1.100:443"
+  endpoint_url:               "https://oauth.your-domain.com"
   cookie_name:                "zrok-auth-session"
   cookie_domain:              "your-domain.com"
   session_lifetime:           "6h"
@@ -174,13 +174,13 @@ When a user accesses the logout endpoint, zrok performs the following actions:
 
 ##### Basic Logout
 ```
-GET https://oauth.your-domain.com:8181/google/logout
+GET https://oauth.your-domain.com/google/logout
 ```
 This logs the user out and redirects them to the Google OAuth login page.
 
 ##### Logout with Custom Redirect
 ```
-GET https://oauth.your-domain.com:8181/github/logout?redirect_url=https://example.com/goodbye
+GET https://oauth.your-domain.com/github/logout?redirect_url=https://example.com/goodbye
 ```
 This logs the user out and redirects them to `https://example.com/goodbye`.
 
