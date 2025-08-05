@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -200,6 +201,82 @@ func (c *githubConfigurer) configure() error {
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.githubCfg.Name), rp.CodeExchangeHandler(login, provider))
+
+	logout := func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie(c.cfg.CookieName)
+		if err == nil {
+			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+				return signingKey, nil
+			})
+			if err == nil {
+				claims := tkn.Claims.(*zrokClaims)
+				if claims.Provider == c.githubCfg.Name {
+					accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
+					if err == nil {
+						req, err := http.NewRequest("DELETE",
+							fmt.Sprintf("https://api.github.com/applications/%s/token", c.githubCfg.ClientId),
+							strings.NewReader(fmt.Sprintf(`{"access_token":"%s"}`, accessToken)))
+						if err != nil {
+							logrus.Errorf("error creating token delete request for '%v': %v", claims.Email, err)
+							proxyUi.WriteUnauthorized(w)
+							return
+						}
+
+						req.Header.Set("Content-Type", "application/json")
+						req.SetBasicAuth(c.githubCfg.ClientId, c.githubCfg.ClientSecret) // Need client credentials
+
+						resp, err := http.DefaultClient.Do(req)
+						if err != nil {
+							logrus.Errorf("error invoking token delete request for '%v': %v", claims.Email, err)
+							proxyUi.WriteUnauthorized(w)
+							return
+						}
+						defer resp.Body.Close()
+
+						if resp.StatusCode == http.StatusNoContent {
+							logrus.Infof("revoked github token for '%v'", claims.Email)
+						} else {
+							logrus.Errorf("token revocation failed with status: %v", resp.StatusCode)
+							proxyUi.WriteUnauthorized(w)
+							return
+						}
+					} else {
+						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						proxyUi.WriteUnauthorized(w)
+						return
+					}
+				} else {
+					logrus.Errorf("expected provider name '%v' got '%v'", c.githubCfg.Name, claims.Email)
+					proxyUi.WriteUnauthorized(w)
+					return
+				}
+			} else {
+				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				proxyUi.WriteUnauthorized(w)
+				return
+			}
+		} else {
+			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     c.cfg.CookieName,
+			Value:    "",
+			MaxAge:   -1,
+			Domain:   c.cfg.CookieDomain,
+			Path:     "/",
+			HttpOnly: true,
+		})
+
+		redirectURL := r.URL.Query().Get("redirect_url")
+		if redirectURL == "" {
+			redirectURL = fmt.Sprintf("%s/%s/login", c.cfg.EndpointUrl, c.githubCfg.Name)
+		}
+		http.Redirect(w, r, redirectURL, http.StatusFound)
+	}
+	http.HandleFunc(fmt.Sprintf("/%v/logout", c.githubCfg.Name), logout)
 
 	logrus.Infof("configured github provider at '/%v", c.githubCfg.Name)
 
