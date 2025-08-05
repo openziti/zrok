@@ -151,6 +151,66 @@ zrok share public --backend-mode web \
 
 This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email addresses or any `admin@*` email address.
 
+## HTTP Headers for Proxied Requests
+
+When zrok successfully authenticates a user via OAuth, it automatically adds authentication headers to all proxied requests sent to your backend application. These headers allow your application to identify the authenticated user and make authorization decisions.
+
+### Authentication Headers
+
+zrok sets the following HTTP headers on every proxied request after successful OAuth authentication:
+
+- **`zrok-auth-provider`**: The name of the OAuth provider used for authentication (e.g., `google`, `github`, `custom-oidc`)
+- **`zrok-auth-email`**: The authenticated user's email address as provided by the OAuth provider
+- **`zrok-auth-expires`**: The timestamp when the authentication session will expire, formatted as RFC3339 (e.g., `2024-01-15T14:30:00Z`)
+
+### Example Usage in Backend Applications
+
+Your backend application can read these headers to implement user-specific logic:
+
+#### Python/Flask Example
+```python
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    provider = request.headers.get('zrok-auth-provider')
+    email = request.headers.get('zrok-auth-email')
+    expires = request.headers.get('zrok-auth-expires')
+    
+    return f"Welcome {email}! Authenticated via {provider}. Session expires: {expires}"
+```
+
+#### Go Example
+```go
+func handler(w http.ResponseWriter, r *http.Request) {
+    provider := r.Header.Get("zrok-auth-provider")
+    email := r.Header.Get("zrok-auth-email")
+    expires := r.Header.Get("zrok-auth-expires")
+    
+    fmt.Fprintf(w, "Welcome %s! Authenticated via %s. Session expires: %s", 
+                email, provider, expires)
+}
+```
+
+#### Node.js/Express Example
+```javascript
+app.get('/', (req, res) => {
+    const provider = req.headers['zrok-auth-provider'];
+    const email = req.headers['zrok-auth-email'];
+    const expires = req.headers['zrok-auth-expires'];
+    
+    res.send(`Welcome ${email}! Authenticated via ${provider}. Session expires: ${expires}`);
+});
+```
+
+### Security Considerations
+
+- **Trust Boundary**: These headers are only present when requests come through zrok's OAuth-protected frontend. Direct access to your backend would not include these headers.
+- **Header Validation**: Your application should validate that these headers are present when OAuth protection is expected.
+- **Session Expiration**: Use the `zrok-auth-expires` header to implement client-side session warnings or automatic logout.
+
 ## Logout Endpoint
 
 Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
