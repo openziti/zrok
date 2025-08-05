@@ -49,9 +49,11 @@ oauth:
 
 ### Configuration Parameters
 
+All of the following parmeters _must_ be specified in the frontend configuration. There are no defaults.
+
 - **`bind_address`**: IP and port where the OAuth frontend will listen (format: `ip:port`)
 - **`endpoint_url`**: Public base URL where OAuth redirects will be handled
-- **`cookie_name`**: Name for authentication cookies (optional, defaults to `zrok-auth-session`)
+- **`cookie_name`**: Name for authentication cookies (suggested to use `zrok-auth-session`)
 - **`cookie_domain`**: Domain where authentication cookies should be stored
 - **`session_lifetime`**: How long authentication sessions remain valid (e.g., `6h`, `24h`)
 - **`intermediate_lifetime`**: Lifetime for intermediate OAuth tokens (e.g., `5m`)
@@ -66,7 +68,7 @@ The `providers` array supports multiple OAuth configurations. Each provider requ
 - **`type`**: Provider type (`google`, `github`, or `oidc`)
 - **`client_id`** and **`client_secret`**: OAuth client credentials
 
-For detailed setup instructions for each provider type, see:
+Providers may also require additional configuration values. For detailed setup instructions for each provider type, see:
 - [Google OAuth Setup](integrations/google.md)
 - [GitHub OAuth Setup](integrations/github.md)  
 - [Generic OIDC Setup](integrations/oidc.md)
@@ -125,7 +127,7 @@ sequenceDiagram
 
 ### Session Management
 
-- **Session Duration**: Controlled by the `session_lifetime` configuration (default: 6h)
+- **Maximum Session Duration**: Controlled by the `session_lifetime` configuration
 - **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than provoking the user to re-authenticate
 - **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider 
 
@@ -151,7 +153,7 @@ This creates a public share that requires Google OAuth authentication and only a
 
 ## Logout Endpoint
 
-Each configured OAuth provider automatically exposes a logout endpoint at `/<provider-name>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
+Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
 
 ### Logout Process
 
@@ -187,4 +189,3 @@ This logs the user out and redirects them to `https://example.com/goodbye`.
 - The logout endpoint validates that the session belongs to the correct provider before proceeding
 - If token revocation fails with the OAuth provider, the logout process will still clear the local session
 - The logout process is idempotent - calling it multiple times or without an active session will not cause errors
-- For security, logout URLs should be used over HTTPS in production environments

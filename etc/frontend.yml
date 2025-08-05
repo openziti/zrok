@@ -2,7 +2,7 @@
 # configuration, the software will expect this field to be incremented. This protects you against invalid configuration
 # versions and will refer to you to the documentation when the configuration structure changes.
 #
-v: 3
+v: 4
 
 # Setting the `host_match` setting will cause a `zrok access public` to ignore `Host` headers that do not contain the
 # configured string. This will allow you to let a load balancer access the frontend by IP address for health check
@@ -32,38 +32,68 @@ v: 3
 # The OAuth configuration is used when enabling OAuth authentication with your public frontend.
 #
 #oauth:
-#  # `bind_address` is the <address:port> of the interface where the OAuth frontend listener should
-#  # bind
+#  # `bind_address` is the <address:port> of the interface where the frontend OAuth listener should bind
 #  #
 #  bind_address: 127.0.0.1:8181
 #
-#  # `redirect_url` is the <scheme://address[:port]> of the URL where OAuth requests should be directed.
+#  # `endpoint_url` is the <scheme://address[:port]> of the URL where OAuth requests should be directed.
 #  #
-#  redirect_url: https://oauth.zrok.io
+#  endpoint_url: https://oauth.zrok.io
+#
+#  # `cookie_name` is the name of the session cookie used to store authentication details
+#  #
+#  cookie_name: zrok-auth-session
 #
 #  # `cookie_domain` is the domain where the authentication cookies should be applied. Should likely match
 #  # the `host_match` specified above.
 #  #
 #  cookie_domain: zrok.io
 #
-#  # `hash_key` is a unique key for your installation that is used to secure authentication payloads
-#  # with OAuth providers.
+#  # `session_lifetime` is the maximum lifetime for an authentication session.
 #  #
-#  hash_key: "<yourRandomHashKey>"
+#  session_lifetime: 6h
 #
-#  # `providers` contains an array of provider details enabled in your installation. Currently only
-#  # `google` and `github` are supported. Your configuration can include `google`, `github`, or both.
+#  # `intermediate_lifetime` is the maximum lifetime for an intermediate authentication (auth result before code
+#  # exchange).
+#  #
+#  intermediate_lifetime: 5m
+#
+#  # `signing_key` is a unique key for your installation that is used to sign authentication payloads
+#  # with OAuth providers. This will be expanded into an actual key using HKDF.
+#  #
+#  signing_key: "<yourRandomSigningKey>"
+#
+#  # `encryption_key` is a unique key for your installation that is used to encrypt access tokens received from OAuth
+#  # providers. This will be expanded into an actual key using HKDF.
+#  #
+#  encryption_key: "<yourRandomEncryptionKey>"
+#
+#  # `providers` contains an array of provider details enabled in your installation. You can specify any number of
+#  # provider configurations for your frontend (shares will select them by name using `--outh-provider`). You should
+#  # ensure that there are no collisions in the `name` fields of your configured providers.
 #  #
 #  providers:
 #    - name: google
+#      type: google
 #      client_id: <client-id>
 #      client_secret: <client-secret>
+#
 #    - name: github
+#      type: github
 #      client_id: <client-id>
 #      client_secret: <client-secret>
+#
+#    - name: okta
+#      type: oidc
+#      client_id: <client-id>
+#      client_secret: <client-secret>
+#      scopes: [ "openid", "email", "profile" ]
+#      issuer: https://your-domain.okta.com/oauth2/default
+#      supports_pkce: true
+
 #
 # The `tls` section sets the cert and key to use and enables serving over HTTPS
 #
 #tls:
-#  cert_path: "/Path/To/Cert/zrok.crt"
-#  key_path:  "/Path/To/Cert/zrok.key"
+#  cert_path: "/path/to/cert/zrok.crt"
+#  key_path:  "/path/to/cert/zrok.key"
