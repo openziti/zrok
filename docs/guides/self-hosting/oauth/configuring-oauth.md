@@ -4,7 +4,7 @@ sidebar_position: 10
 
 # OAuth Public Frontend Configuration
 
-`zrok` includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
+zrok includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
 
 ## Planning for the OAuth Frontend
 
@@ -24,8 +24,8 @@ oauth:
   cookie_domain:              "your-domain.com"
   session_lifetime:           "6h"
   intermediate_lifetime:      "5m"
-  signing_key:                "your-unique-signing-key-32-chars"
-  encryption_key:             "your-unique-encryption-key-24-chars"
+  signing_key:                "your-unique-signing-key"
+  encryption_key:             "your-unique-encryption-key"
 
   providers:
     - name:                   "google"
