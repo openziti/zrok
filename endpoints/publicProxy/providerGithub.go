@@ -217,7 +217,7 @@ func (c *githubConfigurer) configure() error {
 							fmt.Sprintf("https://api.github.com/applications/%s/token", c.githubCfg.ClientId),
 							strings.NewReader(fmt.Sprintf(`{"access_token":"%s"}`, accessToken)))
 						if err != nil {
-							logrus.Errorf("error creating token delete request for '%v': %v", claims.Email, err)
+							logrus.Errorf("error creating access token delete request for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w)
 							return
 						}
@@ -227,16 +227,16 @@ func (c *githubConfigurer) configure() error {
 
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
-							logrus.Errorf("error invoking token delete request for '%v': %v", claims.Email, err)
+							logrus.Errorf("error invoking access token delete request for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w)
 							return
 						}
 						defer resp.Body.Close()
 
 						if resp.StatusCode == http.StatusNoContent {
-							logrus.Infof("revoked github token for '%v'", claims.Email)
+							logrus.Infof("revoked github access token for '%v'", claims.Email)
 						} else {
-							logrus.Errorf("token revocation failed with status: %v", resp.StatusCode)
+							logrus.Errorf("access token revocation failed with status: %v", resp.StatusCode)
 							proxyUi.WriteUnauthorized(w)
 							return
 						}

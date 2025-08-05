@@ -226,6 +226,62 @@ func (c *oidcConfigurer) configure() error {
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
 
+	logout := func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie(c.cfg.CookieName)
+		if err == nil {
+			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+				return signingKey, nil
+			})
+			if err == nil {
+				claims := tkn.Claims.(*zrokClaims)
+				if claims.Provider == c.oidcCfg.Name {
+					accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
+					if err == nil {
+						if err := rp.RevokeToken(context.Background(), provider, accessToken, "access_token"); err == nil {
+							logrus.Infof("revoked access token for '%v'", claims.Email)
+						} else {
+							logrus.Errorf("access token revocation failed: %v", err)
+							proxyUi.WriteUnauthorized(w)
+							return
+						}
+					} else {
+						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						proxyUi.WriteUnauthorized(w)
+						return
+					}
+				} else {
+					logrus.Errorf("expected provider name '%v' got '%v'", c.oidcCfg.Name, claims.Email)
+					proxyUi.WriteUnauthorized(w)
+					return
+				}
+			} else {
+				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				proxyUi.WriteUnauthorized(w)
+				return
+			}
+		} else {
+			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
+			proxyUi.WriteUnauthorized(w)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     c.cfg.CookieName,
+			Value:    "",
+			MaxAge:   -1,
+			Domain:   c.cfg.CookieDomain,
+			Path:     "/",
+			HttpOnly: true,
+		})
+
+		redirectURL := r.URL.Query().Get("redirect_url")
+		if redirectURL == "" {
+			redirectURL = fmt.Sprintf("%s/%s/login", c.cfg.EndpointUrl, c.oidcCfg.Name)
+		}
+		http.Redirect(w, r, redirectURL, http.StatusFound)
+	}
+	http.HandleFunc(fmt.Sprintf("/%v/logout", c.oidcCfg.Name), logout)
+
 	logrus.Infof("configured oidc provider at '/%v'", c.oidcCfg.Name)
 
 	return nil

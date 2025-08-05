@@ -200,12 +200,12 @@ func (c *googleConfigurer) configure() error {
 							if resp.StatusCode == http.StatusOK {
 								logrus.Infof("revoked google token for '%v'", claims.Email)
 							} else {
-								logrus.Errorf("token revocation failed with status: %v", resp.StatusCode)
+								logrus.Errorf("access token revocation failed with status: %v", resp.StatusCode)
 								proxyUi.WriteUnauthorized(w)
 								return
 							}
 						} else {
-							logrus.Errorf("unable to revoke token for '%v': %v", claims.Email, err)
+							logrus.Errorf("unable to revoke access token for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w)
 							return
 						}
