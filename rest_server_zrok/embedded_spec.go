@@ -3045,11 +3045,7 @@ func init() {
           }
         },
         "oauthProvider": {
-          "type": "string",
-          "enum": [
-            "github",
-            "google"
-          ]
+          "type": "string"
         },
         "permissionMode": {
           "type": "string",
@@ -6164,11 +6160,7 @@ func init() {
           }
         },
         "oauthProvider": {
-          "type": "string",
-          "enum": [
-            "github",
-            "google"
-          ]
+          "type": "string"
         },
         "permissionMode": {
           "type": "string",

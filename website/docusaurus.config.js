@@ -16,6 +16,9 @@ const config = {
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/zrok-favicon.png',
 
+  markdown: { mermaid: true },
+  themes: ['@docusaurus/theme-mermaid'],
+
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'NetFoundry', // Usually your GitHub org/user name.
@@ -88,7 +91,7 @@ const config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: '1.0',
+              label: '1.1',
             },
           },
 

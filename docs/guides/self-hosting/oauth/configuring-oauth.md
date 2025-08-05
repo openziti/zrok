@@ -1,156 +1,251 @@
+---
+sidebar_position: 10
+---
+
 # OAuth Public Frontend Configuration
 
-As of `v0.4.7`, `zrok` includes OAuth integration for both Google and GitHub for `zrok access public` public frontends. 
-
-This integration allows you to create public shares and request that the public frontend authenticate your users against either the Google or GitHub OAuth endpoints (using the user's Google or GitHub accounts). Additionally, you can restrict the email address domain associated with the count to a list of domains that you provide when you create the share.
-
-This is a first step towards a more comprehensive portfolio of user authentication strategies in future `zrok` releases.
+`zrok` includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
 
 ## Planning for the OAuth Frontend
 
-The current implementation of the OAuth public frontend uses a HTTP listener to handle redirects from OAuth providers. You'll need to configure a DNS name and a port for this listener that is accessible by your end users. We'll refer to this listener as the "OAuth frontend" in this guide.
+The OAuth public frontend uses an HTTP listener with a stable name to handle redirects from OAuth providers. You'll need to configure a DNS name and port for this listener that is accessible by your end users.
 
-We'll use the public DNS address of the OAuth frontend when creating the Google and GitHub OAuth clients below. This address is typically configured into these clients as the "redirect URL" where these clients will send the authenticated users after authentication.
-
-The `zrok` OAuth frontend will capture the successful authentication and forward the user back to their original destination.
-
-## Configuring a Google OAuth Client ID
-
-### OAuth Content Screen
-
-Before you can configure an OAuth Client ID in Google Cloud, you have to configure the "OAuth content screen". 
-
-In the Google Cloud console, navigate to: `APIs & Services > Credentials > OAuth content screen`
-
-![](images/google_oauth_content_screen_2.png)
-
-Here you can give your `zrok` public frontend an identity and branding to match your deployment.
-
-![](images/google_oauth_content_screen_3.png)
-
-Describe what domains are authorized to access your public frontend and establish contact information.
-
-![](images/google_oauth_content_screen_4.png)
-
-Add a non-sensitive scope for `../auth/userinfo.email`. This is important as it allows the `zrok` OAuth frontend to receive the email address of the authenticated user.
-
-![](images/google_oauth_content_screen_5.png)
-
-![](images/google_oauth_content_screen_6.png)
-
-Now your OAuth content screen is configured.
-
-### Create the OAuth 2.0 Client ID
-
-Next we create the OAuth Client ID for your public frontend.
-
-In the Google Cloud Console, navigate to: `APIs & Services > Credentials > + Create Credentials`
-
-![](images/google_create_credentials_1.png)
-
-Select `OAuth client ID` from the `+ Create Credentials` dropdown.
-
-![](images/google_create_credentials_2.png)
-
-Application type is `Web Application`.
-
-![](images/google_create_credentials_3.png)
-
-The most important bit here is the "Authorized redirect URIs". You're going to want to put a URL here that matches the `zrok` OAuth frontend address that you configured at the start of this guide, but at the end of the URL you're going to append `/google/oauth` to the URL.
-
-![](images/google_create_credentials_4.png)
-
-Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
-
-With this your Google OAuth client should be configured and ready.
-
-## Configuring a GitHub Client ID
-
-Register a new OAuth application through the GitHub settings for the account that owns the application.
-
-Navigate to:`Settings > Developer Settings > OAuth Apps > Register a new application`
-
-![](images/github_create_oauth_application_1.png)
-
-![](images/github_create_oauth_application_2.png)
-
-The "Authorized callback URL" should be configured to match the OAuth frontend address you configured at the start of this guide, with `/github/oauth` appended to the end.
-
-![](images/github_create_oauth_application_3.png)
-
-Create a new client secret.
-
-![](images/github_create_oauth_application_4.png)
-
-Save the client ID and the client secret. You'll configure these into your `frontend.yml`.
+The OAuth frontend address will be used as the "redirect URL" when configuring OAuth clients with your providers. Each provider will redirect authenticated users back to this address, which then forwards them to their original destination.
 
 ## Configuring your Public Frontend
 
-The public frontend configuration includes a new `oauth` section:
+Add an `oauth` section to your frontend configuration:
 
 ```yaml
 oauth:
-  bind_address:                   0.0.0.0:8181
-  redirect_url:                   https://oauth.zrok.io
-  cookie_domain:                  zrok.io
-  hash_key:                       "the quick brown fox jumped over the lazy dog"
+  bind_address:               "192.168.1.100:443"
+  endpoint_url:               "https://oauth.your-domain.com"
+  cookie_name:                "zrok-auth-session"
+  cookie_domain:              "your-domain.com"
+  session_lifetime:           "6h"
+  intermediate_lifetime:      "5m"
+  signing_key:                "your-unique-signing-key-32-chars"
+  encryption_key:             "your-unique-encryption-key-24-chars"
+
   providers:
-    - name:                       google
-      client_id:                  "<client id from google>"
-      client_secret:              "<client secret from google>"
-    - name:                       github
-      client_id:                  "<client id from github>"
-      client_secret:              "<client secret from github>"
+    - name:                   "google"
+      type:                   "google"
+      client_id:              "<google-client-id>"
+      client_secret:          "<google-client-secret>"
       
+    - name:                   "github"
+      type:                   "github"
+      client_id:              "<github-client-id>"
+      client_secret:          "<github-client-secret>"
+      
+    - name:                   "custom-oidc"
+      type:                   "oidc"
+      client_id:              "<oidc-client-id>"
+      client_secret:          "<oidc-client-secret>"
+      scopes:                 ["openid", "email", "profile"]
+      issuer:                 "https://your-oidc-provider.com"
+      supports_pkce:          true
 ```
 
-The `bind_address` parameter determines where the OAuth frontend will bind. Should be in `ip:port` format.
+### Configuration Parameters
 
-The `redirect_url` parameter determines the base URL where OAuth frontend requests will be redirected.
+All of the following parmeters _must_ be specified in the frontend configuration. There are no defaults.
 
-`cookie_domain` is the domain where authentication cookies should be stored.
+- **`bind_address`**: IP and port where the OAuth frontend will listen (format: `ip:port`)
+- **`endpoint_url`**: Public base URL where OAuth redirects will be handled
+- **`cookie_name`**: Name for authentication cookies (suggested to use `zrok-auth-session`)
+- **`cookie_domain`**: Domain where authentication cookies should be stored
+- **`session_lifetime`**: How long authentication sessions remain valid (e.g., `6h`, `24h`)
+- **`intermediate_lifetime`**: Lifetime for intermediate OAuth tokens (e.g., `5m`)
+- **`signing_key`**: Unique 32+ character string for securing authentication payloads
+- **`encryption_key`**: Unique 24+ character string for encrypting session data
 
-`hash_key` is a unique string for your installation that is used to secure the authentication payloads for your public frontend.
+### OAuth Providers
 
-`providers` is a list of configured providers for this public frontend. The current implementation supports `google` and `github` as options.
+The `providers` array supports multiple OAuth configurations. Each provider requires:
 
-Both the `google` and `github` providers accept a `client_id` and `client_secret` parameter. These values are provided when you configure the OAuth clients at Google or GitHub.
+- **`name`**: Unique identifier for this provider configuration; the `name` becomes part of the OAuth URLs for this provider, for example the callback URL becomes `/<name>/auth/callback`
+- **`type`**: Provider type (`google`, `github`, or `oidc`)
+- **`client_id`** and **`client_secret`**: OAuth client credentials
 
-## Enabling OAuth on a Public Share
+Providers may also require additional configuration values. For detailed setup instructions for each provider type, see:
+- [Google OAuth Setup](integrations/google.md)
+- [GitHub OAuth Setup](integrations/github.md)  
+- [Generic OIDC Setup](integrations/oidc.md)
 
-With your public frontend configured to support OAuth, you can test this by creating a public share. There are new command line options to support this:
+## OAuth Identity Flow
 
-```text
-$ zrok share public --help
-Share a target resource publicly
+When a user accesses a zrok public share protected with OAuth, the following flow occurs:
 
-Usage:
-  zrok share public <target> [flags]
+```mermaid
+sequenceDiagram
+    participant User as User Browser
+    participant Share as zrok Public Share
+    participant OAuth as zrok OAuth Frontend
+    participant Provider as OAuth Provider<br/>(Google/GitHub/OIDC)
 
-Flags:
-  -b, --backend-mode string                        The backend mode {proxy, web, caddy, drive} (default "proxy")
-      --basic-auth stringArray                     Basic authentication users (<username:password>,...)
-      --frontends stringArray                      Selected frontends to use for the share (default [public])
-      --headless                                   Disable TUI and run headless
-  -h, --help                                       help for public
-      --insecure                                   Enable insecure TLS certificate validation for <target>
-      --oauth-check-interval duration              Maximum lifetime for OAuth authentication; reauthenticate after expiry (default 3h0m0s)
-      --oauth-email-address-patterns stringArray   Allow only these email domain globs to authenticate via OAuth
-      --oauth-provider string                      Enable OAuth provider [google, github]
+    Note over User, Provider: OAuth Identity Flow for zrok Public Shares
 
-Global Flags:
-  -p, --panic     Panic instead of showing pretty errors
-  -v, --verbose   Enable verbose logging
+    User->>Share: 1. Initial Access<br/>GET /share-url
+    Share->>Share: 2. Authentication Check<br/>Validate session cookie
+    
+    alt No valid session
+        Share->>User: 3. Redirect to Provider<br/>302 to OAuth provider login
+        User->>Provider: 4. User Authentication<br/>Login with credentials
+        Provider->>OAuth: 5. Provider Callback<br/>GET /<provider-name>/auth/callback?code=xyz
+        OAuth->>Provider: 6. Token Exchange<br/>POST /token (exchange code for tokens)
+        Provider->>OAuth: Return access token + user info
+        OAuth->>OAuth: 7. Email Validation<br/>Check email against patterns
+        
+        alt Email validation passes
+            OAuth->>OAuth: 8. Session Creation<br/>Create session + set cookie
+            OAuth->>User: 9. Final Redirect<br/>302 back to original share URL
+            User->>Share: 10. Access Granted<br/>GET /share-url (with valid session)
+            Share->>User: Return protected content
+        else Email validation fails
+            OAuth->>User: Access Denied<br/>403 Forbidden
+        end
+    else Valid session exists
+        Share->>User: Direct Access<br/>Return protected content
+    end
+
+    Note over User, Provider: Session remains valid for configured session_lifetime
 ```
 
-The `--oauth-provider` flag enables OAuth for the share using the specified provider.
+### Flow Steps
 
-The `--oauth-email-address-patterns` flag accepts a single glob pattern that matches an authenticated email address that is allowed to access the share. Use this flag multiple times to allow different patterns.
+1. **Initial Access**: User visits the zrok public share URL
+2. **Authentication Check**: zrok checks for a valid authentication session cookie
+3. **Redirect to Provider**: If no valid session exists, user is redirected to the configured OAuth provider's login page
+4. **User Authentication**: User authenticates with their OAuth provider (Google, GitHub, etc.)
+5. **Provider Callback**: OAuth provider redirects back to zrok's OAuth frontend at `/<provider-name>/auth/callback`
+6. **Token Exchange**: zrok exchanges the authorization code for access tokens and retrieves user information
+7. **Email Validation**: zrok validates the user's email address against any configured `--oauth-email-address-pattern` instances
+8. **Session Creation**: If validation passes, zrok creates an authenticated session and sets a session cookie
+9. **Final Redirect**: User is redirected back to the original zrok share URL
+10. **Access Granted**: User can now access the protected resource
 
-The `--oauth-check-interval` flag specifies how frequently the authentication must be checked.
+### Session Management
 
-An example public share:
+- **Maximum Session Duration**: Controlled by the `session_lifetime` configuration
+- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than provoking the user to re-authenticate
+- **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider 
 
-```text
-zrok share public --backend-mode web --oauth-provider github --oauth-email-address-patterns '*@zrok.io' ~/public
+## Using OAuth with Public Shares
+
+Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these command line options:
+
+- **`--oauth-provider <name>`**: Enable OAuth using the specified provider name from your configuration
+- **`--oauth-email-address-pattern <pattern>`**: Restrict access to email addresses matching the glob pattern (use multiple times for multiple patterns)
+- **`--oauth-check-interval <duration>`**: How often to re-verify authentication (default: 3h)
+
+### Example
+
+```bash
+zrok share public --backend-mode web \
+  --oauth-provider google \
+  --oauth-email-address-pattern '*@example.com' \
+  --oauth-email-address-pattern 'admin@*' \
+  ~/public
 ```
+
+This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email addresses or any `admin@*` email address.
+
+## HTTP Headers for Proxied Requests
+
+When zrok successfully authenticates a user via OAuth, it automatically adds authentication headers to all proxied requests sent to your backend application. These headers allow your application to identify the authenticated user and make authorization decisions.
+
+### Authentication Headers
+
+zrok sets the following HTTP headers on every proxied request after successful OAuth authentication:
+
+- **`zrok-auth-provider`**: The name of the OAuth provider used for authentication (e.g., `google`, `github`, `custom-oidc`)
+- **`zrok-auth-email`**: The authenticated user's email address as provided by the OAuth provider
+- **`zrok-auth-expires`**: The timestamp when the authentication session will expire, formatted as RFC3339 (e.g., `2024-01-15T14:30:00Z`)
+
+### Example Usage in Backend Applications
+
+Your backend application can read these headers to implement user-specific logic:
+
+#### Python/Flask Example
+```python
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    provider = request.headers.get('zrok-auth-provider')
+    email = request.headers.get('zrok-auth-email')
+    expires = request.headers.get('zrok-auth-expires')
+    
+    return f"Welcome {email}! Authenticated via {provider}. Session expires: {expires}"
+```
+
+#### Go Example
+```go
+func handler(w http.ResponseWriter, r *http.Request) {
+    provider := r.Header.Get("zrok-auth-provider")
+    email := r.Header.Get("zrok-auth-email")
+    expires := r.Header.Get("zrok-auth-expires")
+    
+    fmt.Fprintf(w, "Welcome %s! Authenticated via %s. Session expires: %s", 
+                email, provider, expires)
+}
+```
+
+#### Node.js/Express Example
+```javascript
+app.get('/', (req, res) => {
+    const provider = req.headers['zrok-auth-provider'];
+    const email = req.headers['zrok-auth-email'];
+    const expires = req.headers['zrok-auth-expires'];
+    
+    res.send(`Welcome ${email}! Authenticated via ${provider}. Session expires: ${expires}`);
+});
+```
+
+### Security Considerations
+
+- **Trust Boundary**: These headers are only present when requests come through zrok's OAuth-protected frontend. Direct access to your backend would not include these headers.
+- **Header Validation**: Your application should validate that these headers are present when OAuth protection is expected.
+- **Session Expiration**: Use the `zrok-auth-expires` header to implement client-side session warnings or automatic logout.
+
+## Logout Endpoint
+
+Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
+
+### Logout Process
+
+When a user accesses the logout endpoint, zrok performs the following actions:
+
+1. **Token Revocation**: The OAuth access token is revoked with the respective provider:
+   - **Google**: Revokes the token via Google's OAuth2 revocation endpoint
+   - **GitHub**: Deletes the application token using GitHub's API
+   - **OIDC**: Uses the provider's token revocation endpoint (if supported)
+
+2. **Session Clearing**: The local authentication session cookie is cleared by setting it to expire immediately
+
+3. **Redirect**: The user is redirected to either:
+   - A custom URL specified via the `redirect_url` query parameter
+   - The provider's login page (default behavior)
+
+#### Usage Examples
+
+##### Basic Logout
+```
+GET https://oauth.your-domain.com/google/logout
+```
+This logs the user out and redirects them to the Google OAuth login page.
+
+##### Logout with Custom Redirect
+```
+GET https://oauth.your-domain.com/github/logout?redirect_url=https://example.com/goodbye
+```
+This logs the user out and redirects them to `https://example.com/goodbye`.
+
+#### Implementation Notes
+
+- The logout endpoint validates that the session belongs to the correct provider before proceeding
+- If token revocation fails with the OAuth provider, the logout process will still clear the local session
+- The logout process is idempotent - calling it multiple times or without an active session will not cause errors

@@ -2,14 +2,19 @@ package publicProxy
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 )
 
-const V = 3
+const V = 4
 
 type Config struct {
 	V            int
@@ -28,20 +33,15 @@ type InterstitialConfig struct {
 }
 
 type OauthConfig struct {
-	BindAddress  string
-	RedirectUrl  string
-	CookieDomain string
-	HashKey      string `cf:"+secret"`
-	Providers    []*OauthProviderConfig
-}
-
-func (oc *OauthConfig) GetProvider(name string) *OauthProviderConfig {
-	for _, provider := range oc.Providers {
-		if provider.Name == name {
-			return provider
-		}
-	}
-	return nil
+	BindAddress          string
+	EndpointUrl          string
+	CookieName           string
+	CookieDomain         string
+	SessionLifetime      time.Duration
+	IntermediateLifetime time.Duration
+	SigningKey           string        `cf:"+secret"`
+	EncryptionKey        string        `cf:"+secret"`
+	Providers            []interface{} `cf:"+secret"`
 }
 
 type OauthProviderConfig struct {
@@ -58,7 +58,7 @@ func DefaultConfig() *Config {
 }
 
 func (c *Config) Load(path string) error {
-	if err := cf.BindYaml(c, path, cf.DefaultOptions()); err != nil {
+	if err := cf.BindYaml(c, path, cfOptions()); err != nil {
 		return errors.Wrapf(err, "error loading frontend config '%v'", path)
 	}
 	if c.V != V {
@@ -67,17 +67,82 @@ func (c *Config) Load(path string) error {
 	return nil
 }
 
-func configureOauthHandlers(ctx context.Context, cfg *Config, tls bool) error {
+func cfOptions() *cf.Options {
+	cfOpts := cf.DefaultOptions()
+	cfOpts.AddFlexibleSetter("github", func(v interface{}, opt *cf.Options) (interface{}, error) {
+		if vm, ok := v.(map[string]interface{}); ok {
+			return vm, nil
+		}
+		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
+	})
+	cfOpts.AddFlexibleSetter("google", func(v interface{}, opt *cf.Options) (interface{}, error) {
+		if vm, ok := v.(map[string]interface{}); ok {
+			return vm, nil
+		}
+		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
+	})
+	cfOpts.AddFlexibleSetter("oidc", func(v interface{}, opt *cf.Options) (interface{}, error) {
+		if vm, ok := v.(map[string]interface{}); ok {
+			return vm, nil
+		}
+		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
+	})
+	return cfOpts
+}
+
+func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	if cfg.Oauth == nil {
 		logrus.Info("no oauth configuration; skipping oauth handler startup")
 		return nil
 	}
-	if err := configureGoogleOauth(cfg.Oauth, tls); err != nil {
-		return err
+
+	for _, v := range cfg.Oauth.Providers {
+		if mv, ok := v.(map[string]interface{}); ok {
+			if t, found := mv["type"]; found {
+				switch t {
+				case "github":
+					cfger, err := newGithubConfigurer(cfg.Oauth, tls, mv)
+					if err != nil {
+						return err
+					}
+					if err := cfger.configure(); err != nil {
+						return err
+					}
+
+				case "google":
+					cfger, err := newGoogleConfigurer(cfg.Oauth, tls, mv)
+					if err != nil {
+						return err
+					}
+					if err := cfger.configure(); err != nil {
+						return err
+					}
+
+				case "oidc":
+					cfger, err := newOidcConfigurer(cfg.Oauth, tls, mv)
+					if err != nil {
+						return err
+					}
+					if err := cfger.configure(); err != nil {
+						return err
+					}
+
+				default:
+					return errors.Errorf("invalid oauth provider type '%v'", t)
+				}
+			} else {
+				return errors.Errorf("invalid oauth provider configuration; missing 'type'")
+			}
+		} else {
+			return errors.Errorf("invalid oauth provider configuration data type")
+		}
 	}
-	if err := configureGithubOauth(cfg.Oauth, tls); err != nil {
-		return err
-	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		proxyUi.WriteUnauthorized(w)
+	})
+
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)
+
 	return nil
 }
