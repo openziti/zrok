@@ -148,3 +148,43 @@ zrok share public --backend-mode web \
 ```
 
 This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email addresses or any `admin@*` email address.
+
+## Logout Endpoint
+
+Each configured OAuth provider automatically exposes a logout endpoint at `/<provider-name>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
+
+### Logout Process
+
+When a user accesses the logout endpoint, zrok performs the following actions:
+
+1. **Token Revocation**: The OAuth access token is revoked with the respective provider:
+   - **Google**: Revokes the token via Google's OAuth2 revocation endpoint
+   - **GitHub**: Deletes the application token using GitHub's API
+   - **OIDC**: Uses the provider's token revocation endpoint (if supported)
+
+2. **Session Clearing**: The local authentication session cookie is cleared by setting it to expire immediately
+
+3. **Redirect**: The user is redirected to either:
+   - A custom URL specified via the `redirect_url` query parameter
+   - The provider's login page (default behavior)
+
+#### Usage Examples
+
+##### Basic Logout
+```
+GET https://oauth.your-domain.com:8181/google/logout
+```
+This logs the user out and redirects them to the Google OAuth login page.
+
+##### Logout with Custom Redirect
+```
+GET https://oauth.your-domain.com:8181/github/logout?redirect_url=https://example.com/goodbye
+```
+This logs the user out and redirects them to `https://example.com/goodbye`.
+
+#### Implementation Notes
+
+- The logout endpoint validates that the session belongs to the correct provider before proceeding
+- If token revocation fails with the OAuth provider, the logout process will still clear the local session
+- The logout process is idempotent - calling it multiple times or without an active session will not cause errors
+- For security, logout URLs should be used over HTTPS in production environments
