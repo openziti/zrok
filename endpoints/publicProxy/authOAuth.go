@@ -58,7 +58,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 		return false
 	}
 
-	if !h.validateEmailDomain(w, oauthMap, cookie) {
+	if !h.validateEmailDomain(w, oauthMap, cookie, h.cfg) {
 		return false
 	}
 
@@ -105,7 +105,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
-func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie) bool {
+func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie, cfg *Config) bool {
 	if patterns, found := oauthCfg["email_domains"].([]interface{}); found && len(patterns) > 0 {
 		tkn, _ := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return h.signingKey, nil
@@ -116,8 +116,9 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 			if castedPattern, ok := pattern.(string); ok {
 				match, err := glob.Compile(castedPattern)
 				if err != nil {
-					logrus.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
-					proxyUi.WriteUnauthorized(w)
+					err := fmt.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
+					logrus.Error(err)
+					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(err), cfg.TemplatePath)
 					return false
 				}
 				if match.Match(claims.Email) {
@@ -126,7 +127,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 			}
 		}
 		logrus.Warnf("unauthorized email '%v'", claims.Email)
-		proxyUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email), cfg.TemplatePath)
 		return false
 	}
 	return true

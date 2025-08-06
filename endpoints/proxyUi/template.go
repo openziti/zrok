@@ -12,29 +12,54 @@ import (
 
 var externalTemplate []byte
 
-func WriteBadGateway(w http.ResponseWriter, variableData map[string]interface{}, templatePath string) {
+type VariableData map[string]interface{}
+
+func WriteBadGateway(w http.ResponseWriter, variableData VariableData, templatePath string) {
 	WriteTemplate(w, http.StatusBadGateway, variableData, templatePath)
 }
 
-func TemplateData(title, banner string) map[string]interface{} {
+func RequiredData(title, banner string) VariableData {
 	return map[string]interface{}{
 		"title":  title,
 		"banner": banner,
 	}
 }
 
-func NotFoundData(shareToken string) map[string]interface{} {
-	return TemplateData(
+func (vd VariableData) WithError(err error) VariableData {
+	vd["error"] = err.Error()
+	return vd
+}
+
+func NotFoundData(shareToken string) VariableData {
+	return RequiredData(
 		fmt.Sprintf("'%v' not found!", shareToken),
 		fmt.Sprintf("share <code>%v</code> not found!", shareToken),
 	)
 }
 
-func WriteNotFound(w http.ResponseWriter, variableData map[string]interface{}, templatePath string) {
+func WriteNotFound(w http.ResponseWriter, variableData VariableData, templatePath string) {
 	WriteTemplate(w, http.StatusNotFound, variableData, templatePath)
 }
 
-func WriteTemplate(w http.ResponseWriter, statusCode int, variableData map[string]interface{}, templatePath string) {
+func UnauthorizedData() VariableData {
+	return RequiredData(
+		"unauthorized!",
+		"user not authorized!",
+	)
+}
+
+func UnauthorizedUser(user string) VariableData {
+	return RequiredData(
+		"unauthorized!",
+		fmt.Sprintf("user <code>%v</code> not authorized to access share!", user),
+	)
+}
+
+func WriteUnauthorized(w http.ResponseWriter, variableData VariableData, templatePath string) {
+	WriteTemplate(w, http.StatusUnauthorized, variableData, templatePath)
+}
+
+func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableData, templatePath string) {
 	if templatePath != "" && externalTemplate == nil {
 		if f, err := os.ReadFile(templatePath); err == nil {
 			externalTemplate = f
@@ -58,7 +83,6 @@ func WriteTemplate(w http.ResponseWriter, statusCode int, variableData map[strin
 		return
 	}
 
-	logrus.Warnf("merging variable data: %v", variableData)
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, variableData); err != nil {
 		logrus.Errorf("failed to execute template: %v", err)

@@ -107,7 +107,7 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 		logrus.Errorf("error proxying: %v", err)
 		proxyUi.WriteBadGateway(
 			w,
-			proxyUi.TemplateData(
+			proxyUi.RequiredData(
 				"bad gateway!",
 				"bad gateway!",
 			),
@@ -206,8 +206,9 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 			}
 
 		default:
-			logrus.Infof("invalid auth scheme '%v'", authScheme)
-			proxyUi.WriteUnauthorized(w)
+			err := fmt.Errorf("invalid auth scheme '%v'", authScheme)
+			logrus.Error(err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err), cfg.TemplatePath)
 		}
 	}
 }

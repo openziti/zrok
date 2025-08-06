@@ -83,6 +83,12 @@
     <div id="container">
         <div id="info">
             <h1>{{ $.banner }}</h1>
+            
+            {{ if $.error }}
+            <div style="color: red; margin: 20px; padding: 15px; background-color: #ffe6e6; border: 1px solid #ff9999; border-radius: 5px;">
+                <strong>Error:</strong><code>{{ $.error }}</code>
+            </div>
+            {{ end }}
         </div>
     </div>
 </div>

@@ -133,10 +133,10 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
 		proxyUi.WriteBadGateway(
-			w, proxyUi.TemplateData(
+			w, proxyUi.RequiredData(
 				"bad gateway!",
 				fmt.Sprintf("bad gateway for share <code>%v</code>!", cfg.ShrToken),
-			),
+			).WithError(err),
 			cfg.TemplatePath,
 		)
 	}
