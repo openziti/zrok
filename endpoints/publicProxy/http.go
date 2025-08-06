@@ -32,6 +32,12 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 		return nil, err
 	}
 
+	if cfg.TemplatePath != "" {
+		if err := proxyUi.ReplaceTemplate(cfg.TemplatePath); err != nil {
+			return nil, err
+		}
+	}
+
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading environment root")
@@ -111,7 +117,6 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 				"bad gateway!",
 				"bad gateway!",
 			),
-			cfg.TemplatePath,
 		)
 	}
 	return proxy, nil
@@ -157,21 +162,21 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 		shrToken := resolveService(cfg.HostMatch, r.Host)
 		if shrToken == "" {
 			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			proxyUi.WriteHealthOk(w, cfg.TemplatePath)
+			proxyUi.WriteHealthOk(w)
 			return
 		}
 
 		svc, found := endpoints.GetRefreshedService(shrToken, ctx)
 		if !found {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 			return
 		}
 
 		svcCfg, found := svc.Config[sdk.ZrokProxyConfig]
 		if !found {
 			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 			return
 		}
 
@@ -182,7 +187,7 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 		authScheme, found := svcCfg["auth_scheme"]
 		if !found {
 			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 			return
 		}
 
@@ -208,7 +213,7 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 		default:
 			err := fmt.Errorf("invalid auth scheme '%v'", authScheme)
 			logrus.Error(err)
-			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err), cfg.TemplatePath)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		}
 	}
 }

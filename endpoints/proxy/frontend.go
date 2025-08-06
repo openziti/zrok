@@ -25,7 +25,6 @@ type FrontendConfig struct {
 	ShrToken        string
 	Address         string
 	ResponseHeaders []string
-	TemplatePath    string
 	Tls             *endpoints.TlsConfig
 	RequestsChan    chan *endpoints.Request
 	SuperNetwork    bool
@@ -137,7 +136,6 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 				"bad gateway!",
 				fmt.Sprintf("bad gateway for share <code>%v</code>!", cfg.ShrToken),
 			).WithError(err),
-			cfg.TemplatePath,
 		)
 	}
 	return proxy, nil
@@ -238,15 +236,15 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 					}
 				} else {
 					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 				}
 			} else {
 				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 			}
 		} else {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken), cfg.TemplatePath)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 		}
 	}
 }

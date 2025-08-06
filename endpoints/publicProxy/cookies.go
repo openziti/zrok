@@ -12,7 +12,6 @@ import (
 )
 
 type sessionCookieRequest struct {
-	cfg             *Config
 	oauthCfg        *OauthConfig
 	supportsRefresh bool
 	email           string
@@ -29,7 +28,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	if targetHost == "" {
 		err := errors.New("targetHost claim must not be empty")
 		logrus.Error(err)
-		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(err), req.cfg.TemplatePath)
+		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(err))
 		return
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
@@ -37,7 +36,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
 		logrus.Errorf("failed to encrypt access token: %v", err)
-		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(errors.New("failed to encrypt access token")), req.cfg.TemplatePath)
+		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(errors.New("failed to encrypt access token")))
 		return
 	}
 
@@ -56,7 +55,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	sTkn, err := tkn.SignedString(req.signingKey)
 	if err != nil {
 		logrus.Errorf("error signing jwt: %v", err)
-		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")), req.cfg.TemplatePath)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")))
 		return
 	}
 

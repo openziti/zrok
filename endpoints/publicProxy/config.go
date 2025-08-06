@@ -102,7 +102,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 			if t, found := mv["type"]; found {
 				switch t {
 				case "github":
-					cfger, err := newGithubConfigurer(cfg, tls, mv)
+					cfger, err := newGithubConfigurer(cfg.Oauth, tls, mv)
 					if err != nil {
 						return err
 					}
@@ -111,7 +111,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 					}
 
 				case "google":
-					cfger, err := newGoogleConfigurer(cfg, tls, mv)
+					cfger, err := newGoogleConfigurer(cfg.Oauth, tls, mv)
 					if err != nil {
 						return err
 					}
@@ -120,7 +120,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 					}
 
 				case "oidc":
-					cfger, err := newOidcConfigurer(cfg, tls, mv)
+					cfger, err := newOidcConfigurer(cfg.Oauth, tls, mv)
 					if err != nil {
 						return err
 					}
@@ -140,7 +140,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData(), cfg.TemplatePath)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData())
 	})
 
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)

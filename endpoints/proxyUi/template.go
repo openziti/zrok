@@ -7,19 +7,43 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-var externalTemplate []byte
+var tmpl *template.Template
+
+func init() {
+	if data, err := FS.ReadFile("template.html"); err == nil {
+		tmpl, err = template.New("template").Parse(string(data))
+		if err != nil {
+			panic(errors.Wrap(err, "unable to parse embedded template 'template.html'"))
+		}
+	} else {
+		panic(errors.Wrap(err, "unable to load embedded template 'template.html'"))
+	}
+}
 
 type VariableData map[string]interface{}
 
-func WriteHealthOk(w http.ResponseWriter, templatePath string) {
-	WriteTemplate(w, http.StatusOK, RequiredData("healthy", "healthy"), templatePath)
+func ReplaceTemplate(path string) error {
+	if f, err := os.ReadFile(path); err == nil {
+		tmpl, err = template.New("template").Parse(string(f))
+		if err != nil {
+			panic(errors.Wrapf(err, "unable to parse template '%v'", path))
+		}
+	} else {
+		return errors.Wrapf(err, "error reading template from '%v'", path)
+	}
+	return nil
 }
 
-func WriteBadGateway(w http.ResponseWriter, variableData VariableData, templatePath string) {
-	WriteTemplate(w, http.StatusBadGateway, variableData, templatePath)
+func WriteHealthOk(w http.ResponseWriter) {
+	WriteTemplate(w, http.StatusOK, RequiredData("healthy", "healthy"))
+}
+
+func WriteBadGateway(w http.ResponseWriter, variableData VariableData) {
+	WriteTemplate(w, http.StatusBadGateway, variableData)
 }
 
 func RequiredData(title, banner string) VariableData {
@@ -41,8 +65,8 @@ func NotFoundData(shareToken string) VariableData {
 	)
 }
 
-func WriteNotFound(w http.ResponseWriter, variableData VariableData, templatePath string) {
-	WriteTemplate(w, http.StatusNotFound, variableData, templatePath)
+func WriteNotFound(w http.ResponseWriter, variableData VariableData) {
+	WriteTemplate(w, http.StatusNotFound, variableData)
 }
 
 func UnauthorizedData() VariableData {
@@ -59,34 +83,11 @@ func UnauthorizedUser(user string) VariableData {
 	)
 }
 
-func WriteUnauthorized(w http.ResponseWriter, variableData VariableData, templatePath string) {
-	WriteTemplate(w, http.StatusUnauthorized, variableData, templatePath)
+func WriteUnauthorized(w http.ResponseWriter, variableData VariableData) {
+	WriteTemplate(w, http.StatusUnauthorized, variableData)
 }
 
-func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableData, templatePath string) {
-	if templatePath != "" && externalTemplate == nil {
-		if f, err := os.ReadFile(templatePath); err == nil {
-			externalTemplate = f
-		} else {
-			logrus.Errorf("error reading proxyUi template from '%v': %v", templatePath, err)
-		}
-	}
-	var templateData = externalTemplate
-	if templateData == nil {
-		if f, err := FS.ReadFile("template.html"); err == nil {
-			templateData = f
-		} else {
-			logrus.Errorf("error reading embedded proxyUi template 'template.html': %v", err)
-		}
-	}
-
-	tmpl, err := template.New("template").Parse(string(templateData))
-	if err != nil {
-		logrus.Errorf("failed to parse template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
+func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableData) {
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, variableData); err != nil {
 		logrus.Errorf("failed to execute template: %v", err)
@@ -94,7 +95,6 @@ func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableD
 		return
 	}
 
-	// Write the response
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(statusCode)
 
