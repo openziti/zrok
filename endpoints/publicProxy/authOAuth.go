@@ -58,7 +58,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 		return false
 	}
 
-	if !h.validateEmailDomain(w, oauthMap, cookie, h.cfg) {
+	if !h.validateEmailDomain(w, oauthMap, cookie) {
 		return false
 	}
 
@@ -105,7 +105,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
-func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie, cfg *Config) bool {
+func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie) bool {
 	if patterns, found := oauthCfg["email_domains"].([]interface{}); found && len(patterns) > 0 {
 		tkn, _ := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return h.signingKey, nil
