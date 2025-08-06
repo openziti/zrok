@@ -98,7 +98,7 @@ func (c *githubConfigurer) configure() error {
 			if err != nil {
 				err := fmt.Errorf("unable to unescape targetHost: %v", err)
 				logrus.Error(err)
-				proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(err))
+				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 				return
 			}
 			rp.AuthURLHandler(func() string {
