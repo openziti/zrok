@@ -28,7 +28,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	if targetHost == "" {
 		err := errors.New("targetHost claim must not be empty")
 		logrus.Error(err)
-		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(err))
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		return
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
@@ -36,7 +36,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
 		logrus.Errorf("failed to encrypt access token: %v", err)
-		proxyUi.WriteUnauthorized(w, proxyUi.RequiredData("unauthorized!", "unauthorized!").WithError(errors.New("failed to encrypt access token")))
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
 		return
 	}
 
