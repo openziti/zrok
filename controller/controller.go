@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/jessevdk/go-flags"
+	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
@@ -26,6 +27,7 @@ var (
 	str         *store.Store
 	idb         influxdb2.Client
 	limitsAgent *limits.Agent
+	agentCtrl   *agentController.Controller
 )
 
 func Run(inCfg *config.Config) error {
@@ -71,6 +73,12 @@ func Run(inCfg *config.Config) error {
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	if cfg.AgentController != nil {
+		if i, err := agentController.NewAgentController(cfg.AgentController); err == nil {
+			agentCtrl = i
+			logrus.Infof("created new agent controller")
+		} else {
+			return errors.Wrap(err, "error creating agent controller")
+		}
 		api.AgentEnrollHandler = newAgentEnrollHandler()
 		api.AgentPingHandler = newAgentPingHandler()
 		api.AgentRemoteAccessHandler = newAgentRemoteAccessHandler()

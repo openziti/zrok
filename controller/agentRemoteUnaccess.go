@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -37,15 +37,15 @@ func (h *agentRemoteUnaccessHandler) Handle(params agent.RemoteUnaccessParams, p
 	}
 	_ = trx.Rollback() // ...or will block unshare trx on sqlite
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteUnshareInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
 	req := &agentGrpc.ReleaseAccessRequest{FrontendToken: params.Body.FrontendToken}
-	_, err = acli.ReleaseAccess(context.Background(), req)
+	_, err = agentClient.ReleaseAccess(context.Background(), req)
 	if err != nil {
 		logrus.Errorf("error releasing access '%v' for '%v' (%v): %v", params.Body.FrontendToken, params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteUnaccessBadGateway()

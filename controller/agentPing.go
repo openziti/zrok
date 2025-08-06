@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -36,14 +36,14 @@ func (h *agentPingHandler) Handle(params agent.PingParams, principal *rest_model
 		return agent.NewPingBadGateway()
 	}
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewPingInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
-	resp, err := acli.Version(context.Background(), &agentGrpc.VersionRequest{})
+	resp, err := agentClient.Version(context.Background(), &agentGrpc.VersionRequest{})
 	if err != nil {
 		logrus.Errorf("error retrieving agent version for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewPingBadGateway()
