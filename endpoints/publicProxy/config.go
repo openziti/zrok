@@ -21,6 +21,7 @@ type Config struct {
 	Identity     string
 	Address      string
 	HostMatch    string
+	TemplatePath string
 	Interstitial *InterstitialConfig
 	Oauth        *OauthConfig
 	Tls          *endpoints.TlsConfig
