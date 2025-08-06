@@ -157,7 +157,7 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 		shrToken := resolveService(cfg.HostMatch, r.Host)
 		if shrToken == "" {
 			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			proxyUi.WriteHealthOk(w)
+			proxyUi.WriteHealthOk(w, cfg.TemplatePath)
 			return
 		}
 

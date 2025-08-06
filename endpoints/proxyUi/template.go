@@ -14,6 +14,10 @@ var externalTemplate []byte
 
 type VariableData map[string]interface{}
 
+func WriteHealthOk(w http.ResponseWriter, templatePath string) {
+	WriteTemplate(w, http.StatusOK, RequiredData("healthy", "healthy"), templatePath)
+}
+
 func WriteBadGateway(w http.ResponseWriter, variableData VariableData, templatePath string) {
 	WriteTemplate(w, http.StatusBadGateway, variableData, templatePath)
 }
