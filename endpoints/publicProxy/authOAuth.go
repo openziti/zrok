@@ -116,8 +116,9 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 			if castedPattern, ok := pattern.(string); ok {
 				match, err := glob.Compile(castedPattern)
 				if err != nil {
-					logrus.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
-					proxyUi.WriteUnauthorized(w)
+					err := fmt.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
+					logrus.Error(err)
+					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(err))
 					return false
 				}
 				if match.Match(claims.Email) {
@@ -126,7 +127,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 			}
 		}
 		logrus.Warnf("unauthorized email '%v'", claims.Email)
-		proxyUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email))
 		return false
 	}
 	return true

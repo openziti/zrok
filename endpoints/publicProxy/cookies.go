@@ -7,11 +7,12 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type sessionCookieRequest struct {
-	cfg             *OauthConfig
+	oauthCfg        *OauthConfig
 	supportsRefresh bool
 	email           string
 	accessToken     string
@@ -25,8 +26,9 @@ type sessionCookieRequest struct {
 func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
-		logrus.Error("targetHost claim must not be empty")
-		proxyUi.WriteUnauthorized(w)
+		err := errors.New("targetHost claim must not be empty")
+		logrus.Error(err)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		return
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
@@ -34,7 +36,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
 		logrus.Errorf("failed to encrypt access token: %v", err)
-		proxyUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
 		return
 	}
 
@@ -47,23 +49,23 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 		RefreshInterval: req.refreshInterval,
 		NextRefresh:     time.Now().Add(req.refreshInterval),
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(req.cfg.SessionLifetime)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(req.oauthCfg.SessionLifetime)),
 		},
 	})
 	sTkn, err := tkn.SignedString(req.signingKey)
 	if err != nil {
 		logrus.Errorf("error signing jwt: %v", err)
-		proxyUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")))
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    req.cfg.CookieName,
+		Name:    req.oauthCfg.CookieName,
 		Value:   sTkn,
-		MaxAge:  int(req.cfg.SessionLifetime.Seconds()),
-		Domain:  req.cfg.CookieDomain,
+		MaxAge:  int(req.oauthCfg.SessionLifetime.Seconds()),
+		Domain:  req.oauthCfg.CookieDomain,
 		Path:    "/",
-		Expires: time.Now().Add(req.cfg.SessionLifetime),
+		Expires: time.Now().Add(req.oauthCfg.SessionLifetime),
 		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
 		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
 		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie

@@ -131,7 +131,12 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logrus.Errorf("error proxying: %v", err)
-		proxyUi.WriteNotFound(w)
+		proxyUi.WriteBadGateway(
+			w, proxyUi.RequiredData(
+				"bad gateway!",
+				fmt.Sprintf("bad gateway for share <code>%v</code>!", cfg.ShrToken),
+			).WithError(err),
+		)
 	}
 	return proxy, nil
 }
@@ -172,8 +177,8 @@ func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.Reverse
 func authHandler(shrToken string, handler http.Handler, realm string, cfg *FrontendConfig, ctx ziti.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if svc, found := endpoints.GetRefreshedService(shrToken, ctx); found {
-			if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-				if scheme, found := cfg["auth_scheme"]; found {
+			if proxyCfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
+				if scheme, found := proxyCfg["auth_scheme"]; found {
 					switch scheme {
 					case string(sdk.None):
 						logrus.Debugf("auth scheme none '%v'", shrToken)
@@ -188,7 +193,7 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 							return
 						}
 						authed := false
-						if v, found := cfg["basic_auth"]; found {
+						if v, found := proxyCfg["basic_auth"]; found {
 							if basicAuth, ok := v.(map[string]interface{}); ok {
 								if v, found := basicAuth["users"]; found {
 									if arr, ok := v.([]interface{}); ok {
@@ -231,15 +236,15 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 					}
 				} else {
 					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-					proxyUi.WriteNotFound(w)
+					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 				}
 			} else {
 				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-				proxyUi.WriteNotFound(w)
+				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 			}
 		} else {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
 		}
 	}
 }

@@ -21,6 +21,7 @@ type Config struct {
 	Identity     string
 	Address      string
 	HostMatch    string
+	TemplatePath string
 	Interstitial *InterstitialConfig
 	Oauth        *OauthConfig
 	Tls          *endpoints.TlsConfig
@@ -139,7 +140,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		proxyUi.WriteUnauthorized(w)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData())
 	})
 
 	zhttp.StartServer(ctx, cfg.Oauth.BindAddress)

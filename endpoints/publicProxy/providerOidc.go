@@ -2,6 +2,7 @@ package publicProxy
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -92,7 +93,7 @@ func (c *oidcConfigurer) configure() error {
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
 			logrus.Errorf("unable to unescape 'targetHost': %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
 		state := func() string {
@@ -134,14 +135,14 @@ func (c *oidcConfigurer) configure() error {
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
 			logrus.Errorf("unable to unescape 'targetHost': %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
 
 		cookie, err := r.Cookie(c.cfg.CookieName)
 		if err != nil {
-			logrus.Errorf("unable to get 'zrok-access' cookie: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			logrus.Errorf("unable to get auth session cookie: %v", err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
 			return
 		}
 
@@ -150,33 +151,33 @@ func (c *oidcConfigurer) configure() error {
 		})
 		if err != nil {
 			logrus.Errorf("unable to parse jwt: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse jwt")))
 			return
 		}
 
 		claims := tkn.Claims.(*zrokClaims)
 		if claims.Provider != c.oidcCfg.Name {
-			logrus.Error("token validation failed")
-			proxyUi.WriteUnauthorized(w)
+			logrus.Error("token provider mismatch")
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("token provider mismatch")))
 			return
 		}
 
 		accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
 		if err != nil {
 			logrus.Errorf("unable to decrypt access token: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 			return
 		}
 
 		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), provider, accessToken, "", "")
 		if err != nil {
 			logrus.Errorf("unable to refresh tokens: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to refresh tokens")))
 			return
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			cfg:             c.cfg,
+			oauthCfg:        c.cfg,
 			supportsRefresh: true,
 			email:           claims.Email,
 			accessToken:     newTokens.AccessToken,
@@ -197,7 +198,7 @@ func (c *oidcConfigurer) configure() error {
 		})
 		if err != nil {
 			logrus.Errorf("unable to parse intermediate JWT: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse intermediate jwt")))
 			return
 		}
 
@@ -206,12 +207,12 @@ func (c *oidcConfigurer) configure() error {
 			refreshInterval = v
 		} else {
 			logrus.Errorf("unable to parse authorization check interval: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(info.Email).WithError(errors.New("unable to parse authorization check interval")))
 			return
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			cfg:             c.cfg,
+			oauthCfg:        c.cfg,
 			supportsRefresh: true,
 			email:           info.Email,
 			accessToken:     tokens.AccessToken,
@@ -241,27 +242,27 @@ func (c *oidcConfigurer) configure() error {
 							logrus.Infof("revoked access token for '%v'", claims.Email)
 						} else {
 							logrus.Errorf("access token revocation failed: %v", err)
-							proxyUi.WriteUnauthorized(w)
+							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 							return
 						}
 					} else {
 						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
-						proxyUi.WriteUnauthorized(w)
+						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
 					logrus.Errorf("expected provider name '%v' got '%v'", c.oidcCfg.Name, claims.Email)
-					proxyUi.WriteUnauthorized(w)
+					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
 					return
 				}
 			} else {
 				logrus.Errorf("invalid jwt; unable to parse: %v", err)
-				proxyUi.WriteUnauthorized(w)
+				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
 			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
 

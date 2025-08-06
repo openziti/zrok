@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v3/pkg/http"
@@ -95,8 +96,9 @@ func (c *githubConfigurer) configure() error {
 		return func(w http.ResponseWriter, r *http.Request) {
 			targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
-				logrus.Errorf("unable to unescape targetHost: %v", err)
-				proxyUi.WriteUnauthorized(w)
+				err := fmt.Errorf("unable to unescape targetHost: %v", err)
+				logrus.Error(err)
+				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 				return
 			}
 			rp.AuthURLHandler(func() string {
@@ -129,8 +131,9 @@ func (c *githubConfigurer) configure() error {
 			return signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("error parsing intermediate token: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrap(err, "error parsing intermediate token")
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 
@@ -138,15 +141,17 @@ func (c *githubConfigurer) configure() error {
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			logrus.Errorf("unable to parse authorization check interval: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrapf(err, "unable to parse authorization check interval '%v'", token.Claims.(*IntermediateJWT).RefreshInterval)
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 
 		parsedUrl, err := url.Parse("https://api.github.com/user/emails")
 		if err != nil {
-			logrus.Errorf("unable to parse api.github.com url: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrap(err, "error parsing github url")
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 		req := &http.Request{
@@ -157,8 +162,9 @@ func (c *githubConfigurer) configure() error {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens.AccessToken))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			logrus.Errorf("error getting user info from github: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrap(err, "error getting user info from github")
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 		defer func() {
@@ -166,15 +172,17 @@ func (c *githubConfigurer) configure() error {
 		}()
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
-			logrus.Errorf("error reading response body: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrap(err, "error reading response body from github")
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 		var rDat []githubUserResp
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
-			logrus.Errorf("error unmarshalling github oauth response: %v", err)
-			proxyUi.WriteUnauthorized(w)
+			errOut := errors.Wrap(err, "error unmarshalling response from github")
+			logrus.Error(errOut)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
 
@@ -187,7 +195,7 @@ func (c *githubConfigurer) configure() error {
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			cfg:             c.cfg,
+			oauthCfg:        c.cfg,
 			supportsRefresh: false,
 			email:           primaryEmail,
 			accessToken:     tokens.AccessToken,
@@ -218,7 +226,7 @@ func (c *githubConfigurer) configure() error {
 							strings.NewReader(fmt.Sprintf(`{"access_token":"%s"}`, accessToken)))
 						if err != nil {
 							logrus.Errorf("error creating access token delete request for '%v': %v", claims.Email, err)
-							proxyUi.WriteUnauthorized(w)
+							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("error creating access token delete request")))
 							return
 						}
 
@@ -228,7 +236,7 @@ func (c *githubConfigurer) configure() error {
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
 							logrus.Errorf("error invoking access token delete request for '%v': %v", claims.Email, err)
-							proxyUi.WriteUnauthorized(w)
+							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("error executing access token delete request")))
 							return
 						}
 						defer resp.Body.Close()
@@ -237,27 +245,27 @@ func (c *githubConfigurer) configure() error {
 							logrus.Infof("revoked github access token for '%v'", claims.Email)
 						} else {
 							logrus.Errorf("access token revocation failed with status: %v", resp.StatusCode)
-							proxyUi.WriteUnauthorized(w)
+							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 							return
 						}
 					} else {
 						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
-						proxyUi.WriteUnauthorized(w)
+						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
 					logrus.Errorf("expected provider name '%v' got '%v'", c.githubCfg.Name, claims.Email)
-					proxyUi.WriteUnauthorized(w)
+					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}
 			} else {
 				logrus.Errorf("invalid jwt; unable to parse: %v", err)
-				proxyUi.WriteUnauthorized(w)
+				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
 			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
-			proxyUi.WriteUnauthorized(w)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
 
