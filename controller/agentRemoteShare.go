@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -37,17 +37,17 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 	}
 	_ = trx.Rollback() // ...or will block share trx on sqlite
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteShareInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
 	out := &agent.RemoteShareOKBody{}
 	switch params.Body.ShareMode {
 	case "public":
-		token, frontendEndpoints, err := h.publicShare(params, acli)
+		token, frontendEndpoints, err := h.publicShare(params, agentClient)
 		if err != nil {
 			logrus.Errorf("error creating public remote agent share for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 			return agent.NewRemoteShareBadGateway()
@@ -56,7 +56,7 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 		out.FrontendEndpoints = frontendEndpoints
 
 	case "private":
-		token, err := h.privateShare(params, acli)
+		token, err := h.privateShare(params, agentClient)
 		if err != nil {
 			logrus.Errorf("error creating private remote agent share for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 			return agent.NewRemoteShareBadGateway()
@@ -64,7 +64,7 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 		out.Token = token
 
 	case "reserved":
-		token, err := h.reservedShare(params, acli)
+		token, err := h.reservedShare(params, agentClient)
 		if err != nil {
 			logrus.Errorf("error creating reserved remote agent share for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 			return agent.NewRemoteShareBadGateway()

@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -38,12 +37,12 @@ func (h *agentShareHttpHealthcheckHandler) Handle(params agent.ShareHTTPHealthch
 	}
 	_ = trx.Rollback() // ...or will block share trx on sqlite
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewShareHTTPHealthcheckInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
 	req := &agentGrpc.ShareHttpHealthcheckRequest{
 		Token:                params.Body.ShareToken,
@@ -52,7 +51,7 @@ func (h *agentShareHttpHealthcheckHandler) Handle(params agent.ShareHTTPHealthch
 		ExpectedHttpResponse: uint32(params.Body.ExpectedHTTPResponse),
 		TimeoutMs:            uint64(params.Body.TimeoutMs),
 	}
-	resp, err := acli.ShareHttpHealthcheck(context.Background(), req)
+	resp, err := agentClient.ShareHttpHealthcheck(context.Background(), req)
 	if err != nil {
 		logrus.Infof("error invoking remoted share '%v' http healthcheck for '%v': %v", params.Body.ShareToken, params.Body.EnvZID, err)
 		return agent.NewShareHTTPHealthcheckBadGateway()

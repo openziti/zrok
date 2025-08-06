@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -36,14 +36,14 @@ func (h *agentRemoteStatusHandler) Handle(params agent.RemoteStatusParams, princ
 		return agent.NewRemoteStatusBadGateway()
 	}
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
-	resp, err := acli.Status(context.Background(), &agentGrpc.StatusRequest{})
+	resp, err := agentClient.Status(context.Background(), &agentGrpc.StatusRequest{})
 	if err != nil {
 		logrus.Errorf("error retrieving remote agent status for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusBadGateway()

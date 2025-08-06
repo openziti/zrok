@@ -2,9 +2,9 @@ package controller
 
 import (
 	"context"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -37,15 +37,15 @@ func (h *agentRemoteUnshareHandler) Handle(params agent.RemoteUnshareParams, pri
 	}
 	_ = trx.Rollback() // ...or will block unshare trx on sqlite
 
-	acli, aconn, err := agentController.NewAgentClient(ae.Token, cfg.AgentController)
+	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
 		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteUnshareInternalServerError()
 	}
-	defer aconn.Close()
+	defer agentConn.Close()
 
 	req := &agentGrpc.ReleaseShareRequest{Token: params.Body.Token}
-	_, err = acli.ReleaseShare(context.Background(), req)
+	_, err = agentClient.ReleaseShare(context.Background(), req)
 	if err != nil {
 		logrus.Errorf("error releasing share '%v' for '%v' (%v): %v", params.Body.Token, params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteUnshareBadGateway()
