@@ -2,9 +2,11 @@
 
 ## v1.1.0
 
-FEATURE: Rewritten and improved `publicProxy` package (`zrok access public`), with support for extensible OAuth-compliant identity providers. The `publicProxy` configuration now supports any number of configured OAuth-compliant providers (rather than just a single `google` provider and/or a single `github` provider). Also includes a new OIDC-compliant generic IDP provider integration. Improvements to authentication flows and security all around. See the updated guide on using OAuth-based identity providers with the zrok public frontend (https://github.com/openziti/zrok/issues/968)
+FEATURE: Rewritten and improved `publicProxy` package (`zrok access public`), with support for extensible OAuth-compliant identity providers. The `publicProxy` configuration now supports any number of configured OAuth-compliant providers (rather than just a single `google` provider and/or a single `github` provider). Also includes a new OIDC-compliant generic IDP provider integration. Improvements to authentication flows and security all around. See the [updated guide](https://docs.zrok.io/docs/guides/self-hosting/oauth/configuring-oauth/) on using OAuth-based identity providers with the zrok public frontend (https://github.com/openziti/zrok/issues/968)
 
-FEATURE: Templatized and improved static pages (not found/404, unauthorized/401, health check, etc.) used by the public frontend. Consolidated variable data using golang `text/template` so that static `proxyUi` package can display additional error information and provide extension points for replacing all of the templated content with external files (https://github.com/openziti/zrok/issues/1012)
+FEATURE: Templatized and improved static pages (not found/404, unauthorized/401, health check, etc.) used by the public frontend. Consolidated variable data using golang `text/template` so that static `proxyUi` package can display additional error information and provide extension points for replacing all of the templated content with external files. See the [error pages guide](https://docs.zrok.io/docs/guides/self-hosting/error-pages/) for more information on customizing the built-in template (https://github.com/openziti/zrok/issues/1012)
+
+FEATURE: `zrok access private` now includes a `--template-path` allowing the embedded `proxyUi` template to be replaced with an external HTML file (https://github.com/openziti/zrok/issues/1012)
 
 FIX: Invoking `/agent/*` endpoints to remotely manage agents with remoting was causing a new API session to be allocated in the ziti controller for each request. A slightly different strategy was employed for embedding the ziti SDK into the zrok controller that should mitigate this (https://github.com/openziti/zrok/issues/1023)
 

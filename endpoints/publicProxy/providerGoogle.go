@@ -216,7 +216,7 @@ func (c *googleConfigurer) configure() error {
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.googleCfg.Name, claims.Email)
+					logrus.Errorf("expected provider name '%v' got '%v'", c.googleCfg.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}
