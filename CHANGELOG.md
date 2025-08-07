@@ -6,6 +6,8 @@ FEATURE: Rewritten and improved `publicProxy` package (`zrok access public`), wi
 
 FEATURE: Templatized and improved static pages (not found/404, unauthorized/401, health check, etc.) used by the public frontend. Consolidated variable data using golang `text/template` so that static `proxyUi` package can display additional error information and provide extension points for replacing all of the templated content with external files (https://github.com/openziti/zrok/issues/1012)
 
+FEATURE: `zrok access private` now includes a `--template-path` allowing the embedded `proxyUi` template to be replaced with an external HTML file (https://github.com/openziti/zrok/issues/1012)
+
 FIX: Invoking `/agent/*` endpoints to remotely manage agents with remoting was causing a new API session to be allocated in the ziti controller for each request. A slightly different strategy was employed for embedding the ziti SDK into the zrok controller that should mitigate this (https://github.com/openziti/zrok/issues/1023)
 
 ## v1.0.8
