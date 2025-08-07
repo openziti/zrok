@@ -236,15 +236,15 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 					}
 				} else {
 					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(errors.New("'auth_scheme' missing from service config")))
 				}
 			} else {
 				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(errors.New("'zrok.proxy.v1' config missing from service")))
 			}
 		} else {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(fmt.Errorf("share '%v' not found in overlay network")))
 		}
 	}
 }

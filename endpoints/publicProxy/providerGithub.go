@@ -254,7 +254,7 @@ func (c *githubConfigurer) configure() error {
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.githubCfg.Name, claims.Email)
+					logrus.Errorf("expected provider name '%v' got '%v'", c.githubCfg.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}

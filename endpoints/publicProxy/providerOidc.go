@@ -251,7 +251,7 @@ func (c *oidcConfigurer) configure() error {
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.oidcCfg.Name, claims.Email)
+					logrus.Errorf("expected provider name '%v' got '%v'", c.oidcCfg.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
 					return
 				}

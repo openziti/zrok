@@ -24,7 +24,12 @@ func init() {
 	}
 }
 
-type VariableData map[string]interface{}
+type VariableData struct {
+	Title   string
+	Banner  string
+	Message string
+	Error   error
+}
 
 func ReplaceTemplate(path string) error {
 	if f, err := os.ReadFile(path); err == nil {
@@ -47,14 +52,16 @@ func WriteBadGateway(w http.ResponseWriter, variableData VariableData) {
 }
 
 func RequiredData(title, banner string) VariableData {
-	return map[string]interface{}{
-		"title":  title,
-		"banner": banner,
-	}
+	return VariableData{Title: title, Banner: banner}
+}
+
+func (vd VariableData) WithMessage(msg string) VariableData {
+	vd.Message = msg
+	return vd
 }
 
 func (vd VariableData) WithError(err error) VariableData {
-	vd["error"] = err.Error()
+	vd.Error = err
 	return vd
 }
 
@@ -62,7 +69,7 @@ func NotFoundData(shareToken string) VariableData {
 	return RequiredData(
 		fmt.Sprintf("'%v' not found!", shareToken),
 		fmt.Sprintf("share <code>%v</code> not found!", shareToken),
-	)
+	).WithMessage(fmt.Sprintf("are you running <code>zrok share</code> for this share?"))
 }
 
 func WriteNotFound(w http.ResponseWriter, variableData VariableData) {
@@ -79,7 +86,7 @@ func UnauthorizedData() VariableData {
 func UnauthorizedUser(user string) VariableData {
 	return RequiredData(
 		"unauthorized!",
-		fmt.Sprintf("user <code>%v</code> not authorized to access share!", user),
+		fmt.Sprintf("<code>%v</code> not authorized!", user),
 	)
 }
 
