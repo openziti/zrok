@@ -19,6 +19,7 @@ import (
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxy"
+	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
 	"github.com/openziti/zrok/endpoints/vpn"
@@ -47,6 +48,7 @@ type accessPrivateCommand struct {
 	forceLocal      bool
 	forceAgent      bool
 	responseHeaders []string
+	templatePath    string
 	cmd             *cobra.Command
 }
 
@@ -73,6 +75,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	cmd.Flags().Uint16Var(&command.autoStartPort, "auto-start-port", 8080, "The starting port to use for automatic port detection")
 	cmd.Flags().Uint16Var(&command.autoEndPort, "auto-end-port", 8888, "The ending port to use for automatic port detection")
 	cmd.Flags().StringArrayVar(&command.responseHeaders, "response-header", []string{}, "Add a response header ('key:value')")
+	cmd.Flags().StringVar(&command.templatePath, "template-path", "", "The path to the template for proxy error messages")
 	cmd.Run = command.run
 	return command
 }
@@ -123,6 +126,13 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	req := share.NewAccessParams()
 	req.Body.ShareToken = shrToken
 	req.Body.EnvZID = root.Environment().ZitiIdentity
+
+	if cmd.templatePath != "" {
+		if err := proxyUi.ReplaceTemplate(cmd.templatePath); err != nil {
+			logrus.Fatalf("error loading template '%v': %v", cmd.templatePath, err)
+		}
+		logrus.Infof("loaded external proxy ui template '%v'", cmd.templatePath)
+	}
 
 	accessResp, err := zrok.Share.Access(req, auth)
 	if err != nil {
