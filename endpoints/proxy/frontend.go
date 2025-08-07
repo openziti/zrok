@@ -244,7 +244,7 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 			}
 		} else {
 			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(fmt.Errorf("share '%v' not found in overlay network")))
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(fmt.Errorf("share '%v' not found in overlay network", shrToken)))
 		}
 	}
 }
