@@ -2,7 +2,7 @@
 
 ![zrok logo](docs/images/zrok_cover.png)
 
-**Share anything, anywhere, instantly. No firewall changes, no port forwarding, no hassle. Enterprise reliability.**
+**Share anything, anywhere, instantly. Enterprise reliability. No firewall changes. No port forwarding. No hassle.**
 
 `zrok` lets you securely share web services, files, and network resources with anyone—whether they're across the internet or your private network. Built on zero-trust networking, it works through firewalls and NAT without requiring any network configuration changes.
 
