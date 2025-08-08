@@ -1,6 +1,7 @@
 package env_v0_4
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -52,7 +53,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
 	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
 		Body: metadata2.ClientVersionCheckBody{
-			ClientVersion: build.String(),
+			ClientVersion: fmt.Sprintf("v1.0-%s", build.String()), // TODO: go back to build.String()
 		},
 	})
 	if err != nil {
