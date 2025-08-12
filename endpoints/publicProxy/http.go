@@ -27,9 +27,13 @@ type HttpFrontend struct {
 }
 
 func NewHTTP(cfg *Config) (*HttpFrontend, error) {
-	signingKey, err := deriveKey(cfg.Oauth.SigningKey, 32)
-	if err != nil {
-		return nil, err
+	var signingKey []byte
+	var err error
+	if cfg.Oauth != nil {
+		signingKey, err = deriveKey(cfg.Oauth.SigningKey, 32)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if cfg.TemplatePath != "" {

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.2
+
+FIX: A panic happened in the `publicProxy` implementation when no `oauth` config block is present (https://github.com/openziti/zrok/issues/1032)
+
 ## v1.1.1
 
 FIX: Masquerade as `v1.0-v1.1.1 [gitHash]` when performing client version checks. Will be replaced with the usual client identifier in `v1.1.2` when the regular expressions for controlling client compatibility are externalized in the controller config (https://github.com/openziti/zrok/issues/1028)
