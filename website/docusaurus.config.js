@@ -31,7 +31,6 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-  
   plugins: [
     [
       '@docusaurus/plugin-client-redirects',
@@ -160,7 +159,7 @@ const config = {
         style: 'dark',
         links: [
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} NetFoundry Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} <a href="https://netfoundry.io">NetFoundry Inc.</a>`,
       },
       prism: {
         theme: lightCodeTheme,
