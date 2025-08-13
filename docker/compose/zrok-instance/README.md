@@ -210,6 +210,28 @@ ZROK_OAUTH_GOOGLE_CLIENT_ID=abcd1234
 ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
 ```
 
+#### ⚠️ OAuth Configuration Note
+
+**If you are NOT using OAuth for public shares**, remove the entire OAuth section from `zrok-frontend-config.yml.envsubst` to avoid configuration errors:
+
+```yaml
+# Remove this entire section if not using OAuth
+oauth:
+  bind_address: 0.0.0.0:${ZROK_OAUTH_PORT}
+  redirect_url: https://oauth.${ZROK_DNS_ZONE}
+  cookie_domain: ${ZROK_DNS_ZONE}
+  hash_key: ${ZROK_OAUTH_HASH_KEY}
+  providers:
+    - name: github
+      client_id: ${ZROK_OAUTH_GITHUB_CLIENT_ID}
+      client_secret: ${ZROK_OAUTH_GITHUB_CLIENT_SECRET}
+    - name: google
+      client_id: ${ZROK_OAUTH_GOOGLE_CLIENT_ID}
+      client_secret: ${ZROK_OAUTH_GOOGLE_CLIENT_SECRET}
+```
+
+Then rebuild: `docker compose up -d --build zrok-frontend`
+
 ### Troubleshooting
 
 1. Check the service logs:
