@@ -29,25 +29,28 @@ func newClientVersionCheckHandler(cfg *config.Config) *clientVersionCheckHandler
 func (h *clientVersionCheckHandler) Handle(params metadata.ClientVersionCheckParams) middleware.Responder {
 	logrus.Debugf("client sent version '%v'", params.Body.ClientVersion)
 
-	patterns := h.getVersionPatterns()
-	for _, pattern := range patterns {
-		re := regexp.MustCompile(pattern)
+	patterns := h.getCompiledPatterns()
+	for i, re := range patterns {
 		if re.MatchString(params.Body.ClientVersion) {
-			logrus.Debugf("client version matched pattern '%v'", pattern)
+			logrus.Debugf("client version matched pattern %d", i)
 			return metadata.NewClientVersionCheckOK()
 		}
 	}
 
-	return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("client version '%v' does not match any accepted version; please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!", params.Body.ClientVersion))
+	return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("client version '%v' does not match any accepted patterns; please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!", params.Body.ClientVersion))
 }
 
-func (h *clientVersionCheckHandler) getVersionPatterns() []string {
-	if h.cfg.Compatibility != nil && len(h.cfg.Compatibility.VersionPatterns) > 0 {
-		return h.cfg.Compatibility.VersionPatterns
+func (h *clientVersionCheckHandler) getCompiledPatterns() []*regexp.Regexp {
+	if h.cfg.Compatibility != nil && len(h.cfg.Compatibility.GetCompiledPatterns()) > 0 {
+		return h.cfg.Compatibility.GetCompiledPatterns()
 	}
 
-	// default built-in patterns
-	return []string{`^(refs/(heads|tags)/)?` + build.Series}
+	// fallback to built-in patterns (this should not happen in normal operation)
+	logrus.Errorf("missing compatibility patterns; defaulting to last-resort patterns")
+	defaultPatterns := []*regexp.Regexp{
+		regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series),
+	}
+	return defaultPatterns
 }
 
 func versionInventoryHandler(params metadata.VersionInventoryParams) middleware.Responder {

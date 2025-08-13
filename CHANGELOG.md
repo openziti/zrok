@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.1.3
+
+FEATURE: A new `compatibility` > `version_patterns` array is included in the controller configuration, allowing for dynamic adjustment of allowed client version strings (https://github.com/openziti/zrok/issues/1030)
+
+FEATURE: 
+
 ## v1.1.2
 
 FIX: A panic happened in the `publicProxy` implementation when no `oauth` config block is present (https://github.com/openziti/zrok/issues/1032)
