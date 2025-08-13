@@ -218,14 +218,21 @@ ZROK_OAUTH_GOOGLE_CLIENT_SECRET=abcd1234
 # Remove this entire section if not using OAuth
 oauth:
   bind_address: 0.0.0.0:${ZROK_OAUTH_PORT}
-  redirect_url: https://oauth.${ZROK_DNS_ZONE}
+  endpoint_url: https://oauth.${ZROK_DNS_ZONE}
+  cookie_name: zrok-auth-session
   cookie_domain: ${ZROK_DNS_ZONE}
-  hash_key: ${ZROK_OAUTH_HASH_KEY}
+  session_lifetime: 6h
+  intermediate_lifetime: 5m
+  signing_key: ${ZROK_OAUTH_HASH_KEY}
+  encryption_key: ${ZROK_OAUTH_HASH_KEY}
   providers:
     - name: github
+      type: github
       client_id: ${ZROK_OAUTH_GITHUB_CLIENT_ID}
       client_secret: ${ZROK_OAUTH_GITHUB_CLIENT_SECRET}
+
     - name: google
+      type: google
       client_id: ${ZROK_OAUTH_GOOGLE_CLIENT_ID}
       client_secret: ${ZROK_OAUTH_GOOGLE_CLIENT_SECRET}
 ```
