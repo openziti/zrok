@@ -22,6 +22,7 @@ type Config struct {
 	Admin           *AdminConfig
 	AgentController *agentController.Config
 	Bridge          *metrics.BridgeConfig
+	Compatibility   *CompatibilityConfig
 	Endpoint        *EndpointConfig
 	Email           *emailUi.Config
 	Invites         *InvitesConfig
@@ -83,8 +84,18 @@ type TlsConfig struct {
 	KeyPath  string
 }
 
+type CompatibilityConfig struct {
+	VersionPatterns []string
+}
+
 func DefaultConfig() *Config {
 	return &Config{
+		Compatibility: &CompatibilityConfig{
+			VersionPatterns: []string{
+				`^(refs/(heads|tags)/)?v1\.1`,
+				`^v1\.0`,
+			},
+		},
 		Limits: limits.DefaultConfig(),
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{

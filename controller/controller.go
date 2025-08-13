@@ -92,7 +92,7 @@ func Run(inCfg *config.Config) error {
 	api.EnvironmentEnableHandler = newEnableHandler()
 	api.EnvironmentDisableHandler = newDisableHandler()
 	api.MetadataConfigurationHandler = newConfigurationHandler(cfg)
-	api.MetadataClientVersionCheckHandler = metadata.ClientVersionCheckHandlerFunc(clientVersionCheckHandler)
+	api.MetadataClientVersionCheckHandler = newClientVersionCheckHandler(cfg)
 	api.MetadataGetAccountDetailHandler = newAccountDetailHandler()
 	api.MetadataGetSparklinesHandler = newSparklinesHandler(cfg)
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
