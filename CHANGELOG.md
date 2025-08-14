@@ -2,6 +2,10 @@
 
 ## v1.1.3
 
+FEATURE: A new `compatibility` > `version_patterns` array is included in the controller configuration, allowing for dynamic adjustment of allowed client version strings (https://github.com/openziti/zrok/issues/1030)
+
+FEATURE: A new `compatibility` > `log_version` boolean is included in the controller configuration. When this boolean is set to `true`, the controller will log all client versions provided for compatibility checking.
+
 CHANGE: Update `github.com/openziti/sdk-golang` to `v1.2.3`
 
 ## v1.1.2

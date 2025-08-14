@@ -1,6 +1,11 @@
 package config
 
 import (
+	"os"
+	"regexp"
+	"strconv"
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/emailUi"
@@ -10,9 +15,6 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
-	"os"
-	"strconv"
-	"time"
 )
 
 const ConfigVersion = 4
@@ -22,6 +24,7 @@ type Config struct {
 	Admin           *AdminConfig
 	AgentController *agentController.Config
 	Bridge          *metrics.BridgeConfig
+	Compatibility   *CompatibilityConfig
 	Endpoint        *EndpointConfig
 	Email           *emailUi.Config
 	Invites         *InvitesConfig
@@ -83,8 +86,20 @@ type TlsConfig struct {
 	KeyPath  string
 }
 
+type CompatibilityConfig struct {
+	LogRequests      bool
+	VersionPatterns  []string
+	compiledPatterns []*regexp.Regexp
+}
+
 func DefaultConfig() *Config {
-	return &Config{
+	cfg := &Config{
+		Compatibility: &CompatibilityConfig{
+			VersionPatterns: []string{
+				`^(refs/(heads|tags)/)?v1\.1`,
+				`^v1\.0`,
+			},
+		},
 		Limits: limits.DefaultConfig(),
 		Maintenance: &MaintenanceConfig{
 			ResetPassword: &ResetPasswordMaintenanceConfig{
@@ -99,6 +114,11 @@ func DefaultConfig() *Config {
 			},
 		},
 	}
+	// compile default patterns
+	if err := cfg.compileCompatibilityPatterns(); err != nil {
+		panic(errors.Wrap(err, "error compiling default compatibility patterns"))
+	}
+	return cfg
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -109,7 +129,31 @@ func LoadConfig(path string) (*Config, error) {
 	if !envVersionOk() && cfg.V != ConfigVersion {
 		return nil, errors.Errorf("expecting configuration version '%v', your configuration is version '%v'; please see zrok.io for changelog and configuration documentation", ConfigVersion, cfg.V)
 	}
+	if err := cfg.compileCompatibilityPatterns(); err != nil {
+		return nil, errors.Wrap(err, "error compiling compatibility patterns")
+	}
 	return cfg, nil
+}
+
+func (cfg *Config) compileCompatibilityPatterns() error {
+	if cfg.Compatibility == nil {
+		return nil
+	}
+
+	compiled := make([]*regexp.Regexp, len(cfg.Compatibility.VersionPatterns))
+	for i, pattern := range cfg.Compatibility.VersionPatterns {
+		re, err := regexp.Compile(pattern)
+		if err != nil {
+			return errors.Wrapf(err, "invalid regex pattern '%v' at index %d", pattern, i)
+		}
+		compiled[i] = re
+	}
+	cfg.Compatibility.compiledPatterns = compiled
+	return nil
+}
+
+func (cfg *CompatibilityConfig) GetCompiledPatterns() []*regexp.Regexp {
+	return cfg.compiledPatterns
 }
 
 func envVersionOk() bool {

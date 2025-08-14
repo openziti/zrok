@@ -47,6 +47,20 @@ bridge:
     url:            amqp://guest:guest@localhost:5672
     queue_name:     events
 
+# Client version compatibility checking. This section allows administrators to configure which client versions
+# are considered compatible with the controller. If this section is not provided, the controller uses built-in
+# default patterns that match the current version stream.
+#
+# If `log_requests` is set to `true`, the compatibility check handler will log all client versions (useful for metrics).
+#
+#compatibility:
+#  log_requests:                  true
+#  version_patterns:
+#    - "^(refs/(heads|tags)/)?v1\\.1"  # current version stream
+#    - "^v1\\.0"                       # previous version for backward compatibility
+#    - "^v1\\.2"                       # example: allow future version
+#    - "^dev-"                         # example: allow development builds
+
 # The `endpoint` section determines where the HTTP listener that serves the API and web console will be bound.
 #
 endpoint:
