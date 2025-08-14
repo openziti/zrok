@@ -1,6 +1,7 @@
 .$*
 .idea
 .vscode
+CLAUDE.md
 *.db
 /automated-release-build/
 etc/dev.yml

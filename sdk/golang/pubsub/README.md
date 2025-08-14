@@ -1,12 +1,15 @@
 # OpenZiti Pub/Sub Package
 
-A simple, reliable pub/sub implementation built on OpenZiti.
+A simple, reliable pub/sub implementation built on OpenZiti with mesh networking support.
 
 ## Features
 
 - **OpenZiti Native**: Uses OpenZiti services for secure, overlay network communication
+- **Mesh Architecture**: Multiple publishers form a self-organizing mesh for fault tolerance
+- **Addressable Terminators**: Uses OpenZiti addressable terminators for peer discovery
 - **Auto-Reconnect**: Automatic reconnection with configurable delays and retry limits
 - **Topic Filtering**: Subscribe to specific topics or all messages
+- **Message Deduplication**: Prevents message loops in mesh networks
 - **Simple API**: Clean interfaces for both publishers and subscribers
 - **Reliability**: Built-in error handling, connection monitoring, and graceful degradation
 
@@ -148,10 +151,121 @@ func main() {
 - `MaxReconnects`: Maximum reconnection attempts (-1 = infinite)
 - `MessageTimeout`: Timeout for message processing
 
+### Mesh Publisher
+
+```go
+package main
+
+import (
+    "context"
+    "time"
+    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/sirupsen/logrus"
+)
+
+func main() {
+    // configure mesh publisher
+    cfg := &pubsub.MeshConfig{
+        ServiceName:       "zrok-pubsub-mesh",
+        IdentityPath:      "/path/to/identity.json",
+        NodeID:           "controller-1",
+        PeerRefreshDelay: 30 * time.Second,
+        MaxHops:          3,
+        MessageCacheSize: 1000,
+        MessageCacheTTL:  5 * time.Minute,
+    }
+
+    // create mesh publisher
+    pub, err := pubsub.NewMeshPublisher(cfg)
+    if err != nil {
+        logrus.Fatalf("failed to create mesh publisher: %v", err)
+    }
+    defer pub.Close()
+
+    // join mesh network
+    ctx := context.Background()
+    if err := pub.JoinMesh(ctx); err != nil {
+        logrus.Fatalf("failed to join mesh: %v", err)
+    }
+
+    // announce available topics
+    pub.AnnounceTopics([]string{"frontend", "metrics", "events"})
+
+    // publish messages (will reach both local subscribers and mesh peers)
+    msg := pubsub.NewMessage("hostname_update", "frontend", map[string]any{
+        "operation": "ADD",
+        "hostname":  "api.example.com",
+        "service":   "zrok-service-abc123",
+    })
+
+    if err := pub.Publish(ctx, msg); err != nil {
+        logrus.Errorf("failed to publish: %v", err)
+    }
+
+    logrus.Infof("connected to %d mesh peers", len(pub.GetConnectedPeers()))
+}
+```
+
+### Mesh Subscriber
+
+```go
+package main
+
+import (
+    "context"
+    "time"
+    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/sirupsen/logrus"
+)
+
+func main() {
+    // configure subscriber (automatically connects to any mesh publisher)
+    cfg := &pubsub.SubscriberConfig{
+        ServiceName:    "zrok-pubsub-mesh",
+        IdentityPath:   "/path/to/subscriber.json",
+        ReconnectDelay: 5 * time.Second,
+        MaxReconnects:  -1,
+    }
+
+    // create mesh-aware subscriber
+    sub, err := pubsub.NewMeshSubscriber(cfg, "frontend-1")
+    if err != nil {
+        logrus.Fatalf("failed to create subscriber: %v", err)
+    }
+    defer sub.Close()
+
+    // handler automatically deduplicates mesh messages
+    handler := func(msg *pubsub.Message) error {
+        logrus.Infof("received %s from %s (hops: %d)", 
+            msg.Type, msg.OriginNode, msg.HopCount)
+        return nil
+    }
+
+    ctx := context.Background()
+    if err := sub.Subscribe(ctx, []string{"frontend"}, handler); err != nil {
+        logrus.Errorf("subscription failed: %v", err)
+    }
+}
+```
+
+## Discovery Mechanism
+
+Peers discover each other through:
+
+1. **Ziti Terminator Query**: Direct query to ziti controller for service terminators
+2. **Connection-based Discovery**: Fallback discovery protocol through service connections
+3. **Periodic Refresh**: Automatic discovery of new peers every 30 seconds (configurable)
+
+When a new publisher joins:
+- It binds the service with its unique node ID as addressable terminator
+- Existing peers discover it during their next periodic refresh (≤30s)
+- New connections are established automatically
+- Mesh forms organically without configuration
+
 ## Use Cases
 
-Perfect for the dynamic frontend system where:
-- Controller publishes hostname → service mappings
-- Multiple frontend instances subscribe to updates
-- Automatic failover when connections drop
-- Real-time configuration without restarts
+Perfect for distributed systems where:
+- Multiple controllers need to coordinate without single points of failure
+- Frontend instances need real-time updates from any available controller
+- System should gracefully handle controller failures
+- Messages need to reach all nodes regardless of which controller publishes

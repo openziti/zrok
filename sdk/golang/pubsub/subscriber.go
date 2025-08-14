@@ -69,12 +69,16 @@ func (s *subscriber) connect(ctx context.Context) error {
 		default:
 		}
 
+		// try to connect to any available mesh publisher
+		// note: in a mesh setup, we connect to any available terminator
 		conn, err := s.zCtx.DialWithOptions(s.cfg.ServiceName, &ziti.DialOptions{
 			ConnectTimeout: 30 * time.Second,
+			// in mesh mode, we don't specify a particular identity
+			// and let ziti route us to any available terminator
 		})
 		if err != nil {
 			if s.shouldReconnect() {
-				logrus.Warnf("failed to connect to service '%s', retrying in %v: %v",
+				logrus.Warnf("failed to connect to pubsub service '%s', retrying in %v: %v",
 					s.cfg.ServiceName, s.cfg.ReconnectDelay, err)
 				s.reconnectCount++
 
@@ -87,7 +91,7 @@ func (s *subscriber) connect(ctx context.Context) error {
 					return nil
 				}
 			}
-			return errors.Wrapf(err, "failed to connect to service '%s'", s.cfg.ServiceName)
+			return errors.Wrapf(err, "failed to connect to pubsub service '%s'", s.cfg.ServiceName)
 		}
 
 		s.mutex.Lock()
