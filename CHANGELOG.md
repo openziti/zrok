@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.3
+
+CHANGE: Update `github.com/openziti/sdk-golang` to `v1.2.3`
+
 ## v1.1.2
 
 FIX: A panic happened in the `publicProxy` implementation when no `oauth` config block is present (https://github.com/openziti/zrok/issues/1032)
