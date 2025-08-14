@@ -27,7 +27,9 @@ func newClientVersionCheckHandler(cfg *config.Config) *clientVersionCheckHandler
 }
 
 func (h *clientVersionCheckHandler) Handle(params metadata.ClientVersionCheckParams) middleware.Responder {
-	logrus.Debugf("client sent version '%v'", params.Body.ClientVersion)
+	if h.cfg.Compatibility != nil && h.cfg.Compatibility.LogRequests {
+		logrus.Infof("client at '%v' sent version '%v'", params.HTTPRequest.RemoteAddr, params.Body.ClientVersion)
+	}
 
 	patterns := h.getCompiledPatterns()
 	for i, re := range patterns {

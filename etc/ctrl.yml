@@ -51,7 +51,10 @@ bridge:
 # are considered compatible with the controller. If this section is not provided, the controller uses built-in
 # default patterns that match the current version stream.
 #
+# If `log_requests` is set to `true`, the compatibility check handler will log all client versions (useful for metrics).
+#
 #compatibility:
+#  log_requests:                  true
 #  version_patterns:
 #    - "^(refs/(heads|tags)/)?v1\\.1"  # current version stream
 #    - "^v1\\.0"                       # previous version for backward compatibility

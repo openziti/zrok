@@ -1,6 +1,11 @@
 package config
 
 import (
+	"os"
+	"regexp"
+	"strconv"
+	"time"
+
 	"github.com/michaelquigley/cf"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/emailUi"
@@ -10,10 +15,6 @@ import (
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
-	"os"
-	"regexp"
-	"strconv"
-	"time"
 )
 
 const ConfigVersion = 4
@@ -86,6 +87,7 @@ type TlsConfig struct {
 }
 
 type CompatibilityConfig struct {
+	LogRequests      bool
 	VersionPatterns  []string
 	compiledPatterns []*regexp.Regexp
 }
@@ -95,6 +97,7 @@ func DefaultConfig() *Config {
 		Compatibility: &CompatibilityConfig{
 			VersionPatterns: []string{
 				`^(refs/(heads|tags)/)?v1\.1`,
+				`^v1\.0`,
 			},
 		},
 		Limits: limits.DefaultConfig(),

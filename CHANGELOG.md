@@ -4,7 +4,7 @@
 
 FEATURE: A new `compatibility` > `version_patterns` array is included in the controller configuration, allowing for dynamic adjustment of allowed client version strings (https://github.com/openziti/zrok/issues/1030)
 
-FEATURE: 
+FEATURE: A new `compatibility` > `log_version` boolean is included in the controller configuration. When this boolean is set to `true`, the controller will log all client versions provided for compatibility checking.
 
 ## v1.1.2
 
