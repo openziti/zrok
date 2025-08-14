@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/build"
+	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
@@ -17,24 +18,41 @@ func versionHandler(_ metadata.VersionParams) middleware.Responder {
 	return metadata.NewVersionOK().WithPayload(rest_model_zrok.Version(outOfDate))
 }
 
-func clientVersionCheckHandler(params metadata.ClientVersionCheckParams) middleware.Responder {
-	logrus.Debugf("client sent version '%v'", params.Body.ClientVersion)
+type clientVersionCheckHandler struct {
+	cfg *config.Config
+}
 
-	// allow reported version string to be optionally prefixed with
-	// "refs/heads/" or "refs/tags/"
-	currentVersion := regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series)
-	if currentVersion.MatchString(params.Body.ClientVersion) {
-		logrus.Debugf("client version matched current version stream '%v'", build.Series)
-		return metadata.NewClientVersionCheckOK()
+func newClientVersionCheckHandler(cfg *config.Config) *clientVersionCheckHandler {
+	return &clientVersionCheckHandler{cfg: cfg}
+}
+
+func (h *clientVersionCheckHandler) Handle(params metadata.ClientVersionCheckParams) middleware.Responder {
+	if h.cfg.Compatibility != nil && h.cfg.Compatibility.LogRequests {
+		logrus.Infof("client at '%v' sent version '%v'", params.HTTPRequest.RemoteAddr, params.Body.ClientVersion)
 	}
 
-	previousVersion := regexp.MustCompile(`^v1.0`)
-	if previousVersion.MatchString(params.Body.ClientVersion) {
-		logrus.Debug("client version matched previous version stream 'v1.0'")
-		return metadata.NewClientVersionCheckOK()
+	patterns := h.getCompiledPatterns()
+	for i, re := range patterns {
+		if re.MatchString(params.Body.ClientVersion) {
+			logrus.Debugf("client version matched pattern %d", i)
+			return metadata.NewClientVersionCheckOK()
+		}
 	}
 
-	return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("expecting a zrok client version matching '%v' version (or previous version 'v1.0'), received: '%v'; please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!", build.Series, params.Body.ClientVersion))
+	return metadata.NewClientVersionCheckBadRequest().WithPayload(fmt.Sprintf("client version '%v' does not match any accepted patterns; please visit 'https://docs.zrok.io/docs/guides/install/' for the latest release!", params.Body.ClientVersion))
+}
+
+func (h *clientVersionCheckHandler) getCompiledPatterns() []*regexp.Regexp {
+	if h.cfg.Compatibility != nil && len(h.cfg.Compatibility.GetCompiledPatterns()) > 0 {
+		return h.cfg.Compatibility.GetCompiledPatterns()
+	}
+
+	// fallback to built-in patterns (this should not happen in normal operation)
+	logrus.Errorf("missing compatibility patterns; defaulting to last-resort patterns")
+	defaultPatterns := []*regexp.Regexp{
+		regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series),
+	}
+	return defaultPatterns
 }
 
 func versionInventoryHandler(params metadata.VersionInventoryParams) middleware.Responder {
