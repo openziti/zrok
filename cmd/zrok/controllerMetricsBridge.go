@@ -37,7 +37,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(df.Inspect(cfg))
+	logrus.Info(df.MustInspect(cfg))
 
 	bridge, err := metrics.NewBridge(cfg.Bridge)
 	if err != nil {

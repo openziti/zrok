@@ -32,7 +32,7 @@ func (cmd *adminUnbootstrap) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(df.Inspect(cfg))
+	logrus.Info(df.MustInspect(cfg))
 	if err := controller.Unbootstrap(cfg); err != nil {
 		panic(err)
 	}

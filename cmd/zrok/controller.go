@@ -42,7 +42,7 @@ func (cmd *controllerCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(df.Inspect(cfg))
+	logrus.Info(df.MustInspect(cfg))
 	if err := controller.Run(cfg); err != nil {
 		panic(err)
 	}

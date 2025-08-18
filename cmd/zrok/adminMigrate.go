@@ -34,7 +34,7 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Info(df.Inspect(inCfg))
+	logrus.Info(df.MustInspect(inCfg))
 
 	// override the 'disable_auto_migration' setting... the user is requesting a migration here.
 	inCfg.Store.DisableAutoMigration = false

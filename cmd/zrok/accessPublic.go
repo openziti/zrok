@@ -42,7 +42,7 @@ func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 	}
-	logrus.Info(df.Inspect(cfg))
+	logrus.Info(df.MustInspect(cfg))
 	frontend, err := publicProxy.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {

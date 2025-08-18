@@ -22,6 +22,6 @@ func LoadConfig(path string) (*Config, error) {
 	if cfg.V != ConfigVersion {
 		return nil, errors.Errorf("expecting canary configuration version '%v', got '%v'", ConfigVersion, cfg.V)
 	}
-	logrus.Info(df.Inspect(cfg))
+	logrus.Info(df.MustInspect(cfg))
 	return cfg, nil
 }
