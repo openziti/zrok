@@ -34,9 +34,8 @@ require (
 	github.com/kolesnikovae/go-winjob v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.18
-	github.com/michaelquigley/cf v0.0.13
+	github.com/michaelquigley/df v0.1.3
 	github.com/michaelquigley/pfxlog v0.6.10
-	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/reflow v0.3.0
 	github.com/net-byte/vtun v1.7.0
 	github.com/net-byte/water v0.0.7
@@ -183,11 +182,11 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mholt/acmez/v2 v2.0.1 // indirect
-	github.com/michaelquigley/df v0.1.3 // indirect
 	github.com/miekg/dns v1.1.65 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect

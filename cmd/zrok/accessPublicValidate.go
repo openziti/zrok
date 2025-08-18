@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/michaelquigley/cf"
+
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/endpoints/publicProxy"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
@@ -33,5 +34,5 @@ func (cmd *accessPublicValidateCommand) run(_ *cobra.Command, args []string) {
 	if err := cfg.Load(args[0]); err != nil {
 		tui.Error(fmt.Sprintf("unable to load configuration '%v'", args[0]), err)
 	}
-	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(df.Inspect(cfg))
 }

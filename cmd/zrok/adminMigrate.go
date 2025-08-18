@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/sirupsen/logrus"
@@ -34,7 +34,7 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Info(cf.Dump(inCfg, cf.DefaultOptions()))
+	logrus.Info(df.Inspect(inCfg))
 
 	// override the 'disable_auto_migration' setting... the user is requesting a migration here.
 	inCfg.Store.DisableAutoMigration = false

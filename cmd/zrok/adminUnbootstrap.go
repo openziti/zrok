@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/sirupsen/logrus"
@@ -32,7 +32,7 @@ func (cmd *adminUnbootstrap) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(cf.Dump(cfg, cf.DefaultOptions()))
+	logrus.Info(df.Inspect(cfg))
 	if err := controller.Unbootstrap(cfg); err != nil {
 		panic(err)
 	}
