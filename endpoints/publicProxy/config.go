@@ -109,7 +109,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 				if err := oidcCfg.configure(cfg.Oauth, tls); err != nil {
 					return err
 				}
-				
+
 			default:
 				return errors.Errorf("invalid oauth provider type '%v'", prvCfg.Type())
 			}
