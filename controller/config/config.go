@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
@@ -39,7 +39,7 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	Secrets         []string `cf:"+secret"`
+	Secrets         []string `df:",secret"`
 	TouLink         string
 	NewAccountLink  string
 	ProfileEndpoint string
@@ -123,7 +123,7 @@ func DefaultConfig() *Config {
 
 func LoadConfig(path string) (*Config, error) {
 	cfg := DefaultConfig()
-	if err := cf.BindYaml(cfg, path, env.GetCfOptions()); err != nil {
+	if err := df.MergeFromYAML(cfg, path, env.GetDfOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
 	if !envVersionOk() && cfg.V != ConfigVersion {

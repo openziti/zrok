@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/env"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/michaelquigley/df"
+	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/metrics"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -37,7 +37,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(cf.Dump(cfg, env.GetCfOptions()))
+	logrus.Info(df.Inspect(cfg))
 
 	bridge, err := metrics.NewBridge(cfg.Bridge)
 	if err != nil {

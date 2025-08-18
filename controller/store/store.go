@@ -2,6 +2,8 @@ package store
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -11,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type Model struct {
@@ -22,7 +23,7 @@ type Model struct {
 }
 
 type Config struct {
-	Path                 string `cf:"+secret"`
+	Path                 string `df:",secret"`
 	Type                 string
 	EnableLocking        bool
 	DisableAutoMigration bool

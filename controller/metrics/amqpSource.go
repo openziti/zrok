@@ -1,32 +1,27 @@
 package metrics
 
 import (
-	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/controller/env"
+	"time"
+
+	"github.com/michaelquigley/df"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-func init() {
-	env.GetCfOptions().AddFlexibleSetter("amqpSource", loadAmqpSourceConfig)
-}
+const AmqpSourceType = "amqpSource"
 
 type AmqpSourceConfig struct {
-	Url       string `cf:"+secret"`
+	Url       string `df:",secret"`
 	QueueName string
 }
 
-func loadAmqpSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
-	if submap, ok := v.(map[string]interface{}); ok {
-		cfg := &AmqpSourceConfig{}
-		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
-			return nil, err
-		}
-		return newAmqpSource(cfg)
+func LoadAmqpSource(v map[string]any) (df.Dynamic, error) {
+	cfg, err := df.New[AmqpSourceConfig](v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("invalid config structure for 'amqpSource'")
+	return newAmqpSource(cfg)
 }
 
 type amqpSource struct {
@@ -49,6 +44,9 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 	}
 	return as, nil
 }
+
+func (s *amqpSource) Type() string          { return AmqpSourceType }
+func (s *amqpSource) ToMap() map[string]any { return nil }
 
 func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	s.events = events
