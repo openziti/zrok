@@ -2,11 +2,10 @@ package publicProxy
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
@@ -40,15 +39,15 @@ type OauthConfig struct {
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
-	SigningKey           string        `cf:"+secret"`
-	EncryptionKey        string        `cf:"+secret"`
-	Providers            []interface{} `cf:"+secret"`
+	SigningKey           string       `df:",secret"`
+	EncryptionKey        string       `df:",secret"`
+	Providers            []df.Dynamic `df:",secret"`
 }
 
 type OauthProviderConfig struct {
 	Name         string
 	ClientId     string
-	ClientSecret string `cf:"+secret"`
+	ClientSecret string `df:",secret"`
 }
 
 func DefaultConfig() *Config {
@@ -59,36 +58,20 @@ func DefaultConfig() *Config {
 }
 
 func (c *Config) Load(path string) error {
-	if err := cf.BindYaml(c, path, cfOptions()); err != nil {
+	opts := &df.Options{
+		DynamicBinders: map[string]func(map[string]any) (df.Dynamic, error){
+			(&githubConfig{}).Type(): newGithubConfig,
+			(&googleConfig{}).Type(): newGoogleConfig,
+			(&oidcConfig{}).Type():   newOidcConfig,
+		},
+	}
+	if err := df.MergeFromYAML(c, path, opts); err != nil {
 		return errors.Wrapf(err, "error loading frontend config '%v'", path)
 	}
 	if c.V != V {
 		return errors.Errorf("invalid configuration version '%d'; expected '%d'", c.V, V)
 	}
 	return nil
-}
-
-func cfOptions() *cf.Options {
-	cfOpts := cf.DefaultOptions()
-	cfOpts.AddFlexibleSetter("github", func(v interface{}, opt *cf.Options) (interface{}, error) {
-		if vm, ok := v.(map[string]interface{}); ok {
-			return vm, nil
-		}
-		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
-	})
-	cfOpts.AddFlexibleSetter("google", func(v interface{}, opt *cf.Options) (interface{}, error) {
-		if vm, ok := v.(map[string]interface{}); ok {
-			return vm, nil
-		}
-		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
-	})
-	cfOpts.AddFlexibleSetter("oidc", func(v interface{}, opt *cf.Options) (interface{}, error) {
-		if vm, ok := v.(map[string]interface{}); ok {
-			return vm, nil
-		}
-		return nil, fmt.Errorf("expected 'map[string]interface{}' got '%T'", v)
-	})
-	return cfOpts
 }
 
 func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
@@ -98,44 +81,40 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	}
 
 	for _, v := range cfg.Oauth.Providers {
-		if mv, ok := v.(map[string]interface{}); ok {
-			if t, found := mv["type"]; found {
-				switch t {
-				case "github":
-					cfger, err := newGithubConfigurer(cfg.Oauth, tls, mv)
-					if err != nil {
-						return err
-					}
-					if err := cfger.configure(); err != nil {
-						return err
-					}
-
-				case "google":
-					cfger, err := newGoogleConfigurer(cfg.Oauth, tls, mv)
-					if err != nil {
-						return err
-					}
-					if err := cfger.configure(); err != nil {
-						return err
-					}
-
-				case "oidc":
-					cfger, err := newOidcConfigurer(cfg.Oauth, tls, mv)
-					if err != nil {
-						return err
-					}
-					if err := cfger.configure(); err != nil {
-						return err
-					}
-
-				default:
-					return errors.Errorf("invalid oauth provider type '%v'", t)
+		if prvCfg, ok := v.(df.Dynamic); ok {
+			switch prvCfg.Type() {
+			case "github":
+				githubCfg, ok := prvCfg.(*githubConfig)
+				if !ok {
+					return errors.New("invalid github provider configuration")
 				}
-			} else {
-				return errors.Errorf("invalid oauth provider configuration; missing 'type'")
+				if err := githubCfg.configure(cfg.Oauth, tls); err != nil {
+					return err
+				}
+
+			case "google":
+				googleCfg, ok := prvCfg.(*googleConfig)
+				if !ok {
+					return errors.New("invalid google provider configuration")
+				}
+				if err := googleCfg.configure(cfg.Oauth, tls); err != nil {
+					return err
+				}
+
+			case "oidc":
+				oidcCfg, ok := prvCfg.(*oidcConfig)
+				if !ok {
+					return errors.New("invalid oidc provider configuration")
+				}
+				if err := oidcCfg.configure(cfg.Oauth, tls); err != nil {
+					return err
+				}
+				
+			default:
+				return errors.Errorf("invalid oauth provider type '%v'", prvCfg.Type())
 			}
 		} else {
-			return errors.Errorf("invalid oauth provider configuration data type")
+			return errors.Errorf("invalid oauth provider configuration; missing 'type'")
 		}
 	}
 
