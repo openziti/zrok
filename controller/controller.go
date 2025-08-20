@@ -117,6 +117,8 @@ func Run(inCfg *config.Config) error {
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.MetadataVersionInventoryHandler = metadata.VersionInventoryHandlerFunc(versionInventoryHandler)
 	api.ShareAccessHandler = newAccessHandler()
+	api.ShareCreateShareNameHandler = newCreateShareNameHandler()
+	api.ShareDeleteShareNameHandler = newDeleteShareNameHandler()
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
