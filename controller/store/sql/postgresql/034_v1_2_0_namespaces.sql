@@ -5,13 +5,16 @@
 --
 create table namespaces (
   id                    serial              primary key,
-  name                  varchar(255)        not null unique,
+  token                 varchar(32)         not null,
+  name                  varchar(255)        not null,
   description           text,
   created_at            timestamp           not null default(current_timestamp),
   updated_at            timestamp           not null default(current_timestamp),
   deleted               boolean             not null default(false),
 
-  constraint chk_name check (name <> '')
+  constraint chk_name check (name <> ''),
+  constraint uk_namespace_token unique (token) where not deleted,
+  constraint uk_namespace_name unique (name) where not deleted
 );
 
 --
@@ -25,7 +28,7 @@ create table namespace_grants (
   updated_at            timestamp           not null default(current_timestamp),
   deleted               boolean             not null default(false),
 
-  constraint uk_namespace_grants unique (namespace_id, account_id)
+  constraint uk_namespace_grants unique (namespace_id, account_id) where not deleted
 );
 
 --
@@ -40,7 +43,7 @@ create table allocated_names (
   updated_at            timestamp           not null default(current_timestamp),
   deleted               boolean             not null default(false),
 
-  constraint uk_allocated_names unique (namespace_id, name),
+  constraint uk_allocated_names unique (namespace_id, name) where not deleted,
   constraint chk_allocated_name check (name <> '')
 );
 

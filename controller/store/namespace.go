@@ -7,17 +7,18 @@ import (
 
 type Namespace struct {
 	Model
+	Token       string
 	Name        string
 	Description string
 }
 
 func (str *Store) CreateNamespace(ns *Namespace, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into namespaces (name, description) values ($1, $2) returning id")
+	stmt, err := tx.Prepare("insert into namespaces (token, name, description) values ($1, $2, $3) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing namespace insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(ns.Name, ns.Description).Scan(&id); err != nil {
+	if err := stmt.QueryRow(ns.Token, ns.Name, ns.Description).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing namespace insert statement")
 	}
 	return id, nil
@@ -53,6 +54,14 @@ func (str *Store) FindNamespaces(tx *sqlx.Tx) ([]*Namespace, error) {
 		namespaces = append(namespaces, ns)
 	}
 	return namespaces, nil
+}
+
+func (str *Store) FindNamespaceByToken(token string, tx *sqlx.Tx) (*Namespace, error) {
+	ns := &Namespace{}
+	if err := tx.QueryRowx("select * from namespaces where token = $1 and not deleted", token).StructScan(ns); err != nil {
+		return nil, errors.Wrap(err, "error selecting namespace by token")
+	}
+	return ns, nil
 }
 
 func (str *Store) DeleteNamespace(id int, tx *sqlx.Tx) error {
