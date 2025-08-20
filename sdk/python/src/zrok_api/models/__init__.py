@@ -17,6 +17,7 @@
 from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
+from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest

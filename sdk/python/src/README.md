@@ -101,6 +101,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**reset_password_request**](docs/AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
 *AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
 *AdminApi* | [**add_frontend_grant**](docs/AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
+*AdminApi* | [**add_namespace_grant**](docs/AdminApi.md#add_namespace_grant) | **POST** /namespace/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
@@ -119,6 +120,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
+*AdminApi* | [**remove_namespace_grant**](docs/AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AdminApi* | [**update_namespace**](docs/AdminApi.md#update_namespace) | **PATCH** /namespace | 
@@ -163,6 +165,7 @@ Class | Method | HTTP request | Description
  - [Access201Response](docs/Access201Response.md)
  - [AccessRequest](docs/AccessRequest.md)
  - [AddFrontendGrantRequest](docs/AddFrontendGrantRequest.md)
+ - [AddNamespaceGrantRequest](docs/AddNamespaceGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)

@@ -4,6 +4,7 @@ docs/Access201Response.md
 docs/AccessRequest.md
 docs/AccountApi.md
 docs/AddFrontendGrantRequest.md
+docs/AddNamespaceGrantRequest.md
 docs/AddOrganizationMemberRequest.md
 docs/AdminApi.md
 docs/AgentApi.md
@@ -85,6 +86,7 @@ test/test_access201_response.py
 test/test_access_request.py
 test/test_account_api.py
 test/test_add_frontend_grant_request.py
+test/test_add_namespace_grant_request.py
 test/test_add_organization_member_request.py
 test/test_admin_api.py
 test/test_agent_api.py
@@ -175,6 +177,7 @@ zrok_api/models/__init__.py
 zrok_api/models/access201_response.py
 zrok_api/models/access_request.py
 zrok_api/models/add_frontend_grant_request.py
+zrok_api/models/add_namespace_grant_request.py
 zrok_api/models/add_organization_member_request.py
 zrok_api/models/auth_user.py
 zrok_api/models/change_password_request.py

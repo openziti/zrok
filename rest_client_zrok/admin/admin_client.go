@@ -32,6 +32,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	AddFrontendGrant(params *AddFrontendGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddFrontendGrantOK, error)
 
+	AddNamespaceGrant(params *AddNamespaceGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddNamespaceGrantOK, error)
+
 	AddOrganizationMember(params *AddOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddOrganizationMemberCreated, error)
 
 	CreateAccount(params *CreateAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateAccountCreated, error)
@@ -67,6 +69,8 @@ type ClientService interface {
 	ListOrganizationMembers(params *ListOrganizationMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationMembersOK, error)
 
 	ListOrganizations(params *ListOrganizationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationsOK, error)
+
+	RemoveNamespaceGrant(params *RemoveNamespaceGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveNamespaceGrantOK, error)
 
 	RemoveOrganizationMember(params *RemoveOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveOrganizationMemberOK, error)
 
@@ -113,6 +117,45 @@ func (a *Client) AddFrontendGrant(params *AddFrontendGrantParams, authInfo runti
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for addFrontendGrant: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+AddNamespaceGrant add namespace grant API
+*/
+func (a *Client) AddNamespaceGrant(params *AddNamespaceGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddNamespaceGrantOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAddNamespaceGrantParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "addNamespaceGrant",
+		Method:             "POST",
+		PathPattern:        "/namespace/grant",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &AddNamespaceGrantReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AddNamespaceGrantOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for addNamespaceGrant: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -815,6 +858,45 @@ func (a *Client) ListOrganizations(params *ListOrganizationsParams, authInfo run
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listOrganizations: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RemoveNamespaceGrant remove namespace grant API
+*/
+func (a *Client) RemoveNamespaceGrant(params *RemoveNamespaceGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveNamespaceGrantOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoveNamespaceGrantParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "removeNamespaceGrant",
+		Method:             "DELETE",
+		PathPattern:        "/namespace/grant",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoveNamespaceGrantReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoveNamespaceGrantOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for removeNamespaceGrant: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

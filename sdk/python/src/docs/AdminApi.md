@@ -5,6 +5,7 @@ All URIs are relative to */api/v1*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**add_frontend_grant**](AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
+[**add_namespace_grant**](AdminApi.md#add_namespace_grant) | **POST** /namespace/grant | 
 [**add_organization_member**](AdminApi.md#add_organization_member) | **POST** /organization/add | 
 [**create_account**](AdminApi.md#create_account) | **POST** /account | 
 [**create_frontend**](AdminApi.md#create_frontend) | **POST** /frontend | 
@@ -23,6 +24,7 @@ Method | HTTP request | Description
 [**list_namespaces**](AdminApi.md#list_namespaces) | **GET** /namespaces | 
 [**list_organization_members**](AdminApi.md#list_organization_members) | **POST** /organization/list | 
 [**list_organizations**](AdminApi.md#list_organizations) | **GET** /organizations | 
+[**remove_namespace_grant**](AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 [**remove_organization_member**](AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 [**update_frontend**](AdminApi.md#update_frontend) | **PATCH** /frontend | 
 [**update_namespace**](AdminApi.md#update_namespace) | **PATCH** /namespace | 
@@ -97,6 +99,81 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **add_namespace_grant**
+> add_namespace_grant(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.AddNamespaceGrantRequest() # AddNamespaceGrantRequest |  (optional)
+
+    try:
+        api_instance.add_namespace_grant(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->add_namespace_grant: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**AddNamespaceGrantRequest**](AddNamespaceGrantRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | namespace grant added |  -  |
 **401** | unauthorized |  -  |
 **404** | not found |  -  |
 **500** | internal server error |  -  |
@@ -1456,6 +1533,81 @@ This endpoint does not need any parameter.
 |-------------|-------------|------------------|
 **200** | ok |  -  |
 **401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **remove_namespace_grant**
+> remove_namespace_grant(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.AddNamespaceGrantRequest() # AddNamespaceGrantRequest |  (optional)
+
+    try:
+        api_instance.remove_namespace_grant(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->remove_namespace_grant: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**AddNamespaceGrantRequest**](AddNamespaceGrantRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | namespace grant removed |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

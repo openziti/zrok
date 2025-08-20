@@ -32,6 +32,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_add_namespace_grant(self) -> None:
+        """Test case for add_namespace_grant
+
+        """
+        pass
+
     def test_add_organization_member(self) -> None:
         """Test case for add_organization_member
 
@@ -136,6 +142,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_list_organizations(self) -> None:
         """Test case for list_organizations
+
+        """
+        pass
+
+    def test_remove_namespace_grant(self) -> None:
+        """Test case for remove_namespace_grant
 
         """
         pass
