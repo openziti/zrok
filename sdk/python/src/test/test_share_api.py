@@ -32,6 +32,24 @@ class TestShareApi(unittest.TestCase):
         """
         pass
 
+    def test_create_share_name(self) -> None:
+        """Test case for create_share_name
+
+        """
+        pass
+
+    def test_delete_share_name(self) -> None:
+        """Test case for delete_share_name
+
+        """
+        pass
+
+    def test_list_share_names(self) -> None:
+        """Test case for list_share_names
+
+        """
+        pass
+
     def test_share(self) -> None:
         """Test case for share
 

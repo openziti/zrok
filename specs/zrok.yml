@@ -1794,6 +1794,89 @@ paths:
         500:
           description: internal server error
 
+  /share/name:
+    post:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: createShareName
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+      responses:
+        201:
+          description: name created
+        401:
+          description: unauthorized
+        404:
+          description: namespace not found
+        409:
+          description: name already exists
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: deleteShareName
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+      responses:
+        200:
+          description: name deleted
+        401:
+          description: unauthorized
+        404:
+          description: name not found
+        500:
+          description: internal server error
+
+  /share/names/{namespaceToken}:
+    get:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: listShareNames
+      parameters:
+        - name: namespaceToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        404:
+          description: namespace not found
+        500:
+          description: internal server error
+
   /unaccess:
     delete:
       tags:

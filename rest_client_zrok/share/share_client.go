@@ -32,6 +32,12 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	Access(params *AccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AccessCreated, error)
 
+	CreateShareName(params *CreateShareNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateShareNameCreated, error)
+
+	DeleteShareName(params *DeleteShareNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteShareNameOK, error)
+
+	ListShareNames(params *ListShareNamesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListShareNamesOK, error)
+
 	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
 
 	Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error)
@@ -81,6 +87,123 @@ func (a *Client) Access(params *AccessParams, authInfo runtime.ClientAuthInfoWri
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for access: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+CreateShareName create share name API
+*/
+func (a *Client) CreateShareName(params *CreateShareNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateShareNameCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCreateShareNameParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "createShareName",
+		Method:             "POST",
+		PathPattern:        "/share/name",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &CreateShareNameReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*CreateShareNameCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for createShareName: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+DeleteShareName delete share name API
+*/
+func (a *Client) DeleteShareName(params *DeleteShareNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteShareNameOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteShareNameParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteShareName",
+		Method:             "DELETE",
+		PathPattern:        "/share/name",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DeleteShareNameReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteShareNameOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteShareName: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListShareNames list share names API
+*/
+func (a *Client) ListShareNames(params *ListShareNamesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListShareNamesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListShareNamesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listShareNames",
+		Method:             "GET",
+		PathPattern:        "/share/names/{namespaceToken}",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListShareNamesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListShareNamesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listShareNames: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

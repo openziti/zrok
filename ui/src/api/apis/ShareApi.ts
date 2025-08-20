@@ -17,6 +17,8 @@ import * as runtime from '../runtime';
 import type {
   Access201Response,
   AccessRequest,
+  CreateShareNameRequest,
+  ListShareNames200ResponseInner,
   ShareRequest,
   ShareResponse,
   UnaccessRequest,
@@ -29,6 +31,10 @@ import {
     Access201ResponseToJSON,
     AccessRequestFromJSON,
     AccessRequestToJSON,
+    CreateShareNameRequestFromJSON,
+    CreateShareNameRequestToJSON,
+    ListShareNames200ResponseInnerFromJSON,
+    ListShareNames200ResponseInnerToJSON,
     ShareRequestFromJSON,
     ShareRequestToJSON,
     ShareResponseFromJSON,
@@ -45,6 +51,18 @@ import {
 
 export interface AccessOperationRequest {
     body?: AccessRequest;
+}
+
+export interface CreateShareNameOperationRequest {
+    body?: CreateShareNameRequest;
+}
+
+export interface DeleteShareNameRequest {
+    body?: CreateShareNameRequest;
+}
+
+export interface ListShareNamesRequest {
+    namespaceToken: string;
 }
 
 export interface ShareOperationRequest {
@@ -103,6 +121,111 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async access(requestParameters: AccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Access201Response> {
         const response = await this.accessRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async createShareNameRaw(requestParameters: CreateShareNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/share/name`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateShareNameRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async createShareName(requestParameters: CreateShareNameOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.createShareNameRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async deleteShareNameRaw(requestParameters: DeleteShareNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/share/name`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateShareNameRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteShareName(requestParameters: DeleteShareNameRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteShareNameRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async listShareNamesRaw(requestParameters: ListShareNamesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListShareNames200ResponseInner>>> {
+        if (requestParameters['namespaceToken'] == null) {
+            throw new runtime.RequiredError(
+                'namespaceToken',
+                'Required parameter "namespaceToken" was null or undefined when calling listShareNames().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/share/names/{namespaceToken}`;
+        urlPath = urlPath.replace(`{${"namespaceToken"}}`, encodeURIComponent(String(requestParameters['namespaceToken'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListShareNames200ResponseInnerFromJSON));
+    }
+
+    /**
+     */
+    async listShareNames(requestParameters: ListShareNamesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListShareNames200ResponseInner>> {
+        const response = await this.listShareNamesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

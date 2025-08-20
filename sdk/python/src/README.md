@@ -153,6 +153,9 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**version**](docs/MetadataApi.md#version) | **GET** /version | 
 *MetadataApi* | [**version_inventory**](docs/MetadataApi.md#version_inventory) | **GET** /versions | 
 *ShareApi* | [**access**](docs/ShareApi.md#access) | **POST** /access | 
+*ShareApi* | [**create_share_name**](docs/ShareApi.md#create_share_name) | **POST** /share/name | 
+*ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
+*ShareApi* | [**list_share_names**](docs/ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
@@ -179,6 +182,7 @@ Class | Method | HTTP request | Description
  - [CreateNamespaceRequest](docs/CreateNamespaceRequest.md)
  - [CreateOrganization201Response](docs/CreateOrganization201Response.md)
  - [CreateOrganizationRequest](docs/CreateOrganizationRequest.md)
+ - [CreateShareNameRequest](docs/CreateShareNameRequest.md)
  - [DeleteIdentityRequest](docs/DeleteIdentityRequest.md)
  - [DisableRequest](docs/DisableRequest.md)
  - [EnableRequest](docs/EnableRequest.md)
@@ -201,6 +205,7 @@ Class | Method | HTTP request | Description
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
  - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
+ - [ListShareNames200ResponseInner](docs/ListShareNames200ResponseInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)

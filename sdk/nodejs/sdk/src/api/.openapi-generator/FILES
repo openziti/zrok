@@ -23,6 +23,7 @@ models/CreateNamespace201Response.ts
 models/CreateNamespaceRequest.ts
 models/CreateOrganization201Response.ts
 models/CreateOrganizationRequest.ts
+models/CreateShareNameRequest.ts
 models/DeleteIdentityRequest.ts
 models/DisableRequest.ts
 models/EnableRequest.ts
@@ -45,6 +46,7 @@ models/ListOrganizations200Response.ts
 models/ListOrganizations200ResponseOrganizationsInner.ts
 models/ListPublicFrontendsForAccount200Response.ts
 models/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.ts
+models/ListShareNames200ResponseInner.ts
 models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts

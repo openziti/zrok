@@ -86,6 +86,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminCreateOrganizationHandler: admin.CreateOrganizationHandlerFunc(func(params admin.CreateOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.CreateOrganization has not yet been implemented")
 		}),
+		ShareCreateShareNameHandler: share.CreateShareNameHandlerFunc(func(params share.CreateShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.CreateShareName has not yet been implemented")
+		}),
 		AdminDeleteAccountHandler: admin.DeleteAccountHandlerFunc(func(params admin.DeleteAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteAccount has not yet been implemented")
 		}),
@@ -103,6 +106,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
+		}),
+		ShareDeleteShareNameHandler: share.DeleteShareNameHandlerFunc(func(params share.DeleteShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.DeleteShareName has not yet been implemented")
 		}),
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
@@ -166,6 +172,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		MetadataListPublicFrontendsForAccountHandler: metadata.ListPublicFrontendsForAccountHandlerFunc(func(params metadata.ListPublicFrontendsForAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListPublicFrontendsForAccount has not yet been implemented")
+		}),
+		ShareListShareNamesHandler: share.ListShareNamesHandlerFunc(func(params share.ListShareNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.ListShareNames has not yet been implemented")
 		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
@@ -322,6 +331,8 @@ type ZrokAPI struct {
 	AdminCreateNamespaceHandler admin.CreateNamespaceHandler
 	// AdminCreateOrganizationHandler sets the operation handler for the create organization operation
 	AdminCreateOrganizationHandler admin.CreateOrganizationHandler
+	// ShareCreateShareNameHandler sets the operation handler for the create share name operation
+	ShareCreateShareNameHandler share.CreateShareNameHandler
 	// AdminDeleteAccountHandler sets the operation handler for the delete account operation
 	AdminDeleteAccountHandler admin.DeleteAccountHandler
 	// AdminDeleteFrontendHandler sets the operation handler for the delete frontend operation
@@ -334,6 +345,8 @@ type ZrokAPI struct {
 	AdminDeleteNamespaceHandler admin.DeleteNamespaceHandler
 	// AdminDeleteOrganizationHandler sets the operation handler for the delete organization operation
 	AdminDeleteOrganizationHandler admin.DeleteOrganizationHandler
+	// ShareDeleteShareNameHandler sets the operation handler for the delete share name operation
+	ShareDeleteShareNameHandler share.DeleteShareNameHandler
 	// EnvironmentDisableHandler sets the operation handler for the disable operation
 	EnvironmentDisableHandler environment.DisableHandler
 	// EnvironmentEnableHandler sets the operation handler for the enable operation
@@ -376,6 +389,8 @@ type ZrokAPI struct {
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// MetadataListPublicFrontendsForAccountHandler sets the operation handler for the list public frontends for account operation
 	MetadataListPublicFrontendsForAccountHandler metadata.ListPublicFrontendsForAccountHandler
+	// ShareListShareNamesHandler sets the operation handler for the list share names operation
+	ShareListShareNamesHandler share.ListShareNamesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
 	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
@@ -547,6 +562,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminCreateOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.CreateOrganizationHandler")
 	}
+	if o.ShareCreateShareNameHandler == nil {
+		unregistered = append(unregistered, "share.CreateShareNameHandler")
+	}
 	if o.AdminDeleteAccountHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteAccountHandler")
 	}
@@ -564,6 +582,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminDeleteOrganizationHandler == nil {
 		unregistered = append(unregistered, "admin.DeleteOrganizationHandler")
+	}
+	if o.ShareDeleteShareNameHandler == nil {
+		unregistered = append(unregistered, "share.DeleteShareNameHandler")
 	}
 	if o.EnvironmentDisableHandler == nil {
 		unregistered = append(unregistered, "environment.DisableHandler")
@@ -627,6 +648,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListPublicFrontendsForAccountHandler == nil {
 		unregistered = append(unregistered, "metadata.ListPublicFrontendsForAccountHandler")
+	}
+	if o.ShareListShareNamesHandler == nil {
+		unregistered = append(unregistered, "share.ListShareNamesHandler")
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
@@ -856,6 +880,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/organization"] = admin.NewCreateOrganization(o.context, o.AdminCreateOrganizationHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/share/name"] = share.NewCreateShareName(o.context, o.ShareCreateShareNameHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
@@ -880,6 +908,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/organization"] = admin.NewDeleteOrganization(o.context, o.AdminDeleteOrganizationHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/share/name"] = share.NewDeleteShareName(o.context, o.ShareDeleteShareNameHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -964,6 +996,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/overview/public-frontends"] = metadata.NewListPublicFrontendsForAccount(o.context, o.MetadataListPublicFrontendsForAccountHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/share/names/{namespaceToken}"] = share.NewListShareNames(o.context, o.ShareListShareNamesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

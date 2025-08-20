@@ -2787,6 +2787,142 @@ func init() {
         }
       }
     },
+    "/share/name": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "createShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "name created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "409": {
+            "description": "name already exists"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "deleteShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "name deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "name not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/share/names/{namespaceToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listShareNames",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -6031,6 +6167,134 @@ func init() {
         }
       }
     },
+    "/share/name": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "createShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "name created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "409": {
+            "description": "name already exists"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "deleteShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "name deleted"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "name not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/share/names/{namespaceToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listShareNames",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListShareNamesOKBodyItems0"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -6322,6 +6586,17 @@ func init() {
         },
         "updatedAt": {
           "type": "integer"
+        }
+      }
+    },
+    "ListShareNamesOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
         }
       }
     },
