@@ -8,6 +8,10 @@ FEATURE: A new `compatibility` > `log_version` boolean is included in the contro
 
 CHANGE: Update `github.com/openziti/sdk-golang` to `v1.2.3`
 
+CHANGE: Minor vulnerability packages updated in `ui` and `agent/agentUi`
+
+FIX: The `scope` field of the metrics returned from `/metrics/environment/...` is now properly set as `environment` and the from `/metrics/share/...` is now properly set as `share` (https://github.com/openziti/zrok/issues/1031)
+
 ## v1.1.2
 
 FIX: A panic happened in the `publicProxy` implementation when no `oauth` config block is present (https://github.com/openziti/zrok/issues/1032)

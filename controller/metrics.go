@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-openapi/runtime/middleware"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
@@ -10,7 +12,6 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type getAccountMetricsHandler struct {
@@ -127,7 +128,7 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 	}
 
 	response := &rest_model_zrok.Metrics{
-		Scope:  "account",
+		Scope:  "environment",
 		ID:     fmt.Sprintf("%d", principal.ID),
 		Period: duration.Seconds(),
 	}
@@ -206,7 +207,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 	}
 
 	response := &rest_model_zrok.Metrics{
-		Scope:  "account",
+		Scope:  "share",
 		ID:     fmt.Sprintf("%d", principal.ID),
 		Period: duration.Seconds(),
 	}
