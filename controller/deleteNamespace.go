@@ -26,7 +26,7 @@ func (h *deleteNamespaceHandler) Handle(params admin.DeleteNamespaceParams, prin
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	ns, err := str.FindNamespaceByToken(params.Body.NamespaceToken, trx)
+	ns, err := str.FindNamespaceWithToken(params.Body.NamespaceToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding namespace by token: %v", err)
 		return admin.NewDeleteNamespaceNotFound()

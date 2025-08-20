@@ -32,7 +32,7 @@ func (str *Store) GetNamespace(id int, tx *sqlx.Tx) (*Namespace, error) {
 	return ns, nil
 }
 
-func (str *Store) FindNamespaceByName(name string, tx *sqlx.Tx) (*Namespace, error) {
+func (str *Store) FindNamespaceWithName(name string, tx *sqlx.Tx) (*Namespace, error) {
 	ns := &Namespace{}
 	if err := tx.QueryRowx("select * from namespaces where name = $1 and not deleted", name).StructScan(ns); err != nil {
 		return nil, errors.Wrap(err, "error selecting namespace by name")
@@ -56,7 +56,7 @@ func (str *Store) FindNamespaces(tx *sqlx.Tx) ([]*Namespace, error) {
 	return namespaces, nil
 }
 
-func (str *Store) FindNamespaceByToken(token string, tx *sqlx.Tx) (*Namespace, error) {
+func (str *Store) FindNamespaceWithToken(token string, tx *sqlx.Tx) (*Namespace, error) {
 	ns := &Namespace{}
 	if err := tx.QueryRowx("select * from namespaces where token = $1 and not deleted", token).StructScan(ns); err != nil {
 		return nil, errors.Wrap(err, "error selecting namespace by token")

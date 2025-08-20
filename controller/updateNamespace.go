@@ -26,7 +26,7 @@ func (h *updateNamespaceHandler) Handle(params admin.UpdateNamespaceParams, prin
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	ns, err := str.FindNamespaceByToken(params.Body.NamespaceToken, trx)
+	ns, err := str.FindNamespaceWithToken(params.Body.NamespaceToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding namespace by token: %v", err)
 		return admin.NewUpdateNamespaceNotFound()
@@ -34,7 +34,7 @@ func (h *updateNamespaceHandler) Handle(params admin.UpdateNamespaceParams, prin
 
 	// check if name change conflicts with existing namespace
 	if params.Body.Name != "" && params.Body.Name != ns.Name {
-		if _, err := str.FindNamespaceByName(params.Body.Name, trx); err == nil {
+		if _, err := str.FindNamespaceWithName(params.Body.Name, trx); err == nil {
 			logrus.Errorf("namespace name '%v' already exists", params.Body.Name)
 			return admin.NewUpdateNamespaceInternalServerError()
 		}

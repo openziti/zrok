@@ -29,7 +29,7 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 
 	// check if namespace already exists
 	if params.Body.Name != "" {
-		if _, err := str.FindNamespaceByName(params.Body.Name, trx); err == nil {
+		if _, err := str.FindNamespaceWithName(params.Body.Name, trx); err == nil {
 			logrus.Errorf("namespace '%v' already exists", params.Body.Name)
 			return admin.NewCreateNamespaceConflict()
 		}
