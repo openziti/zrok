@@ -65,11 +65,11 @@ func (str *Store) FindNamespaceByToken(token string, tx *sqlx.Tx) (*Namespace, e
 }
 
 func (str *Store) UpdateNamespace(ns *Namespace, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update namespaces set name = $2, description = $3, updated_at = current_timestamp where id = $1")
+	stmt, err := tx.Prepare("update namespaces set name = $1, description = $2, updated_at = current_timestamp where id = $3")
 	if err != nil {
 		return errors.Wrap(err, "error preparing namespace update statement")
 	}
-	_, err = stmt.Exec(ns.Id, ns.Name, ns.Description)
+	_, err = stmt.Exec(ns.Name, ns.Description, ns.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing namespace update statement")
 	}
