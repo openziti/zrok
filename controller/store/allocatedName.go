@@ -72,6 +72,22 @@ func (str *Store) FindAllocatedNamesForAccount(accountId int, tx *sqlx.Tx) ([]*A
 	return names, nil
 }
 
+func (str *Store) FindAllocatedNamesForAccountAndNamespace(accountId, namespaceId int, tx *sqlx.Tx) ([]*AllocatedName, error) {
+	rows, err := tx.Queryx("select * from allocated_names where account_id = $1 and namespace_id = $2 and not deleted order by name", accountId, namespaceId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding allocated names for account and namespace")
+	}
+	var names []*AllocatedName
+	for rows.Next() {
+		an := &AllocatedName{}
+		if err := rows.StructScan(&an); err != nil {
+			return nil, errors.Wrap(err, "error scanning allocated name")
+		}
+		names = append(names, an)
+	}
+	return names, nil
+}
+
 func (str *Store) CheckNameAvailability(namespaceId int, name string, tx *sqlx.Tx) (bool, error) {
 	var count int
 	if err := tx.QueryRow("select count(*) from allocated_names where namespace_id = $1 and name = $2 and not deleted", namespaceId, name).Scan(&count); err != nil {
