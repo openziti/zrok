@@ -105,19 +105,23 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
+*AdminApi* | [**create_namespace**](docs/AdminApi.md#create_namespace) | **POST** /namespace | 
 *AdminApi* | [**create_organization**](docs/AdminApi.md#create_organization) | **POST** /organization | 
 *AdminApi* | [**delete_account**](docs/AdminApi.md#delete_account) | **DELETE** /account | 
 *AdminApi* | [**delete_frontend**](docs/AdminApi.md#delete_frontend) | **DELETE** /frontend | 
 *AdminApi* | [**delete_frontend_grant**](docs/AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
+*AdminApi* | [**delete_namespace**](docs/AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
+*AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
+*AdminApi* | [**update_namespace**](docs/AdminApi.md#update_namespace) | **PATCH** /namespace | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
 *AgentApi* | [**remote_access**](docs/AgentApi.md#remote_access) | **POST** /agent/access | 
@@ -168,6 +172,8 @@ Class | Method | HTTP request | Description
  - [CreateFrontendRequest](docs/CreateFrontendRequest.md)
  - [CreateIdentity201Response](docs/CreateIdentity201Response.md)
  - [CreateIdentityRequest](docs/CreateIdentityRequest.md)
+ - [CreateNamespace201Response](docs/CreateNamespace201Response.md)
+ - [CreateNamespaceRequest](docs/CreateNamespaceRequest.md)
  - [CreateOrganization201Response](docs/CreateOrganization201Response.md)
  - [CreateOrganizationRequest](docs/CreateOrganizationRequest.md)
  - [DeleteIdentityRequest](docs/DeleteIdentityRequest.md)
@@ -185,6 +191,7 @@ Class | Method | HTTP request | Description
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
+ - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)
  - [ListOrganizationMembers200Response](docs/ListOrganizationMembers200Response.md)
  - [ListOrganizationMembers200ResponseMembersInner](docs/ListOrganizationMembers200ResponseMembersInner.md)
  - [ListOrganizations200Response](docs/ListOrganizations200Response.md)
@@ -220,6 +227,7 @@ Class | Method | HTTP request | Description
  - [UnshareRequest](docs/UnshareRequest.md)
  - [UpdateAccessRequest](docs/UpdateAccessRequest.md)
  - [UpdateFrontendRequest](docs/UpdateFrontendRequest.md)
+ - [UpdateNamespaceRequest](docs/UpdateNamespaceRequest.md)
  - [UpdateShareRequest](docs/UpdateShareRequest.md)
  - [Verify200Response](docs/Verify200Response.md)
  - [VerifyRequest](docs/VerifyRequest.md)

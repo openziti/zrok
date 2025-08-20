@@ -45,6 +45,8 @@ __all__ = [
     "CreateFrontendRequest",
     "CreateIdentity201Response",
     "CreateIdentityRequest",
+    "CreateNamespace201Response",
+    "CreateNamespaceRequest",
     "CreateOrganization201Response",
     "CreateOrganizationRequest",
     "DeleteIdentityRequest",
@@ -62,6 +64,7 @@ __all__ = [
     "ListFrontends200ResponseInner",
     "ListMemberships200Response",
     "ListMemberships200ResponseMembershipsInner",
+    "ListNamespaces200ResponseInner",
     "ListOrganizationMembers200Response",
     "ListOrganizationMembers200ResponseMembersInner",
     "ListOrganizations200Response",
@@ -97,6 +100,7 @@ __all__ = [
     "UnshareRequest",
     "UpdateAccessRequest",
     "UpdateFrontendRequest",
+    "UpdateNamespaceRequest",
     "UpdateShareRequest",
     "Verify200Response",
     "VerifyRequest",
@@ -135,6 +139,8 @@ from zrok_api.models.create_frontend201_response import CreateFrontend201Respons
 from zrok_api.models.create_frontend_request import CreateFrontendRequest as CreateFrontendRequest
 from zrok_api.models.create_identity201_response import CreateIdentity201Response as CreateIdentity201Response
 from zrok_api.models.create_identity_request import CreateIdentityRequest as CreateIdentityRequest
+from zrok_api.models.create_namespace201_response import CreateNamespace201Response as CreateNamespace201Response
+from zrok_api.models.create_namespace_request import CreateNamespaceRequest as CreateNamespaceRequest
 from zrok_api.models.create_organization201_response import CreateOrganization201Response as CreateOrganization201Response
 from zrok_api.models.create_organization_request import CreateOrganizationRequest as CreateOrganizationRequest
 from zrok_api.models.delete_identity_request import DeleteIdentityRequest as DeleteIdentityRequest
@@ -152,6 +158,7 @@ from zrok_api.models.invite_token_generate_request import InviteTokenGenerateReq
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
 from zrok_api.models.list_memberships200_response import ListMemberships200Response as ListMemberships200Response
 from zrok_api.models.list_memberships200_response_memberships_inner import ListMemberships200ResponseMembershipsInner as ListMemberships200ResponseMembershipsInner
+from zrok_api.models.list_namespaces200_response_inner import ListNamespaces200ResponseInner as ListNamespaces200ResponseInner
 from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response as ListOrganizationMembers200Response
 from zrok_api.models.list_organization_members200_response_members_inner import ListOrganizationMembers200ResponseMembersInner as ListOrganizationMembers200ResponseMembersInner
 from zrok_api.models.list_organizations200_response import ListOrganizations200Response as ListOrganizations200Response
@@ -187,6 +194,7 @@ from zrok_api.models.unaccess_request import UnaccessRequest as UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest as UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest as UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest as UpdateFrontendRequest
+from zrok_api.models.update_namespace_request import UpdateNamespaceRequest as UpdateNamespaceRequest
 from zrok_api.models.update_share_request import UpdateShareRequest as UpdateShareRequest
 from zrok_api.models.verify200_response import Verify200Response as Verify200Response
 from zrok_api.models.verify_request import VerifyRequest as VerifyRequest

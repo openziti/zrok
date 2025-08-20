@@ -15,6 +15,8 @@ docs/CreateFrontend201Response.md
 docs/CreateFrontendRequest.md
 docs/CreateIdentity201Response.md
 docs/CreateIdentityRequest.md
+docs/CreateNamespace201Response.md
+docs/CreateNamespaceRequest.md
 docs/CreateOrganization201Response.md
 docs/CreateOrganizationRequest.md
 docs/DeleteIdentityRequest.md
@@ -33,6 +35,7 @@ docs/InviteTokenGenerateRequest.md
 docs/ListFrontends200ResponseInner.md
 docs/ListMemberships200Response.md
 docs/ListMemberships200ResponseMembershipsInner.md
+docs/ListNamespaces200ResponseInner.md
 docs/ListOrganizationMembers200Response.md
 docs/ListOrganizationMembers200ResponseMembersInner.md
 docs/ListOrganizations200Response.md
@@ -70,6 +73,7 @@ docs/UnaccessRequest.md
 docs/UnshareRequest.md
 docs/UpdateAccessRequest.md
 docs/UpdateFrontendRequest.md
+docs/UpdateNamespaceRequest.md
 docs/UpdateShareRequest.md
 docs/Verify200Response.md
 docs/VerifyRequest.md
@@ -92,6 +96,8 @@ test/test_create_frontend201_response.py
 test/test_create_frontend_request.py
 test/test_create_identity201_response.py
 test/test_create_identity_request.py
+test/test_create_namespace201_response.py
+test/test_create_namespace_request.py
 test/test_create_organization201_response.py
 test/test_create_organization_request.py
 test/test_delete_identity_request.py
@@ -110,6 +116,7 @@ test/test_invite_token_generate_request.py
 test/test_list_frontends200_response_inner.py
 test/test_list_memberships200_response.py
 test/test_list_memberships200_response_memberships_inner.py
+test/test_list_namespaces200_response_inner.py
 test/test_list_organization_members200_response.py
 test/test_list_organization_members200_response_members_inner.py
 test/test_list_organizations200_response.py
@@ -147,6 +154,7 @@ test/test_unaccess_request.py
 test/test_unshare_request.py
 test/test_update_access_request.py
 test/test_update_frontend_request.py
+test/test_update_namespace_request.py
 test/test_update_share_request.py
 test/test_verify200_response.py
 test/test_verify_request.py
@@ -176,6 +184,8 @@ zrok_api/models/create_frontend201_response.py
 zrok_api/models/create_frontend_request.py
 zrok_api/models/create_identity201_response.py
 zrok_api/models/create_identity_request.py
+zrok_api/models/create_namespace201_response.py
+zrok_api/models/create_namespace_request.py
 zrok_api/models/create_organization201_response.py
 zrok_api/models/create_organization_request.py
 zrok_api/models/delete_identity_request.py
@@ -193,6 +203,7 @@ zrok_api/models/invite_token_generate_request.py
 zrok_api/models/list_frontends200_response_inner.py
 zrok_api/models/list_memberships200_response.py
 zrok_api/models/list_memberships200_response_memberships_inner.py
+zrok_api/models/list_namespaces200_response_inner.py
 zrok_api/models/list_organization_members200_response.py
 zrok_api/models/list_organization_members200_response_members_inner.py
 zrok_api/models/list_organizations200_response.py
@@ -228,6 +239,7 @@ zrok_api/models/unaccess_request.py
 zrok_api/models/unshare_request.py
 zrok_api/models/update_access_request.py
 zrok_api/models/update_frontend_request.py
+zrok_api/models/update_namespace_request.py
 zrok_api/models/update_share_request.py
 zrok_api/models/verify200_response.py
 zrok_api/models/verify_request.py

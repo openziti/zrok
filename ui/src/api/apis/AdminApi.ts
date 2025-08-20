@@ -21,17 +21,21 @@ import type {
   CreateFrontendRequest,
   CreateIdentity201Response,
   CreateIdentityRequest,
+  CreateNamespace201Response,
+  CreateNamespaceRequest,
   CreateOrganization201Response,
   CreateOrganizationRequest,
   DeleteIdentityRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
+  ListNamespaces200ResponseInner,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
   LoginRequest,
   RegenerateAccountToken200Response,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
+  UpdateNamespaceRequest,
   Verify200Response,
 } from '../models/index';
 import {
@@ -47,6 +51,10 @@ import {
     CreateIdentity201ResponseToJSON,
     CreateIdentityRequestFromJSON,
     CreateIdentityRequestToJSON,
+    CreateNamespace201ResponseFromJSON,
+    CreateNamespace201ResponseToJSON,
+    CreateNamespaceRequestFromJSON,
+    CreateNamespaceRequestToJSON,
     CreateOrganization201ResponseFromJSON,
     CreateOrganization201ResponseToJSON,
     CreateOrganizationRequestFromJSON,
@@ -57,6 +65,8 @@ import {
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
     ListFrontends200ResponseInnerToJSON,
+    ListNamespaces200ResponseInnerFromJSON,
+    ListNamespaces200ResponseInnerToJSON,
     ListOrganizationMembers200ResponseFromJSON,
     ListOrganizationMembers200ResponseToJSON,
     ListOrganizations200ResponseFromJSON,
@@ -69,6 +79,8 @@ import {
     RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
     UpdateFrontendRequestToJSON,
+    UpdateNamespaceRequestFromJSON,
+    UpdateNamespaceRequestToJSON,
     Verify200ResponseFromJSON,
     Verify200ResponseToJSON,
 } from '../models/index';
@@ -93,6 +105,10 @@ export interface CreateIdentityOperationRequest {
     body?: CreateIdentityRequest;
 }
 
+export interface CreateNamespaceOperationRequest {
+    body?: CreateNamespaceRequest;
+}
+
 export interface CreateOrganizationOperationRequest {
     body?: CreateOrganizationRequest;
 }
@@ -111,6 +127,10 @@ export interface DeleteFrontendGrantRequest {
 
 export interface DeleteIdentityOperationRequest {
     body?: DeleteIdentityRequest;
+}
+
+export interface DeleteNamespaceRequest {
+    body?: CreateNamespace201Response;
 }
 
 export interface DeleteOrganizationRequest {
@@ -135,6 +155,10 @@ export interface RemoveOrganizationMemberOperationRequest {
 
 export interface UpdateFrontendOperationRequest {
     body?: UpdateFrontendRequest;
+}
+
+export interface UpdateNamespaceOperationRequest {
+    body?: UpdateNamespaceRequest;
 }
 
 /**
@@ -312,6 +336,40 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async createNamespaceRaw(requestParameters: CreateNamespaceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateNamespace201Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateNamespaceRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateNamespace201ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async createNamespace(requestParameters: CreateNamespaceOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateNamespace201Response> {
+        const response = await this.createNamespaceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async createOrganizationRaw(requestParameters: CreateOrganizationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateOrganization201Response>> {
         const queryParameters: any = {};
 
@@ -478,6 +536,39 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async deleteNamespaceRaw(requestParameters: DeleteNamespaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateNamespace201ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteNamespace(requestParameters: DeleteNamespaceRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteNamespaceRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async deleteOrganizationRaw(requestParameters: DeleteOrganizationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -603,6 +694,37 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontends200ResponseInner>> {
         const response = await this.listFrontendsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listNamespacesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListNamespaces200ResponseInner>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespaces`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListNamespaces200ResponseInnerFromJSON));
+    }
+
+    /**
+     */
+    async listNamespaces(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListNamespaces200ResponseInner>> {
+        const response = await this.listNamespacesRaw(initOverrides);
         return await response.value();
     }
 
@@ -735,6 +857,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async updateFrontend(requestParameters: UpdateFrontendOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateFrontendRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateNamespaceRaw(requestParameters: UpdateNamespaceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateNamespaceRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateNamespace(requestParameters: UpdateNamespaceOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateNamespaceRaw(requestParameters, initOverrides);
     }
 
 }

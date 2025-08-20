@@ -56,6 +56,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_create_namespace(self) -> None:
+        """Test case for create_namespace
+
+        """
+        pass
+
     def test_create_organization(self) -> None:
         """Test case for create_organization
 
@@ -86,6 +92,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_namespace(self) -> None:
+        """Test case for delete_namespace
+
+        """
+        pass
+
     def test_delete_organization(self) -> None:
         """Test case for delete_organization
 
@@ -110,6 +122,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_list_namespaces(self) -> None:
+        """Test case for list_namespaces
+
+        """
+        pass
+
     def test_list_organization_members(self) -> None:
         """Test case for list_organization_members
 
@@ -130,6 +148,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_update_frontend(self) -> None:
         """Test case for update_frontend
+
+        """
+        pass
+
+    def test_update_namespace(self) -> None:
+        """Test case for update_namespace
 
         """
         pass

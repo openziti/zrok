@@ -552,6 +552,114 @@ paths:
         500:
           description: internal server error
 
+  /namespace:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+      responses:
+        201:
+          description: namespace created
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+        401:
+          description: unauthorized
+        409:
+          description: namespace already exists
+        500:
+          description: internal server error
+    patch:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: updateNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+      responses:
+        200:
+          description: namespace updated
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+      responses:
+        200:
+          description: namespace deleted
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /namespaces:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listNamespaces
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                createdAt:
+                  type: integer
+                updatedAt:
+                  type: integer
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   /organization:
     post:
       tags:
