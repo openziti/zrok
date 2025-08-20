@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/endpoints/publicProxy2/store/sql/postgres"
+	"github.com/openziti/zrok/endpoints/dynamicProxy/store/sql/postgres"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
@@ -34,7 +34,7 @@ func Open(cfg *Config) (*Store, error) {
 
 	store := &Store{cfg: cfg, db: dbx}
 	if !cfg.DisableAutoMigration {
-		if err := store.migrate(cfg); err != nil {
+		if err := store.migrate(); err != nil {
 			return nil, errors.Wrapf(err, "error migrating database '%v'", cfg.Path)
 		}
 	}
@@ -42,7 +42,7 @@ func Open(cfg *Config) (*Store, error) {
 	return store, nil
 }
 
-func (str *Store) migrate(cfg *Config) error {
+func (str *Store) migrate() error {
 	migrations := &migrate.EmbedFileSystemMigrationSource{
 		FileSystem: postgres.FS,
 		Root:       "/",
