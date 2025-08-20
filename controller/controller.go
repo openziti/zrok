@@ -59,19 +59,23 @@ func Run(inCfg *config.Config) error {
 	api.AdminCreateAccountHandler = newCreateAccountHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()
+	api.AdminCreateNamespaceHandler = newCreateNamespaceHandler()
 	api.AdminCreateOrganizationHandler = newCreateOrganizationHandler()
 	api.AdminDeleteAccountHandler = newDeleteAccountHandler()
 	api.AdminDeleteFrontendGrantHandler = newDeleteFrontendGrantHandler()
 	api.AdminDeleteFrontendHandler = newDeleteFrontendHandler()
 	api.AdminDeleteIdentityHandler = newDeleteIdentityHandler()
+	api.AdminDeleteNamespaceHandler = newDeleteNamespaceHandler()
 	api.AdminDeleteOrganizationHandler = newDeleteOrganizationHandler()
 	api.AdminGrantsHandler = newGrantsHandler()
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()
 	api.AdminListFrontendsHandler = newListFrontendsHandler()
+	api.AdminListNamespacesHandler = newListNamespacesHandler()
 	api.AdminListOrganizationMembersHandler = newListOrganizationMembersHandler()
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
+	api.AdminUpdateNamespaceHandler = newUpdateNamespaceHandler()
 	if cfg.AgentController != nil {
 		if i, err := agentController.NewAgentController(cfg.AgentController); err == nil {
 			agentCtrl = i

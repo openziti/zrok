@@ -64,6 +64,18 @@ func (str *Store) FindNamespaceByToken(token string, tx *sqlx.Tx) (*Namespace, e
 	return ns, nil
 }
 
+func (str *Store) UpdateNamespace(ns *Namespace, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("update namespaces set name = $2, description = $3, updated_at = current_timestamp where id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing namespace update statement")
+	}
+	_, err = stmt.Exec(ns.Id, ns.Name, ns.Description)
+	if err != nil {
+		return errors.Wrap(err, "error executing namespace update statement")
+	}
+	return nil
+}
+
 func (str *Store) DeleteNamespace(id int, tx *sqlx.Tx) error {
 	stmt, err := tx.Prepare("update namespaces set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
