@@ -599,6 +599,8 @@ paths:
           in: body
           schema:
             properties:
+              token:
+                type: string
               name:
                 type: string
               description:

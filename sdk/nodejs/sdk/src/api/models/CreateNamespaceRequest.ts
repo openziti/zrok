@@ -24,6 +24,12 @@ export interface CreateNamespaceRequest {
      * @type {string}
      * @memberof CreateNamespaceRequest
      */
+    token?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateNamespaceRequest
+     */
     name?: string;
     /**
      * 
@@ -56,6 +62,7 @@ export function CreateNamespaceRequestFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'token': json['token'] == null ? undefined : json['token'],
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
         'open': json['open'] == null ? undefined : json['open'],
@@ -73,6 +80,7 @@ export function CreateNamespaceRequestToJSONTyped(value?: CreateNamespaceRequest
 
     return {
         
+        'token': value['token'],
         'name': value['name'],
         'description': value['description'],
         'open': value['open'],

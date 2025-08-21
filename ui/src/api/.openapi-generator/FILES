@@ -53,6 +53,7 @@ models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
+models/NamespaceSelection.ts
 models/Overview.ts
 models/Ping200Response.ts
 models/Principal.ts
@@ -74,6 +75,7 @@ models/Share.ts
 models/ShareHttpHealthcheck200Response.ts
 models/ShareHttpHealthcheckRequest.ts
 models/ShareRequest.ts
+models/ShareRequest12.ts
 models/ShareResponse.ts
 models/SparkDataSample.ts
 models/UnaccessRequest.ts

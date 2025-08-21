@@ -17,20 +17,18 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class CreateNamespaceRequest(BaseModel):
+class NamespaceSelection(BaseModel):
     """
-    CreateNamespaceRequest
+    NamespaceSelection
     """ # noqa: E501
-    token: Optional[StrictStr] = None
+    namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     name: Optional[StrictStr] = None
-    description: Optional[StrictStr] = None
-    open: Optional[StrictBool] = None
-    __properties: ClassVar[List[str]] = ["token", "name", "description", "open"]
+    __properties: ClassVar[List[str]] = ["namespaceToken", "name"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -50,7 +48,7 @@ class CreateNamespaceRequest(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of CreateNamespaceRequest from a JSON string"""
+        """Create an instance of NamespaceSelection from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,7 +73,7 @@ class CreateNamespaceRequest(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of CreateNamespaceRequest from a dict"""
+        """Create an instance of NamespaceSelection from a dict"""
         if obj is None:
             return None
 
@@ -83,10 +81,8 @@ class CreateNamespaceRequest(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "token": obj.get("token"),
-            "name": obj.get("name"),
-            "description": obj.get("description"),
-            "open": obj.get("open")
+            "namespaceToken": obj.get("namespaceToken"),
+            "name": obj.get("name")
         })
         return _obj
 

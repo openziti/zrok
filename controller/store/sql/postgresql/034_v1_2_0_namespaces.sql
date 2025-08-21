@@ -5,7 +5,7 @@
 --
 create table namespaces (
   id                    serial              primary key,
-  token                 varchar(32)         not null,
+  token                 varchar(64)         not null,
   name                  varchar(255)        not null,
   description           text,
   open                  boolean             not null default(false),

@@ -60,6 +60,7 @@ from zrok_api.models.list_share_names200_response_inner import ListShareNames200
 from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
+from zrok_api.models.namespace_selection import NamespaceSelection
 from zrok_api.models.overview import Overview
 from zrok_api.models.ping200_response import Ping200Response
 from zrok_api.models.principal import Principal
@@ -81,6 +82,7 @@ from zrok_api.models.share import Share
 from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.share_request12 import ShareRequest12
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest

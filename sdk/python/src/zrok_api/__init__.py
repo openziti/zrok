@@ -79,6 +79,7 @@ __all__ = [
     "LoginRequest",
     "Metrics",
     "MetricsSample",
+    "NamespaceSelection",
     "Overview",
     "Ping200Response",
     "Principal",
@@ -100,6 +101,7 @@ __all__ = [
     "ShareHttpHealthcheck200Response",
     "ShareHttpHealthcheckRequest",
     "ShareRequest",
+    "ShareRequest12",
     "ShareResponse",
     "SparkDataSample",
     "UnaccessRequest",
@@ -179,6 +181,7 @@ from zrok_api.models.list_share_names200_response_inner import ListShareNames200
 from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample
+from zrok_api.models.namespace_selection import NamespaceSelection as NamespaceSelection
 from zrok_api.models.overview import Overview as Overview
 from zrok_api.models.ping200_response import Ping200Response as Ping200Response
 from zrok_api.models.principal import Principal as Principal
@@ -200,6 +203,7 @@ from zrok_api.models.share import Share as Share
 from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response as ShareHttpHealthcheck200Response
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest as ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest as ShareRequest
+from zrok_api.models.share_request12 import ShareRequest12 as ShareRequest12
 from zrok_api.models.share_response import ShareResponse as ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest as UnaccessRequest

@@ -35,10 +35,15 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 		}
 	}
 
-	namespaceToken, err := CreateToken()
-	if err != nil {
-		logrus.Errorf("error creating namespace token: %v", err)
-		return admin.NewCreateNamespaceInternalServerError()
+	var namespaceToken string
+	if params.Body.Token != "" {
+		namespaceToken = params.Body.Token
+	} else {
+		namespaceToken, err = CreateToken()
+		if err != nil {
+			logrus.Errorf("error creating namespace token: %v", err)
+			return admin.NewCreateNamespaceInternalServerError()
+		}
 	}
 
 	ns := &store.Namespace{

@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.create_namespace_request import CreateNamespaceRequest
+from zrok_api.models.namespace_selection import NamespaceSelection
 
-class TestCreateNamespaceRequest(unittest.TestCase):
-    """CreateNamespaceRequest unit test stubs"""
+class TestNamespaceSelection(unittest.TestCase):
+    """NamespaceSelection unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,28 +25,26 @@ class TestCreateNamespaceRequest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> CreateNamespaceRequest:
-        """Test CreateNamespaceRequest
+    def make_instance(self, include_optional) -> NamespaceSelection:
+        """Test NamespaceSelection
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `CreateNamespaceRequest`
+        # uncomment below to create an instance of `NamespaceSelection`
         """
-        model = CreateNamespaceRequest()
+        model = NamespaceSelection()
         if include_optional:
-            return CreateNamespaceRequest(
-                token = '',
-                name = '',
-                description = '',
-                open = True
+            return NamespaceSelection(
+                namespace_token = '',
+                name = ''
             )
         else:
-            return CreateNamespaceRequest(
+            return NamespaceSelection(
         )
         """
 
-    def testCreateNamespaceRequest(self):
-        """Test CreateNamespaceRequest"""
+    def testNamespaceSelection(self):
+        """Test NamespaceSelection"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

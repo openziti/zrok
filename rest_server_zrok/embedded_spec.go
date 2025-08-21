@@ -1954,6 +1954,9 @@ func init() {
                 },
                 "open": {
                   "type": "boolean"
+                },
+                "token": {
+                  "type": "string"
                 }
               }
             }
@@ -3526,6 +3529,17 @@ func init() {
         }
       }
     },
+    "namespaceSelection": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -3677,6 +3691,77 @@ func init() {
           ]
         },
         "uniqueName": {
+          "type": "string"
+        }
+      }
+    },
+    "shareRequest12": {
+      "type": "object",
+      "properties": {
+        "accessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authScheme": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "tcpTunnel",
+            "udpTunnel",
+            "caddy",
+            "drive",
+            "socks",
+            "vpn"
+          ]
+        },
+        "basicAuthUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authUser"
+          }
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "namespaceSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/namespaceSelection"
+          }
+        },
+        "oauthEmailDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "oauthProvider": {
+          "type": "string"
+        },
+        "oauthRefreshInterval": {
+          "type": "string"
+        },
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
+        },
+        "target": {
           "type": "string"
         }
       }
@@ -5570,6 +5655,9 @@ func init() {
                 },
                 "open": {
                   "type": "boolean"
+                },
+                "token": {
+                  "type": "string"
                 }
               }
             }
@@ -7265,6 +7353,17 @@ func init() {
         }
       }
     },
+    "namespaceSelection": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        }
+      }
+    },
     "overview": {
       "type": "object",
       "properties": {
@@ -7416,6 +7515,77 @@ func init() {
           ]
         },
         "uniqueName": {
+          "type": "string"
+        }
+      }
+    },
+    "shareRequest12": {
+      "type": "object",
+      "properties": {
+        "accessGrants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authScheme": {
+          "type": "string"
+        },
+        "backendMode": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "web",
+            "tcpTunnel",
+            "udpTunnel",
+            "caddy",
+            "drive",
+            "socks",
+            "vpn"
+          ]
+        },
+        "basicAuthUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/authUser"
+          }
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "namespaceSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/namespaceSelection"
+          }
+        },
+        "oauthEmailDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "oauthProvider": {
+          "type": "string"
+        },
+        "oauthRefreshInterval": {
+          "type": "string"
+        },
+        "permissionMode": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "shareMode": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private"
+          ]
+        },
+        "target": {
           "type": "string"
         }
       }

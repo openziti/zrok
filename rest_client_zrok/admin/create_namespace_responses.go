@@ -302,6 +302,9 @@ type CreateNamespaceBody struct {
 
 	// open
 	Open bool `json:"open,omitempty"`
+
+	// token
+	Token string `json:"token,omitempty"`
 }
 
 // Validate validates this create namespace body
