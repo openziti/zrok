@@ -30,6 +30,7 @@ export * from './GetSparklines200Response';
 export * from './GetSparklinesRequest';
 export * from './InviteRequest';
 export * from './InviteTokenGenerateRequest';
+export * from './ListAllShareNames200ResponseInner';
 export * from './ListFrontendNamespaceMappings200ResponseInner';
 export * from './ListFrontends200ResponseInner';
 export * from './ListMemberships200Response';

@@ -155,6 +155,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
+		ShareListAllShareNamesHandler: share.ListAllShareNamesHandlerFunc(func(params share.ListAllShareNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.ListAllShareNames has not yet been implemented")
+		}),
 		AdminListFrontendNamespaceMappingsHandler: admin.ListFrontendNamespaceMappingsHandlerFunc(func(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontendNamespaceMappings has not yet been implemented")
 		}),
@@ -389,6 +392,8 @@ type ZrokAPI struct {
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
+	// ShareListAllShareNamesHandler sets the operation handler for the list all share names operation
+	ShareListAllShareNamesHandler share.ListAllShareNamesHandler
 	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
 	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
@@ -650,6 +655,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminInviteTokenGenerateHandler == nil {
 		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
+	}
+	if o.ShareListAllShareNamesHandler == nil {
+		unregistered = append(unregistered, "share.ListAllShareNamesHandler")
 	}
 	if o.AdminListFrontendNamespaceMappingsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendNamespaceMappingsHandler")
@@ -1004,6 +1012,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/invite/token/generate"] = admin.NewInviteTokenGenerate(o.context, o.AdminInviteTokenGenerateHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/share/names"] = share.NewListAllShareNames(o.context, o.ShareListAllShareNamesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

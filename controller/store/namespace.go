@@ -77,6 +77,27 @@ func (str *Store) UpdateNamespace(ns *Namespace, tx *sqlx.Tx) error {
 	return nil
 }
 
+func (str *Store) FindNamespacesForAccount(accountId int, tx *sqlx.Tx) ([]*Namespace, error) {
+	// find all open namespaces plus namespaces the account has grants for
+	rows, err := tx.Queryx(`
+		select distinct n.* from namespaces n 
+		left join namespace_grants ng on n.id = ng.namespace_id 
+		where not n.deleted and (n.open = true or ng.account_id = $1)
+		order by n.name`, accountId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding namespaces for account")
+	}
+	var namespaces []*Namespace
+	for rows.Next() {
+		ns := &Namespace{}
+		if err := rows.StructScan(&ns); err != nil {
+			return nil, errors.Wrap(err, "error scanning namespace")
+		}
+		namespaces = append(namespaces, ns)
+	}
+	return namespaces, nil
+}
+
 func (str *Store) DeleteNamespace(id int, tx *sqlx.Tx) error {
 	stmt, err := tx.Prepare("update namespaces set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {

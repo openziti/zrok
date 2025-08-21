@@ -159,6 +159,7 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**access**](docs/ShareApi.md#access) | **POST** /access | 
 *ShareApi* | [**create_share_name**](docs/ShareApi.md#create_share_name) | **POST** /share/name | 
 *ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
+*ShareApi* | [**list_all_share_names**](docs/ShareApi.md#list_all_share_names) | **GET** /share/names | 
 *ShareApi* | [**list_share_names**](docs/ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
@@ -200,6 +201,7 @@ Class | Method | HTTP request | Description
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
+ - [ListAllShareNames200ResponseInner](docs/ListAllShareNames200ResponseInner.md)
  - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)

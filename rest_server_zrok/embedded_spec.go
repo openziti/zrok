@@ -3088,6 +3088,50 @@ func init() {
         }
       }
     },
+    "/share/names": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listAllShareNames",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespaceName": {
+                    "type": "string"
+                  },
+                  "namespaceToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share/names/{namespaceToken}": {
       "get": {
         "security": [
@@ -6733,6 +6777,36 @@ func init() {
         }
       }
     },
+    "/share/names": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listAllShareNames",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListAllShareNamesOKBodyItems0"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share/names/{namespaceToken}": {
       "get": {
         "security": [
@@ -7021,6 +7095,23 @@ func init() {
           }
         },
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "ListAllShareNamesOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceName": {
+          "type": "string"
+        },
+        "namespaceToken": {
           "type": "string"
         }
       }

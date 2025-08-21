@@ -18,6 +18,7 @@ import type {
   Access201Response,
   AccessRequest,
   CreateShareNameRequest,
+  ListAllShareNames200ResponseInner,
   ListShareNames200ResponseInner,
   ShareRequest,
   ShareResponse,
@@ -33,6 +34,8 @@ import {
     AccessRequestToJSON,
     CreateShareNameRequestFromJSON,
     CreateShareNameRequestToJSON,
+    ListAllShareNames200ResponseInnerFromJSON,
+    ListAllShareNames200ResponseInnerToJSON,
     ListShareNames200ResponseInnerFromJSON,
     ListShareNames200ResponseInnerToJSON,
     ShareRequestFromJSON,
@@ -188,6 +191,37 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async deleteShareName(requestParameters: DeleteShareNameRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteShareNameRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async listAllShareNamesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListAllShareNames200ResponseInner>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/share/names`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListAllShareNames200ResponseInnerFromJSON));
+    }
+
+    /**
+     */
+    async listAllShareNames(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListAllShareNames200ResponseInner>> {
+        const response = await this.listAllShareNamesRaw(initOverrides);
+        return await response.value();
     }
 
     /**

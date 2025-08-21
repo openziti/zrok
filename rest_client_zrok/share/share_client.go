@@ -36,6 +36,8 @@ type ClientService interface {
 
 	DeleteShareName(params *DeleteShareNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteShareNameOK, error)
 
+	ListAllShareNames(params *ListAllShareNamesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAllShareNamesOK, error)
+
 	ListShareNames(params *ListShareNamesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListShareNamesOK, error)
 
 	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
@@ -165,6 +167,45 @@ func (a *Client) DeleteShareName(params *DeleteShareNameParams, authInfo runtime
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteShareName: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListAllShareNames list all share names API
+*/
+func (a *Client) ListAllShareNames(params *ListAllShareNamesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAllShareNamesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListAllShareNamesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listAllShareNames",
+		Method:             "GET",
+		PathPattern:        "/share/names",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListAllShareNamesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListAllShareNamesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listAllShareNames: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

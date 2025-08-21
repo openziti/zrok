@@ -1980,6 +1980,34 @@ paths:
         500:
           description: internal server error
 
+  /share/names:
+    get:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: listAllShareNames
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                namespaceName:
+                  type: string
+                name:
+                  type: string
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
   /share/names/{namespaceToken}:
     get:
       tags:

@@ -35,6 +35,7 @@ docs/GetSparklines200Response.md
 docs/GetSparklinesRequest.md
 docs/InviteRequest.md
 docs/InviteTokenGenerateRequest.md
+docs/ListAllShareNames200ResponseInner.md
 docs/ListFrontendNamespaceMappings200ResponseInner.md
 docs/ListFrontends200ResponseInner.md
 docs/ListMemberships200Response.md
@@ -124,6 +125,7 @@ test/test_get_sparklines200_response.py
 test/test_get_sparklines_request.py
 test/test_invite_request.py
 test/test_invite_token_generate_request.py
+test/test_list_all_share_names200_response_inner.py
 test/test_list_frontend_namespace_mappings200_response_inner.py
 test/test_list_frontends200_response_inner.py
 test/test_list_memberships200_response.py
@@ -219,6 +221,7 @@ zrok_api/models/get_sparklines200_response.py
 zrok_api/models/get_sparklines_request.py
 zrok_api/models/invite_request.py
 zrok_api/models/invite_token_generate_request.py
+zrok_api/models/list_all_share_names200_response_inner.py
 zrok_api/models/list_frontend_namespace_mappings200_response_inner.py
 zrok_api/models/list_frontends200_response_inner.py
 zrok_api/models/list_memberships200_response.py
