@@ -33,6 +33,7 @@ export * from './InviteTokenGenerateRequest';
 export * from './ListFrontends200ResponseInner';
 export * from './ListMemberships200Response';
 export * from './ListMemberships200ResponseMembershipsInner';
+export * from './ListNamespaceFrontendMappings200ResponseInner';
 export * from './ListNamespaces200ResponseInner';
 export * from './ListOrganizationMembers200Response';
 export * from './ListOrganizationMembers200ResponseMembersInner';

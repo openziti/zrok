@@ -66,6 +66,8 @@ type ClientService interface {
 
 	ListFrontends(params *ListFrontendsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendsOK, error)
 
+	ListNamespaceFrontendMappings(params *ListNamespaceFrontendMappingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListNamespaceFrontendMappingsOK, error)
+
 	ListNamespaces(params *ListNamespacesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListNamespacesOK, error)
 
 	ListOrganizationMembers(params *ListOrganizationMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationMembersOK, error)
@@ -784,6 +786,45 @@ func (a *Client) ListFrontends(params *ListFrontendsParams, authInfo runtime.Cli
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listFrontends: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListNamespaceFrontendMappings list namespace frontend mappings API
+*/
+func (a *Client) ListNamespaceFrontendMappings(params *ListNamespaceFrontendMappingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListNamespaceFrontendMappingsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListNamespaceFrontendMappingsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listNamespaceFrontendMappings",
+		Method:             "GET",
+		PathPattern:        "/namespace/frontend/mapping/{namespaceToken}",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListNamespaceFrontendMappingsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListNamespaceFrontendMappingsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listNamespaceFrontendMappings: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

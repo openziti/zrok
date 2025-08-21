@@ -30,6 +30,7 @@ import type {
   DeleteIdentityRequest,
   InviteTokenGenerateRequest,
   ListFrontends200ResponseInner,
+  ListNamespaceFrontendMappings200ResponseInner,
   ListNamespaces200ResponseInner,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
@@ -71,6 +72,8 @@ import {
     InviteTokenGenerateRequestToJSON,
     ListFrontends200ResponseInnerFromJSON,
     ListFrontends200ResponseInnerToJSON,
+    ListNamespaceFrontendMappings200ResponseInnerFromJSON,
+    ListNamespaceFrontendMappings200ResponseInnerToJSON,
     ListNamespaces200ResponseInnerFromJSON,
     ListNamespaces200ResponseInnerToJSON,
     ListOrganizationMembers200ResponseFromJSON,
@@ -157,6 +160,10 @@ export interface GrantsRequest {
 
 export interface InviteTokenGenerateOperationRequest {
     body?: InviteTokenGenerateRequest;
+}
+
+export interface ListNamespaceFrontendMappingsRequest {
+    namespaceToken: string;
 }
 
 export interface ListOrganizationMembersRequest {
@@ -782,6 +789,45 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontends200ResponseInner>> {
         const response = await this.listFrontendsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listNamespaceFrontendMappingsRaw(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListNamespaceFrontendMappings200ResponseInner>>> {
+        if (requestParameters['namespaceToken'] == null) {
+            throw new runtime.RequiredError(
+                'namespaceToken',
+                'Required parameter "namespaceToken" was null or undefined when calling listNamespaceFrontendMappings().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace/frontend/mapping/{namespaceToken}`;
+        urlPath = urlPath.replace(`{${"namespaceToken"}}`, encodeURIComponent(String(requestParameters['namespaceToken'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListNamespaceFrontendMappings200ResponseInnerFromJSON));
+    }
+
+    /**
+     */
+    async listNamespaceFrontendMappings(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListNamespaceFrontendMappings200ResponseInner>> {
+        const response = await this.listNamespaceFrontendMappingsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

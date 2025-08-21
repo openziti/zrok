@@ -40,6 +40,7 @@ models/InviteTokenGenerateRequest.ts
 models/ListFrontends200ResponseInner.ts
 models/ListMemberships200Response.ts
 models/ListMemberships200ResponseMembershipsInner.ts
+models/ListNamespaceFrontendMappings200ResponseInner.ts
 models/ListNamespaces200ResponseInner.ts
 models/ListOrganizationMembers200Response.ts
 models/ListOrganizationMembers200ResponseMembersInner.ts

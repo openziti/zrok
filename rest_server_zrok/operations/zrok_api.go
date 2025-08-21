@@ -161,6 +161,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListMemberships has not yet been implemented")
 		}),
+		AdminListNamespaceFrontendMappingsHandler: admin.ListNamespaceFrontendMappingsHandlerFunc(func(params admin.ListNamespaceFrontendMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListNamespaceFrontendMappings has not yet been implemented")
+		}),
 		AdminListNamespacesHandler: admin.ListNamespacesHandlerFunc(func(params admin.ListNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListNamespaces has not yet been implemented")
 		}),
@@ -387,6 +390,8 @@ type ZrokAPI struct {
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
 	MetadataListMembershipsHandler metadata.ListMembershipsHandler
+	// AdminListNamespaceFrontendMappingsHandler sets the operation handler for the list namespace frontend mappings operation
+	AdminListNamespaceFrontendMappingsHandler admin.ListNamespaceFrontendMappingsHandler
 	// AdminListNamespacesHandler sets the operation handler for the list namespaces operation
 	AdminListNamespacesHandler admin.ListNamespacesHandler
 	// MetadataListOrgMembersHandler sets the operation handler for the list org members operation
@@ -646,6 +651,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListMembershipsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
+	}
+	if o.AdminListNamespaceFrontendMappingsHandler == nil {
+		unregistered = append(unregistered, "admin.ListNamespaceFrontendMappingsHandler")
 	}
 	if o.AdminListNamespacesHandler == nil {
 		unregistered = append(unregistered, "admin.ListNamespacesHandler")
@@ -996,6 +1004,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/memberships"] = metadata.NewListMemberships(o.context, o.MetadataListMembershipsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/namespace/frontend/mapping/{namespaceToken}"] = admin.NewListNamespaceFrontendMappings(o.context, o.AdminListNamespaceFrontendMappingsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

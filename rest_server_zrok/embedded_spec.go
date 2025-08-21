@@ -2101,6 +2101,58 @@ func init() {
         }
       }
     },
+    "/namespace/frontend/mapping/{namespaceToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listNamespaceFrontendMappings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "namespace frontend mappings listed",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "createdAt": {
+                    "type": "integer"
+                  },
+                  "frontendToken": {
+                    "type": "string"
+                  },
+                  "namespaceToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/namespace/grant": {
       "post": {
         "security": [
@@ -5618,6 +5670,47 @@ func init() {
         }
       }
     },
+    "/namespace/frontend/mapping/{namespaceToken}": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listNamespaceFrontendMappings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "namespace frontend mappings listed",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListNamespaceFrontendMappingsOKBodyItems0"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "namespace not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/namespace/grant": {
       "post": {
         "security": [
@@ -6758,6 +6851,20 @@ func init() {
           "type": "string"
         },
         "zId": {
+          "type": "string"
+        }
+      }
+    },
+    "ListNamespaceFrontendMappingsOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "namespaceToken": {
           "type": "string"
         }
       }
