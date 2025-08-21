@@ -10,30 +10,30 @@ import (
 )
 
 func init() {
-	adminCreateCmd.AddCommand(newAdminCreateFrontendNamespaceCommand().cmd)
+	adminCreateCmd.AddCommand(newAdminCreateNamespaceFrontendCommand().cmd)
 }
 
-type adminCreateFrontendNamespaceCommand struct {
+type adminCreateNamespaceFrontendCommand struct {
 	cmd       *cobra.Command
 	isDefault bool
 }
 
-func newAdminCreateFrontendNamespaceCommand() *adminCreateFrontendNamespaceCommand {
+func newAdminCreateNamespaceFrontendCommand() *adminCreateNamespaceFrontendCommand {
 	cmd := &cobra.Command{
-		Use:     "frontend-namespace <frontendToken> <namespaceToken>",
+		Use:     "namespace-frontend <namespaceToken> <frontendToken>",
 		Aliases: []string{"fn"},
 		Short:   "Map a frontend to a namespace",
 		Args:    cobra.ExactArgs(2),
 	}
-	command := &adminCreateFrontendNamespaceCommand{cmd: cmd}
+	command := &adminCreateNamespaceFrontendCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.isDefault, "default", false, "create mapping as default")
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *adminCreateFrontendNamespaceCommand) run(_ *cobra.Command, args []string) {
-	frontendToken := args[0]
-	namespaceToken := args[1]
+func (cmd *adminCreateNamespaceFrontendCommand) run(_ *cobra.Command, args []string) {
+	namespaceToken := args[0]
+	frontendToken := args[1]
 
 	root, err := environment.LoadRoot()
 	if err != nil {
@@ -51,9 +51,9 @@ func (cmd *adminCreateFrontendNamespaceCommand) run(_ *cobra.Command, args []str
 	req.Body.IsDefault = cmd.isDefault
 
 	if _, err = zrok.Admin.AddNamespaceFrontendMapping(req, mustGetAdminAuth()); err != nil {
-		logrus.Errorf("error creating frontend-namespace mapping: %v", err)
+		logrus.Errorf("error creating namespace-frontend mapping: %v", err)
 		os.Exit(1)
 	}
 
-	logrus.Infof("created frontend-namespace mapping: frontend '%v' -> namespace '%v'", frontendToken, namespaceToken)
+	logrus.Infof("created namespace-frontend mapping: namespace '%v' -> frontend '%v'", namespaceToken, frontendToken)
 }

@@ -10,28 +10,28 @@ import (
 )
 
 func init() {
-	adminDeleteCmd.AddCommand(newAdminDeleteFrontendNamespaceCommand().cmd)
+	adminDeleteCmd.AddCommand(newAdminDeleteNamespaceFrontendCommand().cmd)
 }
 
-type adminDeleteFrontendNamespaceCommand struct {
+type adminDeleteNamespaceFrontendCommand struct {
 	cmd *cobra.Command
 }
 
-func newAdminDeleteFrontendNamespaceCommand() *adminDeleteFrontendNamespaceCommand {
+func newAdminDeleteNamespaceFrontendCommand() *adminDeleteNamespaceFrontendCommand {
 	cmd := &cobra.Command{
-		Use:     "frontend-namespace <frontendToken> <namespaceToken>",
+		Use:     "namespace-frontend <namespaceToken> <frontendToken>",
 		Aliases: []string{"fn"},
 		Short:   "Remove mapping between frontend and namespace",
 		Args:    cobra.ExactArgs(2),
 	}
-	command := &adminDeleteFrontendNamespaceCommand{cmd: cmd}
+	command := &adminDeleteNamespaceFrontendCommand{cmd: cmd}
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *adminDeleteFrontendNamespaceCommand) run(_ *cobra.Command, args []string) {
-	frontendToken := args[0]
-	namespaceToken := args[1]
+func (cmd *adminDeleteNamespaceFrontendCommand) run(_ *cobra.Command, args []string) {
+	namespaceToken := args[0]
+	frontendToken := args[1]
 
 	root, err := environment.LoadRoot()
 	if err != nil {
@@ -48,9 +48,9 @@ func (cmd *adminDeleteFrontendNamespaceCommand) run(_ *cobra.Command, args []str
 	req.Body.NamespaceToken = namespaceToken
 
 	if _, err := zrok.Admin.RemoveNamespaceFrontendMapping(req, mustGetAdminAuth()); err != nil {
-		logrus.Errorf("error deleting frontend-namespace mapping: %v", err)
+		logrus.Errorf("error deleting namespace-frontend mapping: %v", err)
 		os.Exit(1)
 	}
 
-	logrus.Infof("deleted frontend-namespace mapping: frontend '%v' -> namespace '%v'", frontendToken, namespaceToken)
+	logrus.Infof("deleted namespace-frontend mapping: namespace '%v' -> frontend '%v'", namespaceToken, frontendToken)
 }
