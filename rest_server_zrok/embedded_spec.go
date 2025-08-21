@@ -1403,6 +1403,9 @@ func init() {
                   "frontendToken": {
                     "type": "string"
                   },
+                  "isDefault": {
+                    "type": "boolean"
+                  },
                   "namespaceToken": {
                     "type": "string"
                   }
@@ -2088,6 +2091,9 @@ func init() {
                 "frontendToken": {
                   "type": "string"
                 },
+                "isDefault": {
+                  "type": "boolean"
+                },
                 "namespaceToken": {
                   "type": "string"
                 }
@@ -2185,6 +2191,9 @@ func init() {
                   },
                   "frontendToken": {
                     "type": "string"
+                  },
+                  "isDefault": {
+                    "type": "boolean"
                   },
                   "namespaceToken": {
                     "type": "string"
@@ -5698,6 +5707,9 @@ func init() {
                 "frontendToken": {
                   "type": "string"
                 },
+                "isDefault": {
+                  "type": "boolean"
+                },
                 "namespaceToken": {
                   "type": "string"
                 }
@@ -6934,6 +6946,9 @@ func init() {
         "frontendToken": {
           "type": "string"
         },
+        "isDefault": {
+          "type": "boolean"
+        },
         "namespaceToken": {
           "type": "string"
         }
@@ -6970,6 +6985,9 @@ func init() {
         },
         "frontendToken": {
           "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
         },
         "namespaceToken": {
           "type": "string"

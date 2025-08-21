@@ -443,6 +443,8 @@ paths:
                   type: string
                 frontendToken:
                   type: string
+                isDefault:
+                  type: boolean
                 createdAt:
                   type: integer
         401:
@@ -686,6 +688,8 @@ paths:
                 type: string
               frontendToken:
                 type: string
+              isDefault:
+                type: boolean
       responses:
         200:
           description: namespace frontend mapping added
@@ -745,6 +749,8 @@ paths:
                   type: string
                 frontendToken:
                   type: string
+                isDefault:
+                  type: boolean
                 createdAt:
                   type: integer
         401:

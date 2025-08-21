@@ -93,6 +93,7 @@ __all__ = [
     "RemoteStatus200ResponseSharesInner",
     "RemoteUnaccessRequest",
     "RemoteUnshareRequest",
+    "RemoveNamespaceFrontendMappingRequest",
     "RemoveOrganizationMemberRequest",
     "ResetPasswordRequest",
     "Share",
@@ -192,6 +193,7 @@ from zrok_api.models.remote_status200_response_accesses_inner import RemoteStatu
 from zrok_api.models.remote_status200_response_shares_inner import RemoteStatus200ResponseSharesInner as RemoteStatus200ResponseSharesInner
 from zrok_api.models.remote_unaccess_request import RemoteUnaccessRequest as RemoteUnaccessRequest
 from zrok_api.models.remote_unshare_request import RemoteUnshareRequest as RemoteUnshareRequest
+from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest as RemoveNamespaceFrontendMappingRequest
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest as RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest as ResetPasswordRequest
 from zrok_api.models.share import Share as Share

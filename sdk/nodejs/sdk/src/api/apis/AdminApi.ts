@@ -36,6 +36,7 @@ import type {
   ListOrganizations200Response,
   LoginRequest,
   RegenerateAccountToken200Response,
+  RemoveNamespaceFrontendMappingRequest,
   RemoveOrganizationMemberRequest,
   UpdateFrontendRequest,
   UpdateNamespaceRequest,
@@ -84,6 +85,8 @@ import {
     LoginRequestToJSON,
     RegenerateAccountToken200ResponseFromJSON,
     RegenerateAccountToken200ResponseToJSON,
+    RemoveNamespaceFrontendMappingRequestFromJSON,
+    RemoveNamespaceFrontendMappingRequestToJSON,
     RemoveOrganizationMemberRequestFromJSON,
     RemoveOrganizationMemberRequestToJSON,
     UpdateFrontendRequestFromJSON,
@@ -174,8 +177,8 @@ export interface ListOrganizationMembersRequest {
     body?: CreateOrganization201Response;
 }
 
-export interface RemoveNamespaceFrontendMappingRequest {
-    body?: AddNamespaceFrontendMappingRequest;
+export interface RemoveNamespaceFrontendMappingOperationRequest {
+    body?: RemoveNamespaceFrontendMappingRequest;
 }
 
 export interface RemoveNamespaceGrantRequest {
@@ -972,7 +975,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async removeNamespaceFrontendMappingRaw(requestParameters: RemoveNamespaceFrontendMappingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async removeNamespaceFrontendMappingRaw(requestParameters: RemoveNamespaceFrontendMappingOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -991,7 +994,7 @@ export class AdminApi extends runtime.BaseAPI {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: AddNamespaceFrontendMappingRequestToJSON(requestParameters['body']),
+            body: RemoveNamespaceFrontendMappingRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -999,7 +1002,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async removeNamespaceFrontendMapping(requestParameters: RemoveNamespaceFrontendMappingRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async removeNamespaceFrontendMapping(requestParameters: RemoveNamespaceFrontendMappingOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.removeNamespaceFrontendMappingRaw(requestParameters, initOverrides);
     }
 

@@ -17,20 +17,18 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ListFrontendNamespaceMappings200ResponseInner(BaseModel):
+class RemoveNamespaceFrontendMappingRequest(BaseModel):
     """
-    ListFrontendNamespaceMappings200ResponseInner
+    RemoveNamespaceFrontendMappingRequest
     """ # noqa: E501
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     frontend_token: Optional[StrictStr] = Field(default=None, alias="frontendToken")
-    is_default: Optional[StrictBool] = Field(default=None, alias="isDefault")
-    created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
-    __properties: ClassVar[List[str]] = ["namespaceToken", "frontendToken", "isDefault", "createdAt"]
+    __properties: ClassVar[List[str]] = ["namespaceToken", "frontendToken"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -50,7 +48,7 @@ class ListFrontendNamespaceMappings200ResponseInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ListFrontendNamespaceMappings200ResponseInner from a JSON string"""
+        """Create an instance of RemoveNamespaceFrontendMappingRequest from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,7 +73,7 @@ class ListFrontendNamespaceMappings200ResponseInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ListFrontendNamespaceMappings200ResponseInner from a dict"""
+        """Create an instance of RemoveNamespaceFrontendMappingRequest from a dict"""
         if obj is None:
             return None
 
@@ -84,9 +82,7 @@ class ListFrontendNamespaceMappings200ResponseInner(BaseModel):
 
         _obj = cls.model_validate({
             "namespaceToken": obj.get("namespaceToken"),
-            "frontendToken": obj.get("frontendToken"),
-            "isDefault": obj.get("isDefault"),
-            "createdAt": obj.get("createdAt")
+            "frontendToken": obj.get("frontendToken")
         })
         return _obj
 

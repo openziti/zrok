@@ -84,6 +84,9 @@ type ListFrontendNamespaceMappingsOKBodyItems0 struct {
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
+	// is default
+	IsDefault bool `json:"isDefault,omitempty"`
+
 	// namespace token
 	NamespaceToken string `json:"namespaceToken,omitempty"`
 }

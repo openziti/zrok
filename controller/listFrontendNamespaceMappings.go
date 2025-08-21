@@ -34,18 +34,24 @@ func (handler *listFrontendNamespaceMappingsHandler) Handle(params admin.ListFro
 		return admin.NewListFrontendNamespaceMappingsNotFound()
 	}
 
-	namespaces, err := str.FindNamespacesForFrontend(fe.Id, tx)
+	nfMappings, err := str.FindNamespaceFrontendMappingsForFrontend(fe.Id, tx)
 	if err != nil {
-		logrus.Errorf("error finding namespaces for frontend '%s': %v", feToken, err)
+		logrus.Errorf("error finding namespace frontend mappings for frontend '%s': %v", feToken, err)
 		return admin.NewListFrontendNamespaceMappingsInternalServerError()
 	}
 
 	var mappings []*admin.ListFrontendNamespaceMappingsOKBodyItems0
-	for _, ns := range namespaces {
+	for _, nfMapping := range nfMappings {
+		ns, err := str.GetNamespace(nfMapping.NamespaceId, tx)
+		if err != nil {
+			logrus.Errorf("error finding namespace with id '%d': %v", nfMapping.NamespaceId, err)
+			continue
+		}
 		mapping := &admin.ListFrontendNamespaceMappingsOKBodyItems0{
 			FrontendToken:  feToken,
 			NamespaceToken: ns.Token,
-			CreatedAt:      ns.CreatedAt.Unix(),
+			IsDefault:      nfMapping.IsDefault,
+			CreatedAt:      nfMapping.CreatedAt.Unix(),
 		}
 		mappings = append(mappings, mapping)
 	}

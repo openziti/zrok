@@ -37,6 +37,7 @@ class TestListFrontendNamespaceMappings200ResponseInner(unittest.TestCase):
             return ListFrontendNamespaceMappings200ResponseInner(
                 namespace_token = '',
                 frontend_token = '',
+                is_default = True,
                 created_at = 56
             )
         else:

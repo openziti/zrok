@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **namespace_token** | **str** |  | [optional] 
 **frontend_token** | **str** |  | [optional] 
+**is_default** | **bool** |  | [optional] 
 **created_at** | **int** |  | [optional] 
 
 ## Example

@@ -60,6 +60,7 @@ export * from './RemoteStatus200ResponseAccessesInner';
 export * from './RemoteStatus200ResponseSharesInner';
 export * from './RemoteUnaccessRequest';
 export * from './RemoteUnshareRequest';
+export * from './RemoveNamespaceFrontendMappingRequest';
 export * from './RemoveOrganizationMemberRequest';
 export * from './ResetPasswordRequest';
 export * from './Share';

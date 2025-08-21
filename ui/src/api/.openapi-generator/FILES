@@ -67,6 +67,7 @@ models/RemoteStatus200ResponseAccessesInner.ts
 models/RemoteStatus200ResponseSharesInner.ts
 models/RemoteUnaccessRequest.ts
 models/RemoteUnshareRequest.ts
+models/RemoveNamespaceFrontendMappingRequest.ts
 models/RemoveOrganizationMemberRequest.ts
 models/ResetPasswordRequest.ts
 models/Share.ts

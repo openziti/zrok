@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest
+from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest
 
-class TestAddNamespaceFrontendMappingRequest(unittest.TestCase):
-    """AddNamespaceFrontendMappingRequest unit test stubs"""
+class TestRemoveNamespaceFrontendMappingRequest(unittest.TestCase):
+    """RemoveNamespaceFrontendMappingRequest unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,27 +25,26 @@ class TestAddNamespaceFrontendMappingRequest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> AddNamespaceFrontendMappingRequest:
-        """Test AddNamespaceFrontendMappingRequest
+    def make_instance(self, include_optional) -> RemoveNamespaceFrontendMappingRequest:
+        """Test RemoveNamespaceFrontendMappingRequest
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `AddNamespaceFrontendMappingRequest`
+        # uncomment below to create an instance of `RemoveNamespaceFrontendMappingRequest`
         """
-        model = AddNamespaceFrontendMappingRequest()
+        model = RemoveNamespaceFrontendMappingRequest()
         if include_optional:
-            return AddNamespaceFrontendMappingRequest(
+            return RemoveNamespaceFrontendMappingRequest(
                 namespace_token = '',
-                frontend_token = '',
-                is_default = True
+                frontend_token = ''
             )
         else:
-            return AddNamespaceFrontendMappingRequest(
+            return RemoveNamespaceFrontendMappingRequest(
         )
         """
 
-    def testAddNamespaceFrontendMappingRequest(self):
-        """Test AddNamespaceFrontendMappingRequest"""
+    def testRemoveNamespaceFrontendMappingRequest(self):
+        """Test RemoveNamespaceFrontendMappingRequest"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

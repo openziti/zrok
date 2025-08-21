@@ -9,15 +9,16 @@ type NamespaceFrontendMapping struct {
 	Model
 	NamespaceId int
 	FrontendId  int
+	IsDefault   bool
 }
 
-func (str *Store) CreateNamespaceFrontendMapping(nsId, feId int, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into namespace_frontend_mappings (namespace_id, frontend_id) values ($1, $2) returning id")
+func (str *Store) CreateNamespaceFrontendMapping(nsId, feId int, isDefault bool, tx *sqlx.Tx) (int, error) {
+	stmt, err := tx.Prepare("insert into namespace_frontend_mappings (namespace_id, frontend_id, is_default) values ($1, $2, $3) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing namespace frontend mapping insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(nsId, feId).Scan(&id); err != nil {
+	if err := stmt.QueryRow(nsId, feId, isDefault).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing namespace frontend mapping insert statement")
 	}
 	return id, nil
@@ -59,6 +60,42 @@ func (str *Store) FindNamespacesForFrontend(frontendId int, tx *sqlx.Tx) ([]*Nam
 		namespaces = append(namespaces, ns)
 	}
 	return namespaces, nil
+}
+
+func (str *Store) FindNamespaceFrontendMappingsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
+	rows, err := tx.Queryx(`
+		select nfm.* from namespace_frontend_mappings nfm 
+		where nfm.namespace_id = $1 and not nfm.deleted`, namespaceId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting namespace frontend mappings for namespace")
+	}
+	var mappings []*NamespaceFrontendMapping
+	for rows.Next() {
+		mapping := &NamespaceFrontendMapping{}
+		if err := rows.StructScan(mapping); err != nil {
+			return nil, errors.Wrap(err, "error scanning namespace frontend mapping")
+		}
+		mappings = append(mappings, mapping)
+	}
+	return mappings, nil
+}
+
+func (str *Store) FindNamespaceFrontendMappingsForFrontend(frontendId int, tx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
+	rows, err := tx.Queryx(`
+		select nfm.* from namespace_frontend_mappings nfm 
+		where nfm.frontend_id = $1 and not nfm.deleted`, frontendId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting namespace frontend mappings for frontend")
+	}
+	var mappings []*NamespaceFrontendMapping
+	for rows.Next() {
+		mapping := &NamespaceFrontendMapping{}
+		if err := rows.StructScan(mapping); err != nil {
+			return nil, errors.Wrap(err, "error scanning namespace frontend mapping")
+		}
+		mappings = append(mappings, mapping)
+	}
+	return mappings, nil
 }
 
 func (str *Store) DeleteNamespaceFrontendMapping(nsId, feId int, tx *sqlx.Tx) error {

@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -28,7 +28,8 @@ class AddNamespaceFrontendMappingRequest(BaseModel):
     """ # noqa: E501
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     frontend_token: Optional[StrictStr] = Field(default=None, alias="frontendToken")
-    __properties: ClassVar[List[str]] = ["namespaceToken", "frontendToken"]
+    is_default: Optional[StrictBool] = Field(default=None, alias="isDefault")
+    __properties: ClassVar[List[str]] = ["namespaceToken", "frontendToken", "isDefault"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -82,7 +83,8 @@ class AddNamespaceFrontendMappingRequest(BaseModel):
 
         _obj = cls.model_validate({
             "namespaceToken": obj.get("namespaceToken"),
-            "frontendToken": obj.get("frontendToken")
+            "frontendToken": obj.get("frontendToken"),
+            "isDefault": obj.get("isDefault")
         })
         return _obj
 

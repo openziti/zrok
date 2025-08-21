@@ -74,13 +74,13 @@ func (cmd *adminListNamespaceFrontendCommand) run(_ *cobra.Command, args []strin
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleColoredDark)
-		t.AppendHeader(table.Row{"frontend token", "public name", "url template", "created"})
+		t.AppendHeader(table.Row{"frontend token", "public name", "url template", "default", "created"})
 		for _, mapping := range resp.Payload {
 			if fe, exists := frontendMap[mapping.FrontendToken]; exists {
 				created := time.UnixMilli(fe.CreatedAt).Format("2006-01-02 15:04:05")
-				t.AppendRow(table.Row{mapping.FrontendToken, fe.PublicName, fe.URLTemplate, created})
+				t.AppendRow(table.Row{mapping.FrontendToken, fe.PublicName, fe.URLTemplate, mapping.IsDefault, created})
 			} else {
-				t.AppendRow(table.Row{mapping.FrontendToken, "[unknown]", "", ""})
+				t.AppendRow(table.Row{mapping.FrontendToken, "[unknown]", "", mapping.IsDefault, ""})
 			}
 		}
 		t.Render()

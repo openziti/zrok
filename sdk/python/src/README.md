@@ -229,6 +229,7 @@ Class | Method | HTTP request | Description
  - [RemoteStatus200ResponseSharesInner](docs/RemoteStatus200ResponseSharesInner.md)
  - [RemoteUnaccessRequest](docs/RemoteUnaccessRequest.md)
  - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
+ - [RemoveNamespaceFrontendMappingRequest](docs/RemoveNamespaceFrontendMappingRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)

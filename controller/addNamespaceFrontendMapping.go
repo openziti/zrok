@@ -28,6 +28,7 @@ func (handler *addNamespaceFrontendMappingHandler) Handle(params admin.AddNamesp
 
 	nsToken := params.Body.NamespaceToken
 	feToken := params.Body.FrontendToken
+	isDefault := params.Body.IsDefault
 
 	ns, err := str.FindNamespaceWithToken(nsToken, tx)
 	if err != nil {
@@ -41,7 +42,7 @@ func (handler *addNamespaceFrontendMappingHandler) Handle(params admin.AddNamesp
 		return admin.NewAddNamespaceFrontendMappingNotFound()
 	}
 
-	_, err = str.CreateNamespaceFrontendMapping(ns.Id, fe.Id, tx)
+	_, err = str.CreateNamespaceFrontendMapping(ns.Id, fe.Id, isDefault, tx)
 	if err != nil {
 		logrus.Errorf("error creating namespace frontend mapping: %v", err)
 		return admin.NewAddNamespaceFrontendMappingInternalServerError()

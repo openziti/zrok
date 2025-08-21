@@ -33,6 +33,12 @@ export interface ListFrontendNamespaceMappings200ResponseInner {
     frontendToken?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ListFrontendNamespaceMappings200ResponseInner
+     */
+    isDefault?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof ListFrontendNamespaceMappings200ResponseInner
      */
@@ -58,6 +64,7 @@ export function ListFrontendNamespaceMappings200ResponseInnerFromJSONTyped(json:
         
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
+        'isDefault': json['isDefault'] == null ? undefined : json['isDefault'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
     };
 }
@@ -75,6 +82,7 @@ export function ListFrontendNamespaceMappings200ResponseInnerToJSONTyped(value?:
         
         'namespaceToken': value['namespaceToken'],
         'frontendToken': value['frontendToken'],
+        'isDefault': value['isDefault'],
         'createdAt': value['createdAt'],
     };
 }

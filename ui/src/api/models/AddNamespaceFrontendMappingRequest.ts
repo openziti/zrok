@@ -31,6 +31,12 @@ export interface AddNamespaceFrontendMappingRequest {
      * @memberof AddNamespaceFrontendMappingRequest
      */
     frontendToken?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AddNamespaceFrontendMappingRequest
+     */
+    isDefault?: boolean;
 }
 
 /**
@@ -52,6 +58,7 @@ export function AddNamespaceFrontendMappingRequestFromJSONTyped(json: any, ignor
         
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
+        'isDefault': json['isDefault'] == null ? undefined : json['isDefault'],
     };
 }
 
@@ -68,6 +75,7 @@ export function AddNamespaceFrontendMappingRequestToJSONTyped(value?: AddNamespa
         
         'namespaceToken': value['namespaceToken'],
         'frontendToken': value['frontendToken'],
+        'isDefault': value['isDefault'],
     };
 }
 

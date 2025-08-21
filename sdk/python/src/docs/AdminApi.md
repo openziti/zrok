@@ -1779,7 +1779,7 @@ This endpoint does not need any parameter.
 
 ```python
 import zrok_api
-from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest
+from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -1804,7 +1804,7 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.AdminApi(api_client)
-    body = zrok_api.AddNamespaceFrontendMappingRequest() # AddNamespaceFrontendMappingRequest |  (optional)
+    body = zrok_api.RemoveNamespaceFrontendMappingRequest() # RemoveNamespaceFrontendMappingRequest |  (optional)
 
     try:
         api_instance.remove_namespace_frontend_mapping(body=body)
@@ -1819,7 +1819,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**AddNamespaceFrontendMappingRequest**](AddNamespaceFrontendMappingRequest.md)|  | [optional] 
+ **body** | [**RemoveNamespaceFrontendMappingRequest**](RemoveNamespaceFrontendMappingRequest.md)|  | [optional] 
 
 ### Return type
 

@@ -39,6 +39,7 @@ from zrok_api.models.list_organization_members200_response import ListOrganizati
 from zrok_api.models.list_organizations200_response import ListOrganizations200Response
 from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.regenerate_account_token200_response import RegenerateAccountToken200Response
+from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest
 from zrok_api.models.update_namespace_request import UpdateNamespaceRequest
@@ -6310,7 +6311,7 @@ class AdminApi:
     @validate_call
     def remove_namespace_frontend_mapping(
         self,
-        body: Optional[AddNamespaceFrontendMappingRequest] = None,
+        body: Optional[RemoveNamespaceFrontendMappingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -6328,7 +6329,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: AddNamespaceFrontendMappingRequest
+        :type body: RemoveNamespaceFrontendMappingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -6379,7 +6380,7 @@ class AdminApi:
     @validate_call
     def remove_namespace_frontend_mapping_with_http_info(
         self,
-        body: Optional[AddNamespaceFrontendMappingRequest] = None,
+        body: Optional[RemoveNamespaceFrontendMappingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -6397,7 +6398,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: AddNamespaceFrontendMappingRequest
+        :type body: RemoveNamespaceFrontendMappingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -6448,7 +6449,7 @@ class AdminApi:
     @validate_call
     def remove_namespace_frontend_mapping_without_preload_content(
         self,
-        body: Optional[AddNamespaceFrontendMappingRequest] = None,
+        body: Optional[RemoveNamespaceFrontendMappingRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -6466,7 +6467,7 @@ class AdminApi:
 
 
         :param body:
-        :type body: AddNamespaceFrontendMappingRequest
+        :type body: RemoveNamespaceFrontendMappingRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of

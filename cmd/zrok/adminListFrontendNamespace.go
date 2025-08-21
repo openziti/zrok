@@ -74,13 +74,13 @@ func (cmd *adminListFrontendNamespaceCommand) run(_ *cobra.Command, args []strin
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleColoredDark)
-		t.AppendHeader(table.Row{"namespace token", "name", "description", "open", "created"})
+		t.AppendHeader(table.Row{"namespace token", "name", "description", "open", "default", "created"})
 		for _, mapping := range resp.Payload {
 			if ns, exists := namespaceMap[mapping.NamespaceToken]; exists {
 				created := time.Unix(ns.CreatedAt, 0).Format("2006-01-02 15:04:05")
-				t.AppendRow(table.Row{mapping.NamespaceToken, ns.Name, ns.Description, ns.Open, created})
+				t.AppendRow(table.Row{mapping.NamespaceToken, ns.Name, ns.Description, ns.Open, mapping.IsDefault, created})
 			} else {
-				t.AppendRow(table.Row{mapping.NamespaceToken, "[unknown]", "", "", ""})
+				t.AppendRow(table.Row{mapping.NamespaceToken, "[unknown]", "", "", mapping.IsDefault, ""})
 			}
 		}
 		t.Render()
