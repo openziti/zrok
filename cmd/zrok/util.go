@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-openapi/runtime"
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/pkg/errors"
 	"math"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/pkg/errors"
 )
 
 func mustGetAdminAuth() runtime.ClientAuthInfoWriter {
@@ -20,6 +23,18 @@ func mustGetAdminAuth() runtime.ClientAuthInfoWriter {
 		panic("please set ZROK_ADMIN_TOKEN to a valid admin token for your zrok instance")
 	}
 	return httptransport.APIKeyAuth("X-TOKEN", "header", adminToken)
+}
+
+func mustGetEnvironmentAuth() (env_core.Root, runtime.ClientAuthInfoWriter) {
+	env, err := environment.LoadRoot()
+	if err != nil {
+		panic(err)
+	}
+	if !env.IsEnabled() {
+		panic("environment is not enabled; run 'zrok enable' first")
+	}
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", env.Environment().AccountToken)
+	return env, auth
 }
 
 func parseUrl(in string) (string, error) {

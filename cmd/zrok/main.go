@@ -30,6 +30,9 @@ func init() {
 	agentCmd.AddCommand(agentShareCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(modifyCmd)
 	organizationCmd.AddCommand(organizationAdminCmd)
 	rootCmd.AddCommand(organizationCmd)
@@ -103,6 +106,23 @@ var agentShareCmd = &cobra.Command{
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure your zrok environment",
+}
+
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create resources",
+}
+
+var deleteCmd = &cobra.Command{
+	Use:     "delete",
+	Aliases: []string{"rm"},
+	Short:   "Delete resources",
+}
+
+var listCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Short:   "List resources",
 }
 
 var modifyCmd = &cobra.Command{
