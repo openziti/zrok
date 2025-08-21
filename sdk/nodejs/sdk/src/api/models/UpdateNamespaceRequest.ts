@@ -37,6 +37,18 @@ export interface UpdateNamespaceRequest {
      * @memberof UpdateNamespaceRequest
      */
     description?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateNamespaceRequest
+     */
+    open?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateNamespaceRequest
+     */
+    openSet?: boolean;
 }
 
 /**
@@ -59,6 +71,8 @@ export function UpdateNamespaceRequestFromJSONTyped(json: any, ignoreDiscriminat
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
+        'open': json['open'] == null ? undefined : json['open'],
+        'openSet': json['openSet'] == null ? undefined : json['openSet'],
     };
 }
 
@@ -76,6 +90,8 @@ export function UpdateNamespaceRequestToJSONTyped(value?: UpdateNamespaceRequest
         'namespaceToken': value['namespaceToken'],
         'name': value['name'],
         'description': value['description'],
+        'open': value['open'],
+        'openSet': value['openSet'],
     };
 }
 

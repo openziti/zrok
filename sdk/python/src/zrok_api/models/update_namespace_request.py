@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,7 +29,9 @@ class UpdateNamespaceRequest(BaseModel):
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     name: Optional[StrictStr] = None
     description: Optional[StrictStr] = None
-    __properties: ClassVar[List[str]] = ["namespaceToken", "name", "description"]
+    open: Optional[StrictBool] = None
+    open_set: Optional[StrictBool] = Field(default=None, alias="openSet")
+    __properties: ClassVar[List[str]] = ["namespaceToken", "name", "description", "open", "openSet"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -84,7 +86,9 @@ class UpdateNamespaceRequest(BaseModel):
         _obj = cls.model_validate({
             "namespaceToken": obj.get("namespaceToken"),
             "name": obj.get("name"),
-            "description": obj.get("description")
+            "description": obj.get("description"),
+            "open": obj.get("open"),
+            "openSet": obj.get("openSet")
         })
         return _obj
 

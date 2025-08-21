@@ -45,6 +45,7 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 		Token:       namespaceToken,
 		Name:        params.Body.Name,
 		Description: params.Body.Description,
+		Open:        params.Body.Open,
 	}
 	if _, err := str.CreateNamespace(ns, trx); err != nil {
 		logrus.Errorf("error creating namespace: %v", err)

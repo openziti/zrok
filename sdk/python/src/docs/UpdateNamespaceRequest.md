@@ -8,6 +8,8 @@ Name | Type | Description | Notes
 **namespace_token** | **str** |  | [optional] 
 **name** | **str** |  | [optional] 
 **description** | **str** |  | [optional] 
+**open** | **bool** |  | [optional] 
+**open_set** | **bool** |  | [optional] 
 
 ## Example
 

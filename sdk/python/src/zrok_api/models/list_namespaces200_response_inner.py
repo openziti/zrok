@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,9 +29,10 @@ class ListNamespaces200ResponseInner(BaseModel):
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     name: Optional[StrictStr] = None
     description: Optional[StrictStr] = None
+    open: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
     updated_at: Optional[StrictInt] = Field(default=None, alias="updatedAt")
-    __properties: ClassVar[List[str]] = ["namespaceToken", "name", "description", "createdAt", "updatedAt"]
+    __properties: ClassVar[List[str]] = ["namespaceToken", "name", "description", "open", "createdAt", "updatedAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -87,6 +88,7 @@ class ListNamespaces200ResponseInner(BaseModel):
             "namespaceToken": obj.get("namespaceToken"),
             "name": obj.get("name"),
             "description": obj.get("description"),
+            "open": obj.get("open"),
             "createdAt": obj.get("createdAt"),
             "updatedAt": obj.get("updatedAt")
         })

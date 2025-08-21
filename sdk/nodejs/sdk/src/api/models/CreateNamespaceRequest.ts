@@ -31,6 +31,12 @@ export interface CreateNamespaceRequest {
      * @memberof CreateNamespaceRequest
      */
     description?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateNamespaceRequest
+     */
+    open?: boolean;
 }
 
 /**
@@ -52,6 +58,7 @@ export function CreateNamespaceRequestFromJSONTyped(json: any, ignoreDiscriminat
         
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
+        'open': json['open'] == null ? undefined : json['open'],
     };
 }
 
@@ -68,6 +75,7 @@ export function CreateNamespaceRequestToJSONTyped(value?: CreateNamespaceRequest
         
         'name': value['name'],
         'description': value['description'],
+        'open': value['open'],
     };
 }
 

@@ -1896,6 +1896,9 @@ func init() {
                 },
                 "name": {
                   "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
                 }
               }
             }
@@ -1985,6 +1988,12 @@ func init() {
                 },
                 "namespaceToken": {
                   "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "openSet": {
+                  "type": "boolean"
                 }
               }
             }
@@ -2122,6 +2131,9 @@ func init() {
                   },
                   "namespaceToken": {
                     "type": "string"
+                  },
+                  "open": {
+                    "type": "boolean"
                   },
                   "updatedAt": {
                     "type": "integer"
@@ -5315,6 +5327,9 @@ func init() {
                 },
                 "name": {
                   "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
                 }
               }
             }
@@ -5404,6 +5419,12 @@ func init() {
                 },
                 "namespaceToken": {
                   "type": "string"
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "openSet": {
+                  "type": "boolean"
                 }
               }
             }
@@ -6583,6 +6604,9 @@ func init() {
         },
         "namespaceToken": {
           "type": "string"
+        },
+        "open": {
+          "type": "boolean"
         },
         "updatedAt": {
           "type": "integer"

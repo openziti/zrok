@@ -38,6 +38,7 @@ func (h *listNamespacesHandler) Handle(_ admin.ListNamespacesParams, principal *
 			NamespaceToken: ns.Token,
 			Name:           ns.Name,
 			Description:    ns.Description,
+			Open:           ns.Open,
 			CreatedAt:      ns.CreatedAt.Unix(),
 			UpdatedAt:      ns.UpdatedAt.Unix(),
 		})

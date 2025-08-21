@@ -37,7 +37,9 @@ class TestUpdateNamespaceRequest(unittest.TestCase):
             return UpdateNamespaceRequest(
                 namespace_token = '',
                 name = '',
-                description = ''
+                description = '',
+                open = True,
+                open_set = True
             )
         else:
             return UpdateNamespaceRequest(

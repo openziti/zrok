@@ -15,6 +15,7 @@ type adminCreateNamespaceCommand struct {
 	cmd         *cobra.Command
 	name        string
 	description string
+	open        bool
 }
 
 func newAdminCreateNamespaceCommand() *adminCreateNamespaceCommand {
@@ -25,6 +26,7 @@ func newAdminCreateNamespaceCommand() *adminCreateNamespaceCommand {
 	}
 	command := &adminCreateNamespaceCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.description, "description", "d", "", "namespace description")
+	cmd.Flags().BoolVarP(&command.open, "open", "o", false, "namespace is open to all accounts (default is closed)")
 	cmd.Run = command.run
 	return command
 }
@@ -44,6 +46,7 @@ func (cmd *adminCreateNamespaceCommand) run(_ *cobra.Command, args []string) {
 	req.Body = admin.CreateNamespaceBody{
 		Name:        args[0],
 		Description: cmd.description,
+		Open:        cmd.open,
 	}
 
 	resp, err := zrok.Admin.CreateNamespace(req, mustGetAdminAuth())

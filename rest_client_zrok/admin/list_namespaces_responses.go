@@ -242,6 +242,9 @@ type ListNamespacesOKBodyItems0 struct {
 	// namespace token
 	NamespaceToken string `json:"namespaceToken,omitempty"`
 
+	// open
+	Open bool `json:"open,omitempty"`
+
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
 }

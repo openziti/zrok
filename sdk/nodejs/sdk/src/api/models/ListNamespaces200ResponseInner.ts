@@ -39,6 +39,12 @@ export interface ListNamespaces200ResponseInner {
     description?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ListNamespaces200ResponseInner
+     */
+    open?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof ListNamespaces200ResponseInner
      */
@@ -71,6 +77,7 @@ export function ListNamespaces200ResponseInnerFromJSONTyped(json: any, ignoreDis
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
+        'open': json['open'] == null ? undefined : json['open'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
     };
@@ -90,6 +97,7 @@ export function ListNamespaces200ResponseInnerToJSONTyped(value?: ListNamespaces
         'namespaceToken': value['namespaceToken'],
         'name': value['name'],
         'description': value['description'],
+        'open': value['open'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],
     };

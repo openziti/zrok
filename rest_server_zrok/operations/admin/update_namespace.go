@@ -86,6 +86,12 @@ type UpdateNamespaceBody struct {
 
 	// namespace token
 	NamespaceToken string `json:"namespaceToken,omitempty"`
+
+	// open
+	Open bool `json:"open,omitempty"`
+
+	// open set
+	OpenSet bool `json:"openSet,omitempty"`
 }
 
 // Validate validates this update namespace body

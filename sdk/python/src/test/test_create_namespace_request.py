@@ -36,7 +36,8 @@ class TestCreateNamespaceRequest(unittest.TestCase):
         if include_optional:
             return CreateNamespaceRequest(
                 name = '',
-                description = ''
+                description = '',
+                open = True
             )
         else:
             return CreateNamespaceRequest(

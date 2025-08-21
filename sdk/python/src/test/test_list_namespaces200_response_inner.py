@@ -38,6 +38,7 @@ class TestListNamespaces200ResponseInner(unittest.TestCase):
                 namespace_token = '',
                 name = '',
                 description = '',
+                open = True,
                 created_at = 56,
                 updated_at = 56
             )

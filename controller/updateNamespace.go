@@ -45,6 +45,10 @@ func (h *updateNamespaceHandler) Handle(params admin.UpdateNamespaceParams, prin
 		ns.Description = params.Body.Description
 	}
 
+	if params.Body.OpenSet {
+		ns.Open = params.Body.Open
+	}
+
 	if err := str.UpdateNamespace(ns, trx); err != nil {
 		logrus.Errorf("error updating namespace: %v", err)
 		return admin.NewUpdateNamespaceInternalServerError()

@@ -83,6 +83,9 @@ type CreateNamespaceBody struct {
 
 	// name
 	Name string `json:"name,omitempty"`
+
+	// open
+	Open bool `json:"open,omitempty"`
 }
 
 // Validate validates this create namespace body
