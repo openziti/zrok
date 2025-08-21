@@ -1,0 +1,55 @@
+package controller
+
+import (
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
+	"github.com/sirupsen/logrus"
+)
+
+type listFrontendNamespaceMappingsHandler struct{}
+
+func newListFrontendNamespaceMappingsHandler() *listFrontendNamespaceMappingsHandler {
+	return &listFrontendNamespaceMappingsHandler{}
+}
+
+func (handler *listFrontendNamespaceMappingsHandler) Handle(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+	if !principal.Admin {
+		logrus.Errorf("invalid admin principal")
+		return admin.NewListFrontendNamespaceMappingsUnauthorized()
+	}
+
+	tx, err := str.Begin()
+	if err != nil {
+		logrus.Errorf("error starting transaction: %v", err)
+		return admin.NewListFrontendNamespaceMappingsInternalServerError()
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	feToken := params.FrontendToken
+
+	fe, err := str.FindFrontendWithToken(feToken, tx)
+	if err != nil {
+		logrus.Errorf("error finding frontend by token '%s': %v", feToken, err)
+		return admin.NewListFrontendNamespaceMappingsNotFound()
+	}
+
+	namespaces, err := str.FindNamespacesForFrontend(fe.Id, tx)
+	if err != nil {
+		logrus.Errorf("error finding namespaces for frontend '%s': %v", feToken, err)
+		return admin.NewListFrontendNamespaceMappingsInternalServerError()
+	}
+
+	var mappings []*admin.ListFrontendNamespaceMappingsOKBodyItems0
+	for _, ns := range namespaces {
+		mapping := &admin.ListFrontendNamespaceMappingsOKBodyItems0{
+			FrontendToken:  feToken,
+			NamespaceToken: ns.Token,
+			CreatedAt:      ns.CreatedAt.Unix(),
+		}
+		mappings = append(mappings, mapping)
+	}
+
+	logrus.Infof("listed '%d' namespace mappings for frontend '%s'", len(mappings), feToken)
+	return admin.NewListFrontendNamespaceMappingsOK().WithPayload(mappings)
+}

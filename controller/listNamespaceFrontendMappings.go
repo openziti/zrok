@@ -40,11 +40,6 @@ func (handler *listNamespaceFrontendMappingsHandler) Handle(params admin.ListNam
 		return admin.NewListNamespaceFrontendMappingsInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction: %v", err)
-		return admin.NewListNamespaceFrontendMappingsInternalServerError()
-	}
-
 	var mappings []*admin.ListNamespaceFrontendMappingsOKBodyItems0
 	for _, fe := range frontends {
 		mapping := &admin.ListNamespaceFrontendMappingsOKBodyItems0{
