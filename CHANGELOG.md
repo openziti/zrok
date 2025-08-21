@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.2.0
+
+FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
+
 ## v1.1.3
 
 FEATURE: A new `compatibility` > `version_patterns` array is included in the controller configuration, allowing for dynamic adjustment of allowed client version strings (https://github.com/openziti/zrok/issues/1030)

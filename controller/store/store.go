@@ -76,6 +76,14 @@ func (str *Store) Close() error {
 }
 
 func (str *Store) migrate(cfg *Config) error {
+	return str.migrateWithDirection(cfg, migrate.Up, 0)
+}
+
+func (str *Store) MigrateDown(cfg *Config, max int) error {
+	return str.migrateWithDirection(cfg, migrate.Down, max)
+}
+
+func (str *Store) migrateWithDirection(cfg *Config, direction migrate.MigrationDirection, max int) error {
 	switch cfg.Type {
 	case "sqlite3":
 		migrations := &migrate.EmbedFileSystemMigrationSource{
@@ -83,7 +91,7 @@ func (str *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(str.db.DB, "sqlite3", migrations, migrate.Up)
+		n, err := migrate.ExecMax(str.db.DB, "sqlite3", migrations, direction, max)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
@@ -95,7 +103,7 @@ func (str *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(str.db.DB, "postgres", migrations, migrate.Up)
+		n, err := migrate.ExecMax(str.db.DB, "postgres", migrations, direction, max)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
