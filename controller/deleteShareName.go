@@ -28,15 +28,17 @@ func (h *deleteShareNameHandler) Handle(params share.DeleteShareNameParams, prin
 		return share.NewDeleteShareNameNotFound()
 	}
 
-	// check namespace grant
-	granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
-	if err != nil {
-		logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
-		return share.NewDeleteShareNameInternalServerError()
-	}
-	if !granted {
-		logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
-		return share.NewDeleteShareNameUnauthorized()
+	if !ns.Open {
+		// check namespace grant
+		granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
+		if err != nil {
+			logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
+			return share.NewDeleteShareNameInternalServerError()
+		}
+		if !granted {
+			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+			return share.NewDeleteShareNameUnauthorized()
+		}
 	}
 
 	// find allocated name

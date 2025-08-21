@@ -30,14 +30,16 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	}
 
 	// check namespace grant
-	granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
-	if err != nil {
-		logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
-		return share.NewCreateShareNameInternalServerError()
-	}
-	if !granted {
-		logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
-		return share.NewCreateShareNameUnauthorized()
+	if !ns.Open {
+		granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
+		if err != nil {
+			logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
+			return share.NewCreateShareNameInternalServerError()
+		}
+		if !granted {
+			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+			return share.NewCreateShareNameUnauthorized()
+		}
 	}
 
 	// check name availability

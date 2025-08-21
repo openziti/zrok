@@ -28,15 +28,17 @@ func (h *listShareNamesHandler) Handle(params share.ListShareNamesParams, princi
 		return share.NewListShareNamesNotFound()
 	}
 
-	// check namespace grant
-	granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
-	if err != nil {
-		logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
-		return share.NewListShareNamesInternalServerError()
-	}
-	if !granted {
-		logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
-		return share.NewListShareNamesUnauthorized()
+	if !ns.Open {
+		// check namespace grant
+		granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
+		if err != nil {
+			logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
+			return share.NewListShareNamesInternalServerError()
+		}
+		if !granted {
+			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+			return share.NewListShareNamesUnauthorized()
+		}
 	}
 
 	// find allocated names for namespace
