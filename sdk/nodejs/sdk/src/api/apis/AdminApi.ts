@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   AddFrontendGrantRequest,
+  AddNamespaceFrontendMappingRequest,
   AddNamespaceGrantRequest,
   AddOrganizationMemberRequest,
   CreateFrontend201Response,
@@ -42,6 +43,8 @@ import type {
 import {
     AddFrontendGrantRequestFromJSON,
     AddFrontendGrantRequestToJSON,
+    AddNamespaceFrontendMappingRequestFromJSON,
+    AddNamespaceFrontendMappingRequestToJSON,
     AddNamespaceGrantRequestFromJSON,
     AddNamespaceGrantRequestToJSON,
     AddOrganizationMemberRequestFromJSON,
@@ -90,6 +93,10 @@ import {
 
 export interface AddFrontendGrantOperationRequest {
     body?: AddFrontendGrantRequest;
+}
+
+export interface AddNamespaceFrontendMappingOperationRequest {
+    body?: AddNamespaceFrontendMappingRequest;
 }
 
 export interface AddNamespaceGrantOperationRequest {
@@ -156,6 +163,10 @@ export interface ListOrganizationMembersRequest {
     body?: CreateOrganization201Response;
 }
 
+export interface RemoveNamespaceFrontendMappingRequest {
+    body?: AddNamespaceFrontendMappingRequest;
+}
+
 export interface RemoveNamespaceGrantRequest {
     body?: AddNamespaceGrantRequest;
 }
@@ -208,6 +219,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async addFrontendGrant(requestParameters: AddFrontendGrantOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.addFrontendGrantRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async addNamespaceFrontendMappingRaw(requestParameters: AddNamespaceFrontendMappingOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace/frontend/mapping`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddNamespaceFrontendMappingRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async addNamespaceFrontendMapping(requestParameters: AddNamespaceFrontendMappingOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addNamespaceFrontendMappingRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -835,6 +879,39 @@ export class AdminApi extends runtime.BaseAPI {
     async listOrganizations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizations200Response> {
         const response = await this.listOrganizationsRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async removeNamespaceFrontendMappingRaw(requestParameters: RemoveNamespaceFrontendMappingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/namespace/frontend/mapping`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AddNamespaceFrontendMappingRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async removeNamespaceFrontendMapping(requestParameters: RemoveNamespaceFrontendMappingRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.removeNamespaceFrontendMappingRaw(requestParameters, initOverrides);
     }
 
     /**

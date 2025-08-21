@@ -36,6 +36,7 @@ __all__ = [
     "Access201Response",
     "AccessRequest",
     "AddFrontendGrantRequest",
+    "AddNamespaceFrontendMappingRequest",
     "AddNamespaceGrantRequest",
     "AddOrganizationMemberRequest",
     "AuthUser",
@@ -133,6 +134,7 @@ from zrok_api.exceptions import ApiException as ApiException
 from zrok_api.models.access201_response import Access201Response as Access201Response
 from zrok_api.models.access_request import AccessRequest as AccessRequest
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest as AddFrontendGrantRequest
+from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest as AddNamespaceFrontendMappingRequest
 from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest as AddNamespaceGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest as AddOrganizationMemberRequest
 from zrok_api.models.auth_user import AuthUser as AuthUser

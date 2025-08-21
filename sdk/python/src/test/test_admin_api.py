@@ -32,6 +32,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_add_namespace_frontend_mapping(self) -> None:
+        """Test case for add_namespace_frontend_mapping
+
+        """
+        pass
+
     def test_add_namespace_grant(self) -> None:
         """Test case for add_namespace_grant
 
@@ -142,6 +148,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_list_organizations(self) -> None:
         """Test case for list_organizations
+
+        """
+        pass
+
+    def test_remove_namespace_frontend_mapping(self) -> None:
+        """Test case for remove_namespace_frontend_mapping
 
         """
         pass

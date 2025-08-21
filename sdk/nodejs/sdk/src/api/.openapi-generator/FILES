@@ -10,6 +10,7 @@ index.ts
 models/Access201Response.ts
 models/AccessRequest.ts
 models/AddFrontendGrantRequest.ts
+models/AddNamespaceFrontendMappingRequest.ts
 models/AddNamespaceGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
 models/AuthUser.ts

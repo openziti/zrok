@@ -636,6 +636,58 @@ paths:
         500:
           description: internal server error
 
+  /namespace/frontend/mapping:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addNamespaceFrontendMapping
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+      responses:
+        200:
+          description: namespace frontend mapping added
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: removeNamespaceFrontendMapping
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+      responses:
+        200:
+          description: namespace frontend mapping removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
   /namespace/grant:
     post:
       tags:

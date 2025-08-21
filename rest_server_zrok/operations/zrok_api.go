@@ -56,6 +56,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminAddFrontendGrantHandler: admin.AddFrontendGrantHandlerFunc(func(params admin.AddFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddFrontendGrant has not yet been implemented")
 		}),
+		AdminAddNamespaceFrontendMappingHandler: admin.AddNamespaceFrontendMappingHandlerFunc(func(params admin.AddNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.AddNamespaceFrontendMapping has not yet been implemented")
+		}),
 		AdminAddNamespaceGrantHandler: admin.AddNamespaceGrantHandlerFunc(func(params admin.AddNamespaceGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.AddNamespaceGrant has not yet been implemented")
 		}),
@@ -209,6 +212,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
+		AdminRemoveNamespaceFrontendMappingHandler: admin.RemoveNamespaceFrontendMappingHandlerFunc(func(params admin.RemoveNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.RemoveNamespaceFrontendMapping has not yet been implemented")
+		}),
 		AdminRemoveNamespaceGrantHandler: admin.RemoveNamespaceGrantHandlerFunc(func(params admin.RemoveNamespaceGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.RemoveNamespaceGrant has not yet been implemented")
 		}),
@@ -311,6 +317,8 @@ type ZrokAPI struct {
 	ShareAccessHandler share.AccessHandler
 	// AdminAddFrontendGrantHandler sets the operation handler for the add frontend grant operation
 	AdminAddFrontendGrantHandler admin.AddFrontendGrantHandler
+	// AdminAddNamespaceFrontendMappingHandler sets the operation handler for the add namespace frontend mapping operation
+	AdminAddNamespaceFrontendMappingHandler admin.AddNamespaceFrontendMappingHandler
 	// AdminAddNamespaceGrantHandler sets the operation handler for the add namespace grant operation
 	AdminAddNamespaceGrantHandler admin.AddNamespaceGrantHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
@@ -413,6 +421,8 @@ type ZrokAPI struct {
 	AgentRemoteUnaccessHandler agent.RemoteUnaccessHandler
 	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
 	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
+	// AdminRemoveNamespaceFrontendMappingHandler sets the operation handler for the remove namespace frontend mapping operation
+	AdminRemoveNamespaceFrontendMappingHandler admin.RemoveNamespaceFrontendMappingHandler
 	// AdminRemoveNamespaceGrantHandler sets the operation handler for the remove namespace grant operation
 	AdminRemoveNamespaceGrantHandler admin.RemoveNamespaceGrantHandler
 	// AdminRemoveOrganizationMemberHandler sets the operation handler for the remove organization member operation
@@ -531,6 +541,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminAddFrontendGrantHandler == nil {
 		unregistered = append(unregistered, "admin.AddFrontendGrantHandler")
+	}
+	if o.AdminAddNamespaceFrontendMappingHandler == nil {
+		unregistered = append(unregistered, "admin.AddNamespaceFrontendMappingHandler")
 	}
 	if o.AdminAddNamespaceGrantHandler == nil {
 		unregistered = append(unregistered, "admin.AddNamespaceGrantHandler")
@@ -684,6 +697,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AgentRemoteUnshareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
+	}
+	if o.AdminRemoveNamespaceFrontendMappingHandler == nil {
+		unregistered = append(unregistered, "admin.RemoveNamespaceFrontendMappingHandler")
 	}
 	if o.AdminRemoveNamespaceGrantHandler == nil {
 		unregistered = append(unregistered, "admin.RemoveNamespaceGrantHandler")
@@ -840,6 +856,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/frontend/grant"] = admin.NewAddFrontendGrant(o.context, o.AdminAddFrontendGrantHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/namespace/frontend/mapping"] = admin.NewAddNamespaceFrontendMapping(o.context, o.AdminAddNamespaceFrontendMappingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1044,6 +1064,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/agent/unshare"] = agent.NewRemoteUnshare(o.context, o.AgentRemoteUnshareHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/namespace/frontend/mapping"] = admin.NewRemoveNamespaceFrontendMapping(o.context, o.AdminRemoveNamespaceFrontendMappingHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

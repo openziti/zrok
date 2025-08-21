@@ -3,6 +3,7 @@
 export * from './Access201Response';
 export * from './AccessRequest';
 export * from './AddFrontendGrantRequest';
+export * from './AddNamespaceFrontendMappingRequest';
 export * from './AddNamespaceGrantRequest';
 export * from './AddOrganizationMemberRequest';
 export * from './AuthUser';
