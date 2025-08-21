@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/spf13/cobra"
 )
@@ -19,12 +22,11 @@ type listNamesCommand struct {
 func newListNamesCommand() *listNamesCommand {
 	cmd := &cobra.Command{
 		Use:   "names",
-		Short: "list names within a namespace",
+		Short: "list names within a namespace or all accessible namespaces",
 		Args:  cobra.NoArgs,
 	}
 	command := &listNamesCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.namespaceToken, "namespace-token", "n", "", "namespace token")
-	cmd.MarkFlagRequired("namespace-token")
 	cmd.Run = command.run
 	return command
 }
@@ -37,15 +39,51 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	req := share.NewListShareNamesParams()
-	req.NamespaceToken = cmd.namespaceToken
+	if cmd.namespaceToken != "" {
+		// list names for specific namespace
+		req := share.NewListShareNamesParams()
+		req.NamespaceToken = cmd.namespaceToken
 
-	resp, err := zrok.Share.ListShareNames(req, auth)
-	if err != nil {
-		panic(err)
-	}
+		resp, err := zrok.Share.ListShareNames(req, auth)
+		if err != nil {
+			panic(err)
+		}
 
-	for _, name := range resp.Payload {
-		fmt.Println(name.Name)
+		fmt.Println()
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.SetStyle(table.StyleColoredDark)
+		t.AppendHeader(table.Row{"Name", "Created At"})
+		for _, name := range resp.Payload {
+			t.AppendRow(table.Row{
+				name.Name,
+				time.Unix(name.CreatedAt, 0),
+			})
+		}
+		t.Render()
+		fmt.Println()
+	} else {
+		// list all names across all accessible namespaces
+		req := share.NewListAllShareNamesParams()
+
+		resp, err := zrok.Share.ListAllShareNames(req, auth)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println()
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.SetStyle(table.StyleColoredDark)
+		t.AppendHeader(table.Row{"Name", "Namespace", "Created At"})
+		for _, name := range resp.Payload {
+			t.AppendRow(table.Row{
+				name.Name,
+				name.NamespaceName,
+				time.Unix(name.CreatedAt, 0),
+			})
+		}
+		t.Render()
+		fmt.Println()
 	}
 }
