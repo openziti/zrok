@@ -10,15 +10,16 @@ type Namespace struct {
 	Token       string
 	Name        string
 	Description string
+	Open        bool
 }
 
 func (str *Store) CreateNamespace(ns *Namespace, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into namespaces (token, name, description) values ($1, $2, $3) returning id")
+	stmt, err := tx.Prepare("insert into namespaces (token, name, description, open) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing namespace insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(ns.Token, ns.Name, ns.Description).Scan(&id); err != nil {
+	if err := stmt.QueryRow(ns.Token, ns.Name, ns.Description, ns.Open).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing namespace insert statement")
 	}
 	return id, nil
@@ -65,11 +66,11 @@ func (str *Store) FindNamespaceWithToken(token string, tx *sqlx.Tx) (*Namespace,
 }
 
 func (str *Store) UpdateNamespace(ns *Namespace, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update namespaces set name = $1, description = $2, updated_at = current_timestamp where id = $3")
+	stmt, err := tx.Prepare("update namespaces set name = $1, description = $2, open = $3, updated_at = current_timestamp where id = $4")
 	if err != nil {
 		return errors.Wrap(err, "error preparing namespace update statement")
 	}
-	_, err = stmt.Exec(ns.Name, ns.Description, ns.Id)
+	_, err = stmt.Exec(ns.Name, ns.Description, ns.Open, ns.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing namespace update statement")
 	}

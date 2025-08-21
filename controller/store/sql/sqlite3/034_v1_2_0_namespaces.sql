@@ -8,6 +8,7 @@ create table namespaces (
   token                 varchar(32)         not null,
   name                  varchar(255)        not null,
   description           text,
+  open                  boolean             not null default(false),
   created_at            datetime            not null default(current_timestamp),
   updated_at            datetime            not null default(current_timestamp),
   deleted               boolean             not null default(false),
