@@ -2183,6 +2183,14 @@ definitions:
       timestamp:
         type: number
 
+  namespaceSelection:
+    type: object
+    properties:
+      namespaceToken:
+        type: string
+      name:
+        type: string
+
   overview:
     type: object
     properties:
@@ -2284,6 +2292,45 @@ definitions:
           type: string
       uniqueName:
         type: string
+
+  shareRequest12:
+    type: object
+    properties:
+      envZId:
+        type: string
+      shareMode:
+        type: string
+        enum: ["public", "private"]
+      namespaceSelections:
+        type: array
+        items:
+          $ref: "#/definitions/namespaceSelection"
+      backendMode:
+        type: string
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+      target:
+        type: string
+      authScheme:
+        type: string
+      basicAuthUsers:
+        type: array
+        items:
+          $ref: "#/definitions/authUser"
+      oauthProvider:
+        type: string
+      oauthEmailDomains:
+        type: array
+        items:
+          type: string
+      oauthRefreshInterval:
+        type: string
+      permissionMode:
+        type: string
+        enum: ["open", "closed"]
+      accessGrants:
+        type: array
+        items:
+          type: string
 
   shareResponse:
     type: object
