@@ -22,9 +22,9 @@ from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ListNamespaceFrontendMappings200ResponseInner(BaseModel):
+class ListFrontendNamespaceMappings200ResponseInner(BaseModel):
     """
-    ListNamespaceFrontendMappings200ResponseInner
+    ListFrontendNamespaceMappings200ResponseInner
     """ # noqa: E501
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     frontend_token: Optional[StrictStr] = Field(default=None, alias="frontendToken")
@@ -49,7 +49,7 @@ class ListNamespaceFrontendMappings200ResponseInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ListNamespaceFrontendMappings200ResponseInner from a JSON string"""
+        """Create an instance of ListFrontendNamespaceMappings200ResponseInner from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,7 +74,7 @@ class ListNamespaceFrontendMappings200ResponseInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ListNamespaceFrontendMappings200ResponseInner from a dict"""
+        """Create an instance of ListFrontendNamespaceMappings200ResponseInner from a dict"""
         if obj is None:
             return None
 

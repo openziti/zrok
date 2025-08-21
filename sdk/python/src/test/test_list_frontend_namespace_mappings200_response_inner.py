@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.list_namespace_frontend_mappings200_response_inner import ListNamespaceFrontendMappings200ResponseInner
+from zrok_api.models.list_frontend_namespace_mappings200_response_inner import ListFrontendNamespaceMappings200ResponseInner
 
-class TestListNamespaceFrontendMappings200ResponseInner(unittest.TestCase):
-    """ListNamespaceFrontendMappings200ResponseInner unit test stubs"""
+class TestListFrontendNamespaceMappings200ResponseInner(unittest.TestCase):
+    """ListFrontendNamespaceMappings200ResponseInner unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,27 +25,27 @@ class TestListNamespaceFrontendMappings200ResponseInner(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ListNamespaceFrontendMappings200ResponseInner:
-        """Test ListNamespaceFrontendMappings200ResponseInner
+    def make_instance(self, include_optional) -> ListFrontendNamespaceMappings200ResponseInner:
+        """Test ListFrontendNamespaceMappings200ResponseInner
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ListNamespaceFrontendMappings200ResponseInner`
+        # uncomment below to create an instance of `ListFrontendNamespaceMappings200ResponseInner`
         """
-        model = ListNamespaceFrontendMappings200ResponseInner()
+        model = ListFrontendNamespaceMappings200ResponseInner()
         if include_optional:
-            return ListNamespaceFrontendMappings200ResponseInner(
+            return ListFrontendNamespaceMappings200ResponseInner(
                 namespace_token = '',
                 frontend_token = '',
                 created_at = 56
             )
         else:
-            return ListNamespaceFrontendMappings200ResponseInner(
+            return ListFrontendNamespaceMappings200ResponseInner(
         )
         """
 
-    def testListNamespaceFrontendMappings200ResponseInner(self):
-        """Test ListNamespaceFrontendMappings200ResponseInner"""
+    def testListFrontendNamespaceMappings200ResponseInner(self):
+        """Test ListFrontendNamespaceMappings200ResponseInner"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

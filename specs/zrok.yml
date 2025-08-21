@@ -419,6 +419,39 @@ paths:
         500:
           description: internal server error
 
+  /frontend/namespace/mapping/{frontendToken}:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listFrontendNamespaceMappings
+      parameters:
+        - name: frontendToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: frontend namespace mappings listed
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                frontendToken:
+                  type: string
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        404:
+          description: frontend not found
+        500:
+          description: internal server error
+
   /frontends:
     get:
       tags:

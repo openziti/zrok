@@ -64,10 +64,10 @@ __all__ = [
     "GetSparklinesRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
+    "ListFrontendNamespaceMappings200ResponseInner",
     "ListFrontends200ResponseInner",
     "ListMemberships200Response",
     "ListMemberships200ResponseMembershipsInner",
-    "ListNamespaceFrontendMappings200ResponseInner",
     "ListNamespaces200ResponseInner",
     "ListOrganizationMembers200Response",
     "ListOrganizationMembers200ResponseMembersInner",
@@ -163,10 +163,10 @@ from zrok_api.models.get_sparklines200_response import GetSparklines200Response 
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
+from zrok_api.models.list_frontend_namespace_mappings200_response_inner import ListFrontendNamespaceMappings200ResponseInner as ListFrontendNamespaceMappings200ResponseInner
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
 from zrok_api.models.list_memberships200_response import ListMemberships200Response as ListMemberships200Response
 from zrok_api.models.list_memberships200_response_memberships_inner import ListMemberships200ResponseMembershipsInner as ListMemberships200ResponseMembershipsInner
-from zrok_api.models.list_namespace_frontend_mappings200_response_inner import ListNamespaceFrontendMappings200ResponseInner as ListNamespaceFrontendMappings200ResponseInner
 from zrok_api.models.list_namespaces200_response_inner import ListNamespaces200ResponseInner as ListNamespaces200ResponseInner
 from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response as ListOrganizationMembers200Response
 from zrok_api.models.list_organization_members200_response_members_inner import ListOrganizationMembers200ResponseMembersInner as ListOrganizationMembers200ResponseMembersInner

@@ -117,6 +117,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
+*AdminApi* | [**list_frontend_namespace_mappings**](docs/AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
 *AdminApi* | [**list_namespace_frontend_mappings**](docs/AdminApi.md#list_namespace_frontend_mappings) | **GET** /namespace/frontend/mapping/{namespaceToken} | 
 *AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
@@ -199,10 +200,10 @@ Class | Method | HTTP request | Description
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
+ - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
- - [ListNamespaceFrontendMappings200ResponseInner](docs/ListNamespaceFrontendMappings200ResponseInner.md)
  - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)
  - [ListOrganizationMembers200Response](docs/ListOrganizationMembers200Response.md)
  - [ListOrganizationMembers200ResponseMembersInner](docs/ListOrganizationMembers200ResponseMembersInner.md)

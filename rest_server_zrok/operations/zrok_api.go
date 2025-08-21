@@ -155,6 +155,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
+		AdminListFrontendNamespaceMappingsHandler: admin.ListFrontendNamespaceMappingsHandlerFunc(func(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation admin.ListFrontendNamespaceMappings has not yet been implemented")
+		}),
 		AdminListFrontendsHandler: admin.ListFrontendsHandlerFunc(func(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
 		}),
@@ -386,6 +389,8 @@ type ZrokAPI struct {
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
+	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
+	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
@@ -645,6 +650,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminInviteTokenGenerateHandler == nil {
 		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
+	}
+	if o.AdminListFrontendNamespaceMappingsHandler == nil {
+		unregistered = append(unregistered, "admin.ListFrontendNamespaceMappingsHandler")
 	}
 	if o.AdminListFrontendsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendsHandler")
@@ -996,6 +1004,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/invite/token/generate"] = admin.NewInviteTokenGenerate(o.context, o.AdminInviteTokenGenerateHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/frontend/namespace/mapping/{frontendToken}"] = admin.NewListFrontendNamespaceMappings(o.context, o.AdminListFrontendNamespaceMappingsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

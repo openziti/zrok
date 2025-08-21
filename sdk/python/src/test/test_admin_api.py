@@ -128,6 +128,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_list_frontend_namespace_mappings(self) -> None:
+        """Test case for list_frontend_namespace_mappings
+
+        """
+        pass
+
     def test_list_frontends(self) -> None:
         """Test case for list_frontends
 

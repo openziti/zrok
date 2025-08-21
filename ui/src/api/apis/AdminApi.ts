@@ -29,8 +29,8 @@ import type {
   CreateOrganizationRequest,
   DeleteIdentityRequest,
   InviteTokenGenerateRequest,
+  ListFrontendNamespaceMappings200ResponseInner,
   ListFrontends200ResponseInner,
-  ListNamespaceFrontendMappings200ResponseInner,
   ListNamespaces200ResponseInner,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
@@ -70,10 +70,10 @@ import {
     DeleteIdentityRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
+    ListFrontendNamespaceMappings200ResponseInnerFromJSON,
+    ListFrontendNamespaceMappings200ResponseInnerToJSON,
     ListFrontends200ResponseInnerFromJSON,
     ListFrontends200ResponseInnerToJSON,
-    ListNamespaceFrontendMappings200ResponseInnerFromJSON,
-    ListNamespaceFrontendMappings200ResponseInnerToJSON,
     ListNamespaces200ResponseInnerFromJSON,
     ListNamespaces200ResponseInnerToJSON,
     ListOrganizationMembers200ResponseFromJSON,
@@ -160,6 +160,10 @@ export interface GrantsRequest {
 
 export interface InviteTokenGenerateOperationRequest {
     body?: InviteTokenGenerateRequest;
+}
+
+export interface ListFrontendNamespaceMappingsRequest {
+    frontendToken: string;
 }
 
 export interface ListNamespaceFrontendMappingsRequest {
@@ -763,6 +767,45 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async listFrontendNamespaceMappingsRaw(requestParameters: ListFrontendNamespaceMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListFrontendNamespaceMappings200ResponseInner>>> {
+        if (requestParameters['frontendToken'] == null) {
+            throw new runtime.RequiredError(
+                'frontendToken',
+                'Required parameter "frontendToken" was null or undefined when calling listFrontendNamespaceMappings().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/frontend/namespace/mapping/{frontendToken}`;
+        urlPath = urlPath.replace(`{${"frontendToken"}}`, encodeURIComponent(String(requestParameters['frontendToken'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListFrontendNamespaceMappings200ResponseInnerFromJSON));
+    }
+
+    /**
+     */
+    async listFrontendNamespaceMappings(requestParameters: ListFrontendNamespaceMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontendNamespaceMappings200ResponseInner>> {
+        const response = await this.listFrontendNamespaceMappingsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async listFrontendsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListFrontends200ResponseInner>>> {
         const queryParameters: any = {};
 
@@ -794,7 +837,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async listNamespaceFrontendMappingsRaw(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListNamespaceFrontendMappings200ResponseInner>>> {
+    async listNamespaceFrontendMappingsRaw(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListFrontendNamespaceMappings200ResponseInner>>> {
         if (requestParameters['namespaceToken'] == null) {
             throw new runtime.RequiredError(
                 'namespaceToken',
@@ -821,12 +864,12 @@ export class AdminApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListNamespaceFrontendMappings200ResponseInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListFrontendNamespaceMappings200ResponseInnerFromJSON));
     }
 
     /**
      */
-    async listNamespaceFrontendMappings(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListNamespaceFrontendMappings200ResponseInner>> {
+    async listNamespaceFrontendMappings(requestParameters: ListNamespaceFrontendMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontendNamespaceMappings200ResponseInner>> {
         const response = await this.listNamespaceFrontendMappingsRaw(requestParameters, initOverrides);
         return await response.value();
     }
