@@ -46,7 +46,7 @@ func (l *ZrokListener) Addr() net.Addr {
 	return l
 }
 
-func NewZrokListener(_ context.Context, _ string, addr string, _ net.ListenConfig) (any, error) {
+func NewZrokListener(_ context.Context, _ string, addr string, _ string, _ uint, _ net.ListenConfig) (any, error) {
 	shrToken := strings.Split(addr, ":")[0]
 	env, err := environment.LoadRoot()
 	if err != nil {
