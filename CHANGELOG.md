@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.4
+
+CHANGE: Update `github.com/caddyserver/caddy/v2` to `v2.9.1`; fixes CVE-2024-53259 (would only potentially effect users using the QUIC protocol, very atypical) (https://github.com/openziti/zrok/issues/1047)
+
 ## v1.1.3
 
 FEATURE: A new `compatibility` > `version_patterns` array is included in the controller configuration, allowing for dynamic adjustment of allowed client version strings (https://github.com/openziti/zrok/issues/1030)
