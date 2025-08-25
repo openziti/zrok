@@ -2,32 +2,27 @@ package metrics
 
 import (
 	"context"
-	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/controller/env"
+	"time"
+
+	"github.com/michaelquigley/df"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-func init() {
-	env.GetCfOptions().AddFlexibleSetter("amqpSink", loadAmqpSinkConfig)
-}
+const AmqpSinkType = "amqpSink"
 
 type AmqpSinkConfig struct {
-	Url       string `cf:"+secret"`
+	Url       string `df:",secret"`
 	QueueName string
 }
 
-func loadAmqpSinkConfig(v interface{}, _ *cf.Options) (interface{}, error) {
-	if submap, ok := v.(map[string]interface{}); ok {
-		cfg := &AmqpSinkConfig{}
-		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
-			return nil, err
-		}
-		return newAmqpSink(cfg)
+func LoadAmqpSink(v map[string]any) (df.Dynamic, error) {
+	cfg, err := df.New[AmqpSinkConfig](v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("invalid config structure for 'amqpSink'")
+	return &amqpSink{cfg: cfg}, nil
 }
 
 type amqpSink struct {
@@ -38,10 +33,8 @@ type amqpSink struct {
 	connected bool
 }
 
-func newAmqpSink(cfg *AmqpSinkConfig) (*amqpSink, error) {
-	as := &amqpSink{cfg: cfg}
-	return as, nil
-}
+func (s *amqpSink) Type() string          { return AmqpSinkType }
+func (s *amqpSink) ToMap() map[string]any { return nil }
 
 func (s *amqpSink) Handle(event ZitiEventJson) error {
 	if !s.connected {

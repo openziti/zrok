@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/mitchellh/mapstructure"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,57 +22,39 @@ import (
 	githubOAuth "golang.org/x/oauth2/github"
 )
 
-type githubConfigurer struct {
-	cfg       *OauthConfig
-	githubCfg *githubConfig
-	tls       bool
-}
-
-func newGithubConfigurer(cfg *OauthConfig, tls bool, v map[string]interface{}) (*githubConfigurer, error) {
-	c := &githubConfigurer{cfg: cfg}
-	githubCfg, err := newGithubConfig(v)
-	if err != nil {
-		return nil, err
-	}
-	c.githubCfg = githubCfg
-	c.tls = tls
-	return c, nil
-}
-
 type githubConfig struct {
-	Name         string `mapstructure:"name"`
-	ClientId     string `mapstructure:"client_id"`
-	ClientSecret string `mapstructure:"client_secret"`
+	Name         string
+	ClientId     string
+	ClientSecret string
 }
 
-func newGithubConfig(v map[string]interface{}) (*githubConfig, error) {
-	cfg := &githubConfig{}
-	if err := mapstructure.Decode(v, cfg); err != nil {
-		return nil, err
-	}
-	return cfg, nil
+func newGithubConfig(v map[string]interface{}) (df.Dynamic, error) {
+	return df.New[githubConfig](v)
 }
 
-func (c *githubConfigurer) configure() error {
+func (c *githubConfig) Type() string          { return "github" }
+func (c *githubConfig) ToMap() map[string]any { return nil }
+
+func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 	scheme := "http"
-	if c.tls {
+	if tls {
 		scheme = "https"
 	}
 
-	signingKey, err := deriveKey(c.cfg.SigningKey, 32)
+	signingKey, err := deriveKey(cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
-	encryptionKey, err := deriveKey(c.cfg.EncryptionKey, 32)
+	encryptionKey, err := deriveKey(cfg.EncryptionKey, 32)
 	if err != nil {
 		return err
 	}
 
-	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
 	rpConfig := &oauth2.Config{
-		ClientID:     c.githubCfg.ClientId,
-		ClientSecret: c.githubCfg.ClientSecret,
-		RedirectURL:  fmt.Sprintf("%v/%v/auth/callback", c.cfg.EndpointUrl, c.githubCfg.Name),
+		ClientID:     c.ClientId,
+		ClientSecret: c.ClientSecret,
+		RedirectURL:  fmt.Sprintf("%v/%v/auth/callback", cfg.EndpointUrl, c.Name),
 		Scopes:       []string{"user:email"},
 		Endpoint:     githubOAuth.Endpoint,
 	}
@@ -108,7 +90,7 @@ func (c *githubConfigurer) configure() error {
 					TargetHost:      targetHost,
 					RefreshInterval: r.URL.Query().Get("refreshInterval"),
 					RegisteredClaims: jwt.RegisteredClaims{
-						ExpiresAt: jwt.NewNumericDate(time.Now().Add(c.cfg.IntermediateLifetime)),
+						ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.IntermediateLifetime)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
 						NotBefore: jwt.NewNumericDate(time.Now()),
 						Issuer:    "zrok",
@@ -124,7 +106,7 @@ func (c *githubConfigurer) configure() error {
 			}, provider, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
 		}
 	}
-	http.Handle(fmt.Sprintf("/%v/login", c.githubCfg.Name), auth(provider))
+	http.Handle(fmt.Sprintf("/%v/login", c.Name), auth(provider))
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, rp rp.RelyingParty) {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
@@ -195,11 +177,11 @@ func (c *githubConfigurer) configure() error {
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			oauthCfg:        c.cfg,
+			oauthCfg:        cfg,
 			supportsRefresh: false,
 			email:           primaryEmail,
 			accessToken:     tokens.AccessToken,
-			provider:        c.githubCfg.Name,
+			provider:        c.Name,
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
@@ -208,21 +190,21 @@ func (c *githubConfigurer) configure() error {
 
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
-	http.Handle(fmt.Sprintf("/%v/auth/callback", c.githubCfg.Name), rp.CodeExchangeHandler(login, provider))
+	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(login, provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(c.cfg.CookieName)
+		cookie, err := r.Cookie(cfg.CookieName)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil
 			})
 			if err == nil {
 				claims := tkn.Claims.(*zrokClaims)
-				if claims.Provider == c.githubCfg.Name {
+				if claims.Provider == c.Name {
 					accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
 					if err == nil {
 						req, err := http.NewRequest("DELETE",
-							fmt.Sprintf("https://api.github.com/applications/%s/token", c.githubCfg.ClientId),
+							fmt.Sprintf("https://api.github.com/applications/%s/token", c.ClientId),
 							strings.NewReader(fmt.Sprintf(`{"access_token":"%s"}`, accessToken)))
 						if err != nil {
 							logrus.Errorf("error creating access token delete request for '%v': %v", claims.Email, err)
@@ -231,7 +213,7 @@ func (c *githubConfigurer) configure() error {
 						}
 
 						req.Header.Set("Content-Type", "application/json")
-						req.SetBasicAuth(c.githubCfg.ClientId, c.githubCfg.ClientSecret) // Need client credentials
+						req.SetBasicAuth(c.ClientId, c.ClientSecret) // Need client credentials
 
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
@@ -254,7 +236,7 @@ func (c *githubConfigurer) configure() error {
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.githubCfg.Name, claims.Provider)
+					logrus.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}
@@ -264,29 +246,29 @@ func (c *githubConfigurer) configure() error {
 				return
 			}
 		} else {
-			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
+			logrus.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     c.cfg.CookieName,
+			Name:     cfg.CookieName,
 			Value:    "",
 			MaxAge:   -1,
-			Domain:   c.cfg.CookieDomain,
+			Domain:   cfg.CookieDomain,
 			Path:     "/",
 			HttpOnly: true,
 		})
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {
-			redirectURL = fmt.Sprintf("%s/%s/login", c.cfg.EndpointUrl, c.githubCfg.Name)
+			redirectURL = fmt.Sprintf("%s/%s/login", cfg.EndpointUrl, c.Name)
 		}
 		http.Redirect(w, r, redirectURL, http.StatusFound)
 	}
-	http.HandleFunc(fmt.Sprintf("/%v/logout", c.githubCfg.Name), logout)
+	http.HandleFunc(fmt.Sprintf("/%v/logout", c.Name), logout)
 
-	logrus.Infof("configured github provider at '/%v", c.githubCfg.Name)
+	logrus.Infof("configured github provider at '/%v", c.Name)
 
 	return nil
 }

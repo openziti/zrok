@@ -4,31 +4,25 @@ import (
 	"encoding/binary"
 	"os"
 
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/nxadm/tail"
-	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
-	env.GetCfOptions().AddFlexibleSetter("fileSource", loadFileSourceConfig)
-}
+const FileSourceType = "fileSource"
 
 type FileSourceConfig struct {
 	Path        string
 	PointerPath string
 }
 
-func loadFileSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
-	if submap, ok := v.(map[string]interface{}); ok {
-		cfg := &FileSourceConfig{}
-		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
-			return nil, err
-		}
-		return &fileSource{cfg: cfg}, nil
+func LoadFileSource(v map[string]any) (df.Dynamic, error) {
+	cfg, err := df.New[FileSourceConfig](v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("invalid config structure for 'fileSource'")
+	return &fileSource{cfg: cfg}, nil
 }
 
 type fileSource struct {
@@ -36,6 +30,9 @@ type fileSource struct {
 	ptrF *os.File
 	t    *tail.Tail
 }
+
+func (s *fileSource) Type() string          { return FileSourceType }
+func (s *fileSource) ToMap() map[string]any { return nil }
 
 func (s *fileSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	f, err := os.Open(s.cfg.Path)

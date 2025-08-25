@@ -4,45 +4,39 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+
 	"github.com/gorilla/websocket"
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/channel/v4"
 	"github.com/openziti/channel/v4/websockets"
 	"github.com/openziti/edge-api/rest_util"
 	"github.com/openziti/identity"
 	"github.com/openziti/ziti/common/pb/mgmt_pb"
 	"github.com/openziti/ziti/controller/event"
-	"github.com/openziti/zrok/controller/env"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
-	"net/http"
-	"net/url"
-	"time"
 )
 
 const ZitiSession = "zt-session"
-
-func init() {
-	env.GetCfOptions().AddFlexibleSetter("websocketSource", loadWebsocketSourceConfig)
-}
+const WebsocketSourceType = "websocketSource"
 
 type WebsocketSourceConfig struct {
 	WebsocketEndpoint string // wss://127.0.0.1:1280/fabric/v1/ws-api
 	ApiEndpoint       string // https://127.0.0.1:1280
 	Username          string
-	Password          string `cf:"+secret"`
+	Password          string `df:",secret"`
 }
 
-func loadWebsocketSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
-	if submap, ok := v.(map[string]interface{}); ok {
-		cfg := &WebsocketSourceConfig{}
-		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
-			return nil, err
-		}
-		return &websocketSource{cfg: cfg}, nil
+func LoadWebsocketSource(v map[string]any) (df.Dynamic, error) {
+	cfg, err := df.New[WebsocketSourceConfig](v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("invalid config structure for 'websocketSource'")
+	return &websocketSource{cfg: cfg}, nil
 }
 
 type websocketSource struct {
@@ -51,6 +45,9 @@ type websocketSource struct {
 	events chan ZitiEventMsg
 	join   chan struct{}
 }
+
+func (s *websocketSource) Type() string          { return WebsocketSourceType }
+func (s *websocketSource) ToMap() map[string]any { return nil }
 
 func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	caCerts, err := rest_util.GetControllerWellKnownCas(s.cfg.ApiEndpoint)

@@ -101,23 +101,33 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**reset_password_request**](docs/AccountApi.md#reset_password_request) | **POST** /resetPasswordRequest | 
 *AccountApi* | [**verify**](docs/AccountApi.md#verify) | **POST** /verify | 
 *AdminApi* | [**add_frontend_grant**](docs/AdminApi.md#add_frontend_grant) | **POST** /frontend/grant | 
+*AdminApi* | [**add_namespace_frontend_mapping**](docs/AdminApi.md#add_namespace_frontend_mapping) | **POST** /namespace/frontend/mapping | 
+*AdminApi* | [**add_namespace_grant**](docs/AdminApi.md#add_namespace_grant) | **POST** /namespace/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
+*AdminApi* | [**create_namespace**](docs/AdminApi.md#create_namespace) | **POST** /namespace | 
 *AdminApi* | [**create_organization**](docs/AdminApi.md#create_organization) | **POST** /organization | 
 *AdminApi* | [**delete_account**](docs/AdminApi.md#delete_account) | **DELETE** /account | 
 *AdminApi* | [**delete_frontend**](docs/AdminApi.md#delete_frontend) | **DELETE** /frontend | 
 *AdminApi* | [**delete_frontend_grant**](docs/AdminApi.md#delete_frontend_grant) | **DELETE** /frontend/grant | 
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
+*AdminApi* | [**delete_namespace**](docs/AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
 *AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
+*AdminApi* | [**list_frontend_namespace_mappings**](docs/AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
+*AdminApi* | [**list_namespace_frontend_mappings**](docs/AdminApi.md#list_namespace_frontend_mappings) | **GET** /namespace/frontend/mapping/{namespaceToken} | 
+*AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
+*AdminApi* | [**remove_namespace_frontend_mapping**](docs/AdminApi.md#remove_namespace_frontend_mapping) | **DELETE** /namespace/frontend/mapping | 
+*AdminApi* | [**remove_namespace_grant**](docs/AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
+*AdminApi* | [**update_namespace**](docs/AdminApi.md#update_namespace) | **PATCH** /namespace | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 
 *AgentApi* | [**ping**](docs/AgentApi.md#ping) | **POST** /agent/ping | 
 *AgentApi* | [**remote_access**](docs/AgentApi.md#remote_access) | **POST** /agent/access | 
@@ -147,6 +157,10 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**version**](docs/MetadataApi.md#version) | **GET** /version | 
 *MetadataApi* | [**version_inventory**](docs/MetadataApi.md#version_inventory) | **GET** /versions | 
 *ShareApi* | [**access**](docs/ShareApi.md#access) | **POST** /access | 
+*ShareApi* | [**create_share_name**](docs/ShareApi.md#create_share_name) | **POST** /share/name | 
+*ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
+*ShareApi* | [**list_all_share_names**](docs/ShareApi.md#list_all_share_names) | **GET** /share/names | 
+*ShareApi* | [**list_share_names**](docs/ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
@@ -159,6 +173,8 @@ Class | Method | HTTP request | Description
  - [Access201Response](docs/Access201Response.md)
  - [AccessRequest](docs/AccessRequest.md)
  - [AddFrontendGrantRequest](docs/AddFrontendGrantRequest.md)
+ - [AddNamespaceFrontendMappingRequest](docs/AddNamespaceFrontendMappingRequest.md)
+ - [AddNamespaceGrantRequest](docs/AddNamespaceGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
@@ -168,8 +184,11 @@ Class | Method | HTTP request | Description
  - [CreateFrontendRequest](docs/CreateFrontendRequest.md)
  - [CreateIdentity201Response](docs/CreateIdentity201Response.md)
  - [CreateIdentityRequest](docs/CreateIdentityRequest.md)
+ - [CreateNamespace201Response](docs/CreateNamespace201Response.md)
+ - [CreateNamespaceRequest](docs/CreateNamespaceRequest.md)
  - [CreateOrganization201Response](docs/CreateOrganization201Response.md)
  - [CreateOrganizationRequest](docs/CreateOrganizationRequest.md)
+ - [CreateShareNameRequest](docs/CreateShareNameRequest.md)
  - [DeleteIdentityRequest](docs/DeleteIdentityRequest.md)
  - [DisableRequest](docs/DisableRequest.md)
  - [EnableRequest](docs/EnableRequest.md)
@@ -182,18 +201,23 @@ Class | Method | HTTP request | Description
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
+ - [ListAllShareNames200ResponseInner](docs/ListAllShareNames200ResponseInner.md)
+ - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
+ - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)
  - [ListOrganizationMembers200Response](docs/ListOrganizationMembers200Response.md)
  - [ListOrganizationMembers200ResponseMembersInner](docs/ListOrganizationMembers200ResponseMembersInner.md)
  - [ListOrganizations200Response](docs/ListOrganizations200Response.md)
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
  - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
+ - [ListShareNames200ResponseInner](docs/ListShareNames200ResponseInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)
+ - [NamespaceSelection](docs/NamespaceSelection.md)
  - [Overview](docs/Overview.md)
  - [Ping200Response](docs/Ping200Response.md)
  - [Principal](docs/Principal.md)
@@ -208,18 +232,21 @@ Class | Method | HTTP request | Description
  - [RemoteStatus200ResponseSharesInner](docs/RemoteStatus200ResponseSharesInner.md)
  - [RemoteUnaccessRequest](docs/RemoteUnaccessRequest.md)
  - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
+ - [RemoveNamespaceFrontendMappingRequest](docs/RemoveNamespaceFrontendMappingRequest.md)
  - [RemoveOrganizationMemberRequest](docs/RemoveOrganizationMemberRequest.md)
  - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
  - [Share](docs/Share.md)
  - [ShareHttpHealthcheck200Response](docs/ShareHttpHealthcheck200Response.md)
  - [ShareHttpHealthcheckRequest](docs/ShareHttpHealthcheckRequest.md)
  - [ShareRequest](docs/ShareRequest.md)
+ - [ShareRequest12](docs/ShareRequest12.md)
  - [ShareResponse](docs/ShareResponse.md)
  - [SparkDataSample](docs/SparkDataSample.md)
  - [UnaccessRequest](docs/UnaccessRequest.md)
  - [UnshareRequest](docs/UnshareRequest.md)
  - [UpdateAccessRequest](docs/UpdateAccessRequest.md)
  - [UpdateFrontendRequest](docs/UpdateFrontendRequest.md)
+ - [UpdateNamespaceRequest](docs/UpdateNamespaceRequest.md)
  - [UpdateShareRequest](docs/UpdateShareRequest.md)
  - [Verify200Response](docs/Verify200Response.md)
  - [VerifyRequest](docs/VerifyRequest.md)

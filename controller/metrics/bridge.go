@@ -1,13 +1,14 @@
 package metrics
 
 import (
+	"github.com/michaelquigley/df"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type BridgeConfig struct {
-	Source interface{}
-	Sink   interface{}
+	Source df.Dynamic
+	Sink   df.Dynamic
 }
 
 type Bridge struct {
