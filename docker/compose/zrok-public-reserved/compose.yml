@@ -26,6 +26,7 @@ services:
   # reserve zrok frontend subdomain and start sharing the target
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    init: true
     restart: unless-stopped
     entrypoint: zrok-share.bash
     depends_on:
@@ -55,6 +56,7 @@ services:
   # demo server
   zrok-test:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    init: true
     command: test endpoint --address 0.0.0.0  # 9090
 
 volumes:

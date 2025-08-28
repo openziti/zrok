@@ -24,6 +24,7 @@ services:
 
   zrok-share:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    init: true
     restart: unless-stopped
     entrypoint: zrok-share.bash
     depends_on:
@@ -53,6 +54,7 @@ services:
   # demo server you can share with zrok
   zrok-test:
     image: ${ZROK_CONTAINER_IMAGE:-docker.io/openziti/zrok}
+    init: true
     command: test endpoint --address 0.0.0.0  # 9090
 
 volumes:
