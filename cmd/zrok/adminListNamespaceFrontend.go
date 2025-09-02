@@ -73,7 +73,7 @@ func (cmd *adminListNamespaceFrontendCommand) run(_ *cobra.Command, args []strin
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"frontend token", "public name", "url template", "default", "created"})
 		for _, mapping := range resp.Payload {
 			if fe, exists := frontendMap[mapping.FrontendToken]; exists {

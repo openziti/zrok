@@ -65,7 +65,7 @@ func (cmd *overviewPublicFrontendsCommand) run(_ *cobra.Command, _ []string) {
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"Frontend Name", "URL Template"})
 		for _, i := range resp.Payload.PublicFrontends {
 			t.AppendRow(table.Row{i.PublicName, i.URLTemplate})

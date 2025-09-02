@@ -52,7 +52,7 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"Name", "Created At"})
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
@@ -74,7 +74,7 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"Name", "Namespace", "Created At"})
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{

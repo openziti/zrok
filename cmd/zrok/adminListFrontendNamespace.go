@@ -73,7 +73,7 @@ func (cmd *adminListFrontendNamespaceCommand) run(_ *cobra.Command, args []strin
 		fmt.Println()
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"namespace token", "name", "description", "open", "default", "created"})
 		for _, mapping := range resp.Payload {
 			if ns, exists := namespaceMap[mapping.NamespaceToken]; exists {

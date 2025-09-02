@@ -47,7 +47,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintln(os.Stdout, tui.Code.Render("Config")+":\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleRounded)
 	t.AppendHeader(table.Row{"Config", "Value", "Source"})
 	apiEndpoint, apiEndpointFrom := env.ApiEndpoint()
 	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, apiEndpointFrom})
@@ -67,7 +67,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"Property", "Value"})
 		if cmd.secrets {
 			t.AppendRow(table.Row{"Account Token", env.Environment().AccountToken})

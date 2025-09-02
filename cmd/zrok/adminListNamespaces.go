@@ -49,7 +49,7 @@ func (c *adminListNamespacesCommand) run(_ *cobra.Command, _ []string) {
 	fmt.Println()
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleRounded)
 	t.AppendHeader(table.Row{"Namespace Token", "Name", "Description", "Open", "Created", "Updated"})
 	for _, ns := range resp.Payload {
 		created := time.Unix(ns.CreatedAt, 0).Format("2006-01-02 15:04:05")
