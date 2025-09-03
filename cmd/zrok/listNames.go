@@ -7,6 +7,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/rest_client_zrok/share"
+	"github.com/openziti/zrok/util"
 	"github.com/spf13/cobra"
 )
 
@@ -75,13 +76,14 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleRounded)
-		t.AppendHeader(table.Row{"Name", "Reserved", "Namespace", "Created At"})
+		t.AppendHeader(table.Row{"URL", "Name", "Namespace", "Reserved", "Created At"})
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
+				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
 				name.Name,
+				name.NamespaceToken,
 				name.Reserved,
-				name.NamespaceName,
-				time.Unix(name.CreatedAt, 0),
+				time.Unix(name.CreatedAt, 0).Format("2006-01-02 15:04:05"),
 			})
 		}
 		t.Render()

@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/spf13/cobra"
-	"os"
-	"time"
 )
 
 func init() {
@@ -50,7 +51,7 @@ func (c *adminListNamespacesCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
-	t.AppendHeader(table.Row{"Namespace Token", "Name", "Description", "Open", "Created", "Updated"})
+	t.AppendHeader(table.Row{"Namespace Token", "Name", "Description", "Open", "Created At", "Updated At"})
 	for _, ns := range resp.Payload {
 		created := time.Unix(ns.CreatedAt, 0).Format("2006-01-02 15:04:05")
 		updated := time.Unix(ns.UpdatedAt, 0).Format("2006-01-02 15:04:05")
