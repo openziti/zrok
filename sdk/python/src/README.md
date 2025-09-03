@@ -162,6 +162,7 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**list_all_share_names**](docs/ShareApi.md#list_all_share_names) | **GET** /share/names | 
 *ShareApi* | [**list_share_names**](docs/ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
+*ShareApi* | [**share12**](docs/ShareApi.md#share12) | **POST** /share12 | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
 *ShareApi* | [**update_access**](docs/ShareApi.md#update_access) | **PATCH** /access | 

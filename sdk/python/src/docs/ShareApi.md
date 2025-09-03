@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**list_all_share_names**](ShareApi.md#list_all_share_names) | **GET** /share/names | 
 [**list_share_names**](ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
 [**share**](ShareApi.md#share) | **POST** /share | 
+[**share12**](ShareApi.md#share12) | **POST** /share12 | 
 [**unaccess**](ShareApi.md#unaccess) | **DELETE** /unaccess | 
 [**unshare**](ShareApi.md#unshare) | **DELETE** /unshare | 
 [**update_access**](ShareApi.md#update_access) | **PATCH** /access | 
@@ -437,6 +438,86 @@ with zrok_api.ApiClient(configuration) as api_client:
         pprint(api_response)
     except Exception as e:
         print("Exception when calling ShareApi->share: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**ShareRequest**](ShareRequest.md)|  | [optional] 
+
+### Return type
+
+[**ShareResponse**](ShareResponse.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**201** | share created |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
+**409** | conflict |  -  |
+**422** | unprocessable |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **share12**
+> ShareResponse share12(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.share_response import ShareResponse
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v1
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v1"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.ShareApi(api_client)
+    body = zrok_api.ShareRequest() # ShareRequest |  (optional)
+
+    try:
+        api_response = api_instance.share12(body=body)
+        print("The response of ShareApi->share12:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling ShareApi->share12: %s\n" % e)
 ```
 
 

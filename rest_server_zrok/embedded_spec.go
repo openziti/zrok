@@ -3181,6 +3181,54 @@ func init() {
         }
       }
     },
+    "/share12": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "share12",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/shareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "share created",
+            "schema": {
+              "$ref": "#/definitions/shareResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
+          },
+          "422": {
+            "description": "unprocessable"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -6844,6 +6892,54 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/share12": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "share12",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/shareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "share created",
+            "schema": {
+              "$ref": "#/definitions/shareResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "409": {
+            "description": "conflict"
+          },
+          "422": {
+            "description": "unprocessable"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
