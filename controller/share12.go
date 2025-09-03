@@ -87,7 +87,7 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 		return share.NewShare12InternalServerError()
 	}
 
-	logrus.Infof("recorded share12 '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
+	logrus.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
 
 	return share.NewShare12Created().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,

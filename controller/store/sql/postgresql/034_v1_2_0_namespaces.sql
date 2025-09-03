@@ -49,8 +49,25 @@ create table names (
   constraint chk_name check (name <> '')
 );
 
+--
+-- share_name_mappings
+--
+create table share_name_mappings (
+  id                    serial              primary key,
+  share_id              integer             not null constraint fk_share_name_mappings_shares references shares on delete cascade,
+  name_id               integer             not null constraint fk_share_name_mappings_names references names on delete cascade,
+  created_at            timestamp           not null default(current_timestamp),
+  updated_at            timestamp           not null default(current_timestamp),
+  deleted               boolean             not null default(false),
+
+  constraint uk_share_name_mappings_name unique (name_id) where not deleted
+);
+
+create index idx_share_name_mappings_share on share_name_mappings(share_id) where not deleted;
+
 -- +migrate Down
 
+drop table if exists share_name_mappings;
 drop table if exists names;
 drop table if exists namespace_grants;
 drop table if exists namespaces;

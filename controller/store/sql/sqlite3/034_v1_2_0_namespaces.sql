@@ -51,12 +51,30 @@ create table names (
 
 create unique index uk_names on names(namespace_id, name) where not deleted;
 
+--
+-- share_name_mappings
+--
+create table share_name_mappings (
+  id                    integer             primary key,
+  share_id              integer             not null constraint fk_share_name_mappings_shares references shares on delete cascade,
+  name_id               integer             not null constraint fk_share_name_mappings_names references names on delete cascade,
+  created_at            datetime            not null default(current_timestamp),
+  updated_at            datetime            not null default(current_timestamp),
+  deleted               boolean             not null default(false)
+);
+
+create unique index uk_share_name_mappings_name on share_name_mappings(name_id) where not deleted;
+create index idx_share_name_mappings_share on share_name_mappings(share_id) where not deleted;
+
 -- +migrate Down
 
+drop index if exists idx_share_name_mappings_share;
+drop index if exists uk_share_name_mappings_name;
 drop index if exists uk_names;
 drop index if exists uk_namespace_grants;
 drop index if exists uk_namespace_name;
 drop index if exists uk_namespace_token;
+drop table if exists share_name_mappings;
 drop table if exists names;
 drop table if exists namespace_grants;
 drop table if exists namespaces;
