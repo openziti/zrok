@@ -21,6 +21,7 @@ import type {
   ListAllShareNames200ResponseInner,
   ListShareNames200ResponseInner,
   ShareRequest,
+  ShareRequest12,
   ShareResponse,
   UnaccessRequest,
   UnshareRequest,
@@ -40,6 +41,8 @@ import {
     ListShareNames200ResponseInnerToJSON,
     ShareRequestFromJSON,
     ShareRequestToJSON,
+    ShareRequest12FromJSON,
+    ShareRequest12ToJSON,
     ShareResponseFromJSON,
     ShareResponseToJSON,
     UnaccessRequestFromJSON,
@@ -73,7 +76,7 @@ export interface ShareOperationRequest {
 }
 
 export interface Share12Request {
-    body?: ShareRequest;
+    body?: ShareRequest12;
 }
 
 export interface UnaccessOperationRequest {
@@ -322,7 +325,7 @@ export class ShareApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ShareRequestToJSON(requestParameters['body']),
+            body: ShareRequest12ToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ShareResponseFromJSON(jsonValue));

@@ -484,7 +484,7 @@ Name | Type | Description  | Notes
 
 ```python
 import zrok_api
-from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.share_request12 import ShareRequest12
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.rest import ApiException
 from pprint import pprint
@@ -510,7 +510,7 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.ShareApi(api_client)
-    body = zrok_api.ShareRequest() # ShareRequest |  (optional)
+    body = zrok_api.ShareRequest12() # ShareRequest12 |  (optional)
 
     try:
         api_response = api_instance.share12(body=body)
@@ -527,7 +527,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ShareRequest**](ShareRequest.md)|  | [optional] 
+ **body** | [**ShareRequest12**](ShareRequest12.md)|  | [optional] 
 
 ### Return type
 

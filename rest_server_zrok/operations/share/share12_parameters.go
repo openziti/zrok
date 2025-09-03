@@ -36,7 +36,7 @@ type Share12Params struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.ShareRequest
+	Body *rest_model_zrok.ShareRequest12
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +50,7 @@ func (o *Share12Params) BindRequest(r *http.Request, route *middleware.MatchedRo
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.ShareRequest
+		var body rest_model_zrok.ShareRequest12
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

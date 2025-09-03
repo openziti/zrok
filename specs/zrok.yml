@@ -1939,7 +1939,7 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: "#/definitions/shareRequest"
+            $ref: "#/definitions/shareRequest12"
       responses:
         201:
           description: share created

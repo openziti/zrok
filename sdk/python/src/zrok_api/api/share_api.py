@@ -24,6 +24,7 @@ from zrok_api.models.create_share_name_request import CreateShareNameRequest
 from zrok_api.models.list_all_share_names200_response_inner import ListAllShareNames200ResponseInner
 from zrok_api.models.list_share_names200_response_inner import ListShareNames200ResponseInner
 from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.share_request12 import ShareRequest12
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest
@@ -1682,7 +1683,7 @@ class ShareApi:
     @validate_call
     def share12(
         self,
-        body: Optional[ShareRequest] = None,
+        body: Optional[ShareRequest12] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1700,7 +1701,7 @@ class ShareApi:
 
 
         :param body:
-        :type body: ShareRequest
+        :type body: ShareRequest12
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1753,7 +1754,7 @@ class ShareApi:
     @validate_call
     def share12_with_http_info(
         self,
-        body: Optional[ShareRequest] = None,
+        body: Optional[ShareRequest12] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1771,7 +1772,7 @@ class ShareApi:
 
 
         :param body:
-        :type body: ShareRequest
+        :type body: ShareRequest12
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1824,7 +1825,7 @@ class ShareApi:
     @validate_call
     def share12_without_preload_content(
         self,
-        body: Optional[ShareRequest] = None,
+        body: Optional[ShareRequest12] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1842,7 +1843,7 @@ class ShareApi:
 
 
         :param body:
-        :type body: ShareRequest
+        :type body: ShareRequest12
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of

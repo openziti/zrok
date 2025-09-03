@@ -3197,7 +3197,7 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/shareRequest"
+              "$ref": "#/definitions/shareRequest12"
             }
           }
         ],
@@ -6912,7 +6912,7 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/shareRequest"
+              "$ref": "#/definitions/shareRequest12"
             }
           }
         ],

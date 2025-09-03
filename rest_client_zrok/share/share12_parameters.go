@@ -64,7 +64,7 @@ Share12Params contains all the parameters to send to the API endpoint
 type Share12Params struct {
 
 	// Body.
-	Body *rest_model_zrok.ShareRequest
+	Body *rest_model_zrok.ShareRequest12
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +120,13 @@ func (o *Share12Params) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the share12 params
-func (o *Share12Params) WithBody(body *rest_model_zrok.ShareRequest) *Share12Params {
+func (o *Share12Params) WithBody(body *rest_model_zrok.ShareRequest12) *Share12Params {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the share12 params
-func (o *Share12Params) SetBody(body *rest_model_zrok.ShareRequest) {
+func (o *Share12Params) SetBody(body *rest_model_zrok.ShareRequest12) {
 	o.Body = body
 }
 
