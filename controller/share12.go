@@ -3,9 +3,11 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -38,18 +40,18 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 		return share.NewShare12Unauthorized()
 	}
 
-	// process namespace selections
-	frontendEndpoints, err := h.processNamespaceSelections(params.Body.NamespaceSelections, principal, trx)
-	if err != nil {
-		logrus.Errorf("namespace selection processing failed: %v", err)
-		return share.NewShare12NotFound()
-	}
-
 	// create share token
 	shrToken, err := createShareToken()
 	if err != nil {
 		logrus.Error(err)
 		return share.NewShare12InternalServerError()
+	}
+
+	// process namespace selections
+	frontendEndpoints, nameIds, err := h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
+	if err != nil {
+		logrus.Errorf("namespace selection processing failed: %v", err)
+		return share.NewShare12NotFound()
 	}
 
 	// allocate resources based on share mode
@@ -63,9 +65,8 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
 		return share.NewShare12InternalServerError()
 	}
-
 	if err != nil {
-		logrus.Error(err)
+		logrus.Errorf("error allocating share resources: %v", err)
 		return share.NewShare12InternalServerError()
 	}
 
@@ -74,6 +75,19 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
 		return share.NewShare12InternalServerError()
+	}
+
+	// create share name mappings for namespace selections
+	for _, nameId := range nameIds {
+		snm := &store.ShareNameMapping{
+			ShareId: shareId,
+			NameId:  nameId,
+		}
+		_, err := str.CreateShareNameMapping(snm, trx)
+		if err != nil {
+			logrus.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
+			return share.NewShare12InternalServerError()
+		}
 	}
 
 	// handle access grants if closed permission mode
@@ -123,10 +137,76 @@ func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Princ
 	return nil
 }
 
-func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zrok.NamespaceSelection, principal *rest_model_zrok.Principal, trx interface{}) ([]string, error) {
-	// TODO: implement namespace selection processing
-	// this is the key difference from the original share endpoint
-	return nil, nil
+func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zrok.NamespaceSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
+	var frontendEndpoints []string
+	var nameIds []int
+
+	for _, selection := range selections {
+		// find namespace by token
+		ns, err := str.FindNamespaceWithToken(selection.NamespaceToken, trx)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "error finding namespace with token '%v'", selection.NamespaceToken)
+		}
+
+		var endpoint string
+		var nameId int
+
+		if selection.Name != "" { // user specified a name - validate ownership and availability
+			name, err := str.FindNameByNamespaceAndName(ns.Id, selection.Name, trx)
+			if err != nil {
+				return nil, nil, errors.Wrapf(err, "error finding name '%v' in namespace '%v'", selection.Name, ns.Token)
+			}
+
+			// check if user owns this name
+			if name.AccountId != int(principal.ID) {
+				return nil, nil, errors.Errorf("user '%v' does not own name '%v' in namespace '%v'", principal.Email, selection.Name, ns.Token)
+			}
+
+			// check if there's already a share_name_mapping for this name
+			existing, err := str.FindShareNameMappingsByNameId(name.Id, trx)
+			if err != nil {
+				return nil, nil, errors.Wrapf(err, "error checking existing share name mappings for name '%v'", selection.Name)
+			}
+			if len(existing) > 0 {
+				return nil, nil, errors.Errorf("name '%v' in namespace '%v' is already in use by another share", selection.Name, ns.Token)
+			}
+
+			nameId = name.Id
+			endpoint = util.ExpandUrlTemplate(name.Name, ns.Name)
+
+		} else { // no name specified - generate one and create name record
+			// check namespace permissions
+			if !ns.Open {
+				granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
+				if err != nil {
+					return nil, nil, errors.Wrapf(err, "error checking namespace grant for account '%v' and namespace '%v'", principal.Email, ns.Token)
+				}
+				if !granted {
+					return nil, nil, errors.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+				}
+			}
+
+			// create name record with reserved=false (dynamically allocated)
+			name := &store.Name{
+				NamespaceId: ns.Id,
+				Name:        shrToken,
+				AccountId:   int(principal.ID),
+				Reserved:    false,
+			}
+
+			nameId, err = str.CreateName(name, trx)
+			if err != nil {
+				return nil, nil, errors.Wrapf(err, "error creating allocated name '%v' in namespace '%v' for account '%v'", shrToken, ns.Token, principal.Email)
+			}
+
+			endpoint = util.ExpandUrlTemplate(shrToken, ns.Name)
+		}
+
+		frontendEndpoints = append(frontendEndpoints, endpoint)
+		nameIds = append(nameIds, nameId)
+	}
+
+	return frontendEndpoints, nameIds, nil
 }
 
 func (h *share12Handler) allocatePublicResources(envZId, shrToken string, params share.Share12Params, trx interface{}) (string, []string, error) {
