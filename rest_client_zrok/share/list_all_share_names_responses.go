@@ -241,6 +241,9 @@ type ListAllShareNamesOKBodyItems0 struct {
 
 	// namespace token
 	NamespaceToken string `json:"namespaceToken,omitempty"`
+
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
 }
 
 // Validate validates this list all share names o k body items0

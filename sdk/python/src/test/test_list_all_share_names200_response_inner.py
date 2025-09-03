@@ -38,6 +38,7 @@ class TestListAllShareNames200ResponseInner(unittest.TestCase):
                 namespace_token = '',
                 namespace_name = '',
                 name = '',
+                reserved = True,
                 created_at = 56
             )
         else:

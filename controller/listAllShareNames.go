@@ -40,6 +40,7 @@ func (h *listAllShareNamesHandler) Handle(params share.ListAllShareNamesParams, 
 		for _, an := range allocatedNames {
 			nameObj := &share.ListAllShareNamesOKBodyItems0{
 				Name:           an.Name,
+				Reserved:       an.Reserved,
 				CreatedAt:      an.CreatedAt.Unix(),
 				NamespaceName:  ns.Name,
 				NamespaceToken: ns.Token,

@@ -57,6 +57,7 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	an := &store.Name{
 		NamespaceId: ns.Id,
 		Name:        params.Body.Name,
+		Reserved:    true,
 		AccountId:   int(principal.ID),
 	}
 	_, err = str.CreateName(an, trx)

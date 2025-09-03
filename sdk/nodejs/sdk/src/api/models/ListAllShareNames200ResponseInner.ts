@@ -39,6 +39,12 @@ export interface ListAllShareNames200ResponseInner {
     name?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ListAllShareNames200ResponseInner
+     */
+    reserved?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof ListAllShareNames200ResponseInner
      */
@@ -65,6 +71,7 @@ export function ListAllShareNames200ResponseInnerFromJSONTyped(json: any, ignore
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'namespaceName': json['namespaceName'] == null ? undefined : json['namespaceName'],
         'name': json['name'] == null ? undefined : json['name'],
+        'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
     };
 }
@@ -83,6 +90,7 @@ export function ListAllShareNames200ResponseInnerToJSONTyped(value?: ListAllShar
         'namespaceToken': value['namespaceToken'],
         'namespaceName': value['namespaceName'],
         'name': value['name'],
+        'reserved': value['reserved'],
         'createdAt': value['createdAt'],
     };
 }

@@ -2031,6 +2031,8 @@ paths:
                   type: string
                 name:
                   type: string
+                reserved:
+                  type: boolean
                 createdAt:
                   type: integer
         401:

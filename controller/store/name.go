@@ -14,12 +14,12 @@ type Name struct {
 }
 
 func (str *Store) CreateName(an *Name, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into names (namespace_id, name, account_id) values ($1, $2, $3) returning id")
+	stmt, err := tx.Prepare("insert into names (namespace_id, name, account_id, reserved) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing name insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(an.NamespaceId, an.Name, an.AccountId).Scan(&id); err != nil {
+	if err := stmt.QueryRow(an.NamespaceId, an.Name, an.AccountId, an.Reserved).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing name insert statement")
 	}
 	return id, nil

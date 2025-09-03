@@ -3118,6 +3118,9 @@ func init() {
                   },
                   "namespaceToken": {
                     "type": "string"
+                  },
+                  "reserved": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -7209,6 +7212,9 @@ func init() {
         },
         "namespaceToken": {
           "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
         }
       }
     },

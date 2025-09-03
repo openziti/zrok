@@ -75,10 +75,11 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
 		t.SetStyle(table.StyleRounded)
-		t.AppendHeader(table.Row{"Name", "Namespace", "Created At"})
+		t.AppendHeader(table.Row{"Name", "Reserved", "Namespace", "Created At"})
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
 				name.Name,
+				name.Reserved,
 				name.NamespaceName,
 				time.Unix(name.CreatedAt, 0),
 			})
