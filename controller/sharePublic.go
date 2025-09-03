@@ -5,6 +5,7 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/util"
 )
 
 type publicResourceAllocator struct{}
@@ -55,7 +56,7 @@ func (a *publicResourceAllocator) allocate(envZId, shrToken string, frontendZIds
 	}
 
 	for _, frontendTemplate := range frontendTemplates {
-		frontendEndpoints = append(frontendEndpoints, proxyUrl(shrToken, frontendTemplate))
+		frontendEndpoints = append(frontendEndpoints, util.ExpandUrlTemplate(shrToken, frontendTemplate))
 	}
 
 	return shrZId, frontendEndpoints, nil
