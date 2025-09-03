@@ -42,7 +42,7 @@ func (h *listShareNamesHandler) Handle(params share.ListShareNamesParams, princi
 	}
 
 	// find allocated names for namespace
-	allocatedNames, err := str.FindAllocatedNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
+	allocatedNames, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
 		return share.NewListShareNamesInternalServerError()

@@ -54,12 +54,12 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	}
 
 	// create allocated name
-	an := &store.AllocatedName{
+	an := &store.Name{
 		NamespaceId: ns.Id,
 		Name:        params.Body.Name,
 		AccountId:   int(principal.ID),
 	}
-	_, err = str.CreateAllocatedName(an, trx)
+	_, err = str.CreateName(an, trx)
 	if err != nil {
 		logrus.Errorf("error creating allocated name '%v' in namespace '%v' for account '%v': %v", params.Body.Name, ns.Token, principal.Email, err)
 		return share.NewCreateShareNameInternalServerError()

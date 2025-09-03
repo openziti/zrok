@@ -42,7 +42,7 @@ func (h *deleteShareNameHandler) Handle(params share.DeleteShareNameParams, prin
 	}
 
 	// find allocated name
-	an, err := str.FindAllocatedNameByNamespaceAndName(ns.Id, params.Body.Name, trx)
+	an, err := str.FindNameByNamespaceAndName(ns.Id, params.Body.Name, trx)
 	if err != nil {
 		logrus.Errorf("error finding allocated name '%v' in namespace '%v': %v", params.Body.Name, ns.Token, err)
 		return share.NewDeleteShareNameNotFound()
@@ -55,7 +55,7 @@ func (h *deleteShareNameHandler) Handle(params share.DeleteShareNameParams, prin
 	}
 
 	// delete allocated name
-	if err := str.DeleteAllocatedName(an.Id, trx); err != nil {
+	if err := str.DeleteName(an.Id, trx); err != nil {
 		logrus.Errorf("error deleting allocated name '%v' in namespace '%v' for account '%v': %v", params.Body.Name, ns.Token, principal.Email, err)
 		return share.NewDeleteShareNameInternalServerError()
 	}

@@ -33,23 +33,24 @@ create table namespace_grants (
 );
 
 --
--- allocated_names
+-- names
 --
-create table allocated_names (
+create table names (
   id                    serial              primary key,
-  namespace_id          integer             not null constraint fk_allocated_names_namespaces references namespaces on delete cascade,
+  namespace_id          integer             not null constraint fk_names_namespaces references namespaces on delete cascade,
+  account_id            integer             not null constraint fk_names_accounts references accounts on delete cascade,
   name                  varchar(255)        not null,
-  account_id            integer             not null constraint fk_allocated_names_accounts references accounts on delete cascade,
+  reserved              boolean             not null default(false),
   created_at            timestamp           not null default(current_timestamp),
   updated_at            timestamp           not null default(current_timestamp),
   deleted               boolean             not null default(false),
 
-  constraint uk_allocated_names unique (namespace_id, name) where not deleted,
-  constraint chk_allocated_name check (name <> '')
+  constraint uk_names unique (namespace_id, name) where not deleted,
+  constraint chk_name check (name <> '')
 );
 
 -- +migrate Down
 
-drop table if exists allocated_names;
+drop table if exists names;
 drop table if exists namespace_grants;
 drop table if exists namespaces;
