@@ -87,10 +87,6 @@ func realRemoteAddress(req *http.Request) string {
 	return ip
 }
 
-func proxyUrl(shrToken, template string) string {
-	return strings.Replace(template, "{token}", shrToken, -1)
-}
-
 func validatePassword(cfg *config.Config, password string) error {
 	if len(password) < 8 {
 		return fmt.Errorf("password length: expected (8), got (%d)", len(password))

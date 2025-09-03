@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/michaelquigley/cf"
+	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/sirupsen/logrus"
@@ -13,7 +13,8 @@ func init() {
 }
 
 type adminMigrate struct {
-	cmd *cobra.Command
+	cmd   *cobra.Command
+	steps int
 }
 
 func newAdminMigrate() *adminMigrate {
@@ -22,7 +23,8 @@ func newAdminMigrate() *adminMigrate {
 		Short: "Migrate the underlying datastore",
 		Args:  cobra.ExactArgs(1),
 	}
-	command := &adminMigrate{cmd}
+	command := &adminMigrate{cmd: cmd}
+	cmd.Flags().IntVar(&command.steps, "down", 0, "migrate down N steps (0 = migrate up)")
 	cmd.Run = command.run
 	return command
 }
@@ -34,13 +36,28 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Info(cf.Dump(inCfg, cf.DefaultOptions()))
+	logrus.Info(df.MustInspect(inCfg))
 
-	// override the 'disable_auto_migration' setting... the user is requesting a migration here.
-	inCfg.Store.DisableAutoMigration = false
+	// disable auto-migration, we'll control it manually
+	inCfg.Store.DisableAutoMigration = true
 
-	if _, err := store.Open(inCfg.Store); err != nil {
+	str, err := store.Open(inCfg.Store)
+	if err != nil {
 		panic(err)
 	}
-	logrus.Info("migration complete")
+	defer str.Close()
+
+	if cmd.steps > 0 {
+		if err := str.MigrateDown(inCfg.Store, cmd.steps); err != nil {
+			panic(err)
+		}
+		logrus.Infof("migrated down %d steps", cmd.steps)
+	} else {
+		// default behavior - migrate up
+		inCfg.Store.DisableAutoMigration = false
+		if _, err := store.Open(inCfg.Store); err != nil {
+			panic(err)
+		}
+		logrus.Info("migration complete")
+	}
 }

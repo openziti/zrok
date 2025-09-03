@@ -36,6 +36,8 @@ __all__ = [
     "Access201Response",
     "AccessRequest",
     "AddFrontendGrantRequest",
+    "AddNamespaceFrontendMappingRequest",
+    "AddNamespaceGrantRequest",
     "AddOrganizationMemberRequest",
     "AuthUser",
     "ChangePasswordRequest",
@@ -45,8 +47,11 @@ __all__ = [
     "CreateFrontendRequest",
     "CreateIdentity201Response",
     "CreateIdentityRequest",
+    "CreateNamespace201Response",
+    "CreateNamespaceRequest",
     "CreateOrganization201Response",
     "CreateOrganizationRequest",
+    "CreateShareNameRequest",
     "DeleteIdentityRequest",
     "DisableRequest",
     "EnableRequest",
@@ -59,18 +64,23 @@ __all__ = [
     "GetSparklinesRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
+    "ListAllShareNames200ResponseInner",
+    "ListFrontendNamespaceMappings200ResponseInner",
     "ListFrontends200ResponseInner",
     "ListMemberships200Response",
     "ListMemberships200ResponseMembershipsInner",
+    "ListNamespaces200ResponseInner",
     "ListOrganizationMembers200Response",
     "ListOrganizationMembers200ResponseMembersInner",
     "ListOrganizations200Response",
     "ListOrganizations200ResponseOrganizationsInner",
     "ListPublicFrontendsForAccount200Response",
     "ListPublicFrontendsForAccount200ResponsePublicFrontendsInner",
+    "ListShareNames200ResponseInner",
     "LoginRequest",
     "Metrics",
     "MetricsSample",
+    "NamespaceSelection",
     "Overview",
     "Ping200Response",
     "Principal",
@@ -85,18 +95,21 @@ __all__ = [
     "RemoteStatus200ResponseSharesInner",
     "RemoteUnaccessRequest",
     "RemoteUnshareRequest",
+    "RemoveNamespaceFrontendMappingRequest",
     "RemoveOrganizationMemberRequest",
     "ResetPasswordRequest",
     "Share",
     "ShareHttpHealthcheck200Response",
     "ShareHttpHealthcheckRequest",
     "ShareRequest",
+    "ShareRequest12",
     "ShareResponse",
     "SparkDataSample",
     "UnaccessRequest",
     "UnshareRequest",
     "UpdateAccessRequest",
     "UpdateFrontendRequest",
+    "UpdateNamespaceRequest",
     "UpdateShareRequest",
     "Verify200Response",
     "VerifyRequest",
@@ -126,6 +139,8 @@ from zrok_api.exceptions import ApiException as ApiException
 from zrok_api.models.access201_response import Access201Response as Access201Response
 from zrok_api.models.access_request import AccessRequest as AccessRequest
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest as AddFrontendGrantRequest
+from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest as AddNamespaceFrontendMappingRequest
+from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest as AddNamespaceGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest as AddOrganizationMemberRequest
 from zrok_api.models.auth_user import AuthUser as AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest as ChangePasswordRequest
@@ -135,8 +150,11 @@ from zrok_api.models.create_frontend201_response import CreateFrontend201Respons
 from zrok_api.models.create_frontend_request import CreateFrontendRequest as CreateFrontendRequest
 from zrok_api.models.create_identity201_response import CreateIdentity201Response as CreateIdentity201Response
 from zrok_api.models.create_identity_request import CreateIdentityRequest as CreateIdentityRequest
+from zrok_api.models.create_namespace201_response import CreateNamespace201Response as CreateNamespace201Response
+from zrok_api.models.create_namespace_request import CreateNamespaceRequest as CreateNamespaceRequest
 from zrok_api.models.create_organization201_response import CreateOrganization201Response as CreateOrganization201Response
 from zrok_api.models.create_organization_request import CreateOrganizationRequest as CreateOrganizationRequest
+from zrok_api.models.create_share_name_request import CreateShareNameRequest as CreateShareNameRequest
 from zrok_api.models.delete_identity_request import DeleteIdentityRequest as DeleteIdentityRequest
 from zrok_api.models.disable_request import DisableRequest as DisableRequest
 from zrok_api.models.enable_request import EnableRequest as EnableRequest
@@ -149,18 +167,23 @@ from zrok_api.models.get_sparklines200_response import GetSparklines200Response 
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
+from zrok_api.models.list_all_share_names200_response_inner import ListAllShareNames200ResponseInner as ListAllShareNames200ResponseInner
+from zrok_api.models.list_frontend_namespace_mappings200_response_inner import ListFrontendNamespaceMappings200ResponseInner as ListFrontendNamespaceMappings200ResponseInner
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
 from zrok_api.models.list_memberships200_response import ListMemberships200Response as ListMemberships200Response
 from zrok_api.models.list_memberships200_response_memberships_inner import ListMemberships200ResponseMembershipsInner as ListMemberships200ResponseMembershipsInner
+from zrok_api.models.list_namespaces200_response_inner import ListNamespaces200ResponseInner as ListNamespaces200ResponseInner
 from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response as ListOrganizationMembers200Response
 from zrok_api.models.list_organization_members200_response_members_inner import ListOrganizationMembers200ResponseMembersInner as ListOrganizationMembers200ResponseMembersInner
 from zrok_api.models.list_organizations200_response import ListOrganizations200Response as ListOrganizations200Response
 from zrok_api.models.list_organizations200_response_organizations_inner import ListOrganizations200ResponseOrganizationsInner as ListOrganizations200ResponseOrganizationsInner
 from zrok_api.models.list_public_frontends_for_account200_response import ListPublicFrontendsForAccount200Response as ListPublicFrontendsForAccount200Response
 from zrok_api.models.list_public_frontends_for_account200_response_public_frontends_inner import ListPublicFrontendsForAccount200ResponsePublicFrontendsInner as ListPublicFrontendsForAccount200ResponsePublicFrontendsInner
+from zrok_api.models.list_share_names200_response_inner import ListShareNames200ResponseInner as ListShareNames200ResponseInner
 from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample
+from zrok_api.models.namespace_selection import NamespaceSelection as NamespaceSelection
 from zrok_api.models.overview import Overview as Overview
 from zrok_api.models.ping200_response import Ping200Response as Ping200Response
 from zrok_api.models.principal import Principal as Principal
@@ -175,18 +198,21 @@ from zrok_api.models.remote_status200_response_accesses_inner import RemoteStatu
 from zrok_api.models.remote_status200_response_shares_inner import RemoteStatus200ResponseSharesInner as RemoteStatus200ResponseSharesInner
 from zrok_api.models.remote_unaccess_request import RemoteUnaccessRequest as RemoteUnaccessRequest
 from zrok_api.models.remote_unshare_request import RemoteUnshareRequest as RemoteUnshareRequest
+from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest as RemoveNamespaceFrontendMappingRequest
 from zrok_api.models.remove_organization_member_request import RemoveOrganizationMemberRequest as RemoveOrganizationMemberRequest
 from zrok_api.models.reset_password_request import ResetPasswordRequest as ResetPasswordRequest
 from zrok_api.models.share import Share as Share
 from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response as ShareHttpHealthcheck200Response
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest as ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest as ShareRequest
+from zrok_api.models.share_request12 import ShareRequest12 as ShareRequest12
 from zrok_api.models.share_response import ShareResponse as ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest as UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest as UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest as UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest as UpdateFrontendRequest
+from zrok_api.models.update_namespace_request import UpdateNamespaceRequest as UpdateNamespaceRequest
 from zrok_api.models.update_share_request import UpdateShareRequest as UpdateShareRequest
 from zrok_api.models.verify200_response import Verify200Response as Verify200Response
 from zrok_api.models.verify_request import VerifyRequest as VerifyRequest

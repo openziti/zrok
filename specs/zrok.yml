@@ -419,6 +419,41 @@ paths:
         500:
           description: internal server error
 
+  /frontend/namespace/mapping/{frontendToken}:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listFrontendNamespaceMappings
+      parameters:
+        - name: frontendToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: frontend namespace mappings listed
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                frontendToken:
+                  type: string
+                isDefault:
+                  type: boolean
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        404:
+          description: frontend not found
+        500:
+          description: internal server error
+
   /frontends:
     get:
       tags:
@@ -547,6 +582,265 @@ paths:
           description: invite tokens created
         400:
           description: invite tokens not created
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /namespace:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: createNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              token:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              open:
+                type: boolean
+      responses:
+        201:
+          description: namespace created
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+        401:
+          description: unauthorized
+        409:
+          description: namespace already exists
+        500:
+          description: internal server error
+    patch:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: updateNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              open:
+                type: boolean
+              openSet:
+                type: boolean
+      responses:
+        200:
+          description: namespace updated
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteNamespace
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+      responses:
+        200:
+          description: namespace deleted
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /namespace/frontend/mapping:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addNamespaceFrontendMapping
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+              isDefault:
+                type: boolean
+      responses:
+        200:
+          description: namespace frontend mapping added
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: removeNamespaceFrontendMapping
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+      responses:
+        200:
+          description: namespace frontend mapping removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /namespace/frontend/mapping/{namespaceToken}:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listNamespaceFrontendMappings
+      parameters:
+        - name: namespaceToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: namespace frontend mappings listed
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                frontendToken:
+                  type: string
+                isDefault:
+                  type: boolean
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        404:
+          description: namespace not found
+        500:
+          description: internal server error
+
+  /namespace/grant:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: addNamespaceGrant
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: namespace grant added
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: removeNamespaceGrant
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              email:
+                type: string
+      responses:
+        200:
+          description: namespace grant removed
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+  /namespaces:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listNamespaces
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                open:
+                  type: boolean
+                createdAt:
+                  type: integer
+                updatedAt:
+                  type: integer
         401:
           description: unauthorized
         500:
@@ -1634,6 +1928,149 @@ paths:
         500:
           description: internal server error
 
+  /share12:
+    post:
+      tags:
+        - share
+      security:
+        - key: [ ]
+      operationId: share12
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/shareRequest12"
+      responses:
+        201:
+          description: share created
+          schema:
+            $ref: "#/definitions/shareResponse"
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        409:
+          description: conflict
+        422:
+          description: unprocessable
+        500:
+          description: internal server error
+          schema:
+            $ref: "#/definitions/errorMessage"
+
+  /share/name:
+    post:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: createShareName
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+      responses:
+        201:
+          description: name created
+        401:
+          description: unauthorized
+        404:
+          description: namespace not found
+        409:
+          description: name already exists
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: deleteShareName
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+      responses:
+        200:
+          description: name deleted
+        401:
+          description: unauthorized
+        404:
+          description: name not found
+        500:
+          description: internal server error
+
+  /share/names:
+    get:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: listAllShareNames
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                namespaceName:
+                  type: string
+                name:
+                  type: string
+                reserved:
+                  type: boolean
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+  /share/names/{namespaceToken}:
+    get:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: listShareNames
+      parameters:
+        - name: namespaceToken
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                createdAt:
+                  type: integer
+        401:
+          description: unauthorized
+        404:
+          description: namespace not found
+        500:
+          description: internal server error
+
   /unaccess:
     delete:
       tags:
@@ -1808,6 +2245,14 @@ definitions:
       timestamp:
         type: number
 
+  namespaceSelection:
+    type: object
+    properties:
+      namespaceToken:
+        type: string
+      name:
+        type: string
+
   overview:
     type: object
     properties:
@@ -1909,6 +2354,45 @@ definitions:
           type: string
       uniqueName:
         type: string
+
+  shareRequest12:
+    type: object
+    properties:
+      envZId:
+        type: string
+      shareMode:
+        type: string
+        enum: ["public", "private"]
+      namespaceSelections:
+        type: array
+        items:
+          $ref: "#/definitions/namespaceSelection"
+      backendMode:
+        type: string
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+      target:
+        type: string
+      authScheme:
+        type: string
+      basicAuthUsers:
+        type: array
+        items:
+          $ref: "#/definitions/authUser"
+      oauthProvider:
+        type: string
+      oauthEmailDomains:
+        type: array
+        items:
+          type: string
+      oauthRefreshInterval:
+        type: string
+      permissionMode:
+        type: string
+        enum: ["open", "closed"]
+      accessGrants:
+        type: array
+        items:
+          type: string
 
   shareResponse:
     type: object

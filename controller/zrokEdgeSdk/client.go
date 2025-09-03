@@ -2,6 +2,7 @@ package zrokEdgeSdk
 
 import (
 	"crypto/x509"
+
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_util"
 )
@@ -9,7 +10,7 @@ import (
 type Config struct {
 	ApiEndpoint string
 	Username    string
-	Password    string `cf:"+secret"`
+	Password    string `df:",secret"`
 }
 
 func Client(cfg *Config) (*rest_management_api_client.ZitiEdgeManagement, error) {

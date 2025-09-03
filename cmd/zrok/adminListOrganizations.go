@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -49,7 +50,7 @@ func (c *adminListOrganizationsCommand) run(_ *cobra.Command, _ []string) {
 	fmt.Println()
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleRounded)
 	t.AppendHeader(table.Row{"Organization Token", "Description"})
 	for _, org := range resp.Payload.Organizations {
 		t.AppendRow(table.Row{org.OrganizationToken, org.Description})

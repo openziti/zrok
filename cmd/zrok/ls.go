@@ -82,7 +82,7 @@ func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
 
 	tw := table.NewWriter()
 	tw.SetOutputMirror(os.Stdout)
-	tw.SetStyle(table.StyleLight)
+	tw.SetStyle(table.StyleRounded)
 	tw.AppendHeader(table.Row{"type", "Name", "Size", "Modified"})
 	for _, object := range objects {
 		if object.IsDir {
