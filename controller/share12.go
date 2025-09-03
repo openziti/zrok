@@ -2,8 +2,11 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -92,14 +95,31 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	})
 }
 
-func (h *share12Handler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx interface{}) (int, error) {
-	// TODO: implement environment validation logic similar to existing share handler
-	return 0, nil
+func (h *share12Handler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (int, error) {
+	env, err := str.FindEnvironmentForAccount(envZId, int(principal.ID), trx)
+	if err != nil {
+		return 0, errors.Wrapf(err, "error finding environment '%v' for account '%v'", envZId, principal.Email)
+	}
+	return env.Id, nil
 }
 
-func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Principal, params share.Share12Params, trx interface{}) error {
-	// TODO: implement limits checking similar to existing share handler
-	// note: share12 doesn't have reserved/uniqueName fields, may need different limit logic
+func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Principal, params share.Share12Params, trx *sqlx.Tx) error {
+	if !principal.Limitless {
+		if limitsAgent != nil {
+			shareMode := sdk.ShareMode(params.Body.ShareMode)
+			backendMode := sdk.BackendMode(params.Body.BackendMode)
+
+			// we're going to skip reservation checking because we're moving name creation outside the scope of share
+			// creation. the limits check for name creation will happen in the `/share/name` endpoint instead.
+			ok, err := limitsAgent.CanCreateShare(int(principal.ID), envId, false, false, shareMode, backendMode, trx)
+			if err != nil {
+				return errors.Wrapf(err, "error checking share limits for '%v'", principal.Email)
+			}
+			if !ok {
+				return errors.Errorf("share limit check failed for '%v'", principal.Email)
+			}
+		}
+	}
 	return nil
 }
 
