@@ -42,7 +42,7 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 	}
 
 	// find allocated names for namespace
-	names, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
+	names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding names for namespace '%v': %v", ns.Token, err)
 		return share.NewListNamesForNamespaceInternalServerError()
@@ -54,9 +54,12 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 		nameObj := &rest_model_zrok.Name{
 			NamespaceToken: ns.Token,
 			NamespaceName:  ns.Name,
-			Name:           an.Name,
-			Reserved:       an.Reserved,
-			CreatedAt:      an.CreatedAt.Unix(),
+			Name:           an.Name.Name,
+			Reserved:       an.Name.Reserved,
+			CreatedAt:      an.Name.CreatedAt.Unix(),
+		}
+		if an.ShareToken != nil {
+			nameObj.ShareToken = *an.ShareToken
 		}
 		out = append(out, nameObj)
 	}

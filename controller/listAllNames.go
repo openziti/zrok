@@ -31,7 +31,7 @@ func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 	// collect allocated names from all accessible namespaces
 	var out []*rest_model_zrok.Name
 	for _, ns := range namespaces {
-		names, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
+		names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
 			logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
 			return share.NewListAllNamesInternalServerError()
@@ -41,9 +41,12 @@ func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 			nameObj := &rest_model_zrok.Name{
 				NamespaceToken: ns.Token,
 				NamespaceName:  ns.Name,
-				Name:           an.Name,
-				Reserved:       an.Reserved,
-				CreatedAt:      an.CreatedAt.Unix(),
+				Name:           an.Name.Name,
+				Reserved:       an.Name.Reserved,
+				CreatedAt:      an.Name.CreatedAt.Unix(),
+			}
+			if an.ShareToken != nil {
+				nameObj.ShareToken = *an.ShareToken
 			}
 			out = append(out, nameObj)
 		}
