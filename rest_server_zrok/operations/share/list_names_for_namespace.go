@@ -6,12 +6,9 @@ package share
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/rest_model_zrok"
 )
@@ -71,44 +68,4 @@ func (o *ListNamesForNamespace) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 	res := o.Handler.Handle(Params, principal) // actually handle the request
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
-}
-
-// ListNamesForNamespaceOKBodyItems0 list names for namespace o k body items0
-//
-// swagger:model ListNamesForNamespaceOKBodyItems0
-type ListNamesForNamespaceOKBodyItems0 struct {
-
-	// created at
-	CreatedAt int64 `json:"createdAt,omitempty"`
-
-	// name
-	Name string `json:"name,omitempty"`
-}
-
-// Validate validates this list names for namespace o k body items0
-func (o *ListNamesForNamespaceOKBodyItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this list names for namespace o k body items0 based on context it is used
-func (o *ListNamesForNamespaceOKBodyItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *ListNamesForNamespaceOKBodyItems0) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *ListNamesForNamespaceOKBodyItems0) UnmarshalBinary(b []byte) error {
-	var res ListNamesForNamespaceOKBodyItems0
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
 }

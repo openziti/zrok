@@ -29,7 +29,7 @@ func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 	}
 
 	// collect allocated names from all accessible namespaces
-	var allNames []*share.ListAllNamesOKBodyItems0
+	var out []*rest_model_zrok.Name
 	for _, ns := range namespaces {
 		names, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
@@ -38,17 +38,17 @@ func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 		}
 
 		for _, an := range names {
-			nameObj := &share.ListAllNamesOKBodyItems0{
+			nameObj := &rest_model_zrok.Name{
+				NamespaceToken: ns.Token,
+				NamespaceName:  ns.Name,
 				Name:           an.Name,
 				Reserved:       an.Reserved,
 				CreatedAt:      an.CreatedAt.Unix(),
-				NamespaceName:  ns.Name,
-				NamespaceToken: ns.Token,
 			}
-			allNames = append(allNames, nameObj)
+			out = append(out, nameObj)
 		}
 	}
 
-	logrus.Debugf("listed %d allocated names across all namespaces for account '%v'", len(allNames), principal.Email)
-	return share.NewListAllNamesOK().WithPayload(allNames)
+	logrus.Debugf("listed %d allocated names across all namespaces for account '%v'", len(out), principal.Email)
+	return share.NewListAllNamesOK().WithPayload(out)
 }

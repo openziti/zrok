@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ListAllNamesOKCode is the HTTP code returned for type ListAllNamesOK
@@ -24,7 +26,7 @@ type ListAllNamesOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*ListAllNamesOKBodyItems0 `json:"body,omitempty"`
+	Payload []*rest_model_zrok.Name `json:"body,omitempty"`
 }
 
 // NewListAllNamesOK creates ListAllNamesOK with default headers values
@@ -34,13 +36,13 @@ func NewListAllNamesOK() *ListAllNamesOK {
 }
 
 // WithPayload adds the payload to the list all names o k response
-func (o *ListAllNamesOK) WithPayload(payload []*ListAllNamesOKBodyItems0) *ListAllNamesOK {
+func (o *ListAllNamesOK) WithPayload(payload []*rest_model_zrok.Name) *ListAllNamesOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list all names o k response
-func (o *ListAllNamesOK) SetPayload(payload []*ListAllNamesOKBodyItems0) {
+func (o *ListAllNamesOK) SetPayload(payload []*rest_model_zrok.Name) {
 	o.Payload = payload
 }
 
@@ -51,7 +53,7 @@ func (o *ListAllNamesOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*ListAllNamesOKBodyItems0, 0, 50)
+		payload = make([]*rest_model_zrok.Name, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

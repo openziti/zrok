@@ -64,12 +64,10 @@ __all__ = [
     "GetSparklinesRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
-    "ListAllNames200ResponseInner",
     "ListFrontendNamespaceMappings200ResponseInner",
     "ListFrontends200ResponseInner",
     "ListMemberships200Response",
     "ListMemberships200ResponseMembershipsInner",
-    "ListNamesForNamespace200ResponseInner",
     "ListNamespaces200ResponseInner",
     "ListOrganizationMembers200Response",
     "ListOrganizationMembers200ResponseMembersInner",
@@ -80,6 +78,7 @@ __all__ = [
     "LoginRequest",
     "Metrics",
     "MetricsSample",
+    "Name",
     "NamespaceSelection",
     "Overview",
     "Ping200Response",
@@ -168,12 +167,10 @@ from zrok_api.models.get_sparklines200_response import GetSparklines200Response 
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
-from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner as ListAllNames200ResponseInner
 from zrok_api.models.list_frontend_namespace_mappings200_response_inner import ListFrontendNamespaceMappings200ResponseInner as ListFrontendNamespaceMappings200ResponseInner
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
 from zrok_api.models.list_memberships200_response import ListMemberships200Response as ListMemberships200Response
 from zrok_api.models.list_memberships200_response_memberships_inner import ListMemberships200ResponseMembershipsInner as ListMemberships200ResponseMembershipsInner
-from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner as ListNamesForNamespace200ResponseInner
 from zrok_api.models.list_namespaces200_response_inner import ListNamespaces200ResponseInner as ListNamespaces200ResponseInner
 from zrok_api.models.list_organization_members200_response import ListOrganizationMembers200Response as ListOrganizationMembers200Response
 from zrok_api.models.list_organization_members200_response_members_inner import ListOrganizationMembers200ResponseMembersInner as ListOrganizationMembers200ResponseMembersInner
@@ -184,6 +181,7 @@ from zrok_api.models.list_public_frontends_for_account200_response_public_fronte
 from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample
+from zrok_api.models.name import Name as Name
 from zrok_api.models.namespace_selection import NamespaceSelection as NamespaceSelection
 from zrok_api.models.overview import Overview as Overview
 from zrok_api.models.ping200_response import Ping200Response as Ping200Response

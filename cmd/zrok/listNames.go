@@ -40,6 +40,12 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	fmt.Println()
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleRounded)
+	t.AppendHeader(table.Row{"URL", "Name", "Namespace", "Reserved", "Created At"})
+
 	if cmd.namespaceToken != "" {
 		// list names for specific namespace
 		req := share.NewListNamesForNamespaceParams()
@@ -50,33 +56,6 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 
-		fmt.Println()
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleRounded)
-		t.AppendHeader(table.Row{"Name", "Created At"})
-		for _, name := range resp.Payload {
-			t.AppendRow(table.Row{
-				name.Name,
-				time.Unix(name.CreatedAt, 0),
-			})
-		}
-		t.Render()
-		fmt.Println()
-	} else {
-		// list all names across all accessible namespaces
-		req := share.NewListAllNamesParams()
-
-		resp, err := zrok.Share.ListAllNames(req, auth)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println()
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleRounded)
-		t.AppendHeader(table.Row{"URL", "Name", "Namespace", "Reserved", "Created At"})
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
 				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
@@ -86,7 +65,27 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 				time.Unix(name.CreatedAt, 0).Format("2006-01-02 15:04:05"),
 			})
 		}
-		t.Render()
-		fmt.Println()
+	} else {
+		// list all names across all accessible namespaces
+		req := share.NewListAllNamesParams()
+
+		resp, err := zrok.Share.ListAllNames(req, auth)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, name := range resp.Payload {
+			t.AppendRow(table.Row{
+				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
+				name.Name,
+				name.NamespaceToken,
+				name.Reserved,
+				time.Unix(name.CreatedAt, 0).Format("2006-01-02 15:04:05"),
+			})
+		}
 	}
+
+	t.Render()
+	fmt.Println()
+
 }

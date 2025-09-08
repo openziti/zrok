@@ -6,13 +6,13 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ListAllNamesReader is a Reader for the ListAllNames structure.
@@ -57,7 +57,7 @@ ListAllNamesOK describes a response with status code 200, with default header va
 ok
 */
 type ListAllNamesOK struct {
-	Payload []*ListAllNamesOKBodyItems0
+	Payload []*rest_model_zrok.Name
 }
 
 // IsSuccess returns true when this list all names o k response has a 2xx status code
@@ -98,7 +98,7 @@ func (o *ListAllNamesOK) String() string {
 	return fmt.Sprintf("[GET /share/names][%d] listAllNamesOK  %+v", 200, o.Payload)
 }
 
-func (o *ListAllNamesOK) GetPayload() []*ListAllNamesOKBodyItems0 {
+func (o *ListAllNamesOK) GetPayload() []*rest_model_zrok.Name {
 	return o.Payload
 }
 
@@ -221,55 +221,5 @@ func (o *ListAllNamesInternalServerError) String() string {
 
 func (o *ListAllNamesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	return nil
-}
-
-/*
-ListAllNamesOKBodyItems0 list all names o k body items0
-swagger:model ListAllNamesOKBodyItems0
-*/
-type ListAllNamesOKBodyItems0 struct {
-
-	// created at
-	CreatedAt int64 `json:"createdAt,omitempty"`
-
-	// name
-	Name string `json:"name,omitempty"`
-
-	// namespace name
-	NamespaceName string `json:"namespaceName,omitempty"`
-
-	// namespace token
-	NamespaceToken string `json:"namespaceToken,omitempty"`
-
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
-}
-
-// Validate validates this list all names o k body items0
-func (o *ListAllNamesOKBodyItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this list all names o k body items0 based on context it is used
-func (o *ListAllNamesOKBodyItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *ListAllNamesOKBodyItems0) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *ListAllNamesOKBodyItems0) UnmarshalBinary(b []byte) error {
-	var res ListAllNamesOKBodyItems0
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
 	return nil
 }

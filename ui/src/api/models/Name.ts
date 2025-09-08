@@ -16,53 +16,59 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ListAllNames200ResponseInner
+ * @interface Name
  */
-export interface ListAllNames200ResponseInner {
+export interface Name {
     /**
      * 
      * @type {string}
-     * @memberof ListAllNames200ResponseInner
+     * @memberof Name
      */
     namespaceToken?: string;
     /**
      * 
      * @type {string}
-     * @memberof ListAllNames200ResponseInner
+     * @memberof Name
      */
     namespaceName?: string;
     /**
      * 
      * @type {string}
-     * @memberof ListAllNames200ResponseInner
+     * @memberof Name
      */
     name?: string;
     /**
      * 
+     * @type {string}
+     * @memberof Name
+     */
+    shareToken?: string;
+    /**
+     * 
      * @type {boolean}
-     * @memberof ListAllNames200ResponseInner
+     * @memberof Name
      */
     reserved?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof ListAllNames200ResponseInner
+     * @memberof Name
      */
     createdAt?: number;
 }
 
 /**
- * Check if a given object implements the ListAllNames200ResponseInner interface.
+ * Check if a given object implements the Name interface.
  */
-export function instanceOfListAllNames200ResponseInner(value: object): value is ListAllNames200ResponseInner {
+export function instanceOfName(value: object): value is Name {
     return true;
 }
 
-export function ListAllNames200ResponseInnerFromJSON(json: any): ListAllNames200ResponseInner {
-    return ListAllNames200ResponseInnerFromJSONTyped(json, false);
+export function NameFromJSON(json: any): Name {
+    return NameFromJSONTyped(json, false);
 }
 
-export function ListAllNames200ResponseInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ListAllNames200ResponseInner {
+export function NameFromJSONTyped(json: any, ignoreDiscriminator: boolean): Name {
     if (json == null) {
         return json;
     }
@@ -71,16 +77,17 @@ export function ListAllNames200ResponseInnerFromJSONTyped(json: any, ignoreDiscr
         'namespaceToken': json['namespaceToken'] == null ? undefined : json['namespaceToken'],
         'namespaceName': json['namespaceName'] == null ? undefined : json['namespaceName'],
         'name': json['name'] == null ? undefined : json['name'],
+        'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
         'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
     };
 }
 
-export function ListAllNames200ResponseInnerToJSON(json: any): ListAllNames200ResponseInner {
-    return ListAllNames200ResponseInnerToJSONTyped(json, false);
+export function NameToJSON(json: any): Name {
+    return NameToJSONTyped(json, false);
 }
 
-export function ListAllNames200ResponseInnerToJSONTyped(value?: ListAllNames200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
+export function NameToJSONTyped(value?: Name | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -90,6 +97,7 @@ export function ListAllNames200ResponseInnerToJSONTyped(value?: ListAllNames200R
         'namespaceToken': value['namespaceToken'],
         'namespaceName': value['namespaceName'],
         'name': value['name'],
+        'shareToken': value['shareToken'],
         'reserved': value['reserved'],
         'createdAt': value['createdAt'],
     };

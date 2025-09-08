@@ -49,11 +49,14 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 	}
 
 	// build response
-	var out []*share.ListNamesForNamespaceOKBodyItems0
+	var out []*rest_model_zrok.Name
 	for _, an := range names {
-		nameObj := &share.ListNamesForNamespaceOKBodyItems0{
-			Name:      an.Name,
-			CreatedAt: an.CreatedAt.Unix(),
+		nameObj := &rest_model_zrok.Name{
+			NamespaceToken: ns.Token,
+			NamespaceName:  ns.Name,
+			Name:           an.Name,
+			Reserved:       an.Reserved,
+			CreatedAt:      an.CreatedAt.Unix(),
 		}
 		out = append(out, nameObj)
 	}

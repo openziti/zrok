@@ -18,8 +18,7 @@ import type {
   Access201Response,
   AccessRequest,
   CreateShareNameRequest,
-  ListAllNames200ResponseInner,
-  ListNamesForNamespace200ResponseInner,
+  Name,
   ShareRequest,
   ShareRequest12,
   ShareResponse,
@@ -36,10 +35,8 @@ import {
     AccessRequestToJSON,
     CreateShareNameRequestFromJSON,
     CreateShareNameRequestToJSON,
-    ListAllNames200ResponseInnerFromJSON,
-    ListAllNames200ResponseInnerToJSON,
-    ListNamesForNamespace200ResponseInnerFromJSON,
-    ListNamesForNamespace200ResponseInnerToJSON,
+    NameFromJSON,
+    NameToJSON,
     ShareRequestFromJSON,
     ShareRequestToJSON,
     ShareRequest12FromJSON,
@@ -209,7 +206,7 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async listAllNamesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListAllNames200ResponseInner>>> {
+    async listAllNamesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Name>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -228,19 +225,19 @@ export class ShareApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListAllNames200ResponseInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NameFromJSON));
     }
 
     /**
      */
-    async listAllNames(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListAllNames200ResponseInner>> {
+    async listAllNames(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Name>> {
         const response = await this.listAllNamesRaw(initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async listNamesForNamespaceRaw(requestParameters: ListNamesForNamespaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListNamesForNamespace200ResponseInner>>> {
+    async listNamesForNamespaceRaw(requestParameters: ListNamesForNamespaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Name>>> {
         if (requestParameters['namespaceToken'] == null) {
             throw new runtime.RequiredError(
                 'namespaceToken',
@@ -267,12 +264,12 @@ export class ShareApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListNamesForNamespace200ResponseInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NameFromJSON));
     }
 
     /**
      */
-    async listNamesForNamespace(requestParameters: ListNamesForNamespaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListNamesForNamespace200ResponseInner>> {
+    async listNamesForNamespace(requestParameters: ListNamesForNamespaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Name>> {
         const response = await this.listNamesForNamespaceRaw(requestParameters, initOverrides);
         return await response.value();
     }

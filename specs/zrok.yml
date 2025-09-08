@@ -2023,18 +2023,7 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                namespaceToken:
-                  type: string
-                namespaceName:
-                  type: string
-                name:
-                  type: string
-                reserved:
-                  type: boolean
-                createdAt:
-                  type: integer
+              $ref: "#/definitions/name"
         401:
           description: unauthorized
         500:
@@ -2058,12 +2047,7 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                name:
-                  type: string
-                createdAt:
-                  type: integer
+              $ref: "#/definitions/name"
         401:
           description: unauthorized
         404:
@@ -2272,6 +2256,22 @@ definitions:
         type: number
       timestamp:
         type: number
+
+  name:
+    type: object
+    properties:
+      namespaceToken:
+        type: string
+      namespaceName:
+        type: string
+      name:
+        type: string
+      shareToken:
+        type: string
+      reserved:
+        type: boolean
+      createdAt:
+        type: integer
 
   namespaceSelection:
     type: object

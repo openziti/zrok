@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
+from zrok_api.models.name import Name
 
-class TestListNamesForNamespace200ResponseInner(unittest.TestCase):
-    """ListNamesForNamespace200ResponseInner unit test stubs"""
+class TestName(unittest.TestCase):
+    """Name unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,26 +25,30 @@ class TestListNamesForNamespace200ResponseInner(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ListNamesForNamespace200ResponseInner:
-        """Test ListNamesForNamespace200ResponseInner
+    def make_instance(self, include_optional) -> Name:
+        """Test Name
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ListNamesForNamespace200ResponseInner`
+        # uncomment below to create an instance of `Name`
         """
-        model = ListNamesForNamespace200ResponseInner()
+        model = Name()
         if include_optional:
-            return ListNamesForNamespace200ResponseInner(
+            return Name(
+                namespace_token = '',
+                namespace_name = '',
                 name = '',
+                share_token = '',
+                reserved = True,
                 created_at = 56
             )
         else:
-            return ListNamesForNamespace200ResponseInner(
+            return Name(
         )
         """
 
-    def testListNamesForNamespace200ResponseInner(self):
-        """Test ListNamesForNamespace200ResponseInner"""
+    def testName(self):
+        """Test Name"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

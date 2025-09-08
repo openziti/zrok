@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // ListNamesForNamespaceOKCode is the HTTP code returned for type ListNamesForNamespaceOK
@@ -24,7 +26,7 @@ type ListNamesForNamespaceOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*ListNamesForNamespaceOKBodyItems0 `json:"body,omitempty"`
+	Payload []*rest_model_zrok.Name `json:"body,omitempty"`
 }
 
 // NewListNamesForNamespaceOK creates ListNamesForNamespaceOK with default headers values
@@ -34,13 +36,13 @@ func NewListNamesForNamespaceOK() *ListNamesForNamespaceOK {
 }
 
 // WithPayload adds the payload to the list names for namespace o k response
-func (o *ListNamesForNamespaceOK) WithPayload(payload []*ListNamesForNamespaceOKBodyItems0) *ListNamesForNamespaceOK {
+func (o *ListNamesForNamespaceOK) WithPayload(payload []*rest_model_zrok.Name) *ListNamesForNamespaceOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list names for namespace o k response
-func (o *ListNamesForNamespaceOK) SetPayload(payload []*ListNamesForNamespaceOKBodyItems0) {
+func (o *ListNamesForNamespaceOK) SetPayload(payload []*rest_model_zrok.Name) {
 	o.Payload = payload
 }
 
@@ -51,7 +53,7 @@ func (o *ListNamesForNamespaceOK) WriteResponse(rw http.ResponseWriter, producer
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*ListNamesForNamespaceOKBodyItems0, 0, 50)
+		payload = make([]*rest_model_zrok.Name, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

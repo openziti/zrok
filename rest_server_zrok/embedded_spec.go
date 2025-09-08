@@ -3105,24 +3105,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "createdAt": {
-                    "type": "integer"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "namespaceName": {
-                    "type": "string"
-                  },
-                  "namespaceToken": {
-                    "type": "string"
-                  },
-                  "reserved": {
-                    "type": "boolean"
-                  }
-                }
+                "$ref": "#/definitions/name"
               }
             }
           },
@@ -3160,15 +3143,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "createdAt": {
-                    "type": "integer"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/definitions/name"
               }
             }
           },
@@ -3667,6 +3642,29 @@ func init() {
         },
         "tx": {
           "type": "number"
+        }
+      }
+    },
+    "name": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceName": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareToken": {
+          "type": "string"
         }
       }
     },
@@ -6891,7 +6889,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ListAllNamesOKBodyItems0"
+                "$ref": "#/definitions/name"
               }
             }
           },
@@ -6929,7 +6927,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ListNamesForNamespaceOKBodyItems0"
+                "$ref": "#/definitions/name"
               }
             }
           },
@@ -7290,26 +7288,6 @@ func init() {
         }
       }
     },
-    "ListAllNamesOKBodyItems0": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "namespaceToken": {
-          "type": "string"
-        },
-        "reserved": {
-          "type": "boolean"
-        }
-      }
-    },
     "ListFrontendNamespaceMappingsOKBodyItems0": {
       "type": "object",
       "properties": {
@@ -7346,17 +7324,6 @@ func init() {
           "type": "string"
         },
         "zId": {
-          "type": "string"
-        }
-      }
-    },
-    "ListNamesForNamespaceOKBodyItems0": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "name": {
           "type": "string"
         }
       }
@@ -7635,6 +7602,29 @@ func init() {
         },
         "tx": {
           "type": "number"
+        }
+      }
+    },
+    "name": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceName": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareToken": {
+          "type": "string"
         }
       }
     },

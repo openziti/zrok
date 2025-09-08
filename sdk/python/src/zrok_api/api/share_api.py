@@ -21,8 +21,7 @@ from typing import List, Optional
 from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.create_share_name_request import CreateShareNameRequest
-from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner
-from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
+from zrok_api.models.name import Name
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_request12 import ShareRequest12
 from zrok_api.models.share_response import ShareResponse
@@ -894,7 +893,7 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[ListAllNames200ResponseInner]:
+    ) -> List[Name]:
         """list_all_names
 
 
@@ -928,7 +927,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllNames200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '500': None,
         }
@@ -958,7 +957,7 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[ListAllNames200ResponseInner]]:
+    ) -> ApiResponse[List[Name]]:
         """list_all_names
 
 
@@ -992,7 +991,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllNames200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '500': None,
         }
@@ -1056,7 +1055,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllNames200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '500': None,
         }
@@ -1144,7 +1143,7 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[ListNamesForNamespace200ResponseInner]:
+    ) -> List[Name]:
         """list_names_for_namespace
 
 
@@ -1181,7 +1180,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListNamesForNamespace200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '404': None,
             '500': None,
@@ -1213,7 +1212,7 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[ListNamesForNamespace200ResponseInner]]:
+    ) -> ApiResponse[List[Name]]:
         """list_names_for_namespace
 
 
@@ -1250,7 +1249,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListNamesForNamespace200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '404': None,
             '500': None,
@@ -1319,7 +1318,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListNamesForNamespace200ResponseInner]",
+            '200': "List[Name]",
             '401': None,
             '404': None,
             '500': None,

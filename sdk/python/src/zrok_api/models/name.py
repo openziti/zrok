@@ -22,16 +22,17 @@ from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class ListAllNames200ResponseInner(BaseModel):
+class Name(BaseModel):
     """
-    ListAllNames200ResponseInner
+    Name
     """ # noqa: E501
     namespace_token: Optional[StrictStr] = Field(default=None, alias="namespaceToken")
     namespace_name: Optional[StrictStr] = Field(default=None, alias="namespaceName")
     name: Optional[StrictStr] = None
+    share_token: Optional[StrictStr] = Field(default=None, alias="shareToken")
     reserved: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
-    __properties: ClassVar[List[str]] = ["namespaceToken", "namespaceName", "name", "reserved", "createdAt"]
+    __properties: ClassVar[List[str]] = ["namespaceToken", "namespaceName", "name", "shareToken", "reserved", "createdAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -51,7 +52,7 @@ class ListAllNames200ResponseInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of ListAllNames200ResponseInner from a JSON string"""
+        """Create an instance of Name from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -76,7 +77,7 @@ class ListAllNames200ResponseInner(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of ListAllNames200ResponseInner from a dict"""
+        """Create an instance of Name from a dict"""
         if obj is None:
             return None
 
@@ -87,6 +88,7 @@ class ListAllNames200ResponseInner(BaseModel):
             "namespaceToken": obj.get("namespaceToken"),
             "namespaceName": obj.get("namespaceName"),
             "name": obj.get("name"),
+            "shareToken": obj.get("shareToken"),
             "reserved": obj.get("reserved"),
             "createdAt": obj.get("createdAt")
         })

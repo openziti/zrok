@@ -248,7 +248,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_all_names**
-> List[ListAllNames200ResponseInner] list_all_names()
+> List[Name] list_all_names()
 
 ### Example
 
@@ -256,7 +256,7 @@ void (empty response body)
 
 ```python
 import zrok_api
-from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner
+from zrok_api.models.name import Name
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -298,7 +298,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List[ListAllNames200ResponseInner]**](ListAllNames200ResponseInner.md)
+[**List[Name]**](Name.md)
 
 ### Authorization
 
@@ -320,7 +320,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_names_for_namespace**
-> List[ListNamesForNamespace200ResponseInner] list_names_for_namespace(namespace_token)
+> List[Name] list_names_for_namespace(namespace_token)
 
 ### Example
 
@@ -328,7 +328,7 @@ This endpoint does not need any parameter.
 
 ```python
 import zrok_api
-from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
+from zrok_api.models.name import Name
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -374,7 +374,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List[ListNamesForNamespace200ResponseInner]**](ListNamesForNamespace200ResponseInner.md)
+[**List[Name]**](Name.md)
 
 ### Authorization
 
