@@ -4,14 +4,11 @@ import (
 	"github.com/openziti/edge-api/rest_model"
 )
 
-// examples of how to use the new framework
+// examples of how to use the new framework with zrok-specific tag strategies
 
 func ExampleCreateEnvironment(za *ZitiAutomation, accountEmail, uniqueToken, envDescription string) (string, error) {
 	name := accountEmail + "-" + uniqueToken + "-" + envDescription
-	tags := NewSimpleTagStrategy(map[string]interface{}{
-		"zrok":      "v0.4.0", // or build.String()
-		"zrokEmail": accountEmail,
-	})
+	tags := NewZrokTagStrategy().WithTag("zrokEmail", accountEmail)
 
 	identityType := rest_model.IdentityTypeUser
 	opts := &IdentityOptions{
@@ -28,10 +25,7 @@ func ExampleCreateEnvironment(za *ZitiAutomation, accountEmail, uniqueToken, env
 
 func ExampleCreateShare(za *ZitiAutomation, envZId, shareToken, configID string) (string, error) {
 	// create service
-	tags := NewSimpleTagStrategy(map[string]interface{}{
-		"zrok":           "v0.4.0",
-		"zrokShareToken": shareToken,
-	})
+	tags := ZrokShareTags(shareToken)
 
 	serviceID, err := za.CreateServiceWithConfig(shareToken, configID, tags)
 	if err != nil {
@@ -57,9 +51,7 @@ func ExampleCreateShare(za *ZitiAutomation, envZId, shareToken, configID string)
 
 func ExampleCreateAccess(za *ZitiAutomation, envZId, serviceID string, dialIdentities []string) error {
 	// create dial policy
-	tags := NewSimpleTagStrategy(map[string]interface{}{
-		"zrok": "v0.4.0",
-	})
+	tags := ZrokBaseTags()
 
 	dialName := serviceID + "-dial"
 	_, err := za.CreateDialPolicy(dialName, serviceID, dialIdentities, tags)
