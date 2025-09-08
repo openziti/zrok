@@ -366,8 +366,107 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 }
 
 func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, trx interface{}) (string, []string, error) {
-	// TODO: implement private resource allocation for share12
-	return "", frontendEndpoints, nil
+	// create automation client
+	automationCfg := &automation.Config{
+		ApiEndpoint: cfg.Ziti.ApiEndpoint,
+		Username:    cfg.Ziti.Username,
+		Password:    cfg.Ziti.Password,
+	}
+	ziti, err := automation.NewZitiAutomation(automationCfg)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error creating ziti automation client")
+	}
+
+	// prepare auth users
+	var authUsers []*sdk.AuthUserConfig
+	for _, authUser := range params.Body.BasicAuthUsers {
+		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
+	}
+
+	// parse auth scheme
+	authScheme, err := sdk.ParseAuthScheme(params.Body.AuthScheme)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error parsing auth scheme")
+	}
+
+	// prepare oauth config
+	var oauthCfg *sdk.OauthConfig
+	if authScheme == sdk.Oauth {
+		oauthCfg = &sdk.OauthConfig{
+			Provider:                   params.Body.OauthProvider,
+			EmailDomains:               params.Body.OauthEmailDomains,
+			AuthorizationCheckInterval: params.Body.OauthRefreshInterval,
+		}
+	}
+
+	// create frontend config (private shares don't use interstitials)
+	frontendConfig := &sdk.FrontendConfig{
+		Interstitial: false,
+		AuthScheme:   authScheme,
+	}
+	if authScheme == sdk.Basic {
+		frontendConfig.BasicAuth = &sdk.BasicAuthConfig{Users: authUsers}
+	}
+	if authScheme == sdk.Oauth && oauthCfg != nil {
+		frontendConfig.OauthAuth = oauthCfg
+	}
+
+	// create config using the global zrokProxyConfigId
+	tags := automation.ZrokShareTags(shrToken)
+	configOpts := &automation.ConfigOptions{
+		ResourceOptions: &automation.ResourceOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
+		ConfigTypeID: zrokProxyConfigId,
+		Data:         frontendConfig,
+	}
+	cfgZId, err := ziti.Configs.Create(configOpts)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error creating config")
+	}
+
+	// create share service
+	serviceOpts := &automation.ServiceOptions{
+		ResourceOptions: &automation.ResourceOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
+		Configs:            []string{cfgZId},
+		EncryptionRequired: true,
+	}
+	shrZId, err := ziti.Services.Create(serviceOpts)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error creating share service")
+	}
+
+	// create bind policy (backend can bind to this service)
+	bindPolicyName := envZId + "-" + shrZId + "-bind"
+	bindPolicy := automation.NewPolicyBuilder(bindPolicyName).
+		WithServiceIDs(shrZId).
+		WithIdentityIDs(envZId).
+		WithTags(tags, nil)
+	_, err = ziti.Policies.CreateServicePolicyBind(bindPolicy)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error creating service policy bind")
+	}
+
+	// create service edge router policy
+	serpPolicyName := envZId + "-" + shrToken + "-serp"
+	serpPolicy := automation.NewPolicyBuilder(serpPolicyName).
+		WithServiceIDs(shrZId).
+		WithAllEdgeRouters().
+		WithTags(tags, nil)
+	_, err = ziti.Policies.CreateServiceEdgeRouterPolicy(serpPolicy)
+	if err != nil {
+		return "", nil, errors.Wrap(err, "error creating service edge router policy")
+	}
+
+	// note: private shares don't create dial policies here
+	// dial access is granted separately via the access endpoint
+
+	logrus.Infof("allocated private resources for share '%v' with service id '%v'", shrToken, shrZId)
+	return shrZId, frontendEndpoints, nil
 }
 
 func (h *share12Handler) createShareRecord(envId int, shrZId, shrToken string, params share.Share12Params, frontendEndpoints []string, trx interface{}) (int, error) {
