@@ -1951,6 +1951,8 @@ paths:
           description: not found
         409:
           description: conflict
+          schema:
+            $ref: "#/definitions/errorMessage"
         422:
           description: unprocessable
         500:

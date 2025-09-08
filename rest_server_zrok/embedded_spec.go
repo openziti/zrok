@@ -3193,7 +3193,10 @@ func init() {
             "description": "not found"
           },
           "409": {
-            "description": "conflict"
+            "description": "conflict",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "422": {
             "description": "unprocessable"
@@ -6977,7 +6980,10 @@ func init() {
             "description": "not found"
           },
           "409": {
-            "description": "conflict"
+            "description": "conflict",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "422": {
             "description": "unprocessable"

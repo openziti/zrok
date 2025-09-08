@@ -1736,7 +1736,7 @@ class ShareApi:
             '201': "ShareResponse",
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '422': None,
             '500': "str",
         }
@@ -1807,7 +1807,7 @@ class ShareApi:
             '201': "ShareResponse",
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '422': None,
             '500': "str",
         }
@@ -1878,7 +1878,7 @@ class ShareApi:
             '201': "ShareResponse",
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '422': None,
             '500': "str",
         }

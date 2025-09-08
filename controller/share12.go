@@ -52,7 +52,7 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	frontendEndpoints, nameIds, err := h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
 	if err != nil {
 		logrus.Errorf("namespace selection processing failed: %v", err)
-		return share.NewShare12NotFound()
+		return share.NewShare12Conflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	// allocate resources based on share mode
