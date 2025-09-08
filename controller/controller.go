@@ -129,6 +129,7 @@ func Run(inCfg *config.Config) error {
 	api.ShareShare12Handler = newShare12Handler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
+	api.ShareUnshare12Handler = newUnshare12Handler()
 	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
