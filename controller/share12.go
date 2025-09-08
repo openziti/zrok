@@ -146,7 +146,7 @@ func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Princ
 func (h *share12Handler) shouldUseInterstitial(backendMode string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
 	var skipInterstitial bool
 	parsedBackendMode := sdk.BackendMode(backendMode)
-	
+
 	if parsedBackendMode != sdk.DriveBackendMode {
 		var err error
 		skipInterstitial, err = str.IsAccountGrantedSkipInterstitial(int(principal.ID), trx)
@@ -157,7 +157,7 @@ func (h *share12Handler) shouldUseInterstitial(backendMode string, principal *re
 		// always skip interstitial for drive backend mode
 		skipInterstitial = true
 	}
-	
+
 	return !skipInterstitial, nil
 }
 
@@ -327,17 +327,17 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 		if err != nil {
 			return "", nil, errors.Wrapf(err, "error finding namespace with token '%v'", selection.NamespaceToken)
 		}
-		
+
 		frontends, err := str.FindFrontendsForNamespace(ns.Id, trx.(*sqlx.Tx))
 		if err != nil {
 			return "", nil, errors.Wrapf(err, "error finding frontends for namespace '%v'", ns.Token)
 		}
-		
+
 		for _, fe := range frontends {
 			frontendZIds = append(frontendZIds, fe.ZId)
 		}
 	}
-	
+
 	if len(frontendZIds) > 0 {
 		dialPolicyName := envZId + "-" + shrZId + "-dial"
 		dialPolicy := automation.NewPolicyBuilder(dialPolicyName).
@@ -470,9 +470,42 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 }
 
 func (h *share12Handler) createShareRecord(envId int, shrZId, shrToken string, params share.Share12Params, frontendEndpoints []string, trx interface{}) (int, error) {
-	// TODO: implement share record creation with new share12 fields
-	// note: target instead of backendProxyEndpoint, basicAuthUsers instead of authUsers, etc.
-	return 0, nil
+	strShr := &store.Share{
+		ZId:            shrZId,
+		Token:          shrToken,
+		ShareMode:      params.Body.ShareMode,
+		BackendMode:    params.Body.BackendMode,
+		Reserved:       false, // share12 doesn't support reserved shares
+		UniqueName:     false, // share12 doesn't support unique names
+		PermissionMode: store.OpenPermissionMode,
+	}
+
+	// set target as backend proxy endpoint for share12
+	if params.Body.Target != "" {
+		strShr.BackendProxyEndpoint = &params.Body.Target
+	}
+
+	// set permission mode if specified
+	if params.Body.PermissionMode != "" {
+		strShr.PermissionMode = store.PermissionMode(params.Body.PermissionMode)
+	}
+
+	// set frontend endpoint (first one if multiple)
+	if len(frontendEndpoints) > 0 {
+		strShr.FrontendEndpoint = &frontendEndpoints[0]
+	} else if strShr.ShareMode == "private" {
+		// for private shares without frontend endpoints, use the share mode as endpoint
+		strShr.FrontendEndpoint = &strShr.ShareMode
+	}
+
+	// create the share record
+	shareId, err := str.CreateShare(envId, strShr, trx.(*sqlx.Tx))
+	if err != nil {
+		return 0, errors.Wrap(err, "error creating share record")
+	}
+
+	logrus.Infof("created share record with id '%v' for share '%v'", shareId, shrToken)
+	return shareId, nil
 }
 
 func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string, permissionMode string, principal *rest_model_zrok.Principal, trx interface{}) error {
