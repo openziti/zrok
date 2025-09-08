@@ -79,6 +79,7 @@ docs/ShareRequest12.md
 docs/ShareResponse.md
 docs/SparkDataSample.md
 docs/UnaccessRequest.md
+docs/Unshare12Request.md
 docs/UnshareRequest.md
 docs/UpdateAccessRequest.md
 docs/UpdateFrontendRequest.md
@@ -169,6 +170,7 @@ test/test_share_request12.py
 test/test_share_response.py
 test/test_spark_data_sample.py
 test/test_unaccess_request.py
+test/test_unshare12_request.py
 test/test_unshare_request.py
 test/test_update_access_request.py
 test/test_update_frontend_request.py
@@ -263,6 +265,7 @@ zrok_api/models/share_request12.py
 zrok_api/models/share_response.py
 zrok_api/models/spark_data_sample.py
 zrok_api/models/unaccess_request.py
+zrok_api/models/unshare12_request.py
 zrok_api/models/unshare_request.py
 zrok_api/models/update_access_request.py
 zrok_api/models/update_frontend_request.py

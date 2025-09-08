@@ -48,6 +48,8 @@ type ClientService interface {
 
 	Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error)
 
+	Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Unshare12OK, error)
+
 	UpdateAccess(params *UpdateAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateAccessOK, error)
 
 	UpdateShare(params *UpdateShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateShareOK, error)
@@ -403,6 +405,45 @@ func (a *Client) Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoW
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for unshare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+Unshare12 unshare12 API
+*/
+func (a *Client) Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Unshare12OK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUnshare12Params()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "unshare12",
+		Method:             "DELETE",
+		PathPattern:        "/unshare12",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &Unshare12Reader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*Unshare12OK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for unshare12: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

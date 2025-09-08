@@ -24,6 +24,7 @@ import type {
   ShareRequest12,
   ShareResponse,
   UnaccessRequest,
+  Unshare12Request,
   UnshareRequest,
   UpdateAccessRequest,
   UpdateShareRequest,
@@ -47,6 +48,8 @@ import {
     ShareResponseToJSON,
     UnaccessRequestFromJSON,
     UnaccessRequestToJSON,
+    Unshare12RequestFromJSON,
+    Unshare12RequestToJSON,
     UnshareRequestFromJSON,
     UnshareRequestToJSON,
     UpdateAccessRequestFromJSON,
@@ -85,6 +88,10 @@ export interface UnaccessOperationRequest {
 
 export interface UnshareOperationRequest {
     body?: UnshareRequest;
+}
+
+export interface Unshare12OperationRequest {
+    body?: Unshare12Request;
 }
 
 export interface UpdateAccessOperationRequest {
@@ -402,6 +409,39 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async unshare(requestParameters: UnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.unshareRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async unshare12Raw(requestParameters: Unshare12OperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/unshare12`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Unshare12RequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async unshare12(requestParameters: Unshare12OperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.unshare12Raw(requestParameters, initOverrides);
     }
 
     /**

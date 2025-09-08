@@ -165,6 +165,7 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**share12**](docs/ShareApi.md#share12) | **POST** /share12 | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
+*ShareApi* | [**unshare12**](docs/ShareApi.md#unshare12) | **DELETE** /unshare12 | 
 *ShareApi* | [**update_access**](docs/ShareApi.md#update_access) | **PATCH** /access | 
 *ShareApi* | [**update_share**](docs/ShareApi.md#update_share) | **PATCH** /share | 
 
@@ -244,6 +245,7 @@ Class | Method | HTTP request | Description
  - [ShareResponse](docs/ShareResponse.md)
  - [SparkDataSample](docs/SparkDataSample.md)
  - [UnaccessRequest](docs/UnaccessRequest.md)
+ - [Unshare12Request](docs/Unshare12Request.md)
  - [UnshareRequest](docs/UnshareRequest.md)
  - [UpdateAccessRequest](docs/UpdateAccessRequest.md)
  - [UpdateFrontendRequest](docs/UpdateFrontendRequest.md)

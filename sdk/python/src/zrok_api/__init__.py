@@ -106,6 +106,7 @@ __all__ = [
     "ShareResponse",
     "SparkDataSample",
     "UnaccessRequest",
+    "Unshare12Request",
     "UnshareRequest",
     "UpdateAccessRequest",
     "UpdateFrontendRequest",
@@ -209,6 +210,7 @@ from zrok_api.models.share_request12 import ShareRequest12 as ShareRequest12
 from zrok_api.models.share_response import ShareResponse as ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest as UnaccessRequest
+from zrok_api.models.unshare12_request import Unshare12Request as Unshare12Request
 from zrok_api.models.unshare_request import UnshareRequest as UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest as UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest as UpdateFrontendRequest

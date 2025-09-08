@@ -73,6 +73,7 @@ export * from './ShareRequest12';
 export * from './ShareResponse';
 export * from './SparkDataSample';
 export * from './UnaccessRequest';
+export * from './Unshare12Request';
 export * from './UnshareRequest';
 export * from './UpdateAccessRequest';
 export * from './UpdateFrontendRequest';
