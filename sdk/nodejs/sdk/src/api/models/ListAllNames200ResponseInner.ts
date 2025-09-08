@@ -16,53 +16,53 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ListAllShareNames200ResponseInner
+ * @interface ListAllNames200ResponseInner
  */
-export interface ListAllShareNames200ResponseInner {
+export interface ListAllNames200ResponseInner {
     /**
      * 
      * @type {string}
-     * @memberof ListAllShareNames200ResponseInner
+     * @memberof ListAllNames200ResponseInner
      */
     namespaceToken?: string;
     /**
      * 
      * @type {string}
-     * @memberof ListAllShareNames200ResponseInner
+     * @memberof ListAllNames200ResponseInner
      */
     namespaceName?: string;
     /**
      * 
      * @type {string}
-     * @memberof ListAllShareNames200ResponseInner
+     * @memberof ListAllNames200ResponseInner
      */
     name?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof ListAllShareNames200ResponseInner
+     * @memberof ListAllNames200ResponseInner
      */
     reserved?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof ListAllShareNames200ResponseInner
+     * @memberof ListAllNames200ResponseInner
      */
     createdAt?: number;
 }
 
 /**
- * Check if a given object implements the ListAllShareNames200ResponseInner interface.
+ * Check if a given object implements the ListAllNames200ResponseInner interface.
  */
-export function instanceOfListAllShareNames200ResponseInner(value: object): value is ListAllShareNames200ResponseInner {
+export function instanceOfListAllNames200ResponseInner(value: object): value is ListAllNames200ResponseInner {
     return true;
 }
 
-export function ListAllShareNames200ResponseInnerFromJSON(json: any): ListAllShareNames200ResponseInner {
-    return ListAllShareNames200ResponseInnerFromJSONTyped(json, false);
+export function ListAllNames200ResponseInnerFromJSON(json: any): ListAllNames200ResponseInner {
+    return ListAllNames200ResponseInnerFromJSONTyped(json, false);
 }
 
-export function ListAllShareNames200ResponseInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ListAllShareNames200ResponseInner {
+export function ListAllNames200ResponseInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ListAllNames200ResponseInner {
     if (json == null) {
         return json;
     }
@@ -76,11 +76,11 @@ export function ListAllShareNames200ResponseInnerFromJSONTyped(json: any, ignore
     };
 }
 
-export function ListAllShareNames200ResponseInnerToJSON(json: any): ListAllShareNames200ResponseInner {
-    return ListAllShareNames200ResponseInnerToJSONTyped(json, false);
+export function ListAllNames200ResponseInnerToJSON(json: any): ListAllNames200ResponseInner {
+    return ListAllNames200ResponseInnerToJSONTyped(json, false);
 }
 
-export function ListAllShareNames200ResponseInnerToJSONTyped(value?: ListAllShareNames200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
+export function ListAllNames200ResponseInnerToJSONTyped(value?: ListAllNames200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

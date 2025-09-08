@@ -13,19 +13,19 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewListShareNamesParams creates a new ListShareNamesParams object
+// NewListNamesForNamespaceParams creates a new ListNamesForNamespaceParams object
 //
 // There are no default values defined in the spec.
-func NewListShareNamesParams() ListShareNamesParams {
+func NewListNamesForNamespaceParams() ListNamesForNamespaceParams {
 
-	return ListShareNamesParams{}
+	return ListNamesForNamespaceParams{}
 }
 
-// ListShareNamesParams contains all the bound params for the list share names operation
+// ListNamesForNamespaceParams contains all the bound params for the list names for namespace operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters listShareNames
-type ListShareNamesParams struct {
+// swagger:parameters listNamesForNamespace
+type ListNamesForNamespaceParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -40,8 +40,8 @@ type ListShareNamesParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewListShareNamesParams() beforehand.
-func (o *ListShareNamesParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewListNamesForNamespaceParams() beforehand.
+func (o *ListNamesForNamespaceParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -57,7 +57,7 @@ func (o *ListShareNamesParams) BindRequest(r *http.Request, route *middleware.Ma
 }
 
 // bindNamespaceToken binds and validates parameter NamespaceToken from path.
-func (o *ListShareNamesParams) bindNamespaceToken(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *ListNamesForNamespaceParams) bindNamespaceToken(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]

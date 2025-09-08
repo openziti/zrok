@@ -7,8 +7,8 @@ Method | HTTP request | Description
 [**access**](ShareApi.md#access) | **POST** /access | 
 [**create_share_name**](ShareApi.md#create_share_name) | **POST** /share/name | 
 [**delete_share_name**](ShareApi.md#delete_share_name) | **DELETE** /share/name | 
-[**list_all_share_names**](ShareApi.md#list_all_share_names) | **GET** /share/names | 
-[**list_share_names**](ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
+[**list_all_names**](ShareApi.md#list_all_names) | **GET** /share/names | 
+[**list_names_for_namespace**](ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
 [**share**](ShareApi.md#share) | **POST** /share | 
 [**share12**](ShareApi.md#share12) | **POST** /share12 | 
 [**unaccess**](ShareApi.md#unaccess) | **DELETE** /unaccess | 
@@ -247,8 +247,8 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **list_all_share_names**
-> List[ListAllShareNames200ResponseInner] list_all_share_names()
+# **list_all_names**
+> List[ListAllNames200ResponseInner] list_all_names()
 
 ### Example
 
@@ -256,7 +256,7 @@ void (empty response body)
 
 ```python
 import zrok_api
-from zrok_api.models.list_all_share_names200_response_inner import ListAllShareNames200ResponseInner
+from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -283,11 +283,11 @@ with zrok_api.ApiClient(configuration) as api_client:
     api_instance = zrok_api.ShareApi(api_client)
 
     try:
-        api_response = api_instance.list_all_share_names()
-        print("The response of ShareApi->list_all_share_names:\n")
+        api_response = api_instance.list_all_names()
+        print("The response of ShareApi->list_all_names:\n")
         pprint(api_response)
     except Exception as e:
-        print("Exception when calling ShareApi->list_all_share_names: %s\n" % e)
+        print("Exception when calling ShareApi->list_all_names: %s\n" % e)
 ```
 
 
@@ -298,7 +298,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List[ListAllShareNames200ResponseInner]**](ListAllShareNames200ResponseInner.md)
+[**List[ListAllNames200ResponseInner]**](ListAllNames200ResponseInner.md)
 
 ### Authorization
 
@@ -319,8 +319,8 @@ This endpoint does not need any parameter.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **list_share_names**
-> List[ListShareNames200ResponseInner] list_share_names(namespace_token)
+# **list_names_for_namespace**
+> List[ListNamesForNamespace200ResponseInner] list_names_for_namespace(namespace_token)
 
 ### Example
 
@@ -328,7 +328,7 @@ This endpoint does not need any parameter.
 
 ```python
 import zrok_api
-from zrok_api.models.list_share_names200_response_inner import ListShareNames200ResponseInner
+from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -356,11 +356,11 @@ with zrok_api.ApiClient(configuration) as api_client:
     namespace_token = 'namespace_token_example' # str | 
 
     try:
-        api_response = api_instance.list_share_names(namespace_token)
-        print("The response of ShareApi->list_share_names:\n")
+        api_response = api_instance.list_names_for_namespace(namespace_token)
+        print("The response of ShareApi->list_names_for_namespace:\n")
         pprint(api_response)
     except Exception as e:
-        print("Exception when calling ShareApi->list_share_names: %s\n" % e)
+        print("Exception when calling ShareApi->list_names_for_namespace: %s\n" % e)
 ```
 
 
@@ -374,7 +374,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List[ListShareNames200ResponseInner]**](ListShareNames200ResponseInner.md)
+[**List[ListNamesForNamespace200ResponseInner]**](ListNamesForNamespace200ResponseInner.md)
 
 ### Authorization
 

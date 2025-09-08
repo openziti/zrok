@@ -7,17 +7,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type listAllShareNamesHandler struct{}
+type ListAllNamesHandler struct{}
 
-func newListAllShareNamesHandler() *listAllShareNamesHandler {
-	return &listAllShareNamesHandler{}
+func newListAllNamesHandler() *ListAllNamesHandler {
+	return &ListAllNamesHandler{}
 }
 
-func (h *listAllShareNamesHandler) Handle(params share.ListAllShareNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return share.NewListAllShareNamesInternalServerError()
+		return share.NewListAllNamesInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
@@ -25,20 +25,20 @@ func (h *listAllShareNamesHandler) Handle(params share.ListAllShareNamesParams, 
 	namespaces, err := str.FindNamespacesForAccount(int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
-		return share.NewListAllShareNamesInternalServerError()
+		return share.NewListAllNamesInternalServerError()
 	}
 
 	// collect allocated names from all accessible namespaces
-	var allNames []*share.ListAllShareNamesOKBodyItems0
+	var allNames []*share.ListAllNamesOKBodyItems0
 	for _, ns := range namespaces {
-		allocatedNames, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
+		names, err := str.FindNamesForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
 			logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
-			return share.NewListAllShareNamesInternalServerError()
+			return share.NewListAllNamesInternalServerError()
 		}
 
-		for _, an := range allocatedNames {
-			nameObj := &share.ListAllShareNamesOKBodyItems0{
+		for _, an := range names {
+			nameObj := &share.ListAllNamesOKBodyItems0{
 				Name:           an.Name,
 				Reserved:       an.Reserved,
 				CreatedAt:      an.CreatedAt.Unix(),
@@ -50,5 +50,5 @@ func (h *listAllShareNamesHandler) Handle(params share.ListAllShareNamesParams, 
 	}
 
 	logrus.Debugf("listed %d allocated names across all namespaces for account '%v'", len(allNames), principal.Email)
-	return share.NewListAllShareNamesOK().WithPayload(allNames)
+	return share.NewListAllNamesOK().WithPayload(allNames)
 }

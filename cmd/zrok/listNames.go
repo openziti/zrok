@@ -42,10 +42,10 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 
 	if cmd.namespaceToken != "" {
 		// list names for specific namespace
-		req := share.NewListShareNamesParams()
+		req := share.NewListNamesForNamespaceParams()
 		req.NamespaceToken = cmd.namespaceToken
 
-		resp, err := zrok.Share.ListShareNames(req, auth)
+		resp, err := zrok.Share.ListNamesForNamespace(req, auth)
 		if err != nil {
 			panic(err)
 		}
@@ -65,9 +65,9 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		fmt.Println()
 	} else {
 		// list all names across all accessible namespaces
-		req := share.NewListAllShareNamesParams()
+		req := share.NewListAllNamesParams()
 
-		resp, err := zrok.Share.ListAllShareNames(req, auth)
+		resp, err := zrok.Share.ListAllNames(req, auth)
 		if err != nil {
 			panic(err)
 		}

@@ -3098,7 +3098,7 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "listAllShareNames",
+        "operationId": "listAllNames",
         "responses": {
           "200": {
             "description": "ok",
@@ -3145,7 +3145,7 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "listShareNames",
+        "operationId": "listNamesForNamespace",
         "parameters": [
           {
             "type": "string",
@@ -6884,14 +6884,14 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "listAllShareNames",
+        "operationId": "listAllNames",
         "responses": {
           "200": {
             "description": "ok",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ListAllShareNamesOKBodyItems0"
+                "$ref": "#/definitions/ListAllNamesOKBodyItems0"
               }
             }
           },
@@ -6914,7 +6914,7 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "listShareNames",
+        "operationId": "listNamesForNamespace",
         "parameters": [
           {
             "type": "string",
@@ -6929,7 +6929,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ListShareNamesOKBodyItems0"
+                "$ref": "#/definitions/ListNamesForNamespaceOKBodyItems0"
               }
             }
           },
@@ -7290,7 +7290,7 @@ func init() {
         }
       }
     },
-    "ListAllShareNamesOKBodyItems0": {
+    "ListAllNamesOKBodyItems0": {
       "type": "object",
       "properties": {
         "createdAt": {
@@ -7350,6 +7350,17 @@ func init() {
         }
       }
     },
+    "ListNamesForNamespaceOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "ListNamespaceFrontendMappingsOKBodyItems0": {
       "type": "object",
       "properties": {
@@ -7387,17 +7398,6 @@ func init() {
         },
         "updatedAt": {
           "type": "integer"
-        }
-      }
-    },
-    "ListShareNamesOKBodyItems0": {
-      "type": "object",
-      "properties": {
-        "createdAt": {
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
         }
       }
     },

@@ -2016,7 +2016,7 @@ paths:
         - share
       security:
         - key: []
-      operationId: listAllShareNames
+      operationId: listAllNames
       responses:
         200:
           description: ok
@@ -2046,7 +2046,7 @@ paths:
         - share
       security:
         - key: []
-      operationId: listShareNames
+      operationId: listNamesForNamespace
       parameters:
         - name: namespaceToken
           in: path

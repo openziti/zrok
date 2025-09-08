@@ -159,8 +159,8 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**access**](docs/ShareApi.md#access) | **POST** /access | 
 *ShareApi* | [**create_share_name**](docs/ShareApi.md#create_share_name) | **POST** /share/name | 
 *ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
-*ShareApi* | [**list_all_share_names**](docs/ShareApi.md#list_all_share_names) | **GET** /share/names | 
-*ShareApi* | [**list_share_names**](docs/ShareApi.md#list_share_names) | **GET** /share/names/{namespaceToken} | 
+*ShareApi* | [**list_all_names**](docs/ShareApi.md#list_all_names) | **GET** /share/names | 
+*ShareApi* | [**list_names_for_namespace**](docs/ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
 *ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**share12**](docs/ShareApi.md#share12) | **POST** /share12 | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
@@ -203,11 +203,12 @@ Class | Method | HTTP request | Description
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
- - [ListAllShareNames200ResponseInner](docs/ListAllShareNames200ResponseInner.md)
+ - [ListAllNames200ResponseInner](docs/ListAllNames200ResponseInner.md)
  - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
+ - [ListNamesForNamespace200ResponseInner](docs/ListNamesForNamespace200ResponseInner.md)
  - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)
  - [ListOrganizationMembers200Response](docs/ListOrganizationMembers200Response.md)
  - [ListOrganizationMembers200ResponseMembersInner](docs/ListOrganizationMembers200ResponseMembersInner.md)
@@ -215,7 +216,6 @@ Class | Method | HTTP request | Description
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
  - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
- - [ListShareNames200ResponseInner](docs/ListShareNames200ResponseInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)

@@ -1,6 +1,9 @@
 package sdk
 
-import "time"
+import (
+	"time"
+	"github.com/openziti/zrok/rest_model_zrok"
+)
 
 type EnableRequest struct {
 	Host        string
@@ -90,3 +93,22 @@ const (
 	Basic AuthScheme = "basic"
 	Oauth AuthScheme = "oauth"
 )
+
+type Share12Request struct {
+	EnvZId                   string
+	ShareMode                string
+	Target                   string
+	BackendMode              string
+	PermissionMode           PermissionMode
+	AccessGrants             []string
+	BasicAuthUsers           []string
+	OauthProvider            string
+	OauthEmailDomains        []string
+	OauthRefreshInterval     string
+	NamespaceSelections      []*rest_model_zrok.NamespaceSelection
+}
+
+type Share12Response struct {
+	ShareToken             string   `json:"shareToken"`
+	FrontendProxyEndpoints []string `json:"frontendProxyEndpoints"`
+}

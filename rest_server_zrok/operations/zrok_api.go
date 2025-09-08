@@ -155,8 +155,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
-		ShareListAllShareNamesHandler: share.ListAllShareNamesHandlerFunc(func(params share.ListAllShareNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation share.ListAllShareNames has not yet been implemented")
+		ShareListAllNamesHandler: share.ListAllNamesHandlerFunc(func(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
 		AdminListFrontendNamespaceMappingsHandler: admin.ListFrontendNamespaceMappingsHandlerFunc(func(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontendNamespaceMappings has not yet been implemented")
@@ -166,6 +166,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListMemberships has not yet been implemented")
+		}),
+		ShareListNamesForNamespaceHandler: share.ListNamesForNamespaceHandlerFunc(func(params share.ListNamesForNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.ListNamesForNamespace has not yet been implemented")
 		}),
 		AdminListNamespaceFrontendMappingsHandler: admin.ListNamespaceFrontendMappingsHandlerFunc(func(params admin.ListNamespaceFrontendMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListNamespaceFrontendMappings has not yet been implemented")
@@ -184,9 +187,6 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		MetadataListPublicFrontendsForAccountHandler: metadata.ListPublicFrontendsForAccountHandlerFunc(func(params metadata.ListPublicFrontendsForAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListPublicFrontendsForAccount has not yet been implemented")
-		}),
-		ShareListShareNamesHandler: share.ListShareNamesHandlerFunc(func(params share.ListShareNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation share.ListShareNames has not yet been implemented")
 		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
@@ -398,14 +398,16 @@ type ZrokAPI struct {
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
-	// ShareListAllShareNamesHandler sets the operation handler for the list all share names operation
-	ShareListAllShareNamesHandler share.ListAllShareNamesHandler
+	// ShareListAllNamesHandler sets the operation handler for the list all names operation
+	ShareListAllNamesHandler share.ListAllNamesHandler
 	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
 	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
 	MetadataListMembershipsHandler metadata.ListMembershipsHandler
+	// ShareListNamesForNamespaceHandler sets the operation handler for the list names for namespace operation
+	ShareListNamesForNamespaceHandler share.ListNamesForNamespaceHandler
 	// AdminListNamespaceFrontendMappingsHandler sets the operation handler for the list namespace frontend mappings operation
 	AdminListNamespaceFrontendMappingsHandler admin.ListNamespaceFrontendMappingsHandler
 	// AdminListNamespacesHandler sets the operation handler for the list namespaces operation
@@ -418,8 +420,6 @@ type ZrokAPI struct {
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// MetadataListPublicFrontendsForAccountHandler sets the operation handler for the list public frontends for account operation
 	MetadataListPublicFrontendsForAccountHandler metadata.ListPublicFrontendsForAccountHandler
-	// ShareListShareNamesHandler sets the operation handler for the list share names operation
-	ShareListShareNamesHandler share.ListShareNamesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
 	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
@@ -666,8 +666,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminInviteTokenGenerateHandler == nil {
 		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
 	}
-	if o.ShareListAllShareNamesHandler == nil {
-		unregistered = append(unregistered, "share.ListAllShareNamesHandler")
+	if o.ShareListAllNamesHandler == nil {
+		unregistered = append(unregistered, "share.ListAllNamesHandler")
 	}
 	if o.AdminListFrontendNamespaceMappingsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendNamespaceMappingsHandler")
@@ -677,6 +677,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListMembershipsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
+	}
+	if o.ShareListNamesForNamespaceHandler == nil {
+		unregistered = append(unregistered, "share.ListNamesForNamespaceHandler")
 	}
 	if o.AdminListNamespaceFrontendMappingsHandler == nil {
 		unregistered = append(unregistered, "admin.ListNamespaceFrontendMappingsHandler")
@@ -695,9 +698,6 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListPublicFrontendsForAccountHandler == nil {
 		unregistered = append(unregistered, "metadata.ListPublicFrontendsForAccountHandler")
-	}
-	if o.ShareListShareNamesHandler == nil {
-		unregistered = append(unregistered, "share.ListShareNamesHandler")
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
@@ -1031,7 +1031,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/share/names"] = share.NewListAllShareNames(o.context, o.ShareListAllShareNamesHandler)
+	o.handlers["GET"]["/share/names"] = share.NewListAllNames(o.context, o.ShareListAllNamesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1044,6 +1044,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/memberships"] = metadata.NewListMemberships(o.context, o.MetadataListMembershipsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/share/names/{namespaceToken}"] = share.NewListNamesForNamespace(o.context, o.ShareListNamesForNamespaceHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1068,10 +1072,6 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/overview/public-frontends"] = metadata.NewListPublicFrontendsForAccount(o.context, o.MetadataListPublicFrontendsForAccountHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/share/names/{namespaceToken}"] = share.NewListShareNames(o.context, o.ShareListShareNamesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -21,8 +21,8 @@ from typing import List, Optional
 from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.create_share_name_request import CreateShareNameRequest
-from zrok_api.models.list_all_share_names200_response_inner import ListAllShareNames200ResponseInner
-from zrok_api.models.list_share_names200_response_inner import ListShareNames200ResponseInner
+from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner
+from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_request12 import ShareRequest12
 from zrok_api.models.share_response import ShareResponse
@@ -880,7 +880,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_all_share_names(
+    def list_all_names(
         self,
         _request_timeout: Union[
             None,
@@ -894,8 +894,8 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[ListAllShareNames200ResponseInner]:
-        """list_all_share_names
+    ) -> List[ListAllNames200ResponseInner]:
+        """list_all_names
 
 
         :param _request_timeout: timeout setting for this request. If one
@@ -920,7 +920,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_all_share_names_serialize(
+        _param = self._list_all_names_serialize(
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -928,7 +928,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllShareNames200ResponseInner]",
+            '200': "List[ListAllNames200ResponseInner]",
             '401': None,
             '500': None,
         }
@@ -944,7 +944,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_all_share_names_with_http_info(
+    def list_all_names_with_http_info(
         self,
         _request_timeout: Union[
             None,
@@ -958,8 +958,8 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[ListAllShareNames200ResponseInner]]:
-        """list_all_share_names
+    ) -> ApiResponse[List[ListAllNames200ResponseInner]]:
+        """list_all_names
 
 
         :param _request_timeout: timeout setting for this request. If one
@@ -984,7 +984,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_all_share_names_serialize(
+        _param = self._list_all_names_serialize(
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -992,7 +992,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllShareNames200ResponseInner]",
+            '200': "List[ListAllNames200ResponseInner]",
             '401': None,
             '500': None,
         }
@@ -1008,7 +1008,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_all_share_names_without_preload_content(
+    def list_all_names_without_preload_content(
         self,
         _request_timeout: Union[
             None,
@@ -1023,7 +1023,7 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """list_all_share_names
+        """list_all_names
 
 
         :param _request_timeout: timeout setting for this request. If one
@@ -1048,7 +1048,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_all_share_names_serialize(
+        _param = self._list_all_names_serialize(
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -1056,7 +1056,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListAllShareNames200ResponseInner]",
+            '200': "List[ListAllNames200ResponseInner]",
             '401': None,
             '500': None,
         }
@@ -1067,7 +1067,7 @@ class ShareApi:
         return response_data.response
 
 
-    def _list_all_share_names_serialize(
+    def _list_all_names_serialize(
         self,
         _request_auth,
         _content_type,
@@ -1129,7 +1129,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_share_names(
+    def list_names_for_namespace(
         self,
         namespace_token: StrictStr,
         _request_timeout: Union[
@@ -1144,8 +1144,8 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[ListShareNames200ResponseInner]:
-        """list_share_names
+    ) -> List[ListNamesForNamespace200ResponseInner]:
+        """list_names_for_namespace
 
 
         :param namespace_token: (required)
@@ -1172,7 +1172,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_share_names_serialize(
+        _param = self._list_names_for_namespace_serialize(
             namespace_token=namespace_token,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1181,7 +1181,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListShareNames200ResponseInner]",
+            '200': "List[ListNamesForNamespace200ResponseInner]",
             '401': None,
             '404': None,
             '500': None,
@@ -1198,7 +1198,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_share_names_with_http_info(
+    def list_names_for_namespace_with_http_info(
         self,
         namespace_token: StrictStr,
         _request_timeout: Union[
@@ -1213,8 +1213,8 @@ class ShareApi:
         _content_type: Optional[StrictStr] = None,
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[ListShareNames200ResponseInner]]:
-        """list_share_names
+    ) -> ApiResponse[List[ListNamesForNamespace200ResponseInner]]:
+        """list_names_for_namespace
 
 
         :param namespace_token: (required)
@@ -1241,7 +1241,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_share_names_serialize(
+        _param = self._list_names_for_namespace_serialize(
             namespace_token=namespace_token,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1250,7 +1250,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListShareNames200ResponseInner]",
+            '200': "List[ListNamesForNamespace200ResponseInner]",
             '401': None,
             '404': None,
             '500': None,
@@ -1267,7 +1267,7 @@ class ShareApi:
 
 
     @validate_call
-    def list_share_names_without_preload_content(
+    def list_names_for_namespace_without_preload_content(
         self,
         namespace_token: StrictStr,
         _request_timeout: Union[
@@ -1283,7 +1283,7 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """list_share_names
+        """list_names_for_namespace
 
 
         :param namespace_token: (required)
@@ -1310,7 +1310,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._list_share_names_serialize(
+        _param = self._list_names_for_namespace_serialize(
             namespace_token=namespace_token,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1319,7 +1319,7 @@ class ShareApi:
         )
 
         _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[ListShareNames200ResponseInner]",
+            '200': "List[ListNamesForNamespace200ResponseInner]",
             '401': None,
             '404': None,
             '500': None,
@@ -1331,7 +1331,7 @@ class ShareApi:
         return response_data.response
 
 
-    def _list_share_names_serialize(
+    def _list_names_for_namespace_serialize(
         self,
         namespace_token,
         _request_auth,

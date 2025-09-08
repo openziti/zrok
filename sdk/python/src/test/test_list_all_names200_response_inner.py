@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.list_share_names200_response_inner import ListShareNames200ResponseInner
+from zrok_api.models.list_all_names200_response_inner import ListAllNames200ResponseInner
 
-class TestListShareNames200ResponseInner(unittest.TestCase):
-    """ListShareNames200ResponseInner unit test stubs"""
+class TestListAllNames200ResponseInner(unittest.TestCase):
+    """ListAllNames200ResponseInner unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,26 +25,29 @@ class TestListShareNames200ResponseInner(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ListShareNames200ResponseInner:
-        """Test ListShareNames200ResponseInner
+    def make_instance(self, include_optional) -> ListAllNames200ResponseInner:
+        """Test ListAllNames200ResponseInner
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ListShareNames200ResponseInner`
+        # uncomment below to create an instance of `ListAllNames200ResponseInner`
         """
-        model = ListShareNames200ResponseInner()
+        model = ListAllNames200ResponseInner()
         if include_optional:
-            return ListShareNames200ResponseInner(
+            return ListAllNames200ResponseInner(
+                namespace_token = '',
+                namespace_name = '',
                 name = '',
+                reserved = True,
                 created_at = 56
             )
         else:
-            return ListShareNames200ResponseInner(
+            return ListAllNames200ResponseInner(
         )
         """
 
-    def testListShareNames200ResponseInner(self):
-        """Test ListShareNames200ResponseInner"""
+    def testListAllNames200ResponseInner(self):
+        """Test ListAllNames200ResponseInner"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

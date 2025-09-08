@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-// ListShareNamesURL generates an URL for the list share names operation
-type ListShareNamesURL struct {
+// ListNamesForNamespaceURL generates an URL for the list names for namespace operation
+type ListNamesForNamespaceURL struct {
 	NamespaceToken string
 
 	_basePath string
@@ -24,7 +24,7 @@ type ListShareNamesURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ListShareNamesURL) WithBasePath(bp string) *ListShareNamesURL {
+func (o *ListNamesForNamespaceURL) WithBasePath(bp string) *ListNamesForNamespaceURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -32,12 +32,12 @@ func (o *ListShareNamesURL) WithBasePath(bp string) *ListShareNamesURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ListShareNamesURL) SetBasePath(bp string) {
+func (o *ListNamesForNamespaceURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *ListShareNamesURL) Build() (*url.URL, error) {
+func (o *ListNamesForNamespaceURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/share/names/{namespaceToken}"
@@ -46,7 +46,7 @@ func (o *ListShareNamesURL) Build() (*url.URL, error) {
 	if namespaceToken != "" {
 		_path = strings.Replace(_path, "{namespaceToken}", namespaceToken, -1)
 	} else {
-		return nil, errors.New("namespaceToken is required on ListShareNamesURL")
+		return nil, errors.New("namespaceToken is required on ListNamesForNamespaceURL")
 	}
 
 	_basePath := o._basePath
@@ -59,7 +59,7 @@ func (o *ListShareNamesURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *ListShareNamesURL) Must(u *url.URL, err error) *url.URL {
+func (o *ListNamesForNamespaceURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -70,17 +70,17 @@ func (o *ListShareNamesURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *ListShareNamesURL) String() string {
+func (o *ListNamesForNamespaceURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *ListShareNamesURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *ListNamesForNamespaceURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on ListShareNamesURL")
+		return nil, errors.New("scheme is required for a full url on ListNamesForNamespaceURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on ListShareNamesURL")
+		return nil, errors.New("host is required for a full url on ListNamesForNamespaceURL")
 	}
 
 	base, err := o.Build()
@@ -94,6 +94,6 @@ func (o *ListShareNamesURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *ListShareNamesURL) StringFull(scheme, host string) string {
+func (o *ListNamesForNamespaceURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

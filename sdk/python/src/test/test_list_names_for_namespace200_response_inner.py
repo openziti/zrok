@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.list_all_share_names200_response_inner import ListAllShareNames200ResponseInner
+from zrok_api.models.list_names_for_namespace200_response_inner import ListNamesForNamespace200ResponseInner
 
-class TestListAllShareNames200ResponseInner(unittest.TestCase):
-    """ListAllShareNames200ResponseInner unit test stubs"""
+class TestListNamesForNamespace200ResponseInner(unittest.TestCase):
+    """ListNamesForNamespace200ResponseInner unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,29 +25,26 @@ class TestListAllShareNames200ResponseInner(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ListAllShareNames200ResponseInner:
-        """Test ListAllShareNames200ResponseInner
+    def make_instance(self, include_optional) -> ListNamesForNamespace200ResponseInner:
+        """Test ListNamesForNamespace200ResponseInner
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ListAllShareNames200ResponseInner`
+        # uncomment below to create an instance of `ListNamesForNamespace200ResponseInner`
         """
-        model = ListAllShareNames200ResponseInner()
+        model = ListNamesForNamespace200ResponseInner()
         if include_optional:
-            return ListAllShareNames200ResponseInner(
-                namespace_token = '',
-                namespace_name = '',
+            return ListNamesForNamespace200ResponseInner(
                 name = '',
-                reserved = True,
                 created_at = 56
             )
         else:
-            return ListAllShareNames200ResponseInner(
+            return ListNamesForNamespace200ResponseInner(
         )
         """
 
-    def testListAllShareNames200ResponseInner(self):
-        """Test ListAllShareNames200ResponseInner"""
+    def testListNamesForNamespace200ResponseInner(self):
+        """Test ListNamesForNamespace200ResponseInner"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 
