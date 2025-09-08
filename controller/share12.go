@@ -509,6 +509,34 @@ func (h *share12Handler) createShareRecord(envId int, shrZId, shrToken string, p
 }
 
 func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string, permissionMode string, principal *rest_model_zrok.Principal, trx interface{}) error {
-	// TODO: implement access grants processing similar to existing share handler
+	// only process access grants for closed permission mode
+	if store.PermissionMode(permissionMode) != store.ClosedPermissionMode {
+		return nil
+	}
+
+	// find account IDs for the access grant email addresses
+	var accessGrantAcctIds []int
+	for _, email := range accessGrants {
+		acct, err := str.FindAccountWithEmail(email, trx.(*sqlx.Tx))
+		if err != nil {
+			return errors.Wrapf(err, "unable to find account '%v' for share request from '%v'", email, principal.Email)
+		}
+		logrus.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
+		accessGrantAcctIds = append(accessGrantAcctIds, acct.Id)
+	}
+
+	// create access grants for each account
+	for _, acctId := range accessGrantAcctIds {
+		_, err := str.CreateAccessGrant(shareId, acctId, trx.(*sqlx.Tx))
+		if err != nil {
+			return errors.Wrapf(err, "error creating access grant for share '%v' and account '%v'", shareId, acctId)
+		}
+		logrus.Debugf("created access grant for share '%v' and account '%v'", shareId, acctId)
+	}
+
+	if len(accessGrantAcctIds) > 0 {
+		logrus.Infof("created %d access grants for closed share '%v'", len(accessGrantAcctIds), shareId)
+	}
+
 	return nil
 }
