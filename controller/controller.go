@@ -11,6 +11,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
@@ -28,6 +29,7 @@ var (
 	idb         influxdb2.Client
 	limitsAgent *limits.Agent
 	agentCtrl   *agentController.Controller
+	dPCtrl      *dynamicProxyController.Controller
 )
 
 func Run(inCfg *config.Config) error {
@@ -132,6 +134,14 @@ func Run(inCfg *config.Config) error {
 	api.ShareUnshare12Handler = newUnshare12Handler()
 	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
+
+	if cfg.DynamicProxyController != nil {
+		dPCtrl, err = dynamicProxyController.NewController(cfg.DynamicProxyController)
+		if err != nil {
+			return err
+		}
+		logrus.Infof("started dynamic proxy controller")
+	}
 
 	if err := controllerStartup(); err != nil {
 		return err
