@@ -4,9 +4,11 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/automation"
+	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -45,6 +47,11 @@ func (h *unshare12Handler) Handle(params share.Unshare12Params, principal *rest_
 	// deallocate ziti resources using automation framework
 	if err := h.deallocateResources(envZId, shrToken, shr.ZId); err != nil {
 		logrus.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
+	}
+
+	// send unbind mapping updates before cleaning up share name mappings
+	if err := h.sendUnbindMappingUpdates(shr.Id, shrToken, trx); err != nil {
+		logrus.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
 	}
 
 	// clean up share name mappings
@@ -147,6 +154,59 @@ func (h *unshare12Handler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) e
 		// delete the share name mapping
 		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
 			logrus.Warnf("error deleting share name mapping '%v': %v", mapping.Id, err)
+		}
+	}
+
+	return nil
+}
+
+func (h *unshare12Handler) sendUnbindMappingUpdates(shareId int, shrToken string, trx *sqlx.Tx) error {
+	// only send updates if dynamic proxy controller is enabled
+	if dPCtrl == nil {
+		return nil
+	}
+
+	// find all share name mappings for this share
+	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding share name mappings for share '%v'", shareId)
+	}
+
+	for _, mapping := range mappings {
+		// find name record to get the name and namespace
+		name, err := str.GetName(mapping.NameId, trx)
+		if err != nil {
+			logrus.Warnf("error finding name with id '%v' for unbind update: %v", mapping.NameId, err)
+			continue
+		}
+
+		// find namespace
+		ns, err := str.GetNamespace(name.NamespaceId, trx)
+		if err != nil {
+			logrus.Warnf("error finding namespace with id '%v' for unbind update: %v", name.NamespaceId, err)
+			continue
+		}
+
+		// find dynamic frontends for this namespace
+		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
+		if err != nil {
+			logrus.Warnf("error finding dynamic frontends for namespace '%v': %v", ns.Token, err)
+			continue
+		}
+
+		// send unbind mapping updates to each dynamic frontend
+		for _, frontend := range frontends {
+			unbindMapping := dynamicProxyController.Mapping{
+				Operation: dynamicProxyController.OperationUnbind,
+				Name:      util.ExpandUrlTemplate(name.Name, ns.Name),
+			}
+
+			if err := dPCtrl.SendMappingUpdate(frontend.Token, unbindMapping); err != nil {
+				logrus.Errorf("error sending unbind mapping update to frontend '%v': %v", frontend.Token, err)
+				// continue with other frontends rather than failing completely
+			} else {
+				logrus.Debugf("sent unbind mapping update to dynamic frontend '%v'", frontend.Token)
+			}
 		}
 	}
 
