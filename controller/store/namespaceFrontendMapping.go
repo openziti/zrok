@@ -43,6 +43,25 @@ func (str *Store) FindFrontendsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Fr
 	return frontends, nil
 }
 
+func (str *Store) FindDynamicFrontendsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := tx.Queryx(`
+		select f.* from frontends f 
+		inner join namespace_frontend_mappings nfm on f.id = nfm.frontend_id 
+		where nfm.namespace_id = $1 and f.dynamic = true and not f.deleted and not nfm.deleted`, namespaceId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting dynamic frontends for namespace")
+	}
+	var frontends []*Frontend
+	for rows.Next() {
+		fe := &Frontend{}
+		if err := rows.StructScan(fe); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend")
+		}
+		frontends = append(frontends, fe)
+	}
+	return frontends, nil
+}
+
 func (str *Store) FindNamespacesForFrontend(frontendId int, tx *sqlx.Tx) ([]*Namespace, error) {
 	rows, err := tx.Queryx(`
 		select n.* from namespaces n 

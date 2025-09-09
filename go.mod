@@ -40,12 +40,12 @@ require (
 	github.com/net-byte/vtun v1.7.0
 	github.com/net-byte/water v0.0.7
 	github.com/nxadm/tail v1.4.8
-	github.com/openziti/channel/v4 v4.2.21
+	github.com/openziti/channel/v4 v4.2.31
 	github.com/openziti/cobra-to-md v1.0.1
 	github.com/openziti/edge-api v0.26.47
-	github.com/openziti/identity v1.0.109
-	github.com/openziti/sdk-golang v1.2.3
-	github.com/openziti/transport/v2 v2.0.183
+	github.com/openziti/identity v1.0.112
+	github.com/openziti/sdk-golang v1.2.4
+	github.com/openziti/transport/v2 v2.0.189
 	github.com/openziti/ziti v1.6.0
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/pkg/errors v0.9.1
@@ -54,21 +54,21 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
-	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.10.0
+	github.com/spf13/cobra v1.10.1
+	github.com/stretchr/testify v1.11.1
 	github.com/wneessen/go-mail v0.2.7
 	github.com/zitadel/oidc/v2 v2.12.2
 	github.com/zitadel/oidc/v3 v3.44.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/net v0.43.0
-	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sys v0.35.0
+	golang.org/x/oauth2 v0.31.0
+	golang.org/x/sys v0.36.0
 	golang.org/x/time v0.7.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9
 	google.golang.org/grpc v1.67.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.9
 	nhooyr.io/websocket v1.8.17
 )
 
@@ -197,9 +197,9 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
-	github.com/openziti/foundation/v2 v2.0.70 // indirect
+	github.com/openziti/foundation/v2 v2.0.73 // indirect
 	github.com/openziti/metrics v1.4.2 // indirect
-	github.com/openziti/secretstream v0.1.38 // indirect
+	github.com/openziti/secretstream v0.1.39 // indirect
 	github.com/openziti/storage v0.4.7 // indirect
 	github.com/parallaxsecond/parsec-client-go v0.0.0-20221025095442-f0a77d263cf9 // indirect
 	github.com/pires/go-proxyproto v0.7.1-0.20240628150027-b718e7ce4964 // indirect
@@ -229,7 +229,7 @@ require (
 	github.com/smallstep/truststore v0.13.0 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible // indirect
 	github.com/spf13/cast v1.7.1 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/tailscale/tscert v0.0.0-20240608151842-d3f834017e53 // indirect
 	github.com/tklauser/go-sysconf v0.3.15 // indirect

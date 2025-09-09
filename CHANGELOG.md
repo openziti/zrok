@@ -4,6 +4,8 @@
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
+
 ## v1.1.4
 
 CHANGE: Update `github.com/caddyserver/caddy/v2` to `v2.9.1`; fixes CVE-2024-53259 (would only potentially effect users using the QUIC protocol, very atypical) (https://github.com/openziti/zrok/issues/1047)
