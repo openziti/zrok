@@ -8,6 +8,7 @@ import (
 
 	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller/agentController"
+	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
@@ -20,22 +21,23 @@ import (
 const ConfigVersion = 4
 
 type Config struct {
-	V               int
-	Admin           *AdminConfig
-	AgentController *agentController.Config
-	Bridge          *metrics.BridgeConfig
-	Compatibility   *CompatibilityConfig
-	Endpoint        *EndpointConfig
-	Email           *emailUi.Config
-	Invites         *InvitesConfig
-	Limits          *limits.Config
-	Maintenance     *MaintenanceConfig
-	Metrics         *metrics.Config
-	Registration    *RegistrationConfig
-	ResetPassword   *ResetPasswordConfig
-	Store           *store.Config
-	Ziti            *zrokEdgeSdk.Config
-	Tls             *TlsConfig
+	V                      int
+	Admin                  *AdminConfig
+	AgentController        *agentController.Config
+	Bridge                 *metrics.BridgeConfig
+	Compatibility          *CompatibilityConfig
+	DynamicProxyController *dynamicProxyController.Config
+	Endpoint               *EndpointConfig
+	Email                  *emailUi.Config
+	Invites                *InvitesConfig
+	Limits                 *limits.Config
+	Maintenance            *MaintenanceConfig
+	Metrics                *metrics.Config
+	Registration           *RegistrationConfig
+	ResetPassword          *ResetPasswordConfig
+	Store                  *store.Config
+	Ziti                   *zrokEdgeSdk.Config
+	Tls                    *TlsConfig
 }
 
 type AdminConfig struct {
