@@ -45,10 +45,8 @@ func (za *ZitiAutomation) CreateUserIdentityWithTag(name, tag, value string) (st
 	tags := NewSimpleTagStrategy(map[string]interface{}{tag: value})
 
 	opts := &IdentityOptions{
-		ResourceOptions: &ResourceOptions{
-			Name: name,
-			Tags: tags,
-		},
+		Name:    name,
+		Tags:    tags,
 		Type:    identityType,
 		IsAdmin: false,
 	}
@@ -58,10 +56,8 @@ func (za *ZitiAutomation) CreateUserIdentityWithTag(name, tag, value string) (st
 
 func (za *ZitiAutomation) CreateServiceWithConfig(name, configID string, tags TagStrategy) (string, error) {
 	opts := &ServiceOptions{
-		ResourceOptions: &ResourceOptions{
-			Name: name,
-			Tags: tags,
-		},
+		Name:               name,
+		Tags:               tags,
 		Configs:            []string{configID},
 		EncryptionRequired: true,
 	}
@@ -164,10 +160,8 @@ func (za *ZitiAutomation) CleanupByTagFilter(tag, value string) error {
 
 func (za *ZitiAutomation) CreateIdentity(name string, identityType rest_model.IdentityType, tags TagStrategy) (string, *ziti.Config, error) {
 	opts := &IdentityOptions{
-		ResourceOptions: &ResourceOptions{
-			Name: name,
-			Tags: tags,
-		},
+		Name:    name,
+		Tags:    tags,
 		Type:    identityType,
 		IsAdmin: false,
 	}

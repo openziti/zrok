@@ -12,20 +12,40 @@ import (
 )
 
 type IdentityManager struct {
-	*ResourceManager
+	*BaseResourceManager[rest_model.IdentityDetail]
 }
 
 func NewIdentityManager(client *Client) *IdentityManager {
 	return &IdentityManager{
-		ResourceManager: NewResourceManager(client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.IdentityDetail](client),
 	}
 }
 
+// ensure IdentityManager implements the interface
+var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = (*IdentityManager)(nil)
+
 type IdentityOptions struct {
-	*ResourceOptions
+	Name        string
+	Tags        TagStrategy
+	TagContext  map[string]interface{}
+	Timeout     time.Duration
 	Type        rest_model.IdentityType
 	IsAdmin     bool
 	RoleAttribs []string
+}
+
+func (io *IdentityOptions) GetTimeout() time.Duration {
+	if io.Timeout == 0 {
+		return 30 * time.Second
+	}
+	return io.Timeout
+}
+
+func (io *IdentityOptions) GetTags() *rest_model.Tags {
+	if io.Tags != nil {
+		return io.Tags.GenerateTags(io.TagContext)
+	}
+	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
@@ -40,6 +60,7 @@ func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
 		Type:                &opts.Type,
 	}
 	req.SetTimeout(opts.GetTimeout())
+	req.Context = im.Context()
 
 	resp, err := im.Edge().Identity.CreateIdentity(req, nil)
 	if err != nil {
@@ -84,15 +105,15 @@ func (im *IdentityManager) Find(opts *FilterOptions) ([]*rest_model.IdentityDeta
 }
 
 func (im *IdentityManager) GetByID(id string) (*rest_model.IdentityDetail, error) {
-	opts := &FilterOptions{Filter: BuildFilter("id", id)}
-	identities, err := im.Find(opts)
-	if err != nil {
-		return nil, err
-	}
-	if len(identities) != 1 {
-		return nil, errors.Errorf("expected 1 identity, found %d", len(identities))
-	}
-	return identities[0], nil
+	return GetByID(im.Find, id, "identity")
+}
+
+func (im *IdentityManager) GetByName(name string) (*rest_model.IdentityDetail, error) {
+	return GetByName(im.Find, name, "identity")
+}
+
+func (im *IdentityManager) DeleteWithFilter(filter string) error {
+	return DeleteWithFilter(im.Find, im.Delete, filter, "identity")
 }
 
 func (im *IdentityManager) Enroll(id string) (*ziti.Config, error) {

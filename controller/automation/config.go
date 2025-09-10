@@ -10,19 +10,39 @@ import (
 )
 
 type ConfigManager struct {
-	*ResourceManager
+	*BaseResourceManager[rest_model.ConfigDetail]
 }
 
 func NewConfigManager(client *Client) *ConfigManager {
 	return &ConfigManager{
-		ResourceManager: NewResourceManager(client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ConfigDetail](client),
 	}
 }
 
+// ensure ConfigManager implements the interface
+var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = (*ConfigManager)(nil)
+
 type ConfigOptions struct {
-	*ResourceOptions
+	Name         string
+	Tags         TagStrategy
+	TagContext   map[string]interface{}
+	Timeout      time.Duration
 	ConfigTypeID string
 	Data         interface{}
+}
+
+func (co *ConfigOptions) GetTimeout() time.Duration {
+	if co.Timeout == 0 {
+		return 30 * time.Second
+	}
+	return co.Timeout
+}
+
+func (co *ConfigOptions) GetTags() *rest_model.Tags {
+	if co.Tags != nil {
+		return co.Tags.GenerateTags(co.TagContext)
+	}
+	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (cm *ConfigManager) Create(opts *ConfigOptions) (string, error) {
@@ -103,35 +123,13 @@ func (cm *ConfigManager) Find(opts *FilterOptions) ([]*rest_model.ConfigDetail, 
 }
 
 func (cm *ConfigManager) GetByID(id string) (*rest_model.ConfigDetail, error) {
-	opts := &FilterOptions{Filter: BuildFilter("id", id)}
-	configs, err := cm.Find(opts)
-	if err != nil {
-		return nil, err
-	}
-	if len(configs) != 1 {
-		return nil, errors.Errorf("expected 1 config, found %d", len(configs))
-	}
-	return configs[0], nil
+	return GetByID(cm.Find, id, "config")
+}
+
+func (cm *ConfigManager) GetByName(name string) (*rest_model.ConfigDetail, error) {
+	return GetByName(cm.Find, name, "config")
 }
 
 func (cm *ConfigManager) DeleteWithFilter(filter string) error {
-	opts := &FilterOptions{Filter: filter}
-	configs, err := cm.Find(opts)
-	if err != nil {
-		return err
-	}
-
-	logrus.Infof("found %d configs to delete for filter '%s'", len(configs), filter)
-
-	for _, cfg := range configs {
-		if err := cm.Delete(*cfg.ID); err != nil {
-			return err
-		}
-	}
-
-	if len(configs) == 0 {
-		logrus.Warnf("no configs found for filter '%s'", filter)
-	}
-
-	return nil
+	return DeleteWithFilter(cm.Find, cm.Delete, filter, "config")
 }

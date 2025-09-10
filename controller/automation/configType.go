@@ -10,18 +10,38 @@ import (
 )
 
 type ConfigTypeManager struct {
-	*ResourceManager
+	*BaseResourceManager[rest_model.ConfigTypeDetail]
 }
 
 func NewConfigTypeManager(client *Client) *ConfigTypeManager {
 	return &ConfigTypeManager{
-		ResourceManager: NewResourceManager(client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ConfigTypeDetail](client),
 	}
 }
 
+// ensure ConfigTypeManager implements the interface
+var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = (*ConfigTypeManager)(nil)
+
 type ConfigTypeOptions struct {
-	*ResourceOptions
-	Schema interface{}
+	Name       string
+	Tags       TagStrategy
+	TagContext map[string]interface{}
+	Timeout    time.Duration
+	Schema     interface{}
+}
+
+func (cto *ConfigTypeOptions) GetTimeout() time.Duration {
+	if cto.Timeout == 0 {
+		return 30 * time.Second
+	}
+	return cto.Timeout
+}
+
+func (cto *ConfigTypeOptions) GetTags() *rest_model.Tags {
+	if cto.Tags != nil {
+		return cto.Tags.GenerateTags(cto.TagContext)
+	}
+	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (ctm *ConfigTypeManager) Create(opts *ConfigTypeOptions) (string, error) {
@@ -79,6 +99,10 @@ func (ctm *ConfigTypeManager) Find(opts *FilterOptions) ([]*rest_model.ConfigTyp
 	return resp.Payload.Data, nil
 }
 
+func (ctm *ConfigTypeManager) GetByID(id string) (*rest_model.ConfigTypeDetail, error) {
+	return GetByID(ctm.Find, id, "config type")
+}
+
 func (ctm *ConfigTypeManager) GetByName(name string) (*rest_model.ConfigTypeDetail, error) {
 	opts := &FilterOptions{Filter: BuildFilter("name", name)}
 	configTypes, err := ctm.Find(opts)
@@ -94,6 +118,10 @@ func (ctm *ConfigTypeManager) GetByName(name string) (*rest_model.ConfigTypeDeta
 	return configTypes[0], nil
 }
 
+func (ctm *ConfigTypeManager) DeleteWithFilter(filter string) error {
+	return DeleteWithFilter(ctm.Find, ctm.Delete, filter, "config type")
+}
+
 func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 	existing, err := ctm.GetByName(name)
 	if err != nil {
@@ -107,8 +135,8 @@ func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 
 	// create it
 	opts := &ConfigTypeOptions{
-		ResourceOptions: &ResourceOptions{Name: name},
-		Schema:          nil, // no schema for zrok proxy config
+		Name:   name,
+		Schema: nil, // no schema for zrok proxy config
 	}
 
 	id, err := ctm.Create(opts)

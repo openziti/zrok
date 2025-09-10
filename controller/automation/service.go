@@ -10,22 +10,42 @@ import (
 )
 
 type ServiceManager struct {
-	*ResourceManager
+	*BaseResourceManager[rest_model.ServiceDetail]
 }
 
 func NewServiceManager(client *Client) *ServiceManager {
 	return &ServiceManager{
-		ResourceManager: NewResourceManager(client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ServiceDetail](client),
 	}
 }
 
+// ensure ServiceManager implements the interface
+var _ IResourceManager[rest_model.ServiceDetail, *ServiceOptions] = (*ServiceManager)(nil)
+
 type ServiceOptions struct {
-	*ResourceOptions
+	Name               string
+	Tags               TagStrategy
+	TagContext         map[string]interface{}
+	Timeout            time.Duration
 	Configs            []string
 	EncryptionRequired bool
 	TerminatorStrategy string
 	RoleAttributes     []string
 	MaxIdleTime        *int64
+}
+
+func (so *ServiceOptions) GetTimeout() time.Duration {
+	if so.Timeout == 0 {
+		return 30 * time.Second
+	}
+	return so.Timeout
+}
+
+func (so *ServiceOptions) GetTags() *rest_model.Tags {
+	if so.Tags != nil {
+		return so.Tags.GenerateTags(so.TagContext)
+	}
+	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {
@@ -100,25 +120,13 @@ func (sm *ServiceManager) Find(opts *FilterOptions) ([]*rest_model.ServiceDetail
 }
 
 func (sm *ServiceManager) GetByID(id string) (*rest_model.ServiceDetail, error) {
-	opts := &FilterOptions{Filter: BuildFilter("id", id)}
-	services, err := sm.Find(opts)
-	if err != nil {
-		return nil, err
-	}
-	if len(services) != 1 {
-		return nil, errors.Errorf("expected 1 service, found %d", len(services))
-	}
-	return services[0], nil
+	return GetByID(sm.Find, id, "service")
 }
 
 func (sm *ServiceManager) GetByName(name string) (*rest_model.ServiceDetail, error) {
-	opts := &FilterOptions{Filter: BuildFilter("name", name)}
-	services, err := sm.Find(opts)
-	if err != nil {
-		return nil, err
-	}
-	if len(services) != 1 {
-		return nil, errors.Errorf("expected 1 service with name '%s', found %d", name, len(services))
-	}
-	return services[0], nil
+	return GetByName(sm.Find, name, "service")
+}
+
+func (sm *ServiceManager) DeleteWithFilter(filter string) error {
+	return DeleteWithFilter(sm.Find, sm.Delete, filter, "service")
 }
