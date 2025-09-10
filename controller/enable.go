@@ -3,10 +3,11 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/pkg/errors"
@@ -32,9 +33,15 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableUnauthorized()
 	}
 
-	client, err := zrokEdgeSdk.Client(cfg.Ziti)
+	automationCfg := &automation.Config{
+		ApiEndpoint: cfg.Ziti.ApiEndpoint,
+		Username:    cfg.Ziti.Username,
+		Password:    cfg.Ziti.Password,
+	}
+
+	za, err := automation.NewZitiAutomation(automationCfg)
 	if err != nil {
-		logrus.Errorf("error getting edge client for user '%v': %v", principal.Email, err)
+		logrus.Errorf("error connecting to ziti edge management api for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -44,21 +51,9 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableInternalServerError()
 	}
 
-	ident, err := zrokEdgeSdk.CreateEnvironmentIdentity(uniqueToken, principal.Email, params.Body.Description, client)
+	envZId, zitiCfg, err := h.createEnvironmentIdentity(za, uniqueToken, principal.Email, params.Body.Description)
 	if err != nil {
 		logrus.Errorf("error creating environment identity for user '%v': %v", principal.Email, err)
-		return environment.NewEnableInternalServerError()
-	}
-
-	envZId := ident.Payload.Data.ID
-	cfg, err := zrokEdgeSdk.EnrollIdentity(envZId, client)
-	if err != nil {
-		logrus.Errorf("error enrolling environment identity for user '%v': %v", principal.Email, err)
-		return environment.NewEnableInternalServerError()
-	}
-
-	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(envZId, envZId, client); err != nil {
-		logrus.Errorf("error creating edge router policy for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -78,14 +73,14 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
-	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, ident.Payload.Data.ID, envId)
+	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, envZId, envId)
 
 	resp := environment.NewEnableCreated().WithPayload(&environment.EnableCreatedBody{Identity: envZId})
 
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
 	enc.SetEscapeHTML(false)
-	err = enc.Encode(&cfg)
+	err = enc.Encode(&zitiCfg)
 	if err != nil {
 		panic(err)
 	}
@@ -107,4 +102,8 @@ func (h *enableHandler) checkLimits(principal *rest_model_zrok.Principal, trx *s
 		}
 	}
 	return nil
+}
+
+func (h *enableHandler) createEnvironmentIdentity(za *automation.ZitiAutomation, uniqueToken, accountEmail, envDescription string) (string, interface{}, error) {
+	return za.CreateEnvironmentIdentity(uniqueToken, accountEmail, envDescription)
 }

@@ -2,15 +2,18 @@ package automation
 
 import (
 	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type ZitiAutomation struct {
-	client     *Client
-	Identities *IdentityManager
-	Services   *ServiceManager
-	Policies   *PolicyManager
-	Configs    *ConfigManager
+	client      *Client
+	Identities  *IdentityManager
+	Services    *ServiceManager
+	Policies    *PolicyManager
+	Configs     *ConfigManager
+	ConfigTypes *ConfigTypeManager
 }
 
 func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
@@ -20,11 +23,12 @@ func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
 	}
 
 	return &ZitiAutomation{
-		client:     client,
-		Identities: NewIdentityManager(client),
-		Services:   NewServiceManager(client),
-		Policies:   NewPolicyManager(client),
-		Configs:    NewConfigManager(client),
+		client:      client,
+		Identities:  NewIdentityManager(client),
+		Services:    NewServiceManager(client),
+		Policies:    NewPolicyManager(client),
+		Configs:     NewConfigManager(client),
+		ConfigTypes: NewConfigTypeManager(client),
 	}, nil
 }
 
@@ -99,8 +103,6 @@ func (za *ZitiAutomation) CreateServiceEdgeRouterPolicy(name, serviceID string, 
 	return za.Policies.CreateServiceEdgeRouterPolicy(builder)
 }
 
-// cleanup methods
-
 func (za *ZitiAutomation) CleanupByTagFilter(tag, value string) error {
 	filter := BuildTagFilter(tag, value)
 
@@ -138,5 +140,87 @@ func (za *ZitiAutomation) CleanupByTagFilter(tag, value string) error {
 		}
 	}
 
+	return nil
+}
+
+func (za *ZitiAutomation) CreateIdentity(name string, identityType rest_model.IdentityType, tags TagStrategy) (string, *ziti.Config, error) {
+	opts := &IdentityOptions{
+		ResourceOptions: &ResourceOptions{
+			Name: name,
+			Tags: tags,
+		},
+		Type:    identityType,
+		IsAdmin: false,
+	}
+
+	// create identity
+	zId, err := za.Identities.Create(opts)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// enroll identity
+	cfg, err := za.Identities.Enroll(zId)
+	if err != nil {
+		return zId, nil, err
+	}
+
+	// create edge router policy
+	if err := za.EnsureEdgeRouterPolicyForIdentity(name, zId); err != nil {
+		// identity was created but policy failed - log but don't fail completely
+		logrus.Warnf("failed to create edge router policy for identity '%s' (%s): %v", name, zId, err)
+	}
+
+	return zId, cfg, nil
+}
+
+func (za *ZitiAutomation) CreateBootstrapIdentity(name string) (string, *ziti.Config, error) {
+	tags := ZrokBaseTags()
+	return za.CreateIdentity(name, rest_model.IdentityTypeDevice, tags)
+}
+
+func (za *ZitiAutomation) CreateEnvironmentIdentity(uniqueToken, accountEmail, envDescription string) (string, *ziti.Config, error) {
+	name := accountEmail + "-" + uniqueToken + "-" + envDescription
+	tags := NewZrokTagStrategy().WithTag("zrokEmail", accountEmail)
+	return za.CreateIdentity(name, rest_model.IdentityTypeUser, tags)
+}
+
+func (za *ZitiAutomation) EnsureConfigType(name string) error {
+	_, err := za.ConfigTypes.EnsureExists(name)
+	return err
+}
+
+func (za *ZitiAutomation) FindIdentityByID(id string) (*rest_model.IdentityDetail, error) {
+	return za.Identities.GetByID(id)
+}
+
+func (za *ZitiAutomation) EnsureEdgeRouterPolicyForIdentity(name, identityID string) error {
+	// check if policy already exists
+	filter := BuildFilter("name", name) + " and tags.zrok != null"
+	opts := &FilterOptions{Filter: filter}
+
+	policies, err := za.Policies.findEdgeRouterPolicies(opts)
+	if err != nil {
+		return errors.Wrapf(err, "error listing edge router policies for '%s' (%s)", name, identityID)
+	}
+
+	if len(policies) == 1 {
+		logrus.Infof("found existing edge router policy for '%s' (%s)", name, identityID)
+		return nil
+	}
+
+	if len(policies) > 1 {
+		return errors.Errorf("found %d edge router policies for '%s' (%s); expected 0 or 1", len(policies), name, identityID)
+	}
+
+	// create policy
+	logrus.Infof("creating edge router policy for '%s' (%s)", name, identityID)
+	zrokTags := ZrokBaseTags()
+	_, err = za.CreateEdgeRouterPolicy(name, identityID, zrokTags)
+	if err != nil {
+		return errors.Wrapf(err, "error creating edge router policy for '%s' (%s)", name, identityID)
+	}
+
+	logrus.Infof("asserted edge router policy for '%s' (%s)", name, identityID)
 	return nil
 }

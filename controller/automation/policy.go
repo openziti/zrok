@@ -261,3 +261,20 @@ func (pm *PolicyManager) DeleteServicePoliciesWithFilter(filter string) error {
 
 	return nil
 }
+
+func (pm *PolicyManager) findEdgeRouterPolicies(opts *FilterOptions) ([]*rest_model.EdgeRouterPolicyDetail, error) {
+	req := &edge_router_policy.ListEdgeRouterPoliciesParams{
+		Filter:  &opts.Filter,
+		Limit:   &opts.Limit,
+		Offset:  &opts.Offset,
+		Context: pm.Context(),
+	}
+	req.SetTimeout(opts.GetTimeout())
+
+	resp, err := pm.Edge().EdgeRouterPolicy.ListEdgeRouterPolicies(req, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error listing edge router policies")
+	}
+
+	return resp.Payload.Data, nil
+}
