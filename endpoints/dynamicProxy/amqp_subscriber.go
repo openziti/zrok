@@ -6,14 +6,19 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/openziti/zrok/endpoints/dynamicProxy/config"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 )
 
+type AmqpSubscriberConfig struct {
+	Url           string `df:"required"`
+	ExchangeName  string `df:"required"`
+	FrontendToken string `df:"required"`
+}
+
 type AmqpSubscriber struct {
-	cfg        *config.AmqpSubscriberConfig
+	cfg        *AmqpSubscriberConfig
 	conn       *amqp.Connection
 	ch         *amqp.Channel
 	queue      amqp.Queue
@@ -35,7 +40,7 @@ const (
 	OperationUnbind = "unbind"
 )
 
-func NewAmqpSubscriber(cfg *config.AmqpSubscriberConfig) (*AmqpSubscriber, error) {
+func NewAmqpSubscriber(cfg *AmqpSubscriberConfig) (*AmqpSubscriber, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &AmqpSubscriber{
