@@ -8,35 +8,36 @@ import (
 )
 
 type FrontendMapping struct {
-	Name       string    `db:"name"`
-	Version    int64     `db:"version"`
-	ShareToken string    `db:"share_token"`
-	CreatedAt  time.Time `db:"created_at"`
+	FrontendToken string    `db:"frontend_token"`
+	Name          string    `db:"name"`
+	Version       int64     `db:"version"`
+	ShareToken    string    `db:"share_token"`
+	CreatedAt     time.Time `db:"created_at"`
 }
 
 func (str *Store) CreateFrontendMapping(fm *FrontendMapping, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("insert into frontend_mappings (name, version, share_token) values ($1, $2, $3)")
+	stmt, err := tx.Prepare("insert into frontend_mappings (frontend_token, name, version, share_token) values ($1, $2, $3, $4)")
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontend_mappings insert statement")
 	}
-	if _, err := stmt.Exec(fm.Name, fm.Version, fm.ShareToken); err != nil {
+	if _, err := stmt.Exec(fm.FrontendToken, fm.Name, fm.Version, fm.ShareToken); err != nil {
 		return errors.Wrap(err, "error executing frontend_mappings insert statement")
 	}
 	return nil
 }
 
-func (str *Store) FindFrontendMapping(name string, version int64, tx *sqlx.Tx) (*FrontendMapping, error) {
+func (str *Store) FindFrontendMapping(frontendToken, name string, version int64, tx *sqlx.Tx) (*FrontendMapping, error) {
 	fm := &FrontendMapping{}
-	if err := tx.QueryRowx("select * from frontend_mappings where name = $1 and version = $2", name, version).StructScan(fm); err != nil {
-		return nil, errors.Wrap(err, "error selecting frontend mapping by name and version")
+	if err := tx.QueryRowx("select * from frontend_mappings where frontend_token = $1 and name = $2 and version = $3", frontendToken, name, version).StructScan(fm); err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend mapping by frontend_token, name and version")
 	}
 	return fm, nil
 }
 
-func (str *Store) FindFrontendMappingsByName(name string, tx *sqlx.Tx) ([]*FrontendMapping, error) {
-	rows, err := tx.Queryx("select * from frontend_mappings where name = $1 order by version desc", name)
+func (str *Store) FindFrontendMappingsByFrontendTokenAndName(frontendToken, name string, tx *sqlx.Tx) ([]*FrontendMapping, error) {
+	rows, err := tx.Queryx("select * from frontend_mappings where frontend_token = $1 and name = $2 order by version desc", frontendToken, name)
 	if err != nil {
-		return nil, errors.Wrap(err, "error selecting frontend mappings by name")
+		return nil, errors.Wrap(err, "error selecting frontend mappings by frontend_token and name")
 	}
 	var mappings []*FrontendMapping
 	for rows.Next() {
@@ -49,32 +50,59 @@ func (str *Store) FindFrontendMappingsByName(name string, tx *sqlx.Tx) ([]*Front
 	return mappings, nil
 }
 
-func (str *Store) FindLatestFrontendMapping(name string, tx *sqlx.Tx) (*FrontendMapping, error) {
+func (str *Store) FindLatestFrontendMapping(frontendToken, name string, tx *sqlx.Tx) (*FrontendMapping, error) {
 	fm := &FrontendMapping{}
-	if err := tx.QueryRowx("select * from frontend_mappings where name = $1 order by version desc limit 1", name).StructScan(fm); err != nil {
-		return nil, errors.Wrap(err, "error selecting latest frontend mapping by name")
+	if err := tx.QueryRowx("select * from frontend_mappings where frontend_token = $1 and name = $2 order by version desc limit 1", frontendToken, name).StructScan(fm); err != nil {
+		return nil, errors.Wrap(err, "error selecting latest frontend mapping by frontend_token and name")
 	}
 	return fm, nil
 }
 
-func (str *Store) DeleteFrontendMapping(name string, version int64, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from frontend_mappings where name = $1 and version = $2")
+func (str *Store) DeleteFrontendMapping(frontendToken, name string, version int64, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from frontend_mappings where frontend_token = $1 and name = $2 and version = $3")
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontend_mappings delete statement")
 	}
-	if _, err := stmt.Exec(name, version); err != nil {
+	if _, err := stmt.Exec(frontendToken, name, version); err != nil {
 		return errors.Wrap(err, "error executing frontend_mappings delete statement")
 	}
 	return nil
 }
 
-func (str *Store) DeleteFrontendMappingsByName(name string, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("delete from frontend_mappings where name = $1")
+func (str *Store) FindFrontendMappingsByFrontendToken(frontendToken string, tx *sqlx.Tx) ([]*FrontendMapping, error) {
+	rows, err := tx.Queryx("select * from frontend_mappings where frontend_token = $1 order by name, version desc", frontendToken)
 	if err != nil {
-		return errors.Wrap(err, "error preparing frontend_mappings delete by name statement")
+		return nil, errors.Wrap(err, "error selecting frontend mappings by frontend_token")
 	}
-	if _, err := stmt.Exec(name); err != nil {
-		return errors.Wrap(err, "error executing frontend_mappings delete by name statement")
+	var mappings []*FrontendMapping
+	for rows.Next() {
+		fm := &FrontendMapping{}
+		if err := rows.StructScan(fm); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend mapping")
+		}
+		mappings = append(mappings, fm)
+	}
+	return mappings, nil
+}
+
+func (str *Store) DeleteFrontendMappingsByFrontendTokenAndName(frontendToken, name string, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from frontend_mappings where frontend_token = $1 and name = $2")
+	if err != nil {
+		return errors.Wrap(err, "error preparing frontend_mappings delete by frontend_token and name statement")
+	}
+	if _, err := stmt.Exec(frontendToken, name); err != nil {
+		return errors.Wrap(err, "error executing frontend_mappings delete by frontend_token and name statement")
+	}
+	return nil
+}
+
+func (str *Store) DeleteFrontendMappingsByFrontendToken(frontendToken string, tx *sqlx.Tx) error {
+	stmt, err := tx.Prepare("delete from frontend_mappings where frontend_token = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing frontend_mappings delete by frontend_token statement")
+	}
+	if _, err := stmt.Exec(frontendToken); err != nil {
+		return errors.Wrap(err, "error executing frontend_mappings delete by frontend_token statement")
 	}
 	return nil
 }
