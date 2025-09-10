@@ -92,7 +92,6 @@ func (c *Controller) UnbindFrontendMapping(frontendToken, name string, trx *sqlx
 	mapping := dynamicProxyModel.Mapping{
 		Operation: dynamicProxyModel.OperationUnbind,
 		Name:      name,
-		Version:   time.Now().UnixNano(),
 	}
 	return c.sendMappingUpdate(frontendToken, mapping)
 }

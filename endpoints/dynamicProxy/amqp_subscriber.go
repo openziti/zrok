@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/michaelquigley/df"
+	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -26,13 +28,6 @@ type AmqpSubscriber struct {
 	cancel     context.CancelFunc
 	done       chan struct{}
 	instanceID string
-}
-
-// mapping update message structure (matches dynamicProxyController.Mapping)
-type MappingUpdate struct {
-	Operation string `json:"op"`
-	Name      string `json:"n"`
-	Version   int64  `json:"v"`
 }
 
 func NewAmqpSubscriber(cfg *AmqpSubscriberConfig) (*AmqpSubscriber, error) {
@@ -196,11 +191,15 @@ func (s *AmqpSubscriber) consume() error {
 }
 
 func (s *AmqpSubscriber) handleMessage(delivery amqp.Delivery) error {
-	var update MappingUpdate
-	if err := json.Unmarshal(delivery.Body, &update); err != nil {
-		return errors.Wrap(err, "failed to unmarshal mapping update")
+	var data map[string]any
+	if err := json.Unmarshal(delivery.Body, &data); err != nil {
+		return errors.Wrap(err, "failed to unmarshal mapping data")
 	}
-	logrus.Infof("processed mapping update: operation='%s', name='%s', version=%d", update.Operation, update.Name, update.Version)
+	update, err := df.New[dynamicProxyModel.Mapping](data)
+	if err != nil {
+		return err
+	}
+	logrus.Infof("mapping update -> %v", update)
 	return nil
 }
 
