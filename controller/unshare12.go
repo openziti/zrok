@@ -4,8 +4,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/util"
@@ -196,8 +196,8 @@ func (h *unshare12Handler) sendUnbindMappingUpdates(shareId int, shrToken string
 
 		// send unbind mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
-			unbindMapping := dynamicProxyController.Mapping{
-				Operation: dynamicProxyController.OperationUnbind,
+			unbindMapping := dynamicProxyModel.Mapping{
+				Operation: dynamicProxyModel.OperationUnbind,
 				Name:      util.ExpandUrlTemplate(name.Name, ns.Name),
 			}
 

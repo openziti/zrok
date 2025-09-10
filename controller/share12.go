@@ -6,8 +6,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -111,7 +111,7 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	}
 
 	// send mapping updates to dynamic frontends after successful commit
-	if err := h.sendMappingUpdates(shareId, shrToken, nameIds, dynamicProxyController.OperationBind, trx); err != nil {
+	if err := h.sendMappingUpdates(shareId, shrToken, nameIds, dynamicProxyModel.OperationBind, trx); err != nil {
 		logrus.Errorf("error sending mapping updates: %v", err)
 	}
 
@@ -549,7 +549,7 @@ func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string,
 	return nil
 }
 
-func (h *share12Handler) sendMappingUpdates(shareId int, shrToken string, nameIds []int, operation dynamicProxyController.Operation, trx *sqlx.Tx) error {
+func (h *share12Handler) sendMappingUpdates(shareId int, shrToken string, nameIds []int, operation dynamicProxyModel.Operation, trx *sqlx.Tx) error {
 	// only send updates if dynamic proxy controller is enabled
 	if dPCtrl == nil {
 		return nil
@@ -576,7 +576,7 @@ func (h *share12Handler) sendMappingUpdates(shareId int, shrToken string, nameId
 
 		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
-			mapping := dynamicProxyController.Mapping{
+			mapping := dynamicProxyModel.Mapping{
 				Operation: operation,
 				Name:      util.ExpandUrlTemplate(name.Name, ns.Name),
 				Version:   time.Now().UnixNano(), // use timestamp as version

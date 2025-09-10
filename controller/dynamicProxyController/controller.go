@@ -3,23 +3,9 @@ package dynamicProxyController
 import (
 	"context"
 
+	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/sirupsen/logrus"
 )
-
-type Operation string
-
-const (
-	OperationBind   Operation = "bind"
-	OperationUnbind Operation = "unbind"
-)
-
-const MappingUpdate = "mapping-update"
-
-type Mapping struct {
-	Operation Operation
-	Name      string
-	Version   int64
-}
 
 type Controller struct {
 	publisher *AmqpPublisher
@@ -33,7 +19,7 @@ func NewController(cfg *Config) (*Controller, error) {
 	return &Controller{publisher: publisher}, nil
 }
 
-func (c *Controller) SendMappingUpdate(frontendToken string, m Mapping) error {
+func (c *Controller) SendMappingUpdate(frontendToken string, m dynamicProxyModel.Mapping) error {
 	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
 		return err
 	}
