@@ -197,7 +197,7 @@ func (h *unshare12Handler) processDynamicMappings(shareId int, shrToken string, 
 		for _, frontend := range frontends {
 			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
 
-			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName); err != nil {
+			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
 				logrus.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)
 				// continue with other frontends rather than failing completely
 			} else {

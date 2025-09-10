@@ -5,7 +5,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -98,7 +97,7 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	}
 
 	// send mapping updates to dynamic frontends after successful commit
-	if err := h.processDynamicMappings(shareId, shrToken, nameIds, dynamicProxyModel.OperationBind, trx); err != nil {
+	if err := h.processDynamicMappings(shrToken, nameIds, trx); err != nil {
 		logrus.Errorf("error sending mapping updates: %v", err)
 	}
 
@@ -547,36 +546,43 @@ func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string,
 	return nil
 }
 
-func (h *share12Handler) processDynamicMappings(shareId int, shrToken string, nameIds []int, operation dynamicProxyModel.Operation, trx *sqlx.Tx) error {
+func (h *share12Handler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) error {
 	// only send updates if dynamic proxy controller is enabled
 	if dPCtrl == nil {
+		logrus.Warnf("dynamic proxy controller is nil")
 		return nil
 	}
 
 	for _, nameId := range nameIds {
+		logrus.Infof("processing nameId '%v'", nameId)
+
 		// find name record to get the name and namespace
 		name, err := str.GetName(nameId, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding name with id '%v'", nameId)
 		}
+		logrus.Infof("name: %v", name)
 
 		// find namespace
 		ns, err := str.GetNamespace(name.NamespaceId, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding namespace with id '%v'", name.NamespaceId)
 		}
+		logrus.Infof("namespace: %v", ns)
 
 		// find dynamic frontends for this namespace
 		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding dynamic frontends for namespace '%v'", ns.Token)
 		}
+		logrus.Infof("frontends: %v", frontends)
 
 		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
 			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
+			logrus.Infof("binding name '%v'", frontendName)
 
-			if err := dPCtrl.BindFrontendMapping(frontend.Token, frontendName, shrToken); err != nil {
+			if err := dPCtrl.BindFrontendMapping(frontend.Token, frontendName, shrToken, trx); err != nil {
 				logrus.Errorf("error binding frontend mapping to frontend '%v': %v", frontend.Token, err)
 				// continue with other frontends rather than failing completely
 			} else {

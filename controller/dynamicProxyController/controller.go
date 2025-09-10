@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/dynamicProxyModel"
@@ -56,13 +57,7 @@ func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 	return ctrl, nil
 }
 
-func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string) error {
-	trx, err := c.str.Begin()
-	if err != nil {
-		return err
-	}
-	defer trx.Rollback()
-
+func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string, trx *sqlx.Tx) error {
 	// use current timestamp as version to ensure it's always increasing
 	version := time.Now().UnixNano()
 
@@ -78,10 +73,6 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string)
 		return err
 	}
 
-	if err := trx.Commit(); err != nil {
-		return err
-	}
-
 	// broadcast the mapping update via AMQP
 	mapping := dynamicProxyModel.Mapping{
 		Operation:  dynamicProxyModel.OperationBind,
@@ -92,18 +83,8 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string)
 	return c.sendMappingUpdate(frontendToken, mapping)
 }
 
-func (c *Controller) UnbindFrontendMapping(frontendToken, name string) error {
-	trx, err := c.str.Begin()
-	if err != nil {
-		return err
-	}
-	defer trx.Rollback()
-
+func (c *Controller) UnbindFrontendMapping(frontendToken, name string, trx *sqlx.Tx) error {
 	if err := c.str.DeleteFrontendMappingsByFrontendTokenAndName(frontendToken, name, trx); err != nil {
-		return err
-	}
-
-	if err := trx.Commit(); err != nil {
 		return err
 	}
 
