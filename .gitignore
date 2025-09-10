@@ -4,9 +4,7 @@
 CLAUDE.md
 *.db
 /automated-release-build/
-etc/dev.yml
-etc/dev-canary.yml
-etc/dev-frontend.yml
+etc/dev*
 
 # Dependencies
 node_modules/

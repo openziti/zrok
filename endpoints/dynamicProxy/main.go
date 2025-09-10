@@ -5,18 +5,18 @@ import (
 )
 
 type Config struct {
-	V              int                   `df:"match=\"1\"`
+	V              int                   `df:"v,match=\"1\""`
 	AmqpSubscriber *AmqpSubscriberConfig `df:"required"`
 }
 
 type Service struct {
-	app        *df.Application[Config]
+	app        *df.Application[*Config]
 	subscriber *AmqpSubscriber
 }
 
 func NewService(cfgPath string) (*Service, error) {
-	defaults := Config{}
-	pp := &Service{app: df.NewApplication[Config](defaults)}
+	defaults := &Config{}
+	pp := &Service{app: df.NewApplication[*Config](defaults)}
 	df.WithFactoryFunc(pp.app, pp.buildSubscriber)
 	if err := pp.app.Initialize(cfgPath); err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (p *Service) Stop() error {
 	return p.app.Stop()
 }
 
-func (p *Service) buildSubscriber(app *df.Application[Config]) error {
+func (p *Service) buildSubscriber(app *df.Application[*Config]) error {
 	if app.Cfg.AmqpSubscriber == nil {
 		return nil // amqp subscriber is optional
 	}
