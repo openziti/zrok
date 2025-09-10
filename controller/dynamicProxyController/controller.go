@@ -2,6 +2,7 @@ package dynamicProxyController
 
 import (
 	"context"
+	"time"
 
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/store"
@@ -61,6 +62,68 @@ func (c *Controller) SendMappingUpdate(frontendToken string, m dynamicProxyModel
 	}
 	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
 	return nil
+}
+
+func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string) error {
+	trx, err := c.str.Begin()
+	if err != nil {
+		return err
+	}
+	defer trx.Rollback()
+
+	// use current timestamp as version to ensure it's always increasing
+	version := time.Now().UnixNano()
+
+	// create new frontend mapping
+	fm := &store.FrontendMapping{
+		FrontendToken: frontendToken,
+		Name:          name,
+		Version:       version,
+		ShareToken:    shareToken,
+	}
+
+	if err := c.str.CreateFrontendMapping(fm, trx); err != nil {
+		return err
+	}
+
+	if err := trx.Commit(); err != nil {
+		return err
+	}
+
+	// broadcast the mapping update via AMQP
+	mapping := dynamicProxyModel.Mapping{
+		Operation:  dynamicProxyModel.OperationBind,
+		Name:       name,
+		Version:    version,
+		ShareToken: shareToken,
+	}
+
+	return c.SendMappingUpdate(frontendToken, mapping)
+}
+
+func (c *Controller) UnbindFrontendMapping(frontendToken, name string) error {
+	trx, err := c.str.Begin()
+	if err != nil {
+		return err
+	}
+	defer trx.Rollback()
+
+	if err := c.str.DeleteFrontendMappingsByFrontendTokenAndName(frontendToken, name, trx); err != nil {
+		return err
+	}
+
+	if err := trx.Commit(); err != nil {
+		return err
+	}
+
+	// broadcast the mapping update via AMQP
+	mapping := dynamicProxyModel.Mapping{
+		Operation: dynamicProxyModel.OperationUnbind,
+		Name:      name,
+		Version:   time.Now().UnixNano(),
+	}
+
+	return c.SendMappingUpdate(frontendToken, mapping)
 }
 
 func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRequest) (*FrontendMappingsResponse, error) {
