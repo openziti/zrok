@@ -32,8 +32,8 @@ func newOidcConfig(v map[string]interface{}) (df.Dynamic, error) {
 	return df.New[oidcConfig](v)
 }
 
-func (c *oidcConfig) Type() string          { return "oidc" }
-func (c *oidcConfig) ToMap() map[string]any { return nil }
+func (c *oidcConfig) Type() string                   { return "oidc" }
+func (c *oidcConfig) ToMap() (map[string]any, error) { return nil, nil }
 
 func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 	scheme := "http"

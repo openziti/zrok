@@ -46,8 +46,8 @@ type websocketSource struct {
 	join   chan struct{}
 }
 
-func (s *websocketSource) Type() string          { return WebsocketSourceType }
-func (s *websocketSource) ToMap() map[string]any { return nil }
+func (s *websocketSource) Type() string                   { return WebsocketSourceType }
+func (s *websocketSource) ToMap() (map[string]any, error) { return nil, nil }
 
 func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	caCerts, err := rest_util.GetControllerWellKnownCas(s.cfg.ApiEndpoint)

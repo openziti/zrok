@@ -31,8 +31,8 @@ func newGoogleConfig(v map[string]interface{}) (df.Dynamic, error) {
 	return df.New[googleConfig](v)
 }
 
-func (c *googleConfig) Type() string          { return "google" }
-func (c *googleConfig) ToMap() map[string]any { return nil }
+func (c *googleConfig) Type() string                   { return "google" }
+func (c *googleConfig) ToMap() (map[string]any, error) { return nil, nil }
 
 func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 	scheme := "http"

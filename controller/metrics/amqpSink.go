@@ -33,8 +33,8 @@ type amqpSink struct {
 	connected bool
 }
 
-func (s *amqpSink) Type() string          { return AmqpSinkType }
-func (s *amqpSink) ToMap() map[string]any { return nil }
+func (s *amqpSink) Type() string                   { return AmqpSinkType }
+func (s *amqpSink) ToMap() (map[string]any, error) { return nil, nil }
 
 func (s *amqpSink) Handle(event ZitiEventJson) error {
 	if !s.connected {

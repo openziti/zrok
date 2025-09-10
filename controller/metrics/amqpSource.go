@@ -45,8 +45,8 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 	return as, nil
 }
 
-func (s *amqpSource) Type() string          { return AmqpSourceType }
-func (s *amqpSource) ToMap() map[string]any { return nil }
+func (s *amqpSource) Type() string                   { return AmqpSourceType }
+func (s *amqpSource) ToMap() (map[string]any, error) { return nil, nil }
 
 func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	s.events = events

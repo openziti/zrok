@@ -32,8 +32,8 @@ func newGithubConfig(v map[string]interface{}) (df.Dynamic, error) {
 	return df.New[githubConfig](v)
 }
 
-func (c *githubConfig) Type() string          { return "github" }
-func (c *githubConfig) ToMap() map[string]any { return nil }
+func (c *githubConfig) Type() string                   { return "github" }
+func (c *githubConfig) ToMap() (map[string]any, error) { return nil, nil }
 
 func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 	scheme := "http"

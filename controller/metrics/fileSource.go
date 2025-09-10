@@ -31,8 +31,8 @@ type fileSource struct {
 	t    *tail.Tail
 }
 
-func (s *fileSource) Type() string          { return FileSourceType }
-func (s *fileSource) ToMap() map[string]any { return nil }
+func (s *fileSource) Type() string                   { return FileSourceType }
+func (s *fileSource) ToMap() (map[string]any, error) { return nil, nil }
 
 func (s *fileSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	f, err := os.Open(s.cfg.Path)
