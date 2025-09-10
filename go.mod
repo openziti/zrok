@@ -34,7 +34,7 @@ require (
 	github.com/kolesnikovae/go-winjob v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.18
-	github.com/michaelquigley/df v0.2.6
+	github.com/michaelquigley/df v0.2.7
 	github.com/michaelquigley/pfxlog v0.6.10
 	github.com/muesli/reflow v0.3.0
 	github.com/net-byte/vtun v1.7.0

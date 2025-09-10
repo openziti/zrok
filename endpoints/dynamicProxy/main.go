@@ -4,6 +4,11 @@ import (
 	"github.com/michaelquigley/df"
 )
 
+type Config struct {
+	V              int                   `df:"match=\"1\"`
+	AmqpSubscriber *AmqpSubscriberConfig `df:"required"`
+}
+
 type Service struct {
 	app        *df.Application[Config]
 	subscriber *AmqpSubscriber

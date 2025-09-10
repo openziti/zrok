@@ -35,11 +35,6 @@ type MappingUpdate struct {
 	Version   int64  `json:"v"`
 }
 
-const (
-	OperationBind   = "bind"
-	OperationUnbind = "unbind"
-)
-
 func NewAmqpSubscriber(cfg *AmqpSubscriberConfig) (*AmqpSubscriber, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
