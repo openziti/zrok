@@ -1,6 +1,8 @@
 package automation
 
 import (
+	"fmt"
+
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
@@ -104,14 +106,26 @@ func (za *ZitiAutomation) CreateServiceEdgeRouterPolicy(name, serviceID string, 
 }
 
 func (za *ZitiAutomation) CleanupByTagFilter(tag, value string) error {
-	filter := BuildTagFilter(tag, value)
+	var filter string
+	if value == "*" {
+		// cleanup all resources with the tag (any value)
+		filter = fmt.Sprintf("tags.%s != null", tag)
+	} else {
+		// cleanup resources with specific tag value
+		filter = BuildTagFilter(tag, value)
+	}
 
-	// delete service policies first
+	// delete service edge router policies first
+	if err := za.deleteServiceEdgeRouterPoliciesWithFilter(filter); err != nil {
+		return errors.Wrap(err, "failed to delete service edge router policies")
+	}
+
+	// delete service policies
 	if err := za.Policies.DeleteServicePoliciesWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete service policies")
 	}
 
-	// then delete configs
+	// delete configs
 	if err := za.Configs.DeleteWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete configs")
 	}
@@ -126,6 +140,11 @@ func (za *ZitiAutomation) CleanupByTagFilter(tag, value string) error {
 		if err := za.Services.Delete(*service.ID); err != nil {
 			return errors.Wrapf(err, "failed to delete service %s", *service.ID)
 		}
+	}
+
+	// delete edge router policies
+	if err := za.deleteEdgeRouterPoliciesWithFilter(filter); err != nil {
+		return errors.Wrap(err, "failed to delete edge router policies")
 	}
 
 	// find and delete identities
@@ -199,7 +218,7 @@ func (za *ZitiAutomation) EnsureEdgeRouterPolicyForIdentity(name, identityID str
 	filter := BuildFilter("name", name) + " and tags.zrok != null"
 	opts := &FilterOptions{Filter: filter}
 
-	policies, err := za.Policies.findEdgeRouterPolicies(opts)
+	policies, err := za.Policies.FindEdgeRouterPolicies(opts)
 	if err != nil {
 		return errors.Wrapf(err, "error listing edge router policies for '%s' (%s)", name, identityID)
 	}
@@ -223,4 +242,47 @@ func (za *ZitiAutomation) EnsureEdgeRouterPolicyForIdentity(name, identityID str
 
 	logrus.Infof("asserted edge router policy for '%s' (%s)", name, identityID)
 	return nil
+}
+
+// helper methods for cleanup operations
+
+func (za *ZitiAutomation) deleteServiceEdgeRouterPoliciesWithFilter(filter string) error {
+	opts := &FilterOptions{Filter: filter}
+	policies, err := za.findServiceEdgeRouterPolicies(opts)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("found %d service edge router policies to delete for filter '%s'", len(policies), filter)
+
+	for _, policy := range policies {
+		if err := za.Policies.DeleteServiceEdgeRouterPolicy(*policy.ID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (za *ZitiAutomation) deleteEdgeRouterPoliciesWithFilter(filter string) error {
+	opts := &FilterOptions{Filter: filter}
+	policies, err := za.Policies.FindEdgeRouterPolicies(opts)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("found %d edge router policies to delete for filter '%s'", len(policies), filter)
+
+	for _, policy := range policies {
+		if err := za.Policies.DeleteEdgeRouterPolicy(*policy.ID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (za *ZitiAutomation) findServiceEdgeRouterPolicies(opts *FilterOptions) ([]*rest_model.ServiceEdgeRouterPolicyDetail, error) {
+	// this method needs to be implemented in the policy manager
+	return za.Policies.FindServiceEdgeRouterPolicies(opts)
 }

@@ -262,7 +262,7 @@ func (pm *PolicyManager) DeleteServicePoliciesWithFilter(filter string) error {
 	return nil
 }
 
-func (pm *PolicyManager) findEdgeRouterPolicies(opts *FilterOptions) ([]*rest_model.EdgeRouterPolicyDetail, error) {
+func (pm *PolicyManager) FindEdgeRouterPolicies(opts *FilterOptions) ([]*rest_model.EdgeRouterPolicyDetail, error) {
 	req := &edge_router_policy.ListEdgeRouterPoliciesParams{
 		Filter:  &opts.Filter,
 		Limit:   &opts.Limit,
@@ -274,6 +274,23 @@ func (pm *PolicyManager) findEdgeRouterPolicies(opts *FilterOptions) ([]*rest_mo
 	resp, err := pm.Edge().EdgeRouterPolicy.ListEdgeRouterPolicies(req, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error listing edge router policies")
+	}
+
+	return resp.Payload.Data, nil
+}
+
+func (pm *PolicyManager) FindServiceEdgeRouterPolicies(opts *FilterOptions) ([]*rest_model.ServiceEdgeRouterPolicyDetail, error) {
+	req := &service_edge_router_policy.ListServiceEdgeRouterPoliciesParams{
+		Filter:  &opts.Filter,
+		Limit:   &opts.Limit,
+		Offset:  &opts.Offset,
+		Context: pm.Context(),
+	}
+	req.SetTimeout(opts.GetTimeout())
+
+	resp, err := pm.Edge().ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(req, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error listing service edge router policies")
 	}
 
 	return resp.Payload.Data, nil
