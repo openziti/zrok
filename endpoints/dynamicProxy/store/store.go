@@ -42,6 +42,10 @@ func Open(cfg *Config) (*Store, error) {
 	return store, nil
 }
 
+func (str *Store) Begin() (*sqlx.Tx, error) {
+	return str.db.Beginx()
+}
+
 func (str *Store) migrate() error {
 	migrations := &migrate.EmbedFileSystemMigrationSource{
 		FileSystem: postgres.FS,
