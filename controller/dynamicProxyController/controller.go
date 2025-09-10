@@ -56,14 +56,6 @@ func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 	return ctrl, nil
 }
 
-func (c *Controller) SendMappingUpdate(frontendToken string, m dynamicProxyModel.Mapping) error {
-	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
-		return err
-	}
-	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
-	return nil
-}
-
 func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string) error {
 	trx, err := c.str.Begin()
 	if err != nil {
@@ -97,8 +89,7 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string)
 		Version:    version,
 		ShareToken: shareToken,
 	}
-
-	return c.SendMappingUpdate(frontendToken, mapping)
+	return c.sendMappingUpdate(frontendToken, mapping)
 }
 
 func (c *Controller) UnbindFrontendMapping(frontendToken, name string) error {
@@ -122,8 +113,7 @@ func (c *Controller) UnbindFrontendMapping(frontendToken, name string) error {
 		Name:      name,
 		Version:   time.Now().UnixNano(),
 	}
-
-	return c.SendMappingUpdate(frontendToken, mapping)
+	return c.sendMappingUpdate(frontendToken, mapping)
 }
 
 func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRequest) (*FrontendMappingsResponse, error) {
@@ -153,4 +143,12 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 	}
 
 	return &FrontendMappingsResponse{FrontendMappings: out}, nil
+}
+
+func (c *Controller) sendMappingUpdate(frontendToken string, m dynamicProxyModel.Mapping) error {
+	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
+		return err
+	}
+	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
+	return nil
 }
