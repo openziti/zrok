@@ -135,14 +135,6 @@ func Run(inCfg *config.Config) error {
 	api.ShareUpdateAccessHandler = newUpdateAccessHandler()
 	api.ShareUpdateShareHandler = newUpdateShareHandler()
 
-	if cfg.DynamicProxyController != nil {
-		dPCtrl, err = dynamicProxyController.NewController(cfg.DynamicProxyController)
-		if err != nil {
-			return err
-		}
-		logrus.Infof("started dynamic proxy controller")
-	}
-
 	if err := controllerStartup(); err != nil {
 		return err
 	}
@@ -151,6 +143,14 @@ func Run(inCfg *config.Config) error {
 		str = v
 	} else {
 		return errors.Wrap(err, "error opening store")
+	}
+
+	if cfg.DynamicProxyController != nil {
+		dPCtrl, err = dynamicProxyController.NewController(cfg.DynamicProxyController, str)
+		if err != nil {
+			return err
+		}
+		logrus.Infof("started dynamic proxy controller")
 	}
 
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {

@@ -3,20 +3,56 @@ package dynamicProxyController
 import (
 	"context"
 
+	"github.com/openziti/sdk-golang/ziti"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 type Controller struct {
+	UnimplementedDynamicProxyControllerServer
+	str       *store.Store
 	publisher *AmqpPublisher
+	zCfg      *ziti.Config
+	zCtx      ziti.Context
 }
 
-func NewController(cfg *Config) (*Controller, error) {
+func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 	publisher, err := NewAmqpPublisher(cfg.AmqpPublisher)
 	if err != nil {
 		return nil, err
 	}
-	return &Controller{publisher: publisher}, nil
+
+	zCfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
+	if err != nil {
+		return nil, err
+	}
+	zCtx, err := ziti.NewContext(zCfg)
+	if err != nil {
+		return nil, err
+	}
+	srv := grpc.NewServer()
+	ctrl := &Controller{
+		str:       str,
+		publisher: publisher,
+		zCfg:      zCfg,
+		zCtx:      zCtx,
+	}
+	RegisterDynamicProxyControllerServer(srv, ctrl)
+	l, err := zCtx.Listen(cfg.ServiceName)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		if err := srv.Serve(l); err != nil {
+			logrus.Errorf("error serving dynamic proxy controller: %v", err)
+			return
+		}
+	}()
+	logrus.Infof("started dynamic proxy controller server")
+
+	return ctrl, nil
 }
 
 func (c *Controller) SendMappingUpdate(frontendToken string, m dynamicProxyModel.Mapping) error {
@@ -25,4 +61,33 @@ func (c *Controller) SendMappingUpdate(frontendToken string, m dynamicProxyModel
 	}
 	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
 	return nil
+}
+
+func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRequest) (*FrontendMappingsResponse, error) {
+	trx, err := c.str.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer trx.Rollback()
+
+	var mappings []*store.FrontendMapping
+	if req.GetName() == "" {
+		mappings, err = c.str.FindFrontendMappingsByFrontendTokenWithVersionOrHigher(req.GetFrontendToken(), req.GetVersion(), trx)
+	} else {
+		mappings, err = c.str.FindFrontendMappingsWithVersionOrHigher(req.GetFrontendToken(), req.GetName(), req.GetVersion(), trx)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]*FrontendMapping, len(mappings))
+	for i, storeMapping := range mappings {
+		out[i] = &FrontendMapping{
+			Name:       storeMapping.Name,
+			Version:    storeMapping.Version,
+			ShareToken: storeMapping.ShareToken,
+		}
+	}
+
+	return &FrontendMappingsResponse{FrontendMappings: out}, nil
 }

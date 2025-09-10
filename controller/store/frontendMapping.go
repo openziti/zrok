@@ -106,3 +106,35 @@ func (str *Store) DeleteFrontendMappingsByFrontendToken(frontendToken string, tx
 	}
 	return nil
 }
+
+func (str *Store) FindFrontendMappingsWithVersionOrHigher(frontendToken, name string, version int64, tx *sqlx.Tx) ([]*FrontendMapping, error) {
+	rows, err := tx.Queryx("select * from frontend_mappings where frontend_token = $1 and name = $2 and version >= $3 order by version asc", frontendToken, name, version)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend mappings with version or higher")
+	}
+	var mappings []*FrontendMapping
+	for rows.Next() {
+		fm := &FrontendMapping{}
+		if err := rows.StructScan(fm); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend mapping")
+		}
+		mappings = append(mappings, fm)
+	}
+	return mappings, nil
+}
+
+func (str *Store) FindFrontendMappingsByFrontendTokenWithVersionOrHigher(frontendToken string, version int64, tx *sqlx.Tx) ([]*FrontendMapping, error) {
+	rows, err := tx.Queryx("select * from frontend_mappings where frontend_token = $1 and version >= $2 order by name, version asc", frontendToken, version)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend mappings by frontend_token with version or higher")
+	}
+	var mappings []*FrontendMapping
+	for rows.Next() {
+		fm := &FrontendMapping{}
+		if err := rows.StructScan(fm); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend mapping")
+		}
+		mappings = append(mappings, fm)
+	}
+	return mappings, nil
+}

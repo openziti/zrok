@@ -1,5 +1,7 @@
 package dynamicProxyController
 
 type Config struct {
-	AmqpPublisher *AmqpPublisherConfig
+	IdentityPath  string               `df:"required"`
+	ServiceName   string               `df:"required"`
+	AmqpPublisher *AmqpPublisherConfig `df:"required"`
 }
