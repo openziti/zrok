@@ -3,8 +3,6 @@ package dynamicProxyController
 import (
 	"context"
 
-	"github.com/michaelquigley/df"
-	"github.com/openziti/zrok/sdk/golang/pubsub"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,11 +22,11 @@ type Mapping struct {
 }
 
 type Controller struct {
-	publisher pubsub.Publisher
+	publisher *AmqpPublisher
 }
 
 func NewController(cfg *Config) (*Controller, error) {
-	publisher, err := pubsub.NewPublisher(cfg.Publisher)
+	publisher, err := NewAmqpPublisher(cfg.AmqpPublisher)
 	if err != nil {
 		return nil, err
 	}
@@ -36,14 +34,9 @@ func NewController(cfg *Config) (*Controller, error) {
 }
 
 func (c *Controller) SendMappingUpdate(frontendToken string, m Mapping) error {
-	data, err := df.Unbind(m)
-	if err != nil {
+	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
 		return err
 	}
-	msg := pubsub.NewMessage(MappingUpdate, frontendToken, data)
-	if err := c.publisher.Publish(context.Background(), msg); err != nil {
-		return err
-	}
-	logrus.Infof("sent '%v' -> '%v'", data, frontendToken)
+	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
 	return nil
 }
