@@ -76,7 +76,7 @@ mainLoop:
 					break mainLoop
 				}
 			}
-			logrus.Infof("connected to amqp broker, consuming m.essages for frontend '%s'", s.cfg.FrontendToken)
+			logrus.Infof("connected to amqp broker, consuming messages for frontend '%s'", s.cfg.FrontendToken)
 
 			if err := s.consume(); err != nil {
 				logrus.Errorf("consume error: %v", err)
