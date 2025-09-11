@@ -58,6 +58,28 @@ func NewNotFoundError(resource, operation string, cause error) *AutomationError 
 	}
 }
 
+// base options for resource creation; common fields across all resource types
+type BaseOptions struct {
+	Name       string
+	Tags       TagStrategy
+	TagContext map[string]interface{}
+	Timeout    time.Duration
+}
+
+func (bo *BaseOptions) GetTimeout() time.Duration {
+	if bo.Timeout == 0 {
+		return 30 * time.Second
+	}
+	return bo.Timeout
+}
+
+func (bo *BaseOptions) GetTags() *rest_model.Tags {
+	if bo.Tags != nil {
+		return bo.Tags.GenerateTags(bo.TagContext)
+	}
+	return &rest_model.Tags{SubTags: make(map[string]interface{})}
+}
+
 // base resource manager for common functionality
 type BaseResourceManager[T any] struct {
 	client *Client
@@ -142,7 +164,6 @@ func getResourceID(item interface{}) string {
 	}
 }
 
-
 type FilterOptions struct {
 	Filter  string
 	Limit   int64
@@ -163,7 +184,6 @@ func (fo *FilterOptions) GetLimit() int64 {
 	}
 	return fo.Limit
 }
-
 
 func BuildFilter(field, value string) string {
 	return fmt.Sprintf("%s=\"%s\"", field, value)

@@ -25,27 +25,10 @@ func NewIdentityManager(client *Client) *IdentityManager {
 var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = (*IdentityManager)(nil)
 
 type IdentityOptions struct {
-	Name        string
-	Tags        TagStrategy
-	TagContext  map[string]interface{}
-	Timeout     time.Duration
-	Type        rest_model.IdentityType
-	IsAdmin     bool
-	RoleAttribs []string
-}
-
-func (io *IdentityOptions) GetTimeout() time.Duration {
-	if io.Timeout == 0 {
-		return 30 * time.Second
-	}
-	return io.Timeout
-}
-
-func (io *IdentityOptions) GetTags() *rest_model.Tags {
-	if io.Tags != nil {
-		return io.Tags.GenerateTags(io.TagContext)
-	}
-	return &rest_model.Tags{SubTags: make(map[string]interface{})}
+	BaseOptions
+	Type            rest_model.IdentityType
+	IsAdmin         bool
+	RoleAttributes  []string
 }
 
 func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
@@ -54,7 +37,7 @@ func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
 		Enrollment:          &rest_model.IdentityCreateEnrollment{Ott: true},
 		IsAdmin:             &opts.IsAdmin,
 		Name:                &opts.Name,
-		RoleAttributes:      (*rest_model.Attributes)(&opts.RoleAttribs),
+		RoleAttributes:      (*rest_model.Attributes)(&opts.RoleAttributes),
 		ServiceHostingCosts: nil,
 		Tags:                opts.GetTags(),
 		Type:                &opts.Type,

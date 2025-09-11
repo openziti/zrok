@@ -50,8 +50,10 @@ func ExampleCreateIdentity(za *ZitiAutomation) (string, error) {
 	tags := NewZrokTagStrategy().WithTag("zrokEmail", "user@example.com")
 	
 	opts := &IdentityOptions{
-		Name:    "user-identity",
-		Tags:    tags,
+		BaseOptions: BaseOptions{
+			Name: "user-identity",
+			Tags: tags,
+		},
 		Type:    rest_model.IdentityTypeUser,
 		IsAdmin: false,
 	}
@@ -63,8 +65,10 @@ func ExampleCreateService(za *ZitiAutomation, configID string) (string, error) {
 	tags := ZrokBaseTags()
 	
 	opts := &ServiceOptions{
-		Name:               "my-service",
-		Tags:               tags,
+		BaseOptions: BaseOptions{
+			Name: "my-service",
+			Tags: tags,
+		},
 		Configs:            []string{configID},
 		EncryptionRequired: true,
 	}
@@ -76,8 +80,10 @@ func ExampleCreateConfig(za *ZitiAutomation, configTypeID string) (string, error
 	tags := ZrokShareTags("share-token-123")
 	
 	opts := &ConfigOptions{
-		Name:         "proxy-config",
-		Tags:         tags,
+		BaseOptions: BaseOptions{
+			Name: "proxy-config",
+			Tags: tags,
+		},
 		ConfigTypeID: configTypeID,
 		Data:         map[string]interface{}{"address": "localhost:8080"},
 	}
@@ -94,8 +100,10 @@ func ExampleCreateEnvironment(za *ZitiAutomation, accountEmail, uniqueToken, env
 	tags := NewZrokTagStrategy().WithTag("zrokEmail", accountEmail)
 	
 	opts := &IdentityOptions{
-		Name:    name,
-		Tags:    tags,
+		BaseOptions: BaseOptions{
+			Name: name,
+			Tags: tags,
+		},
 		Type:    rest_model.IdentityTypeUser,
 		IsAdmin: false,
 	}

@@ -23,25 +23,8 @@ func NewConfigTypeManager(client *Client) *ConfigTypeManager {
 var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = (*ConfigTypeManager)(nil)
 
 type ConfigTypeOptions struct {
-	Name       string
-	Tags       TagStrategy
-	TagContext map[string]interface{}
-	Timeout    time.Duration
-	Schema     interface{}
-}
-
-func (cto *ConfigTypeOptions) GetTimeout() time.Duration {
-	if cto.Timeout == 0 {
-		return 30 * time.Second
-	}
-	return cto.Timeout
-}
-
-func (cto *ConfigTypeOptions) GetTags() *rest_model.Tags {
-	if cto.Tags != nil {
-		return cto.Tags.GenerateTags(cto.TagContext)
-	}
-	return &rest_model.Tags{SubTags: make(map[string]interface{})}
+	BaseOptions
+	Schema interface{}
 }
 
 func (ctm *ConfigTypeManager) Create(opts *ConfigTypeOptions) (string, error) {
@@ -135,7 +118,9 @@ func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 
 	// create it
 	opts := &ConfigTypeOptions{
-		Name:   name,
+		BaseOptions: BaseOptions{
+			Name: name,
+		},
 		Schema: nil, // no schema for zrok proxy config
 	}
 

@@ -23,26 +23,9 @@ func NewConfigManager(client *Client) *ConfigManager {
 var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = (*ConfigManager)(nil)
 
 type ConfigOptions struct {
-	Name         string
-	Tags         TagStrategy
-	TagContext   map[string]interface{}
-	Timeout      time.Duration
+	BaseOptions
 	ConfigTypeID string
 	Data         interface{}
-}
-
-func (co *ConfigOptions) GetTimeout() time.Duration {
-	if co.Timeout == 0 {
-		return 30 * time.Second
-	}
-	return co.Timeout
-}
-
-func (co *ConfigOptions) GetTags() *rest_model.Tags {
-	if co.Tags != nil {
-		return co.Tags.GenerateTags(co.TagContext)
-	}
-	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (cm *ConfigManager) Create(opts *ConfigOptions) (string, error) {

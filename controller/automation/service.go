@@ -23,29 +23,12 @@ func NewServiceManager(client *Client) *ServiceManager {
 var _ IResourceManager[rest_model.ServiceDetail, *ServiceOptions] = (*ServiceManager)(nil)
 
 type ServiceOptions struct {
-	Name               string
-	Tags               TagStrategy
-	TagContext         map[string]interface{}
-	Timeout            time.Duration
+	BaseOptions
 	Configs            []string
 	EncryptionRequired bool
 	TerminatorStrategy string
 	RoleAttributes     []string
 	MaxIdleTime        *int64
-}
-
-func (so *ServiceOptions) GetTimeout() time.Duration {
-	if so.Timeout == 0 {
-		return 30 * time.Second
-	}
-	return so.Timeout
-}
-
-func (so *ServiceOptions) GetTags() *rest_model.Tags {
-	if so.Tags != nil {
-		return so.Tags.GenerateTags(so.TagContext)
-	}
-	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
 func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {

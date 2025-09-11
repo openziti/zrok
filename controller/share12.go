@@ -287,8 +287,10 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 	// create config using the global zrokProxyConfigId
 	tags := automation.ZrokShareTags(shrToken)
 	configOpts := &automation.ConfigOptions{
-		Name:         shrToken,
-		Tags:         tags,
+		BaseOptions: automation.BaseOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
 		ConfigTypeID: zrokProxyConfigId,
 		Data:         frontendConfig,
 	}
@@ -299,8 +301,10 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 
 	// create share service
 	serviceOpts := &automation.ServiceOptions{
-		Name:               shrToken,
-		Tags:               tags,
+		BaseOptions: automation.BaseOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
 		Configs:            []string{cfgZId},
 		EncryptionRequired: true,
 	}
@@ -415,8 +419,10 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 	// create config using the global zrokProxyConfigId
 	tags := automation.ZrokShareTags(shrToken)
 	configOpts := &automation.ConfigOptions{
-		Name:         shrToken,
-		Tags:         tags,
+		BaseOptions: automation.BaseOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
 		ConfigTypeID: zrokProxyConfigId,
 		Data:         frontendConfig,
 	}
@@ -427,8 +433,10 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 
 	// create share service
 	serviceOpts := &automation.ServiceOptions{
-		Name:               shrToken,
-		Tags:               tags,
+		BaseOptions: automation.BaseOptions{
+			Name: shrToken,
+			Tags: tags,
+		},
 		Configs:            []string{cfgZId},
 		EncryptionRequired: true,
 	}
