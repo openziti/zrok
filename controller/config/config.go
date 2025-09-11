@@ -41,7 +41,7 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	Secrets         []string `df:",secret"`
+	Secrets         []string `df:"+secret"`
 	TouLink         string
 	NewAccountLink  string
 	ProfileEndpoint string

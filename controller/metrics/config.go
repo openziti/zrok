@@ -15,5 +15,5 @@ type InfluxConfig struct {
 	Url    string
 	Bucket string
 	Org    string
-	Token  string `df:",secret"`
+	Token  string `df:"+secret"`
 }

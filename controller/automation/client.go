@@ -10,18 +10,18 @@ import (
 type Config struct {
 	ApiEndpoint string
 	Username    string
-	Password    string `df:",secret"`
+	Password    string `df:"+secret"`
 }
 
 type Client struct {
-	edge                      *rest_management_api_client.ZitiEdgeManagement
-	Identity                  *IdentityManager
-	Service                   *ServiceManager
-	Config                    *ConfigManager
-	ConfigType                *ConfigTypeManager
-	EdgeRouterPolicy          *EdgeRouterPolicyManager
-	ServiceEdgeRouterPolicy   *ServiceEdgeRouterPolicyManager
-	ServicePolicy             *ServicePolicyManager
+	edge                    *rest_management_api_client.ZitiEdgeManagement
+	Identity                *IdentityManager
+	Service                 *ServiceManager
+	Config                  *ConfigManager
+	ConfigType              *ConfigTypeManager
+	EdgeRouterPolicy        *EdgeRouterPolicyManager
+	ServiceEdgeRouterPolicy *ServiceEdgeRouterPolicyManager
+	ServicePolicy           *ServicePolicyManager
 }
 
 func NewClient(cfg *Config) (*Client, error) {
@@ -37,7 +37,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	client := &Client{edge: edge}
 	client.Identity = NewIdentityManager(client)
 	client.Service = NewServiceManager(client)
@@ -46,7 +46,7 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.EdgeRouterPolicy = NewEdgeRouterPolicyManager(client)
 	client.ServiceEdgeRouterPolicy = NewServiceEdgeRouterPolicyManager(client)
 	client.ServicePolicy = NewServicePolicyManager(client)
-	
+
 	return client, nil
 }
 

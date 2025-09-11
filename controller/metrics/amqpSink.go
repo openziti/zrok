@@ -13,7 +13,7 @@ import (
 const AmqpSinkType = "amqpSink"
 
 type AmqpSinkConfig struct {
-	Url       string `df:",secret"`
+	Url       string `df:"+secret"`
 	QueueName string
 }
 

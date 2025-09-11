@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	V              int                   `df:"v,match=\"1\""`
-	AmqpSubscriber *AmqpSubscriberConfig `df:"required"`
+	V              int                   `df:"+match=1"`
+	AmqpSubscriber *AmqpSubscriberConfig `df:"+required"`
 }
 
 type Service struct {

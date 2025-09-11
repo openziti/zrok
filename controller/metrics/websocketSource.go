@@ -28,7 +28,7 @@ type WebsocketSourceConfig struct {
 	WebsocketEndpoint string // wss://127.0.0.1:1280/fabric/v1/ws-api
 	ApiEndpoint       string // https://127.0.0.1:1280
 	Username          string
-	Password          string `df:",secret"`
+	Password          string `df:"+secret"`
 }
 
 func LoadWebsocketSource(v map[string]any) (df.Dynamic, error) {

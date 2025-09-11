@@ -14,9 +14,9 @@ import (
 )
 
 type AmqpSubscriberConfig struct {
-	Url           string `df:"required"`
-	ExchangeName  string `df:"required"`
-	FrontendToken string `df:"required"`
+	Url           string `df:"+required"`
+	ExchangeName  string `df:"+required"`
+	FrontendToken string `df:"+required"`
 }
 
 type AmqpSubscriber struct {

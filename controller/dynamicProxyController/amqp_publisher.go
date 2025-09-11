@@ -13,8 +13,8 @@ import (
 )
 
 type AmqpPublisherConfig struct {
-	Url          string `df:"required"`
-	ExchangeName string `df:"required"`
+	Url          string `df:"+required"`
+	ExchangeName string `df:"+required"`
 }
 
 type AmqpPublisher struct {

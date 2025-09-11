@@ -39,15 +39,15 @@ type OauthConfig struct {
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
-	SigningKey           string       `df:",secret"`
-	EncryptionKey        string       `df:",secret"`
-	Providers            []df.Dynamic `df:",secret"`
+	SigningKey           string       `df:"+secret"`
+	EncryptionKey        string       `df:"+secret"`
+	Providers            []df.Dynamic `df:"+secret"`
 }
 
 type OauthProviderConfig struct {
 	Name         string
 	ClientId     string
-	ClientSecret string `df:",secret"`
+	ClientSecret string `df:"+secret"`
 }
 
 func DefaultConfig() *Config {

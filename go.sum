@@ -696,10 +696,8 @@ github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d h1:5PJl274Y63IEHC+7izoQ
 github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
 github.com/mholt/acmez/v3 v3.0.0 h1:r1NcjuWR0VaKP2BTjDK9LRFBw/WvURx3jlaEUl9Ht8E=
 github.com/mholt/acmez/v3 v3.0.0/go.mod h1:L1wOU06KKvq7tswuMDwKdcHeKpFFgkppZy/y0DFxagQ=
-github.com/michaelquigley/df v0.2.6 h1:SMnq6LzQuA99pyE2Sl37Dc/OtjE/YIcMmtbYYHTOkUo=
-github.com/michaelquigley/df v0.2.6/go.mod h1:Ym3uLqdbI6DxhqzLLtAzQ2ry7KfPKCjfXEgoOL23xfI=
-github.com/michaelquigley/df v0.2.7 h1:fuAq4o7qp4o+NS9cBWegPpH3Yqe1TpBKH2PChremQpk=
-github.com/michaelquigley/df v0.2.7/go.mod h1:Ym3uLqdbI6DxhqzLLtAzQ2ry7KfPKCjfXEgoOL23xfI=
+github.com/michaelquigley/df v0.2.8 h1:UHfygwq+OwVaz8wtoAe+0a5PZhlVtfacDh9FzqET0Ik=
+github.com/michaelquigley/df v0.2.8/go.mod h1:Ym3uLqdbI6DxhqzLLtAzQ2ry7KfPKCjfXEgoOL23xfI=
 github.com/michaelquigley/pfxlog v0.6.10 h1:IbC/H3MmSDcPlQHF1UZPQU13Dkrs0+ycWRyQd2ihnjw=
 github.com/michaelquigley/pfxlog v0.6.10/go.mod h1:gEiNTfKEX6cJHSwRpOuqBpc8oYrlhMiDK/xMk/gV7D0=
 github.com/microcosm-cc/bluemonday v1.0.1/go.mod h1:hsXNsILzKxV+sX77C5b8FSuKF00vh2OMYv+xgHpAMF4=
