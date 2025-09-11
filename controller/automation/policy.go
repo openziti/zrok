@@ -1,8 +1,10 @@
 package automation
 
 import (
+	"context"
 	"time"
 
+	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
@@ -12,13 +14,21 @@ import (
 )
 
 type PolicyManager struct {
-	*ResourceManager
+	client *Client
 }
 
 func NewPolicyManager(client *Client) *PolicyManager {
 	return &PolicyManager{
-		ResourceManager: NewResourceManager(client),
+		client: client,
 	}
+}
+
+func (pm *PolicyManager) Edge() *rest_management_api_client.ZitiEdgeManagement {
+	return pm.client.Edge()
+}
+
+func (pm *PolicyManager) Context() context.Context {
+	return context.Background()
 }
 
 type PolicyBuilder struct {

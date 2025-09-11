@@ -142,35 +142,6 @@ func getResourceID(item interface{}) string {
 	}
 }
 
-// legacy ResourceManager for backward compatibility
-type ResourceManager struct {
-	client *Client
-}
-
-func NewResourceManager(client *Client) *ResourceManager {
-	return &ResourceManager{client: client}
-}
-
-type ResourceOptions struct {
-	Name       string
-	Tags       TagStrategy
-	TagContext map[string]interface{}
-	Timeout    time.Duration
-}
-
-func (ro *ResourceOptions) GetTimeout() time.Duration {
-	if ro.Timeout == 0 {
-		return 30 * time.Second
-	}
-	return ro.Timeout
-}
-
-func (ro *ResourceOptions) GetTags() *rest_model.Tags {
-	if ro.Tags != nil {
-		return ro.Tags.GenerateTags(ro.TagContext)
-	}
-	return &rest_model.Tags{SubTags: make(map[string]interface{})}
-}
 
 type FilterOptions struct {
 	Filter  string
@@ -193,13 +164,6 @@ func (fo *FilterOptions) GetLimit() int64 {
 	return fo.Limit
 }
 
-func (rm *ResourceManager) Edge() *rest_management_api_client.ZitiEdgeManagement {
-	return rm.client.Edge()
-}
-
-func (rm *ResourceManager) Context() context.Context {
-	return context.Background()
-}
 
 func BuildFilter(field, value string) string {
 	return fmt.Sprintf("%s=\"%s\"", field, value)
