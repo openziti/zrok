@@ -239,15 +239,10 @@ func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zro
 }
 
 func (h *share12Handler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, interstitial bool, trx interface{}) (string, []string, error) {
-	// create automation client
-	automationCfg := &automation.Config{
-		ApiEndpoint: cfg.Ziti.ApiEndpoint,
-		Username:    cfg.Ziti.Username,
-		Password:    cfg.Ziti.Password,
-	}
-	ziti, err := automation.NewZitiAutomation(automationCfg)
+	// get shared automation client
+	ziti, err := automation.GetZitiAutomation(cfg)
 	if err != nil {
-		return "", nil, errors.Wrap(err, "error creating ziti automation client")
+		return "", nil, errors.Wrap(err, "error getting ziti automation client")
 	}
 
 	// prepare auth users
@@ -318,7 +313,7 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 	bindPolicy := automation.NewPolicyBuilder(bindPolicyName).
 		WithServiceIDs(shrZId).
 		WithIdentityIDs(envZId).
-		WithTags(tags, nil)
+		WithTags(tags)
 	_, err = ziti.Policies.CreateServicePolicyBind(bindPolicy)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
@@ -348,7 +343,7 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 		dialPolicy := automation.NewPolicyBuilder(dialPolicyName).
 			WithServiceIDs(shrZId).
 			WithIdentityIDs(frontendZIds...).
-			WithTags(tags, nil)
+			WithTags(tags)
 		_, err = ziti.Policies.CreateServicePolicyDial(dialPolicy)
 		if err != nil {
 			return "", nil, errors.Wrap(err, "error creating service policy dial")
@@ -360,7 +355,7 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 	serpPolicy := automation.NewPolicyBuilder(serpPolicyName).
 		WithServiceIDs(shrZId).
 		WithAllEdgeRouters().
-		WithTags(tags, nil)
+		WithTags(tags)
 	_, err = ziti.Policies.CreateServiceEdgeRouterPolicy(serpPolicy)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
@@ -371,15 +366,10 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 }
 
 func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, trx interface{}) (string, []string, error) {
-	// create automation client
-	automationCfg := &automation.Config{
-		ApiEndpoint: cfg.Ziti.ApiEndpoint,
-		Username:    cfg.Ziti.Username,
-		Password:    cfg.Ziti.Password,
-	}
-	ziti, err := automation.NewZitiAutomation(automationCfg)
+	// get shared automation client
+	ziti, err := automation.GetZitiAutomation(cfg)
 	if err != nil {
-		return "", nil, errors.Wrap(err, "error creating ziti automation client")
+		return "", nil, errors.Wrap(err, "error getting ziti automation client")
 	}
 
 	// prepare auth users
@@ -450,7 +440,7 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 	bindPolicy := automation.NewPolicyBuilder(bindPolicyName).
 		WithServiceIDs(shrZId).
 		WithIdentityIDs(envZId).
-		WithTags(tags, nil)
+		WithTags(tags)
 	_, err = ziti.Policies.CreateServicePolicyBind(bindPolicy)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
@@ -461,7 +451,7 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 	serpPolicy := automation.NewPolicyBuilder(serpPolicyName).
 		WithServiceIDs(shrZId).
 		WithAllEdgeRouters().
-		WithTags(tags, nil)
+		WithTags(tags)
 	_, err = ziti.Policies.CreateServiceEdgeRouterPolicy(serpPolicy)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")

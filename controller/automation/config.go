@@ -19,9 +19,6 @@ func NewConfigManager(client *Client) *ConfigManager {
 	}
 }
 
-// ensure ConfigManager implements the interface
-var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = (*ConfigManager)(nil)
-
 type ConfigOptions struct {
 	BaseOptions
 	ConfigTypeID string
@@ -116,3 +113,6 @@ func (cm *ConfigManager) GetByName(name string) (*rest_model.ConfigDetail, error
 func (cm *ConfigManager) DeleteWithFilter(filter string) error {
 	return DeleteWithFilter(cm.Find, cm.Delete, filter, "config")
 }
+
+// ensure ConfigManager implements the interface
+var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = (*ConfigManager)(nil)

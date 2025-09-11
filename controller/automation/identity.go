@@ -21,14 +21,11 @@ func NewIdentityManager(client *Client) *IdentityManager {
 	}
 }
 
-// ensure IdentityManager implements the interface
-var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = (*IdentityManager)(nil)
-
 type IdentityOptions struct {
 	BaseOptions
-	Type            rest_model.IdentityType
-	IsAdmin         bool
-	RoleAttributes  []string
+	Type           rest_model.IdentityType
+	IsAdmin        bool
+	RoleAttributes []string
 }
 
 func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
@@ -129,3 +126,6 @@ func (im *IdentityManager) Enroll(id string) (*ziti.Config, error) {
 	logrus.Infof("enrolled identity '%s'", id)
 	return conf, nil
 }
+
+// ensure IdentityManager implements the interface
+var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = (*IdentityManager)(nil)

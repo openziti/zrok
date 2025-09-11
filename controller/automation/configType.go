@@ -19,9 +19,6 @@ func NewConfigTypeManager(client *Client) *ConfigTypeManager {
 	}
 }
 
-// ensure ConfigTypeManager implements the interface
-var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = (*ConfigTypeManager)(nil)
-
 type ConfigTypeOptions struct {
 	BaseOptions
 	Schema interface{}
@@ -131,3 +128,6 @@ func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 
 	return id, nil
 }
+
+// ensure ConfigTypeManager implements the interface
+var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = (*ConfigTypeManager)(nil)

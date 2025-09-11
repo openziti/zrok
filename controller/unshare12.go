@@ -44,7 +44,7 @@ func (h *unshare12Handler) Handle(params share.Unshare12Params, principal *rest_
 	}
 
 	// deallocate ziti resources using automation framework
-	if err := h.deallocateResources(envZId, shrToken, shr.ZId); err != nil {
+	if err := h.deallocateResources(shrToken); err != nil {
 		logrus.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
 	}
 
@@ -104,20 +104,15 @@ func (h *unshare12Handler) findAndValidateShare(shrToken string, env *store.Envi
 	return nil, errors.Errorf("share '%v' not found in environment '%v'", shrToken, env.ZId)
 }
 
-func (h *unshare12Handler) deallocateResources(envZId, shrToken, shrZId string) error {
-	// create automation client
-	automationCfg := &automation.Config{
-		ApiEndpoint: cfg.Ziti.ApiEndpoint,
-		Username:    cfg.Ziti.Username,
-		Password:    cfg.Ziti.Password,
-	}
-	ziti, err := automation.NewZitiAutomation(automationCfg)
+func (h *unshare12Handler) deallocateResources(shrToken string) error {
+	// get shared automation client
+	za, err := automation.GetZitiAutomation(cfg)
 	if err != nil {
-		return errors.Wrap(err, "error creating ziti automation client")
+		return errors.Wrap(err, "error getting ziti automation client")
 	}
 
-	// use tag-based cleanup for all resources associated with this share
-	err = ziti.CleanupByTagFilter("zrokShareToken", shrToken)
+	// use fluent workflow API for tag-based cleanup
+	err = za.CleanupByTag("zrokShareToken", shrToken)
 	if err != nil {
 		return errors.Wrapf(err, "error cleaning up ziti resources for share '%v'", shrToken)
 	}

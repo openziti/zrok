@@ -10,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// unified resource management interface
 type IResourceManager[T any, CreateOpts any] interface {
 	Create(opts CreateOpts) (string, error)
 	Delete(id string) error
@@ -19,7 +18,6 @@ type IResourceManager[T any, CreateOpts any] interface {
 	GetByName(name string) (*T, error)
 }
 
-// error types for better error handling
 type ErrorType int
 
 const (
@@ -58,10 +56,9 @@ func NewNotFoundError(resource, operation string, cause error) *AutomationError 
 	}
 }
 
-// base options for resource creation; common fields across all resource types
 type BaseOptions struct {
 	Name       string
-	Tags       TagStrategy
+	Tags       *Tags
 	TagContext map[string]interface{}
 	Timeout    time.Duration
 }
@@ -75,12 +72,11 @@ func (bo *BaseOptions) GetTimeout() time.Duration {
 
 func (bo *BaseOptions) GetTags() *rest_model.Tags {
 	if bo.Tags != nil {
-		return bo.Tags.GenerateTags(bo.TagContext)
+		return bo.Tags.ToRestModel()
 	}
 	return &rest_model.Tags{SubTags: make(map[string]interface{})}
 }
 
-// base resource manager for common functionality
 type BaseResourceManager[T any] struct {
 	client *Client
 }

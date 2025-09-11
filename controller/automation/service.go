@@ -3,7 +3,7 @@ package automation
 import (
 	"time"
 
-	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
+	edgeservice "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -54,7 +54,7 @@ func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {
 		svc.MaxIdleTimeMillis = *opts.MaxIdleTime
 	}
 
-	req := &edge_service.CreateServiceParams{
+	req := &edgeservice.CreateServiceParams{
 		Service: svc,
 		Context: sm.Context(),
 	}
@@ -70,7 +70,7 @@ func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {
 }
 
 func (sm *ServiceManager) Delete(id string) error {
-	req := &edge_service.DeleteServiceParams{
+	req := &edgeservice.DeleteServiceParams{
 		ID:      id,
 		Context: sm.Context(),
 	}
@@ -86,7 +86,7 @@ func (sm *ServiceManager) Delete(id string) error {
 }
 
 func (sm *ServiceManager) Find(opts *FilterOptions) ([]*rest_model.ServiceDetail, error) {
-	req := &edge_service.ListServicesParams{
+	req := &edgeservice.ListServicesParams{
 		Filter:  &opts.Filter,
 		Limit:   &opts.Limit,
 		Offset:  &opts.Offset,
