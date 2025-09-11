@@ -3,11 +3,9 @@ package dynamicProxyModel
 type Operation string
 
 const (
-	OperationBind   Operation = "bi"
-	OperationUnbind Operation = "un"
+	OperationBind   Operation = "bnd"
+	OperationUnbind Operation = "ubd"
 )
-
-const MappingUpdate = "mup"
 
 type Mapping struct {
 	Operation  Operation `json:"o"`

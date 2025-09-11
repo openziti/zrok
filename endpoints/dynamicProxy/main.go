@@ -24,8 +24,8 @@ func NewService(cfgPath string) (*Service, error) {
 		},
 	}
 	svc := &Service{app: df.NewApplication[*Config](defaults)}
-	df.WithFactoryFunc(svc.app, svc.buildSubscriber)
-	df.WithFactoryFunc(svc.app, svc.buildGrpcClient)
+	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
+	df.WithFactoryFunc(svc.app, buildControllerClient)
 	if err := svc.app.Initialize(cfgPath); err != nil {
 		return nil, err
 	}
@@ -41,25 +41,14 @@ func (p *Service) Stop() error {
 	return p.app.Stop()
 }
 
-func (p *Service) buildSubscriber(app *df.Application[*Config]) error {
-	subscriber, err := NewAmqpSubscriber(app.Cfg.AmqpSubscriber)
-	if err != nil {
-		return err
+func (p *Service) getAmqpSubscriber() *AmqpSubscriber {
+	if subscriber, found := df.Get[*AmqpSubscriber](p.app.C); found {
+		return subscriber
 	}
-	df.Set(app.C, subscriber)
 	return nil
 }
 
-func (p *Service) buildGrpcClient(app *df.Application[*Config]) error {
-	client, err := NewControllerClient(app.Cfg.Controller)
-	if err != nil {
-		return err
-	}
-	df.Set(app.C, client)
-	return nil
-}
-
-func (p *Service) getDynamicProxyClient() *ControllerClient {
+func (p *Service) getControllerClient() *ControllerClient {
 	if client, found := df.Get[*ControllerClient](p.app.C); found {
 		return client
 	}

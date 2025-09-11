@@ -217,3 +217,12 @@ func (s *AmqpSubscriber) disconnect() {
 func (s *AmqpSubscriber) generateQueueName() string {
 	return "frontend-" + s.cfg.FrontendToken + "-" + s.instanceID
 }
+
+func buildAmqpSubscriber(app *df.Application[*Config]) error {
+	subscriber, err := NewAmqpSubscriber(app.Cfg.AmqpSubscriber)
+	if err != nil {
+		return err
+	}
+	df.Set(app.C, subscriber)
+	return nil
+}

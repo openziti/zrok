@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/michaelquigley/df"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
@@ -134,4 +135,13 @@ func (c *ControllerClient) IsConnected() bool {
 		return false
 	}
 	return c.conn.GetState().String() == "READY"
+}
+
+func buildControllerClient(app *df.Application[*Config]) error {
+	client, err := NewControllerClient(app.Cfg.Controller)
+	if err != nil {
+		return err
+	}
+	df.Set(app.C, client)
+	return nil
 }
