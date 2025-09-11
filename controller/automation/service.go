@@ -1,8 +1,6 @@
 package automation
 
 import (
-	"time"
-
 	edgeservice "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
@@ -74,7 +72,7 @@ func (sm *ServiceManager) Delete(id string) error {
 		ID:      id,
 		Context: sm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := sm.Edge().Service.DeleteService(req, nil)
 	if err != nil {

@@ -1,8 +1,6 @@
 package automation
 
 import (
-	"time"
-
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
@@ -74,7 +72,7 @@ func (cm *ConfigManager) Delete(id string) error {
 		ID:      id,
 		Context: cm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := cm.Edge().Config.DeleteConfig(req, nil)
 	if err != nil {

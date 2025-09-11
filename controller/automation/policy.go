@@ -2,7 +2,6 @@ package automation
 
 import (
 	"context"
-	"time"
 
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
@@ -114,7 +113,7 @@ func (pm *PolicyManager) CreateEdgeRouterPolicy(builder *PolicyBuilder) (string,
 		Policy:  erp,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	resp, err := pm.Edge().EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
 	if err != nil {
@@ -130,7 +129,7 @@ func (pm *PolicyManager) DeleteEdgeRouterPolicy(id string) error {
 		ID:      id,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := pm.Edge().EdgeRouterPolicy.DeleteEdgeRouterPolicy(req, nil)
 	if err != nil {
@@ -195,7 +194,7 @@ func (pm *PolicyManager) CreateServiceEdgeRouterPolicy(builder *PolicyBuilder) (
 		Policy:  serp,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	resp, err := pm.Edge().ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(req, nil)
 	if err != nil {
@@ -211,7 +210,7 @@ func (pm *PolicyManager) DeleteServiceEdgeRouterPolicy(id string) error {
 		ID:      id,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := pm.Edge().ServiceEdgeRouterPolicy.DeleteServiceEdgeRouterPolicy(req, nil)
 	if err != nil {
@@ -278,7 +277,7 @@ func (pm *PolicyManager) CreateServicePolicy(builder *PolicyBuilder, policyType 
 		Policy:  spc,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	resp, err := pm.Edge().ServicePolicy.CreateServicePolicy(req, nil)
 	if err != nil {
@@ -302,7 +301,7 @@ func (pm *PolicyManager) DeleteServicePolicy(id string) error {
 		ID:      id,
 		Context: pm.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := pm.Edge().ServicePolicy.DeleteServicePolicy(req, nil)
 	if err != nil {

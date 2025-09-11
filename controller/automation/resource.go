@@ -65,7 +65,7 @@ type BaseOptions struct {
 
 func (bo *BaseOptions) GetTimeout() time.Duration {
 	if bo.Timeout == 0 {
-		return 30 * time.Second
+		return DefaultRequestTimeout
 	}
 	return bo.Timeout
 }
@@ -171,7 +171,7 @@ type FilterOptions struct {
 
 func (fo *FilterOptions) GetTimeout() time.Duration {
 	if fo.Timeout == 0 {
-		return 30 * time.Second
+		return DefaultRequestTimeout
 	}
 	return fo.Timeout
 }

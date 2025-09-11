@@ -1,8 +1,6 @@
 package automation
 
 import (
-	"time"
-
 	"github.com/openziti/edge-api/rest_management_api_client/identity"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
@@ -56,7 +54,7 @@ func (im *IdentityManager) Delete(id string) error {
 		ID:      id,
 		Context: im.Context(),
 	}
-	req.SetTimeout(30 * time.Second)
+	req.SetTimeout(DefaultOperationTimeout)
 
 	_, err := im.Edge().Identity.DeleteIdentity(req, nil)
 	if err != nil {
@@ -101,7 +99,7 @@ func (im *IdentityManager) Enroll(id string) (*ziti.Config, error) {
 		Context: im.Context(),
 		ID:      id,
 	}
-	p.SetTimeout(30 * time.Second)
+	p.SetTimeout(DefaultOperationTimeout)
 
 	resp, err := im.Edge().Identity.DetailIdentity(p, nil)
 	if err != nil {

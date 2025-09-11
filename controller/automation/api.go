@@ -3,6 +3,7 @@ package automation
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/openziti/zrok/controller/config"
 	"github.com/pkg/errors"
@@ -85,7 +86,7 @@ func (za *ZitiAutomation) CleanupByTag(tag, value string) error {
 		filter = BuildTagFilter(tag, value)
 	}
 
-	// delete service edge router policies first
+	// delete service edge router policies
 	if err := za.Policies.DeleteServiceEdgeRouterPoliciesWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete service edge router policies")
 	}
@@ -117,6 +118,14 @@ func (za *ZitiAutomation) CleanupByTag(tag, value string) error {
 
 	return nil
 }
+
+const (
+	// DefaultRequestTimeout is the default timeout for API requests
+	DefaultRequestTimeout = 30 * time.Second
+
+	// DefaultOperationTimeout is the default timeout for CRUD operations
+	DefaultOperationTimeout = 30 * time.Second
+)
 
 var (
 	automationClientOnce sync.Once
