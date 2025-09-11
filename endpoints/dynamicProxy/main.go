@@ -2,6 +2,7 @@ package dynamicProxy
 
 import (
 	"github.com/michaelquigley/df"
+	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
@@ -16,12 +17,13 @@ type Service struct {
 
 func NewService(cfgPath string) (*Service, error) {
 	defaults := &Config{}
-	pp := &Service{app: df.NewApplication[*Config](defaults)}
-	df.WithFactoryFunc(pp.app, pp.buildSubscriber)
-	if err := pp.app.Initialize(cfgPath); err != nil {
+	svc := &Service{app: df.NewApplication[*Config](defaults)}
+	df.WithFactoryFunc(svc.app, svc.buildSubscriber)
+	if err := svc.app.Initialize(cfgPath); err != nil {
 		return nil, err
 	}
-	return pp, nil
+	logrus.Info(df.Inspect(svc.app.Cfg))
+	return svc, nil
 }
 
 func (p *Service) Start() error {

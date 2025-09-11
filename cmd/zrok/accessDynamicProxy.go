@@ -70,7 +70,7 @@ func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 
 func (cmd *accessDynamicProxyCommand) error(err error) {
 	if !panicInstead {
-		tui.Error("unable to start dynamic proxy", err)
+		tui.Error("unable to start dynamicProxy", err)
 	}
 	panic(err)
 }
