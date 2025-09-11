@@ -84,18 +84,7 @@ func (ctm *ConfigTypeManager) GetByID(id string) (*rest_model.ConfigTypeDetail, 
 }
 
 func (ctm *ConfigTypeManager) GetByName(name string) (*rest_model.ConfigTypeDetail, error) {
-	opts := &FilterOptions{Filter: BuildFilter("name", name)}
-	configTypes, err := ctm.Find(opts)
-	if err != nil {
-		return nil, err
-	}
-	if len(configTypes) == 0 {
-		return nil, nil
-	}
-	if len(configTypes) > 1 {
-		return nil, errors.Errorf("found %d config types for name '%s'; expected 0 or 1", len(configTypes), name)
-	}
-	return configTypes[0], nil
+	return GetByName(ctm.Find, name, "config type")
 }
 
 func (ctm *ConfigTypeManager) DeleteWithFilter(filter string) error {

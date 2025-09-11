@@ -134,7 +134,10 @@ func DeleteWithFilter[T any](finder func(*FilterOptions) ([]*T, error), deleter 
 	}
 
 	for _, item := range items {
-		id := getResourceID(item)
+		id, err := getResourceID(item)
+		if err != nil {
+			return errors.Wrapf(err, "error extracting ID for %s", resourceType)
+		}
 		if err := deleter(id); err != nil {
 			return errors.Wrapf(err, "error deleting %s '%s'", resourceType, id)
 		}
@@ -144,19 +147,18 @@ func DeleteWithFilter[T any](finder func(*FilterOptions) ([]*T, error), deleter 
 }
 
 // helper to extract ID from any resource type
-func getResourceID(item interface{}) string {
+func getResourceID(item interface{}) (string, error) {
 	switch v := item.(type) {
 	case *rest_model.IdentityDetail:
-		return *v.ID
+		return *v.ID, nil
 	case *rest_model.ServiceDetail:
-		return *v.ID
+		return *v.ID, nil
 	case *rest_model.ConfigDetail:
-		return *v.ID
+		return *v.ID, nil
 	case *rest_model.ConfigTypeDetail:
-		return *v.ID
+		return *v.ID, nil
 	default:
-		// fallback - try to get ID field via reflection or panic
-		panic(fmt.Sprintf("unsupported resource type: %T", item))
+		return "", errors.Errorf("unsupported resource type: %T", item)
 	}
 }
 

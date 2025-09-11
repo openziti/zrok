@@ -250,9 +250,7 @@ func (pm *PolicyManager) DeleteServiceEdgeRouterPoliciesWithFilter(filter string
 
 	for _, policy := range policies {
 		if err := pm.DeleteServiceEdgeRouterPolicy(*policy.ID); err != nil {
-			if err := pm.DeleteServiceEdgeRouterPolicy(*policy.ID); err != nil {
-				return err
-			}
+			return err
 		}
 	}
 
