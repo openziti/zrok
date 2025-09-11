@@ -164,7 +164,7 @@ func (pm *PolicyManager) DeleteEdgeRouterPoliciesWithFilter(filter string) error
 		return err
 	}
 
-	logrus.Infof("found %d edge router policies to delete for filter '%s", len(policies), filter)
+	logrus.Infof("found %d edge router policies to delete for filter '%s'", len(policies), filter)
 
 	for _, policy := range policies {
 		if err := pm.DeleteEdgeRouterPolicy(*policy.ID); err != nil {
@@ -245,7 +245,7 @@ func (pm *PolicyManager) DeleteServiceEdgeRouterPoliciesWithFilter(filter string
 		return err
 	}
 
-	logrus.Infof("found %d service edge router policies for filter '%v'", len(policies), filter)
+	logrus.Infof("found %d service edge router policies for filter '%s'", len(policies), filter)
 
 	for _, policy := range policies {
 		if err := pm.DeleteServiceEdgeRouterPolicy(*policy.ID); err != nil {
