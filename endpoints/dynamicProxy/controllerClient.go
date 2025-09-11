@@ -31,7 +31,7 @@ type ControllerClient struct {
 	cancel context.CancelFunc
 }
 
-func NewControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error) {
+func newControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error) {
 	zCfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to load ziti config from '%s'", cfg.IdentityPath)
@@ -101,8 +101,8 @@ func (c *ControllerClient) Stop() error {
 	return nil
 }
 
-// GetFrontendMappings retrieves frontend mappings from the controller
-func (c *ControllerClient) GetFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
+// getFrontendMappings retrieves frontend mappings from the controller
+func (c *ControllerClient) getFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
 	if c.client == nil {
 		return nil, errors.New("grpc client not connected")
 	}
@@ -124,9 +124,9 @@ func (c *ControllerClient) GetFrontendMappings(frontendToken, name string, versi
 	return resp.GetFrontendMappings(), nil
 }
 
-// GetAllFrontendMappings is a convenience method to get all mappings for a frontend token
-func (c *ControllerClient) GetAllFrontendMappings(frontendToken string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
-	return c.GetFrontendMappings(frontendToken, "", version)
+// getAllFrontendMappings is a convenience method to get all mappings for a frontend token
+func (c *ControllerClient) getAllFrontendMappings(frontendToken string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
+	return c.getFrontendMappings(frontendToken, "", version)
 }
 
 // IsConnected checks if the grpc connection is healthy
@@ -138,7 +138,7 @@ func (c *ControllerClient) IsConnected() bool {
 }
 
 func buildControllerClient(app *df.Application[*Config]) error {
-	client, err := NewControllerClient(app.Cfg.Controller)
+	client, err := newControllerClient(app.Cfg.Controller)
 	if err != nil {
 		return err
 	}
