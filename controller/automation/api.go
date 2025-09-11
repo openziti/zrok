@@ -10,12 +10,14 @@ import (
 )
 
 type ZitiAutomation struct {
-	client      *Client
-	Identities  *IdentityManager
-	Services    *ServiceManager
-	Policies    *PolicyManager
-	Configs     *ConfigManager
-	ConfigTypes *ConfigTypeManager
+	client                    *Client
+	Identities                *IdentityManager
+	Services                  *ServiceManager
+	Configs                   *ConfigManager
+	ConfigTypes               *ConfigTypeManager
+	EdgeRouterPolicies        *EdgeRouterPolicyManager
+	ServiceEdgeRouterPolicies *ServiceEdgeRouterPolicyManager
+	ServicePolicies           *ServicePolicyManager
 }
 
 func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
@@ -25,12 +27,14 @@ func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
 	}
 
 	return &ZitiAutomation{
-		client:      client,
-		Identities:  NewIdentityManager(client),
-		Services:    NewServiceManager(client),
-		Policies:    NewPolicyManager(client),
-		Configs:     NewConfigManager(client),
-		ConfigTypes: NewConfigTypeManager(client),
+		client:                    client,
+		Identities:                client.Identity,
+		Services:                  client.Service,
+		Configs:                   client.Config,
+		ConfigTypes:               client.ConfigType,
+		EdgeRouterPolicies:        client.EdgeRouterPolicy,
+		ServiceEdgeRouterPolicies: client.ServiceEdgeRouterPolicy,
+		ServicePolicies:           client.ServicePolicy,
 	}, nil
 }
 
@@ -87,12 +91,12 @@ func (za *ZitiAutomation) CleanupByTag(tag, value string) error {
 	}
 
 	// delete service edge router policies
-	if err := za.Policies.DeleteServiceEdgeRouterPoliciesWithFilter(filter); err != nil {
+	if err := za.ServiceEdgeRouterPolicies.DeleteWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete service edge router policies")
 	}
 
 	// delete service policies
-	if err := za.Policies.DeleteServicePoliciesWithFilter(filter); err != nil {
+	if err := za.ServicePolicies.DeleteWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete service policies")
 	}
 
@@ -107,7 +111,7 @@ func (za *ZitiAutomation) CleanupByTag(tag, value string) error {
 	}
 
 	// delete edge router policies
-	if err := za.Policies.DeleteEdgeRouterPoliciesWithFilter(filter); err != nil {
+	if err := za.EdgeRouterPolicies.DeleteWithFilter(filter); err != nil {
 		return errors.Wrap(err, "failed to delete edge router policies")
 	}
 

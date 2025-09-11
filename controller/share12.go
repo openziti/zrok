@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -310,11 +311,17 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 
 	// create bind policy (backend can bind to this service)
 	bindPolicyName := envZId + "-" + shrZId + "-bind"
-	bindPolicy := automation.NewPolicyBuilder(bindPolicyName).
-		WithServiceIDs(shrZId).
-		WithIdentityIDs(envZId).
-		WithTags(tags)
-	_, err = ziti.Policies.CreateServicePolicyBind(bindPolicy)
+	bindPolicyOpts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: bindPolicyName,
+			Tags: tags,
+		},
+		IdentityRoles: []string{"@" + envZId},
+		ServiceRoles:  []string{"@" + shrZId},
+		PolicyType:    rest_model.DialBindBind,
+		Semantic:      rest_model.SemanticAllOf,
+	}
+	_, err = ziti.ServicePolicies.Create(bindPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
 	}
@@ -340,11 +347,21 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 
 	if len(frontendZIds) > 0 {
 		dialPolicyName := envZId + "-" + shrZId + "-dial"
-		dialPolicy := automation.NewPolicyBuilder(dialPolicyName).
-			WithServiceIDs(shrZId).
-			WithIdentityIDs(frontendZIds...).
-			WithTags(tags)
-		_, err = ziti.Policies.CreateServicePolicyDial(dialPolicy)
+		var dialIdentityRoles []string
+		for _, frontendZId := range frontendZIds {
+			dialIdentityRoles = append(dialIdentityRoles, "@"+frontendZId)
+		}
+		dialPolicyOpts := &automation.ServicePolicyOptions{
+			BaseOptions: automation.BaseOptions{
+				Name: dialPolicyName,
+				Tags: tags,
+			},
+			IdentityRoles: dialIdentityRoles,
+			ServiceRoles:  []string{"@" + shrZId},
+			PolicyType:    rest_model.DialBindDial,
+			Semantic:      rest_model.SemanticAllOf,
+		}
+		_, err = ziti.ServicePolicies.Create(dialPolicyOpts)
 		if err != nil {
 			return "", nil, errors.Wrap(err, "error creating service policy dial")
 		}
@@ -352,11 +369,16 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 
 	// create service edge router policy
 	serpPolicyName := envZId + "-" + shrToken + "-serp"
-	serpPolicy := automation.NewPolicyBuilder(serpPolicyName).
-		WithServiceIDs(shrZId).
-		WithAllEdgeRouters().
-		WithTags(tags)
-	_, err = ziti.Policies.CreateServiceEdgeRouterPolicy(serpPolicy)
+	serpPolicyOpts := &automation.ServiceEdgeRouterPolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: serpPolicyName,
+			Tags: tags,
+		},
+		ServiceRoles:    []string{"@" + shrZId},
+		EdgeRouterRoles: []string{"#all"},
+		Semantic:        rest_model.SemanticAllOf,
+	}
+	_, err = ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
 	}
@@ -437,22 +459,33 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 
 	// create bind policy (backend can bind to this service)
 	bindPolicyName := envZId + "-" + shrZId + "-bind"
-	bindPolicy := automation.NewPolicyBuilder(bindPolicyName).
-		WithServiceIDs(shrZId).
-		WithIdentityIDs(envZId).
-		WithTags(tags)
-	_, err = ziti.Policies.CreateServicePolicyBind(bindPolicy)
+	bindPolicyOpts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: bindPolicyName,
+			Tags: tags,
+		},
+		IdentityRoles: []string{"@" + envZId},
+		ServiceRoles:  []string{"@" + shrZId},
+		PolicyType:    rest_model.DialBindBind,
+		Semantic:      rest_model.SemanticAllOf,
+	}
+	_, err = ziti.ServicePolicies.Create(bindPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
 	}
 
 	// create service edge router policy
 	serpPolicyName := envZId + "-" + shrToken + "-serp"
-	serpPolicy := automation.NewPolicyBuilder(serpPolicyName).
-		WithServiceIDs(shrZId).
-		WithAllEdgeRouters().
-		WithTags(tags)
-	_, err = ziti.Policies.CreateServiceEdgeRouterPolicy(serpPolicy)
+	serpPolicyOpts := &automation.ServiceEdgeRouterPolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: serpPolicyName,
+			Tags: tags,
+		},
+		ServiceRoles:    []string{"@" + shrZId},
+		EdgeRouterRoles: []string{"#all"},
+		Semantic:        rest_model.SemanticAllOf,
+	}
+	_, err = ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
 	}

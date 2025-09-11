@@ -157,6 +157,12 @@ func getResourceID(item interface{}) (string, error) {
 		return *v.ID, nil
 	case *rest_model.ConfigTypeDetail:
 		return *v.ID, nil
+	case *rest_model.EdgeRouterPolicyDetail:
+		return *v.ID, nil
+	case *rest_model.ServiceEdgeRouterPolicyDetail:
+		return *v.ID, nil
+	case *rest_model.ServicePolicyDetail:
+		return *v.ID, nil
 	default:
 		return "", errors.Errorf("unsupported resource type: %T", item)
 	}
