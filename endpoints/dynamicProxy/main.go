@@ -26,10 +26,11 @@ func NewService(cfgPath string) (*Service, error) {
 	svc := &Service{app: df.NewApplication[*Config](defaults)}
 	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
 	df.WithFactoryFunc(svc.app, buildControllerClient)
+	df.WithFactoryFunc(svc.app, buildMappings)
 	if err := svc.app.Initialize(cfgPath); err != nil {
 		return nil, err
 	}
-	logrus.Info(df.Inspect(svc.app.Cfg))
+	logrus.Info(df.MustInspect(svc.app.Cfg))
 	return svc, nil
 }
 

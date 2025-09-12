@@ -31,6 +31,15 @@ type ControllerClient struct {
 	cancel context.CancelFunc
 }
 
+func buildControllerClient(app *df.Application[*Config]) error {
+	client, err := newControllerClient(app.Cfg.Controller)
+	if err != nil {
+		return err
+	}
+	df.Set(app.C, client)
+	return nil
+}
+
 func newControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error) {
 	zCfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
@@ -135,13 +144,4 @@ func (c *ControllerClient) IsConnected() bool {
 		return false
 	}
 	return c.conn.GetState().String() == "READY"
-}
-
-func buildControllerClient(app *df.Application[*Config]) error {
-	client, err := newControllerClient(app.Cfg.Controller)
-	if err != nil {
-		return err
-	}
-	df.Set(app.C, client)
-	return nil
 }
