@@ -22,10 +22,13 @@ import (
 )
 
 type httpListener struct {
-	cfg      *config
-	zCtx     ziti.Context
-	handler  http.Handler
-	mappings *mappings
+	cfg        *config
+	zCtx       ziti.Context
+	handler    http.Handler
+	mappings   *mappings
+	signingKey []byte
+	zTransport *http.Transport
+	server     *http.Server
 }
 
 func buildHttpListener(app *df.Application[*config]) error {
@@ -78,19 +81,16 @@ func newHttpListener(cfg *config) (*httpListener, error) {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	proxy, err := newServiceProxy(cfg, zCtx)
-	if err != nil {
-		return nil, err
-	}
-	proxy.Transport = zTransport
 	if err := configureOauth(context.Background(), cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
-	handler := shareHandler(util.NewRequestsWrapper(proxy), cfg, signingKey, zCtx)
+
 	return &httpListener{
-		cfg:     cfg,
-		zCtx:    zCtx,
-		handler: handler,
+		cfg:        cfg,
+		zCtx:       zCtx,
+		handler:    nil, // set in Link()
+		signingKey: signingKey,
+		zTransport: zTransport,
 	}, nil
 }
 
@@ -107,8 +107,8 @@ func (c *zitiDialContext) Dial(_ context.Context, _ string, addr string) (net.Co
 	return conn, nil
 }
 
-func newServiceProxy(cfg *config, ctx ziti.Context) (*httputil.ReverseProxy, error) {
-	proxy := hostTargetReverseProxy(cfg, ctx)
+func newServiceProxy(cfg *config, ctx ziti.Context, mappings *mappings) (*httputil.ReverseProxy, error) {
+	proxy := hostTargetReverseProxy(cfg, ctx, mappings)
 	director := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		director(req)
@@ -130,61 +130,63 @@ func newServiceProxy(cfg *config, ctx ziti.Context) (*httputil.ReverseProxy, err
 	return proxy, nil
 }
 
-func hostTargetReverseProxy(cfg *config, ctx ziti.Context) *httputil.ReverseProxy {
+func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetShrToken := "todo-get-from-mapping"
-		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
-			if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-				logrus.Debugf("auth model: %v", cfg)
-			} else {
-				logrus.Warn("no config!")
-			}
-			if target, err := url.Parse(fmt.Sprintf("http://%v", targetShrToken)); err == nil {
-				logrus.Infof("[%v] -> %v", targetShrToken, req.URL)
-
-				targetQuery := target.RawQuery
-				req.URL.Scheme = target.Scheme
-				req.URL.Host = target.Host
-				req.URL.Path, req.URL.RawPath = endpoints.JoinURLPath(target, req.URL)
-				if targetQuery == "" || req.URL.RawQuery == "" {
-					req.URL.RawQuery = targetQuery + req.URL.RawQuery
+		targetMapping, found := mappings.getMapping(req.Host)
+		if found {
+			if svc, found := endpoints.GetRefreshedService(targetMapping.ShareToken, ctx); found {
+				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
+					logrus.Debugf("auth model: %v", cfg)
 				} else {
-					req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+					logrus.Warn("no config!")
 				}
-				if _, ok := req.Header["User-Agent"]; !ok {
-					// explicitly disable User-Agent so it's not set to default value
-					req.Header.Set("User-Agent", "")
+				if target, err := url.Parse(fmt.Sprintf("http://%v", targetMapping.ShareToken)); err == nil {
+					logrus.Infof("[%v] -> %v", target, req.URL)
+
+					targetQuery := target.RawQuery
+					req.URL.Scheme = target.Scheme
+					req.URL.Host = target.Host
+					req.URL.Path, req.URL.RawPath = endpoints.JoinURLPath(target, req.URL)
+					if targetQuery == "" || req.URL.RawQuery == "" {
+						req.URL.RawQuery = targetQuery + req.URL.RawQuery
+					} else {
+						req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+					}
+					if _, ok := req.Header["User-Agent"]; !ok {
+						// explicitly disable User-Agent so it's not set to default value
+						req.Header.Set("User-Agent", "")
+					}
+				} else {
+					logrus.Errorf("error proxying: %v", err)
 				}
-			} else {
-				logrus.Errorf("error proxying: %v", err)
 			}
 		}
 	}
 	return &httputil.ReverseProxy{Director: director}
 }
 
-func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti.Context) http.HandlerFunc {
+func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti.Context, mappings *mappings) http.HandlerFunc {
 	auth := newAuthHandler(cfg, signingKey)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		shrToken := "todo-get-from-mapping"
-		if shrToken == "" {
-			logrus.Debugf("host '%v' did not match host match, returning health check", r.Host)
-			proxyUi.WriteHealthOk(w)
+		mapping, found := mappings.getMapping(r.Host)
+		if !found {
+			logrus.Debugf("mapping not found for '%v'", r.Host)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(r.Host))
 			return
 		}
 
-		svc, found := endpoints.GetRefreshedService(shrToken, ctx)
+		svc, found := endpoints.GetRefreshedService(mapping.ShareToken, ctx)
 		if !found {
-			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, mapping.ShareToken)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
 
 		svcCfg, found := svc.Config[sdk.ZrokProxyConfig]
 		if !found {
-			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, mapping.ShareToken)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
 
@@ -194,27 +196,27 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 
 		authScheme, found := svcCfg["auth_scheme"]
 		if !found {
-			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
-			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken))
+			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, mapping.ShareToken)
+			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
 
 		switch authScheme {
 		case string(sdk.None):
-			logrus.Debugf("auth scheme none '%v'", shrToken)
+			logrus.Debugf("auth scheme none '%v'", mapping.ShareToken)
 			filterSessionCookies(w, r, cfg)
 			handler.ServeHTTP(w, r)
 
 		case string(sdk.Basic):
-			logrus.Debugf("auth scheme basic '%v'", shrToken)
-			if auth.handleBasicAuth(w, r, svcCfg, shrToken) {
+			logrus.Debugf("auth scheme basic '%v'", mapping.ShareToken)
+			if auth.handleBasicAuth(w, r, svcCfg, mapping.ShareToken) {
 				filterSessionCookies(w, r, cfg)
 				handler.ServeHTTP(w, r)
 			}
 
 		case string(sdk.Oauth):
-			logrus.Debugf("auth scheme oauth '%v'", shrToken)
-			if auth.handleOAuth(w, r, svcCfg, shrToken) {
+			logrus.Debugf("auth scheme oauth '%v'", mapping.ShareToken)
+			if auth.handleOAuth(w, r, svcCfg, mapping.ShareToken) {
 				handler.ServeHTTP(w, r)
 			}
 
@@ -259,11 +261,70 @@ func handleInterstitial(w http.ResponseWriter, r *http.Request, pcfg *config, cf
 	return false
 }
 
+func (l *httpListener) initializeHandler() error {
+	proxy, err := newServiceProxy(l.cfg, l.zCtx, l.mappings)
+	if err != nil {
+		return err
+	}
+	proxy.Transport = l.zTransport
+
+	l.handler = shareHandler(util.NewRequestsWrapper(proxy), l.cfg, l.signingKey, l.zCtx, l.mappings)
+	return nil
+}
+
 func (l *httpListener) Link(c *df.Container) error {
 	var found bool
 	l.mappings, found = df.Get[*mappings](c)
 	if !found {
 		return errors.New("mapping not found")
 	}
+
+	// now that we have mappings, create the proxy and handler
+	if err := l.initializeHandler(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (l *httpListener) Start() error {
+	l.server = &http.Server{
+		Addr:    l.cfg.BindAddress,
+		Handler: l.handler,
+	}
+
+	if l.cfg.Tls != nil {
+		go func() {
+			if err := l.server.ListenAndServeTLS(l.cfg.Tls.CertPath, l.cfg.Tls.KeyPath); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logrus.Error(err)
+			}
+		}()
+		logrus.Infof("started TLS listener")
+
+	} else {
+		go func() {
+			if err := l.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logrus.Error(err)
+			}
+		}()
+		logrus.Infof("started HTTP listener")
+	}
+	return nil
+}
+
+func (l *httpListener) Stop() error {
+	if l.server == nil {
+		return nil
+	}
+
+	// create a timeout context for graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	logrus.Info("shutting down HTTP listener")
+	if err := l.server.Shutdown(ctx); err != nil {
+		return errors.Wrap(err, "error shutting down HTTP server")
+	}
+
 	return nil
 }
