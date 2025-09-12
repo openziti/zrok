@@ -1,4 +1,4 @@
-package publicProxy
+package dynamicProxy
 
 import (
 	"context"
@@ -10,65 +10,62 @@ import (
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	zhttp "github.com/zitadel/oidc/v2/pkg/http"
+	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 )
 
-const V = 4
-
-type Config struct {
-	V            int
-	Identity     string
-	Address      string
-	HostMatch    string
-	TemplatePath string
-	Interstitial *InterstitialConfig
-	Oauth        *OauthConfig
-	Tls          *endpoints.TlsConfig
+type config struct {
+	V                      int    `df:"+match=1"`
+	FrontendToken          string `df:"+required"`
+	Identity               string
+	BindAddress            string
+	TemplatePath           string
+	MappingRefreshInterval time.Duration
+	Interstitial           *interstitialConfig
+	Oauth                  *oauthConfig
+	AmqpSubscriber         *amqpSubscriberConfig   `df:"+required"`
+	Controller             *controllerClientConfig `df:"+required"`
+	Tls                    *endpoints.TlsConfig
 }
 
-type InterstitialConfig struct {
+type interstitialConfig struct {
 	Enabled           bool
 	HtmlPath          string
 	UserAgentPrefixes []string
 }
 
-type OauthConfig struct {
+type oauthConfig struct {
 	BindAddress          string
 	EndpointUrl          string
 	CookieName           string
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
-	SigningKey           string       `df:"+secret"`
-	EncryptionKey        string       `df:"+secret"`
-	Providers            []df.Dynamic `df:"+secret"`
+	SigningKey           string `df:"+secret"`
+	EncryptionKey        string `df:"+secret"`
+	Providers            []df.Dynamic
 }
 
-func DefaultConfig() *Config {
-	return &Config{
-		Identity: "public",
-		Address:  "0.0.0.0:8080",
-	}
+type oauthProviderConfig struct {
+	Name         string
+	ClientId     string
+	ClientSecret string `df:"+secret"`
 }
 
-func (c *Config) Load(path string) error {
-	opts := &df.Options{
-		DynamicBinders: map[string]func(map[string]any) (df.Dynamic, error){
-			(&githubConfig{}).Type(): newGithubConfig,
-			(&googleConfig{}).Type(): newGoogleConfig,
-			(&oidcConfig{}).Type():   newOidcConfig,
+func defaults() *config {
+	return &config{
+		Identity:               "public",
+		BindAddress:            "0.0.0.0:8080",
+		MappingRefreshInterval: 5 * time.Minute,
+		AmqpSubscriber: &amqpSubscriberConfig{
+			QueueDepth: 1024,
+		},
+		Controller: &controllerClientConfig{
+			Timeout: 30 * time.Second,
 		},
 	}
-	if err := df.MergeFromYAML(c, path, opts); err != nil {
-		return errors.Wrapf(err, "error loading frontend config '%v'", path)
-	}
-	if c.V != V {
-		return errors.Errorf("invalid configuration version '%d'; expected '%d'", c.V, V)
-	}
-	return nil
 }
 
-func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
+func configureOauth(ctx context.Context, cfg *config, tls bool) error {
 	if cfg.Oauth == nil {
 		logrus.Info("no oauth configuration; skipping oauth handler startup")
 		return nil

@@ -24,6 +24,7 @@ type mappings struct {
 
 func buildMappings(app *df.Application[*config]) error {
 	mappings := newMappings()
+	mappings.cfg = app.Cfg
 	df.Set(app.C, mappings)
 	return nil
 }
@@ -44,11 +45,6 @@ func (m *mappings) getMapping(name string) (*dynamicProxyController.FrontendMapp
 
 func (m *mappings) Link(c *df.Container) error {
 	var found bool
-	m.cfg, found = df.Get[*config](c)
-	if !found {
-		return errors.New("no config found")
-	}
-
 	m.amqp, found = df.Get[*amqpSubscriber](c)
 	if !found {
 		return errors.New("no amqp subscriber found")
@@ -80,7 +76,7 @@ func (m *mappings) run() {
 
 	// load initial mappings
 	start := time.Now()
-	mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.AmqpSubscriber.FrontendToken, 0)
+	mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, 0)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -88,7 +84,7 @@ func (m *mappings) run() {
 	logrus.Infof("retrieved '%d' mappings in '%v'", len(mappings), time.Since(start))
 
 	// periodic update loop
-	ticker := time.NewTicker(m.cfg.RefreshInterval)
+	ticker := time.NewTicker(m.cfg.MappingRefreshInterval)
 	defer ticker.Stop()
 
 	for {
@@ -98,7 +94,7 @@ func (m *mappings) run() {
 		case <-ticker.C:
 			// periodically refresh mappings
 			logrus.Info("refreshing")
-			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.AmqpSubscriber.FrontendToken, m.getHighestVersion())
+			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, m.getHighestVersion())
 			if err != nil {
 				logrus.Errorf("failed to refresh mappings: %v", err)
 				continue

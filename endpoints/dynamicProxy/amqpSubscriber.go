@@ -14,14 +14,13 @@ import (
 )
 
 type amqpSubscriberConfig struct {
-	Url           string `df:"+required"`
-	ExchangeName  string `df:"+required"`
-	FrontendToken string `df:"+required"`
-	QueueDepth    int
+	Url          string `df:"+required"`
+	ExchangeName string `df:"+required"`
+	QueueDepth   int
 }
 
 type amqpSubscriber struct {
-	cfg        *amqpSubscriberConfig
+	cfg        *config
 	conn       *amqp.Connection
 	ch         *amqp.Channel
 	queue      amqp.Queue
@@ -33,7 +32,7 @@ type amqpSubscriber struct {
 }
 
 func buildAmqpSubscriber(app *df.Application[*config]) error {
-	subscriber, err := newAmqpSubscriber(app.Cfg.AmqpSubscriber)
+	subscriber, err := newAmqpSubscriber(app.Cfg)
 	if err != nil {
 		return err
 	}
@@ -41,7 +40,7 @@ func buildAmqpSubscriber(app *df.Application[*config]) error {
 	return nil
 }
 
-func newAmqpSubscriber(cfg *amqpSubscriberConfig) (*amqpSubscriber, error) {
+func newAmqpSubscriber(cfg *config) (*amqpSubscriber, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &amqpSubscriber{
@@ -50,7 +49,7 @@ func newAmqpSubscriber(cfg *amqpSubscriberConfig) (*amqpSubscriber, error) {
 		cancel:     cancel,
 		done:       make(chan struct{}),
 		instanceId: uuid.New().String(),
-		updates:    make(chan *dynamicProxyModel.Mapping, cfg.QueueDepth),
+		updates:    make(chan *dynamicProxyModel.Mapping, cfg.AmqpSubscriber.QueueDepth),
 	}
 
 	return s, nil
@@ -78,7 +77,7 @@ mainLoop:
 		case <-s.ctx.Done():
 			break mainLoop
 		default:
-			logrus.Infof("connecting to amqp broker at '%s'", s.cfg.Url)
+			logrus.Infof("connecting to amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
 			if err := s.connect(); err != nil {
 				logrus.Errorf("failed to connect to amqp broker: %v", err)
 				select {
@@ -101,9 +100,9 @@ mainLoop:
 }
 
 func (s *amqpSubscriber) connect() error {
-	conn, err := amqp.Dial(s.cfg.Url)
+	conn, err := amqp.Dial(s.cfg.AmqpSubscriber.Url)
 	if err != nil {
-		return errors.Wrapf(err, "failed to dial amqp broker at '%s'", s.cfg.Url)
+		return errors.Wrapf(err, "failed to dial amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
 	}
 
 	ch, err := conn.Channel()
@@ -114,18 +113,18 @@ func (s *amqpSubscriber) connect() error {
 
 	// declare exchange (should already exist from publisher side)
 	err = ch.ExchangeDeclare(
-		s.cfg.ExchangeName, // name
-		"topic",            // type
-		true,               // durable
-		false,              // auto-deleted
-		false,              // internal
-		false,              // no-wait
-		nil,                // arguments
+		s.cfg.AmqpSubscriber.ExchangeName, // name
+		"topic",                           // type
+		true,                              // durable
+		false,                             // auto-deleted
+		false,                             // internal
+		false,                             // no-wait
+		nil,                               // arguments
 	)
 	if err != nil {
 		ch.Close()
 		conn.Close()
-		return errors.Wrapf(err, "failed to declare exchange '%s'", s.cfg.ExchangeName)
+		return errors.Wrapf(err, "failed to declare exchange '%s'", s.cfg.AmqpSubscriber.ExchangeName)
 	}
 
 	// create ephemeral queue for this process instance
@@ -146,17 +145,17 @@ func (s *amqpSubscriber) connect() error {
 
 	// bind queue to exchange with frontend token as routing key
 	err = ch.QueueBind(
-		queue.Name,          // queue name
-		s.cfg.FrontendToken, // routing key (frontend token)
-		s.cfg.ExchangeName,  // exchange
-		false,               // no-wait
-		nil,                 // arguments
+		queue.Name,                        // queue name
+		s.cfg.FrontendToken,               // routing key (frontend token)
+		s.cfg.AmqpSubscriber.ExchangeName, // exchange
+		false,                             // no-wait
+		nil,                               // arguments
 	)
 	if err != nil {
 		ch.Close()
 		conn.Close()
 		return errors.Wrapf(err, "failed to bind queue '%s' to exchange '%s' with routing key '%s'",
-			queue.Name, s.cfg.ExchangeName, s.cfg.FrontendToken)
+			queue.Name, s.cfg.AmqpSubscriber.ExchangeName, s.cfg.FrontendToken)
 	}
 
 	s.conn = conn

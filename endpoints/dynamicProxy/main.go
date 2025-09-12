@@ -1,37 +1,20 @@
 package dynamicProxy
 
 import (
-	"time"
-
 	"github.com/michaelquigley/df"
 	"github.com/sirupsen/logrus"
 )
-
-type config struct {
-	V               int `df:"+match=1"`
-	RefreshInterval time.Duration
-	AmqpSubscriber  *amqpSubscriberConfig   `df:"+required"`
-	Controller      *controllerClientConfig `df:"+required"`
-}
 
 type Service struct {
 	app *df.Application[*config]
 }
 
 func NewService(cfgPath string) (*Service, error) {
-	defaults := &config{
-		RefreshInterval: 5 * time.Minute,
-		AmqpSubscriber: &amqpSubscriberConfig{
-			QueueDepth: 1024,
-		},
-		Controller: &controllerClientConfig{
-			Timeout: 30 * time.Second,
-		},
-	}
-	svc := &Service{app: df.NewApplication[*config](defaults)}
+	svc := &Service{app: df.NewApplication[*config](defaults())}
 	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
 	df.WithFactoryFunc(svc.app, buildControllerClient)
 	df.WithFactoryFunc(svc.app, buildMappings)
+	df.WithFactoryFunc(svc.app, buildHttpListener)
 	if err := svc.app.Initialize(cfgPath); err != nil {
 		return nil, err
 	}
@@ -45,18 +28,4 @@ func (p *Service) Start() error {
 
 func (p *Service) Stop() error {
 	return p.app.Stop()
-}
-
-func (p *Service) getAmqpSubscriber() *amqpSubscriber {
-	if subscriber, found := df.Get[*amqpSubscriber](p.app.C); found {
-		return subscriber
-	}
-	return nil
-}
-
-func (p *Service) getControllerClient() *controllerClient {
-	if client, found := df.Get[*controllerClient](p.app.C); found {
-		return client
-	}
-	return nil
 }
