@@ -106,7 +106,7 @@ func (h *unshare12Handler) findAndValidateShare(shrToken string, env *store.Envi
 
 func (h *unshare12Handler) deallocateResources(shrToken string) error {
 	// get shared automation client
-	za, err := automation.GetZitiAutomation(cfg)
+	za, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
 		return errors.Wrap(err, "error getting ziti automation client")
 	}

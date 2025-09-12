@@ -20,12 +20,15 @@ type ZitiAutomation struct {
 	ServicePolicies           *ServicePolicyManager
 }
 
-func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
-	client, err := NewClient(cfg)
+func NewZitiAutomation(cfg *config.Config) (*ZitiAutomation, error) {
+	client, err := NewClient(&Config{
+		ApiEndpoint: cfg.Ziti.ApiEndpoint,
+		Username:    cfg.Ziti.Username,
+		Password:    cfg.Ziti.Password,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create client")
 	}
-
 	return &ZitiAutomation{
 		client:                    client,
 		Identities:                client.Identity,
@@ -36,30 +39,6 @@ func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
 		ServiceEdgeRouterPolicies: client.ServiceEdgeRouterPolicy,
 		ServicePolicies:           client.ServicePolicy,
 	}, nil
-}
-
-func (za *ZitiAutomation) Client() *Client {
-	return za.client
-}
-
-// GetZitiAutomation returns a shared automation client instance
-func GetZitiAutomation(cfg *config.Config) (*ZitiAutomation, error) {
-	automationClientOnce.Do(func() {
-		if cfg == nil {
-			automationClientErr = errors.New("controller config is nil")
-			return
-		}
-
-		automationCfg := &Config{
-			ApiEndpoint: cfg.Ziti.ApiEndpoint,
-			Username:    cfg.Ziti.Username,
-			Password:    cfg.Ziti.Password,
-		}
-
-		automationClient, automationClientErr = NewZitiAutomation(automationCfg)
-	})
-
-	return automationClient, automationClientErr
 }
 
 // error helper methods to simplify error handling

@@ -241,7 +241,7 @@ func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zro
 
 func (h *share12Handler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, interstitial bool, trx interface{}) (string, []string, error) {
 	// get shared automation client
-	ziti, err := automation.GetZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error getting ziti automation client")
 	}
@@ -389,7 +389,7 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 
 func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, trx interface{}) (string, []string, error) {
 	// get shared automation client
-	ziti, err := automation.GetZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error getting ziti automation client")
 	}
