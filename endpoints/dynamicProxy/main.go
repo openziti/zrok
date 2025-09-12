@@ -8,9 +8,10 @@ import (
 )
 
 type config struct {
-	V              int                     `df:"+match=1"`
-	AmqpSubscriber *amqpSubscriberConfig   `df:"+required"`
-	Controller     *controllerClientConfig `df:"+required"`
+	V               int `df:"+match=1"`
+	RefreshInterval time.Duration
+	AmqpSubscriber  *amqpSubscriberConfig   `df:"+required"`
+	Controller      *controllerClientConfig `df:"+required"`
 }
 
 type Service struct {
@@ -19,6 +20,10 @@ type Service struct {
 
 func NewService(cfgPath string) (*Service, error) {
 	defaults := &config{
+		RefreshInterval: 5 * time.Minute,
+		AmqpSubscriber: &amqpSubscriberConfig{
+			QueueDepth: 1024,
+		},
 		Controller: &controllerClientConfig{
 			Timeout: 30 * time.Second,
 		},

@@ -17,6 +17,7 @@ type amqpSubscriberConfig struct {
 	Url           string `df:"+required"`
 	ExchangeName  string `df:"+required"`
 	FrontendToken string `df:"+required"`
+	QueueDepth    int
 }
 
 type amqpSubscriber struct {
@@ -27,7 +28,8 @@ type amqpSubscriber struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	done       chan struct{}
-	instanceID string
+	instanceId string
+	updates    chan *dynamicProxyModel.Mapping
 }
 
 func buildAmqpSubscriber(app *df.Application[*config]) error {
@@ -47,7 +49,8 @@ func newAmqpSubscriber(cfg *amqpSubscriberConfig) (*amqpSubscriber, error) {
 		ctx:        ctx,
 		cancel:     cancel,
 		done:       make(chan struct{}),
-		instanceID: uuid.New().String(),
+		instanceId: uuid.New().String(),
+		updates:    make(chan *dynamicProxyModel.Mapping, cfg.QueueDepth),
 	}
 
 	return s, nil
@@ -209,6 +212,16 @@ func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 		return err
 	}
 	logrus.Infof("mapping update -> %v", update)
+
+	select {
+	case s.updates <- update:
+		logrus.Debugf("published mapping update to channel")
+	case <-s.ctx.Done():
+		return errors.New("context cancelled while publishing update")
+	default:
+		logrus.Warnf("updates channel full, dropping mapping update")
+	}
+
 	return nil
 }
 
@@ -223,6 +236,10 @@ func (s *amqpSubscriber) disconnect() {
 	}
 }
 
+func (s *amqpSubscriber) Updates() <-chan *dynamicProxyModel.Mapping {
+	return s.updates
+}
+
 func (s *amqpSubscriber) generateQueueName() string {
-	return "frontend-" + s.cfg.FrontendToken + "-" + s.instanceID
+	return "frontend-" + s.cfg.FrontendToken + "-" + s.instanceId
 }
