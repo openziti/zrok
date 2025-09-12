@@ -92,14 +92,16 @@ func (m *mappings) run() {
 			return
 		case <-ticker.C:
 			// periodically refresh mappings
-			logrus.Info("refreshing")
+			start := time.Now()
 			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, m.getHighestVersion())
 			if err != nil {
 				logrus.Errorf("failed to refresh mappings: %v", err)
 				continue
 			}
-			m.updateMappings(mappings)
-			logrus.Debugf("updated '%d' mappings", len(mappings))
+			if len(mappings) > 0 {
+				m.updateMappings(mappings)
+				logrus.Warnf("updated '%d' mappings in '%d'", len(mappings), time.Since(start))
+			}
 
 		case update := <-m.amqp.Updates():
 			// handle real-time mapping updates from AMQP
