@@ -7,23 +7,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Config struct {
+type config struct {
 	V              int                     `df:"+match=1"`
-	AmqpSubscriber *AmqpSubscriberConfig   `df:"+required"`
-	Controller     *ControllerClientConfig `df:"+required"`
+	AmqpSubscriber *amqpSubscriberConfig   `df:"+required"`
+	Controller     *controllerClientConfig `df:"+required"`
 }
 
 type Service struct {
-	app *df.Application[*Config]
+	app *df.Application[*config]
 }
 
 func NewService(cfgPath string) (*Service, error) {
-	defaults := &Config{
-		Controller: &ControllerClientConfig{
+	defaults := &config{
+		Controller: &controllerClientConfig{
 			Timeout: 30 * time.Second,
 		},
 	}
-	svc := &Service{app: df.NewApplication[*Config](defaults)}
+	svc := &Service{app: df.NewApplication[*config](defaults)}
 	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
 	df.WithFactoryFunc(svc.app, buildControllerClient)
 	df.WithFactoryFunc(svc.app, buildMappings)
@@ -42,15 +42,15 @@ func (p *Service) Stop() error {
 	return p.app.Stop()
 }
 
-func (p *Service) getAmqpSubscriber() *AmqpSubscriber {
-	if subscriber, found := df.Get[*AmqpSubscriber](p.app.C); found {
+func (p *Service) getAmqpSubscriber() *amqpSubscriber {
+	if subscriber, found := df.Get[*amqpSubscriber](p.app.C); found {
 		return subscriber
 	}
 	return nil
 }
 
-func (p *Service) getControllerClient() *ControllerClient {
-	if client, found := df.Get[*ControllerClient](p.app.C); found {
+func (p *Service) getControllerClient() *controllerClient {
+	if client, found := df.Get[*controllerClient](p.app.C); found {
 		return client
 	}
 	return nil

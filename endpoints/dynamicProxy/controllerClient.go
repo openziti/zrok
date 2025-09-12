@@ -13,16 +13,17 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/resolver"
 )
 
-type ControllerClientConfig struct {
+type controllerClientConfig struct {
 	IdentityPath string `df:"+required"`
 	ServiceName  string `df:"+required"`
 	Timeout      time.Duration
 }
 
-type ControllerClient struct {
-	cfg    *ControllerClientConfig
+type controllerClient struct {
+	cfg    *controllerClientConfig
 	zCfg   *ziti.Config
 	zCtx   ziti.Context
 	conn   *grpc.ClientConn
@@ -31,7 +32,7 @@ type ControllerClient struct {
 	cancel context.CancelFunc
 }
 
-func buildControllerClient(app *df.Application[*Config]) error {
+func buildControllerClient(app *df.Application[*config]) error {
 	client, err := newControllerClient(app.Cfg.Controller)
 	if err != nil {
 		return err
@@ -40,7 +41,7 @@ func buildControllerClient(app *df.Application[*Config]) error {
 	return nil
 }
 
-func newControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error) {
+func newControllerClient(cfg *controllerClientConfig) (*controllerClient, error) {
 	zCfg, err := ziti.NewConfigFromFile(cfg.IdentityPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to load ziti config from '%s'", cfg.IdentityPath)
@@ -53,7 +54,7 @@ func newControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	client := &ControllerClient{
+	client := &controllerClient{
 		cfg:    cfg,
 		zCfg:   zCfg,
 		zCtx:   zCtx,
@@ -64,9 +65,10 @@ func newControllerClient(cfg *ControllerClientConfig) (*ControllerClient, error)
 	return client, nil
 }
 
-func (c *ControllerClient) Start() error {
+func (c *controllerClient) Start() error {
 	opts := []grpc.DialOption{
 		grpc.WithContextDialer(func(_ context.Context, addr string) (net.Conn, error) {
+			logrus.Infof("dialing '%s'", addr)
 			conn, err := c.zCtx.DialWithOptions(addr, &ziti.DialOptions{ConnectTimeout: c.cfg.Timeout})
 			if err != nil {
 				return nil, err
@@ -80,6 +82,7 @@ func (c *ControllerClient) Start() error {
 			PermitWithoutStream: true,             // send pings even without active streams
 		}),
 	}
+	resolver.SetDefaultScheme("passthrough")
 
 	// create grpc connection using ziti service name
 	conn, err := grpc.NewClient(c.cfg.ServiceName, opts...)
@@ -94,7 +97,7 @@ func (c *ControllerClient) Start() error {
 	return nil
 }
 
-func (c *ControllerClient) Stop() error {
+func (c *controllerClient) Stop() error {
 	c.cancel()
 	if c.conn != nil {
 		if err := c.conn.Close(); err != nil {
@@ -111,7 +114,7 @@ func (c *ControllerClient) Stop() error {
 }
 
 // getFrontendMappings retrieves frontend mappings from the controller
-func (c *ControllerClient) getFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
+func (c *controllerClient) getFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
 	if c.client == nil {
 		return nil, errors.New("grpc client not connected")
 	}
@@ -134,12 +137,12 @@ func (c *ControllerClient) getFrontendMappings(frontendToken, name string, versi
 }
 
 // getAllFrontendMappings is a convenience method to get all mappings for a frontend token
-func (c *ControllerClient) getAllFrontendMappings(frontendToken string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
+func (c *controllerClient) getAllFrontendMappings(frontendToken string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
 	return c.getFrontendMappings(frontendToken, "", version)
 }
 
-// IsConnected checks if the grpc connection is healthy
-func (c *ControllerClient) IsConnected() bool {
+// isConnected checks if the grpc connection is healthy
+func (c *controllerClient) isConnected() bool {
 	if c.conn == nil {
 		return false
 	}

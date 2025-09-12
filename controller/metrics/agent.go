@@ -47,7 +47,7 @@ func (a *Agent) Start() error {
 				if usage, err := Ingest(event.Data()); err == nil {
 					if usage.ZitiServiceId != "" {
 						if err := a.cache.addZrokDetail(usage); err != nil {
-							logrus.Errorf("unable to add zrok detail for: %v: %v", usage.String(), err)
+							logrus.Debugf("unable to add zrok detail for: %v: %v", usage.String(), err)
 						}
 					}
 					shouldAck := true

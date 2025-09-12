@@ -239,7 +239,7 @@ mainLoop:
 					lastCycle = time.Now()
 				}
 			} else {
-				logrus.Warnf("not enforcing for usage with no share token: %v", usage.String())
+				logrus.Debugf("not enforcing for usage with no share token: %v", usage.String())
 			}
 
 		case <-time.After(a.cfg.Cycle):

@@ -13,14 +13,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type AmqpSubscriberConfig struct {
+type amqpSubscriberConfig struct {
 	Url           string `df:"+required"`
 	ExchangeName  string `df:"+required"`
 	FrontendToken string `df:"+required"`
 }
 
-type AmqpSubscriber struct {
-	cfg        *AmqpSubscriberConfig
+type amqpSubscriber struct {
+	cfg        *amqpSubscriberConfig
 	conn       *amqp.Connection
 	ch         *amqp.Channel
 	queue      amqp.Queue
@@ -30,7 +30,7 @@ type AmqpSubscriber struct {
 	instanceID string
 }
 
-func buildAmqpSubscriber(app *df.Application[*Config]) error {
+func buildAmqpSubscriber(app *df.Application[*config]) error {
 	subscriber, err := newAmqpSubscriber(app.Cfg.AmqpSubscriber)
 	if err != nil {
 		return err
@@ -39,10 +39,10 @@ func buildAmqpSubscriber(app *df.Application[*Config]) error {
 	return nil
 }
 
-func newAmqpSubscriber(cfg *AmqpSubscriberConfig) (*AmqpSubscriber, error) {
+func newAmqpSubscriber(cfg *amqpSubscriberConfig) (*amqpSubscriber, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	s := &AmqpSubscriber{
+	s := &amqpSubscriber{
 		cfg:        cfg,
 		ctx:        ctx,
 		cancel:     cancel,
@@ -53,18 +53,18 @@ func newAmqpSubscriber(cfg *AmqpSubscriberConfig) (*AmqpSubscriber, error) {
 	return s, nil
 }
 
-func (s *AmqpSubscriber) Start() error {
+func (s *amqpSubscriber) Start() error {
 	go s.run()
 	return nil
 }
 
-func (s *AmqpSubscriber) Stop() error {
+func (s *amqpSubscriber) Stop() error {
 	s.cancel()
 	<-s.done
 	return nil
 }
 
-func (s *AmqpSubscriber) run() {
+func (s *amqpSubscriber) run() {
 	logrus.Infof("amqp subscriber started for frontend token '%s'", s.cfg.FrontendToken)
 	defer logrus.Infof("amqp subscriber stopped for frontend token '%s'", s.cfg.FrontendToken)
 	defer close(s.done)
@@ -97,7 +97,7 @@ mainLoop:
 	s.disconnect()
 }
 
-func (s *AmqpSubscriber) connect() error {
+func (s *amqpSubscriber) connect() error {
 	conn, err := amqp.Dial(s.cfg.Url)
 	if err != nil {
 		return errors.Wrapf(err, "failed to dial amqp broker at '%s'", s.cfg.Url)
@@ -164,7 +164,7 @@ func (s *AmqpSubscriber) connect() error {
 	return nil
 }
 
-func (s *AmqpSubscriber) consume() error {
+func (s *amqpSubscriber) consume() error {
 	msgs, err := s.ch.Consume(
 		s.queue.Name, // queue
 		"",           // consumer tag (auto-generated)
@@ -199,7 +199,7 @@ func (s *AmqpSubscriber) consume() error {
 	}
 }
 
-func (s *AmqpSubscriber) handleMessage(delivery amqp.Delivery) error {
+func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 	var data map[string]any
 	if err := json.Unmarshal(delivery.Body, &data); err != nil {
 		return errors.Wrap(err, "failed to unmarshal mapping data")
@@ -212,7 +212,7 @@ func (s *AmqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 	return nil
 }
 
-func (s *AmqpSubscriber) disconnect() {
+func (s *amqpSubscriber) disconnect() {
 	if s.ch != nil {
 		s.ch.Close()
 		s.ch = nil
@@ -223,6 +223,6 @@ func (s *AmqpSubscriber) disconnect() {
 	}
 }
 
-func (s *AmqpSubscriber) generateQueueName() string {
+func (s *amqpSubscriber) generateQueueName() string {
 	return "frontend-" + s.cfg.FrontendToken + "-" + s.instanceID
 }
