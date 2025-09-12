@@ -22,6 +22,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.3
 	github.com/greenpau/caddy-security v1.1.29
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
@@ -34,7 +35,7 @@ require (
 	github.com/kolesnikovae/go-winjob v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.18
-	github.com/michaelquigley/df v0.2.8
+	github.com/michaelquigley/df v0.2.9
 	github.com/michaelquigley/pfxlog v0.6.10
 	github.com/muesli/reflow v0.3.0
 	github.com/net-byte/vtun v1.7.0
@@ -149,7 +150,6 @@ require (
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/go-tspi v0.3.0 // indirect
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/greenpau/go-authcrunch v1.1.4 // indirect

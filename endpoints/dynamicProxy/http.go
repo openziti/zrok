@@ -81,7 +81,7 @@ func newHttpListener(cfg *config) (*httpListener, error) {
 	zTransport := http.DefaultTransport.(*http.Transport).Clone()
 	zTransport.DialContext = zDialCtx.Dial
 
-	if err := configureOauth(context.Background(), cfg, cfg.Tls != nil); err != nil {
+	if err := configureOauth(cfg, cfg.Tls != nil); err != nil {
 		return nil, err
 	}
 

@@ -14,8 +14,10 @@ func NewService(cfgPath string) (*Service, error) {
 	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
 	df.WithFactoryFunc(svc.app, buildControllerClient)
 	df.WithFactoryFunc(svc.app, buildMappings)
+	df.WithFactoryFunc(svc.app, buildOAuthRouter)
 	df.WithFactoryFunc(svc.app, buildHttpListener)
-	if err := svc.app.Initialize(cfgPath); err != nil {
+	opts := &df.Options{DynamicBinders: oauthBinders}
+	if err := svc.app.InitializeWithOptions(opts, cfgPath); err != nil {
 		return nil, err
 	}
 	logrus.Info(df.MustInspect(svc.app.Cfg))

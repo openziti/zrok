@@ -77,9 +77,9 @@ func (c *controllerClient) Start() error {
 		}),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                10 * time.Second, // send keepalive ping every 10 seconds
-			Timeout:             5 * time.Second,  // wait 5 seconds for ping ack
-			PermitWithoutStream: true,             // send pings even without active streams
+			Time:                1 * time.Minute, // send keepalive ping every 1 minute
+			Timeout:             5 * time.Second, // wait 5 seconds for ping ack
+			PermitWithoutStream: true,            // send pings even without active streams
 		}),
 	}
 	resolver.SetDefaultScheme("passthrough")

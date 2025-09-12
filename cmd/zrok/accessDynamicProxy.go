@@ -49,7 +49,7 @@ func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 		cmd.error(err)
 	}
 
-	logrus.Infof("starting dynamic proxy service with config: %v", cmd.configPath)
+	logrus.Infof("starting dynamicProxy service with config '%v'", cmd.configPath)
 
 	go func() {
 		if err := service.Start(); err != nil {
@@ -61,7 +61,7 @@ func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	<-c
 
-	logrus.Infof("shutting down dynamic proxy service")
+	logrus.Infof("shutting down dynamicProxy service")
 
 	if err := service.Stop(); err != nil {
 		logrus.Errorf("error shutting down: %v", err)
