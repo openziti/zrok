@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df"
-	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -68,7 +67,7 @@ func (p *AmqpPublisher) connect() error {
 	return nil
 }
 
-func (p *AmqpPublisher) Publish(ctx context.Context, frontendToken string, m dynamicProxyModel.Mapping) error {
+func (p *AmqpPublisher) Publish(ctx context.Context, frontendToken string, m Mapping) error {
 	if !p.connected {
 		if err := p.connect(); err != nil {
 			return err

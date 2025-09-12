@@ -7,7 +7,6 @@ import (
 
 	"github.com/michaelquigley/df"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
-	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -122,12 +121,12 @@ func (m *mappings) getHighestVersion() int64 {
 	return highestVersion
 }
 
-func (m *mappings) handleMappingUpdate(update *dynamicProxyModel.Mapping) {
+func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	switch update.Operation {
-	case dynamicProxyModel.OperationBind:
+	case dynamicProxyController.OperationBind:
 		mapping := &dynamicProxyController.FrontendMapping{
 			Name:       update.Name,
 			Version:    update.Version,
@@ -136,7 +135,7 @@ func (m *mappings) handleMappingUpdate(update *dynamicProxyModel.Mapping) {
 		m.nameMap[mapping.Name] = mapping
 		logrus.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
 
-	case dynamicProxyModel.OperationUnbind:
+	case dynamicProxyController.OperationUnbind:
 		delete(m.nameMap, update.Name)
 		logrus.Infof("removed mapping: '%v'", update.Name)
 

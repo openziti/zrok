@@ -1,4 +1,4 @@
-package dynamicProxyModel
+package dynamicProxyController
 
 type Operation string
 

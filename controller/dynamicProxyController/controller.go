@@ -7,7 +7,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/dynamicProxyModel"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -74,8 +73,8 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string,
 	}
 
 	// broadcast the mapping update via AMQP
-	mapping := dynamicProxyModel.Mapping{
-		Operation:  dynamicProxyModel.OperationBind,
+	mapping := Mapping{
+		Operation:  OperationBind,
 		Name:       name,
 		Version:    version,
 		ShareToken: shareToken,
@@ -89,8 +88,8 @@ func (c *Controller) UnbindFrontendMapping(frontendToken, name string, trx *sqlx
 	}
 
 	// broadcast the mapping update via AMQP
-	mapping := dynamicProxyModel.Mapping{
-		Operation: dynamicProxyModel.OperationUnbind,
+	mapping := Mapping{
+		Operation: OperationUnbind,
 		Name:      name,
 	}
 	return c.sendMappingUpdate(frontendToken, mapping)
@@ -125,7 +124,7 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 	return &FrontendMappingsResponse{FrontendMappings: out}, nil
 }
 
-func (c *Controller) sendMappingUpdate(frontendToken string, m dynamicProxyModel.Mapping) error {
+func (c *Controller) sendMappingUpdate(frontendToken string, m Mapping) error {
 	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
 		return err
 	}
