@@ -12,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -26,8 +25,6 @@ type controllerClient struct {
 	cfg    *controllerClientConfig
 	zCfg   *ziti.Config
 	zCtx   ziti.Context
-	conn   *grpc.ClientConn
-	client dynamicProxyController.DynamicProxyControllerClient
 	ctx    context.Context
 	cancel context.CancelFunc
 }
@@ -66,9 +63,24 @@ func newControllerClient(cfg *controllerClientConfig) (*controllerClient, error)
 }
 
 func (c *controllerClient) Start() error {
+	logrus.Infof("dynamic proxy controller client started for service '%s'", c.cfg.ServiceName)
+	return nil
+}
+
+func (c *controllerClient) Stop() error {
+	c.cancel()
+	if c.zCtx != nil {
+		c.zCtx.Close()
+		c.zCtx = nil
+	}
+	logrus.Info("dynamic proxy controller client stopped")
+	return nil
+}
+
+// dialAndCall creates a connection, makes an RPC call, and closes the connection
+func (c *controllerClient) dialAndCall(call func(client dynamicProxyController.DynamicProxyControllerClient, ctx context.Context) error) error {
 	opts := []grpc.DialOption{
 		grpc.WithContextDialer(func(_ context.Context, addr string) (net.Conn, error) {
-			logrus.Infof("dialing '%s'", addr)
 			conn, err := c.zCtx.DialWithOptions(addr, &ziti.DialOptions{ConnectTimeout: c.cfg.Timeout})
 			if err != nil {
 				return nil, err
@@ -76,11 +88,6 @@ func (c *controllerClient) Start() error {
 			return conn, nil
 		}),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                1 * time.Minute, // send keepalive ping every 1 minute
-			Timeout:             5 * time.Second, // wait 5 seconds for ping ack
-			PermitWithoutStream: true,            // send pings even without active streams
-		}),
 	}
 	resolver.SetDefaultScheme("passthrough")
 
@@ -89,62 +96,45 @@ func (c *controllerClient) Start() error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to connect to service '%s'", c.cfg.ServiceName)
 	}
-
-	c.conn = conn
-	c.client = dynamicProxyController.NewDynamicProxyControllerClient(conn)
-
-	logrus.Infof("grpc client connected to dynamic proxy controller service '%s'", c.cfg.ServiceName)
-	return nil
-}
-
-func (c *controllerClient) Stop() error {
-	c.cancel()
-	if c.conn != nil {
-		if err := c.conn.Close(); err != nil {
+	defer func() {
+		if err := conn.Close(); err != nil {
 			logrus.Warnf("error closing grpc connection: %v", err)
 		}
-		c.conn = nil
-	}
-	if c.zCtx != nil {
-		c.zCtx.Close()
-		c.zCtx = nil
-	}
-	logrus.Info("grpc client disconnected from dynamic proxy controller")
-	return nil
+	}()
+
+	client := dynamicProxyController.NewDynamicProxyControllerClient(conn)
+	ctx, cancel := context.WithTimeout(c.ctx, c.cfg.Timeout)
+	defer cancel()
+
+	return call(client, ctx)
 }
 
 // getFrontendMappings retrieves frontend mappings from the controller
 func (c *controllerClient) getFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
-	if c.client == nil {
-		return nil, errors.New("grpc client not connected")
-	}
+	var mappings []*dynamicProxyController.FrontendMapping
+	err := c.dialAndCall(func(client dynamicProxyController.DynamicProxyControllerClient, ctx context.Context) error {
+		req := &dynamicProxyController.FrontendMappingsRequest{
+			FrontendToken: frontendToken,
+			Name:          name,
+			Version:       version,
+		}
 
-	ctx, cancel := context.WithTimeout(c.ctx, c.cfg.Timeout)
-	defer cancel()
+		resp, err := client.FrontendMappings(ctx, req)
+		if err != nil {
+			return errors.Wrap(err, "failed to get frontend mappings")
+		}
 
-	req := &dynamicProxyController.FrontendMappingsRequest{
-		FrontendToken: frontendToken,
-		Name:          name,
-		Version:       version,
-	}
+		mappings = resp.GetFrontendMappings()
+		return nil
+	})
 
-	resp, err := c.client.FrontendMappings(ctx, req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get frontend mappings")
+		return nil, err
 	}
-
-	return resp.GetFrontendMappings(), nil
+	return mappings, nil
 }
 
 // getAllFrontendMappings is a convenience method to get all mappings for a frontend token
 func (c *controllerClient) getAllFrontendMappings(frontendToken string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
 	return c.getFrontendMappings(frontendToken, "", version)
-}
-
-// isConnected checks if the grpc connection is healthy
-func (c *controllerClient) isConnected() bool {
-	if c.conn == nil {
-		return false
-	}
-	return c.conn.GetState().String() == "READY"
 }
