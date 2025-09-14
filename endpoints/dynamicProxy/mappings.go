@@ -100,7 +100,7 @@ func (m *mappings) run() {
 			}
 			if len(mappings) > 0 {
 				m.updateMappings(mappings)
-				logrus.Warnf("updated '%d' mappings in '%d'", len(mappings), time.Since(start))
+				logrus.Warnf("updated '%d' mappings in '%v'", len(mappings), time.Since(start))
 			}
 
 		case update := <-m.amqp.Updates():
