@@ -1,26 +1,27 @@
 package dynamicProxy
 
 import (
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dd"
 	"github.com/sirupsen/logrus"
 )
 
 type Service struct {
-	app *df.Application[*config]
+	app *da.Application[*config]
 }
 
 func NewService(cfgPath string) (*Service, error) {
-	svc := &Service{app: df.NewApplication[*config](defaults())}
-	df.WithFactoryFunc(svc.app, buildAmqpSubscriber)
-	df.WithFactoryFunc(svc.app, buildControllerClient)
-	df.WithFactoryFunc(svc.app, buildMappings)
-	df.WithFactoryFunc(svc.app, buildOAuthRouter)
-	df.WithFactoryFunc(svc.app, buildHttpListener)
-	opts := &df.Options{DynamicBinders: oauthBinders}
+	svc := &Service{app: da.NewApplication[*config](defaults())}
+	da.WithFactoryFunc(svc.app, buildAmqpSubscriber)
+	da.WithFactoryFunc(svc.app, buildControllerClient)
+	da.WithFactoryFunc(svc.app, buildMappings)
+	da.WithFactoryFunc(svc.app, buildOAuthRouter)
+	da.WithFactoryFunc(svc.app, buildHttpListener)
+	opts := &dd.Options{DynamicBinders: oauthBinders}
 	if err := svc.app.InitializeWithOptions(opts, cfgPath); err != nil {
 		return nil, err
 	}
-	logrus.Info(df.MustInspect(svc.app.Cfg))
+	logrus.Info(dd.MustInspect(svc.app.Cfg))
 	return svc, nil
 }
 

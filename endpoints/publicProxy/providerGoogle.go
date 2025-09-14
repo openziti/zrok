@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -27,8 +27,8 @@ type googleConfig struct {
 	ClientSecret string
 }
 
-func newGoogleConfig(v map[string]interface{}) (df.Dynamic, error) {
-	return df.New[googleConfig](v)
+func newGoogleConfig(v map[string]interface{}) (dd.Dynamic, error) {
+	return dd.New[googleConfig](v)
 }
 
 func (c *googleConfig) Type() string                   { return "google" }

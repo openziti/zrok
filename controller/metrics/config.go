@@ -1,6 +1,8 @@
 package metrics
 
-import "github.com/michaelquigley/df"
+import (
+	"github.com/michaelquigley/df/dd"
+)
 
 type Config struct {
 	Influx *InfluxConfig
@@ -8,12 +10,12 @@ type Config struct {
 }
 
 type AgentConfig struct {
-	Source df.Dynamic
+	Source dd.Dynamic
 }
 
 type InfluxConfig struct {
 	Url    string
 	Bucket string
 	Org    string
-	Token  string `df:"+secret"`
+	Token  string `dd:"+secret"`
 }

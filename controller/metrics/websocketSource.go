@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/channel/v4"
 	"github.com/openziti/channel/v4/websockets"
 	"github.com/openziti/edge-api/rest_util"
@@ -28,11 +28,11 @@ type WebsocketSourceConfig struct {
 	WebsocketEndpoint string // wss://127.0.0.1:1280/fabric/v1/ws-api
 	ApiEndpoint       string // https://127.0.0.1:1280
 	Username          string
-	Password          string `df:"+secret"`
+	Password          string `dd:"+secret"`
 }
 
-func LoadWebsocketSource(v map[string]any) (df.Dynamic, error) {
-	cfg, err := df.New[WebsocketSourceConfig](v)
+func LoadWebsocketSource(v map[string]any) (dd.Dynamic, error) {
+	cfg, err := dd.New[WebsocketSourceConfig](v)
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
@@ -31,12 +31,12 @@ type httpListener struct {
 	server     *http.Server
 }
 
-func buildHttpListener(app *df.Application[*config]) error {
+func buildHttpListener(app *da.Application[*config]) error {
 	hl, err := newHttpListener(app.Cfg)
 	if err != nil {
 		return err
 	}
-	df.Set(app.C, hl)
+	da.Set(app.C, hl)
 	return nil
 }
 
@@ -272,9 +272,9 @@ func (l *httpListener) initializeHandler() error {
 	return nil
 }
 
-func (l *httpListener) Link(c *df.Container) error {
+func (l *httpListener) Link(c *da.Container) error {
 	var found bool
-	l.mappings, found = df.Get[*mappings](c)
+	l.mappings, found = da.Get[*mappings](c)
 	if !found {
 		return errors.New("mapping not found")
 	}

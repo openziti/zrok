@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/emailUi"
@@ -41,7 +41,7 @@ type Config struct {
 }
 
 type AdminConfig struct {
-	Secrets         []string `df:"+secret"`
+	Secrets         []string `dd:"+secret"`
 	TouLink         string
 	NewAccountLink  string
 	ProfileEndpoint string
@@ -125,7 +125,7 @@ func DefaultConfig() *Config {
 
 func LoadConfig(path string) (*Config, error) {
 	cfg := DefaultConfig()
-	if err := df.MergeFromYAML(cfg, path, env.GetDfOptions()); err != nil {
+	if err := dd.MergeFromYAML(cfg, path, env.GetDdOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
 	if !envVersionOk() && cfg.V != ConfigVersion {

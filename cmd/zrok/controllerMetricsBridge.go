@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/sirupsen/logrus"
@@ -37,7 +37,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(df.MustInspect(cfg))
+	logrus.Info(dd.MustInspect(cfg))
 
 	bridge, err := metrics.NewBridge(cfg.Bridge)
 	if err != nil {

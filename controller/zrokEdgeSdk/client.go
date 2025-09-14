@@ -10,7 +10,7 @@ import (
 type Config struct {
 	ApiEndpoint string
 	Username    string
-	Password    string `df:"+secret"`
+	Password    string `dd:"+secret"`
 }
 
 func Client(cfg *Config) (*rest_management_api_client.ZitiEdgeManagement, error) {

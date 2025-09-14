@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"os"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/nxadm/tail"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -17,8 +17,8 @@ type FileSourceConfig struct {
 	PointerPath string
 }
 
-func LoadFileSource(v map[string]any) (df.Dynamic, error) {
-	cfg, err := df.New[FileSourceConfig](v)
+func LoadFileSource(v map[string]any) (dd.Dynamic, error) {
+	cfg, err := dd.New[FileSourceConfig](v)
 	if err != nil {
 		return nil, err
 	}

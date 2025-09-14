@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
@@ -39,9 +39,9 @@ type OauthConfig struct {
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
-	SigningKey           string       `df:"+secret"`
-	EncryptionKey        string       `df:"+secret"`
-	Providers            []df.Dynamic `df:"+secret"`
+	SigningKey           string       `dd:"+secret"`
+	EncryptionKey        string       `dd:"+secret"`
+	Providers            []dd.Dynamic `dd:"+secret"`
 }
 
 func DefaultConfig() *Config {
@@ -52,14 +52,14 @@ func DefaultConfig() *Config {
 }
 
 func (c *Config) Load(path string) error {
-	opts := &df.Options{
-		DynamicBinders: map[string]func(map[string]any) (df.Dynamic, error){
+	opts := &dd.Options{
+		DynamicBinders: map[string]func(map[string]any) (dd.Dynamic, error){
 			(&githubConfig{}).Type(): newGithubConfig,
 			(&googleConfig{}).Type(): newGoogleConfig,
 			(&oidcConfig{}).Type():   newOidcConfig,
 		},
 	}
-	if err := df.MergeFromYAML(c, path, opts); err != nil {
+	if err := dd.MergeFromYAML(c, path, opts); err != nil {
 		return errors.Wrapf(err, "error loading frontend config '%v'", path)
 	}
 	if c.V != V {
@@ -75,7 +75,7 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	}
 
 	for _, v := range cfg.Oauth.Providers {
-		if prvCfg, ok := v.(df.Dynamic); ok {
+		if prvCfg, ok := v.(dd.Dynamic); ok {
 			switch prvCfg.Type() {
 			case "github":
 				githubCfg, ok := prvCfg.(*githubConfig)

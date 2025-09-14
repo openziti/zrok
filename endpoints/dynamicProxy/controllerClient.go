@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
@@ -16,8 +16,8 @@ import (
 )
 
 type controllerClientConfig struct {
-	IdentityPath string `df:"+required"`
-	ServiceName  string `df:"+required"`
+	IdentityPath string `dd:"+required"`
+	ServiceName  string `dd:"+required"`
 	Timeout      time.Duration
 }
 
@@ -29,12 +29,12 @@ type controllerClient struct {
 	cancel context.CancelFunc
 }
 
-func buildControllerClient(app *df.Application[*config]) error {
+func buildControllerClient(app *da.Application[*config]) error {
 	client, err := newControllerClient(app.Cfg.Controller)
 	if err != nil {
 		return err
 	}
-	df.Set(app.C, client)
+	da.Set(app.C, client)
 	return nil
 }
 

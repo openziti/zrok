@@ -1,16 +1,16 @@
 package env
 
 import (
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/metrics"
 )
 
-var dfOpts *df.Options
+var ddOpts *dd.Options
 
-func GetDfOptions() *df.Options {
-	if dfOpts == nil {
-		dfOpts = &df.Options{
-			DynamicBinders: map[string]func(map[string]any) (df.Dynamic, error){
+func GetDdOptions() *dd.Options {
+	if ddOpts == nil {
+		ddOpts = &dd.Options{
+			DynamicBinders: map[string]func(map[string]any) (dd.Dynamic, error){
 				metrics.AmqpSinkType:        metrics.LoadAmqpSink,
 				metrics.AmqpSourceType:      metrics.LoadAmqpSource,
 				metrics.FileSourceType:      metrics.LoadFileSource,
@@ -18,5 +18,5 @@ func GetDfOptions() *df.Options {
 			},
 		}
 	}
-	return dfOpts
+	return ddOpts
 }

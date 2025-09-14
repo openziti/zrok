@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -21,10 +21,10 @@ type mappings struct {
 	nameMap map[string]*dynamicProxyController.FrontendMapping
 }
 
-func buildMappings(app *df.Application[*config]) error {
+func buildMappings(app *da.Application[*config]) error {
 	mappings := newMappings()
 	mappings.cfg = app.Cfg
-	df.Set(app.C, mappings)
+	da.Set(app.C, mappings)
 	return nil
 }
 
@@ -42,14 +42,14 @@ func (m *mappings) getMapping(name string) (*dynamicProxyController.FrontendMapp
 	return mapping, exists
 }
 
-func (m *mappings) Link(c *df.Container) error {
+func (m *mappings) Link(c *da.Container) error {
 	var found bool
-	m.amqp, found = df.Get[*amqpSubscriber](c)
+	m.amqp, found = da.Get[*amqpSubscriber](c)
 	if !found {
 		return errors.New("no amqp subscriber found")
 	}
 
-	m.ctrl, found = df.Get[*controllerClient](c)
+	m.ctrl, found = da.Get[*controllerClient](c)
 	if !found {
 		return errors.New("no controller client found")
 	}

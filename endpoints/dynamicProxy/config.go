@@ -3,21 +3,21 @@ package dynamicProxy
 import (
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints"
 )
 
 type config struct {
-	V                      int    `df:"+match=1"`
-	FrontendToken          string `df:"+required"`
+	V                      int    `dd:"+match=1"`
+	FrontendToken          string `dd:"+required"`
 	Identity               string
 	BindAddress            string
 	TemplatePath           string
 	MappingRefreshInterval time.Duration
 	Interstitial           *interstitialConfig
 	Oauth                  *oauthConfig
-	AmqpSubscriber         *amqpSubscriberConfig   `df:"+required"`
-	Controller             *controllerClientConfig `df:"+required"`
+	AmqpSubscriber         *amqpSubscriberConfig   `dd:"+required"`
+	Controller             *controllerClientConfig `dd:"+required"`
 	Tls                    *endpoints.TlsConfig
 }
 
@@ -34,15 +34,15 @@ type oauthConfig struct {
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
-	SigningKey           string `df:"+secret"`
-	EncryptionKey        string `df:"+secret"`
-	Providers            []df.Dynamic
+	SigningKey           string `dd:"+secret"`
+	EncryptionKey        string `dd:"+secret"`
+	Providers            []dd.Dynamic
 }
 
 type oauthProviderConfig struct {
 	Name         string
 	ClientId     string
-	ClientSecret string `df:"+secret"`
+	ClientSecret string `dd:"+secret"`
 }
 
 func defaults() *config {

@@ -10,7 +10,7 @@ import (
 type Config struct {
 	ApiEndpoint string
 	Username    string
-	Password    string `df:"+secret"`
+	Password    string `dd:"+secret"`
 }
 
 type Client struct {

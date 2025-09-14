@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/sirupsen/logrus"
@@ -36,7 +36,7 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Info(df.MustInspect(inCfg))
+	logrus.Info(dd.MustInspect(inCfg))
 
 	// disable auto-migration, we'll control it manually
 	inCfg.Store.DisableAutoMigration = true

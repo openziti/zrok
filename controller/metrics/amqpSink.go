@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -13,12 +13,12 @@ import (
 const AmqpSinkType = "amqpSink"
 
 type AmqpSinkConfig struct {
-	Url       string `df:"+secret"`
+	Url       string `dd:"+secret"`
 	QueueName string
 }
 
-func LoadAmqpSink(v map[string]any) (df.Dynamic, error) {
-	cfg, err := df.New[AmqpSinkConfig](v)
+func LoadAmqpSink(v map[string]any) (dd.Dynamic, error) {
+	cfg, err := dd.New[AmqpSinkConfig](v)
 	if err != nil {
 		return nil, err
 	}

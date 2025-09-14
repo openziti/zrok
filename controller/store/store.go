@@ -23,7 +23,7 @@ type Model struct {
 }
 
 type Config struct {
-	Path                 string `df:"+secret"`
+	Path                 string `dd:"+secret"`
 	Type                 string
 	EnableLocking        bool
 	DisableAutoMigration bool

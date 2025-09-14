@@ -7,17 +7,18 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-var oauthBinders map[string]func(map[string]any) (df.Dynamic, error)
+var oauthBinders map[string]func(map[string]any) (dd.Dynamic, error)
 
-func registerOauthBinder(typ string, binder func(map[string]any) (df.Dynamic, error)) {
+func registerOauthBinder(typ string, binder func(map[string]any) (dd.Dynamic, error)) {
 	if oauthBinders == nil {
-		oauthBinders = make(map[string]func(map[string]any) (df.Dynamic, error))
+		oauthBinders = make(map[string]func(map[string]any) (dd.Dynamic, error))
 	}
 	oauthBinders[typ] = binder
 }
@@ -122,7 +123,7 @@ func (r *oauthRouter) Stop() error {
 }
 
 // buildOAuthRouter creates and registers the OAuth router as a df component
-func buildOAuthRouter(app *df.Application[*config]) error {
+func buildOAuthRouter(app *da.Application[*config]) error {
 	if app.Cfg.Oauth == nil {
 		logrus.Info("no oauth configuration; skipping oauth router")
 		return nil
@@ -132,6 +133,6 @@ func buildOAuthRouter(app *df.Application[*config]) error {
 	globalOAuthRouter = newOAuthRouter(app.Cfg.Oauth)
 
 	// register with df container for lifecycle management
-	df.Set(app.C, globalOAuthRouter)
+	da.Set(app.C, globalOAuthRouter)
 	return nil
 }

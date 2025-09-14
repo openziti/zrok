@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -14,8 +15,8 @@ import (
 )
 
 type amqpSubscriberConfig struct {
-	Url          string `df:"+required"`
-	ExchangeName string `df:"+required"`
+	Url          string `dd:"+required"`
+	ExchangeName string `dd:"+required"`
 	QueueDepth   int
 }
 
@@ -31,12 +32,12 @@ type amqpSubscriber struct {
 	updates    chan *dynamicProxyController.Mapping
 }
 
-func buildAmqpSubscriber(app *df.Application[*config]) error {
+func buildAmqpSubscriber(app *da.Application[*config]) error {
 	subscriber, err := newAmqpSubscriber(app.Cfg)
 	if err != nil {
 		return err
 	}
-	df.Set(app.C, subscriber)
+	da.Set(app.C, subscriber)
 	return nil
 }
 
@@ -206,7 +207,7 @@ func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 	if err := json.Unmarshal(delivery.Body, &data); err != nil {
 		return errors.Wrap(err, "failed to unmarshal mapping data")
 	}
-	update, err := df.New[dynamicProxyController.Mapping](data)
+	update, err := dd.New[dynamicProxyController.Mapping](data)
 	if err != nil {
 		return err
 	}

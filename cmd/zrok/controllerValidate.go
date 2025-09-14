@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
@@ -32,5 +32,5 @@ func (cmd *controllerValidateCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		tui.Error("controller config validation failed", err)
 	}
-	logrus.Info(df.MustInspect(cfg))
+	logrus.Info(dd.MustInspect(cfg))
 }

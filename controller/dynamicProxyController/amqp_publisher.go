@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 )
 
 type AmqpPublisherConfig struct {
-	Url          string `df:"+required"`
-	ExchangeName string `df:"+required"`
+	Url          string `dd:"+required"`
+	ExchangeName string `dd:"+required"`
 }
 
 type AmqpPublisher struct {
@@ -74,7 +74,7 @@ func (p *AmqpPublisher) Publish(ctx context.Context, frontendToken string, m Map
 		}
 	}
 
-	data, err := df.Unbind(m)
+	data, err := dd.Unbind(m)
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize mapping")
 	}

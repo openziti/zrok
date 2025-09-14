@@ -4,6 +4,6 @@ type Config struct {
 	Host     string
 	Port     int
 	Username string
-	Password string `df:"+secret"`
+	Password string `dd:"+secret"`
 	From     string
 }

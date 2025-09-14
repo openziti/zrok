@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -28,8 +28,8 @@ type githubConfig struct {
 	ClientSecret string
 }
 
-func newGithubConfig(v map[string]interface{}) (df.Dynamic, error) {
-	return df.New[githubConfig](v)
+func newGithubConfig(v map[string]interface{}) (dd.Dynamic, error) {
+	return dd.New[githubConfig](v)
 }
 
 func (c *githubConfig) Type() string                   { return "github" }

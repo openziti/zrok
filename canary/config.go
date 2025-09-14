@@ -1,7 +1,7 @@
 package canary
 
 import (
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -15,13 +15,13 @@ type Config struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	cfg, err := df.NewFromYAML[Config](path)
+	cfg, err := dd.NewFromYAML[Config](path)
 	if err != nil {
 		return nil, err
 	}
 	if cfg.V != ConfigVersion {
 		return nil, errors.Errorf("expecting canary configuration version '%v', got '%v'", ConfigVersion, cfg.V)
 	}
-	logrus.Info(df.MustInspect(cfg))
+	logrus.Info(dd.MustInspect(cfg))
 	return cfg, nil
 }

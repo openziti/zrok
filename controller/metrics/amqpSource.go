@@ -3,7 +3,7 @@ package metrics
 import (
 	"time"
 
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -12,12 +12,12 @@ import (
 const AmqpSourceType = "amqpSource"
 
 type AmqpSourceConfig struct {
-	Url       string `df:"+secret"`
+	Url       string `dd:"+secret"`
 	QueueName string
 }
 
-func LoadAmqpSource(v map[string]any) (df.Dynamic, error) {
-	cfg, err := df.New[AmqpSourceConfig](v)
+func LoadAmqpSource(v map[string]any) (dd.Dynamic, error) {
+	cfg, err := dd.New[AmqpSourceConfig](v)
 	if err != nil {
 		return nil, err
 	}

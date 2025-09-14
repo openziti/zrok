@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -33,8 +33,8 @@ type oidcConfig struct {
 	Pkce         bool
 }
 
-func newOidcConfig(v map[string]interface{}) (df.Dynamic, error) {
-	return df.New[oidcConfig](v)
+func newOidcConfig(v map[string]interface{}) (dd.Dynamic, error) {
+	return dd.New[oidcConfig](v)
 }
 
 func (c *oidcConfig) Type() string                   { return "oidc" }

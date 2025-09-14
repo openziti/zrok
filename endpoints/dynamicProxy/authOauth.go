@@ -8,7 +8,7 @@ import (
 
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/michaelquigley/df"
+	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -161,7 +161,7 @@ func configureOauth(cfg *config, tls bool) error {
 
 	// configure providers (they will register themselves with the router)
 	for _, v := range cfg.Oauth.Providers {
-		if prvCfg, ok := v.(df.Dynamic); ok {
+		if prvCfg, ok := v.(dd.Dynamic); ok {
 			switch prvCfg.Type() {
 			case "github":
 				githubCfg, ok := prvCfg.(*githubConfig)
