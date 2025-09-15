@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.2.0
+## v2.0.0
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
