@@ -173,10 +173,8 @@ func (m *mappings) dumpMappings() string {
 	t.SetStyle(table.StyleRounded)
 	t.SetCaption("%d mappings", len(m.nameMap))
 	t.AppendHeader(table.Row{"name", "share token", "version"})
-
 	for key, mapping := range m.nameMap {
 		t.AppendRow(table.Row{key, mapping.ShareToken, mapping.Version})
 	}
-
 	return t.Render()
 }
