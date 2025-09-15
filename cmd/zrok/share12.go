@@ -13,7 +13,6 @@ import (
 	"github.com/openziti/zrok/endpoints/proxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
@@ -46,7 +45,7 @@ func newShare12Command() *share12Command {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &share12Command{cmd: cmd}
-	
+
 	cmd.Flags().StringVar(&command.namespace, "namespace", "public", "Namespace token to use for the share")
 	cmd.Flags().StringVar(&command.name, "name", "", "Reserved name to use (auto-generates if omitted)")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
@@ -116,31 +115,30 @@ func (cmd *share12Command) shareLocal(args []string, root env_core.Root) {
 	}
 
 	// create share request
-	req := &sdk.Share12Request{
-		EnvZId:                      root.Environment().ZitiIdentity,
-		ShareMode:                   "public",
-		Target:                      target,
-		BackendMode:                 cmd.backendMode,
-		PermissionMode:              sdk.ClosedPermissionMode,
-		AccessGrants:                cmd.accessGrants,
-		BasicAuthUsers:              cmd.basicAuth,
-		OauthProvider:               cmd.oauthProvider,
-		OauthEmailDomains:           cmd.oauthEmailAddressPatterns,
-		OauthRefreshInterval:        cmd.oauthCheckInterval.String(),
-		NamespaceSelections:         []*rest_model_zrok.NamespaceSelection{{NamespaceToken: cmd.namespace, Name: cmd.name}},
+	req := &sdk.ShareRequest{
+		ShareMode:                 "public",
+		Target:                    target,
+		BackendMode:               sdk.BackendMode(cmd.backendMode),
+		PermissionMode:            sdk.ClosedPermissionMode,
+		AccessGrants:              cmd.accessGrants,
+		BasicAuth:                 cmd.basicAuth,
+		OauthProvider:             cmd.oauthProvider,
+		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
+		OauthRefreshInterval:      cmd.oauthCheckInterval,
+		NamespaceSelections:       []sdk.NamespaceSelection{{NamespaceToken: cmd.namespace, Name: cmd.name}},
 	}
 	if cmd.open {
 		req.PermissionMode = sdk.OpenPermissionMode
 	}
 
-	shr, err := sdk.CreateShare12(root, req)
+	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
 		cmd.error("unable to create share", err)
 	}
 
-	logrus.Infof("created share '%v'", shr.ShareToken)
+	logrus.Infof("created share '%v'", shr.Token)
 	logrus.Infof("access your zrok share at the following endpoints:")
-	for _, endpoint := range shr.FrontendProxyEndpoints {
+	for _, endpoint := range shr.FrontendEndpoints {
 		logrus.Infof("  %v", endpoint)
 	}
 
@@ -159,7 +157,7 @@ func (cmd *share12Command) shareLocal(args []string, root env_core.Root) {
 		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
 			EndpointAddress: target,
-			ShrToken:        shr.ShareToken,
+			ShrToken:        shr.Token,
 			Insecure:        cmd.insecure,
 			Requests:        requests,
 			SuperNetwork:    superNetwork,
@@ -180,7 +178,7 @@ func (cmd *share12Command) shareLocal(args []string, root env_core.Root) {
 		cfg := &proxy.CaddyWebBackendConfig{
 			IdentityPath: zif,
 			WebRoot:      target,
-			ShrToken:     shr.ShareToken,
+			ShrToken:     shr.Token,
 			Requests:     requests,
 		}
 
@@ -198,8 +196,8 @@ func (cmd *share12Command) shareLocal(args []string, root env_core.Root) {
 	case "caddy":
 		// convert to sdk.Share for caddy backend compatibility
 		sdkShare := &sdk.Share{
-			Token:             shr.ShareToken,
-			FrontendEndpoints: shr.FrontendProxyEndpoints,
+			Token:             shr.Token,
+			FrontendEndpoints: shr.FrontendEndpoints,
 		}
 		cfg := &proxy.CaddyfileBackendConfig{
 			CaddyfilePath: target,
@@ -223,7 +221,7 @@ func (cmd *share12Command) shareLocal(args []string, root env_core.Root) {
 		cfg := &drive.BackendConfig{
 			IdentityPath: zif,
 			DriveRoot:    target,
-			ShrToken:     shr.ShareToken,
+			ShrToken:     shr.Token,
 			Requests:     requests,
 			SuperNetwork: superNetwork,
 		}
@@ -261,11 +259,6 @@ func (cmd *share12Command) error(msg string, err error) {
 
 func (cmd *share12Command) shutdown(root env_core.Root, shr interface{}) {
 	switch s := shr.(type) {
-	case *sdk.Share12Response:
-		logrus.Debugf("shutting down share12 '%v'", s.ShareToken)
-		if err := sdk.DeleteShare12(root, s.ShareToken); err != nil {
-			logrus.Errorf("error shutting down share12 '%v': %v", s.ShareToken, err)
-		}
 	case *sdk.Share:
 		logrus.Debugf("shutting down share '%v'", s.Token)
 		if err := sdk.DeleteShare(root, s); err != nil {

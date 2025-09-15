@@ -35,7 +35,7 @@ func NewUpdateShare(ctx *middleware.Context, handler UpdateShareHandler) *Update
 }
 
 /*
-	UpdateShare swagger:route PATCH /share share updateShare
+	UpdateShare swagger:route PATCH /share12 share updateShare
 
 UpdateShare update share API
 */
@@ -80,9 +80,6 @@ type UpdateShareBody struct {
 
 	// add access grants
 	AddAccessGrants []string `json:"addAccessGrants"`
-
-	// backend proxy endpoint
-	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
 	// remove access grants
 	RemoveAccessGrants []string `json:"removeAccessGrants"`

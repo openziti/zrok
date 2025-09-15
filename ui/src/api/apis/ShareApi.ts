@@ -19,12 +19,10 @@ import type {
   AccessRequest,
   CreateShareNameRequest,
   Name,
-  ShareRequest,
   ShareRequest12,
   ShareResponse,
   UnaccessRequest,
   Unshare12Request,
-  UnshareRequest,
   UpdateAccessRequest,
   UpdateShareRequest,
 } from '../models/index';
@@ -37,8 +35,6 @@ import {
     CreateShareNameRequestToJSON,
     NameFromJSON,
     NameToJSON,
-    ShareRequestFromJSON,
-    ShareRequestToJSON,
     ShareRequest12FromJSON,
     ShareRequest12ToJSON,
     ShareResponseFromJSON,
@@ -47,8 +43,6 @@ import {
     UnaccessRequestToJSON,
     Unshare12RequestFromJSON,
     Unshare12RequestToJSON,
-    UnshareRequestFromJSON,
-    UnshareRequestToJSON,
     UpdateAccessRequestFromJSON,
     UpdateAccessRequestToJSON,
     UpdateShareRequestFromJSON,
@@ -71,20 +65,12 @@ export interface ListNamesForNamespaceRequest {
     namespaceToken: string;
 }
 
-export interface ShareOperationRequest {
-    body?: ShareRequest;
-}
-
 export interface Share12Request {
     body?: ShareRequest12;
 }
 
 export interface UnaccessOperationRequest {
     body?: UnaccessRequest;
-}
-
-export interface UnshareOperationRequest {
-    body?: UnshareRequest;
 }
 
 export interface Unshare12OperationRequest {
@@ -276,40 +262,6 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async shareRaw(requestParameters: ShareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareResponse>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/zrok.v1+json';
-
-        if (this.configuration && this.configuration.apiKey) {
-            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
-        }
-
-
-        let urlPath = `/share`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ShareRequestToJSON(requestParameters['body']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ShareResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async share(requestParameters: ShareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareResponse> {
-        const response = await this.shareRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
     async share12Raw(requestParameters: Share12Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareResponse>> {
         const queryParameters: any = {};
 
@@ -373,39 +325,6 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async unaccess(requestParameters: UnaccessOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.unaccessRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async unshareRaw(requestParameters: UnshareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/zrok.v1+json';
-
-        if (this.configuration && this.configuration.apiKey) {
-            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
-        }
-
-
-        let urlPath = `/unshare`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UnshareRequestToJSON(requestParameters['body']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async unshare(requestParameters: UnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.unshareRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -488,7 +407,7 @@ export class ShareApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/share`;
+        let urlPath = `/share12`;
 
         const response = await this.request({
             path: urlPath,

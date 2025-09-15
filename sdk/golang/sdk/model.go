@@ -1,8 +1,11 @@
 package sdk
 
 import (
+	"strings"
 	"time"
+
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/pkg/errors"
 )
 
 type EnableRequest struct {
@@ -44,19 +47,40 @@ const (
 	ClosedPermissionMode PermissionMode = "closed"
 )
 
+type NamespaceSelection struct {
+	NamespaceToken string
+	Name           string
+}
+
+// ParseNamespaceSelection converts a string in the format "<namespaceToken>[:<name>]"
+// into a NamespaceSelection struct. if no name is provided, the Name field will be empty.
+func ParseNamespaceSelection(input string) (NamespaceSelection, error) {
+	parts := strings.SplitN(input, ":", 2)
+	if len(parts) > 2 {
+		return NamespaceSelection{}, errors.New("invalid namespace selection")
+	}
+	selection := NamespaceSelection{
+		NamespaceToken: parts[0],
+	}
+	if len(parts) == 2 {
+		selection.Name = parts[1]
+	}
+	return selection, nil
+}
+
 type ShareRequest struct {
-	Reserved                        bool
-	UniqueName                      string
-	BackendMode                     BackendMode
-	ShareMode                       ShareMode
-	Target                          string
-	Frontends                       []string
-	BasicAuth                       []string
-	OauthProvider                   string
-	OauthEmailAddressPatterns       []string
-	OauthAuthorizationCheckInterval time.Duration
-	PermissionMode                  PermissionMode
-	AccessGrants                    []string
+	Reserved                  bool
+	UniqueName                string
+	BackendMode               BackendMode
+	ShareMode                 ShareMode
+	Target                    string
+	NamespaceSelections       []NamespaceSelection
+	BasicAuth                 []string
+	OauthProvider             string
+	OauthEmailAddressPatterns []string
+	OauthRefreshInterval      time.Duration
+	PermissionMode            PermissionMode
+	AccessGrants              []string
 }
 
 type Share struct {
@@ -95,17 +119,17 @@ const (
 )
 
 type Share12Request struct {
-	EnvZId                   string
-	ShareMode                string
-	Target                   string
-	BackendMode              string
-	PermissionMode           PermissionMode
-	AccessGrants             []string
-	BasicAuthUsers           []string
-	OauthProvider            string
-	OauthEmailDomains        []string
-	OauthRefreshInterval     string
-	NamespaceSelections      []*rest_model_zrok.NamespaceSelection
+	EnvZId               string
+	ShareMode            string
+	Target               string
+	BackendMode          string
+	PermissionMode       PermissionMode
+	AccessGrants         []string
+	BasicAuthUsers       []string
+	OauthProvider        string
+	OauthEmailDomains    []string
+	OauthRefreshInterval string
+	NamespaceSelections  []*rest_model_zrok.NamespaceSelection
 }
 
 type Share12Response struct {

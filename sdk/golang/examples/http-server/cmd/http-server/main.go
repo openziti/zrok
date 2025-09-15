@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
 func helloZrok(w http.ResponseWriter, r *http.Request) {
@@ -20,10 +21,10 @@ func main() {
 	}
 
 	shr, err := sdk.CreateShare(root, &sdk.ShareRequest{
-		BackendMode: sdk.ProxyBackendMode,
-		ShareMode:   sdk.PublicShareMode,
-		Frontends:   []string{"public"},
-		Target:      "http-server",
+		BackendMode:         sdk.ProxyBackendMode,
+		ShareMode:           sdk.PublicShareMode,
+		NamespaceSelections: []sdk.NamespaceSelection{{NamespaceToken: "public"}},
+		Target:              "http-server",
 	})
 
 	if err != nil {

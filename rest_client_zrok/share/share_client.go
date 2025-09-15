@@ -40,13 +40,9 @@ type ClientService interface {
 
 	ListNamesForNamespace(params *ListNamesForNamespaceParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListNamesForNamespaceOK, error)
 
-	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
-
 	Share12(params *Share12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Share12Created, error)
 
 	Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error)
-
-	Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error)
 
 	Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Unshare12OK, error)
 
@@ -253,45 +249,6 @@ func (a *Client) ListNamesForNamespace(params *ListNamesForNamespaceParams, auth
 }
 
 /*
-Share share API
-*/
-func (a *Client) Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewShareParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "share",
-		Method:             "POST",
-		PathPattern:        "/share",
-		ProducesMediaTypes: []string{"application/zrok.v1+json"},
-		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &ShareReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*ShareCreated)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for share: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
 Share12 share12 API
 */
 func (a *Client) Share12(params *Share12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Share12Created, error) {
@@ -366,45 +323,6 @@ func (a *Client) Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInf
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for unaccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-Unshare unshare API
-*/
-func (a *Client) Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUnshareParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "unshare",
-		Method:             "DELETE",
-		PathPattern:        "/unshare",
-		ProducesMediaTypes: []string{"application/zrok.v1+json"},
-		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &UnshareReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UnshareOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for unshare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -497,7 +415,7 @@ func (a *Client) UpdateShare(params *UpdateShareParams, authInfo runtime.ClientA
 	op := &runtime.ClientOperation{
 		ID:                 "updateShare",
 		Method:             "PATCH",
-		PathPattern:        "/share",
+		PathPattern:        "/share12",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

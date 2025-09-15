@@ -1864,70 +1864,6 @@ paths:
         500:
           description: internal server error
 
-  /share:
-    post:
-      tags:
-        - share
-      security:
-        - key: []
-      operationId: share
-      parameters:
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/shareRequest"
-      responses:
-        201:
-          description: share created
-          schema:
-            $ref: "#/definitions/shareResponse"
-        401:
-          description: unauthorized
-        404:
-          description: not found
-        409:
-          description: conflict
-        422:
-          description: unprocessable
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
-    patch:
-      tags:
-        - share
-      security:
-        - key: []
-      operationId: updateShare
-      parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              shareToken:
-                type: string
-              backendProxyEndpoint:
-                type: string
-              addAccessGrants:
-                type: array
-                items:
-                  type: string
-              removeAccessGrants:
-                type: array
-                items:
-                  type: string
-      responses:
-        200:
-          description: share updated
-        400:
-          description: bad request
-        401:
-          description: unauthorized
-        404:
-          description: not found
-        500:
-          description: internal server error
-
   /share12:
     post:
       tags:
@@ -1959,6 +1895,38 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+    patch:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: updateShare
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              shareToken:
+                type: string
+              addAccessGrants:
+                type: array
+                items:
+                  type: string
+              removeAccessGrants:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: share updated
+        400:
+          description: bad request
+        401:
+          description: unauthorized
+        404:
+          description: not found
+        500:
+          description: internal server error
 
   /share/name:
     post:
@@ -2084,36 +2052,6 @@ paths:
           description: not found
         500:
           description: internal server error
-
-  /unshare:
-    delete:
-      tags:
-        - share
-      security:
-        - key: []
-      operationId: unshare
-      parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              envZId:
-                type: string
-              shareToken:
-                type: string
-              reserved:
-                type: boolean
-      responses:
-        200:
-          description: share removed
-        401:
-          description: unauthorized
-        404:
-          description: not found
-        500:
-          description: internal server error
-          schema:
-            $ref: "#/definitions/errorMessage"
 
   /unshare12:
     delete:
@@ -2341,49 +2279,6 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/share"
-
-  shareRequest:
-    type: object
-    properties:
-      envZId:
-        type: string
-      shareMode:
-        type: string
-        enum: ["public", "private"]
-      frontendSelection:
-        type: array
-        items:
-          type: string
-      backendMode:
-        type: string
-        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
-      backendProxyEndpoint:
-        type: string
-      authScheme:
-        type: string
-      authUsers:
-        type: array
-        items:
-          $ref: "#/definitions/authUser"
-      oauthProvider:
-        type: string
-      oauthEmailDomains:
-        type: array
-        items:
-          type: string
-      oauthAuthorizationCheckInterval:
-        type: string
-      reserved:
-        type: boolean
-      permissionMode:
-        type: string
-        enum: ["open", "closed"]
-      accessGrants:
-        type: array
-        items:
-          type: string
-      uniqueName:
-        type: string
 
   shareRequest12:
     type: object

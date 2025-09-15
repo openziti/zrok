@@ -36,7 +36,6 @@ class TestUpdateShareRequest(unittest.TestCase):
         if include_optional:
             return UpdateShareRequest(
                 share_token = '',
-                backend_proxy_endpoint = '',
                 add_access_grants = [
                     ''
                     ],

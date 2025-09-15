@@ -34,7 +34,7 @@ func init() {
 
 type sharePublicCommand struct {
 	basicAuth                 []string
-	frontendSelection         []string
+	namespaceSelection        []string
 	backendMode               string
 	headless                  bool
 	subordinate               bool
@@ -43,7 +43,7 @@ type sharePublicCommand struct {
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string
-	oauthCheckInterval        time.Duration
+	oauthRefreshInterval      time.Duration
 	open                      bool
 	accessGrants              []string
 	cmd                       *cobra.Command
@@ -56,16 +56,16 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	defaultFrontends := []string{"public"}
+	defaultNamespaceSelections := []string{"public"}
 	if root, err := environment.LoadRoot(); err == nil {
 		defaultFrontend, _ := root.DefaultFrontend()
-		defaultFrontends = []string{defaultFrontend}
+		defaultNamespaceSelections = []string{defaultFrontend}
 	}
 	headless := false
 	if root, err := environment.LoadRoot(); err == nil {
 		headless, _ = root.Headless()
 	}
-	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
+	cmd.Flags().StringArrayVar(&command.namespaceSelection, "namespace-selection", defaultNamespaceSelections, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
@@ -79,7 +79,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
 	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-pattern", []string{}, "Allow only email addresses matching this glob to access")
-	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
+	cmd.Flags().DurationVar(&command.oauthRefreshInterval, "oauth-refresh-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
 	cmd.Run = command.run
@@ -153,11 +153,17 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	req := &sdk.ShareRequest{
 		BackendMode:    sdk.BackendMode(cmd.backendMode),
 		ShareMode:      sdk.PublicShareMode,
-		Frontends:      cmd.frontendSelection,
 		BasicAuth:      cmd.basicAuth,
 		Target:         target,
 		PermissionMode: sdk.ClosedPermissionMode,
 		AccessGrants:   cmd.accessGrants,
+	}
+	for _, nssStr := range cmd.namespaceSelection {
+		if nss, err := sdk.ParseNamespaceSelection(nssStr); err == nil {
+			req.NamespaceSelections = append(req.NamespaceSelections, nss)
+		} else {
+			cmd.error("unable to parse namespace selection", err)
+		}
 	}
 	if cmd.open {
 		req.PermissionMode = sdk.OpenPermissionMode
@@ -165,7 +171,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
-		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
+		req.OauthRefreshInterval = cmd.oauthRefreshInterval
 
 		for _, g := range cmd.oauthEmailAddressPatterns {
 			_, err := glob.Compile(g)
@@ -414,12 +420,12 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
 		Target:                    target,
 		BasicAuth:                 cmd.basicAuth,
-		FrontendSelection:         cmd.frontendSelection,
+		FrontendSelection:         cmd.namespaceSelection,
 		BackendMode:               cmd.backendMode,
 		Insecure:                  cmd.insecure,
 		OauthProvider:             cmd.oauthProvider,
 		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
-		OauthCheckInterval:        cmd.oauthCheckInterval.String(),
+		OauthCheckInterval:        cmd.oauthRefreshInterval.String(),
 		Closed:                    !cmd.open,
 		AccessGrants:              cmd.accessGrants,
 	})

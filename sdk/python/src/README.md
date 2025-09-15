@@ -161,13 +161,11 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
 *ShareApi* | [**list_all_names**](docs/ShareApi.md#list_all_names) | **GET** /share/names | 
 *ShareApi* | [**list_names_for_namespace**](docs/ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
-*ShareApi* | [**share**](docs/ShareApi.md#share) | **POST** /share | 
 *ShareApi* | [**share12**](docs/ShareApi.md#share12) | **POST** /share12 | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
-*ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
 *ShareApi* | [**unshare12**](docs/ShareApi.md#unshare12) | **DELETE** /unshare12 | 
 *ShareApi* | [**update_access**](docs/ShareApi.md#update_access) | **PATCH** /access | 
-*ShareApi* | [**update_share**](docs/ShareApi.md#update_share) | **PATCH** /share | 
+*ShareApi* | [**update_share**](docs/ShareApi.md#update_share) | **PATCH** /share12 | 
 
 
 ## Documentation For Models
@@ -239,13 +237,11 @@ Class | Method | HTTP request | Description
  - [Share](docs/Share.md)
  - [ShareHttpHealthcheck200Response](docs/ShareHttpHealthcheck200Response.md)
  - [ShareHttpHealthcheckRequest](docs/ShareHttpHealthcheckRequest.md)
- - [ShareRequest](docs/ShareRequest.md)
  - [ShareRequest12](docs/ShareRequest12.md)
  - [ShareResponse](docs/ShareResponse.md)
  - [SparkDataSample](docs/SparkDataSample.md)
  - [UnaccessRequest](docs/UnaccessRequest.md)
  - [Unshare12Request](docs/Unshare12Request.md)
- - [UnshareRequest](docs/UnshareRequest.md)
  - [UpdateAccessRequest](docs/UpdateAccessRequest.md)
  - [UpdateFrontendRequest](docs/UpdateFrontendRequest.md)
  - [UpdateNamespaceRequest](docs/UpdateNamespaceRequest.md)

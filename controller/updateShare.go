@@ -15,7 +15,6 @@ func newUpdateShareHandler() *updateShareHandler {
 
 func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	shrToken := params.Body.ShareToken
-	backendProxyEndpoint := params.Body.BackendProxyEndpoint
 
 	tx, err := str.Begin()
 	if err != nil {
@@ -49,15 +48,6 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 	}
 
 	doCommit := false
-	if backendProxyEndpoint != "" {
-		sshr.BackendProxyEndpoint = &backendProxyEndpoint
-		if err := str.UpdateShare(sshr, tx); err != nil {
-			logrus.Errorf("error updating share '%v': %v", shrToken, err)
-			return share.NewUpdateShareInternalServerError()
-		}
-		doCommit = true
-	}
-
 	for _, addr := range params.Body.AddAccessGrants {
 		acct, err := str.FindAccountWithEmail(addr, tx)
 		if err != nil {

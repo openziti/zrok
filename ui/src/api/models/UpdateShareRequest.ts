@@ -27,12 +27,6 @@ export interface UpdateShareRequest {
     shareToken?: string;
     /**
      * 
-     * @type {string}
-     * @memberof UpdateShareRequest
-     */
-    backendProxyEndpoint?: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof UpdateShareRequest
      */
@@ -63,7 +57,6 @@ export function UpdateShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         
         'shareToken': json['shareToken'] == null ? undefined : json['shareToken'],
-        'backendProxyEndpoint': json['backendProxyEndpoint'] == null ? undefined : json['backendProxyEndpoint'],
         'addAccessGrants': json['addAccessGrants'] == null ? undefined : json['addAccessGrants'],
         'removeAccessGrants': json['removeAccessGrants'] == null ? undefined : json['removeAccessGrants'],
     };
@@ -81,7 +74,6 @@ export function UpdateShareRequestToJSONTyped(value?: UpdateShareRequest | null,
     return {
         
         'shareToken': value['shareToken'],
-        'backendProxyEndpoint': value['backendProxyEndpoint'],
         'addAccessGrants': value['addAccessGrants'],
         'removeAccessGrants': value['removeAccessGrants'],
     };

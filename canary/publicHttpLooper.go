@@ -4,38 +4,39 @@ import (
 	"bytes"
 	cryptorand "crypto/rand"
 	"encoding/base64"
+	"io"
+	"math/rand"
+	"net/http"
+	"time"
+
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
-	"math/rand"
-	"net/http"
-	"time"
 )
 
 type PublicHttpLooper struct {
-	id       uint
-	frontend string
-	opt      *LooperOptions
-	root     env_core.Root
-	shr      *sdk.Share
-	listener edge.Listener
-	abort    bool
-	done     chan struct{}
-	results  *LooperResults
+	id        uint
+	namespace string
+	opt       *LooperOptions
+	root      env_core.Root
+	shr       *sdk.Share
+	listener  edge.Listener
+	abort     bool
+	done      chan struct{}
+	results   *LooperResults
 }
 
-func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_core.Root) *PublicHttpLooper {
+func NewPublicHttpLooper(id uint, namespace string, opt *LooperOptions, root env_core.Root) *PublicHttpLooper {
 	return &PublicHttpLooper{
-		id:       id,
-		frontend: frontend,
-		opt:      opt,
-		root:     root,
-		done:     make(chan struct{}),
-		results:  &LooperResults{},
+		id:        id,
+		namespace: namespace,
+		opt:       opt,
+		root:      root,
+		done:      make(chan struct{}),
+		results:   &LooperResults{},
 	}
 }
 
@@ -80,11 +81,11 @@ func (l *PublicHttpLooper) startup() error {
 
 	snapshotCreateShare := NewSnapshot("create-share", l.id, 0)
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
-		ShareMode:      sdk.PublicShareMode,
-		BackendMode:    sdk.ProxyBackendMode,
-		Target:         target,
-		Frontends:      []string{l.frontend},
-		PermissionMode: sdk.ClosedPermissionMode,
+		ShareMode:           sdk.PublicShareMode,
+		BackendMode:         sdk.ProxyBackendMode,
+		Target:              target,
+		NamespaceSelections: []sdk.NamespaceSelection{{NamespaceToken: l.namespace}},
+		PermissionMode:      sdk.ClosedPermissionMode,
 	})
 	snapshotCreateShare.Complete()
 	if err != nil {
