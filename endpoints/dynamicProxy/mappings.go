@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
@@ -87,6 +88,7 @@ func (m *mappings) run() {
 	defer ticker.Stop()
 
 	for {
+		dl.ChannelLog("mappings").Debugf("\n%s", m.dumpMappings())
 		select {
 		case <-m.ctx.Done():
 			return
@@ -147,24 +149,34 @@ func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
 	default:
 		dl.Errorf("unknown mapping operation '%v'", update.Operation)
 	}
-
-	dl.Infof("'%d' mappings in table", len(m.nameMap))
 }
 
 func (m *mappings) updateMappings(frontendMappings []*dynamicProxyController.FrontendMapping) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	// clear existing mappings
-	m.nameMap = make(map[string]*dynamicProxyController.FrontendMapping)
-
-	// populate with new mappings
+	// populate new mappings
 	for _, mapping := range frontendMappings {
 		if mapping.Name != "" {
 			m.nameMap[mapping.Name] = mapping
 		}
 		dl.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
 	}
+}
 
-	dl.Infof("'%d' mappings in table", len(m.nameMap))
+// dumpMappings returns a formatted table string containing all mapping details
+func (m *mappings) dumpMappings() string {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	t := table.NewWriter()
+	t.SetStyle(table.StyleRounded)
+	t.SetCaption("%d mappings", len(m.nameMap))
+	t.AppendHeader(table.Row{"name", "share token", "version"})
+
+	for key, mapping := range m.nameMap {
+		t.AppendRow(table.Row{key, mapping.ShareToken, mapping.Version})
+	}
+
+	return t.Render()
 }
