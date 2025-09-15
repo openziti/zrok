@@ -93,14 +93,17 @@ func (m *mappings) run() {
 		case <-ticker.C:
 			// periodically refresh mappings
 			start := time.Now()
-			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, m.getHighestVersion())
+			highestVersion := m.getHighestVersion()
+			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, highestVersion)
 			if err != nil {
-				logrus.Errorf("failed to refresh mappings: %v", err)
+				logrus.Errorf("failed to refresh mappings (highest version '%v'): %v", highestVersion, err)
 				continue
 			}
 			if len(mappings) > 0 {
 				m.updateMappings(mappings)
-				logrus.Warnf("updated '%d' mappings in '%v'", len(mappings), time.Since(start))
+				logrus.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestVersion, time.Since(start))
+			} else {
+				logrus.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestVersion, time.Since(start))
 			}
 
 		case update := <-m.amqp.Updates():
