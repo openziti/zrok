@@ -24,41 +24,41 @@ import {
 /**
  * 
  * @export
- * @interface RpcStatus
+ * @interface GooglerpcStatus
  */
-export interface RpcStatus {
+export interface GooglerpcStatus {
     /**
      * 
      * @type {number}
-     * @memberof RpcStatus
+     * @memberof GooglerpcStatus
      */
     code?: number;
     /**
      * 
      * @type {string}
-     * @memberof RpcStatus
+     * @memberof GooglerpcStatus
      */
     message?: string;
     /**
      * 
      * @type {Array<ProtobufAny>}
-     * @memberof RpcStatus
+     * @memberof GooglerpcStatus
      */
     details?: Array<ProtobufAny>;
 }
 
 /**
- * Check if a given object implements the RpcStatus interface.
+ * Check if a given object implements the GooglerpcStatus interface.
  */
-export function instanceOfRpcStatus(value: object): value is RpcStatus {
+export function instanceOfGooglerpcStatus(value: object): value is GooglerpcStatus {
     return true;
 }
 
-export function RpcStatusFromJSON(json: any): RpcStatus {
-    return RpcStatusFromJSONTyped(json, false);
+export function GooglerpcStatusFromJSON(json: any): GooglerpcStatus {
+    return GooglerpcStatusFromJSONTyped(json, false);
 }
 
-export function RpcStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): RpcStatus {
+export function GooglerpcStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): GooglerpcStatus {
     if (json == null) {
         return json;
     }
@@ -70,11 +70,11 @@ export function RpcStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function RpcStatusToJSON(json: any): RpcStatus {
-    return RpcStatusToJSONTyped(json, false);
+export function GooglerpcStatusToJSON(json: any): GooglerpcStatus {
+    return GooglerpcStatusToJSONTyped(json, false);
 }
 
-export function RpcStatusToJSONTyped(value?: RpcStatus | null, ignoreDiscriminator: boolean = false): any {
+export function GooglerpcStatusToJSONTyped(value?: GooglerpcStatus | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -16,7 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   AccessPrivateResponse,
-  RpcStatus,
+  GooglerpcStatus,
   ShareHttpHealthcheckResponse,
   SharePrivateResponse,
   SharePublicResponse,
@@ -26,8 +26,8 @@ import type {
 import {
     AccessPrivateResponseFromJSON,
     AccessPrivateResponseToJSON,
-    RpcStatusFromJSON,
-    RpcStatusToJSON,
+    GooglerpcStatusFromJSON,
+    GooglerpcStatusToJSON,
     ShareHttpHealthcheckResponseFromJSON,
     ShareHttpHealthcheckResponseToJSON,
     SharePrivateResponseFromJSON,
