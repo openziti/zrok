@@ -23,7 +23,7 @@ func init() {
 
 	// dd/dl Logging
 	dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
-	dl.ConfigureChannel("mappings", dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelDebug))
+	dl.ConfigureChannel("mappings", dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
 
 	// legacy pfxlog
 	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix(trimPrefix))
