@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/resolver"
@@ -63,7 +63,7 @@ func newControllerClient(cfg *controllerClientConfig) (*controllerClient, error)
 }
 
 func (c *controllerClient) Start() error {
-	logrus.Infof("dynamic proxy controller client started for service '%s'", c.cfg.ServiceName)
+	dl.Infof("dynamic proxy controller client started for service '%s'", c.cfg.ServiceName)
 	return nil
 }
 
@@ -73,7 +73,7 @@ func (c *controllerClient) Stop() error {
 		c.zCtx.Close()
 		c.zCtx = nil
 	}
-	logrus.Info("dynamic proxy controller client stopped")
+	dl.Info("dynamic proxy controller client stopped")
 	return nil
 }
 
@@ -98,7 +98,7 @@ func (c *controllerClient) dialAndCall(call func(client dynamicProxyController.D
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logrus.Warnf("error closing grpc connection: %v", err)
+			dl.Warnf("error closing grpc connection: %v", err)
 		}
 	}()
 

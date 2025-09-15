@@ -1,10 +1,12 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/cobra-to-md"
 	"github.com/openziti/transport/v2"
@@ -17,7 +19,15 @@ import (
 )
 
 func init() {
-	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti/"))
+	trimPrefix := "github.com/openziti/"
+
+	// dd/dl Logging
+	dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
+	dl.ConfigureChannel("mappings", dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelDebug))
+
+	// legacy pfxlog
+	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix(trimPrefix))
+
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	rootCmd.AddCommand(accessCmd)

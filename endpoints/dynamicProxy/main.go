@@ -3,7 +3,7 @@ package dynamicProxy
 import (
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dd"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
 )
 
 type Service struct {
@@ -21,7 +21,7 @@ func NewService(cfgPath string) (*Service, error) {
 	if err := svc.app.InitializeWithOptions(opts, cfgPath); err != nil {
 		return nil, err
 	}
-	logrus.Info(dd.MustInspect(svc.app.Cfg))
+	dl.Info(dd.MustInspect(svc.app.Cfg))
 	return svc, nil
 }
 

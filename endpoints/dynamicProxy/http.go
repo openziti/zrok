@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
@@ -18,7 +19,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type httpListener struct {
@@ -118,7 +118,7 @@ func newServiceProxy(cfg *config, ctx ziti.Context, mappings *mappings) (*httput
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		logrus.Errorf("error proxying: %v", err)
+		dl.Errorf("error proxying: %v", err)
 		proxyUi.WriteBadGateway(
 			w,
 			proxyUi.RequiredData(
@@ -136,12 +136,12 @@ func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *
 		if found {
 			if svc, found := endpoints.GetRefreshedService(targetMapping.ShareToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-					logrus.Debugf("auth model: %v", cfg)
+					dl.Debugf("auth model: %v", cfg)
 				} else {
-					logrus.Warn("no config!")
+					dl.Warn("no config!")
 				}
 				if target, err := url.Parse(fmt.Sprintf("http://%v", targetMapping.ShareToken)); err == nil {
-					logrus.Infof("[%v] -> %v", target, req.URL)
+					dl.Infof("[%v] -> %v", target, req.URL)
 
 					targetQuery := target.RawQuery
 					req.URL.Scheme = target.Scheme
@@ -157,7 +157,7 @@ func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *
 						req.Header.Set("User-Agent", "")
 					}
 				} else {
-					logrus.Errorf("error proxying: %v", err)
+					dl.Errorf("error proxying: %v", err)
 				}
 			}
 		}
@@ -171,21 +171,21 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 	return func(w http.ResponseWriter, r *http.Request) {
 		mapping, found := mappings.getMapping(r.Host)
 		if !found {
-			logrus.Debugf("mapping not found for '%v'", r.Host)
+			dl.Debugf("mapping not found for '%v'", r.Host)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(r.Host))
 			return
 		}
 
 		svc, found := endpoints.GetRefreshedService(mapping.ShareToken, ctx)
 		if !found {
-			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, mapping.ShareToken)
+			dl.Warnf("%v -> service '%v' not found", r.RemoteAddr, mapping.ShareToken)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
 
 		svcCfg, found := svc.Config[sdk.ZrokProxyConfig]
 		if !found {
-			logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, mapping.ShareToken)
+			dl.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, mapping.ShareToken)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
@@ -196,33 +196,33 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 
 		authScheme, found := svcCfg["auth_scheme"]
 		if !found {
-			logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, mapping.ShareToken)
+			dl.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, mapping.ShareToken)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
 			return
 		}
 
 		switch authScheme {
 		case string(sdk.None):
-			logrus.Debugf("auth scheme none '%v'", mapping.ShareToken)
+			dl.Debugf("auth scheme none '%v'", mapping.ShareToken)
 			filterSessionCookies(w, r, cfg)
 			handler.ServeHTTP(w, r)
 
 		case string(sdk.Basic):
-			logrus.Debugf("auth scheme basic '%v'", mapping.ShareToken)
+			dl.Debugf("auth scheme basic '%v'", mapping.ShareToken)
 			if auth.handleBasicAuth(w, r, svcCfg, mapping.ShareToken) {
 				filterSessionCookies(w, r, cfg)
 				handler.ServeHTTP(w, r)
 			}
 
 		case string(sdk.Oauth):
-			logrus.Debugf("auth scheme oauth '%v'", mapping.ShareToken)
+			dl.Debugf("auth scheme oauth '%v'", mapping.ShareToken)
 			if auth.handleOAuth(w, r, svcCfg, mapping.ShareToken) {
 				handler.ServeHTTP(w, r)
 			}
 
 		default:
 			err := fmt.Errorf("invalid auth scheme '%v'", authScheme)
-			logrus.Error(err)
+			dl.Error(err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		}
 	}
@@ -251,7 +251,7 @@ func handleInterstitial(w http.ResponseWriter, r *http.Request, pcfg *config, cf
 				skip := r.Header.Get("skip_zrok_interstitial")
 				_, zrokOkErr := r.Cookie("zrok_interstitial")
 				if skip == "" && zrokOkErr != nil {
-					logrus.Debugf("forcing interstitial for '%v'", r.URL)
+					dl.Debugf("forcing interstitial for '%v'", r.URL)
 					proxyUi.WriteInterstitialAnnounce(w, pcfg.Interstitial.HtmlPath)
 					return true
 				}
@@ -296,18 +296,18 @@ func (l *httpListener) Start() error {
 	if l.cfg.Tls != nil {
 		go func() {
 			if err := l.server.ListenAndServeTLS(l.cfg.Tls.CertPath, l.cfg.Tls.KeyPath); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logrus.Error(err)
+				dl.Error(err)
 			}
 		}()
-		logrus.Infof("started TLS listener")
+		dl.Infof("started TLS listener")
 
 	} else {
 		go func() {
 			if err := l.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logrus.Error(err)
+				dl.Error(err)
 			}
 		}()
-		logrus.Infof("started HTTP listener")
+		dl.Infof("started HTTP listener")
 	}
 	return nil
 }
@@ -321,7 +321,7 @@ func (l *httpListener) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	logrus.Info("shutting down HTTP listener")
+	dl.Info("shutting down HTTP listener")
 	if err := l.server.Shutdown(ctx); err != nil {
 		return errors.Wrap(err, "error shutting down HTTP server")
 	}

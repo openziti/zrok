@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type mappings struct {
@@ -70,17 +70,17 @@ func (m *mappings) Stop() error {
 }
 
 func (m *mappings) run() {
-	logrus.Infof("started")
-	defer logrus.Infof("stopped")
+	dl.Infof("started")
+	defer dl.Infof("stopped")
 
 	// load initial mappings
 	start := time.Now()
 	mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, 0)
 	if err != nil {
-		logrus.Fatal(err)
+		dl.Fatal(err)
 	}
 	m.updateMappings(mappings)
-	logrus.Infof("retrieved '%d' mappings in '%v'", len(mappings), time.Since(start))
+	dl.Infof("retrieved '%d' mappings in '%v'", len(mappings), time.Since(start))
 
 	// periodic update loop
 	ticker := time.NewTicker(m.cfg.MappingRefreshInterval)
@@ -96,14 +96,14 @@ func (m *mappings) run() {
 			highestVersion := m.getHighestVersion()
 			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, highestVersion)
 			if err != nil {
-				logrus.Errorf("failed to refresh mappings (highest version '%v'): %v", highestVersion, err)
+				dl.Errorf("failed to refresh mappings (highest version '%v'): %v", highestVersion, err)
 				continue
 			}
 			if len(mappings) > 0 {
 				m.updateMappings(mappings)
-				logrus.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestVersion, time.Since(start))
+				dl.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestVersion, time.Since(start))
 			} else {
-				logrus.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestVersion, time.Since(start))
+				dl.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestVersion, time.Since(start))
 			}
 
 		case update := <-m.amqp.Updates():
@@ -138,17 +138,17 @@ func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
 			ShareToken: update.ShareToken,
 		}
 		m.nameMap[mapping.Name] = mapping
-		logrus.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
+		dl.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
 
 	case dynamicProxyController.OperationUnbind:
 		delete(m.nameMap, update.Name)
-		logrus.Infof("removed mapping: '%v'", update.Name)
+		dl.Infof("removed mapping: '%v'", update.Name)
 
 	default:
-		logrus.Errorf("unknown mapping operation '%v'", update.Operation)
+		dl.Errorf("unknown mapping operation '%v'", update.Operation)
 	}
 
-	logrus.Infof("'%d' mappings in table", len(m.nameMap))
+	dl.Infof("'%d' mappings in table", len(m.nameMap))
 }
 
 func (m *mappings) updateMappings(frontendMappings []*dynamicProxyController.FrontendMapping) {
@@ -163,8 +163,8 @@ func (m *mappings) updateMappings(frontendMappings []*dynamicProxyController.Fro
 		if mapping.Name != "" {
 			m.nameMap[mapping.Name] = mapping
 		}
-		logrus.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
+		dl.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
 	}
 
-	logrus.Infof("'%d' mappings in table", len(m.nameMap))
+	dl.Infof("'%d' mappings in table", len(m.nameMap))
 }

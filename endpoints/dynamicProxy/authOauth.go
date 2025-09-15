@@ -9,9 +9,9 @@ import (
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type zrokClaims struct {
@@ -40,7 +40,7 @@ func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConf
 func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg map[string]interface{}, shrToken string) bool {
 	oauthCfg, found := cfg["oauth"]
 	if !found {
-		logrus.Warnf("%v -> no oauth cfg for '%v'", r.RemoteAddr, shrToken)
+		dl.Warnf("%v -> no oauth cfg for '%v'", r.RemoteAddr, shrToken)
 		return false
 	}
 
@@ -51,7 +51,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 
 	cookie, err := r.Cookie(h.cfg.Oauth.CookieName)
 	if err != nil {
-		logrus.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
+		dl.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
@@ -75,29 +75,29 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 		return h.signingKey, nil
 	})
 	if err != nil {
-		logrus.Errorf("unable to parse jwt: %v", err)
+		dl.Errorf("unable to parse jwt: %v", err)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
-		logrus.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
+		dl.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
 	if time.Now().After(claims.NextRefresh) {
 		if claims.SupportsRefresh {
-			logrus.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
+			dl.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
 			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
 		} else {
-			logrus.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
+			dl.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
 		return false
 	} else {
-		logrus.Debugf("%v until next refresh", time.Until(claims.NextRefresh))
+		dl.Debugf("%v until next refresh", time.Until(claims.NextRefresh))
 	}
 
 	r.Header.Set("zrok-auth-provider", provider)
@@ -119,7 +119,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 				match, err := glob.Compile(castedPattern)
 				if err != nil {
 					err := fmt.Errorf("invalid email address pattern glob '%v': %v", pattern, err)
-					logrus.Error(err)
+					dl.Error(err)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(err))
 					return false
 				}
@@ -128,7 +128,7 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 				}
 			}
 		}
-		logrus.Warnf("unauthorized email '%v'", claims.Email)
+		dl.Warnf("unauthorized email '%v'", claims.Email)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email))
 		return false
 	}
@@ -137,12 +137,12 @@ func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[st
 
 func getRefreshInterval(oauthCfg map[string]interface{}) time.Duration {
 	if refreshInterval, found := oauthCfg["authorization_check_interval"]; !found {
-		logrus.Error("missing 'authorization_check_interval', defaulting to 3 hours")
+		dl.Error("missing 'authorization_check_interval', defaulting to 3 hours")
 		return 3 * time.Hour
 	} else {
 		i, err := time.ParseDuration(refreshInterval.(string))
 		if err != nil {
-			logrus.Errorf("invalid refresh interval '%v', defaulting to 3 hours", refreshInterval)
+			dl.Errorf("invalid refresh interval '%v', defaulting to 3 hours", refreshInterval)
 			return 3 * time.Hour
 		}
 		return i
@@ -151,7 +151,7 @@ func getRefreshInterval(oauthCfg map[string]interface{}) time.Duration {
 
 func configureOauth(cfg *config, tls bool) error {
 	if cfg.Oauth == nil {
-		logrus.Info("no oauth configuration; skipping oauth handler startup")
+		dl.Info("no oauth configuration; skipping oauth handler startup")
 		return nil
 	}
 

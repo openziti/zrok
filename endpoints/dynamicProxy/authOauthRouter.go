@@ -9,9 +9,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var oauthBinders map[string]func(map[string]any) (dd.Dynamic, error)
@@ -77,7 +77,7 @@ func (r *oauthRouter) registerProvider(provider oauthProvider) error {
 	}
 
 	r.providers[provider.Name()] = provider
-	logrus.Debugf("registered oauth provider: '%s'", provider.Name())
+	dl.Debugf("registered oauth provider: '%s'", provider.Name())
 
 	return nil
 }
@@ -98,19 +98,19 @@ func (r *oauthRouter) Start() error {
 	}
 
 	go func() {
-		logrus.Infof("starting oauth server on '%s'", r.cfg.BindAddress)
+		dl.Infof("starting oauth server on '%s'", r.cfg.BindAddress)
 		if err := r.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logrus.Errorf("oauth server error: %v", err)
+			dl.Errorf("oauth server error: %v", err)
 		}
 	}()
 
-	logrus.Infof("started with '%d' providers", len(r.providers))
+	dl.Infof("started with '%d' providers", len(r.providers))
 
 	return nil
 }
 
 func (r *oauthRouter) Stop() error {
-	logrus.Info("stopping")
+	dl.Info("stopping")
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -125,7 +125,7 @@ func (r *oauthRouter) Stop() error {
 // buildOAuthRouter creates and registers the OAuth router as a df component
 func buildOAuthRouter(app *da.Application[*config]) error {
 	if app.Cfg.Oauth == nil {
-		logrus.Info("no oauth configuration; skipping oauth router")
+		dl.Info("no oauth configuration; skipping oauth router")
 		return nil
 	}
 

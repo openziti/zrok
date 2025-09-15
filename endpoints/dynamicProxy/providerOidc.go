@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -81,7 +81,7 @@ func (p *oidcProvider) RegisterRoutes(router *mux.Router) error {
 	// register logout route
 	router.HandleFunc(fmt.Sprintf("/%v/logout", p.config.Name), p.logoutHandler())
 
-	logrus.Debugf("registered oidc provider routes at '/%v'", p.config.Name)
+	dl.Debugf("registered oidc provider routes at '/%v'", p.config.Name)
 	return nil
 }
 
@@ -90,7 +90,7 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
-			logrus.Errorf("unable to unescape 'targetHost': %v", err)
+			dl.Errorf("unable to unescape 'targetHost': %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
@@ -112,7 +112,7 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 			})
 			s, err := t.SignedString(p.signingKey)
 			if err != nil {
-				logrus.Errorf("unable to sign intermediate JWT: %v", err)
+				dl.Errorf("unable to sign intermediate JWT: %v", err)
 			}
 			return s
 		}
@@ -136,14 +136,14 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
-			logrus.Errorf("unable to unescape 'targetHost': %v", err)
+			dl.Errorf("unable to unescape 'targetHost': %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
 
 		cookie, err := r.Cookie(p.oauthCfg.CookieName)
 		if err != nil {
-			logrus.Errorf("unable to get auth session cookie: %v", err)
+			dl.Errorf("unable to get auth session cookie: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
 			return
 		}
@@ -152,28 +152,28 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			return p.signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("unable to parse jwt: %v", err)
+			dl.Errorf("unable to parse jwt: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse jwt")))
 			return
 		}
 
 		claims := tkn.Claims.(*zrokClaims)
 		if claims.Provider != p.config.Name {
-			logrus.Error("token provider mismatch")
+			dl.Error("token provider mismatch")
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("token provider mismatch")))
 			return
 		}
 
 		accessToken, err := decryptToken(claims.AccessToken, p.encryptionKey)
 		if err != nil {
-			logrus.Errorf("unable to decrypt access token: %v", err)
+			dl.Errorf("unable to decrypt access token: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 			return
 		}
 
 		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), p.provider, accessToken, "", "")
 		if err != nil {
-			logrus.Errorf("unable to refresh tokens: %v", err)
+			dl.Errorf("unable to refresh tokens: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to refresh tokens")))
 			return
 		}
@@ -201,7 +201,7 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 			return p.signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("unable to parse intermediate JWT: %v", err)
+			dl.Errorf("unable to parse intermediate JWT: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse intermediate jwt")))
 			return
 		}
@@ -210,7 +210,7 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			logrus.Errorf("unable to parse authorization check interval: %v", err)
+			dl.Errorf("unable to parse authorization check interval: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(info.Email).WithError(errors.New("unable to parse authorization check interval")))
 			return
 		}
@@ -249,29 +249,29 @@ func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 					accessToken, err := decryptToken(claims.AccessToken, p.encryptionKey)
 					if err == nil {
 						if err := rp.RevokeToken(context.Background(), p.provider, accessToken, "access_token"); err == nil {
-							logrus.Infof("revoked access token for '%v'", claims.Email)
+							dl.Infof("revoked access token for '%v'", claims.Email)
 						} else {
-							logrus.Errorf("access token revocation failed: %v", err)
+							dl.Errorf("access token revocation failed: %v", err)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 							return
 						}
 					} else {
-						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
 						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
+					dl.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
 					return
 				}
 			} else {
-				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				dl.Errorf("invalid jwt; unable to parse: %v", err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
-			logrus.Errorf("error getting cookie '%v': %v", p.oauthCfg.CookieName, err)
+			dl.Errorf("error getting cookie '%v': %v", p.oauthCfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}

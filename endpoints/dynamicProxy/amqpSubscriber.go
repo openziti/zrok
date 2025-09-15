@@ -8,10 +8,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 )
 
 type amqpSubscriberConfig struct {
@@ -68,8 +68,8 @@ func (s *amqpSubscriber) Stop() error {
 }
 
 func (s *amqpSubscriber) run() {
-	logrus.Infof("amqp subscriber started for frontend token '%s'", s.cfg.FrontendToken)
-	defer logrus.Infof("amqp subscriber stopped for frontend token '%s'", s.cfg.FrontendToken)
+	dl.Infof("amqp subscriber started for frontend token '%s'", s.cfg.FrontendToken)
+	defer dl.Infof("amqp subscriber stopped for frontend token '%s'", s.cfg.FrontendToken)
 	defer close(s.done)
 
 mainLoop:
@@ -78,9 +78,9 @@ mainLoop:
 		case <-s.ctx.Done():
 			break mainLoop
 		default:
-			logrus.Infof("connecting to amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
+			dl.Infof("connecting to amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
 			if err := s.connect(); err != nil {
-				logrus.Errorf("failed to connect to amqp broker: %v", err)
+				dl.Errorf("failed to connect to amqp broker: %v", err)
 				select {
 				case <-time.After(10 * time.Second):
 					continue mainLoop
@@ -88,10 +88,10 @@ mainLoop:
 					break mainLoop
 				}
 			}
-			logrus.Infof("connected to amqp broker, consuming messages for frontend '%s'", s.cfg.FrontendToken)
+			dl.Infof("connected to amqp broker, consuming messages for frontend '%s'", s.cfg.FrontendToken)
 
 			if err := s.consume(); err != nil {
-				logrus.Errorf("consume error: %v", err)
+				dl.Errorf("consume error: %v", err)
 				s.disconnect()
 			}
 		}
@@ -163,7 +163,7 @@ func (s *amqpSubscriber) connect() error {
 	s.ch = ch
 	s.queue = queue
 
-	logrus.Debugf("created ephemeral queue '%s' bound to frontend token '%s'", queue.Name, s.cfg.FrontendToken)
+	dl.Debugf("created ephemeral queue '%s' bound to frontend token '%s'", queue.Name, s.cfg.FrontendToken)
 	return nil
 }
 
@@ -191,7 +191,7 @@ func (s *amqpSubscriber) consume() error {
 			}
 
 			if err := s.handleMessage(msg); err != nil {
-				logrus.Errorf("failed to handle message: %v", err)
+				dl.Errorf("failed to handle message: %v", err)
 				// negative acknowledgment - message will be requeued
 				msg.Nack(false, true)
 			} else {
@@ -211,15 +211,15 @@ func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("mapping update -> %v", update)
+	dl.Infof("mapping update -> %v", update)
 
 	select {
 	case s.updates <- update:
-		logrus.Debugf("published mapping update to channel")
+		dl.Debugf("published mapping update to channel")
 	case <-s.ctx.Done():
 		return errors.New("context cancelled while publishing update")
 	default:
-		logrus.Warnf("updates channel full, dropping mapping update")
+		dl.Warnf("updates channel full, dropping mapping update")
 	}
 
 	return nil
