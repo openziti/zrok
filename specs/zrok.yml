@@ -2025,6 +2025,33 @@ paths:
         500:
           description: internal server error
 
+  /share/namespaces:
+    get:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: listShareNamespaces
+      responses:
+        200:
+          description: ok
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                namespaceToken:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+
+
   /unaccess:
     delete:
       tags:

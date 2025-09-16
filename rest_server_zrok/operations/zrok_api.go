@@ -188,6 +188,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		MetadataListPublicFrontendsForAccountHandler: metadata.ListPublicFrontendsForAccountHandlerFunc(func(params metadata.ListPublicFrontendsForAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation metadata.ListPublicFrontendsForAccount has not yet been implemented")
 		}),
+		ShareListShareNamespacesHandler: share.ListShareNamespacesHandlerFunc(func(params share.ListShareNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.ListShareNamespaces has not yet been implemented")
+		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
@@ -414,6 +417,8 @@ type ZrokAPI struct {
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// MetadataListPublicFrontendsForAccountHandler sets the operation handler for the list public frontends for account operation
 	MetadataListPublicFrontendsForAccountHandler metadata.ListPublicFrontendsForAccountHandler
+	// ShareListShareNamespacesHandler sets the operation handler for the list share namespaces operation
+	ShareListShareNamespacesHandler share.ListShareNamespacesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
 	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
@@ -688,6 +693,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataListPublicFrontendsForAccountHandler == nil {
 		unregistered = append(unregistered, "metadata.ListPublicFrontendsForAccountHandler")
+	}
+	if o.ShareListShareNamespacesHandler == nil {
+		unregistered = append(unregistered, "share.ListShareNamespacesHandler")
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
@@ -1056,6 +1064,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/overview/public-frontends"] = metadata.NewListPublicFrontendsForAccount(o.context, o.MetadataListPublicFrontendsForAccountHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/share/namespaces"] = share.NewListShareNamespaces(o.context, o.ShareListShareNamespacesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

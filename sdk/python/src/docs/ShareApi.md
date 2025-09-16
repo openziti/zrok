@@ -9,6 +9,7 @@ Method | HTTP request | Description
 [**delete_share_name**](ShareApi.md#delete_share_name) | **DELETE** /share/name | 
 [**list_all_names**](ShareApi.md#list_all_names) | **GET** /share/names | 
 [**list_names_for_namespace**](ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
+[**list_share_namespaces**](ShareApi.md#list_share_namespaces) | **GET** /share/namespaces | 
 [**share12**](ShareApi.md#share12) | **POST** /share12 | 
 [**unaccess**](ShareApi.md#unaccess) | **DELETE** /unaccess | 
 [**unshare12**](ShareApi.md#unshare12) | **DELETE** /unshare12 | 
@@ -390,6 +391,78 @@ Name | Type | Description  | Notes
 **200** | ok |  -  |
 **401** | unauthorized |  -  |
 **404** | namespace not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **list_share_namespaces**
+> List[ListShareNamespaces200ResponseInner] list_share_namespaces()
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.list_share_namespaces200_response_inner import ListShareNamespaces200ResponseInner
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.ShareApi(api_client)
+
+    try:
+        api_response = api_instance.list_share_namespaces()
+        print("The response of ShareApi->list_share_namespaces:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling ShareApi->list_share_namespaces: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**List[ListShareNamespaces200ResponseInner]**](ListShareNamespaces200ResponseInner.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

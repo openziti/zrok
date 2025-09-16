@@ -56,6 +56,12 @@ class TestShareApi(unittest.TestCase):
         """
         pass
 
+    def test_list_share_namespaces(self) -> None:
+        """Test case for list_share_namespaces
+
+        """
+        pass
+
     def test_share12(self) -> None:
         """Test case for share12
 

@@ -161,6 +161,7 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**delete_share_name**](docs/ShareApi.md#delete_share_name) | **DELETE** /share/name | 
 *ShareApi* | [**list_all_names**](docs/ShareApi.md#list_all_names) | **GET** /share/names | 
 *ShareApi* | [**list_names_for_namespace**](docs/ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
+*ShareApi* | [**list_share_namespaces**](docs/ShareApi.md#list_share_namespaces) | **GET** /share/namespaces | 
 *ShareApi* | [**share12**](docs/ShareApi.md#share12) | **POST** /share12 | 
 *ShareApi* | [**unaccess**](docs/ShareApi.md#unaccess) | **DELETE** /unaccess | 
 *ShareApi* | [**unshare12**](docs/ShareApi.md#unshare12) | **DELETE** /unshare12 | 
@@ -212,6 +213,7 @@ Class | Method | HTTP request | Description
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
  - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
+ - [ListShareNamespaces200ResponseInner](docs/ListShareNamespaces200ResponseInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)

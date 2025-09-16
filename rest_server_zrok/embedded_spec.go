@@ -3055,6 +3055,47 @@ func init() {
         }
       }
     },
+    "/share/namespaces": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listShareNamespaces",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespaceToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share12": {
       "post": {
         "security": [
@@ -6665,6 +6706,36 @@ func init() {
         }
       }
     },
+    "/share/namespaces": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "listShareNamespaces",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListShareNamespacesOKBodyItems0"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share12": {
       "post": {
         "security": [
@@ -7094,6 +7165,20 @@ func init() {
         },
         "updatedAt": {
           "type": "integer"
+        }
+      }
+    },
+    "ListShareNamespacesOKBodyItems0": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
         }
       }
     },

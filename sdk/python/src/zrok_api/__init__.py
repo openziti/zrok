@@ -75,6 +75,7 @@ __all__ = [
     "ListOrganizations200ResponseOrganizationsInner",
     "ListPublicFrontendsForAccount200Response",
     "ListPublicFrontendsForAccount200ResponsePublicFrontendsInner",
+    "ListShareNamespaces200ResponseInner",
     "LoginRequest",
     "Metrics",
     "MetricsSample",
@@ -176,6 +177,7 @@ from zrok_api.models.list_organizations200_response import ListOrganizations200R
 from zrok_api.models.list_organizations200_response_organizations_inner import ListOrganizations200ResponseOrganizationsInner as ListOrganizations200ResponseOrganizationsInner
 from zrok_api.models.list_public_frontends_for_account200_response import ListPublicFrontendsForAccount200Response as ListPublicFrontendsForAccount200Response
 from zrok_api.models.list_public_frontends_for_account200_response_public_frontends_inner import ListPublicFrontendsForAccount200ResponsePublicFrontendsInner as ListPublicFrontendsForAccount200ResponsePublicFrontendsInner
+from zrok_api.models.list_share_namespaces200_response_inner import ListShareNamespaces200ResponseInner as ListShareNamespaces200ResponseInner
 from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample

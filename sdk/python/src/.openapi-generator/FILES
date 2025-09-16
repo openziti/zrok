@@ -46,6 +46,7 @@ docs/ListOrganizations200Response.md
 docs/ListOrganizations200ResponseOrganizationsInner.md
 docs/ListPublicFrontendsForAccount200Response.md
 docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md
+docs/ListShareNamespaces200ResponseInner.md
 docs/LoginRequest.md
 docs/MetadataApi.md
 docs/Metrics.md
@@ -134,6 +135,7 @@ test/test_list_organizations200_response.py
 test/test_list_organizations200_response_organizations_inner.py
 test/test_list_public_frontends_for_account200_response.py
 test/test_list_public_frontends_for_account200_response_public_frontends_inner.py
+test/test_list_share_namespaces200_response_inner.py
 test/test_login_request.py
 test/test_metadata_api.py
 test/test_metrics.py
@@ -228,6 +230,7 @@ zrok_api/models/list_organizations200_response.py
 zrok_api/models/list_organizations200_response_organizations_inner.py
 zrok_api/models/list_public_frontends_for_account200_response.py
 zrok_api/models/list_public_frontends_for_account200_response_public_frontends_inner.py
+zrok_api/models/list_share_namespaces200_response_inner.py
 zrok_api/models/login_request.py
 zrok_api/models/metrics.py
 zrok_api/models/metrics_sample.py
