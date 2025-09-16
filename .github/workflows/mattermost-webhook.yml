@@ -19,6 +19,7 @@ on:
 
 jobs:
   mattermost-ziti-webhook:
+    continue-on-error: true
     runs-on: ubuntu-latest
     name: POST Webhook
     steps:
