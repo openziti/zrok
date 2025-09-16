@@ -44,7 +44,7 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
-	t.AppendHeader(table.Row{"URL", "Name", "Namespace", "Share Token", "Reserved", "Created At"})
+	t.AppendHeader(table.Row{"URL", "Namespace", "Share Token", "Reserved", "Created"})
 
 	if cmd.namespaceToken != "" {
 		// list names for specific namespace
@@ -59,7 +59,6 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
 				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
-				name.Name,
 				name.NamespaceToken,
 				name.ShareToken,
 				name.Reserved,
@@ -78,7 +77,6 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
 				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
-				name.Name,
 				name.NamespaceToken,
 				name.ShareToken,
 				name.Reserved,
