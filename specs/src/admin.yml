@@ -1,0 +1,782 @@
+/account:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: createAccount
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+    responses:
+      201:
+        description: created
+        schema:
+          properties:
+            accountToken:
+              type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: deleteAccount
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+    responses:
+      200:
+        description: ok
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/frontend:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: createFrontend
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            zId:
+              type: string
+            url_template:
+              type: string
+            public_name:
+              type: string
+            permissionMode:
+              type: string
+              enum: [ "open", "closed" ]
+    responses:
+      201:
+        description: frontend created
+        schema:
+          type: object
+          properties:
+            frontendToken:
+              type: string
+      400:
+        description: bad request
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  patch:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: updateFrontend
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            frontendToken:
+              type: string
+            publicName:
+              type: string
+            urlTemplate:
+              type: string
+    responses:
+      200:
+        description: frontend updated
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: deleteFrontend
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            frontendToken:
+              type: string
+    responses:
+      200:
+        description: frontend deleted
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/frontend/grant:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: addFrontendGrant
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            frontendToken:
+              type: string
+            email:
+              type: string
+    responses:
+      200:
+        description: ok
+      401:
+        description: unauthorized
+      404:
+        description: not found
+        schema:
+          $ref: "#/definitions/errorMessage"
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: deleteFrontendGrant
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            frontendToken:
+              type: string
+            email:
+              type: string
+    responses:
+      200:
+        description: ok
+      401:
+        description: unauthorized
+      404:
+        description: not found
+        schema:
+          $ref: "#/definitions/errorMessage"
+      500:
+        description: internal server error
+
+/frontend/namespace/mapping/{frontendToken}:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listFrontendNamespaceMappings
+    parameters:
+      - name: frontendToken
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: frontend namespace mappings listed
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+              isDefault:
+                type: boolean
+              createdAt:
+                type: integer
+      401:
+        description: unauthorized
+      404:
+        description: frontend not found
+      500:
+        description: internal server error
+
+/frontends:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listFrontends
+    responses:
+      200:
+        description: ok
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              frontendToken:
+                type: string
+              zId:
+                type: string
+              urlTemplate:
+                type: string
+              publicName:
+                type: string
+              createdAt:
+                type: integer
+              updatedAt:
+                type: integer
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/grants:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: grants
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+    responses:
+      200:
+        description: ok
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+
+/identity:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: createIdentity
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            name:
+              type: string
+    responses:
+      201:
+        description: created
+        schema:
+          properties:
+            identity:
+              type: string
+            cfg:
+              type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: deleteIdentity
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            zId:
+              type: string
+    responses:
+      200:
+        description: deleted
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/invite/token/generate:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: inviteTokenGenerate
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            inviteTokens:
+              type: array
+              items:
+                type: string
+    responses:
+      201:
+        description: invite tokens created
+      400:
+        description: invite tokens not created
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/namespace:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: createNamespace
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            token:
+              type: string
+            name:
+              type: string
+            description:
+              type: string
+            open:
+              type: boolean
+    responses:
+      201:
+        description: namespace created
+        schema:
+          properties:
+            namespaceToken:
+              type: string
+      401:
+        description: unauthorized
+      409:
+        description: namespace already exists
+      500:
+        description: internal server error
+  patch:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: updateNamespace
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            namespaceToken:
+              type: string
+            name:
+              type: string
+            description:
+              type: string
+            open:
+              type: boolean
+            openSet:
+              type: boolean
+    responses:
+      200:
+        description: namespace updated
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: deleteNamespace
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            namespaceToken:
+              type: string
+    responses:
+      200:
+        description: namespace deleted
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/namespace/frontend/mapping:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: addNamespaceFrontendMapping
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            frontendToken:
+              type: string
+            isDefault:
+              type: boolean
+    responses:
+      200:
+        description: namespace frontend mapping added
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: removeNamespaceFrontendMapping
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            frontendToken:
+              type: string
+    responses:
+      200:
+        description: namespace frontend mapping removed
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/namespace/frontend/mapping/{namespaceToken}:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listNamespaceFrontendMappings
+    parameters:
+      - name: namespaceToken
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: namespace frontend mappings listed
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              frontendToken:
+                type: string
+              isDefault:
+                type: boolean
+              createdAt:
+                type: integer
+      401:
+        description: unauthorized
+      404:
+        description: namespace not found
+      500:
+        description: internal server error
+
+/namespace/grant:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: addNamespaceGrant
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            email:
+              type: string
+    responses:
+      200:
+        description: namespace grant added
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: removeNamespaceGrant
+    parameters:
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            email:
+              type: string
+    responses:
+      200:
+        description: namespace grant removed
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/namespaces:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listNamespaces
+    responses:
+      200:
+        description: ok
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              open:
+                type: boolean
+              createdAt:
+                type: integer
+              updatedAt:
+                type: integer
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/organization:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: createOrganization
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            description:
+              type: string
+    responses:
+      201:
+        description: organization created
+        schema:
+          properties:
+            organizationToken:
+              type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+  delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: deleteOrganization
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              organizationToken:
+                type: string
+      responses:
+        200:
+          description: organization deleted
+        401:
+          description: unauthorized
+        404:
+          description: organization not found
+        500:
+          description: internal server error
+
+/organization/add:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: addOrganizationMember
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            organizationToken:
+              type: string
+            email:
+              type: string
+            admin:
+              type: boolean
+    responses:
+      201:
+        description: member added
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/organization/list:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listOrganizationMembers
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            organizationToken:
+              type: string
+    responses:
+      200:
+        description: list organization members
+        schema:
+          properties:
+            members:
+              type: array
+              items:
+                properties:
+                  email:
+                    type: string
+                  admin:
+                    type: boolean
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/organization/remove:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: removeOrganizationMember
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            organizationToken:
+              type: string
+            email:
+              type: string
+    responses:
+      200:
+        description: member removed
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/organizations:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listOrganizations
+    responses:
+      200:
+        description: ok
+        schema:
+          properties:
+            organizations:
+              type: array
+              items:
+                properties:
+                  organizationToken:
+                    type: string
+                  description:
+                    type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error

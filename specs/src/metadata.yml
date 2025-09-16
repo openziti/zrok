@@ -1,0 +1,378 @@
+/clientVersionCheck:
+  post:
+    tags:
+      - metadata
+    operationId: clientVersionCheck
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            clientVersion:
+              type: string
+    responses:
+      200:
+        description: compatible
+      400:
+        description: not compatible
+        schema:
+          type: string
+
+/configuration:
+  get:
+    tags:
+      - metadata
+    operationId: configuration
+    responses:
+      200:
+        description: current configuration
+        schema:
+          $ref: "#/definitions/configuration"
+
+/detail/account:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getAccountDetail
+    responses:
+      200:
+        description: ok
+        schema:
+          $ref: "#/definitions/environments"
+      500:
+        description: internal server error
+
+/detail/environment/{envZId}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getEnvironmentDetail
+    parameters:
+      - name: envZId
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          $ref: "#/definitions/environmentAndResources"
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/detail/frontend/{frontendId}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getFrontendDetail
+    parameters:
+      - name: frontendId
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          $ref: "#/definitions/frontend"
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/detail/share/{shareToken}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getShareDetail
+    parameters:
+      - name: shareToken
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          $ref: "#/definitions/share"
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/members/{organizationToken}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listOrgMembers
+    parameters:
+        - name: organizationToken
+          in: path
+          type: string
+          required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          properties:
+            members:
+              type: array
+              items:
+                properties:
+                  email:
+                    type: string
+                  admin:
+                    type: boolean
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/memberships:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listMemberships
+    responses:
+      200:
+        description: ok
+        schema:
+          properties:
+            memberships:
+              type: array
+              items:
+                properties:
+                  organizationToken:
+                    type: string
+                  description:
+                    type: string
+                  admin:
+                    type: boolean
+      500:
+        description: internal server error
+
+/overview:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: overview
+    responses:
+      200:
+        description: overview returned
+        schema:
+          $ref: "#/definitions/overview"
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"
+
+/overview/public-frontends:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listPublicFrontendsForAccount
+    responses:
+      200:
+        description: public frontends list returned
+        schema:
+          properties:
+            publicFrontends:
+              type: array
+              items:
+                type: object
+                properties:
+                  publicName:
+                    type: string
+                  urlTemplate:
+                    type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/overview/{organizationToken}/{accountEmail}:
+    get:
+      tags:
+        - metadata
+      security:
+        - key: []
+      operationId: orgAccountOverview
+      parameters:
+        - name: organizationToken
+          in: path
+          type: string
+          required: true
+        - name: accountEmail
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/overview"
+        404:
+          description: not found
+        500:
+          description: internal server error
+
+/metrics/account:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getAccountMetrics
+    parameters:
+      - name: duration
+        in: query
+        type: string
+    responses:
+      200:
+        description: account metrics
+        schema:
+          $ref: "#/definitions/metrics"
+      400:
+        description: bad request
+      500:
+        description: internal server error
+
+/metrics/environment/{envId}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getEnvironmentMetrics
+    parameters:
+      - name: envId
+        in: path
+        type: string
+        required: true
+      - name: duration
+        in: query
+        type: string
+    responses:
+      200:
+        description: environment metrics
+        schema:
+          $ref: "#/definitions/metrics"
+      400:
+        description: bad request
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+
+/metrics/share/{shareToken}:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getShareMetrics
+    parameters:
+      - name: shareToken
+        in: path
+        type: string
+        required: true
+      - name: duration
+        in: query
+        type: string
+    responses:
+      200:
+        description: share metrics
+        schema:
+          $ref: "#/definitions/metrics"
+      400:
+        description: bad request
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/sparklines:
+  post:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: getSparklines
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            account:
+              type: boolean
+            environments:
+              type: array
+              items:
+                type: string
+            shares:
+              type: array
+              items:
+                type: string
+    responses:
+      200:
+        description: sparklines data
+        schema:
+          properties:
+            sparklines:
+              type: array
+              items:
+                $ref: "#/definitions/metrics"
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+# deprecated (for legacy clients)
+/version:
+  get:
+    tags:
+      - metadata
+    operationId: version
+    responses:
+      200:
+        description: legacy upgrade required
+        schema:
+          $ref: "#/definitions/version"
+
+/versions:
+  get:
+    tags:
+      - metadata
+    operationId: versionInventory
+    responses:
+      200:
+        description: ok
+        schema:
+          properties:
+            controllerVersion:
+              type: string

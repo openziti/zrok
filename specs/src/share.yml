@@ -1,0 +1,304 @@
+/access:
+  post:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: access
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            envZId:
+              type: string
+            shareToken:
+              type: string
+            bindAddress:
+              type: string
+            description:
+              type: string
+    responses:
+      201:
+        description: access created
+        schema:
+          properties:
+            frontendToken:
+              type: string
+            backendMode:
+              type: string
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+  patch:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: updateAccess
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            frontendToken:
+              type: string
+            bindAddress:
+              type: string
+            description:
+              type: string
+    responses:
+      200:
+        description: access updated
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/share12:
+  post:
+    tags:
+      - share
+    security:
+      - key: [ ]
+    operationId: share12
+    parameters:
+      - name: body
+        in: body
+        schema:
+          $ref: "#/definitions/shareRequest12"
+    responses:
+      201:
+        description: share created
+        schema:
+          $ref: "#/definitions/shareResponse"
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      409:
+        description: conflict
+        schema:
+          $ref: "#/definitions/errorMessage"
+      422:
+        description: unprocessable
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"
+  patch:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: updateShare
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            shareToken:
+              type: string
+            addAccessGrants:
+              type: array
+              items:
+                type: string
+            removeAccessGrants:
+              type: array
+              items:
+                type: string
+    responses:
+      200:
+        description: share updated
+      400:
+        description: bad request
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/share/name:
+  post:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: createShareName
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            namespaceToken:
+              type: string
+            name:
+              type: string
+    responses:
+      201:
+        description: name created
+      401:
+        description: unauthorized
+      404:
+        description: namespace not found
+      409:
+        description: name already exists
+      500:
+        description: internal server error
+  delete:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: deleteShareName
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            namespaceToken:
+              type: string
+            name:
+              type: string
+    responses:
+      200:
+        description: name deleted
+      401:
+        description: unauthorized
+      404:
+        description: name not found
+      500:
+        description: internal server error
+
+/share/names:
+  get:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: listAllNames
+    responses:
+      200:
+        description: ok
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/name"
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/share/names/{namespaceToken}:
+  get:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: listNamesForNamespace
+    parameters:
+      - name: namespaceToken
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/name"
+      401:
+        description: unauthorized
+      404:
+        description: namespace not found
+      500:
+        description: internal server error
+
+/share/namespaces:
+  get:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: listShareNamespaces
+    responses:
+      200:
+        description: ok
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/unaccess:
+  delete:
+    tags:
+      - share
+    security:
+      - key: []
+    operationId: unaccess
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            frontendToken:
+              type: string
+            envZId:
+              type: string
+            shareToken:
+              type: string
+    responses:
+      200:
+        description: access removed
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
+/unshare12:
+  delete:
+    tags:
+      - share
+    security:
+      - key: [ ]
+    operationId: unshare12
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            envZId:
+              type: string
+            shareToken:
+              type: string
+    responses:
+      200:
+        description: share removed
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"

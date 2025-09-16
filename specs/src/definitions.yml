@@ -1,0 +1,262 @@
+authUser:
+  type: object
+  properties:
+    username:
+      type: string
+    password:
+      type: string
+
+configuration:
+  type: object
+  properties:
+    version:
+      type: string
+    touLink:
+      type: string
+    newAccountLink:
+      type: string
+    invitesOpen:
+      type: boolean
+    requiresInviteToken:
+      type: boolean
+    inviteTokenContact:
+      type: string
+
+environment:
+  type: object
+  properties:
+    description:
+      type: string
+    host:
+      type: string
+    address:
+      type: string
+    zId:
+      type: string
+    remoteAgent:
+      type: boolean
+    activity:
+      $ref: "#/definitions/sparkData"
+    limited:
+      type: boolean
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+environments:
+  type: array
+  items:
+    $ref: "#/definitions/environment"
+
+environmentAndResources:
+  type: object
+  properties:
+    environment:
+      $ref: "#/definitions/environment"
+    frontends:
+      $ref: "#/definitions/frontends"
+    shares:
+      $ref: "#/definitions/shares"
+
+errorMessage:
+  type: string
+
+frontend:
+  type: object
+  properties:
+    id:
+      type: integer
+    frontendToken:
+      type: string
+    shareToken:
+      type: string
+    backendMode:
+      type: string
+    bindAddress:
+      type: string
+    description:
+      type: string
+    zId:
+      type: string
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+frontends:
+  type: array
+  items:
+    $ref: "#/definitions/frontend"
+
+metrics:
+  type: object
+  properties:
+    scope:
+      type: string
+    id:
+      type: string
+    period:
+      type: number
+    samples:
+      type: array
+      items:
+        $ref: "#/definitions/metricsSample"
+
+metricsSample:
+  type: object
+  properties:
+    rx:
+      type: number
+    tx:
+      type: number
+    timestamp:
+      type: number
+
+name:
+  type: object
+  properties:
+    namespaceToken:
+      type: string
+    namespaceName:
+      type: string
+    name:
+      type: string
+    shareToken:
+      type: string
+    reserved:
+      type: boolean
+    createdAt:
+      type: integer
+
+namespaceSelection:
+  type: object
+  properties:
+    namespaceToken:
+      type: string
+    name:
+      type: string
+
+overview:
+  type: object
+  properties:
+    accountLimited:
+      type: boolean
+    environments:
+      type: array
+      items:
+        $ref: "#/definitions/environmentAndResources"
+
+principal:
+  type: object
+  properties:
+    id:
+      type: integer
+    email:
+      type: string
+    token:
+      type: string
+    limitless:
+      type: boolean
+    admin:
+      type: boolean
+
+share:
+  type: object
+  properties:
+    shareToken:
+      type: string
+    zId:
+      type: string
+    envZId:
+      type: string
+    shareMode:
+      type: string
+    backendMode:
+      type: string
+    frontendSelection:
+      type: string
+    frontendEndpoint:
+      type: string
+    backendProxyEndpoint:
+      type: string
+    reserved:
+      type: boolean
+    activity:
+      $ref: "#/definitions/sparkData"
+    limited:
+      type: boolean
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+shares:
+  type: array
+  items:
+    $ref: "#/definitions/share"
+
+shareRequest12:
+  type: object
+  properties:
+    envZId:
+      type: string
+    shareMode:
+      type: string
+      enum: ["public", "private"]
+    namespaceSelections:
+      type: array
+      items:
+        $ref: "#/definitions/namespaceSelection"
+    backendMode:
+      type: string
+      enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+    target:
+      type: string
+    authScheme:
+      type: string
+    basicAuthUsers:
+      type: array
+      items:
+        $ref: "#/definitions/authUser"
+    oauthProvider:
+      type: string
+    oauthEmailDomains:
+      type: array
+      items:
+        type: string
+    oauthRefreshInterval:
+      type: string
+    permissionMode:
+      type: string
+      enum: ["open", "closed"]
+    accessGrants:
+      type: array
+      items:
+        type: string
+
+shareResponse:
+  type: object
+  properties:
+    frontendProxyEndpoints:
+      type: array
+      items:
+        type: string
+    shareToken:
+      type: string
+
+sparkData:
+  type: array
+  items:
+    $ref: "#/definitions/sparkDataSample"
+
+sparkDataSample:
+  type: object
+  properties:
+    rx:
+      type: number
+    tx:
+      type: number
+
+version:
+  type: string
