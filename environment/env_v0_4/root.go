@@ -292,11 +292,11 @@ func loadEnvironment() (*env_core.Environment, error) {
 		ApiEndpoint:  env.ApiEndpoint,
 	}
 	if strings.HasPrefix(env.ApiEndpoint, "https://api.zrok.io") {
-		out.ApiEndpoint = "https://api-v1.zrok.io"
+		out.ApiEndpoint = "https://api-v2.zrok.io"
 		if err := saveEnvironment(out); err != nil {
 			return nil, errors.Wrap(err, "error auto-rebasing apiEndpoint")
 		}
-		logrus.Info("auto-rebased 'apiEndpoint' for v1.0.x")
+		logrus.Info("auto-rebased 'apiEndpoint' for v2.0.x")
 	}
 	return out, nil
 }

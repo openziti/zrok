@@ -98,8 +98,7 @@ func DefaultConfig() *Config {
 	cfg := &Config{
 		Compatibility: &CompatibilityConfig{
 			VersionPatterns: []string{
-				`^(refs/(heads|tags)/)?v1\.1`,
-				`^v1\.0`,
+				`^(refs/(heads|tags)/)?v2\.0`,
 			},
 		},
 		Limits: limits.DefaultConfig(),

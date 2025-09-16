@@ -15,7 +15,7 @@ func Overview(root env_core.Root) (string, error) {
 
 	client := &http.Client{}
 	apiEndpoint, _ := root.ApiEndpoint()
-	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v1/overview", apiEndpoint), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v2/overview", apiEndpoint), nil)
 	if err != nil {
 		return "", err
 	}

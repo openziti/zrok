@@ -42,7 +42,7 @@ fi
 )
 
 # Get version information
-VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.x")
+VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.0.x")
 STEPS=$(git rev-list --count ${VERSION}..HEAD 2>/dev/null || echo "0")
 if [ "$STEPS" -gt "0" ]; then
     VERSION="${VERSION}-${STEPS}"

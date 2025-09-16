@@ -44,7 +44,7 @@ func (cmd *orgAdminOverviewCommand) run(_ *cobra.Command, args []string) {
 
 	client := &http.Client{}
 	apiEndpoint, _ := root.ApiEndpoint()
-	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v1/overview/%v/%v", apiEndpoint, args[0], args[1]), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%v/api/v2/overview/%v/%v", apiEndpoint, args[0], args[1]), nil)
 	if err != nil {
 		if !panicInstead {
 			tui.Error("error creating request", err)

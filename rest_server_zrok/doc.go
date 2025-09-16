@@ -6,8 +6,8 @@
 //	Schemes:
 //	  http
 //	Host: localhost
-//	BasePath: /api/v1
-//	Version: 1.0.0
+//	BasePath: /api/v2
+//	Version: 2.0.0
 //
 //	Consumes:
 //	  - application/zrok.v1+json

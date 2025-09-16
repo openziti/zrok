@@ -1,6 +1,6 @@
 # zrok_api.ShareApi
 
-All URIs are relative to */api/v1*
+All URIs are relative to */api/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -30,10 +30,10 @@ from zrok_api.models.access_request import AccessRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -107,10 +107,10 @@ from zrok_api.models.create_share_name_request import CreateShareNameRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -183,10 +183,10 @@ from zrok_api.models.create_share_name_request import CreateShareNameRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -258,10 +258,10 @@ from zrok_api.models.name import Name
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -330,10 +330,10 @@ from zrok_api.models.name import Name
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -408,10 +408,10 @@ from zrok_api.models.share_response import ShareResponse
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -487,10 +487,10 @@ from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -562,10 +562,10 @@ from zrok_api.models.unshare12_request import Unshare12Request
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -637,10 +637,10 @@ from zrok_api.models.update_access_request import UpdateAccessRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -712,10 +712,10 @@ from zrok_api.models.update_share_request import UpdateShareRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
