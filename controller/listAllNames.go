@@ -7,13 +7,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ListAllNamesHandler struct{}
+type listAllNamesHandler struct{}
 
-func newListAllNamesHandler() *ListAllNamesHandler {
-	return &ListAllNamesHandler{}
+func newListAllNamesHandler() *listAllNamesHandler {
+	return &listAllNamesHandler{}
 }
 
-func (h *ListAllNamesHandler) Handle(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *listAllNamesHandler) Handle(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
