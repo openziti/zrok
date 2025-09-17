@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -19,12 +19,6 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 	if !principal.Admin {
 		logrus.Errorf("invalid admin principal")
 		return admin.NewGrantsUnauthorized()
-	}
-
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
-	if err != nil {
-		logrus.Errorf("error connecting to ziti: %v", err)
-		return admin.NewGrantsInternalServerError()
 	}
 
 	trx, err := str.Begin()
@@ -51,6 +45,12 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 		return admin.NewGrantsInternalServerError()
 	}
 
+	ziti, err := automation.NewZitiAutomation(cfg)
+	if err != nil {
+		logrus.Errorf("error connecting to ziti: %v", err)
+		return admin.NewGrantsInternalServerError()
+	}
+
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
@@ -60,15 +60,53 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 
 		for _, shr := range shrs {
 			if shr.ShareMode == string(sdk.PublicShareMode) && shr.BackendMode != string(sdk.DriveBackendMode) {
-				cfgZId, shrCfg, err := zrokEdgeSdk.GetConfig(shr.Token, edge)
+				// find config by zrokShareToken tag
+				filterOpts := &automation.FilterOptions{
+					Filter: "tags.zrokShareToken=\"" + shr.Token + "\"",
+					Limit:  0,
+					Offset: 0,
+				}
+				configs, err := ziti.Configs.Find(filterOpts)
 				if err != nil {
-					logrus.Errorf("error getting config for share '%v': %v", shr.Token, err)
+					logrus.Errorf("error finding config for share '%v': %v", shr.Token, err)
+					return admin.NewGrantsInternalServerError()
+				}
+				if len(configs) != 1 {
+					logrus.Errorf("expected 1 configuration for share '%v', found %v", shr.Token, len(configs))
+					return admin.NewGrantsInternalServerError()
+				}
+				config := configs[0]
+				if config.ConfigType.Name != sdk.ZrokProxyConfig {
+					logrus.Errorf("expected '%v' config type for share '%v', found '%v'", sdk.ZrokProxyConfig, shr.Token, config.ConfigType.Name)
+					return admin.NewGrantsInternalServerError()
+				}
+
+				// parse the config data
+				var shrCfg *sdk.FrontendConfig
+				if v, ok := config.Data.(map[string]interface{}); ok {
+					shrCfg, err = sdk.FrontendConfigFromMap(v)
+					if err != nil {
+						logrus.Errorf("error parsing config data for share '%v': %v", shr.Token, err)
+						return admin.NewGrantsInternalServerError()
+					}
+				} else {
+					logrus.Errorf("unexpected config data type for share '%v'", shr.Token)
 					return admin.NewGrantsInternalServerError()
 				}
 
 				if shrCfg.Interstitial != !acctSkipInterstitial {
 					shrCfg.Interstitial = !acctSkipInterstitial
-					err := zrokEdgeSdk.UpdateConfig(shr.Token, cfgZId, shrCfg, edge)
+
+					// update config using automation
+					configOpts := &automation.ConfigOptions{
+						BaseOptions: automation.BaseOptions{
+							Name: shr.Token,
+							Tags: automation.ZrokShareTags(shr.Token),
+						},
+						ConfigTypeID: config.ConfigType.ID,
+						Data:         shrCfg,
+					}
+					err := ziti.Configs.Update(*config.ID, configOpts)
 					if err != nil {
 						logrus.Errorf("error updating config for '%v': %v", shr.Token, err)
 						return admin.NewGrantsInternalServerError()

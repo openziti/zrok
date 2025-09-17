@@ -22,10 +22,6 @@ func GC(inCfg *zrok_config.Config) error {
 			logrus.Errorf("error closing store: %v", err)
 		}
 	}()
-	ziti, err := automation.NewZitiAutomation(cfg)
-	if err != nil {
-		return err
-	}
 	tx, err := str.Begin()
 	if err != nil {
 		return err
@@ -38,6 +34,10 @@ func GC(inCfg *zrok_config.Config) error {
 	liveMap := make(map[string]struct{})
 	for _, sshr := range sshrs {
 		liveMap[sshr.Token] = struct{}{}
+	}
+	ziti, err := automation.NewZitiAutomation(cfg)
+	if err != nil {
+		return err
 	}
 	if err := gcServices(ziti, liveMap); err != nil {
 		return errors.Wrap(err, "error garbage collecting services")
@@ -182,4 +182,3 @@ func gcConfigs(ziti *automation.ZitiAutomation, liveMap map[string]struct{}) err
 	}
 	return nil
 }
-
