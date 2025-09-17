@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/sirupsen/logrus"
@@ -42,19 +42,19 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 	}
 	logrus.Infof("found %d environments to clean up for account '%s'", len(envs), params.Body.Email)
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewDeleteAccountInternalServerError()
 	}
 
 	for _, env := range envs {
-		logrus.Infof("disabling environment %d (ZId: %s) for account '%s'", env.Id, env.ZId, params.Body.Email)
-		if err := disableEnvironment(env, trx, edge); err != nil {
-			logrus.Errorf("error disabling environment %d for account '%s': %v", env.Id, params.Body.Email, err)
+		logrus.Infof("disabling environment '%d' (envZId: '%s') for account '%s'", env.Id, env.ZId, params.Body.Email)
+		if err := disableEnvironment(env, trx, ziti); err != nil {
+			logrus.Errorf("error disabling environment '%d' for account '%s': %v", env.Id, params.Body.Email, err)
 			return admin.NewDeleteAccountInternalServerError()
 		}
-		logrus.Infof("successfully disabled environment %d for account '%s'", env.Id, params.Body.Email)
+		logrus.Infof("successfully disabled environment '%d' for account '%s'", env.Id, params.Body.Email)
 	}
 
 	if err := str.DeleteAccount(account.Id, trx); err != nil {
