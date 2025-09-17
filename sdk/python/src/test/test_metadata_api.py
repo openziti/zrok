@@ -98,12 +98,6 @@ class TestMetadataApi(unittest.TestCase):
         """
         pass
 
-    def test_list_public_frontends_for_account(self) -> None:
-        """Test case for list_public_frontends_for_account
-
-        """
-        pass
-
     def test_org_account_overview(self) -> None:
         """Test case for org_account_overview
 

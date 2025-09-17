@@ -185,9 +185,6 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminListOrganizationsHandler: admin.ListOrganizationsHandlerFunc(func(params admin.ListOrganizationsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListOrganizations has not yet been implemented")
 		}),
-		MetadataListPublicFrontendsForAccountHandler: metadata.ListPublicFrontendsForAccountHandlerFunc(func(params metadata.ListPublicFrontendsForAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation metadata.ListPublicFrontendsForAccount has not yet been implemented")
-		}),
 		ShareListShareNamespacesHandler: share.ListShareNamespacesHandlerFunc(func(params share.ListShareNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.ListShareNamespaces has not yet been implemented")
 		}),
@@ -415,8 +412,6 @@ type ZrokAPI struct {
 	AdminListOrganizationMembersHandler admin.ListOrganizationMembersHandler
 	// AdminListOrganizationsHandler sets the operation handler for the list organizations operation
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
-	// MetadataListPublicFrontendsForAccountHandler sets the operation handler for the list public frontends for account operation
-	MetadataListPublicFrontendsForAccountHandler metadata.ListPublicFrontendsForAccountHandler
 	// ShareListShareNamespacesHandler sets the operation handler for the list share namespaces operation
 	ShareListShareNamespacesHandler share.ListShareNamespacesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
@@ -690,9 +685,6 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminListOrganizationsHandler == nil {
 		unregistered = append(unregistered, "admin.ListOrganizationsHandler")
-	}
-	if o.MetadataListPublicFrontendsForAccountHandler == nil {
-		unregistered = append(unregistered, "metadata.ListPublicFrontendsForAccountHandler")
 	}
 	if o.ShareListShareNamespacesHandler == nil {
 		unregistered = append(unregistered, "share.ListShareNamespacesHandler")
@@ -1060,10 +1052,6 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/organizations"] = admin.NewListOrganizations(o.context, o.AdminListOrganizationsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/overview/public-frontends"] = metadata.NewListPublicFrontendsForAccount(o.context, o.MetadataListPublicFrontendsForAccountHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -151,7 +151,6 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**get_sparklines**](docs/MetadataApi.md#get_sparklines) | **POST** /sparklines | 
 *MetadataApi* | [**list_memberships**](docs/MetadataApi.md#list_memberships) | **GET** /memberships | 
 *MetadataApi* | [**list_org_members**](docs/MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
-*MetadataApi* | [**list_public_frontends_for_account**](docs/MetadataApi.md#list_public_frontends_for_account) | **GET** /overview/public-frontends | 
 *MetadataApi* | [**org_account_overview**](docs/MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 *MetadataApi* | [**overview**](docs/MetadataApi.md#overview) | **GET** /overview | 
 *MetadataApi* | [**version**](docs/MetadataApi.md#version) | **GET** /version | 
@@ -211,8 +210,6 @@ Class | Method | HTTP request | Description
  - [ListOrganizationMembers200ResponseMembersInner](docs/ListOrganizationMembers200ResponseMembersInner.md)
  - [ListOrganizations200Response](docs/ListOrganizations200Response.md)
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
- - [ListPublicFrontendsForAccount200Response](docs/ListPublicFrontendsForAccount200Response.md)
- - [ListPublicFrontendsForAccount200ResponsePublicFrontendsInner](docs/ListPublicFrontendsForAccount200ResponsePublicFrontendsInner.md)
  - [ListShareNamespaces200ResponseInner](docs/ListShareNamespaces200ResponseInner.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)

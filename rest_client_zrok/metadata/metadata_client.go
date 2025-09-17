@@ -54,8 +54,6 @@ type ClientService interface {
 
 	ListOrgMembers(params *ListOrgMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrgMembersOK, error)
 
-	ListPublicFrontendsForAccount(params *ListPublicFrontendsForAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListPublicFrontendsForAccountOK, error)
-
 	OrgAccountOverview(params *OrgAccountOverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OrgAccountOverviewOK, error)
 
 	Overview(params *OverviewParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*OverviewOK, error)
@@ -530,45 +528,6 @@ func (a *Client) ListOrgMembers(params *ListOrgMembersParams, authInfo runtime.C
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listOrgMembers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-ListPublicFrontendsForAccount list public frontends for account API
-*/
-func (a *Client) ListPublicFrontendsForAccount(params *ListPublicFrontendsForAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListPublicFrontendsForAccountOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewListPublicFrontendsForAccountParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "listPublicFrontendsForAccount",
-		Method:             "GET",
-		PathPattern:        "/overview/public-frontends",
-		ProducesMediaTypes: []string{"application/zrok.v1+json"},
-		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &ListPublicFrontendsForAccountReader{formats: a.formats},
-		AuthInfo:           authInfo,
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*ListPublicFrontendsForAccountOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for listPublicFrontendsForAccount: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
