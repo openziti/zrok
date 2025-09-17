@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
 	"github.com/sirupsen/logrus"
@@ -34,12 +36,6 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		return agent.NewEnrollBadRequest()
 	}
 
-	client, err := zrokEdgeSdk.Client(cfg.Ziti)
-	if err != nil {
-		logrus.Errorf("error getting ziti client for '%v': %v", principal.Email, err)
-		return agent.NewEnrollInternalServerError()
-	}
-
 	token, err := CreateToken()
 	if err != nil {
 		logrus.Errorf("error creating agent enrollment token for '%v': %v", principal.Email, err)
@@ -47,23 +43,72 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 	}
 	logrus.Infof("enrollment token: %v", token)
 
-	zId, err := zrokEdgeSdk.CreateService(token, nil, map[string]interface{}{"zrokEnvZId": env.ZId}, client)
+	automationClient, err := automation.NewZitiAutomation(cfg)
+	if err != nil {
+		logrus.Errorf("error getting automation client for '%v': %v", principal.Email, err)
+		return agent.NewEnrollInternalServerError()
+	}
+
+	// create service for agent remoting
+	tags := automation.ZrokAgentRemoteTags(token, env.ZId).WithTag("zrokEnvZId", env.ZId)
+	serviceOpts := &automation.ServiceOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: token,
+			Tags: tags,
+		},
+		EncryptionRequired: true,
+	}
+	zId, err := automationClient.Services.Create(serviceOpts)
 	if err != nil {
 		logrus.Errorf("error creating agent remoting service for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyBind(env.ZId+"-"+token+"-bind", zId, env.ZId, zrokEdgeSdk.ZrokAgentRemoteTags(token, env.ZId).SubTags, client); err != nil {
-		logrus.Errorf("error creating agent remoting bind policy for '%v' (%v): %v", env.ZId, principal.Email, err.Error())
+	// create bind policy for the service
+	bindPolicyName := env.ZId + "-" + token + "-bind"
+	bindOpts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: bindPolicyName,
+			Tags: automation.ZrokAgentRemoteTags(token, env.ZId),
+		},
+		IdentityRoles: []string{"@" + env.ZId},
+		ServiceRoles:  []string{"@" + zId},
+		PolicyType:    rest_model.DialBindBind,
+		Semantic:      rest_model.SemanticAllOf,
+	}
+	if _, err := automationClient.ServicePolicies.CreateBind(bindOpts); err != nil {
+		logrus.Errorf("error creating agent remoting bind policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+token+"-dial", zId, []string{cfg.AgentController.ZId}, zrokEdgeSdk.ZrokAgentRemoteTags(token, env.ZId).SubTags, client); err != nil {
-		logrus.Errorf("error creating agent remoting dial policy for '%v' (%v): %v", env.ZId, principal.Email, err.Error())
+	// create dial policy for the service
+	dialPolicyName := env.ZId + "-" + token + "-dial"
+	dialOpts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: dialPolicyName,
+			Tags: automation.ZrokAgentRemoteTags(token, env.ZId),
+		},
+		IdentityRoles: []string{"@" + cfg.AgentController.ZId},
+		ServiceRoles:  []string{"@" + zId},
+		PolicyType:    rest_model.DialBindDial,
+		Semantic:      rest_model.SemanticAllOf,
+	}
+	if _, err := automationClient.ServicePolicies.CreateDial(dialOpts); err != nil {
+		logrus.Errorf("error creating agent remoting dial policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateAgentRemoteServiceEdgeRouterPolicy(env.ZId, token, zId, client); err != nil {
+	// create service edge router policy
+	serpOpts := &automation.ServiceEdgeRouterPolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: token,
+			Tags: automation.ZrokAgentRemoteTags(token, env.ZId),
+		},
+		ServiceRoles:    []string{fmt.Sprintf("@%v", zId)},
+		EdgeRouterRoles: []string{"#all"},
+		Semantic:        rest_model.SemanticAllOf,
+	}
+	if _, err := automationClient.ServiceEdgeRouterPolicies.Create(serpOpts); err != nil {
 		logrus.Errorf("error creating agent remoting serp for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
