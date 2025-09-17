@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/sirupsen/logrus"
@@ -28,12 +28,6 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessInternalServerError()
 	}
 	defer func() { _ = tx.Rollback() }()
-
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
-	if err != nil {
-		logrus.Error(err)
-		return share.NewUnaccessInternalServerError()
-	}
 
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
@@ -68,7 +62,14 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessNotFound()
 	}
 
-	if err := zrokEdgeSdk.DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken), edge); err != nil {
+	automationClient, err := automation.NewZitiAutomation(cfg)
+	if err != nil {
+		logrus.Error(err)
+		return share.NewUnaccessInternalServerError()
+	}
+
+	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken)
+	if err := automationClient.ServicePolicies.DeleteWithFilter(filter); err != nil {
 		logrus.Errorf("error removing access to '%v' for '%v': %v", shrToken, envZId, err)
 		return share.NewUnaccessInternalServerError()
 	}

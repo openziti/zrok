@@ -3,8 +3,9 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
@@ -90,17 +91,29 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	automationClient, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
 		logrus.Error(err)
 		return share.NewAccessInternalServerError()
 	}
-	addlTags := map[string]interface{}{
-		"zrokEnvironmentZId": envZId,
-		"zrokFrontendToken":  feToken,
-		"zrokShareToken":     shrToken,
+
+	policyName := feToken + "-" + envZId + "-" + shr.ZId + "-dial"
+	tags := automation.ZrokShareTags(shrToken).
+		WithTag("zrokEnvironmentZId", envZId).
+		WithTag("zrokFrontendToken", feToken)
+
+	opts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: policyName,
+			Tags: tags,
+		},
+		IdentityRoles: []string{"@" + envZId},
+		ServiceRoles:  []string{"@" + shr.ZId},
+		PolicyType:    rest_model.DialBindDial,
+		Semantic:      rest_model.SemanticAllOf,
 	}
-	if err := zrokEdgeSdk.CreateServicePolicyDial(feToken+"-"+envZId+"-"+shr.ZId+"-dial", shr.ZId, []string{envZId}, addlTags, edge); err != nil {
+
+	if _, err := automationClient.ServicePolicies.CreateDial(opts); err != nil {
 		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
