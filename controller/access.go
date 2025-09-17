@@ -91,7 +91,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		return share.NewAccessInternalServerError()
 	}
 
-	automationClient, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Error(err)
 		return share.NewAccessInternalServerError()
@@ -113,7 +113,7 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		Semantic:      rest_model.SemanticAllOf,
 	}
 
-	if _, err := automationClient.ServicePolicies.CreateDial(opts); err != nil {
+	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
 		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}

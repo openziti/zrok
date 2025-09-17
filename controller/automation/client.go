@@ -14,14 +14,14 @@ type Config struct {
 }
 
 type Client struct {
-	edge                    *rest_management_api_client.ZitiEdgeManagement
-	Identity                *IdentityManager
-	Service                 *ServiceManager
-	Config                  *ConfigManager
-	ConfigType              *ConfigTypeManager
-	EdgeRouterPolicy        *EdgeRouterPolicyManager
-	ServiceEdgeRouterPolicy *ServiceEdgeRouterPolicyManager
-	ServicePolicy           *ServicePolicyManager
+	edge                      *rest_management_api_client.ZitiEdgeManagement
+	Identity                  *IdentityManager
+	Service                   *ServiceManager
+	Config                    *ConfigManager
+	ConfigType                *ConfigTypeManager
+	EdgeRouterPolicies        *EdgeRouterPolicyManager
+	ServiceEdgeRouterPolicies *ServiceEdgeRouterPolicyManager
+	ServicePolicies           *ServicePolicyManager
 }
 
 func NewClient(cfg *Config) (*Client, error) {
@@ -43,9 +43,9 @@ func NewClient(cfg *Config) (*Client, error) {
 	client.Service = NewServiceManager(client)
 	client.Config = NewConfigManager(client)
 	client.ConfigType = NewConfigTypeManager(client)
-	client.EdgeRouterPolicy = NewEdgeRouterPolicyManager(client)
-	client.ServiceEdgeRouterPolicy = NewServiceEdgeRouterPolicyManager(client)
-	client.ServicePolicy = NewServicePolicyManager(client)
+	client.EdgeRouterPolicies = NewEdgeRouterPolicyManager(client)
+	client.ServiceEdgeRouterPolicies = NewServiceEdgeRouterPolicyManager(client)
+	client.ServicePolicies = NewServicePolicyManager(client)
 
 	return client, nil
 }

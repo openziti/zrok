@@ -8,13 +8,13 @@ import (
 
 	"github.com/michaelquigley/df/dd"
 	"github.com/openziti/zrok/controller/agentController"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/env"
 	"github.com/openziti/zrok/controller/limits"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/pkg/errors"
 )
 
@@ -36,7 +36,7 @@ type Config struct {
 	Registration           *RegistrationConfig
 	ResetPassword          *ResetPasswordConfig
 	Store                  *store.Config
-	Ziti                   *zrokEdgeSdk.Config
+	Ziti                   *automation.Config
 	Tls                    *TlsConfig
 }
 

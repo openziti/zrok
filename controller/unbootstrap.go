@@ -10,7 +10,7 @@ import (
 )
 
 func Unbootstrap(cfg *config.Config) error {
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return err
 	}

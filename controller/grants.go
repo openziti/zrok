@@ -45,7 +45,7 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 		return admin.NewGrantsInternalServerError()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error connecting to ziti: %v", err)
 		return admin.NewGrantsInternalServerError()

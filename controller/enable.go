@@ -41,7 +41,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableInternalServerError()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()

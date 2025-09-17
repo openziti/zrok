@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/openziti/zrok/controller/config"
 	"github.com/pkg/errors"
 )
 
@@ -20,12 +19,8 @@ type ZitiAutomation struct {
 	ServicePolicies           *ServicePolicyManager
 }
 
-func NewZitiAutomation(cfg *config.Config) (*ZitiAutomation, error) {
-	client, err := NewClient(&Config{
-		ApiEndpoint: cfg.Ziti.ApiEndpoint,
-		Username:    cfg.Ziti.Username,
-		Password:    cfg.Ziti.Password,
-	})
+func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
+	client, err := NewClient(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create client")
 	}
@@ -35,9 +30,9 @@ func NewZitiAutomation(cfg *config.Config) (*ZitiAutomation, error) {
 		Services:                  client.Service,
 		Configs:                   client.Config,
 		ConfigTypes:               client.ConfigType,
-		EdgeRouterPolicies:        client.EdgeRouterPolicy,
-		ServiceEdgeRouterPolicies: client.ServiceEdgeRouterPolicy,
-		ServicePolicies:           client.ServicePolicy,
+		EdgeRouterPolicies:        client.EdgeRouterPolicies,
+		ServiceEdgeRouterPolicies: client.ServiceEdgeRouterPolicies,
+		ServicePolicies:           client.ServicePolicies,
 	}, nil
 }
 

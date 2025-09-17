@@ -2,9 +2,9 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -12,10 +12,10 @@ import (
 
 type relaxAction struct {
 	str  *store.Store
-	zCfg *zrokEdgeSdk.Config
+	zCfg *automation.Config
 }
 
-func newRelaxAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *relaxAction {
+func newRelaxAction(str *store.Store, zCfg *automation.Config) *relaxAction {
 	return &relaxAction{str, zCfg}
 }
 
@@ -44,7 +44,7 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		}
 	}
 
-	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	ziti, err := automation.NewZitiAutomation(a.zCfg)
 	if err != nil {
 		return err
 	}
@@ -60,11 +60,11 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 			if (!bwc.IsScoped() && !stayLimited) || bwc.GetBackendMode() == sdk.BackendMode(shr.BackendMode) {
 				switch shr.ShareMode {
 				case string(sdk.PublicShareMode):
-					if err := relaxPublicShare(a.str, edge, shr, trx); err != nil {
+					if err := relaxPublicShare(a.str, ziti, shr, trx); err != nil {
 						logrus.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				case string(sdk.PrivateShareMode):
-					if err := relaxPrivateShare(a.str, edge, shr, trx); err != nil {
+					if err := relaxPrivateShare(a.str, ziti, shr, trx); err != nil {
 						logrus.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				}
@@ -75,7 +75,7 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 	return nil
 }
 
-func relaxPublicShare(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement, shr *store.Share, trx *sqlx.Tx) error {
+func relaxPublicShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
 	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
 	if err != nil {
 		return errors.Wrap(err, "error finding environment")
@@ -86,14 +86,25 @@ func relaxPublicShare(str *store.Store, edge *rest_management_api_client.ZitiEdg
 		return errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token)
 	}
 
-	if err := zrokEdgeSdk.CreateServicePolicyDial(env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{fe.ZId}, zrokEdgeSdk.ZrokShareTags(shr.Token).SubTags, edge); err != nil {
+	opts := &automation.ServicePolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: env.ZId + "-" + shr.ZId + "-dial",
+			Tags: automation.ZrokShareTags(shr.Token),
+		},
+		IdentityRoles: []string{"@" + fe.ZId},
+		ServiceRoles:  []string{"@" + shr.ZId},
+		PolicyType:    rest_model.DialBindDial,
+		Semantic:      rest_model.SemanticAllOf,
+	}
+
+	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
 		return errors.Wrapf(err, "error creating dial service policy for '%v'", shr.Token)
 	}
 	logrus.Infof("added dial service policy for '%v'", shr.Token)
 	return nil
 }
 
-func relaxPrivateShare(str *store.Store, edge *rest_management_api_client.ZitiEdgeManagement, shr *store.Share, trx *sqlx.Tx) error {
+func relaxPrivateShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
 	fes, err := str.FindFrontendsForPrivateShare(shr.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding frontends for share '%v'", shr.Token)
@@ -105,12 +116,22 @@ func relaxPrivateShare(str *store.Store, edge *rest_management_api_client.ZitiEd
 				return errors.Wrapf(err, "error getting environment for frontend '%v'", fe.Token)
 			}
 
-			addlTags := map[string]interface{}{
-				"zrokEnvironmentZId": env.ZId,
-				"zrokFrontendToken":  fe.Token,
-				"zrokShareToken":     shr.Token,
+			opts := &automation.ServicePolicyOptions{
+				BaseOptions: automation.BaseOptions{
+					Name: fe.Token + "-" + env.ZId + "-" + shr.ZId + "-dial",
+					Tags: automation.NewTags().
+						WithZrok().
+						WithShareToken(shr.Token).
+						WithTag("zrokEnvironmentZId", env.ZId).
+						WithTag("zrokFrontendToken", fe.Token),
+				},
+				IdentityRoles: []string{"@" + env.ZId},
+				ServiceRoles:  []string{"@" + shr.ZId},
+				PolicyType:    rest_model.DialBindDial,
+				Semantic:      rest_model.SemanticAllOf,
 			}
-			if err := zrokEdgeSdk.CreateServicePolicyDial(fe.Token+"-"+env.ZId+"-"+shr.ZId+"-dial", shr.ZId, []string{env.ZId}, addlTags, edge); err != nil {
+
+			if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
 				return errors.Wrapf(err, "unable to create dial policy for frontend '%v'", fe.Token)
 			}
 

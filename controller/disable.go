@@ -33,7 +33,7 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		return environment.NewDisableUnauthorized()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()

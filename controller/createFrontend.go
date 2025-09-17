@@ -25,7 +25,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		return admin.NewCreateFrontendUnauthorized()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateFrontendInternalServerError()

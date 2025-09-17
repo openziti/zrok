@@ -26,7 +26,7 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 	}
 
 	logrus.Info("connecting to the ziti edge management api")
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
 	}

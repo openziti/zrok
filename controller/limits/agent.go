@@ -1,23 +1,24 @@
 package limits
 
 import (
+	"reflect"
+	"time"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"reflect"
-	"time"
 )
 
 type Agent struct {
 	cfg            *Config
 	ifx            *influxReader
-	zCfg           *zrokEdgeSdk.Config
+	zCfg           *automation.Config
 	str            *store.Store
 	queue          chan *metrics.Usage
 	warningActions []AccountAction
@@ -27,7 +28,7 @@ type Agent struct {
 	join           chan struct{}
 }
 
-func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
+func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *automation.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	a := &Agent{
 		cfg:            cfg,
 		ifx:            newInfluxReader(ifxCfg),

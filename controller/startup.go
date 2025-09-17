@@ -21,7 +21,7 @@ func controllerStartup() error {
 func inspectZiti() error {
 	logrus.Infof("inspecting ziti controller configuration")
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error getting automation client")
 	}

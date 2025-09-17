@@ -36,7 +36,7 @@ func (h *agentUnenrollHandler) Handle(params agent.UnenrollParams, principal *re
 		return agent.NewUnenrollBadRequest()
 	}
 
-	automationClient, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client for '%v': %v", principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
@@ -44,28 +44,28 @@ func (h *agentUnenrollHandler) Handle(params agent.UnenrollParams, principal *re
 
 	// delete service edge router policies for agent remote
 	serpFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\"", ae.Token)
-	if err := automationClient.ServiceEdgeRouterPolicies.DeleteWithFilter(serpFilter); err != nil {
+	if err := ziti.ServiceEdgeRouterPolicies.DeleteWithFilter(serpFilter); err != nil {
 		logrus.Errorf("error removing agent remote serp for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}
 
 	// delete dial service policies for agent remote
 	dialFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=1", ae.Token)
-	if err := automationClient.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
+	if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
 		logrus.Errorf("error removing agent remote dial service policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}
 
 	// delete bind service policies for agent remote
 	bindFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=2", ae.Token)
-	if err := automationClient.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
+	if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
 		logrus.Errorf("error removing agent remote bind service policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}
 
 	// find and delete the agent remote service
 	serviceFilter := fmt.Sprintf("name=\"%v\"", ae.Token)
-	if err := automationClient.Services.DeleteWithFilter(serviceFilter); err != nil {
+	if err := ziti.Services.DeleteWithFilter(serviceFilter); err != nil {
 		logrus.Errorf("error removing agent remote service for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}
@@ -82,4 +82,3 @@ func (h *agentUnenrollHandler) Handle(params agent.UnenrollParams, principal *re
 
 	return agent.NewUnenrollOK()
 }
-

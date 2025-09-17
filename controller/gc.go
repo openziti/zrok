@@ -35,7 +35,7 @@ func GC(inCfg *zrok_config.Config) error {
 	for _, sshr := range sshrs {
 		liveMap[sshr.Token] = struct{}{}
 	}
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return err
 	}

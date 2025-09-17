@@ -43,7 +43,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 	}
 	logrus.Infof("enrollment token: %v", token)
 
-	automationClient, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client for '%v': %v", principal.Email, err)
 		return agent.NewEnrollInternalServerError()
@@ -58,7 +58,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		},
 		EncryptionRequired: true,
 	}
-	zId, err := automationClient.Services.Create(serviceOpts)
+	zId, err := ziti.Services.Create(serviceOpts)
 	if err != nil {
 		logrus.Errorf("error creating agent remoting service for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
@@ -76,7 +76,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		PolicyType:    rest_model.DialBindBind,
 		Semantic:      rest_model.SemanticAllOf,
 	}
-	if _, err := automationClient.ServicePolicies.CreateBind(bindOpts); err != nil {
+	if _, err := ziti.ServicePolicies.CreateBind(bindOpts); err != nil {
 		logrus.Errorf("error creating agent remoting bind policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
@@ -93,7 +93,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		PolicyType:    rest_model.DialBindDial,
 		Semantic:      rest_model.SemanticAllOf,
 	}
-	if _, err := automationClient.ServicePolicies.CreateDial(dialOpts); err != nil {
+	if _, err := ziti.ServicePolicies.CreateDial(dialOpts); err != nil {
 		logrus.Errorf("error creating agent remoting dial policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
@@ -108,7 +108,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		EdgeRouterRoles: []string{"#all"},
 		Semantic:        rest_model.SemanticAllOf,
 	}
-	if _, err := automationClient.ServiceEdgeRouterPolicies.Create(serpOpts); err != nil {
+	if _, err := ziti.ServiceEdgeRouterPolicies.Create(serpOpts); err != nil {
 		logrus.Errorf("error creating agent remoting serp for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}

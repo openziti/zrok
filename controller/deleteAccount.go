@@ -42,7 +42,7 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 	}
 	logrus.Infof("found %d environments to clean up for account '%s'", len(envs), params.Body.Email)
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewDeleteAccountInternalServerError()

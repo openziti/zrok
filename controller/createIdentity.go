@@ -27,7 +27,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityUnauthorized()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateIdentityInternalServerError()

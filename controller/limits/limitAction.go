@@ -1,9 +1,11 @@
 package limits
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -11,10 +13,10 @@ import (
 
 type limitAction struct {
 	str  *store.Store
-	zCfg *zrokEdgeSdk.Config
+	zCfg *automation.Config
 }
 
-func newLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *limitAction {
+func newLimitAction(str *store.Store, zCfg *automation.Config) *limitAction {
 	return &limitAction{str, zCfg}
 }
 
@@ -24,7 +26,7 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
 	}
 
-	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	ziti, err := automation.NewZitiAutomation(a.zCfg)
 	if err != nil {
 		return err
 	}
@@ -38,7 +40,9 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 
 		for _, shr := range shrs {
 			if _, ignore := ignoreBackends[sdk.BackendMode(shr.BackendMode)]; !ignore {
-				if err := zrokEdgeSdk.DeleteServicePoliciesDialForShare(env.ZId, shr.Token, edge); err != nil {
+				// delete dial polcies for share
+				filter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=1", shr.Token)
+				if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
 					return errors.Wrapf(err, "error deleting dial service policy for '%v'", shr.Token)
 				}
 				logrus.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)
