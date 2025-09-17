@@ -2,11 +2,12 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/sirupsen/logrus"
@@ -24,23 +25,22 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		return admin.NewCreateFrontendUnauthorized()
 	}
 
-	client, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
 	zId := params.Body.ZID
-	detail, err := zrokEdgeSdk.GetIdentityByZId(zId, client)
+	identity, err := ziti.Identities.GetByID(zId)
 	if err != nil {
 		logrus.Errorf("error getting identity details for '%v': %v", zId, err)
+		if ziti.IsNotFound(err) {
+			return admin.NewCreateFrontendNotFound()
+		}
 		return admin.NewCreateFrontendInternalServerError()
 	}
-	if len(detail.Payload.Data) != 1 {
-		logrus.Errorf("expected a single identity to be returned for '%v'", zId)
-		return admin.NewCreateFrontendNotFound()
-	}
-	logrus.Infof("found frontend identity '%v'", *detail.Payload.Data[0].Name)
+	logrus.Infof("found frontend identity '%v'", *identity.Name)
 
 	tx, err := str.Begin()
 	if err != nil {
