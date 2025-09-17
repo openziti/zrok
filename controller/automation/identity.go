@@ -13,9 +13,9 @@ type IdentityManager struct {
 	*BaseResourceManager[rest_model.IdentityDetail]
 }
 
-func NewIdentityManager(client *Client) *IdentityManager {
+func NewIdentityManager(ziti *ZitiAutomation) *IdentityManager {
 	return &IdentityManager{
-		BaseResourceManager: NewBaseResourceManager[rest_model.IdentityDetail](client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.IdentityDetail](ziti),
 	}
 }
 

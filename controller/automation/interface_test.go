@@ -22,7 +22,7 @@ func TestUnifiedInterface(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	
+
 	if identity == nil {
 		t.Fatal("expected identity to be returned")
 	}
@@ -32,7 +32,7 @@ func TestUnifiedInterface(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for non-existent ID")
 	}
-	
+
 	if automationErr, ok := err.(*AutomationError); ok {
 		if !automationErr.IsNotFound() {
 			t.Fatal("expected not found error")
@@ -42,23 +42,23 @@ func TestUnifiedInterface(t *testing.T) {
 
 // test that all managers implement the interface
 func TestManagerInterfaces(t *testing.T) {
-	client := &Client{} // mock client for testing
+	ziti := &ZitiAutomation{} // mock client for testing
 
 	// verify all managers implement their interfaces
-	var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = NewIdentityManager(client)
-	var _ IResourceManager[rest_model.ServiceDetail, *ServiceOptions] = NewServiceManager(client)
-	var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = NewConfigManager(client)
-	var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = NewConfigTypeManager(client)
+	var _ IResourceManager[rest_model.IdentityDetail, *IdentityOptions] = NewIdentityManager(ziti)
+	var _ IResourceManager[rest_model.ServiceDetail, *ServiceOptions] = NewServiceManager(ziti)
+	var _ IResourceManager[rest_model.ConfigDetail, *ConfigOptions] = NewConfigManager(ziti)
+	var _ IResourceManager[rest_model.ConfigTypeDetail, *ConfigTypeOptions] = NewConfigTypeManager(ziti)
 }
 
 // test error types
 func TestErrorTypes(t *testing.T) {
 	err := NewNotFoundError("identity", "GetByID", nil)
-	
+
 	if !err.IsNotFound() {
 		t.Fatal("expected IsNotFound to return true")
 	}
-	
+
 	if err.IsRetryable() {
 		t.Fatal("expected IsRetryable to return false for not found error")
 	}

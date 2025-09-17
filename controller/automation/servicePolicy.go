@@ -11,9 +11,9 @@ type ServicePolicyManager struct {
 	*BaseResourceManager[rest_model.ServicePolicyDetail]
 }
 
-func NewServicePolicyManager(client *Client) *ServicePolicyManager {
+func NewServicePolicyManager(ziti *ZitiAutomation) *ServicePolicyManager {
 	return &ServicePolicyManager{
-		BaseResourceManager: NewBaseResourceManager[rest_model.ServicePolicyDetail](client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ServicePolicyDetail](ziti),
 	}
 }
 

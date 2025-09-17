@@ -11,9 +11,9 @@ type ConfigManager struct {
 	*BaseResourceManager[rest_model.ConfigDetail]
 }
 
-func NewConfigManager(client *Client) *ConfigManager {
+func NewConfigManager(ziti *ZitiAutomation) *ConfigManager {
 	return &ConfigManager{
-		BaseResourceManager: NewBaseResourceManager[rest_model.ConfigDetail](client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ConfigDetail](ziti),
 	}
 }
 

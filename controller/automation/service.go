@@ -11,9 +11,9 @@ type ServiceManager struct {
 	*BaseResourceManager[rest_model.ServiceDetail]
 }
 
-func NewServiceManager(client *Client) *ServiceManager {
+func NewServiceManager(ziti *ZitiAutomation) *ServiceManager {
 	return &ServiceManager{
-		BaseResourceManager: NewBaseResourceManager[rest_model.ServiceDetail](client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ServiceDetail](ziti),
 	}
 }
 

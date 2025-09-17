@@ -78,11 +78,11 @@ func (bo *BaseOptions) GetTags() *rest_model.Tags {
 }
 
 type BaseResourceManager[T any] struct {
-	client *Client
+	client *ZitiAutomation
 }
 
-func NewBaseResourceManager[T any](client *Client) *BaseResourceManager[T] {
-	return &BaseResourceManager[T]{client: client}
+func NewBaseResourceManager[T any](ziti *ZitiAutomation) *BaseResourceManager[T] {
+	return &BaseResourceManager[T]{client: ziti}
 }
 
 func (brm *BaseResourceManager[T]) Edge() *rest_management_api_client.ZitiEdgeManagement {

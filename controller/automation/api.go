@@ -1,15 +1,23 @@
 package automation
 
 import (
+	"crypto/x509"
 	"fmt"
-	"sync"
 	"time"
 
+	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_util"
 	"github.com/pkg/errors"
 )
 
+type Config struct {
+	ApiEndpoint string
+	Username    string
+	Password    string `dd:"+secret"`
+}
+
 type ZitiAutomation struct {
-	client                    *Client
+	edge                      *rest_management_api_client.ZitiEdgeManagement
 	Identities                *IdentityManager
 	Services                  *ServiceManager
 	Configs                   *ConfigManager
@@ -20,20 +28,31 @@ type ZitiAutomation struct {
 }
 
 func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
-	client, err := NewClient(cfg)
+	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.ApiEndpoint)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create client")
+		return nil, err
 	}
-	return &ZitiAutomation{
-		client:                    client,
-		Identities:                client.Identity,
-		Services:                  client.Service,
-		Configs:                   client.Config,
-		ConfigTypes:               client.ConfigType,
-		EdgeRouterPolicies:        client.EdgeRouterPolicies,
-		ServiceEdgeRouterPolicies: client.ServiceEdgeRouterPolicies,
-		ServicePolicies:           client.ServicePolicies,
-	}, nil
+	caPool := x509.NewCertPool()
+	for _, ca := range caCerts {
+		caPool.AddCert(ca)
+	}
+	edge, err := rest_util.NewEdgeManagementClientWithUpdb(cfg.Username, cfg.Password, cfg.ApiEndpoint, caPool)
+	if err != nil {
+		return nil, err
+	}
+	ziti := &ZitiAutomation{edge: edge}
+	ziti.Identities = NewIdentityManager(ziti)
+	ziti.Services = NewServiceManager(ziti)
+	ziti.Configs = NewConfigManager(ziti)
+	ziti.ConfigTypes = NewConfigTypeManager(ziti)
+	ziti.EdgeRouterPolicies = NewEdgeRouterPolicyManager(ziti)
+	ziti.ServiceEdgeRouterPolicies = NewServiceEdgeRouterPolicyManager(ziti)
+	ziti.ServicePolicies = NewServicePolicyManager(ziti)
+	return ziti, nil
+}
+
+func (za *ZitiAutomation) Edge() *rest_management_api_client.ZitiEdgeManagement {
+	return za.edge
 }
 
 // error helper methods to simplify error handling
@@ -103,10 +122,4 @@ const (
 
 	// DefaultOperationTimeout is the default timeout for CRUD operations
 	DefaultOperationTimeout = 30 * time.Second
-)
-
-var (
-	automationClientOnce sync.Once
-	automationClient     *ZitiAutomation
-	automationClientErr  error
 )

@@ -11,9 +11,9 @@ type ServiceEdgeRouterPolicyManager struct {
 	*BaseResourceManager[rest_model.ServiceEdgeRouterPolicyDetail]
 }
 
-func NewServiceEdgeRouterPolicyManager(client *Client) *ServiceEdgeRouterPolicyManager {
+func NewServiceEdgeRouterPolicyManager(ziti *ZitiAutomation) *ServiceEdgeRouterPolicyManager {
 	return &ServiceEdgeRouterPolicyManager{
-		BaseResourceManager: NewBaseResourceManager[rest_model.ServiceEdgeRouterPolicyDetail](client),
+		BaseResourceManager: NewBaseResourceManager[rest_model.ServiceEdgeRouterPolicyDetail](ziti),
 	}
 }
 
