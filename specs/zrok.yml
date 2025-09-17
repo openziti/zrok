@@ -1127,7 +1127,7 @@ paths:
                 type: string
               shareMode:
                 type: string
-                enum: ["public", "private", "reserved"]
+                enum: ["public", "private"]
               token:
                 type: string
               target:
@@ -1136,10 +1136,10 @@ paths:
                 type: array
                 items:
                   type: string
-              frontendSelection:
+              namespaceSelections:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/definitions/namespaceSelection"
               backendMode:
                 type: string
                 enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
@@ -1147,11 +1147,11 @@ paths:
                 type: boolean
               oauthProvider:
                 type: string
-              oauthEmailAddressPatterns:
+              oauthEmailDomains:
                 type: array
                 items:
                   type: string
-              oauthCheckInterval:
+              oauthRefreshInterval:
                 type: string
               open:
                 type: boolean

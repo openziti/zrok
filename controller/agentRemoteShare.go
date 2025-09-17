@@ -62,14 +62,6 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 			return agent.NewRemoteShareBadGateway()
 		}
 		out.Token = token
-
-	case "reserved":
-		token, err := h.reservedShare(params, agentClient)
-		if err != nil {
-			logrus.Errorf("error creating reserved remote agent share for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
-			return agent.NewRemoteShareBadGateway()
-		}
-		out.Token = token
 	}
 
 	return agent.NewRemoteShareOK().WithPayload(out)
@@ -77,16 +69,21 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 
 func (h *agentRemoteShareHandler) publicShare(params agent.RemoteShareParams, client agentGrpc.AgentClient) (token string, frontendEndpoints []string, err error) {
 	req := &agentGrpc.SharePublicRequest{
-		Target:                    params.Body.Target,
-		BasicAuth:                 params.Body.BasicAuth,
-		FrontendSelection:         params.Body.FrontendSelection,
-		BackendMode:               params.Body.BackendMode,
-		Insecure:                  params.Body.Insecure,
-		OauthProvider:             params.Body.OauthProvider,
-		OauthEmailAddressPatterns: params.Body.OauthEmailAddressPatterns,
-		OauthCheckInterval:        params.Body.OauthCheckInterval,
-		Closed:                    !params.Body.Open,
-		AccessGrants:              params.Body.AccessGrants,
+		Target:               params.Body.Target,
+		BasicAuth:            params.Body.BasicAuth,
+		BackendMode:          params.Body.BackendMode,
+		Insecure:             params.Body.Insecure,
+		OauthProvider:        params.Body.OauthProvider,
+		OauthEmailDomains:    params.Body.OauthEmailDomains,
+		OauthRefreshInterval: params.Body.OauthRefreshInterval,
+		Closed:               !params.Body.Open,
+		AccessGrants:         params.Body.AccessGrants,
+	}
+	for _, nss := range params.Body.NamespaceSelections {
+		req.NamespaceSelections = append(req.NamespaceSelections, &agentGrpc.NamespaceSelection{
+			NamespaceToken: nss.NamespaceToken,
+			Name:           nss.Name,
+		})
 	}
 	resp, err := client.SharePublic(context.Background(), req)
 	if err != nil {
@@ -105,19 +102,6 @@ func (h *agentRemoteShareHandler) privateShare(params agent.RemoteShareParams, c
 		AccessGrants: params.Body.AccessGrants,
 	}
 	resp, err := client.SharePrivate(context.Background(), req)
-	if err != nil {
-		return "", err
-	}
-	return resp.Token, nil
-}
-
-func (h *agentRemoteShareHandler) reservedShare(params agent.RemoteShareParams, client agentGrpc.AgentClient) (token string, err error) {
-	req := &agentGrpc.ShareReservedRequest{
-		Token:            params.Body.Token,
-		OverrideEndpoint: params.Body.Target,
-		Insecure:         params.Body.Insecure,
-	}
-	resp, err := client.ShareReserved(context.Background(), req)
 	if err != nil {
 		return "", err
 	}

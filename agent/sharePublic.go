@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, frontendEndpoint []string, err error) {
@@ -47,10 +48,14 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 	}
 	shr.basicAuth = req.BasicAuth
 
-	for _, frontendSelection := range req.FrontendSelection {
-		shrCmd = append(shrCmd, "--frontend", frontendSelection)
+	for _, nss := range req.NamespaceSelections {
+		nssStr := nss.NamespaceToken
+		if nss.Name != "" {
+			nssStr += ":" + nss.Name
+		}
+		shrCmd = append(shrCmd, "--namespace-selection", nssStr)
 	}
-	shr.frontendSelection = req.FrontendSelection
+	shr.namespaceSelections = req.NamespaceSelections
 
 	if req.Insecure {
 		shrCmd = append(shrCmd, "--insecure")
@@ -62,13 +67,13 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 	}
 	shr.oauthProvider = req.OauthProvider
 
-	for _, pattern := range req.OauthEmailAddressPatterns {
-		shrCmd = append(shrCmd, "--oauth-email-address-patterns", pattern)
+	for _, pattern := range req.OauthEmailDomains {
+		shrCmd = append(shrCmd, "--oauth-email-domain", pattern)
 	}
-	shr.oauthEmailAddressPatterns = req.OauthEmailAddressPatterns
+	shr.oauthEmailAddressPatterns = req.OauthEmailDomains
 
-	if req.OauthCheckInterval != "" {
-		shrCmd = append(shrCmd, "--oauth-check-interval", req.OauthCheckInterval)
+	if req.OauthRefreshInterval != "" {
+		shrCmd = append(shrCmd, "--oauth-refresh-interval", req.OauthRefreshInterval)
 	}
 
 	if !req.Closed {
@@ -107,18 +112,21 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 }
 
 func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
-	if shareToken, frontendEndpoints, err := i.agent.SharePublic(&SharePublicRequest{
-		Target:                    req.Target,
-		BasicAuth:                 req.BasicAuth,
-		FrontendSelection:         req.FrontendSelection,
-		BackendMode:               req.BackendMode,
-		Insecure:                  req.Insecure,
-		OauthProvider:             req.OauthProvider,
-		OauthEmailAddressPatterns: req.OauthEmailAddressPatterns,
-		OauthCheckInterval:        req.OauthCheckInterval,
-		Closed:                    req.Closed,
-		AccessGrants:              req.AccessGrants,
-	}); err == nil {
+	out := &SharePublicRequest{
+		Target:               req.Target,
+		BasicAuth:            req.BasicAuth,
+		BackendMode:          req.BackendMode,
+		Insecure:             req.Insecure,
+		OauthProvider:        req.OauthProvider,
+		OauthEmailDomains:    req.OauthEmailDomains,
+		OauthRefreshInterval: req.OauthRefreshInterval,
+		Closed:               req.Closed,
+		AccessGrants:         req.AccessGrants,
+	}
+	for _, nssIn := range req.NamespaceSelections {
+		out.NamespaceSelections = append(out.NamespaceSelections, NamespaceSelection{NamespaceToken: nssIn.NamespaceToken, Name: nssIn.Name})
+	}
+	if shareToken, frontendEndpoints, err := i.agent.SharePublic(out); err == nil {
 		return &agentGrpc.SharePublicResponse{Token: shareToken, FrontendEndpoints: frontendEndpoints}, nil
 	} else {
 		return nil, err

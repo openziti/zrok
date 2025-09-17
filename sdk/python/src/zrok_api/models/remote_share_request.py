@@ -19,6 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
+from zrok_api.models.namespace_selection import NamespaceSelection
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -31,15 +32,15 @@ class RemoteShareRequest(BaseModel):
     token: Optional[StrictStr] = None
     target: Optional[StrictStr] = None
     basic_auth: Optional[List[StrictStr]] = Field(default=None, alias="basicAuth")
-    frontend_selection: Optional[List[StrictStr]] = Field(default=None, alias="frontendSelection")
+    namespace_selections: Optional[List[NamespaceSelection]] = Field(default=None, alias="namespaceSelections")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
     insecure: Optional[StrictBool] = None
     oauth_provider: Optional[StrictStr] = Field(default=None, alias="oauthProvider")
-    oauth_email_address_patterns: Optional[List[StrictStr]] = Field(default=None, alias="oauthEmailAddressPatterns")
-    oauth_check_interval: Optional[StrictStr] = Field(default=None, alias="oauthCheckInterval")
+    oauth_email_domains: Optional[List[StrictStr]] = Field(default=None, alias="oauthEmailDomains")
+    oauth_refresh_interval: Optional[StrictStr] = Field(default=None, alias="oauthRefreshInterval")
     open: Optional[StrictBool] = None
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
-    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "token", "target", "basicAuth", "frontendSelection", "backendMode", "insecure", "oauthProvider", "oauthEmailAddressPatterns", "oauthCheckInterval", "open", "accessGrants"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "token", "target", "basicAuth", "namespaceSelections", "backendMode", "insecure", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "open", "accessGrants"]
 
     @field_validator('share_mode')
     def share_mode_validate_enum(cls, value):
@@ -47,8 +48,8 @@ class RemoteShareRequest(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['public', 'private', 'reserved']):
-            raise ValueError("must be one of enum values ('public', 'private', 'reserved')")
+        if value not in set(['public', 'private']):
+            raise ValueError("must be one of enum values ('public', 'private')")
         return value
 
     @field_validator('backend_mode')
@@ -100,6 +101,13 @@ class RemoteShareRequest(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in namespace_selections (list)
+        _items = []
+        if self.namespace_selections:
+            for _item_namespace_selections in self.namespace_selections:
+                if _item_namespace_selections:
+                    _items.append(_item_namespace_selections.to_dict())
+            _dict['namespaceSelections'] = _items
         return _dict
 
     @classmethod
@@ -117,12 +125,12 @@ class RemoteShareRequest(BaseModel):
             "token": obj.get("token"),
             "target": obj.get("target"),
             "basicAuth": obj.get("basicAuth"),
-            "frontendSelection": obj.get("frontendSelection"),
+            "namespaceSelections": [NamespaceSelection.from_dict(_item) for _item in obj["namespaceSelections"]] if obj.get("namespaceSelections") is not None else None,
             "backendMode": obj.get("backendMode"),
             "insecure": obj.get("insecure"),
             "oauthProvider": obj.get("oauthProvider"),
-            "oauthEmailAddressPatterns": obj.get("oauthEmailAddressPatterns"),
-            "oauthCheckInterval": obj.get("oauthCheckInterval"),
+            "oauthEmailDomains": obj.get("oauthEmailDomains"),
+            "oauthRefreshInterval": obj.get("oauthRefreshInterval"),
             "open": obj.get("open"),
             "accessGrants": obj.get("accessGrants")
         })

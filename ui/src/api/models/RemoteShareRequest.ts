@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { NamespaceSelection } from './NamespaceSelection';
+import {
+    NamespaceSelectionFromJSON,
+    NamespaceSelectionFromJSONTyped,
+    NamespaceSelectionToJSON,
+    NamespaceSelectionToJSONTyped,
+} from './NamespaceSelection';
+
 /**
  * 
  * @export
@@ -51,10 +59,10 @@ export interface RemoteShareRequest {
     basicAuth?: Array<string>;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<NamespaceSelection>}
      * @memberof RemoteShareRequest
      */
-    frontendSelection?: Array<string>;
+    namespaceSelections?: Array<NamespaceSelection>;
     /**
      * 
      * @type {string}
@@ -78,13 +86,13 @@ export interface RemoteShareRequest {
      * @type {Array<string>}
      * @memberof RemoteShareRequest
      */
-    oauthEmailAddressPatterns?: Array<string>;
+    oauthEmailDomains?: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof RemoteShareRequest
      */
-    oauthCheckInterval?: string;
+    oauthRefreshInterval?: string;
     /**
      * 
      * @type {boolean}
@@ -105,8 +113,7 @@ export interface RemoteShareRequest {
  */
 export const RemoteShareRequestShareModeEnum = {
     Public: 'public',
-    Private: 'private',
-    Reserved: 'reserved'
+    Private: 'private'
 } as const;
 export type RemoteShareRequestShareModeEnum = typeof RemoteShareRequestShareModeEnum[keyof typeof RemoteShareRequestShareModeEnum];
 
@@ -148,12 +155,12 @@ export function RemoteShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
         'token': json['token'] == null ? undefined : json['token'],
         'target': json['target'] == null ? undefined : json['target'],
         'basicAuth': json['basicAuth'] == null ? undefined : json['basicAuth'],
-        'frontendSelection': json['frontendSelection'] == null ? undefined : json['frontendSelection'],
+        'namespaceSelections': json['namespaceSelections'] == null ? undefined : ((json['namespaceSelections'] as Array<any>).map(NamespaceSelectionFromJSON)),
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'insecure': json['insecure'] == null ? undefined : json['insecure'],
         'oauthProvider': json['oauthProvider'] == null ? undefined : json['oauthProvider'],
-        'oauthEmailAddressPatterns': json['oauthEmailAddressPatterns'] == null ? undefined : json['oauthEmailAddressPatterns'],
-        'oauthCheckInterval': json['oauthCheckInterval'] == null ? undefined : json['oauthCheckInterval'],
+        'oauthEmailDomains': json['oauthEmailDomains'] == null ? undefined : json['oauthEmailDomains'],
+        'oauthRefreshInterval': json['oauthRefreshInterval'] == null ? undefined : json['oauthRefreshInterval'],
         'open': json['open'] == null ? undefined : json['open'],
         'accessGrants': json['accessGrants'] == null ? undefined : json['accessGrants'],
     };
@@ -175,12 +182,12 @@ export function RemoteShareRequestToJSONTyped(value?: RemoteShareRequest | null,
         'token': value['token'],
         'target': value['target'],
         'basicAuth': value['basicAuth'],
-        'frontendSelection': value['frontendSelection'],
+        'namespaceSelections': value['namespaceSelections'] == null ? undefined : ((value['namespaceSelections'] as Array<any>).map(NamespaceSelectionToJSON)),
         'backendMode': value['backendMode'],
         'insecure': value['insecure'],
         'oauthProvider': value['oauthProvider'],
-        'oauthEmailAddressPatterns': value['oauthEmailAddressPatterns'],
-        'oauthCheckInterval': value['oauthCheckInterval'],
+        'oauthEmailDomains': value['oauthEmailDomains'],
+        'oauthRefreshInterval': value['oauthRefreshInterval'],
         'open': value['open'],
         'accessGrants': value['accessGrants'],
     };

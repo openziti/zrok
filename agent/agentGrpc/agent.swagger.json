@@ -297,16 +297,6 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "frontendSelection",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
             "name": "backendMode",
             "in": "query",
             "required": false,
@@ -325,7 +315,7 @@
             "type": "string"
           },
           {
-            "name": "oauthEmailAddressPatterns",
+            "name": "oauthEmailDomains",
             "in": "query",
             "required": false,
             "type": "array",
@@ -335,7 +325,7 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "oauthCheckInterval",
+            "name": "oauthRefreshInterval",
             "in": "query",
             "required": false,
             "type": "string"
@@ -436,6 +426,17 @@
         }
       }
     },
+    "NamespaceSelection": {
+      "type": "object",
+      "properties": {
+        "namespaceToken": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "ReleaseAccessResponse": {
       "type": "object"
     },
@@ -504,29 +505,6 @@
           "items": {
             "type": "string"
           }
-        }
-      }
-    },
-    "ShareReservedResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "backendMode": {
-          "type": "string"
-        },
-        "shareMode": {
-          "type": "string"
-        },
-        "frontendEndpoints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "target": {
-          "type": "string"
         }
       }
     },

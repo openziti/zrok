@@ -77,12 +77,11 @@ export interface AgentSharePrivateRequest {
 export interface AgentSharePublicRequest {
     target?: string;
     basicAuth?: Array<string>;
-    frontendSelection?: Array<string>;
     backendMode?: string;
     insecure?: boolean;
     oauthProvider?: string;
-    oauthEmailAddressPatterns?: Array<string>;
-    oauthCheckInterval?: string;
+    oauthEmailDomains?: Array<string>;
+    oauthRefreshInterval?: string;
     closed?: boolean;
     accessGrants?: Array<string>;
 }
@@ -316,10 +315,6 @@ export class AgentApi extends runtime.BaseAPI {
             queryParameters['basicAuth'] = requestParameters['basicAuth'];
         }
 
-        if (requestParameters['frontendSelection'] != null) {
-            queryParameters['frontendSelection'] = requestParameters['frontendSelection'];
-        }
-
         if (requestParameters['backendMode'] != null) {
             queryParameters['backendMode'] = requestParameters['backendMode'];
         }
@@ -332,12 +327,12 @@ export class AgentApi extends runtime.BaseAPI {
             queryParameters['oauthProvider'] = requestParameters['oauthProvider'];
         }
 
-        if (requestParameters['oauthEmailAddressPatterns'] != null) {
-            queryParameters['oauthEmailAddressPatterns'] = requestParameters['oauthEmailAddressPatterns'];
+        if (requestParameters['oauthEmailDomains'] != null) {
+            queryParameters['oauthEmailDomains'] = requestParameters['oauthEmailDomains'];
         }
 
-        if (requestParameters['oauthCheckInterval'] != null) {
-            queryParameters['oauthCheckInterval'] = requestParameters['oauthCheckInterval'];
+        if (requestParameters['oauthRefreshInterval'] != null) {
+            queryParameters['oauthRefreshInterval'] = requestParameters['oauthRefreshInterval'];
         }
 
         if (requestParameters['closed'] != null) {

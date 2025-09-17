@@ -2,11 +2,12 @@ package agent
 
 import (
 	"errors"
+	"time"
+
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"time"
 )
 
 type SharePrivateRequest struct {
@@ -17,31 +18,22 @@ type SharePrivateRequest struct {
 	AccessGrants []string `json:"access_grants"`
 }
 
+type NamespaceSelection struct {
+	NamespaceToken string `json:"namespace_token"`
+	Name           string `json:"name"`
+}
+
 type SharePublicRequest struct {
-	Target                    string   `json:"target"`
-	BasicAuth                 []string `json:"basic_auth"`
-	FrontendSelection         []string `json:"frontend_selection"`
-	BackendMode               string   `json:"backend_mode"`
-	Insecure                  bool     `json:"insecure"`
-	OauthProvider             string   `json:"oauth_provider"`
-	OauthEmailAddressPatterns []string `json:"oauth_email_address_patterns"`
-	OauthCheckInterval        string   `json:"oauth_check_interval"`
-	Closed                    bool     `json:"closed"`
-	AccessGrants              []string `json:"access_grants"`
-}
-
-type ShareReservedRequest struct {
-	Token            string `json:"token"`
-	OverrideEndpoint string `json:"override_endpoint"`
-	Insecure         bool   `json:"insecure"`
-}
-
-type ShareReservedResponse struct {
-	Token             string
-	BackendMode       string
-	ShareMode         string
-	FrontendEndpoints []string
-	Target            string
+	Target               string               `json:"target"`
+	BasicAuth            []string             `json:"basic_auth"`
+	NamespaceSelections  []NamespaceSelection `json:"namespace_selections"`
+	BackendMode          string               `json:"backend_mode"`
+	Insecure             bool                 `json:"insecure"`
+	OauthProvider        string               `json:"oauth_provider"`
+	OauthEmailDomains    []string             `json:"oauth_email_domains"`
+	OauthRefreshInterval string               `json:"oauth_refresh_interval"`
+	Closed               bool                 `json:"closed"`
+	AccessGrants         []string             `json:"access_grants"`
 }
 
 type share struct {
@@ -49,7 +41,7 @@ type share struct {
 	frontendEndpoints         []string
 	target                    string
 	basicAuth                 []string
-	frontendSelection         []string
+	namespaceSelections       []NamespaceSelection
 	shareMode                 sdk.ShareMode
 	backendMode               sdk.BackendMode
 	reserved                  bool

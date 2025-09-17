@@ -33,20 +33,20 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth                 []string
-	namespaceSelection        []string
-	backendMode               string
-	headless                  bool
-	subordinate               bool
-	forceLocal                bool
-	forceAgent                bool
-	insecure                  bool
-	oauthProvider             string
-	oauthEmailAddressPatterns []string
-	oauthRefreshInterval      time.Duration
-	open                      bool
-	accessGrants              []string
-	cmd                       *cobra.Command
+	basicAuth            []string
+	namespaceSelection   []string
+	backendMode          string
+	headless             bool
+	subordinate          bool
+	forceLocal           bool
+	forceAgent           bool
+	insecure             bool
+	oauthProvider        string
+	oauthEmailDomains    []string
+	oauthRefreshInterval time.Duration
+	open                 bool
+	accessGrants         []string
+	cmd                  *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -78,7 +78,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
-	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-pattern", []string{}, "Allow only email addresses matching this glob to access")
+	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domain", []string{}, "Allow only email addresses matching this glob to access")
 	cmd.Flags().DurationVar(&command.oauthRefreshInterval, "oauth-refresh-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
@@ -170,10 +170,10 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
-		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
+		req.OauthEmailAddressPatterns = cmd.oauthEmailDomains
 		req.OauthRefreshInterval = cmd.oauthRefreshInterval
 
-		for _, g := range cmd.oauthEmailAddressPatterns {
+		for _, g := range cmd.oauthEmailDomains {
 			_, err := glob.Compile(g)
 			if err != nil {
 				cmd.error(fmt.Sprintf("unable to create share, invalid oauth email glob (%v)", g), err)
@@ -417,18 +417,28 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	}
 	defer func() { _ = conn.Close() }()
 
-	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
-		Target:                    target,
-		BasicAuth:                 cmd.basicAuth,
-		FrontendSelection:         cmd.namespaceSelection,
-		BackendMode:               cmd.backendMode,
-		Insecure:                  cmd.insecure,
-		OauthProvider:             cmd.oauthProvider,
-		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
-		OauthCheckInterval:        cmd.oauthRefreshInterval.String(),
-		Closed:                    !cmd.open,
-		AccessGrants:              cmd.accessGrants,
-	})
+	grpcReq := &agentGrpc.SharePublicRequest{
+		Target:               target,
+		BasicAuth:            cmd.basicAuth,
+		BackendMode:          cmd.backendMode,
+		Insecure:             cmd.insecure,
+		OauthProvider:        cmd.oauthProvider,
+		OauthEmailDomains:    cmd.oauthEmailDomains,
+		OauthRefreshInterval: cmd.oauthRefreshInterval.String(),
+		Closed:               !cmd.open,
+		AccessGrants:         cmd.accessGrants,
+	}
+	for _, nssStr := range cmd.namespaceSelection {
+		nss, err := sdk.ParseNamespaceSelection(nssStr)
+		if err != nil {
+			tui.Error(fmt.Sprintf("invalid namespace selection '%v'", nssStr), err)
+		}
+		grpcReq.NamespaceSelections = append(grpcReq.NamespaceSelections, &agentGrpc.NamespaceSelection{
+			NamespaceToken: nss.NamespaceToken,
+			Name:           nss.Name,
+		})
+	}
+	shr, err := client.SharePublic(context.Background(), grpcReq)
 	if err != nil {
 		tui.Error("error creating share", err)
 	}

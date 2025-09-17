@@ -437,25 +437,25 @@ func init() {
                 "envZId": {
                   "type": "string"
                 },
-                "frontendSelection": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
                 "insecure": {
                   "type": "boolean"
                 },
-                "oauthCheckInterval": {
-                  "type": "string"
+                "namespaceSelections": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/namespaceSelection"
+                  }
                 },
-                "oauthEmailAddressPatterns": {
+                "oauthEmailDomains": {
                   "type": "array",
                   "items": {
                     "type": "string"
                   }
                 },
                 "oauthProvider": {
+                  "type": "string"
+                },
+                "oauthRefreshInterval": {
                   "type": "string"
                 },
                 "open": {
@@ -465,8 +465,7 @@ func init() {
                   "type": "string",
                   "enum": [
                     "public",
-                    "private",
-                    "reserved"
+                    "private"
                   ]
                 },
                 "target": {
@@ -4199,25 +4198,25 @@ func init() {
                 "envZId": {
                   "type": "string"
                 },
-                "frontendSelection": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
                 "insecure": {
                   "type": "boolean"
                 },
-                "oauthCheckInterval": {
-                  "type": "string"
+                "namespaceSelections": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/namespaceSelection"
+                  }
                 },
-                "oauthEmailAddressPatterns": {
+                "oauthEmailDomains": {
                   "type": "array",
                   "items": {
                     "type": "string"
                   }
                 },
                 "oauthProvider": {
+                  "type": "string"
+                },
+                "oauthRefreshInterval": {
                   "type": "string"
                 },
                 "open": {
@@ -4227,8 +4226,7 @@ func init() {
                   "type": "string",
                   "enum": [
                     "public",
-                    "private",
-                    "reserved"
+                    "private"
                   ]
                 },
                 "target": {

@@ -25,7 +25,6 @@ service Agent {
 			post: "/v1/agent/httpShareHealthcheck"
 		};
 	}
-	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
 	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {
 		option(google.api.http) = {
 			post: "/v1/agent/sharePrivate"
@@ -67,6 +66,11 @@ message AccessPrivateRequest{
 	uint32 autoStartPort = 5;
 	uint32 autoEndPort = 6;
 	repeated string responseHeaders = 7;
+}
+
+message NamespaceSelection {
+  string namespaceToken = 1;
+  string name = 2;
 }
 
 message ReleaseAccessRequest {
@@ -122,12 +126,12 @@ message SharePrivateResponse {
 message SharePublicRequest {
 	string target = 1;
 	repeated string basicAuth = 2;
-	repeated string frontendSelection = 3;
+	repeated NamespaceSelection namespaceSelections = 3;
 	string backendMode = 4;
 	bool insecure = 5;
 	string oauthProvider = 6;
-	repeated string oauthEmailAddressPatterns = 7;
-	string oauthCheckInterval = 8;
+	repeated string oauthEmailDomains = 7;
+	string oauthRefreshInterval = 8;
 	bool closed = 9;
 	repeated string accessGrants = 10;
 }
@@ -135,20 +139,6 @@ message SharePublicRequest {
 message SharePublicResponse {
 	string token = 1;
 	repeated string frontendEndpoints = 2;
-}
-
-message ShareReservedRequest {
-	string token = 1;
-	string overrideEndpoint = 2;
-	bool insecure = 3;
-}
-
-message ShareReservedResponse {
-	string token = 1;
-	string backendMode = 2;
-	string shareMode = 3;
-	repeated string frontendEndpoints = 4;
-	string target = 5;
 }
 
 message StatusRequest {

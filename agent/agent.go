@@ -117,14 +117,7 @@ func (a *Agent) ReloadRegistry() error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("loaded %d reserved shares, %d accesses", len(registry.ReservedShares), len(registry.PrivateAccesses))
-	for _, req := range registry.ReservedShares {
-		if resp, err := a.ShareReserved(req); err == nil {
-			logrus.Infof("restarted reserved share '%v' -> '%v'", req, resp)
-		} else {
-			logrus.Errorf("error restarting reserved share '%v': %v", req, err)
-		}
-	}
+	logrus.Infof("loaded %d accesses", len(registry.PrivateAccesses))
 	for _, req := range registry.PrivateAccesses {
 		if resp, err := a.AccessPrivate(req); err == nil {
 			logrus.Infof("restarted private access '%v' -> '%v'", req, resp)
@@ -138,15 +131,6 @@ func (a *Agent) ReloadRegistry() error {
 
 func (a *Agent) SaveRegistry() error {
 	r := &Registry{}
-	for _, shr := range a.shares {
-		if shr.request != nil {
-			switch shr.request.(type) {
-			case *ShareReservedRequest:
-				logrus.Infof("persisting reserved share '%v'", shr.token)
-				r.ReservedShares = append(r.ReservedShares, shr.request.(*ShareReservedRequest))
-			}
-		}
-	}
 	for _, acc := range a.accesses {
 		if acc.request != nil {
 			r.PrivateAccesses = append(r.PrivateAccesses, acc.request)

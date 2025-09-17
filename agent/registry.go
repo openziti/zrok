@@ -10,7 +10,6 @@ const RegistryV = "1"
 
 type Registry struct {
 	V               string                  `json:"v"`
-	ReservedShares  []*ShareReservedRequest `json:"reserved_shares"`
 	PrivateAccesses []*AccessPrivateRequest `json:"private_accesses"`
 }
 

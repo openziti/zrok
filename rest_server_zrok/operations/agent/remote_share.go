@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
@@ -94,26 +95,26 @@ type RemoteShareBody struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// frontend selection
-	FrontendSelection []string `json:"frontendSelection"`
-
 	// insecure
 	Insecure bool `json:"insecure,omitempty"`
 
-	// oauth check interval
-	OauthCheckInterval string `json:"oauthCheckInterval,omitempty"`
+	// namespace selections
+	NamespaceSelections []*rest_model_zrok.NamespaceSelection `json:"namespaceSelections"`
 
-	// oauth email address patterns
-	OauthEmailAddressPatterns []string `json:"oauthEmailAddressPatterns"`
+	// oauth email domains
+	OauthEmailDomains []string `json:"oauthEmailDomains"`
 
 	// oauth provider
 	OauthProvider string `json:"oauthProvider,omitempty"`
+
+	// oauth refresh interval
+	OauthRefreshInterval string `json:"oauthRefreshInterval,omitempty"`
 
 	// open
 	Open bool `json:"open,omitempty"`
 
 	// share mode
-	// Enum: [public private reserved]
+	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
@@ -128,6 +129,10 @@ func (o *RemoteShareBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateBackendMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateNamespaceSelections(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -201,11 +206,37 @@ func (o *RemoteShareBody) validateBackendMode(formats strfmt.Registry) error {
 	return nil
 }
 
+func (o *RemoteShareBody) validateNamespaceSelections(formats strfmt.Registry) error {
+	if swag.IsZero(o.NamespaceSelections) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.NamespaceSelections); i++ {
+		if swag.IsZero(o.NamespaceSelections[i]) { // not required
+			continue
+		}
+
+		if o.NamespaceSelections[i] != nil {
+			if err := o.NamespaceSelections[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 var remoteShareBodyTypeShareModePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["public","private","reserved"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["public","private"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -220,9 +251,6 @@ const (
 
 	// RemoteShareBodyShareModePrivate captures enum value "private"
 	RemoteShareBodyShareModePrivate string = "private"
-
-	// RemoteShareBodyShareModeReserved captures enum value "reserved"
-	RemoteShareBodyShareModeReserved string = "reserved"
 )
 
 // prop value enum
@@ -246,8 +274,42 @@ func (o *RemoteShareBody) validateShareMode(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this remote share body based on context it is used
+// ContextValidate validate this remote share body based on the context it is used
 func (o *RemoteShareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateNamespaceSelections(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *RemoteShareBody) contextValidateNamespaceSelections(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.NamespaceSelections); i++ {
+
+		if o.NamespaceSelections[i] != nil {
+
+			if swag.IsZero(o.NamespaceSelections[i]) { // not required
+				return nil
+			}
+
+			if err := o.NamespaceSelections[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

@@ -42,16 +42,18 @@ class TestRemoteShareRequest(unittest.TestCase):
                 basic_auth = [
                     ''
                     ],
-                frontend_selection = [
-                    ''
+                namespace_selections = [
+                    zrok_api.models.namespace_selection.namespaceSelection(
+                        namespace_token = '', 
+                        name = '', )
                     ],
                 backend_mode = 'proxy',
                 insecure = True,
                 oauth_provider = '',
-                oauth_email_address_patterns = [
+                oauth_email_domains = [
                     ''
                     ],
-                oauth_check_interval = '',
+                oauth_refresh_interval = '',
                 open = True,
                 access_grants = [
                     ''
