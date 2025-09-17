@@ -3,10 +3,11 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/sirupsen/logrus"
@@ -26,26 +27,45 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		return admin.NewCreateIdentityUnauthorized()
 	}
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg)
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		logrus.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	idc, err := zrokEdgeSdk.CreateIdentity(name, rest_model_edge.IdentityTypeService, nil, edge)
+	// create identity
+	identityOpts := &automation.IdentityOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: name,
+			Tags: automation.ZrokTags(),
+		},
+		Type:    rest_model_edge.IdentityTypeService,
+		IsAdmin: false,
+	}
+	zId, err := ziti.Identities.Create(identityOpts)
 	if err != nil {
 		logrus.Errorf("error creating identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	zId := idc.Payload.Data.ID
-	idCfg, err := zrokEdgeSdk.EnrollIdentity(zId, edge)
+	// enroll identity
+	idCfg, err := ziti.Identities.Enroll(zId)
 	if err != nil {
 		logrus.Errorf("error enrolling identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.CreateEdgeRouterPolicy(zId, zId, edge); err != nil {
+	// create edge router policy for the identity
+	erpOpts := &automation.EdgeRouterPolicyOptions{
+		BaseOptions: automation.BaseOptions{
+			Name: zId,
+			Tags: automation.ZrokTags(),
+		},
+		IdentityRoles:   []string{fmt.Sprintf("@%v", zId)},
+		EdgeRouterRoles: []string{"#all"},
+		Semantic:        rest_model_edge.SemanticAllOf,
+	}
+	if _, err := ziti.EdgeRouterPolicies.Create(erpOpts); err != nil {
 		logrus.Errorf("error creating edge router policy for identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
@@ -56,7 +76,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	err = enc.Encode(&idCfg)
 	if err != nil {
 		logrus.Errorf("error encoding identity config: %v", err)
-		return admin.NewCreateFrontendInternalServerError()
+		return admin.NewCreateIdentityInternalServerError()
 	}
 
 	return admin.NewCreateIdentityCreated().WithPayload(&admin.CreateIdentityCreatedBody{
