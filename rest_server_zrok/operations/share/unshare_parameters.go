@@ -12,23 +12,21 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
-
-	"github.com/openziti/zrok/rest_model_zrok"
 )
 
-// NewShare12Params creates a new Share12Params object
+// NewUnshareParams creates a new UnshareParams object
 //
 // There are no default values defined in the spec.
-func NewShare12Params() Share12Params {
+func NewUnshareParams() UnshareParams {
 
-	return Share12Params{}
+	return UnshareParams{}
 }
 
-// Share12Params contains all the bound params for the share12 operation
+// UnshareParams contains all the bound params for the unshare operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters share12
-type Share12Params struct {
+// swagger:parameters unshare
+type UnshareParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -36,21 +34,21 @@ type Share12Params struct {
 	/*
 	  In: body
 	*/
-	Body *rest_model_zrok.ShareRequest12
+	Body UnshareBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewShare12Params() beforehand.
-func (o *Share12Params) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewUnshareParams() beforehand.
+func (o *UnshareParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body rest_model_zrok.ShareRequest12
+		var body UnshareBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -65,7 +63,7 @@ func (o *Share12Params) BindRequest(r *http.Request, route *middleware.MatchedRo
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}

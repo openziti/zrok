@@ -12,17 +12,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type unshare12Handler struct{}
+type unshareHandler struct{}
 
-func newUnshare12Handler() *unshare12Handler {
-	return &unshare12Handler{}
+func newUnshareHandler() *unshareHandler {
+	return &unshareHandler{}
 }
 
-func (h *unshare12Handler) Handle(params share.Unshare12Params, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
-		return share.NewUnshare12InternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
@@ -33,14 +33,14 @@ func (h *unshare12Handler) Handle(params share.Unshare12Params, principal *rest_
 	env, err := h.validateEnvironment(envZId, principal, trx)
 	if err != nil {
 		logrus.Errorf("environment validation failed for '%v': %v", principal.Email, err)
-		return share.NewUnshare12NotFound()
+		return share.NewUnshareNotFound()
 	}
 
 	// find and validate share
 	shr, err := h.findAndValidateShare(shrToken, env, trx)
 	if err != nil {
 		logrus.Errorf("share validation failed for '%v': %v", principal.Email, err)
-		return share.NewUnshare12NotFound()
+		return share.NewUnshareNotFound()
 	}
 
 	// deallocate ziti resources using automation framework
@@ -49,39 +49,39 @@ func (h *unshare12Handler) Handle(params share.Unshare12Params, principal *rest_
 	}
 
 	// send unbind mapping updates before cleaning up share name mappings
-	if err := h.processDynamicMappings(shr.Id, shrToken, trx); err != nil {
+	if err := h.processDynamicMappings(shr.Id, trx); err != nil {
 		logrus.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
 	}
 
 	// clean up share name mappings
 	if err := h.cleanupShareNameMappings(shr.Id, trx); err != nil {
 		logrus.Errorf("error cleaning up share name mappings for '%v': %v", shrToken, err)
-		return share.NewUnshare12InternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 
 	// clean up access grants
 	if err := str.DeleteAccessGrantsForShare(shr.Id, trx); err != nil {
 		logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
-		return share.NewUnshare12InternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 
 	// delete the share record
 	if err := str.DeleteShare(shr.Id, trx); err != nil {
 		logrus.Errorf("error deleting share '%v': %v", shrToken, err)
-		return share.NewUnshare12InternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 
 	// commit transaction
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing transaction for '%v': %v", shrToken, err)
-		return share.NewUnshare12InternalServerError()
+		return share.NewUnshareInternalServerError()
 	}
 
 	logrus.Infof("successfully unshared '%v' for '%v'", shrToken, principal.Email)
-	return share.NewUnshare12OK()
+	return share.NewUnshareOK()
 }
 
-func (h *unshare12Handler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (*store.Environment, error) {
+func (h *unshareHandler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (*store.Environment, error) {
 	env, err := str.FindEnvironmentForAccount(envZId, int(principal.ID), trx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error finding environment '%v' for account '%v'", envZId, principal.Email)
@@ -89,7 +89,7 @@ func (h *unshare12Handler) validateEnvironment(envZId string, principal *rest_mo
 	return env, nil
 }
 
-func (h *unshare12Handler) findAndValidateShare(shrToken string, env *store.Environment, trx *sqlx.Tx) (*store.Share, error) {
+func (h *unshareHandler) findAndValidateShare(shrToken string, env *store.Environment, trx *sqlx.Tx) (*store.Share, error) {
 	shares, err := str.FindSharesForEnvironment(env.Id, trx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId)
@@ -104,7 +104,7 @@ func (h *unshare12Handler) findAndValidateShare(shrToken string, env *store.Envi
 	return nil, errors.Errorf("share '%v' not found in environment '%v'", shrToken, env.ZId)
 }
 
-func (h *unshare12Handler) deallocateResources(shrToken string) error {
+func (h *unshareHandler) deallocateResources(shrToken string) error {
 	// get shared automation client
 	za, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -121,7 +121,7 @@ func (h *unshare12Handler) deallocateResources(shrToken string) error {
 	return nil
 }
 
-func (h *unshare12Handler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) error {
+func (h *unshareHandler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) error {
 	// find all share name mappings for this share
 	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
 	if err != nil {
@@ -154,7 +154,7 @@ func (h *unshare12Handler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) e
 	return nil
 }
 
-func (h *unshare12Handler) processDynamicMappings(shareId int, shrToken string, trx *sqlx.Tx) error {
+func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error {
 	// only send updates if dynamic proxy controller is enabled
 	if dPCtrl == nil {
 		return nil

@@ -42,11 +42,11 @@ type ClientService interface {
 
 	ListShareNamespaces(params *ListShareNamespacesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListShareNamespacesOK, error)
 
-	Share12(params *Share12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Share12Created, error)
+	Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error)
 
 	Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnaccessOK, error)
 
-	Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Unshare12OK, error)
+	Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error)
 
 	UpdateAccess(params *UpdateAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateAccessOK, error)
 
@@ -290,22 +290,22 @@ func (a *Client) ListShareNamespaces(params *ListShareNamespacesParams, authInfo
 }
 
 /*
-Share12 share12 API
+Share share API
 */
-func (a *Client) Share12(params *Share12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Share12Created, error) {
+func (a *Client) Share(params *ShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewShare12Params()
+		params = NewShareParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "share12",
+		ID:                 "share",
 		Method:             "POST",
-		PathPattern:        "/share12",
+		PathPattern:        "/share",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &Share12Reader{formats: a.formats},
+		Reader:             &ShareReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -318,13 +318,13 @@ func (a *Client) Share12(params *Share12Params, authInfo runtime.ClientAuthInfoW
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*Share12Created)
+	success, ok := result.(*ShareCreated)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for share12: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for share: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -368,22 +368,22 @@ func (a *Client) Unaccess(params *UnaccessParams, authInfo runtime.ClientAuthInf
 }
 
 /*
-Unshare12 unshare12 API
+Unshare unshare API
 */
-func (a *Client) Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Unshare12OK, error) {
+func (a *Client) Unshare(params *UnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnshareOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewUnshare12Params()
+		params = NewUnshareParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "unshare12",
+		ID:                 "unshare",
 		Method:             "DELETE",
-		PathPattern:        "/unshare12",
+		PathPattern:        "/unshare",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &Unshare12Reader{formats: a.formats},
+		Reader:             &UnshareReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -396,13 +396,13 @@ func (a *Client) Unshare12(params *Unshare12Params, authInfo runtime.ClientAuthI
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*Unshare12OK)
+	success, ok := result.(*UnshareOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for unshare12: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for unshare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -456,7 +456,7 @@ func (a *Client) UpdateShare(params *UpdateShareParams, authInfo runtime.ClientA
 	op := &runtime.ClientOperation{
 		ID:                 "updateShare",
 		Method:             "PATCH",
-		PathPattern:        "/share12",
+		PathPattern:        "/share",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},

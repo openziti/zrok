@@ -60,18 +60,18 @@
       500:
         description: internal server error
 
-/share12:
+/share:
   post:
     tags:
       - share
     security:
       - key: [ ]
-    operationId: share12
+    operationId: share
     parameters:
       - name: body
         in: body
         schema:
-          $ref: "#/definitions/shareRequest12"
+          $ref: "#/definitions/shareRequest"
     responses:
       201:
         description: share created
@@ -275,13 +275,13 @@
       500:
         description: internal server error
 
-/unshare12:
+/unshare:
   delete:
     tags:
       - share
     security:
       - key: [ ]
-    operationId: unshare12
+    operationId: unshare
     parameters:
       - name: body
         in: body

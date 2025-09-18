@@ -35,7 +35,7 @@ func NewUpdateShare(ctx *middleware.Context, handler UpdateShareHandler) *Update
 }
 
 /*
-	UpdateShare swagger:route PATCH /share12 share updateShare
+	UpdateShare swagger:route PATCH /share share updateShare
 
 UpdateShare update share API
 */

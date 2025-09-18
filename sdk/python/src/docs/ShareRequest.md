@@ -1,4 +1,4 @@
-# ShareRequest12
+# ShareRequest
 
 
 ## Properties
@@ -21,19 +21,19 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from zrok_api.models.share_request12 import ShareRequest12
+from zrok_api.models.share_request import ShareRequest
 
 # TODO update the JSON string below
 json = "{}"
-# create an instance of ShareRequest12 from a JSON string
-share_request12_instance = ShareRequest12.from_json(json)
+# create an instance of ShareRequest from a JSON string
+share_request_instance = ShareRequest.from_json(json)
 # print the JSON string representation of the object
-print(ShareRequest12.to_json())
+print(ShareRequest.to_json())
 
 # convert the object into a dict
-share_request12_dict = share_request12_instance.to_dict()
-# create an instance of ShareRequest12 from a dict
-share_request12_from_dict = ShareRequest12.from_dict(share_request12_dict)
+share_request_dict = share_request_instance.to_dict()
+# create an instance of ShareRequest from a dict
+share_request_from_dict = ShareRequest.from_dict(share_request_dict)
 ```
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

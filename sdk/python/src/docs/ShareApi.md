@@ -10,11 +10,11 @@ Method | HTTP request | Description
 [**list_all_names**](ShareApi.md#list_all_names) | **GET** /share/names | 
 [**list_names_for_namespace**](ShareApi.md#list_names_for_namespace) | **GET** /share/names/{namespaceToken} | 
 [**list_share_namespaces**](ShareApi.md#list_share_namespaces) | **GET** /share/namespaces | 
-[**share12**](ShareApi.md#share12) | **POST** /share12 | 
+[**share**](ShareApi.md#share) | **POST** /share | 
 [**unaccess**](ShareApi.md#unaccess) | **DELETE** /unaccess | 
-[**unshare12**](ShareApi.md#unshare12) | **DELETE** /unshare12 | 
+[**unshare**](ShareApi.md#unshare) | **DELETE** /unshare | 
 [**update_access**](ShareApi.md#update_access) | **PATCH** /access | 
-[**update_share**](ShareApi.md#update_share) | **PATCH** /share12 | 
+[**update_share**](ShareApi.md#update_share) | **PATCH** /share | 
 
 
 # **access**
@@ -467,8 +467,8 @@ This endpoint does not need any parameter.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **share12**
-> ShareResponse share12(body=body)
+# **share**
+> ShareResponse share(body=body)
 
 ### Example
 
@@ -476,7 +476,7 @@ This endpoint does not need any parameter.
 
 ```python
 import zrok_api
-from zrok_api.models.share_request12 import ShareRequest12
+from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.rest import ApiException
 from pprint import pprint
@@ -502,14 +502,14 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.ShareApi(api_client)
-    body = zrok_api.ShareRequest12() # ShareRequest12 |  (optional)
+    body = zrok_api.ShareRequest() # ShareRequest |  (optional)
 
     try:
-        api_response = api_instance.share12(body=body)
-        print("The response of ShareApi->share12:\n")
+        api_response = api_instance.share(body=body)
+        print("The response of ShareApi->share:\n")
         pprint(api_response)
     except Exception as e:
-        print("Exception when calling ShareApi->share12: %s\n" % e)
+        print("Exception when calling ShareApi->share: %s\n" % e)
 ```
 
 
@@ -519,7 +519,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**ShareRequest12**](ShareRequest12.md)|  | [optional] 
+ **body** | [**ShareRequest**](ShareRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -622,8 +622,8 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **unshare12**
-> unshare12(body=body)
+# **unshare**
+> unshare(body=body)
 
 ### Example
 
@@ -631,7 +631,7 @@ void (empty response body)
 
 ```python
 import zrok_api
-from zrok_api.models.unshare12_request import Unshare12Request
+from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
@@ -656,12 +656,12 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.ShareApi(api_client)
-    body = zrok_api.Unshare12Request() # Unshare12Request |  (optional)
+    body = zrok_api.UnshareRequest() # UnshareRequest |  (optional)
 
     try:
-        api_instance.unshare12(body=body)
+        api_instance.unshare(body=body)
     except Exception as e:
-        print("Exception when calling ShareApi->unshare12: %s\n" % e)
+        print("Exception when calling ShareApi->unshare: %s\n" % e)
 ```
 
 
@@ -671,7 +671,7 @@ with zrok_api.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Unshare12Request**](Unshare12Request.md)|  | [optional] 
+ **body** | [**UnshareRequest**](UnshareRequest.md)|  | [optional] 
 
 ### Return type
 

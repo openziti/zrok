@@ -31,79 +31,79 @@ import {
 /**
  * 
  * @export
- * @interface ShareRequest12
+ * @interface ShareRequest
  */
-export interface ShareRequest12 {
+export interface ShareRequest {
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     envZId?: string;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
-    shareMode?: ShareRequest12ShareModeEnum;
+    shareMode?: ShareRequestShareModeEnum;
     /**
      * 
      * @type {Array<NamespaceSelection>}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     namespaceSelections?: Array<NamespaceSelection>;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
-    backendMode?: ShareRequest12BackendModeEnum;
+    backendMode?: ShareRequestBackendModeEnum;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     target?: string;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     authScheme?: string;
     /**
      * 
      * @type {Array<AuthUser>}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     basicAuthUsers?: Array<AuthUser>;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     oauthProvider?: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     oauthEmailDomains?: Array<string>;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     oauthRefreshInterval?: string;
     /**
      * 
      * @type {string}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
-    permissionMode?: ShareRequest12PermissionModeEnum;
+    permissionMode?: ShareRequestPermissionModeEnum;
     /**
      * 
      * @type {Array<string>}
-     * @memberof ShareRequest12
+     * @memberof ShareRequest
      */
     accessGrants?: Array<string>;
 }
@@ -112,16 +112,16 @@ export interface ShareRequest12 {
 /**
  * @export
  */
-export const ShareRequest12ShareModeEnum = {
+export const ShareRequestShareModeEnum = {
     Public: 'public',
     Private: 'private'
 } as const;
-export type ShareRequest12ShareModeEnum = typeof ShareRequest12ShareModeEnum[keyof typeof ShareRequest12ShareModeEnum];
+export type ShareRequestShareModeEnum = typeof ShareRequestShareModeEnum[keyof typeof ShareRequestShareModeEnum];
 
 /**
  * @export
  */
-export const ShareRequest12BackendModeEnum = {
+export const ShareRequestBackendModeEnum = {
     Proxy: 'proxy',
     Web: 'web',
     TcpTunnel: 'tcpTunnel',
@@ -131,30 +131,30 @@ export const ShareRequest12BackendModeEnum = {
     Socks: 'socks',
     Vpn: 'vpn'
 } as const;
-export type ShareRequest12BackendModeEnum = typeof ShareRequest12BackendModeEnum[keyof typeof ShareRequest12BackendModeEnum];
+export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[keyof typeof ShareRequestBackendModeEnum];
 
 /**
  * @export
  */
-export const ShareRequest12PermissionModeEnum = {
+export const ShareRequestPermissionModeEnum = {
     Open: 'open',
     Closed: 'closed'
 } as const;
-export type ShareRequest12PermissionModeEnum = typeof ShareRequest12PermissionModeEnum[keyof typeof ShareRequest12PermissionModeEnum];
+export type ShareRequestPermissionModeEnum = typeof ShareRequestPermissionModeEnum[keyof typeof ShareRequestPermissionModeEnum];
 
 
 /**
- * Check if a given object implements the ShareRequest12 interface.
+ * Check if a given object implements the ShareRequest interface.
  */
-export function instanceOfShareRequest12(value: object): value is ShareRequest12 {
+export function instanceOfShareRequest(value: object): value is ShareRequest {
     return true;
 }
 
-export function ShareRequest12FromJSON(json: any): ShareRequest12 {
-    return ShareRequest12FromJSONTyped(json, false);
+export function ShareRequestFromJSON(json: any): ShareRequest {
+    return ShareRequestFromJSONTyped(json, false);
 }
 
-export function ShareRequest12FromJSONTyped(json: any, ignoreDiscriminator: boolean): ShareRequest12 {
+export function ShareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ShareRequest {
     if (json == null) {
         return json;
     }
@@ -175,11 +175,11 @@ export function ShareRequest12FromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ShareRequest12ToJSON(json: any): ShareRequest12 {
-    return ShareRequest12ToJSONTyped(json, false);
+export function ShareRequestToJSON(json: any): ShareRequest {
+    return ShareRequestToJSONTyped(json, false);
 }
 
-export function ShareRequest12ToJSONTyped(value?: ShareRequest12 | null, ignoreDiscriminator: boolean = false): any {
+export function ShareRequestToJSONTyped(value?: ShareRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

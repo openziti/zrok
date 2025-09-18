@@ -80,11 +80,11 @@ from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.models.share import Share
 from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthcheck200Response
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest
-from zrok_api.models.share_request12 import ShareRequest12
+from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.spark_data_sample import SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest
-from zrok_api.models.unshare12_request import Unshare12Request
+from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest
 from zrok_api.models.update_namespace_request import UpdateNamespaceRequest

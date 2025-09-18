@@ -196,7 +196,7 @@ shares:
   items:
     $ref: "#/definitions/share"
 
-shareRequest12:
+shareRequest:
   type: object
   properties:
     envZId:

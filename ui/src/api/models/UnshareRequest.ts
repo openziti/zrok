@@ -16,35 +16,35 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface Unshare12Request
+ * @interface UnshareRequest
  */
-export interface Unshare12Request {
+export interface UnshareRequest {
     /**
      * 
      * @type {string}
-     * @memberof Unshare12Request
+     * @memberof UnshareRequest
      */
     envZId?: string;
     /**
      * 
      * @type {string}
-     * @memberof Unshare12Request
+     * @memberof UnshareRequest
      */
     shareToken?: string;
 }
 
 /**
- * Check if a given object implements the Unshare12Request interface.
+ * Check if a given object implements the UnshareRequest interface.
  */
-export function instanceOfUnshare12Request(value: object): value is Unshare12Request {
+export function instanceOfUnshareRequest(value: object): value is UnshareRequest {
     return true;
 }
 
-export function Unshare12RequestFromJSON(json: any): Unshare12Request {
-    return Unshare12RequestFromJSONTyped(json, false);
+export function UnshareRequestFromJSON(json: any): UnshareRequest {
+    return UnshareRequestFromJSONTyped(json, false);
 }
 
-export function Unshare12RequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): Unshare12Request {
+export function UnshareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): UnshareRequest {
     if (json == null) {
         return json;
     }
@@ -55,11 +55,11 @@ export function Unshare12RequestFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function Unshare12RequestToJSON(json: any): Unshare12Request {
-    return Unshare12RequestToJSONTyped(json, false);
+export function UnshareRequestToJSON(json: any): UnshareRequest {
+    return UnshareRequestToJSONTyped(json, false);
 }
 
-export function Unshare12RequestToJSONTyped(value?: Unshare12Request | null, ignoreDiscriminator: boolean = false): any {
+export function UnshareRequestToJSONTyped(value?: UnshareRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -34,14 +34,14 @@ func (cmd *unshareCommand) run(_ *cobra.Command, args []string) {
 		dl.Fatal(err)
 	}
 
-	req := share.NewUnshare12Params()
+	req := share.NewUnshareParams()
 	req.Body.EnvZID = env.Environment().ZitiIdentity
 	if cmd.envZId != "" {
 		req.Body.EnvZID = cmd.envZId
 	}
 	req.Body.ShareToken = args[0]
 
-	_, err = zrok.Share.Unshare12(req, auth)
+	_, err = zrok.Share.Unshare(req, auth)
 	if err != nil {
 		dl.Fatal(err)
 	}

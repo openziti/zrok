@@ -2854,6 +2854,110 @@ func init() {
         }
       }
     },
+    "/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "share",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/shareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "share created",
+            "schema": {
+              "$ref": "#/definitions/shareResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "409": {
+            "description": "conflict",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "422": {
+            "description": "unprocessable"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share updated"
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share/name": {
       "post": {
         "security": [
@@ -3053,110 +3157,6 @@ func init() {
         }
       }
     },
-    "/share12": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "share"
-        ],
-        "operationId": "share12",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/shareRequest12"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "share created",
-            "schema": {
-              "$ref": "#/definitions/shareResponse"
-            }
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "409": {
-            "description": "conflict",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          },
-          "422": {
-            "description": "unprocessable"
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      },
-      "patch": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "share"
-        ],
-        "operationId": "updateShare",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "addAccessGrants": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "removeAccessGrants": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "shareToken": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "share updated"
-          },
-          "400": {
-            "description": "bad request"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/sparklines": {
       "post": {
         "security": [
@@ -3262,7 +3262,7 @@ func init() {
         }
       }
     },
-    "/unshare12": {
+    "/unshare": {
       "delete": {
         "security": [
           {
@@ -3272,7 +3272,7 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "unshare12",
+        "operationId": "unshare",
         "parameters": [
           {
             "name": "body",
@@ -3658,7 +3658,7 @@ func init() {
         }
       }
     },
-    "shareRequest12": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "accessGrants": {
@@ -6470,6 +6470,110 @@ func init() {
         }
       }
     },
+    "/share": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "share",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/shareRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "share created",
+            "schema": {
+              "$ref": "#/definitions/shareResponse"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "409": {
+            "description": "conflict",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "422": {
+            "description": "unprocessable"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShare",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "addAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "removeAccessGrants": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "share updated"
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/share/name": {
       "post": {
         "security": [
@@ -6658,110 +6762,6 @@ func init() {
         }
       }
     },
-    "/share12": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "share"
-        ],
-        "operationId": "share12",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/shareRequest12"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "share created",
-            "schema": {
-              "$ref": "#/definitions/shareResponse"
-            }
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "409": {
-            "description": "conflict",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          },
-          "422": {
-            "description": "unprocessable"
-          },
-          "500": {
-            "description": "internal server error",
-            "schema": {
-              "$ref": "#/definitions/errorMessage"
-            }
-          }
-        }
-      },
-      "patch": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "share"
-        ],
-        "operationId": "updateShare",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "addAccessGrants": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "removeAccessGrants": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "shareToken": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "share updated"
-          },
-          "400": {
-            "description": "bad request"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/sparklines": {
       "post": {
         "security": [
@@ -6867,7 +6867,7 @@ func init() {
         }
       }
     },
-    "/unshare12": {
+    "/unshare": {
       "delete": {
         "security": [
           {
@@ -6877,7 +6877,7 @@ func init() {
         "tags": [
           "share"
         ],
-        "operationId": "unshare12",
+        "operationId": "unshare",
         "parameters": [
           {
             "name": "body",
@@ -7442,7 +7442,7 @@ func init() {
         }
       }
     },
-    "shareRequest12": {
+    "shareRequest": {
       "type": "object",
       "properties": {
         "accessGrants": {

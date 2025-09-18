@@ -236,8 +236,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
 		}),
-		ShareShare12Handler: share.Share12HandlerFunc(func(params share.Share12Params, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation share.Share12 has not yet been implemented")
+		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
 		AgentShareHTTPHealthcheckHandler: agent.ShareHTTPHealthcheckHandlerFunc(func(params agent.ShareHTTPHealthcheckParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.ShareHTTPHealthcheck has not yet been implemented")
@@ -248,8 +248,8 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AgentUnenrollHandler: agent.UnenrollHandlerFunc(func(params agent.UnenrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation agent.Unenroll has not yet been implemented")
 		}),
-		ShareUnshare12Handler: share.Unshare12HandlerFunc(func(params share.Unshare12Params, principal *rest_model_zrok.Principal) middleware.Responder {
-			return middleware.NotImplemented("operation share.Unshare12 has not yet been implemented")
+		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
 		}),
 		ShareUpdateAccessHandler: share.UpdateAccessHandlerFunc(func(params share.UpdateAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.UpdateAccess has not yet been implemented")
@@ -446,16 +446,16 @@ type ZrokAPI struct {
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
-	// ShareShare12Handler sets the operation handler for the share12 operation
-	ShareShare12Handler share.Share12Handler
+	// ShareShareHandler sets the operation handler for the share operation
+	ShareShareHandler share.ShareHandler
 	// AgentShareHTTPHealthcheckHandler sets the operation handler for the share Http healthcheck operation
 	AgentShareHTTPHealthcheckHandler agent.ShareHTTPHealthcheckHandler
 	// ShareUnaccessHandler sets the operation handler for the unaccess operation
 	ShareUnaccessHandler share.UnaccessHandler
 	// AgentUnenrollHandler sets the operation handler for the unenroll operation
 	AgentUnenrollHandler agent.UnenrollHandler
-	// ShareUnshare12Handler sets the operation handler for the unshare12 operation
-	ShareUnshare12Handler share.Unshare12Handler
+	// ShareUnshareHandler sets the operation handler for the unshare operation
+	ShareUnshareHandler share.UnshareHandler
 	// ShareUpdateAccessHandler sets the operation handler for the update access operation
 	ShareUpdateAccessHandler share.UpdateAccessHandler
 	// AdminUpdateFrontendHandler sets the operation handler for the update frontend operation
@@ -737,8 +737,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
 	}
-	if o.ShareShare12Handler == nil {
-		unregistered = append(unregistered, "share.Share12Handler")
+	if o.ShareShareHandler == nil {
+		unregistered = append(unregistered, "share.ShareHandler")
 	}
 	if o.AgentShareHTTPHealthcheckHandler == nil {
 		unregistered = append(unregistered, "agent.ShareHTTPHealthcheckHandler")
@@ -749,8 +749,8 @@ func (o *ZrokAPI) Validate() error {
 	if o.AgentUnenrollHandler == nil {
 		unregistered = append(unregistered, "agent.UnenrollHandler")
 	}
-	if o.ShareUnshare12Handler == nil {
-		unregistered = append(unregistered, "share.Unshare12Handler")
+	if o.ShareUnshareHandler == nil {
+		unregistered = append(unregistered, "share.UnshareHandler")
 	}
 	if o.ShareUpdateAccessHandler == nil {
 		unregistered = append(unregistered, "share.UpdateAccessHandler")
@@ -1123,7 +1123,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/share12"] = share.NewShare12(o.context, o.ShareShare12Handler)
+	o.handlers["POST"]["/share"] = share.NewShare(o.context, o.ShareShareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1139,7 +1139,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/unshare12"] = share.NewUnshare12(o.context, o.ShareUnshare12Handler)
+	o.handlers["DELETE"]["/unshare"] = share.NewUnshare(o.context, o.ShareUnshareHandler)
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
@@ -1155,7 +1155,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["PATCH"] == nil {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
-	o.handlers["PATCH"]["/share12"] = share.NewUpdateShare(o.context, o.ShareUpdateShareHandler)
+	o.handlers["PATCH"]["/share"] = share.NewUpdateShare(o.context, o.ShareUpdateShareHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -13,40 +13,40 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 )
 
-// Share12HandlerFunc turns a function with the right signature into a share12 handler
-type Share12HandlerFunc func(Share12Params, *rest_model_zrok.Principal) middleware.Responder
+// ShareHandlerFunc turns a function with the right signature into a share handler
+type ShareHandlerFunc func(ShareParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn Share12HandlerFunc) Handle(params Share12Params, principal *rest_model_zrok.Principal) middleware.Responder {
+func (fn ShareHandlerFunc) Handle(params ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	return fn(params, principal)
 }
 
-// Share12Handler interface for that can handle valid share12 params
-type Share12Handler interface {
-	Handle(Share12Params, *rest_model_zrok.Principal) middleware.Responder
+// ShareHandler interface for that can handle valid share params
+type ShareHandler interface {
+	Handle(ShareParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
-// NewShare12 creates a new http.Handler for the share12 operation
-func NewShare12(ctx *middleware.Context, handler Share12Handler) *Share12 {
-	return &Share12{Context: ctx, Handler: handler}
+// NewShare creates a new http.Handler for the share operation
+func NewShare(ctx *middleware.Context, handler ShareHandler) *Share {
+	return &Share{Context: ctx, Handler: handler}
 }
 
 /*
-	Share12 swagger:route POST /share12 share share12
+	Share swagger:route POST /share share share
 
-Share12 share12 API
+Share share API
 */
-type Share12 struct {
+type Share struct {
 	Context *middleware.Context
-	Handler Share12Handler
+	Handler ShareHandler
 }
 
-func (o *Share12) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *Share) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewShare12Params()
+	var Params = NewShareParams()
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)

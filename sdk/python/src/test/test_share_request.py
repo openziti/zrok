@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.share_request12 import ShareRequest12
+from zrok_api.models.share_request import ShareRequest
 
-class TestShareRequest12(unittest.TestCase):
-    """ShareRequest12 unit test stubs"""
+class TestShareRequest(unittest.TestCase):
+    """ShareRequest unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,16 +25,16 @@ class TestShareRequest12(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ShareRequest12:
-        """Test ShareRequest12
+    def make_instance(self, include_optional) -> ShareRequest:
+        """Test ShareRequest
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ShareRequest12`
+        # uncomment below to create an instance of `ShareRequest`
         """
-        model = ShareRequest12()
+        model = ShareRequest()
         if include_optional:
-            return ShareRequest12(
+            return ShareRequest(
                 env_zid = '',
                 share_mode = 'public',
                 namespace_selections = [
@@ -61,12 +61,12 @@ class TestShareRequest12(unittest.TestCase):
                     ]
             )
         else:
-            return ShareRequest12(
+            return ShareRequest(
         )
         """
 
-    def testShareRequest12(self):
-        """Test ShareRequest12"""
+    def testShareRequest(self):
+        """Test ShareRequest"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

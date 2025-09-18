@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.unshare12_request import Unshare12Request
+from zrok_api.models.unshare_request import UnshareRequest
 
-class TestUnshare12Request(unittest.TestCase):
-    """Unshare12Request unit test stubs"""
+class TestUnshareRequest(unittest.TestCase):
+    """UnshareRequest unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,26 +25,26 @@ class TestUnshare12Request(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> Unshare12Request:
-        """Test Unshare12Request
+    def make_instance(self, include_optional) -> UnshareRequest:
+        """Test UnshareRequest
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `Unshare12Request`
+        # uncomment below to create an instance of `UnshareRequest`
         """
-        model = Unshare12Request()
+        model = UnshareRequest()
         if include_optional:
-            return Unshare12Request(
+            return UnshareRequest(
                 env_zid = '',
                 share_token = ''
             )
         else:
-            return Unshare12Request(
+            return UnshareRequest(
         )
         """
 
-    def testUnshare12Request(self):
-        """Test Unshare12Request"""
+    def testUnshareRequest(self):
+        """Test UnshareRequest"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

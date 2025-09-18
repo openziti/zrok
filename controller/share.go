@@ -14,17 +14,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type share12Handler struct{}
+type shareHandler struct{}
 
-func newShare12Handler() *share12Handler {
-	return &share12Handler{}
+func newShareHandler() *shareHandler {
+	return &shareHandler{}
 }
 
-func (h *share12Handler) Handle(params share.Share12Params, principal *rest_model_zrok.Principal) middleware.Responder {
+func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
@@ -33,27 +33,27 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	envId, err := h.validateEnvironment(envZId, principal, trx)
 	if err != nil {
 		logrus.Errorf("environment validation failed: %v", err)
-		return share.NewShare12Unauthorized()
+		return share.NewShareUnauthorized()
 	}
 
 	// check limits
 	if err := h.checkLimits(envId, principal, params, trx); err != nil {
 		logrus.Errorf("limits error: %v", err)
-		return share.NewShare12Unauthorized()
+		return share.NewShareUnauthorized()
 	}
 
 	// create share token
 	shrToken, err := createShareToken()
 	if err != nil {
 		logrus.Error(err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	// process namespace selections
 	frontendEndpoints, nameIds, err := h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
 	if err != nil {
 		logrus.Errorf("namespace selection processing failed: %v", err)
-		return share.NewShare12Conflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
 	// allocate resources based on share mode
@@ -63,25 +63,25 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 		interstitial, err := h.shouldUseInterstitial(params.Body.BackendMode, principal, trx)
 		if err != nil {
 			logrus.Errorf("error determining interstitial setting for account '%v': %v", principal.Email, err)
-			return share.NewShare12InternalServerError()
+			return share.NewShareInternalServerError()
 		}
 		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, trx)
 	case "private":
 		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, trx)
 	default:
 		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 	if err != nil {
 		logrus.Errorf("error allocating share resources: %v", err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	// create share record
 	shareId, err := h.createShareRecord(envId, shrZId, shrToken, params, frontendEndpoints, trx)
 	if err != nil {
 		logrus.Errorf("error creating share record: %v", err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	// create share name mappings for namespace selections
@@ -93,7 +93,7 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 		_, err := str.CreateShareNameMapping(snm, trx)
 		if err != nil {
 			logrus.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
-			return share.NewShare12InternalServerError()
+			return share.NewShareInternalServerError()
 		}
 	}
 
@@ -105,23 +105,23 @@ func (h *share12Handler) Handle(params share.Share12Params, principal *rest_mode
 	// handle access grants if closed permission mode
 	if err := h.processAccessGrants(shareId, params.Body.AccessGrants, params.Body.PermissionMode, principal, trx); err != nil {
 		logrus.Errorf("error processing access grants: %v", err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing share record: %v", err)
-		return share.NewShare12InternalServerError()
+		return share.NewShareInternalServerError()
 	}
 
 	logrus.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
 
-	return share.NewShare12Created().WithPayload(&rest_model_zrok.ShareResponse{
+	return share.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,
 		ShareToken:             shrToken,
 	})
 }
 
-func (h *share12Handler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (int, error) {
+func (h *shareHandler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (int, error) {
 	env, err := str.FindEnvironmentForAccount(envZId, int(principal.ID), trx)
 	if err != nil {
 		return 0, errors.Wrapf(err, "error finding environment '%v' for account '%v'", envZId, principal.Email)
@@ -129,7 +129,7 @@ func (h *share12Handler) validateEnvironment(envZId string, principal *rest_mode
 	return env.Id, nil
 }
 
-func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Principal, params share.Share12Params, trx *sqlx.Tx) error {
+func (h *shareHandler) checkLimits(envId int, principal *rest_model_zrok.Principal, params share.ShareParams, trx *sqlx.Tx) error {
 	if !principal.Limitless {
 		if limitsAgent != nil {
 			shareMode := sdk.ShareMode(params.Body.ShareMode)
@@ -149,7 +149,7 @@ func (h *share12Handler) checkLimits(envId int, principal *rest_model_zrok.Princ
 	return nil
 }
 
-func (h *share12Handler) shouldUseInterstitial(backendMode string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
+func (h *shareHandler) shouldUseInterstitial(backendMode string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
 	var skipInterstitial bool
 	parsedBackendMode := sdk.BackendMode(backendMode)
 
@@ -167,7 +167,7 @@ func (h *share12Handler) shouldUseInterstitial(backendMode string, principal *re
 	return !skipInterstitial, nil
 }
 
-func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zrok.NamespaceSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
+func (h *shareHandler) processNamespaceSelections(selections []*rest_model_zrok.NamespaceSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
 	var frontendEndpoints []string
 	var nameIds []int
 
@@ -239,7 +239,7 @@ func (h *share12Handler) processNamespaceSelections(selections []*rest_model_zro
 	return frontendEndpoints, nameIds, nil
 }
 
-func (h *share12Handler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, interstitial bool, trx interface{}) (string, []string, error) {
+func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, interstitial bool, trx interface{}) (string, []string, error) {
 	// get shared automation client
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -387,7 +387,7 @@ func (h *share12Handler) allocatePublicResources(envZId, shrToken string, fronte
 	return shrZId, frontendEndpoints, nil
 }
 
-func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.Share12Params, trx interface{}) (string, []string, error) {
+func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, trx interface{}) (string, []string, error) {
 	// get shared automation client
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -497,7 +497,7 @@ func (h *share12Handler) allocatePrivateResources(envZId, shrToken string, front
 	return shrZId, frontendEndpoints, nil
 }
 
-func (h *share12Handler) createShareRecord(envId int, shrZId, shrToken string, params share.Share12Params, frontendEndpoints []string, trx interface{}) (int, error) {
+func (h *shareHandler) createShareRecord(envId int, shrZId, shrToken string, params share.ShareParams, frontendEndpoints []string, trx interface{}) (int, error) {
 	strShr := &store.Share{
 		ZId:            shrZId,
 		Token:          shrToken,
@@ -536,7 +536,7 @@ func (h *share12Handler) createShareRecord(envId int, shrZId, shrToken string, p
 	return shareId, nil
 }
 
-func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string, permissionMode string, principal *rest_model_zrok.Principal, trx interface{}) error {
+func (h *shareHandler) processAccessGrants(shareId int, accessGrants []string, permissionMode string, principal *rest_model_zrok.Principal, trx interface{}) error {
 	// only process access grants for closed permission mode
 	if store.PermissionMode(permissionMode) != store.ClosedPermissionMode {
 		return nil
@@ -569,7 +569,7 @@ func (h *share12Handler) processAccessGrants(shareId int, accessGrants []string,
 	return nil
 }
 
-func (h *share12Handler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) error {
+func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) error {
 	// only send updates if dynamic proxy controller is enabled
 	if dPCtrl == nil {
 		logrus.Warnf("dynamic proxy controller is nil")

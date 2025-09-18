@@ -16,40 +16,40 @@ import (
 	"github.com/openziti/zrok/rest_model_zrok"
 )
 
-// Unshare12HandlerFunc turns a function with the right signature into a unshare12 handler
-type Unshare12HandlerFunc func(Unshare12Params, *rest_model_zrok.Principal) middleware.Responder
+// UnshareHandlerFunc turns a function with the right signature into a unshare handler
+type UnshareHandlerFunc func(UnshareParams, *rest_model_zrok.Principal) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn Unshare12HandlerFunc) Handle(params Unshare12Params, principal *rest_model_zrok.Principal) middleware.Responder {
+func (fn UnshareHandlerFunc) Handle(params UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	return fn(params, principal)
 }
 
-// Unshare12Handler interface for that can handle valid unshare12 params
-type Unshare12Handler interface {
-	Handle(Unshare12Params, *rest_model_zrok.Principal) middleware.Responder
+// UnshareHandler interface for that can handle valid unshare params
+type UnshareHandler interface {
+	Handle(UnshareParams, *rest_model_zrok.Principal) middleware.Responder
 }
 
-// NewUnshare12 creates a new http.Handler for the unshare12 operation
-func NewUnshare12(ctx *middleware.Context, handler Unshare12Handler) *Unshare12 {
-	return &Unshare12{Context: ctx, Handler: handler}
+// NewUnshare creates a new http.Handler for the unshare operation
+func NewUnshare(ctx *middleware.Context, handler UnshareHandler) *Unshare {
+	return &Unshare{Context: ctx, Handler: handler}
 }
 
 /*
-	Unshare12 swagger:route DELETE /unshare12 share unshare12
+	Unshare swagger:route DELETE /unshare share unshare
 
-Unshare12 unshare12 API
+Unshare unshare API
 */
-type Unshare12 struct {
+type Unshare struct {
 	Context *middleware.Context
-	Handler Unshare12Handler
+	Handler UnshareHandler
 }
 
-func (o *Unshare12) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *Unshare) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewUnshare12Params()
+	var Params = NewUnshareParams()
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -73,10 +73,10 @@ func (o *Unshare12) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-// Unshare12Body unshare12 body
+// UnshareBody unshare body
 //
-// swagger:model Unshare12Body
-type Unshare12Body struct {
+// swagger:model UnshareBody
+type UnshareBody struct {
 
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
@@ -85,18 +85,18 @@ type Unshare12Body struct {
 	ShareToken string `json:"shareToken,omitempty"`
 }
 
-// Validate validates this unshare12 body
-func (o *Unshare12Body) Validate(formats strfmt.Registry) error {
+// Validate validates this unshare body
+func (o *UnshareBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this unshare12 body based on context it is used
-func (o *Unshare12Body) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this unshare body based on context it is used
+func (o *UnshareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (o *Unshare12Body) MarshalBinary() ([]byte, error) {
+func (o *UnshareBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -104,8 +104,8 @@ func (o *Unshare12Body) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *Unshare12Body) UnmarshalBinary(b []byte) error {
-	var res Unshare12Body
+func (o *UnshareBody) UnmarshalBinary(b []byte) error {
+	var res UnshareBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

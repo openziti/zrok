@@ -73,11 +73,11 @@ models/ResetPasswordRequest.ts
 models/Share.ts
 models/ShareHttpHealthcheck200Response.ts
 models/ShareHttpHealthcheckRequest.ts
-models/ShareRequest12.ts
+models/ShareRequest.ts
 models/ShareResponse.ts
 models/SparkDataSample.ts
 models/UnaccessRequest.ts
-models/Unshare12Request.ts
+models/UnshareRequest.ts
 models/UpdateAccessRequest.ts
 models/UpdateFrontendRequest.ts
 models/UpdateNamespaceRequest.ts

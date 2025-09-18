@@ -16,10 +16,10 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ShareRequest12 share request12
+// ShareRequest share request
 //
-// swagger:model shareRequest12
-type ShareRequest12 struct {
+// swagger:model shareRequest
+type ShareRequest struct {
 
 	// access grants
 	AccessGrants []string `json:"accessGrants"`
@@ -61,8 +61,8 @@ type ShareRequest12 struct {
 	Target string `json:"target,omitempty"`
 }
 
-// Validate validates this share request12
-func (m *ShareRequest12) Validate(formats strfmt.Registry) error {
+// Validate validates this share request
+func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateBackendMode(formats); err != nil {
@@ -91,7 +91,7 @@ func (m *ShareRequest12) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var shareRequest12TypeBackendModePropEnum []interface{}
+var shareRequestTypeBackendModePropEnum []interface{}
 
 func init() {
 	var res []string
@@ -99,46 +99,46 @@ func init() {
 		panic(err)
 	}
 	for _, v := range res {
-		shareRequest12TypeBackendModePropEnum = append(shareRequest12TypeBackendModePropEnum, v)
+		shareRequestTypeBackendModePropEnum = append(shareRequestTypeBackendModePropEnum, v)
 	}
 }
 
 const (
 
-	// ShareRequest12BackendModeProxy captures enum value "proxy"
-	ShareRequest12BackendModeProxy string = "proxy"
+	// ShareRequestBackendModeProxy captures enum value "proxy"
+	ShareRequestBackendModeProxy string = "proxy"
 
-	// ShareRequest12BackendModeWeb captures enum value "web"
-	ShareRequest12BackendModeWeb string = "web"
+	// ShareRequestBackendModeWeb captures enum value "web"
+	ShareRequestBackendModeWeb string = "web"
 
-	// ShareRequest12BackendModeTCPTunnel captures enum value "tcpTunnel"
-	ShareRequest12BackendModeTCPTunnel string = "tcpTunnel"
+	// ShareRequestBackendModeTCPTunnel captures enum value "tcpTunnel"
+	ShareRequestBackendModeTCPTunnel string = "tcpTunnel"
 
-	// ShareRequest12BackendModeUDPTunnel captures enum value "udpTunnel"
-	ShareRequest12BackendModeUDPTunnel string = "udpTunnel"
+	// ShareRequestBackendModeUDPTunnel captures enum value "udpTunnel"
+	ShareRequestBackendModeUDPTunnel string = "udpTunnel"
 
-	// ShareRequest12BackendModeCaddy captures enum value "caddy"
-	ShareRequest12BackendModeCaddy string = "caddy"
+	// ShareRequestBackendModeCaddy captures enum value "caddy"
+	ShareRequestBackendModeCaddy string = "caddy"
 
-	// ShareRequest12BackendModeDrive captures enum value "drive"
-	ShareRequest12BackendModeDrive string = "drive"
+	// ShareRequestBackendModeDrive captures enum value "drive"
+	ShareRequestBackendModeDrive string = "drive"
 
-	// ShareRequest12BackendModeSocks captures enum value "socks"
-	ShareRequest12BackendModeSocks string = "socks"
+	// ShareRequestBackendModeSocks captures enum value "socks"
+	ShareRequestBackendModeSocks string = "socks"
 
-	// ShareRequest12BackendModeVpn captures enum value "vpn"
-	ShareRequest12BackendModeVpn string = "vpn"
+	// ShareRequestBackendModeVpn captures enum value "vpn"
+	ShareRequestBackendModeVpn string = "vpn"
 )
 
 // prop value enum
-func (m *ShareRequest12) validateBackendModeEnum(path, location string, value string) error {
-	if err := validate.EnumCase(path, location, value, shareRequest12TypeBackendModePropEnum, true); err != nil {
+func (m *ShareRequest) validateBackendModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeBackendModePropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *ShareRequest12) validateBackendMode(formats strfmt.Registry) error {
+func (m *ShareRequest) validateBackendMode(formats strfmt.Registry) error {
 	if swag.IsZero(m.BackendMode) { // not required
 		return nil
 	}
@@ -151,7 +151,7 @@ func (m *ShareRequest12) validateBackendMode(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ShareRequest12) validateBasicAuthUsers(formats strfmt.Registry) error {
+func (m *ShareRequest) validateBasicAuthUsers(formats strfmt.Registry) error {
 	if swag.IsZero(m.BasicAuthUsers) { // not required
 		return nil
 	}
@@ -177,7 +177,7 @@ func (m *ShareRequest12) validateBasicAuthUsers(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ShareRequest12) validateNamespaceSelections(formats strfmt.Registry) error {
+func (m *ShareRequest) validateNamespaceSelections(formats strfmt.Registry) error {
 	if swag.IsZero(m.NamespaceSelections) { // not required
 		return nil
 	}
@@ -203,7 +203,7 @@ func (m *ShareRequest12) validateNamespaceSelections(formats strfmt.Registry) er
 	return nil
 }
 
-var shareRequest12TypePermissionModePropEnum []interface{}
+var shareRequestTypePermissionModePropEnum []interface{}
 
 func init() {
 	var res []string
@@ -211,28 +211,28 @@ func init() {
 		panic(err)
 	}
 	for _, v := range res {
-		shareRequest12TypePermissionModePropEnum = append(shareRequest12TypePermissionModePropEnum, v)
+		shareRequestTypePermissionModePropEnum = append(shareRequestTypePermissionModePropEnum, v)
 	}
 }
 
 const (
 
-	// ShareRequest12PermissionModeOpen captures enum value "open"
-	ShareRequest12PermissionModeOpen string = "open"
+	// ShareRequestPermissionModeOpen captures enum value "open"
+	ShareRequestPermissionModeOpen string = "open"
 
-	// ShareRequest12PermissionModeClosed captures enum value "closed"
-	ShareRequest12PermissionModeClosed string = "closed"
+	// ShareRequestPermissionModeClosed captures enum value "closed"
+	ShareRequestPermissionModeClosed string = "closed"
 )
 
 // prop value enum
-func (m *ShareRequest12) validatePermissionModeEnum(path, location string, value string) error {
-	if err := validate.EnumCase(path, location, value, shareRequest12TypePermissionModePropEnum, true); err != nil {
+func (m *ShareRequest) validatePermissionModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypePermissionModePropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *ShareRequest12) validatePermissionMode(formats strfmt.Registry) error {
+func (m *ShareRequest) validatePermissionMode(formats strfmt.Registry) error {
 	if swag.IsZero(m.PermissionMode) { // not required
 		return nil
 	}
@@ -245,7 +245,7 @@ func (m *ShareRequest12) validatePermissionMode(formats strfmt.Registry) error {
 	return nil
 }
 
-var shareRequest12TypeShareModePropEnum []interface{}
+var shareRequestTypeShareModePropEnum []interface{}
 
 func init() {
 	var res []string
@@ -253,28 +253,28 @@ func init() {
 		panic(err)
 	}
 	for _, v := range res {
-		shareRequest12TypeShareModePropEnum = append(shareRequest12TypeShareModePropEnum, v)
+		shareRequestTypeShareModePropEnum = append(shareRequestTypeShareModePropEnum, v)
 	}
 }
 
 const (
 
-	// ShareRequest12ShareModePublic captures enum value "public"
-	ShareRequest12ShareModePublic string = "public"
+	// ShareRequestShareModePublic captures enum value "public"
+	ShareRequestShareModePublic string = "public"
 
-	// ShareRequest12ShareModePrivate captures enum value "private"
-	ShareRequest12ShareModePrivate string = "private"
+	// ShareRequestShareModePrivate captures enum value "private"
+	ShareRequestShareModePrivate string = "private"
 )
 
 // prop value enum
-func (m *ShareRequest12) validateShareModeEnum(path, location string, value string) error {
-	if err := validate.EnumCase(path, location, value, shareRequest12TypeShareModePropEnum, true); err != nil {
+func (m *ShareRequest) validateShareModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, shareRequestTypeShareModePropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *ShareRequest12) validateShareMode(formats strfmt.Registry) error {
+func (m *ShareRequest) validateShareMode(formats strfmt.Registry) error {
 	if swag.IsZero(m.ShareMode) { // not required
 		return nil
 	}
@@ -287,8 +287,8 @@ func (m *ShareRequest12) validateShareMode(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this share request12 based on the context it is used
-func (m *ShareRequest12) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this share request based on the context it is used
+func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateBasicAuthUsers(ctx, formats); err != nil {
@@ -305,7 +305,7 @@ func (m *ShareRequest12) ContextValidate(ctx context.Context, formats strfmt.Reg
 	return nil
 }
 
-func (m *ShareRequest12) contextValidateBasicAuthUsers(ctx context.Context, formats strfmt.Registry) error {
+func (m *ShareRequest) contextValidateBasicAuthUsers(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(m.BasicAuthUsers); i++ {
 
@@ -330,7 +330,7 @@ func (m *ShareRequest12) contextValidateBasicAuthUsers(ctx context.Context, form
 	return nil
 }
 
-func (m *ShareRequest12) contextValidateNamespaceSelections(ctx context.Context, formats strfmt.Registry) error {
+func (m *ShareRequest) contextValidateNamespaceSelections(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(m.NamespaceSelections); i++ {
 
@@ -356,7 +356,7 @@ func (m *ShareRequest12) contextValidateNamespaceSelections(ctx context.Context,
 }
 
 // MarshalBinary interface implementation
-func (m *ShareRequest12) MarshalBinary() ([]byte, error) {
+func (m *ShareRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -364,8 +364,8 @@ func (m *ShareRequest12) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ShareRequest12) UnmarshalBinary(b []byte) error {
-	var res ShareRequest12
+func (m *ShareRequest) UnmarshalBinary(b []byte) error {
+	var res ShareRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

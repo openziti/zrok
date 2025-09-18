@@ -22,9 +22,9 @@ from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class Unshare12Request(BaseModel):
+class UnshareRequest(BaseModel):
     """
-    Unshare12Request
+    UnshareRequest
     """ # noqa: E501
     env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
     share_token: Optional[StrictStr] = Field(default=None, alias="shareToken")
@@ -48,7 +48,7 @@ class Unshare12Request(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of Unshare12Request from a JSON string"""
+        """Create an instance of UnshareRequest from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -73,7 +73,7 @@ class Unshare12Request(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of Unshare12Request from a dict"""
+        """Create an instance of UnshareRequest from a dict"""
         if obj is None:
             return None
 

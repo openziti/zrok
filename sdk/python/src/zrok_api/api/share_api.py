@@ -23,10 +23,10 @@ from zrok_api.models.access_request import AccessRequest
 from zrok_api.models.create_share_name_request import CreateShareNameRequest
 from zrok_api.models.list_share_namespaces200_response_inner import ListShareNamespaces200ResponseInner
 from zrok_api.models.name import Name
-from zrok_api.models.share_request12 import ShareRequest12
+from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
 from zrok_api.models.unaccess_request import UnaccessRequest
-from zrok_api.models.unshare12_request import Unshare12Request
+from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest
 from zrok_api.models.update_share_request import UpdateShareRequest
 
@@ -1643,9 +1643,9 @@ class ShareApi:
 
 
     @validate_call
-    def share12(
+    def share(
         self,
-        body: Optional[ShareRequest12] = None,
+        body: Optional[ShareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1659,11 +1659,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ShareResponse:
-        """share12
+        """share
 
 
         :param body:
-        :type body: ShareRequest12
+        :type body: ShareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1686,7 +1686,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._share12_serialize(
+        _param = self._share_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1714,9 +1714,9 @@ class ShareApi:
 
 
     @validate_call
-    def share12_with_http_info(
+    def share_with_http_info(
         self,
-        body: Optional[ShareRequest12] = None,
+        body: Optional[ShareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1730,11 +1730,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ApiResponse[ShareResponse]:
-        """share12
+        """share
 
 
         :param body:
-        :type body: ShareRequest12
+        :type body: ShareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1757,7 +1757,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._share12_serialize(
+        _param = self._share_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1785,9 +1785,9 @@ class ShareApi:
 
 
     @validate_call
-    def share12_without_preload_content(
+    def share_without_preload_content(
         self,
-        body: Optional[ShareRequest12] = None,
+        body: Optional[ShareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -1801,11 +1801,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """share12
+        """share
 
 
         :param body:
-        :type body: ShareRequest12
+        :type body: ShareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -1828,7 +1828,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._share12_serialize(
+        _param = self._share_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1851,7 +1851,7 @@ class ShareApi:
         return response_data.response
 
 
-    def _share12_serialize(
+    def _share_serialize(
         self,
         body,
         _request_auth,
@@ -1912,7 +1912,7 @@ class ShareApi:
 
         return self.api_client.param_serialize(
             method='POST',
-            resource_path='/share12',
+            resource_path='/share',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,
@@ -2202,9 +2202,9 @@ class ShareApi:
 
 
     @validate_call
-    def unshare12(
+    def unshare(
         self,
-        body: Optional[Unshare12Request] = None,
+        body: Optional[UnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2218,11 +2218,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> None:
-        """unshare12
+        """unshare
 
 
         :param body:
-        :type body: Unshare12Request
+        :type body: UnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2245,7 +2245,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._unshare12_serialize(
+        _param = self._unshare_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2271,9 +2271,9 @@ class ShareApi:
 
 
     @validate_call
-    def unshare12_with_http_info(
+    def unshare_with_http_info(
         self,
-        body: Optional[Unshare12Request] = None,
+        body: Optional[UnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2287,11 +2287,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> ApiResponse[None]:
-        """unshare12
+        """unshare
 
 
         :param body:
-        :type body: Unshare12Request
+        :type body: UnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2314,7 +2314,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._unshare12_serialize(
+        _param = self._unshare_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2340,9 +2340,9 @@ class ShareApi:
 
 
     @validate_call
-    def unshare12_without_preload_content(
+    def unshare_without_preload_content(
         self,
-        body: Optional[Unshare12Request] = None,
+        body: Optional[UnshareRequest] = None,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2356,11 +2356,11 @@ class ShareApi:
         _headers: Optional[Dict[StrictStr, Any]] = None,
         _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
     ) -> RESTResponseType:
-        """unshare12
+        """unshare
 
 
         :param body:
-        :type body: Unshare12Request
+        :type body: UnshareRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2383,7 +2383,7 @@ class ShareApi:
         :return: Returns the result object.
         """ # noqa: E501
 
-        _param = self._unshare12_serialize(
+        _param = self._unshare_serialize(
             body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2404,7 +2404,7 @@ class ShareApi:
         return response_data.response
 
 
-    def _unshare12_serialize(
+    def _unshare_serialize(
         self,
         body,
         _request_auth,
@@ -2465,7 +2465,7 @@ class ShareApi:
 
         return self.api_client.param_serialize(
             method='DELETE',
-            resource_path='/unshare12',
+            resource_path='/unshare',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,
@@ -3014,7 +3014,7 @@ class ShareApi:
 
         return self.api_client.param_serialize(
             method='PATCH',
-            resource_path='/share12',
+            resource_path='/share',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

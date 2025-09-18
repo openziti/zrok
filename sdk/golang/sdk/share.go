@@ -16,7 +16,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	}
 
 	var err error
-	var out *share.Share12Params
+	var out *share.ShareParams
 
 	switch request.ShareMode {
 	case PrivateShareMode:
@@ -49,7 +49,7 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
-	in, err := zrok.Share.Share12(out, auth)
+	in, err := zrok.Share.Share(out, auth)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create share")
 	}
@@ -60,9 +60,9 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	}, nil
 }
 
-func newPrivateShare(root env_core.Root, request *ShareRequest) *share.Share12Params {
-	req := share.NewShare12Params()
-	req.Body = &rest_model_zrok.ShareRequest12{
+func newPrivateShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
+	req := share.NewShareParams()
+	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:         root.Environment().ZitiIdentity,
 		ShareMode:      string(request.ShareMode),
 		BackendMode:    string(request.BackendMode),
@@ -74,9 +74,9 @@ func newPrivateShare(root env_core.Root, request *ShareRequest) *share.Share12Pa
 	return req
 }
 
-func newPublicShare(root env_core.Root, request *ShareRequest) *share.Share12Params {
-	req := share.NewShare12Params()
-	req.Body = &rest_model_zrok.ShareRequest12{
+func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
+	req := share.NewShareParams()
+	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               root.Environment().ZitiIdentity,
 		ShareMode:            string(request.ShareMode),
 		BackendMode:          string(request.BackendMode),
@@ -98,7 +98,7 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.Share12Par
 }
 
 func DeleteShare(root env_core.Root, shr *Share) error {
-	req := share.NewUnshare12Params()
+	req := share.NewUnshareParams()
 	req.Body.EnvZID = root.Environment().ZitiIdentity
 	req.Body.ShareToken = shr.Token
 
@@ -108,7 +108,7 @@ func DeleteShare(root env_core.Root, shr *Share) error {
 	}
 	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
 
-	_, err = zrok.Share.Unshare12(req, auth)
+	_, err = zrok.Share.Unshare(req, auth)
 	if err != nil {
 		return errors.Wrap(err, "error deleting share")
 	}

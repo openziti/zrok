@@ -20,10 +20,10 @@ import type {
   CreateShareNameRequest,
   ListShareNamespaces200ResponseInner,
   Name,
-  ShareRequest12,
+  ShareRequest,
   ShareResponse,
   UnaccessRequest,
-  Unshare12Request,
+  UnshareRequest,
   UpdateAccessRequest,
   UpdateShareRequest,
 } from '../models/index';
@@ -38,14 +38,14 @@ import {
     ListShareNamespaces200ResponseInnerToJSON,
     NameFromJSON,
     NameToJSON,
-    ShareRequest12FromJSON,
-    ShareRequest12ToJSON,
+    ShareRequestFromJSON,
+    ShareRequestToJSON,
     ShareResponseFromJSON,
     ShareResponseToJSON,
     UnaccessRequestFromJSON,
     UnaccessRequestToJSON,
-    Unshare12RequestFromJSON,
-    Unshare12RequestToJSON,
+    UnshareRequestFromJSON,
+    UnshareRequestToJSON,
     UpdateAccessRequestFromJSON,
     UpdateAccessRequestToJSON,
     UpdateShareRequestFromJSON,
@@ -68,16 +68,16 @@ export interface ListNamesForNamespaceRequest {
     namespaceToken: string;
 }
 
-export interface Share12Request {
-    body?: ShareRequest12;
+export interface ShareOperationRequest {
+    body?: ShareRequest;
 }
 
 export interface UnaccessOperationRequest {
     body?: UnaccessRequest;
 }
 
-export interface Unshare12OperationRequest {
-    body?: Unshare12Request;
+export interface UnshareOperationRequest {
+    body?: UnshareRequest;
 }
 
 export interface UpdateAccessOperationRequest {
@@ -296,7 +296,7 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async share12Raw(requestParameters: Share12Request, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareResponse>> {
+    async shareRaw(requestParameters: ShareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -308,14 +308,14 @@ export class ShareApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/share12`;
+        let urlPath = `/share`;
 
         const response = await this.request({
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ShareRequest12ToJSON(requestParameters['body']),
+            body: ShareRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ShareResponseFromJSON(jsonValue));
@@ -323,8 +323,8 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async share12(requestParameters: Share12Request = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareResponse> {
-        const response = await this.share12Raw(requestParameters, initOverrides);
+    async share(requestParameters: ShareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareResponse> {
+        const response = await this.shareRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -363,7 +363,7 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async unshare12Raw(requestParameters: Unshare12OperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async unshareRaw(requestParameters: UnshareOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -375,14 +375,14 @@ export class ShareApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/unshare12`;
+        let urlPath = `/unshare`;
 
         const response = await this.request({
             path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
-            body: Unshare12RequestToJSON(requestParameters['body']),
+            body: UnshareRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -390,8 +390,8 @@ export class ShareApi extends runtime.BaseAPI {
 
     /**
      */
-    async unshare12(requestParameters: Unshare12OperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.unshare12Raw(requestParameters, initOverrides);
+    async unshare(requestParameters: UnshareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.unshareRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -441,7 +441,7 @@ export class ShareApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/share12`;
+        let urlPath = `/share`;
 
         const response = await this.request({
             path: urlPath,

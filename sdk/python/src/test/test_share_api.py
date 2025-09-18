@@ -62,8 +62,8 @@ class TestShareApi(unittest.TestCase):
         """
         pass
 
-    def test_share12(self) -> None:
-        """Test case for share12
+    def test_share(self) -> None:
+        """Test case for share
 
         """
         pass
@@ -74,8 +74,8 @@ class TestShareApi(unittest.TestCase):
         """
         pass
 
-    def test_unshare12(self) -> None:
-        """Test case for unshare12
+    def test_unshare(self) -> None:
+        """Test case for unshare
 
         """
         pass
