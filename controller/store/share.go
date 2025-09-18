@@ -20,8 +20,8 @@ type Share struct {
 	PermissionMode       PermissionMode
 }
 
-func (str *Store) CreateShare(envId int, shr *Share, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved, unique_name, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
+func (str *Store) CreateShare(envId int, shr *Share, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved, unique_name, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing shares insert statement")
 	}
@@ -32,16 +32,16 @@ func (str *Store) CreateShare(envId int, shr *Share, tx *sqlx.Tx) (int, error) {
 	return id, nil
 }
 
-func (str *Store) GetShare(id int, tx *sqlx.Tx) (*Share, error) {
+func (str *Store) GetShare(id int, trx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where id = $1", id).StructScan(shr); err != nil {
+	if err := trx.QueryRowx("select * from shares where id = $1", id).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by id")
 	}
 	return shr, nil
 }
 
-func (str *Store) FindAllShares(tx *sqlx.Tx) ([]*Share, error) {
-	rows, err := tx.Queryx("select * from shares where not deleted order by id")
+func (str *Store) FindAllShares(trx *sqlx.Tx) ([]*Share, error) {
+	rows, err := trx.Queryx("select * from shares where not deleted order by id")
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting all shares")
 	}
@@ -76,40 +76,40 @@ func (str *Store) FindAllSharesForAccount(accountId int, trx *sqlx.Tx) ([]*Share
 	return shrs, nil
 }
 
-func (str *Store) FindShareWithToken(shrToken string, tx *sqlx.Tx) (*Share, error) {
+func (str *Store) FindShareWithToken(shrToken string, trx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where token = $1 and not deleted", shrToken).StructScan(shr); err != nil {
+	if err := trx.QueryRowx("select * from shares where token = $1 and not deleted", shrToken).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by token")
 	}
 	return shr, nil
 }
 
-func (str *Store) FindShareWithTokenEvenIfDeleted(shrToken string, tx *sqlx.Tx) (*Share, error) {
+func (str *Store) FindShareWithTokenEvenIfDeleted(shrToken string, trx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where token = $1", shrToken).StructScan(shr); err != nil {
+	if err := trx.QueryRowx("select * from shares where token = $1", shrToken).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by token, even if deleted")
 	}
 	return shr, nil
 }
 
-func (str *Store) ShareWithTokenExists(shrToken string, tx *sqlx.Tx) (bool, error) {
+func (str *Store) ShareWithTokenExists(shrToken string, trx *sqlx.Tx) (bool, error) {
 	count := 0
-	if err := tx.QueryRowx("select count(0) from shares where token = $1 and not deleted", shrToken).Scan(&count); err != nil {
+	if err := trx.QueryRowx("select count(0) from shares where token = $1 and not deleted", shrToken).Scan(&count); err != nil {
 		return true, errors.Wrap(err, "error selecting share count by token")
 	}
 	return count > 0, nil
 }
 
-func (str *Store) FindShareWithZIdAndDeleted(zId string, tx *sqlx.Tx) (*Share, error) {
+func (str *Store) FindShareWithZIdAndDeleted(zId string, trx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
+	if err := trx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by z_id")
 	}
 	return shr, nil
 }
 
-func (str *Store) FindSharesForEnvironment(envId int, tx *sqlx.Tx) ([]*Share, error) {
-	rows, err := tx.Queryx("select shares.* from shares where environment_id = $1 and not deleted", envId)
+func (str *Store) FindSharesForEnvironment(envId int, trx *sqlx.Tx) ([]*Share, error) {
+	rows, err := trx.Queryx("select shares.* from shares where environment_id = $1 and not deleted", envId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting shares by environment id")
 	}
@@ -124,9 +124,9 @@ func (str *Store) FindSharesForEnvironment(envId int, tx *sqlx.Tx) ([]*Share, er
 	return shrs, nil
 }
 
-func (str *Store) UpdateShare(shr *Share, tx *sqlx.Tx) error {
+func (str *Store) UpdateShare(shr *Share, trx *sqlx.Tx) error {
 	sql := "update shares set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, unique_name = $9, permission_mode = $10, updated_at = current_timestamp where id = $11"
-	stmt, err := tx.Prepare(sql)
+	stmt, err := trx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares update statement")
 	}
@@ -137,8 +137,8 @@ func (str *Store) UpdateShare(shr *Share, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (str *Store) DeleteShare(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update shares set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeleteShare(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update shares set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares delete statement")
 	}

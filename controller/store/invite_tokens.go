@@ -14,7 +14,7 @@ type InviteToken struct {
 	Deleted bool
 }
 
-func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) error {
+func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, trx *sqlx.Tx) error {
 	sql := "insert into invite_tokens (token) values %s"
 	invs := make([]any, len(inviteTokens))
 	queries := make([]string, len(inviteTokens))
@@ -22,7 +22,7 @@ func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) e
 		invs[i] = inv.Token
 		queries[i] = fmt.Sprintf("($%d)", i+1)
 	}
-	stmt, err := tx.Prepare(fmt.Sprintf(sql, strings.Join(queries, ",")))
+	stmt, err := trx.Prepare(fmt.Sprintf(sql, strings.Join(queries, ",")))
 	if err != nil {
 		return errors.Wrap(err, "error preparing invite_tokens insert statement")
 	}
@@ -32,16 +32,16 @@ func (str *Store) CreateInviteTokens(inviteTokens []*InviteToken, tx *sqlx.Tx) e
 	return nil
 }
 
-func (str *Store) FindInviteTokenByToken(token string, tx *sqlx.Tx) (*InviteToken, error) {
+func (str *Store) FindInviteTokenByToken(token string, trx *sqlx.Tx) (*InviteToken, error) {
 	inviteToken := &InviteToken{}
-	if err := tx.QueryRowx("select * from invite_tokens where token = $1 and not deleted", token).StructScan(inviteToken); err != nil {
+	if err := trx.QueryRowx("select * from invite_tokens where token = $1 and not deleted", token).StructScan(inviteToken); err != nil {
 		return nil, errors.Wrap(err, "error getting unused invite_token")
 	}
 	return inviteToken, nil
 }
 
-func (str *Store) DeleteInviteToken(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update invite_tokens set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeleteInviteToken(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update invite_tokens set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing invite_tokens delete statement")
 	}

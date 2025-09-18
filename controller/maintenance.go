@@ -46,14 +46,14 @@ func (ma *maintenanceRegistrationAgent) run() {
 }
 
 func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		return err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	timeout := time.Now().UTC().Add(-ma.cfg.ExpirationTimeout)
-	accountRequests, err := str.FindExpiredAccountRequests(timeout, ma.cfg.BatchLimit, tx)
+	accountRequests, err := str.FindExpiredAccountRequests(timeout, ma.cfg.BatchLimit, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding expire account requests before %v", timeout)
 	}
@@ -67,10 +67,10 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 		}
 
 		logrus.Infof("deleting expired account requests: %v", strings.Join(acctStrings, ","))
-		if err := str.DeleteMultipleAccountRequests(ids, tx); err != nil {
+		if err := str.DeleteMultipleAccountRequests(ids, trx); err != nil {
 			return errors.Wrapf(err, "error deleting expired account requests before %v", timeout)
 		}
-		if err := tx.Commit(); err != nil {
+		if err := trx.Commit(); err != nil {
 			return errors.Wrapf(err, "error committing expired acount requests deletion")
 		}
 	}
@@ -112,14 +112,14 @@ func (ma *maintenanceResetPasswordAgent) run() {
 	}
 }
 func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() error {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		return err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	timeout := time.Now().UTC().Add(-ma.cfg.ExpirationTimeout)
-	passwordResetRequests, err := str.FindExpiredPasswordResetRequests(timeout, ma.cfg.BatchLimit, tx)
+	passwordResetRequests, err := str.FindExpiredPasswordResetRequests(timeout, ma.cfg.BatchLimit, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding expired password reset requests before %v", timeout)
 	}
@@ -133,10 +133,10 @@ func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() e
 		}
 
 		logrus.Infof("deleting expired password reset requests: %v", strings.Join(acctStrings, ","))
-		if err := str.DeleteMultiplePasswordResetRequests(ids, tx); err != nil {
+		if err := str.DeleteMultiplePasswordResetRequests(ids, trx); err != nil {
 			return errors.Wrapf(err, "error deleting expired password reset requests before %v", timeout)
 		}
-		if err := tx.Commit(); err != nil {
+		if err := trx.Commit(); err != nil {
 			return errors.Wrapf(err, "error committing expired password reset requests deletion")
 		}
 	}

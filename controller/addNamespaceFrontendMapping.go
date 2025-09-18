@@ -19,36 +19,36 @@ func (handler *addNamespaceFrontendMappingHandler) Handle(params admin.AddNamesp
 		return admin.NewAddNamespaceFrontendMappingUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewAddNamespaceFrontendMappingInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	nsToken := params.Body.NamespaceToken
 	feToken := params.Body.FrontendToken
 	isDefault := params.Body.IsDefault
 
-	ns, err := str.FindNamespaceWithToken(nsToken, tx)
+	ns, err := str.FindNamespaceWithToken(nsToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding namespace by token '%s': %v", nsToken, err)
 		return admin.NewAddNamespaceFrontendMappingNotFound()
 	}
 
-	fe, err := str.FindFrontendWithToken(feToken, tx)
+	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend by token '%s': %v", feToken, err)
 		return admin.NewAddNamespaceFrontendMappingNotFound()
 	}
 
-	_, err = str.CreateNamespaceFrontendMapping(ns.Id, fe.Id, isDefault, tx)
+	_, err = str.CreateNamespaceFrontendMapping(ns.Id, fe.Id, isDefault, trx)
 	if err != nil {
 		logrus.Errorf("error creating namespace frontend mapping: %v", err)
 		return admin.NewAddNamespaceFrontendMappingInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing transaction: %v", err)
 		return admin.NewAddNamespaceFrontendMappingInternalServerError()
 	}

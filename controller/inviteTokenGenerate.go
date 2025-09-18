@@ -34,19 +34,19 @@ func (handler *inviteTokenGenerateHandler) Handle(params admin.InviteTokenGenera
 			Token: token,
 		}
 	}
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Error(err)
 		return admin.NewInviteTokenGenerateInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	if err := str.CreateInviteTokens(invites, tx); err != nil {
+	if err := str.CreateInviteTokens(invites, trx); err != nil {
 		logrus.Error(err)
 		return admin.NewInviteTokenGenerateInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing inviteGenerate request: %v", err)
 		return account.NewInviteInternalServerError()
 	}

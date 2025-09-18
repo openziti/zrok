@@ -25,14 +25,14 @@ func (handler *changePasswordHandler) Handle(params account.ChangePasswordParams
 	}
 	logrus.Infof("received change password request for email '%v'", params.Body.Email)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return account.NewChangePasswordUnauthorized()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	a, err := str.FindAccountWithEmail(params.Body.Email, tx)
+	a, err := str.FindAccountWithEmail(params.Body.Email, trx)
 	if err != nil {
 		logrus.Errorf("error finding account '%v': %v", params.Body.Email, err)
 		return account.NewChangePasswordUnauthorized()
@@ -60,12 +60,12 @@ func (handler *changePasswordHandler) Handle(params account.ChangePasswordParams
 	a.Salt = nhpwd.Salt
 	a.Password = nhpwd.Password
 
-	if _, err := str.UpdateAccount(a, tx); err != nil {
+	if _, err := str.UpdateAccount(a, trx); err != nil {
 		logrus.Errorf("error updating for '%v': %v", a.Email, err)
 		return account.NewChangePasswordInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing '%v': %v", a.Email, err)
 		return account.NewChangePasswordInternalServerError()
 	}

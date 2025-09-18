@@ -12,8 +12,8 @@ type NamespaceFrontendMapping struct {
 	IsDefault   bool
 }
 
-func (str *Store) CreateNamespaceFrontendMapping(nsId, feId int, isDefault bool, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into namespace_frontend_mappings (namespace_id, frontend_id, is_default) values ($1, $2, $3) returning id")
+func (str *Store) CreateNamespaceFrontendMapping(nsId, feId int, isDefault bool, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into namespace_frontend_mappings (namespace_id, frontend_id, is_default) values ($1, $2, $3) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing namespace frontend mapping insert statement")
 	}
@@ -24,8 +24,8 @@ func (str *Store) CreateNamespaceFrontendMapping(nsId, feId int, isDefault bool,
 	return id, nil
 }
 
-func (str *Store) FindFrontendsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindFrontendsForNamespace(namespaceId int, trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx(`
 		select f.* from frontends f 
 		inner join namespace_frontend_mappings nfm on f.id = nfm.frontend_id 
 		where nfm.namespace_id = $1 and not f.deleted and not nfm.deleted`, namespaceId)
@@ -43,8 +43,8 @@ func (str *Store) FindFrontendsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Fr
 	return frontends, nil
 }
 
-func (str *Store) FindDynamicFrontendsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindDynamicFrontendsForNamespace(namespaceId int, trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx(`
 		select f.* from frontends f 
 		inner join namespace_frontend_mappings nfm on f.id = nfm.frontend_id 
 		where nfm.namespace_id = $1 and f.dynamic = true and not f.deleted and not nfm.deleted`, namespaceId)
@@ -62,8 +62,8 @@ func (str *Store) FindDynamicFrontendsForNamespace(namespaceId int, tx *sqlx.Tx)
 	return frontends, nil
 }
 
-func (str *Store) FindNamespacesForFrontend(frontendId int, tx *sqlx.Tx) ([]*Namespace, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindNamespacesForFrontend(frontendId int, trx *sqlx.Tx) ([]*Namespace, error) {
+	rows, err := trx.Queryx(`
 		select n.* from namespaces n 
 		inner join namespace_frontend_mappings nfm on n.id = nfm.namespace_id 
 		where nfm.frontend_id = $1 and not n.deleted and not nfm.deleted`, frontendId)
@@ -81,8 +81,8 @@ func (str *Store) FindNamespacesForFrontend(frontendId int, tx *sqlx.Tx) ([]*Nam
 	return namespaces, nil
 }
 
-func (str *Store) FindNamespaceFrontendMappingsForNamespace(namespaceId int, tx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindNamespaceFrontendMappingsForNamespace(namespaceId int, trx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
+	rows, err := trx.Queryx(`
 		select nfm.* from namespace_frontend_mappings nfm 
 		where nfm.namespace_id = $1 and not nfm.deleted`, namespaceId)
 	if err != nil {
@@ -99,8 +99,8 @@ func (str *Store) FindNamespaceFrontendMappingsForNamespace(namespaceId int, tx 
 	return mappings, nil
 }
 
-func (str *Store) FindNamespaceFrontendMappingsForFrontend(frontendId int, tx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindNamespaceFrontendMappingsForFrontend(frontendId int, trx *sqlx.Tx) ([]*NamespaceFrontendMapping, error) {
+	rows, err := trx.Queryx(`
 		select nfm.* from namespace_frontend_mappings nfm 
 		where nfm.frontend_id = $1 and not nfm.deleted`, frontendId)
 	if err != nil {
@@ -117,8 +117,8 @@ func (str *Store) FindNamespaceFrontendMappingsForFrontend(frontendId int, tx *s
 	return mappings, nil
 }
 
-func (str *Store) DeleteNamespaceFrontendMapping(nsId, feId int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update namespace_frontend_mappings set updated_at = current_timestamp, deleted = true where namespace_id = $1 and frontend_id = $2")
+func (str *Store) DeleteNamespaceFrontendMapping(nsId, feId int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update namespace_frontend_mappings set updated_at = current_timestamp, deleted = true where namespace_id = $1 and frontend_id = $2")
 	if err != nil {
 		return errors.Wrap(err, "error preparing namespace frontend mapping delete statement")
 	}

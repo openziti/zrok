@@ -10,19 +10,19 @@ func TestEphemeralEnvironment(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, str)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	assert.Nil(t, err)
-	assert.NotNil(t, tx)
+	assert.NotNil(t, trx)
 
 	envId, err := str.CreateEphemeralEnvironment(&Environment{
 		Description: "description",
 		Host:        "host",
 		Address:     "address",
 		ZId:         "zId0",
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
-	env, err := str.GetEnvironment(envId, tx)
+	env, err := str.GetEnvironment(envId, trx)
 	assert.Nil(t, err)
 	assert.NotNil(t, env)
 	assert.Nil(t, env.AccountId)
@@ -34,15 +34,15 @@ func TestEnvironment(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, str)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	assert.Nil(t, err)
-	assert.NotNil(t, tx)
+	assert.NotNil(t, trx)
 
 	acctId, err := str.CreateAccount(&Account{
 		Email:    "test@test.com",
 		Password: "password",
 		Token:    "token",
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
 	envId, err := str.CreateEnvironment(acctId, &Environment{
@@ -50,10 +50,10 @@ func TestEnvironment(t *testing.T) {
 		Host:        "host",
 		Address:     "address",
 		ZId:         "zId0",
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
-	env, err := str.GetEnvironment(envId, tx)
+	env, err := str.GetEnvironment(envId, trx)
 	assert.Nil(t, err)
 	assert.NotNil(t, env)
 	assert.NotNil(t, env.AccountId)

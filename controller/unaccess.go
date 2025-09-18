@@ -22,15 +22,15 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 	envZId := params.Body.EnvZID
 	logrus.Infof("processing unaccess request for frontend '%v' (share '%v', environment '%v')", feToken, shrToken, envZId)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return share.NewUnaccessInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	var senv *store.Environment
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
+	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx); err == nil {
 		for _, env := range envs {
 			if env.ZId == envZId {
 				senv = env
@@ -46,7 +46,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessUnauthorized()
 	}
 
-	sfe, err := str.FindFrontendWithToken(feToken, tx)
+	sfe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend for '%v': %v", principal.Email, err)
 		return share.NewUnaccessInternalServerError()
@@ -57,7 +57,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessInternalServerError()
 	}
 
-	if err := str.DeleteFrontend(sfe.Id, tx); err != nil {
+	if err := str.DeleteFrontend(sfe.Id, trx); err != nil {
 		logrus.Errorf("error deleting frontend named '%v': %v", feToken, err)
 		return share.NewUnaccessNotFound()
 	}
@@ -74,7 +74,7 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing frontend '%v' delete: %v", feToken, err)
 		return share.NewUnaccessInternalServerError()
 	}

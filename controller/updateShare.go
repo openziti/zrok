@@ -16,20 +16,20 @@ func newUpdateShareHandler() *updateShareHandler {
 func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	shrToken := params.Body.ShareToken
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return share.NewUpdateShareInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	sshr, err := str.FindShareWithToken(shrToken, tx)
+	sshr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
 		logrus.Errorf("share '%v' not found: %v", shrToken, err)
 		return share.NewUpdateShareNotFound()
 	}
 
-	senvs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
+	senvs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return share.NewUpdateShareInternalServerError()
@@ -49,12 +49,12 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 
 	doCommit := false
 	for _, addr := range params.Body.AddAccessGrants {
-		acct, err := str.FindAccountWithEmail(addr, tx)
+		acct, err := str.FindAccountWithEmail(addr, trx)
 		if err != nil {
 			logrus.Errorf("error looking up account by email '%v' for user '%v': %v", addr, principal.Email, err)
 			return share.NewUpdateShareBadRequest()
 		}
-		if _, err := str.CreateAccessGrant(sshr.Id, acct.Id, tx); err != nil {
+		if _, err := str.CreateAccessGrant(sshr.Id, acct.Id, trx); err != nil {
 			logrus.Errorf("error adding access grant '%v' for share '%v': %v", acct.Email, shrToken, err)
 			return share.NewUpdateShareInternalServerError()
 		}
@@ -63,12 +63,12 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 	}
 
 	for _, addr := range params.Body.RemoveAccessGrants {
-		acct, err := str.FindAccountWithEmail(addr, tx)
+		acct, err := str.FindAccountWithEmail(addr, trx)
 		if err != nil {
 			logrus.Errorf("error looking up account by email '%v' for user '%v': %v", addr, principal.Email, err)
 			return share.NewUpdateShareBadRequest()
 		}
-		if err := str.DeleteAccessGrantsForShareAndAccount(sshr.Id, acct.Id, tx); err != nil {
+		if err := str.DeleteAccessGrantsForShareAndAccount(sshr.Id, acct.Id, trx); err != nil {
 			logrus.Errorf("error removing access grant '%v' for share '%v': %v", acct.Email, shrToken, err)
 			return share.NewUpdateShareInternalServerError()
 		}
@@ -77,7 +77,7 @@ func (h *updateShareHandler) Handle(params share.UpdateShareParams, principal *r
 	}
 
 	if doCommit {
-		if err := tx.Commit(); err != nil {
+		if err := trx.Commit(); err != nil {
 			logrus.Errorf("error committing transaction for share '%v' update: %v", shrToken, err)
 			return share.NewUpdateShareInternalServerError()
 		}

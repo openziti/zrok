@@ -14,13 +14,13 @@ func loginHandler(params account.LoginParams) middleware.Responder {
 
 	logrus.Infof("received login request for email '%v'", params.Body.Email)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return account.NewLoginUnauthorized()
 	}
-	defer func() { _ = tx.Rollback() }()
-	a, err := str.FindAccountWithEmail(params.Body.Email, tx)
+	defer func() { _ = trx.Rollback() }()
+	a, err := str.FindAccountWithEmail(params.Body.Email, trx)
 	if err != nil {
 		logrus.Errorf("error finding account '%v': %v", params.Body.Email, err)
 		return account.NewLoginUnauthorized()

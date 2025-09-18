@@ -17,12 +17,12 @@ type PasswordResetRequest struct {
 	Deleted   bool
 }
 
-func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sqlx.Tx) (int, error) {
-	if err := str.DeletePasswordResetRequestsByAccountId(prr.AccountId, tx); err != nil {
+func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, trx *sqlx.Tx) (int, error) {
+	if err := str.DeletePasswordResetRequestsByAccountId(prr.AccountId, trx); err != nil {
 		logrus.Errorf("unable to delete old password reset requests for account '%v', but continuing: %v", prr.AccountId, err)
 	}
 
-	stmt, err := tx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")
+	stmt, err := trx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing password_reset_requests insert statement")
 	}
@@ -33,15 +33,15 @@ func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, tx *sqlx
 	return id, nil
 }
 
-func (str *Store) FindPasswordResetRequestWithToken(token string, tx *sqlx.Tx) (*PasswordResetRequest, error) {
+func (str *Store) FindPasswordResetRequestWithToken(token string, trx *sqlx.Tx) (*PasswordResetRequest, error) {
 	prr := &PasswordResetRequest{}
-	if err := tx.QueryRowx("select * from password_reset_requests where token = $1 and not deleted", token).StructScan(prr); err != nil {
+	if err := trx.QueryRowx("select * from password_reset_requests where token = $1 and not deleted", token).StructScan(prr); err != nil {
 		return nil, errors.Wrap(err, "error selecting password_reset_requests by token")
 	}
 	return prr, nil
 }
 
-func (str *Store) FindExpiredPasswordResetRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*PasswordResetRequest, error) {
+func (str *Store) FindExpiredPasswordResetRequests(before time.Time, limit int, trx *sqlx.Tx) ([]*PasswordResetRequest, error) {
 	var sql string
 	switch str.cfg.Type {
 	case "postgres":
@@ -53,7 +53,7 @@ func (str *Store) FindExpiredPasswordResetRequests(before time.Time, limit int, 
 		return nil, errors.Errorf("unknown database type '%v'", str.cfg.Type)
 	}
 
-	rows, err := tx.Queryx(fmt.Sprintf(sql, limit), before)
+	rows, err := trx.Queryx(fmt.Sprintf(sql, limit), before)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting expired password_reset_requests")
 	}
@@ -68,8 +68,8 @@ func (str *Store) FindExpiredPasswordResetRequests(before time.Time, limit int, 
 	return prrs, nil
 }
 
-func (str *Store) DeletePasswordResetRequest(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeletePasswordResetRequest(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing password_reset_requests delete statement")
 	}
@@ -80,7 +80,7 @@ func (str *Store) DeletePasswordResetRequest(id int, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) error {
+func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, trx *sqlx.Tx) error {
 	if len(ids) == 0 {
 		return nil
 	}
@@ -93,7 +93,7 @@ func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) er
 		indexes[i] = fmt.Sprintf("$%d", i+1)
 	}
 
-	stmt, err := tx.Prepare(fmt.Sprintf("update password_reset_requests set updated_at = current_timestamp, deleted = true where id in (%s)", strings.Join(indexes, ",")))
+	stmt, err := trx.Prepare(fmt.Sprintf("update password_reset_requests set updated_at = current_timestamp, deleted = true where id in (%s)", strings.Join(indexes, ",")))
 	if err != nil {
 		return errors.Wrap(err, "error preparing password_reset_requests delete multiple statement")
 	}
@@ -104,8 +104,8 @@ func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, tx *sqlx.Tx) er
 	return nil
 }
 
-func (str *Store) DeletePasswordResetRequestsByAccountId(accountId int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where account_id = $1")
+func (str *Store) DeletePasswordResetRequestsByAccountId(accountId int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where account_id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing password_reset_requests delete by account_id statement")
 	}

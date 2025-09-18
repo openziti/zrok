@@ -23,8 +23,8 @@ type NameWithNamespace struct {
 	NamespaceName string
 }
 
-func (str *Store) CreateName(an *Name, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into names (namespace_id, name, account_id, reserved) values ($1, $2, $3, $4) returning id")
+func (str *Store) CreateName(an *Name, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into names (namespace_id, name, account_id, reserved) values ($1, $2, $3, $4) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing name insert statement")
 	}
@@ -35,24 +35,24 @@ func (str *Store) CreateName(an *Name, tx *sqlx.Tx) (int, error) {
 	return id, nil
 }
 
-func (str *Store) GetName(id int, tx *sqlx.Tx) (*Name, error) {
+func (str *Store) GetName(id int, trx *sqlx.Tx) (*Name, error) {
 	an := &Name{}
-	if err := tx.QueryRowx("select * from names where id = $1 and not deleted", id).StructScan(an); err != nil {
+	if err := trx.QueryRowx("select * from names where id = $1 and not deleted", id).StructScan(an); err != nil {
 		return nil, errors.Wrap(err, "error selecting name by id")
 	}
 	return an, nil
 }
 
-func (str *Store) FindNameByNamespaceAndName(namespaceId int, name string, tx *sqlx.Tx) (*Name, error) {
+func (str *Store) FindNameByNamespaceAndName(namespaceId int, name string, trx *sqlx.Tx) (*Name, error) {
 	an := &Name{}
-	if err := tx.QueryRowx("select * from names where namespace_id = $1 and name = $2 and not deleted", namespaceId, name).StructScan(an); err != nil {
+	if err := trx.QueryRowx("select * from names where namespace_id = $1 and name = $2 and not deleted", namespaceId, name).StructScan(an); err != nil {
 		return nil, errors.Wrap(err, "error selecting name by namespace and name")
 	}
 	return an, nil
 }
 
-func (str *Store) FindNamesForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Name, error) {
-	rows, err := tx.Queryx("select * from names where namespace_id = $1 and not deleted order by name", namespaceId)
+func (str *Store) FindNamesForNamespace(namespaceId int, trx *sqlx.Tx) ([]*Name, error) {
+	rows, err := trx.Queryx("select * from names where namespace_id = $1 and not deleted order by name", namespaceId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding names for namespace")
 	}
@@ -67,8 +67,8 @@ func (str *Store) FindNamesForNamespace(namespaceId int, tx *sqlx.Tx) ([]*Name, 
 	return names, nil
 }
 
-func (str *Store) FindNamesForAccount(accountId int, tx *sqlx.Tx) ([]*Name, error) {
-	rows, err := tx.Queryx("select * from names where account_id = $1 and not deleted order by name", accountId)
+func (str *Store) FindNamesForAccount(accountId int, trx *sqlx.Tx) ([]*Name, error) {
+	rows, err := trx.Queryx("select * from names where account_id = $1 and not deleted order by name", accountId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding names for account")
 	}
@@ -83,8 +83,8 @@ func (str *Store) FindNamesForAccount(accountId int, tx *sqlx.Tx) ([]*Name, erro
 	return names, nil
 }
 
-func (str *Store) FindNamesForAccountAndNamespace(accountId, namespaceId int, tx *sqlx.Tx) ([]*Name, error) {
-	rows, err := tx.Queryx("select * from names where account_id = $1 and namespace_id = $2 and not deleted order by name", accountId, namespaceId)
+func (str *Store) FindNamesForAccountAndNamespace(accountId, namespaceId int, trx *sqlx.Tx) ([]*Name, error) {
+	rows, err := trx.Queryx("select * from names where account_id = $1 and namespace_id = $2 and not deleted order by name", accountId, namespaceId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding names for account and namespace")
 	}
@@ -99,15 +99,15 @@ func (str *Store) FindNamesForAccountAndNamespace(accountId, namespaceId int, tx
 	return names, nil
 }
 
-func (str *Store) CheckNameAvailability(namespaceId int, name string, tx *sqlx.Tx) (bool, error) {
+func (str *Store) CheckNameAvailability(namespaceId int, name string, trx *sqlx.Tx) (bool, error) {
 	var count int
-	if err := tx.QueryRow("select count(*) from names where namespace_id = $1 and name = $2 and not deleted", namespaceId, name).Scan(&count); err != nil {
+	if err := trx.QueryRow("select count(*) from names where namespace_id = $1 and name = $2 and not deleted", namespaceId, name).Scan(&count); err != nil {
 		return false, errors.Wrap(err, "error checking name availability")
 	}
 	return count == 0, nil
 }
 
-func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, namespaceId int, tx *sqlx.Tx) ([]*NameWithShareToken, error) {
+func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, namespaceId int, trx *sqlx.Tx) ([]*NameWithShareToken, error) {
 	sql := `select n.id, n.created_at, n.updated_at, n.deleted, n.namespace_id, n.name, n.account_id, n.reserved, s.token as share_token
 			from names n
 			left join share_name_mappings snm on n.id = snm.name_id and not snm.deleted
@@ -115,7 +115,7 @@ func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, name
 			where n.account_id = $1 and n.namespace_id = $2 and not n.deleted
 			order by n.name`
 
-	rows, err := tx.Queryx(sql, accountId, namespaceId)
+	rows, err := trx.Queryx(sql, accountId, namespaceId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding names with share tokens for account and namespace")
 	}
@@ -132,7 +132,7 @@ func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, name
 	return names, nil
 }
 
-func (str *Store) FindNamesForShare(shareId int, tx *sqlx.Tx) ([]*NameWithNamespace, error) {
+func (str *Store) FindNamesForShare(shareId int, trx *sqlx.Tx) ([]*NameWithNamespace, error) {
 	sql := `select n.id, n.created_at, n.updated_at, n.deleted, n.namespace_id,
 	               n.name, n.account_id, n.reserved,
 	               ns.name as namespace_name
@@ -145,7 +145,7 @@ func (str *Store) FindNamesForShare(shareId int, tx *sqlx.Tx) ([]*NameWithNamesp
 	          and not ns.deleted
 	        order by ns.name, n.name`
 
-	rows, err := tx.Queryx(sql, shareId)
+	rows, err := trx.Queryx(sql, shareId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding names for share")
 	}
@@ -164,8 +164,8 @@ func (str *Store) FindNamesForShare(shareId int, tx *sqlx.Tx) ([]*NameWithNamesp
 	return names, nil
 }
 
-func (str *Store) DeleteName(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update names set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeleteName(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update names set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing name delete statement")
 	}

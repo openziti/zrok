@@ -17,8 +17,8 @@ type AccountRequest struct {
 	Deleted       bool
 }
 
-func (str *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into account_requests (token, email, source_address) values ($1, $2, $3) returning id")
+func (str *Store) CreateAccountRequest(ar *AccountRequest, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into account_requests (token, email, source_address) values ($1, $2, $3) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing account_requests insert statement")
 	}
@@ -29,23 +29,23 @@ func (str *Store) CreateAccountRequest(ar *AccountRequest, tx *sqlx.Tx) (int, er
 	return id, nil
 }
 
-func (str *Store) GetAccountRequest(id int, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) GetAccountRequest(id int, trx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
-	if err := tx.QueryRowx("select * from account_requests where id = $1", id).StructScan(ar); err != nil {
+	if err := trx.QueryRowx("select * from account_requests where id = $1", id).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by id")
 	}
 	return ar, nil
 }
 
-func (str *Store) FindAccountRequestWithToken(token string, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) FindAccountRequestWithToken(token string, trx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
-	if err := tx.QueryRowx("select * from account_requests where token = $1 and not deleted", token).StructScan(ar); err != nil {
+	if err := trx.QueryRowx("select * from account_requests where token = $1 and not deleted", token).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by token")
 	}
 	return ar, nil
 }
 
-func (str *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sqlx.Tx) ([]*AccountRequest, error) {
+func (str *Store) FindExpiredAccountRequests(before time.Time, limit int, trx *sqlx.Tx) ([]*AccountRequest, error) {
 	var sql string
 	switch str.cfg.Type {
 	case "postgres":
@@ -58,7 +58,7 @@ func (str *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sq
 		return nil, errors.Errorf("unknown database type '%v'", str.cfg.Type)
 	}
 
-	rows, err := tx.Queryx(fmt.Sprintf(sql, limit), before)
+	rows, err := trx.Queryx(fmt.Sprintf(sql, limit), before)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting expired account_requests")
 	}
@@ -73,16 +73,16 @@ func (str *Store) FindExpiredAccountRequests(before time.Time, limit int, tx *sq
 	return ars, nil
 }
 
-func (str *Store) FindAccountRequestWithEmail(email string, tx *sqlx.Tx) (*AccountRequest, error) {
+func (str *Store) FindAccountRequestWithEmail(email string, trx *sqlx.Tx) (*AccountRequest, error) {
 	ar := &AccountRequest{}
-	if err := tx.QueryRowx("select * from account_requests where email = $1 and not deleted", email).StructScan(ar); err != nil {
+	if err := trx.QueryRowx("select * from account_requests where email = $1 and not deleted", email).StructScan(ar); err != nil {
 		return nil, errors.Wrap(err, "error selecting account_request by email")
 	}
 	return ar, nil
 }
 
-func (str *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update account_requests set deleted = true, updated_at = current_timestamp where id = $1")
+func (str *Store) DeleteAccountRequest(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update account_requests set deleted = true, updated_at = current_timestamp where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing account_requests delete statement")
 	}
@@ -93,7 +93,7 @@ func (str *Store) DeleteAccountRequest(id int, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (str *Store) DeleteMultipleAccountRequests(ids []int, tx *sqlx.Tx) error {
+func (str *Store) DeleteMultipleAccountRequests(ids []int, trx *sqlx.Tx) error {
 	if len(ids) == 0 {
 		return nil
 	}
@@ -106,7 +106,7 @@ func (str *Store) DeleteMultipleAccountRequests(ids []int, tx *sqlx.Tx) error {
 		indexes[i] = fmt.Sprintf("$%d", i+1)
 	}
 
-	stmt, err := tx.Prepare(fmt.Sprintf("update account_requests set deleted = true, updated_at = current_timestamp where id in (%s)", strings.Join(indexes, ",")))
+	stmt, err := trx.Prepare(fmt.Sprintf("update account_requests set deleted = true, updated_at = current_timestamp where id in (%s)", strings.Join(indexes, ",")))
 	if err != nil {
 		return errors.Wrap(err, "error preparing account_requests delete multiple statement")
 	}

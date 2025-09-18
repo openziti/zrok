@@ -15,18 +15,18 @@ func newShareDetailHandler() *shareDetailHandler {
 }
 
 func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return metadata.NewGetShareDetailInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
-	shr, err := str.FindShareWithToken(params.ShareToken, tx)
+	defer func() { _ = trx.Rollback() }()
+	shr, err := str.FindShareWithToken(params.ShareToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding share '%v': %v", params.ShareToken, err)
 		return metadata.NewGetShareDetailNotFound()
 	}
-	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx)
+	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return metadata.NewGetShareDetailInternalServerError()
@@ -55,7 +55,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		logrus.Debug("skipping spark data; no influx configuration")
 	}
 
-	frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, tx)
+	frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
 
 	target := ""
 	if shr.BackendProxyEndpoint != nil {

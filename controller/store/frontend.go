@@ -20,8 +20,8 @@ type Frontend struct {
 	Description    *string
 }
 
-func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (environment_id, private_share_id, token, z_id, public_name, url_template, dynamic, bind_address, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
+func (str *Store) CreateFrontend(envId int, f *Frontend, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into frontends (environment_id, private_share_id, token, z_id, public_name, url_template, dynamic, bind_address, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing frontends insert statement")
 	}
@@ -32,8 +32,8 @@ func (str *Store) CreateFrontend(envId int, f *Frontend, tx *sqlx.Tx) (int, erro
 	return id, nil
 }
 
-func (str *Store) CreateGlobalFrontend(f *Frontend, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into frontends (token, z_id, public_name, url_template, dynamic, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id")
+func (str *Store) CreateGlobalFrontend(f *Frontend, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into frontends (token, z_id, public_name, url_template, dynamic, reserved, permission_mode, description) values ($1, $2, $3, $4, $5, $6, $7, $8) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing global frontends insert statement")
 	}
@@ -44,40 +44,40 @@ func (str *Store) CreateGlobalFrontend(f *Frontend, tx *sqlx.Tx) (int, error) {
 	return id, nil
 }
 
-func (str *Store) GetFrontend(id int, tx *sqlx.Tx) (*Frontend, error) {
+func (str *Store) GetFrontend(id int, trx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
-	if err := tx.QueryRowx("select * from frontends where id = $1", id).StructScan(i); err != nil {
+	if err := trx.QueryRowx("select * from frontends where id = $1", id).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by id")
 	}
 	return i, nil
 }
 
-func (str *Store) FindFrontendWithToken(token string, tx *sqlx.Tx) (*Frontend, error) {
+func (str *Store) FindFrontendWithToken(token string, trx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
-	if err := tx.QueryRowx("select frontends.* from frontends where token = $1 and not deleted", token).StructScan(i); err != nil {
+	if err := trx.QueryRowx("select frontends.* from frontends where token = $1 and not deleted", token).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by name")
 	}
 	return i, nil
 }
 
-func (str *Store) FindFrontendWithZId(zId string, tx *sqlx.Tx) (*Frontend, error) {
+func (str *Store) FindFrontendWithZId(zId string, trx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
-	if err := tx.QueryRowx("select frontends.* from frontends where z_id = $1 and not deleted", zId).StructScan(i); err != nil {
+	if err := trx.QueryRowx("select frontends.* from frontends where z_id = $1 and not deleted", zId).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by ziti id")
 	}
 	return i, nil
 }
 
-func (str *Store) FindFrontendPubliclyNamed(publicName string, tx *sqlx.Tx) (*Frontend, error) {
+func (str *Store) FindFrontendPubliclyNamed(publicName string, trx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
-	if err := tx.QueryRowx("select frontends.* from frontends where public_name = $1 and not deleted", publicName).StructScan(i); err != nil {
+	if err := trx.QueryRowx("select frontends.* from frontends where public_name = $1 and not deleted", publicName).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting frontend by public_name")
 	}
 	return i, nil
 }
 
-func (str *Store) FindFrontendsForEnvironment(envId int, tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx("select frontends.* from frontends where environment_id = $1 and not deleted", envId)
+func (str *Store) FindFrontendsForEnvironment(envId int, trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx("select frontends.* from frontends where environment_id = $1 and not deleted", envId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting frontends by environment_id")
 	}
@@ -92,8 +92,8 @@ func (str *Store) FindFrontendsForEnvironment(envId int, tx *sqlx.Tx) ([]*Fronte
 	return is, nil
 }
 
-func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx("select frontends.* from frontends where environment_id is null and reserved = true and not deleted")
+func (str *Store) FindPublicFrontends(trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx("select frontends.* from frontends where environment_id is null and reserved = true and not deleted")
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting public frontends")
 	}
@@ -108,8 +108,8 @@ func (str *Store) FindPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
 	return frontends, nil
 }
 
-func (str *Store) FindOpenPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx("select frontends.* from frontends where environment_id is null and permission_mode = 'open' and reserved = true and not deleted")
+func (str *Store) FindOpenPublicFrontends(trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx("select frontends.* from frontends where environment_id is null and permission_mode = 'open' and reserved = true and not deleted")
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting open public frontends")
 	}
@@ -124,8 +124,8 @@ func (str *Store) FindOpenPublicFrontends(tx *sqlx.Tx) ([]*Frontend, error) {
 	return frontends, nil
 }
 
-func (str *Store) FindClosedPublicFrontendsGrantedToAccount(accountId int, tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx(`
+func (str *Store) FindClosedPublicFrontendsGrantedToAccount(accountId int, trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx(`
 		select frontends.* from frontends 
 		inner join frontend_grants on frontends.id = frontend_grants.frontend_id 
 		where frontend_grants.account_id = $1 
@@ -148,8 +148,8 @@ func (str *Store) FindClosedPublicFrontendsGrantedToAccount(accountId int, tx *s
 	return frontends, nil
 }
 
-func (str *Store) FindFrontendsForPrivateShare(shrId int, tx *sqlx.Tx) ([]*Frontend, error) {
-	rows, err := tx.Queryx("select frontends.* from frontends where private_share_id = $1 and not deleted", shrId)
+func (str *Store) FindFrontendsForPrivateShare(shrId int, trx *sqlx.Tx) ([]*Frontend, error) {
+	rows, err := trx.Queryx("select frontends.* from frontends where private_share_id = $1 and not deleted", shrId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error selecting frontends by private_share_id")
 	}
@@ -164,9 +164,9 @@ func (str *Store) FindFrontendsForPrivateShare(shrId int, tx *sqlx.Tx) ([]*Front
 	return is, nil
 }
 
-func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
+func (str *Store) UpdateFrontend(fe *Frontend, trx *sqlx.Tx) error {
 	sql := "update frontends set environment_id = $1, private_share_id = $2, token = $3, z_id = $4, public_name = $5, url_template = $6, dynamic = $7, bind_address = $8, reserved = $9, permission_mode = $10, description = $11, updated_at = current_timestamp where id = $12"
-	stmt, err := tx.Prepare(sql)
+	stmt, err := trx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends update statement")
 	}
@@ -177,8 +177,8 @@ func (str *Store) UpdateFrontend(fe *Frontend, tx *sqlx.Tx) error {
 	return nil
 }
 
-func (str *Store) DeleteFrontend(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update frontends set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeleteFrontend(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update frontends set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing frontends delete statement")
 	}

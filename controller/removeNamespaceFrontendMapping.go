@@ -19,35 +19,35 @@ func (handler *removeNamespaceFrontendMappingHandler) Handle(params admin.Remove
 		return admin.NewRemoveNamespaceFrontendMappingUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewRemoveNamespaceFrontendMappingInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	nsToken := params.Body.NamespaceToken
 	feToken := params.Body.FrontendToken
 
-	ns, err := str.FindNamespaceWithToken(nsToken, tx)
+	ns, err := str.FindNamespaceWithToken(nsToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding namespace by token '%s': %v", nsToken, err)
 		return admin.NewRemoveNamespaceFrontendMappingNotFound()
 	}
 
-	fe, err := str.FindFrontendWithToken(feToken, tx)
+	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend by token '%s': %v", feToken, err)
 		return admin.NewRemoveNamespaceFrontendMappingNotFound()
 	}
 
-	err = str.DeleteNamespaceFrontendMapping(ns.Id, fe.Id, tx)
+	err = str.DeleteNamespaceFrontendMapping(ns.Id, fe.Id, trx)
 	if err != nil {
 		logrus.Errorf("error deleting namespace frontend mapping: %v", err)
 		return admin.NewRemoveNamespaceFrontendMappingInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing transaction: %v", err)
 		return admin.NewRemoveNamespaceFrontendMappingInternalServerError()
 	}

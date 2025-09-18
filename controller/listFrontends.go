@@ -19,14 +19,14 @@ func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principa
 		return admin.NewListFrontendsUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewListFrontendsInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	sfes, err := str.FindPublicFrontends(tx)
+	sfes, err := str.FindPublicFrontends(trx)
 	if err != nil {
 		logrus.Errorf("error finding public frontends: %v", err)
 		return admin.NewListFrontendsInternalServerError()

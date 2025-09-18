@@ -19,22 +19,22 @@ func (handler *listFrontendNamespaceMappingsHandler) Handle(params admin.ListFro
 		return admin.NewListFrontendNamespaceMappingsUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewListFrontendNamespaceMappingsInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	feToken := params.FrontendToken
 
-	fe, err := str.FindFrontendWithToken(feToken, tx)
+	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend by token '%s': %v", feToken, err)
 		return admin.NewListFrontendNamespaceMappingsNotFound()
 	}
 
-	nfMappings, err := str.FindNamespaceFrontendMappingsForFrontend(fe.Id, tx)
+	nfMappings, err := str.FindNamespaceFrontendMappingsForFrontend(fe.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding namespace frontend mappings for frontend '%s': %v", feToken, err)
 		return admin.NewListFrontendNamespaceMappingsInternalServerError()
@@ -42,7 +42,7 @@ func (handler *listFrontendNamespaceMappingsHandler) Handle(params admin.ListFro
 
 	var mappings []*admin.ListFrontendNamespaceMappingsOKBodyItems0
 	for _, nfMapping := range nfMappings {
-		ns, err := str.GetNamespace(nfMapping.NamespaceId, tx)
+		ns, err := str.GetNamespace(nfMapping.NamespaceId, trx)
 		if err != nil {
 			logrus.Errorf("error finding namespace with id '%d': %v", nfMapping.NamespaceId, err)
 			continue

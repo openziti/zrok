@@ -27,12 +27,12 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 
 	var token string
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for request '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	token, err = CreateToken()
 	if err != nil {
@@ -40,7 +40,7 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
-	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
+	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, trx)
 	if err != nil {
 		logrus.Errorf("no account found for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
@@ -51,12 +51,12 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 		AccountId: a.Id,
 	}
 
-	if _, err := str.CreatePasswordResetRequest(prr, tx); err != nil {
+	if _, err := str.CreatePasswordResetRequest(prr, trx); err != nil {
 		logrus.Errorf("error creating reset password request for '%v': %v", a.Email, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing reset password request for '%v': %v", a.Email, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}

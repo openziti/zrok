@@ -22,12 +22,12 @@ func GC(inCfg *zrok_config.Config) error {
 			logrus.Errorf("error closing store: %v", err)
 		}
 	}()
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		return err
 	}
-	defer func() { _ = tx.Rollback() }()
-	sshrs, err := str.FindAllShares(tx)
+	defer func() { _ = trx.Rollback() }()
+	sshrs, err := str.FindAllShares(trx)
 	if err != nil {
 		return err
 	}

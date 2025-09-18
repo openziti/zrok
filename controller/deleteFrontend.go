@@ -21,25 +21,25 @@ func (h *deleteFrontendHandler) Handle(params admin.DeleteFrontendParams, princi
 		return admin.NewDeleteFrontendUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	fe, err := str.FindFrontendWithToken(feToken, tx)
+	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend with token '%v': %v", feToken, err)
 		return admin.NewDeleteFrontendNotFound()
 	}
 
-	if err := str.DeleteFrontend(fe.Id, tx); err != nil {
+	if err := str.DeleteFrontend(fe.Id, trx); err != nil {
 		logrus.Errorf("error deleting frontend '%v': %v", feToken, err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing frontend '%v' deletion: %v", feToken, err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}

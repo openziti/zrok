@@ -21,14 +21,14 @@ func (handler *regenerateAccountTokenHandler) Handle(params account.RegenerateAc
 		return account.NewRegenerateAccountTokenNotFound()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewRegenerateAccountTokenInternalServerError()
 	}
-	defer tx.Rollback()
+	defer trx.Rollback()
 
-	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, tx)
+	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, trx)
 	if err != nil {
 		logrus.Errorf("error finding account for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewRegenerateAccountTokenNotFound()
@@ -47,12 +47,12 @@ func (handler *regenerateAccountTokenHandler) Handle(params account.RegenerateAc
 
 	a.Token = accountToken
 
-	if _, err := str.UpdateAccount(a, tx); err != nil {
+	if _, err := str.UpdateAccount(a, trx); err != nil {
 		logrus.Errorf("error updating account for request '%v': %v", params.Body.EmailAddress, err)
 		return account.NewRegenerateAccountTokenInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing '%v' (%v): %v", params.Body.EmailAddress, a.Email, err)
 		return account.NewRegenerateAccountTokenInternalServerError()
 	}

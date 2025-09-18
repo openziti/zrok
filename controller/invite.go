@@ -35,20 +35,20 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	logrus.Infof("received account request for email '%v'", params.Body.Email)
 	var regToken string
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Error(err)
 		return account.NewInviteInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	if h.cfg.Invites != nil && h.cfg.Invites.TokenStrategy == "store" {
-		inviteToken, err := str.FindInviteTokenByToken(params.Body.InviteToken, tx)
+		inviteToken, err := str.FindInviteTokenByToken(params.Body.InviteToken, trx)
 		if err != nil {
 			logrus.Errorf("cannot get invite token '%v' for '%v': %v", params.Body.InviteToken, params.Body.Email, err)
 			return account.NewInviteBadRequest().WithPayload("missing invite token")
 		}
-		if err := str.DeleteInviteToken(inviteToken.Id, tx); err != nil {
+		if err := str.DeleteInviteToken(inviteToken.Id, trx); err != nil {
 			logrus.Error(err)
 			return account.NewInviteInternalServerError()
 		}
@@ -67,16 +67,16 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 	}
 
 	// deleted accounts still exist as far as invites are concerned (ignore deleted flag)
-	if _, err := str.FindAccountWithEmailAndDeleted(params.Body.Email, tx); err == nil {
+	if _, err := str.FindAccountWithEmailAndDeleted(params.Body.Email, trx); err == nil {
 		logrus.Errorf("found account for '%v', cannot process account request", params.Body.Email)
 		return account.NewInviteBadRequest().WithPayload("duplicate email found")
 	} else {
 		logrus.Infof("no account found for '%v': %v", params.Body.Email, err)
 	}
 
-	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, tx); err == nil {
+	if oldAr, err := str.FindAccountRequestWithEmail(params.Body.Email, trx); err == nil {
 		logrus.Warnf("found previous account request for '%v', removing", params.Body.Email)
-		if err := str.DeleteAccountRequest(oldAr.Id, tx); err != nil {
+		if err := str.DeleteAccountRequest(oldAr.Id, trx); err != nil {
 			logrus.Errorf("error deleting previous account request for '%v': %v", params.Body.Email, err)
 			return account.NewInviteInternalServerError()
 		}
@@ -84,11 +84,11 @@ func (h *inviteHandler) Handle(params account.InviteParams) middleware.Responder
 		logrus.Warnf("error finding previous account request for '%v': %v", params.Body.Email, err)
 	}
 
-	if _, err := str.CreateAccountRequest(ar, tx); err != nil {
+	if _, err := str.CreateAccountRequest(ar, trx); err != nil {
 		logrus.Errorf("error creating account request for '%v': %v", params.Body.Email, err)
 		return account.NewInviteInternalServerError()
 	}
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing account request for '%v': %v", params.Body.Email, err)
 		return account.NewInviteInternalServerError()
 	}

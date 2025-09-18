@@ -11,8 +11,8 @@ type ShareNameMapping struct {
 	NameId  int
 }
 
-func (str *Store) CreateShareNameMapping(snm *ShareNameMapping, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into share_name_mappings (share_id, name_id) values ($1, $2) returning id")
+func (str *Store) CreateShareNameMapping(snm *ShareNameMapping, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into share_name_mappings (share_id, name_id) values ($1, $2) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing share name mapping insert statement")
 	}
@@ -23,16 +23,16 @@ func (str *Store) CreateShareNameMapping(snm *ShareNameMapping, tx *sqlx.Tx) (in
 	return id, nil
 }
 
-func (str *Store) GetShareNameMapping(id int, tx *sqlx.Tx) (*ShareNameMapping, error) {
+func (str *Store) GetShareNameMapping(id int, trx *sqlx.Tx) (*ShareNameMapping, error) {
 	snm := &ShareNameMapping{}
-	if err := tx.QueryRowx("select * from share_name_mappings where id = $1 and not deleted", id).StructScan(snm); err != nil {
+	if err := trx.QueryRowx("select * from share_name_mappings where id = $1 and not deleted", id).StructScan(snm); err != nil {
 		return nil, errors.Wrap(err, "error selecting share name mapping by id")
 	}
 	return snm, nil
 }
 
-func (str *Store) FindShareNameMappingsByShareId(shareId int, tx *sqlx.Tx) ([]*ShareNameMapping, error) {
-	rows, err := tx.Queryx("select * from share_name_mappings where share_id = $1 and not deleted", shareId)
+func (str *Store) FindShareNameMappingsByShareId(shareId int, trx *sqlx.Tx) ([]*ShareNameMapping, error) {
+	rows, err := trx.Queryx("select * from share_name_mappings where share_id = $1 and not deleted", shareId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding share name mappings by share id")
 	}
@@ -47,8 +47,8 @@ func (str *Store) FindShareNameMappingsByShareId(shareId int, tx *sqlx.Tx) ([]*S
 	return mappings, nil
 }
 
-func (str *Store) FindShareNameMappingsByNameId(nameId int, tx *sqlx.Tx) ([]*ShareNameMapping, error) {
-	rows, err := tx.Queryx("select * from share_name_mappings where name_id = $1 and not deleted", nameId)
+func (str *Store) FindShareNameMappingsByNameId(nameId int, trx *sqlx.Tx) ([]*ShareNameMapping, error) {
+	rows, err := trx.Queryx("select * from share_name_mappings where name_id = $1 and not deleted", nameId)
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding share name mappings by name id")
 	}
@@ -63,16 +63,16 @@ func (str *Store) FindShareNameMappingsByNameId(nameId int, tx *sqlx.Tx) ([]*Sha
 	return mappings, nil
 }
 
-func (str *Store) FindShareNameMappingByShareIdAndNameId(shareId, nameId int, tx *sqlx.Tx) (*ShareNameMapping, error) {
+func (str *Store) FindShareNameMappingByShareIdAndNameId(shareId, nameId int, trx *sqlx.Tx) (*ShareNameMapping, error) {
 	snm := &ShareNameMapping{}
-	if err := tx.QueryRowx("select * from share_name_mappings where share_id = $1 and name_id = $2 and not deleted", shareId, nameId).StructScan(snm); err != nil {
+	if err := trx.QueryRowx("select * from share_name_mappings where share_id = $1 and name_id = $2 and not deleted", shareId, nameId).StructScan(snm); err != nil {
 		return nil, errors.Wrap(err, "error selecting share name mapping by share id and name id")
 	}
 	return snm, nil
 }
 
-func (str *Store) DeleteShareNameMapping(id int, tx *sqlx.Tx) error {
-	stmt, err := tx.Prepare("update share_name_mappings set updated_at = current_timestamp, deleted = true where id = $1")
+func (str *Store) DeleteShareNameMapping(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update share_name_mappings set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing share name mapping delete statement")
 	}

@@ -25,14 +25,14 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 	}
 	logrus.Infof("received register request for registration token '%v'", params.Body.RegisterToken)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for registration token '%v': %v", params.Body.RegisterToken, err)
 		return account.NewRegisterInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	ar, err := str.FindAccountRequestWithToken(params.Body.RegisterToken, tx)
+	ar, err := str.FindAccountRequestWithToken(params.Body.RegisterToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding account request with registration token '%v': %v", params.Body.RegisterToken, err)
 		return account.NewRegisterNotFound()
@@ -60,17 +60,17 @@ func (h *registerHandler) Handle(params account.RegisterParams) middleware.Respo
 		Password: hpwd.Password,
 		Token:    accountToken,
 	}
-	if _, err := str.CreateAccount(a, tx); err != nil {
+	if _, err := str.CreateAccount(a, trx); err != nil {
 		logrus.Errorf("error creating account for request '%v' (%v): %v", params.Body.RegisterToken, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 
-	if err := str.DeleteAccountRequest(ar.Id, tx); err != nil {
+	if err := str.DeleteAccountRequest(ar.Id, trx); err != nil {
 		logrus.Errorf("error deleteing account request '%v' (%v): %v", params.Body.RegisterToken, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing '%v' (%v): %v", params.Body.RegisterToken, ar.Email, err)
 		return account.NewRegisterInternalServerError()
 	}

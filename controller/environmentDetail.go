@@ -14,13 +14,13 @@ func newEnvironmentDetailHandler() *environmentDetailHandler {
 }
 
 func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
-	senv, err := str.FindEnvironmentForAccount(params.EnvZID, int(principal.ID), tx)
+	defer func() { _ = trx.Rollback() }()
+	senv, err := str.FindEnvironmentForAccount(params.EnvZID, int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
@@ -35,7 +35,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 			ZID:         senv.ZId,
 		},
 	}
-	shrs, err := str.FindSharesForEnvironment(senv.Id, tx)
+	shrs, err := str.FindSharesForEnvironment(senv.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding shares for environment '%v' for user '%v': %v", senv.ZId, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
@@ -51,7 +51,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		logrus.Debug("skipping spark data for shares; no influx configuration")
 	}
 	for _, shr := range shrs {
-		frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, tx)
+		frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
 		target := ""
 		if shr.BackendProxyEndpoint != nil {
 			target = *shr.BackendProxyEndpoint

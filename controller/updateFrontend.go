@@ -23,14 +23,14 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 		return admin.NewUpdateFrontendUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewUpdateFrontendInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	fe, err := str.FindFrontendWithToken(feToken, tx)
+	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding frontend with token '%v': %v", feToken, err)
 		return admin.NewUpdateFrontendNotFound()
@@ -51,12 +51,12 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 	}
 
 	if doUpdate {
-		if err := str.UpdateFrontend(fe, tx); err != nil {
+		if err := str.UpdateFrontend(fe, trx); err != nil {
 			logrus.Errorf("error updating frontend: %v", err)
 			return admin.NewUpdateFrontendInternalServerError()
 		}
 
-		if err := tx.Commit(); err != nil {
+		if err := trx.Commit(); err != nil {
 			logrus.Errorf("error committing frontend update: %v", err)
 			return admin.NewUpdateFrontendInternalServerError()
 		}

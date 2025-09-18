@@ -25,20 +25,20 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 	}
 	logrus.Infof("received password reset request for reset token '%v'", params.Body.ResetToken)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction for '%v': %v", params.Body.ResetToken, err)
 		return account.NewResetPasswordInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	prr, err := str.FindPasswordResetRequestWithToken(params.Body.ResetToken, tx)
+	prr, err := str.FindPasswordResetRequestWithToken(params.Body.ResetToken, trx)
 	if err != nil {
 		logrus.Errorf("error finding reset request for reset token '%v': %v", params.Body.ResetToken, err)
 		return account.NewResetPasswordNotFound()
 	}
 
-	a, err := str.GetAccount(prr.AccountId, tx)
+	a, err := str.GetAccount(prr.AccountId, trx)
 	if err != nil {
 		logrus.Errorf("error finding account for reset token '%v': %v", params.Body.ResetToken, err)
 		return account.NewResetPasswordNotFound()
@@ -61,17 +61,17 @@ func (handler *resetPasswordHandler) Handle(params account.ResetPasswordParams) 
 	a.Salt = hpwd.Salt
 	a.Password = hpwd.Password
 
-	if _, err := str.UpdateAccount(a, tx); err != nil {
+	if _, err := str.UpdateAccount(a, trx); err != nil {
 		logrus.Errorf("error updating for reset token '%v' (%v): %v", params.Body.ResetToken, a.Email, err)
 		return account.NewResetPasswordInternalServerError()
 	}
 
-	if err := str.DeletePasswordResetRequest(prr.Id, tx); err != nil {
+	if err := str.DeletePasswordResetRequest(prr.Id, trx); err != nil {
 		logrus.Errorf("error deleting reset request for reset token '%v' (%v): %v", params.Body.ResetToken, a.Email, err)
 		return account.NewResetPasswordInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing for reset token '%v' (%v): %v", params.Body.ResetToken, a.Email, err)
 		return account.NewResetPasswordInternalServerError()
 	}

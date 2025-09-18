@@ -42,12 +42,12 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 	}
 	logrus.Infof("found frontend identity '%v'", *identity.Name)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
 		logrus.Errorf("error starting transaction: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	feToken, err := CreateToken()
 	if err != nil {
@@ -63,7 +63,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		Reserved:       true,
 		PermissionMode: store.PermissionMode(params.Body.PermissionMode),
 	}
-	if _, err := str.CreateGlobalFrontend(fe, tx); err != nil {
+	if _, err := str.CreateGlobalFrontend(fe, trx); err != nil {
 		perr := &pq.Error{}
 		sqliteErr := &sqlite3.Error{}
 		switch {
@@ -81,7 +81,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := trx.Commit(); err != nil {
 		logrus.Errorf("error committing frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
