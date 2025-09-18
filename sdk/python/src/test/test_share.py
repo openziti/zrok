@@ -40,10 +40,10 @@ class TestShare(unittest.TestCase):
                 env_zid = '',
                 share_mode = '',
                 backend_mode = '',
-                frontend_selection = '',
-                frontend_endpoint = '',
-                backend_proxy_endpoint = '',
-                reserved = True,
+                frontend_endpoints = [
+                    ''
+                    ],
+                target = '',
                 activity = [
                     zrok_api.models.spark_data_sample.sparkDataSample(
                         rx = 1.337, 

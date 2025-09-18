@@ -3626,31 +3626,28 @@ func init() {
         "backendMode": {
           "type": "string"
         },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
         "createdAt": {
           "type": "integer"
         },
         "envZId": {
           "type": "string"
         },
-        "frontendEndpoint": {
-          "type": "string"
-        },
-        "frontendSelection": {
-          "type": "string"
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "limited": {
-          "type": "boolean"
-        },
-        "reserved": {
           "type": "boolean"
         },
         "shareMode": {
           "type": "string"
         },
         "shareToken": {
+          "type": "string"
+        },
+        "target": {
           "type": "string"
         },
         "updatedAt": {
@@ -7416,31 +7413,28 @@ func init() {
         "backendMode": {
           "type": "string"
         },
-        "backendProxyEndpoint": {
-          "type": "string"
-        },
         "createdAt": {
           "type": "integer"
         },
         "envZId": {
           "type": "string"
         },
-        "frontendEndpoint": {
-          "type": "string"
-        },
-        "frontendSelection": {
-          "type": "string"
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "limited": {
-          "type": "boolean"
-        },
-        "reserved": {
           "type": "boolean"
         },
         "shareMode": {
           "type": "string"
         },
         "shareToken": {
+          "type": "string"
+        },
+        "target": {
           "type": "string"
         },
         "updatedAt": {

@@ -18,6 +18,11 @@ type NameWithShareToken struct {
 	ShareToken *string
 }
 
+type NameWithNamespace struct {
+	Name
+	NamespaceName string
+}
+
 func (str *Store) CreateName(an *Name, tx *sqlx.Tx) (int, error) {
 	stmt, err := tx.Prepare("insert into names (namespace_id, name, account_id, reserved) values ($1, $2, $3, $4) returning id")
 	if err != nil {
@@ -122,6 +127,38 @@ func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, name
 			return nil, errors.Wrap(err, "error scanning name with share token")
 		}
 		names = append(names, nwst)
+	}
+
+	return names, nil
+}
+
+func (str *Store) FindNamesForShare(shareId int, tx *sqlx.Tx) ([]*NameWithNamespace, error) {
+	sql := `select n.id, n.created_at, n.updated_at, n.deleted, n.namespace_id,
+	               n.name, n.account_id, n.reserved,
+	               ns.name as namespace_name
+	        from share_name_mappings snm
+	        join names n on snm.name_id = n.id
+	        join namespaces ns on n.namespace_id = ns.id
+	        where snm.share_id = $1
+	          and not snm.deleted
+	          and not n.deleted
+	          and not ns.deleted
+	        order by ns.name, n.name`
+
+	rows, err := tx.Queryx(sql, shareId)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding names for share")
+	}
+
+	var names []*NameWithNamespace
+	for rows.Next() {
+		nwn := &NameWithNamespace{}
+		if err := rows.Scan(&nwn.Name.Id, &nwn.Name.CreatedAt, &nwn.Name.UpdatedAt,
+			&nwn.Name.Deleted, &nwn.Name.NamespaceId, &nwn.Name.Name,
+			&nwn.Name.AccountId, &nwn.Name.Reserved, &nwn.NamespaceName); err != nil {
+			return nil, errors.Wrap(err, "error scanning name with namespace")
+		}
+		names = append(names, nwn)
 	}
 
 	return names, nil

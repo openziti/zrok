@@ -61,31 +61,22 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, shr := range shrs {
-			feEndpoint := ""
-			if shr.FrontendEndpoint != nil {
-				feEndpoint = *shr.FrontendEndpoint
-			}
-			feSelection := ""
-			if shr.FrontendSelection != nil {
-				feSelection = *shr.FrontendSelection
-			}
-			beProxyEndpoint := ""
+			frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+			target := ""
 			if shr.BackendProxyEndpoint != nil {
-				beProxyEndpoint = *shr.BackendProxyEndpoint
+				target = *shr.BackendProxyEndpoint
 			}
 			envShr := &rest_model_zrok.Share{
-				ShareToken:           shr.Token,
-				ZID:                  shr.ZId,
-				EnvZID:               env.ZId,
-				ShareMode:            shr.ShareMode,
-				BackendMode:          shr.BackendMode,
-				FrontendSelection:    feSelection,
-				FrontendEndpoint:     feEndpoint,
-				BackendProxyEndpoint: beProxyEndpoint,
-				Reserved:             shr.Reserved,
-				Limited:              accountLimited,
-				CreatedAt:            shr.CreatedAt.UnixMilli(),
-				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
+				ShareToken:        shr.Token,
+				ZID:               shr.ZId,
+				EnvZID:            env.ZId,
+				ShareMode:         shr.ShareMode,
+				BackendMode:       shr.BackendMode,
+				FrontendEndpoints: frontendEndpoints,
+				Target:            target,
+				Limited:           accountLimited,
+				CreatedAt:         shr.CreatedAt.UnixMilli(),
+				UpdatedAt:         shr.UpdatedAt.UnixMilli(),
 			}
 			ear.Shares = append(ear.Shares, envShr)
 		}

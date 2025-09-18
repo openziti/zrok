@@ -71,10 +71,10 @@ class TestOverview(unittest.TestCase):
                                 env_zid = '', 
                                 share_mode = '', 
                                 backend_mode = '', 
-                                frontend_selection = '', 
-                                frontend_endpoint = '', 
-                                backend_proxy_endpoint = '', 
-                                reserved = True, 
+                                frontend_endpoints = [
+                                    ''
+                                    ], 
+                                target = '', 
                                 limited = True, 
                                 created_at = 56, 
                                 updated_at = 56, )

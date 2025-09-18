@@ -54,34 +54,27 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 	} else {
 		logrus.Debug("skipping spark data; no influx configuration")
 	}
-	feEndpoint := ""
-	if shr.FrontendEndpoint != nil {
-		feEndpoint = *shr.FrontendEndpoint
-	}
-	feSelection := ""
-	if shr.FrontendSelection != nil {
-		feSelection = *shr.FrontendSelection
-	}
-	beProxyEndpoint := ""
+
+	frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, tx)
+
+	target := ""
 	if shr.BackendProxyEndpoint != nil {
-		beProxyEndpoint = *shr.BackendProxyEndpoint
+		target = *shr.BackendProxyEndpoint
 	}
 	var sparkData []*rest_model_zrok.SparkDataSample
 	for i := 0; i < len(sparkRx[shr.Token]) && i < len(sparkTx[shr.Token]); i++ {
 		sparkData = append(sparkData, &rest_model_zrok.SparkDataSample{Rx: float64(sparkRx[shr.Token][i]), Tx: float64(sparkTx[shr.Token][i])})
 	}
 	return metadata.NewGetShareDetailOK().WithPayload(&rest_model_zrok.Share{
-		ShareToken:           shr.Token,
-		ZID:                  shr.ZId,
-		EnvZID:               shrEnv.ZId,
-		ShareMode:            shr.ShareMode,
-		BackendMode:          shr.BackendMode,
-		FrontendSelection:    feSelection,
-		FrontendEndpoint:     feEndpoint,
-		BackendProxyEndpoint: beProxyEndpoint,
-		Reserved:             shr.Reserved,
-		Activity:             sparkData,
-		CreatedAt:            shr.CreatedAt.UnixMilli(),
-		UpdatedAt:            shr.UpdatedAt.UnixMilli(),
+		ShareToken:        shr.Token,
+		ZID:               shr.ZId,
+		EnvZID:            shrEnv.ZId,
+		ShareMode:         shr.ShareMode,
+		BackendMode:       shr.BackendMode,
+		FrontendEndpoints: frontendEndpoints,
+		Target:            target,
+		Activity:          sparkData,
+		CreatedAt:         shr.CreatedAt.UnixMilli(),
+		UpdatedAt:         shr.UpdatedAt.UnixMilli(),
 	})
 }

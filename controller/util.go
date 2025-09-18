@@ -8,8 +8,11 @@ import (
 
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -119,4 +122,33 @@ func hasNumeric(check string) bool {
 		}
 	}
 	return false
+}
+
+// buildFrontendEndpointsForShare retrieves names for a share and builds frontend endpoints
+// from those names. Falls back to the deprecated FrontendEndpoint field if no names are
+// mapped (for backwards compatibility).
+func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEndpoint *string, tx *sqlx.Tx) []string {
+	// retrieve names for this share using the new mapping table
+	shareNames, err := str.FindNamesForShare(shareId, tx)
+	if err != nil {
+		logrus.Errorf("error finding names for share '%v': %v", shareToken, err)
+		// continue without failing the entire request
+		shareNames = []*store.NameWithNamespace{}
+	}
+
+	// build frontend endpoints from the names
+	var frontendEndpoints []string
+	for _, sn := range shareNames {
+		// use ExpandUrlTemplate where namespace.name is the template and name.name is the token
+		// this replaces {token} in namespace.name with the actual name.name value
+		endpoint := util.ExpandUrlTemplate(sn.Name.Name, sn.NamespaceName)
+		frontendEndpoints = append(frontendEndpoints, endpoint)
+	}
+
+	// fallback to deprecated field if no names are mapped (for backwards compatibility)
+	if len(frontendEndpoints) == 0 && deprecatedEndpoint != nil {
+		frontendEndpoints = []string{*deprecatedEndpoint}
+	}
+
+	return frontendEndpoints
 }

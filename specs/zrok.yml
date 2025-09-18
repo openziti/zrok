@@ -2254,14 +2254,12 @@ definitions:
         type: string
       backendMode:
         type: string
-      frontendSelection:
+      frontendEndpoints:
+        type: array
+        items:
+          type: string
+      target:
         type: string
-      frontendEndpoint:
-        type: string
-      backendProxyEndpoint:
-        type: string
-      reserved:
-        type: boolean
       activity:
         $ref: "#/definitions/sparkData"
       limited:

@@ -49,8 +49,8 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
                     let shrLabel = shr.shareToken!;
-                    if(shr.backendProxyEndpoint !== "") {
-                        shrLabel = shr.backendProxyEndpoint!;
+                    if(shr.target !== "") {
+                        shrLabel = shr.target!;
                     }
                     let shrNode = {
                         id: shr.shareToken!,
