@@ -461,6 +461,9 @@ func init() {
                 "open": {
                   "type": "boolean"
                 },
+                "privateShareToken": {
+                  "type": "string"
+                },
                 "shareMode": {
                   "type": "string",
                   "enum": [
@@ -4224,6 +4227,9 @@ func init() {
                 },
                 "open": {
                   "type": "boolean"
+                },
+                "privateShareToken": {
+                  "type": "string"
                 },
                 "shareMode": {
                   "type": "string",

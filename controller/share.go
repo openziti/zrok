@@ -64,10 +64,14 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 
 	// process namespace selections
-	frontendEndpoints, nameIds, err := h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
-	if err != nil {
-		logrus.Errorf("namespace selection processing failed: %v", err)
-		return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+	var frontendEndpoints []string
+	var nameIds []int
+	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
+		frontendEndpoints, nameIds, err = h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
+		if err != nil {
+			logrus.Errorf("namespace selection processing failed: %v", err)
+			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		}
 	}
 
 	// allocate resources based on share mode
@@ -82,6 +86,13 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, trx)
 
 	case sdk.PrivateShareMode:
+		// check private share token availability if provided
+		if params.Body.PrivateShareToken != "" {
+			if err := h.checkPrivateShareTokenAvailability(shrToken); err != nil {
+				logrus.Errorf("private share token conflict: %v", err)
+				return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			}
+		}
 		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, trx)
 
 	default:
@@ -100,22 +111,24 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
-	// create share name mappings for namespace selections
-	for _, nameId := range nameIds {
-		snm := &store.ShareNameMapping{
-			ShareId: shareId,
-			NameId:  nameId,
+	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
+		// create share name mappings for namespace selections
+		for _, nameId := range nameIds {
+			snm := &store.ShareNameMapping{
+				ShareId: shareId,
+				NameId:  nameId,
+			}
+			_, err := str.CreateShareNameMapping(snm, trx)
+			if err != nil {
+				logrus.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
+				return share.NewShareInternalServerError()
+			}
 		}
-		_, err := str.CreateShareNameMapping(snm, trx)
-		if err != nil {
-			logrus.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
-			return share.NewShareInternalServerError()
-		}
-	}
 
-	// send mapping updates to dynamic frontends after successful commit
-	if err := h.processDynamicMappings(shrToken, nameIds, trx); err != nil {
-		logrus.Errorf("error sending mapping updates: %v", err)
+		// send mapping updates to dynamic frontends after successful commit
+		if err := h.processDynamicMappings(shrToken, nameIds, trx); err != nil {
+			logrus.Errorf("error sending mapping updates: %v", err)
+		}
 	}
 
 	// handle access grants if closed permission mode
@@ -401,6 +414,20 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 
 	logrus.Infof("allocated public resources for share '%v' with service id '%v'", shrToken, shrZId)
 	return shrZId, frontendEndpoints, nil
+}
+
+func (h *shareHandler) checkPrivateShareTokenAvailability(privateShareToken string) error {
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
+	if err != nil {
+		return errors.Wrap(err, "error getting ziti automation client")
+	}
+
+	// verify the service name is available
+	_, err = ziti.Services.GetByName(privateShareToken)
+	if err == nil {
+		return errors.Errorf("service name '%v' is already in use", privateShareToken)
+	}
+	return nil
 }
 
 func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, trx interface{}) (string, []string, error) {

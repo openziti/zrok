@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **target** | **str** |  | [optional] 
 **basic_auth** | **List[str]** |  | [optional] 
 **namespace_selections** | [**List[NamespaceSelection]**](NamespaceSelection.md) |  | [optional] 
+**private_share_token** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 
 **insecure** | **bool** |  | [optional] 
 **oauth_provider** | **str** |  | [optional] 

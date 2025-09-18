@@ -95,11 +95,12 @@ func (h *agentRemoteShareHandler) publicShare(params agent.RemoteShareParams, cl
 
 func (h *agentRemoteShareHandler) privateShare(params agent.RemoteShareParams, client agentGrpc.AgentClient) (token string, err error) {
 	req := &agentGrpc.SharePrivateRequest{
-		Target:       params.Body.Target,
-		BackendMode:  params.Body.BackendMode,
-		Insecure:     params.Body.Insecure,
-		Closed:       !params.Body.Open,
-		AccessGrants: params.Body.AccessGrants,
+		Target:            params.Body.Target,
+		PrivateShareToken: params.Body.PrivateShareToken,
+		BackendMode:       params.Body.BackendMode,
+		Insecure:          params.Body.Insecure,
+		Closed:            !params.Body.Open,
+		AccessGrants:      params.Body.AccessGrants,
 	}
 	resp, err := client.SharePrivate(context.Background(), req)
 	if err != nil {

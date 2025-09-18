@@ -68,6 +68,7 @@ export interface AgentShareHttpHealthcheckRequest {
 
 export interface AgentSharePrivateRequest {
     target?: string;
+    privateShareToken?: string;
     backendMode?: string;
     insecure?: boolean;
     closed?: boolean;
@@ -262,6 +263,10 @@ export class AgentApi extends runtime.BaseAPI {
 
         if (requestParameters['target'] != null) {
             queryParameters['target'] = requestParameters['target'];
+        }
+
+        if (requestParameters['privateShareToken'] != null) {
+            queryParameters['privateShareToken'] = requestParameters['privateShareToken'];
         }
 
         if (requestParameters['backendMode'] != null) {

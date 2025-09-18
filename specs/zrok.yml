@@ -1140,6 +1140,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/namespaceSelection"
+              privateShareToken:
+                type: string
               backendMode:
                 type: string
                 enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]

@@ -47,6 +47,7 @@ class TestRemoteShareRequest(unittest.TestCase):
                         namespace_token = '', 
                         name = '', )
                     ],
+                private_share_token = '',
                 backend_mode = 'proxy',
                 insecure = True,
                 oauth_provider = '',

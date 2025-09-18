@@ -33,6 +33,7 @@ class RemoteShareRequest(BaseModel):
     target: Optional[StrictStr] = None
     basic_auth: Optional[List[StrictStr]] = Field(default=None, alias="basicAuth")
     namespace_selections: Optional[List[NamespaceSelection]] = Field(default=None, alias="namespaceSelections")
+    private_share_token: Optional[StrictStr] = Field(default=None, alias="privateShareToken")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
     insecure: Optional[StrictBool] = None
     oauth_provider: Optional[StrictStr] = Field(default=None, alias="oauthProvider")
@@ -40,7 +41,7 @@ class RemoteShareRequest(BaseModel):
     oauth_refresh_interval: Optional[StrictStr] = Field(default=None, alias="oauthRefreshInterval")
     open: Optional[StrictBool] = None
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
-    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "token", "target", "basicAuth", "namespaceSelections", "backendMode", "insecure", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "open", "accessGrants"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "token", "target", "basicAuth", "namespaceSelections", "privateShareToken", "backendMode", "insecure", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "open", "accessGrants"]
 
     @field_validator('share_mode')
     def share_mode_validate_enum(cls, value):
@@ -126,6 +127,7 @@ class RemoteShareRequest(BaseModel):
             "target": obj.get("target"),
             "basicAuth": obj.get("basicAuth"),
             "namespaceSelections": [NamespaceSelection.from_dict(_item) for _item in obj["namespaceSelections"]] if obj.get("namespaceSelections") is not None else None,
+            "privateShareToken": obj.get("privateShareToken"),
             "backendMode": obj.get("backendMode"),
             "insecure": obj.get("insecure"),
             "oauthProvider": obj.get("oauthProvider"),

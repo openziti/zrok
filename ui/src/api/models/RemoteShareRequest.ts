@@ -68,6 +68,12 @@ export interface RemoteShareRequest {
      * @type {string}
      * @memberof RemoteShareRequest
      */
+    privateShareToken?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RemoteShareRequest
+     */
     backendMode?: RemoteShareRequestBackendModeEnum;
     /**
      * 
@@ -156,6 +162,7 @@ export function RemoteShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
         'target': json['target'] == null ? undefined : json['target'],
         'basicAuth': json['basicAuth'] == null ? undefined : json['basicAuth'],
         'namespaceSelections': json['namespaceSelections'] == null ? undefined : ((json['namespaceSelections'] as Array<any>).map(NamespaceSelectionFromJSON)),
+        'privateShareToken': json['privateShareToken'] == null ? undefined : json['privateShareToken'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'insecure': json['insecure'] == null ? undefined : json['insecure'],
         'oauthProvider': json['oauthProvider'] == null ? undefined : json['oauthProvider'],
@@ -183,6 +190,7 @@ export function RemoteShareRequestToJSONTyped(value?: RemoteShareRequest | null,
         'target': value['target'],
         'basicAuth': value['basicAuth'],
         'namespaceSelections': value['namespaceSelections'] == null ? undefined : ((value['namespaceSelections'] as Array<any>).map(NamespaceSelectionToJSON)),
+        'privateShareToken': value['privateShareToken'],
         'backendMode': value['backendMode'],
         'insecure': value['insecure'],
         'oauthProvider': value['oauthProvider'],

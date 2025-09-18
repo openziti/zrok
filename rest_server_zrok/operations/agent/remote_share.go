@@ -113,6 +113,9 @@ type RemoteShareBody struct {
 	// open
 	Open bool `json:"open,omitempty"`
 
+	// private share token
+	PrivateShareToken string `json:"privateShareToken,omitempty"`
+
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
