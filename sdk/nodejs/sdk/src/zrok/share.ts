@@ -29,7 +29,7 @@ export const CLOSED_PERMISSION_MODE = "closed";
 export class NamespaceSelection {
     namespaceToken: string;
     name: string | undefined;
-    
+
     constructor(namespaceToken: string) {
         this.namespaceToken = namespaceToken;
     }
