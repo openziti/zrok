@@ -2,8 +2,6 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/sirupsen/logrus"
@@ -29,7 +27,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		return metadata.NewOverviewInternalServerError()
 	}
 
-	accountLimited, err := h.isAccountLimited(principal, trx)
+	accountLimited, err := isAccountLimited(int(principal.ID), trx)
 	if err != nil {
 		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
 	}
@@ -115,19 +113,4 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 	}
 
 	return metadata.NewOverviewOK().WithPayload(ovr)
-}
-
-func (h *overviewHandler) isAccountLimited(principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
-	var je *store.BandwidthLimitJournalEntry
-	jEmpty, err := str.IsBandwidthLimitJournalEmpty(int(principal.ID), trx)
-	if err != nil {
-		return false, err
-	}
-	if !jEmpty {
-		je, err = str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
-		if err != nil {
-			return false, err
-		}
-	}
-	return je != nil && je.Action == store.LimitLimitAction, nil
 }

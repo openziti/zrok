@@ -16,7 +16,7 @@ func newAccountDetailHandler() *accountDetailHandler {
 func (h *accountDetailHandler) Handle(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error stasrting transaction for '%v': %v", principal.Email, err)
+		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()

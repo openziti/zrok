@@ -152,3 +152,27 @@ func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEn
 
 	return frontendEndpoints
 }
+
+// isAccountLimited checks if an account has an active bandwidth limit restriction.
+// returns true if the account is currently limited, false otherwise.
+func isAccountLimited(accountId int, tx *sqlx.Tx) (bool, error) {
+	// check if journal is empty first to avoid unnecessary queries
+	jEmpty, err := str.IsBandwidthLimitJournalEmpty(accountId, tx)
+	if err != nil {
+		return false, err
+	}
+
+	// if journal is empty, account is not limited
+	if jEmpty {
+		return false, nil
+	}
+
+	// retrieve the latest journal entry
+	je, err := str.FindLatestBandwidthLimitJournal(accountId, tx)
+	if err != nil {
+		return false, err
+	}
+
+	// account is limited if latest entry exists and action is "limit"
+	return je != nil && je.Action == store.LimitLimitAction, nil
+}
