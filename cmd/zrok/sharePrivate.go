@@ -37,6 +37,7 @@ func init() {
 
 type sharePrivateCommand struct {
 	backendMode  string
+	shareToken   string
 	headless     bool
 	subordinate  bool
 	forceLocal   bool
@@ -59,6 +60,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 		headless, _ = root.Headless()
 	}
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
+	cmd.Flags().StringVarP(&command.shareToken, "share-token", "s", "", "Request a specific share token name")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
@@ -187,11 +189,12 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	req := &sdk.ShareRequest{
-		BackendMode:    sdk.BackendMode(cmd.backendMode),
-		ShareMode:      sdk.PrivateShareMode,
-		Target:         target,
-		PermissionMode: sdk.ClosedPermissionMode,
-		AccessGrants:   cmd.accessGrants,
+		BackendMode:       sdk.BackendMode(cmd.backendMode),
+		ShareMode:         sdk.PrivateShareMode,
+		PrivateShareToken: cmd.shareToken,
+		Target:            target,
+		PermissionMode:    sdk.ClosedPermissionMode,
+		AccessGrants:      cmd.accessGrants,
 	}
 	if cmd.open {
 		req.PermissionMode = sdk.OpenPermissionMode

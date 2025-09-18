@@ -3717,6 +3717,9 @@ func init() {
             "closed"
           ]
         },
+        "privateShareToken": {
+          "type": "string"
+        },
         "shareMode": {
           "type": "string",
           "enum": [
@@ -7500,6 +7503,9 @@ func init() {
             "open",
             "closed"
           ]
+        },
+        "privateShareToken": {
+          "type": "string"
         },
         "shareMode": {
           "type": "string",

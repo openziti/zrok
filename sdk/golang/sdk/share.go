@@ -63,13 +63,14 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 func newPrivateShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
-		EnvZID:         root.Environment().ZitiIdentity,
-		ShareMode:      string(request.ShareMode),
-		BackendMode:    string(request.BackendMode),
-		Target:         request.Target,
-		AuthScheme:     string(None),
-		PermissionMode: string(request.PermissionMode),
-		AccessGrants:   request.AccessGrants,
+		EnvZID:            root.Environment().ZitiIdentity,
+		ShareMode:         string(request.ShareMode),
+		PrivateShareToken: request.PrivateShareToken,
+		BackendMode:       string(request.BackendMode),
+		Target:            request.Target,
+		AuthScheme:        string(None),
+		PermissionMode:    string(request.PermissionMode),
+		AccessGrants:      request.AccessGrants,
 	}
 	return req
 }

@@ -57,6 +57,12 @@ export interface ShareRequest {
      * @type {string}
      * @memberof ShareRequest
      */
+    privateShareToken?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShareRequest
+     */
     backendMode?: ShareRequestBackendModeEnum;
     /**
      * 
@@ -163,6 +169,7 @@ export function ShareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'namespaceSelections': json['namespaceSelections'] == null ? undefined : ((json['namespaceSelections'] as Array<any>).map(NamespaceSelectionFromJSON)),
+        'privateShareToken': json['privateShareToken'] == null ? undefined : json['privateShareToken'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'target': json['target'] == null ? undefined : json['target'],
         'authScheme': json['authScheme'] == null ? undefined : json['authScheme'],
@@ -189,6 +196,7 @@ export function ShareRequestToJSONTyped(value?: ShareRequest | null, ignoreDiscr
         'envZId': value['envZId'],
         'shareMode': value['shareMode'],
         'namespaceSelections': value['namespaceSelections'] == null ? undefined : ((value['namespaceSelections'] as Array<any>).map(NamespaceSelectionToJSON)),
+        'privateShareToken': value['privateShareToken'],
         'backendMode': value['backendMode'],
         'target': value['target'],
         'authScheme': value['authScheme'],

@@ -75,6 +75,7 @@ type ShareRequest struct {
 	ShareMode                 ShareMode
 	Target                    string
 	NamespaceSelections       []NamespaceSelection
+	PrivateShareToken         string
 	BasicAuth                 []string
 	OauthProvider             string
 	OauthEmailAddressPatterns []string

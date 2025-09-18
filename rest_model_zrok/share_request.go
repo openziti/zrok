@@ -53,6 +53,9 @@ type ShareRequest struct {
 	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
+	// private share token
+	PrivateShareToken string `json:"privateShareToken,omitempty"`
+
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`

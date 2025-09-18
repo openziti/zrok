@@ -31,6 +31,7 @@ class ShareRequest(BaseModel):
     env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
     share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
     namespace_selections: Optional[List[NamespaceSelection]] = Field(default=None, alias="namespaceSelections")
+    private_share_token: Optional[StrictStr] = Field(default=None, alias="privateShareToken")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
     target: Optional[StrictStr] = None
     auth_scheme: Optional[StrictStr] = Field(default=None, alias="authScheme")
@@ -40,7 +41,7 @@ class ShareRequest(BaseModel):
     oauth_refresh_interval: Optional[StrictStr] = Field(default=None, alias="oauthRefreshInterval")
     permission_mode: Optional[StrictStr] = Field(default=None, alias="permissionMode")
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
-    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "namespaceSelections", "backendMode", "target", "authScheme", "basicAuthUsers", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "permissionMode", "accessGrants"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "namespaceSelections", "privateShareToken", "backendMode", "target", "authScheme", "basicAuthUsers", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "permissionMode", "accessGrants"]
 
     @field_validator('share_mode')
     def share_mode_validate_enum(cls, value):
@@ -140,6 +141,7 @@ class ShareRequest(BaseModel):
             "envZId": obj.get("envZId"),
             "shareMode": obj.get("shareMode"),
             "namespaceSelections": [NamespaceSelection.from_dict(_item) for _item in obj["namespaceSelections"]] if obj.get("namespaceSelections") is not None else None,
+            "privateShareToken": obj.get("privateShareToken"),
             "backendMode": obj.get("backendMode"),
             "target": obj.get("target"),
             "authScheme": obj.get("authScheme"),

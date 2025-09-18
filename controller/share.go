@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
@@ -43,10 +46,21 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 
 	// create share token
-	shrToken, err := createShareToken()
-	if err != nil {
-		logrus.Error(err)
-		return share.NewShareInternalServerError()
+	var shrToken string
+	if sdk.ShareMode(params.Body.ShareMode) == sdk.PrivateShareMode && params.Body.PrivateShareToken != "" {
+		dl.Infof("private share requested share token '%v'", params.Body.PrivateShareToken)
+		if util.IsValidUniqueName(params.Body.PrivateShareToken) {
+			shrToken = params.Body.PrivateShareToken
+		} else {
+			logrus.Errorf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)
+			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)))
+		}
+	} else {
+		shrToken, err = createShareToken()
+		if err != nil {
+			logrus.Error(err)
+			return share.NewShareInternalServerError()
+		}
 	}
 
 	// process namespace selections
@@ -58,16 +72,18 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 
 	// allocate resources based on share mode
 	var shrZId string
-	switch params.Body.ShareMode {
-	case "public":
+	switch sdk.ShareMode(params.Body.ShareMode) {
+	case sdk.PublicShareMode:
 		interstitial, err := h.shouldUseInterstitial(params.Body.BackendMode, principal, trx)
 		if err != nil {
 			logrus.Errorf("error determining interstitial setting for account '%v': %v", principal.Email, err)
 			return share.NewShareInternalServerError()
 		}
 		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, trx)
-	case "private":
+
+	case sdk.PrivateShareMode:
 		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, trx)
+
 	default:
 		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
 		return share.NewShareInternalServerError()
