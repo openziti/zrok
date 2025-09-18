@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err error) {
@@ -42,6 +43,9 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 		logrus.Error(msg)
 	}
 
+	if req.PrivateShareToken != "" {
+		shrCmd = append(shrCmd, "--share-token", req.PrivateShareToken)
+	}
 	if req.Insecure {
 		shrCmd = append(shrCmd, "--insecure")
 	}
@@ -84,11 +88,12 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 
 func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
 	if shareToken, err := i.agent.SharePrivate(&SharePrivateRequest{
-		Target:       req.Target,
-		BackendMode:  req.BackendMode,
-		Insecure:     req.Insecure,
-		Closed:       req.Closed,
-		AccessGrants: req.AccessGrants,
+		Target:            req.Target,
+		PrivateShareToken: req.PrivateShareToken,
+		BackendMode:       req.BackendMode,
+		Insecure:          req.Insecure,
+		Closed:            req.Closed,
+		AccessGrants:      req.AccessGrants,
 	}); err == nil {
 		return &agentGrpc.SharePrivateResponse{Token: shareToken}, nil
 	} else {

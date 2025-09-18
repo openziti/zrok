@@ -229,6 +229,12 @@
             "type": "string"
           },
           {
+            "name": "privateShareToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "backendMode",
             "in": "query",
             "required": false,

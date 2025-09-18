@@ -667,14 +667,15 @@ func (x *ShareHttpHealthcheckResponse) GetError() string {
 }
 
 type SharePrivateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Target        string                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
-	BackendMode   string                 `protobuf:"bytes,2,opt,name=backendMode,proto3" json:"backendMode,omitempty"`
-	Insecure      bool                   `protobuf:"varint,3,opt,name=insecure,proto3" json:"insecure,omitempty"`
-	Closed        bool                   `protobuf:"varint,4,opt,name=closed,proto3" json:"closed,omitempty"`
-	AccessGrants  []string               `protobuf:"bytes,5,rep,name=accessGrants,proto3" json:"accessGrants,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Target            string                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
+	PrivateShareToken string                 `protobuf:"bytes,2,opt,name=privateShareToken,proto3" json:"privateShareToken,omitempty"`
+	BackendMode       string                 `protobuf:"bytes,3,opt,name=backendMode,proto3" json:"backendMode,omitempty"`
+	Insecure          bool                   `protobuf:"varint,4,opt,name=insecure,proto3" json:"insecure,omitempty"`
+	Closed            bool                   `protobuf:"varint,5,opt,name=closed,proto3" json:"closed,omitempty"`
+	AccessGrants      []string               `protobuf:"bytes,6,rep,name=accessGrants,proto3" json:"accessGrants,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *SharePrivateRequest) Reset() {
@@ -710,6 +711,13 @@ func (*SharePrivateRequest) Descriptor() ([]byte, []int) {
 func (x *SharePrivateRequest) GetTarget() string {
 	if x != nil {
 		return x.Target
+	}
+	return ""
+}
+
+func (x *SharePrivateRequest) GetPrivateShareToken() string {
+	if x != nil {
+		return x.PrivateShareToken
 	}
 	return ""
 }
@@ -1176,13 +1184,14 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\ttimeoutMs\x18\x05 \x01(\x04R\ttimeoutMs\"N\n" +
 	"\x1cShareHttpHealthcheckResponse\x12\x18\n" +
 	"\ahealthy\x18\x01 \x01(\bR\ahealthy\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\"\xa7\x01\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\xd5\x01\n" +
 	"\x13SharePrivateRequest\x12\x16\n" +
-	"\x06target\x18\x01 \x01(\tR\x06target\x12 \n" +
-	"\vbackendMode\x18\x02 \x01(\tR\vbackendMode\x12\x1a\n" +
-	"\binsecure\x18\x03 \x01(\bR\binsecure\x12\x16\n" +
-	"\x06closed\x18\x04 \x01(\bR\x06closed\x12\"\n" +
-	"\faccessGrants\x18\x05 \x03(\tR\faccessGrants\",\n" +
+	"\x06target\x18\x01 \x01(\tR\x06target\x12,\n" +
+	"\x11privateShareToken\x18\x02 \x01(\tR\x11privateShareToken\x12 \n" +
+	"\vbackendMode\x18\x03 \x01(\tR\vbackendMode\x12\x1a\n" +
+	"\binsecure\x18\x04 \x01(\bR\binsecure\x12\x16\n" +
+	"\x06closed\x18\x05 \x01(\bR\x06closed\x12\"\n" +
+	"\faccessGrants\x18\x06 \x03(\tR\faccessGrants\",\n" +
 	"\x14SharePrivateResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"\x93\x03\n" +
 	"\x12SharePublicRequest\x12\x16\n" +

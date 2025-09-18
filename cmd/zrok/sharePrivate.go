@@ -558,11 +558,12 @@ func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
 	defer func() { _ = conn.Close() }()
 
 	shr, err := client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{
-		Target:       target,
-		BackendMode:  cmd.backendMode,
-		Insecure:     cmd.insecure,
-		Closed:       !cmd.open,
-		AccessGrants: cmd.accessGrants,
+		Target:            target,
+		PrivateShareToken: cmd.shareToken,
+		BackendMode:       cmd.backendMode,
+		Insecure:          cmd.insecure,
+		Closed:            !cmd.open,
+		AccessGrants:      cmd.accessGrants,
 	})
 	if err != nil {
 		tui.Error("error creating share", err)

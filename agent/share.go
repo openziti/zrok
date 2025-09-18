@@ -11,11 +11,12 @@ import (
 )
 
 type SharePrivateRequest struct {
-	Target       string   `json:"target"`
-	BackendMode  string   `json:"backend_mode"`
-	Insecure     bool     `json:"insecure"`
-	Closed       bool     `json:"closed"`
-	AccessGrants []string `json:"access_grants"`
+	Target            string   `json:"target"`
+	PrivateShareToken string   `json:"private_share_token"`
+	BackendMode       string   `json:"backend_mode"`
+	Insecure          bool     `json:"insecure"`
+	Closed            bool     `json:"closed"`
+	AccessGrants      []string `json:"access_grants"`
 }
 
 type NamespaceSelection struct {

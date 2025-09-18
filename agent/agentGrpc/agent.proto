@@ -113,10 +113,11 @@ message ShareHttpHealthcheckResponse{
 
 message SharePrivateRequest {
 	string target = 1;
-	string backendMode = 2;
-	bool insecure = 3;
-	bool closed = 4;
-	repeated string accessGrants = 5;
+  string privateShareToken = 2;
+	string backendMode = 3;
+	bool insecure = 4;
+	bool closed = 5;
+	repeated string accessGrants = 6;
 }
 
 message SharePrivateResponse {
