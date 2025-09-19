@@ -94,22 +94,12 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
 	}
 
-	if cmd.subordinate || cmd.forceLocal {
-		cmd.accessLocal(args, root)
-	} else {
-		agent := cmd.forceAgent
-		if !cmd.forceAgent {
-			agent, err = agentClient.IsAgentRunning(root)
-			if err != nil {
-				tui.Error("error checking if agent is running", err)
-			}
-		}
-		if agent {
-			cmd.accessAgent(args, root)
-		} else {
-			cmd.accessLocal(args, root)
-		}
-	}
+	detectAndRouteToAgent(
+		cmd.subordinate, cmd.forceLocal, cmd.forceAgent,
+		root,
+		func() { cmd.accessLocal(args, root) },
+		func() { cmd.accessAgent(args, root) },
+	)
 }
 
 func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) {

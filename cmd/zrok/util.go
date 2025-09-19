@@ -11,9 +11,11 @@ import (
 
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/tui"
 	"github.com/pkg/errors"
 )
 
@@ -73,4 +75,37 @@ func subordinateError(err error) {
 		fmt.Println("{\"" + subordinate.MessageKey + "\":\"" + subordinate.ErrorMessage + "\",\"" + subordinate.ErrorMessage + "\":\"internal error\"}")
 	}
 	os.Exit(1)
+}
+
+// detectAndRouteToAgent handles the common pattern of checking if the agent is running
+// and routing to either agent or local execution paths. This eliminates duplicate code
+// found in sharePrivate, sharePublic, and accessPrivate commands.
+func detectAndRouteToAgent(
+	subordinate, forceLocal, forceAgent bool,
+	root env_core.Root,
+	localFn func(),
+	agentFn func(),
+) {
+	// if running in subordinate mode or forced local, always use local
+	if subordinate || forceLocal {
+		localFn()
+		return
+	}
+
+	// determine if agent is running
+	agent := forceAgent
+	if !forceAgent {
+		var err error
+		agent, err = agentClient.IsAgentRunning(root)
+		if err != nil {
+			tui.Error("error checking if agent is running", err)
+		}
+	}
+
+	// route to appropriate handler
+	if agent {
+		agentFn()
+	} else {
+		localFn()
+	}
 }
