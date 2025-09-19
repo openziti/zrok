@@ -647,9 +647,6 @@ func init() {
                       "open": {
                         "type": "boolean"
                       },
-                      "reserved": {
-                        "type": "boolean"
-                      },
                       "shareMode": {
                         "type": "string"
                       },
@@ -7159,9 +7156,6 @@ func init() {
           }
         },
         "open": {
-          "type": "boolean"
-        },
-        "reserved": {
           "type": "boolean"
         },
         "shareMode": {

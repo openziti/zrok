@@ -91,11 +91,10 @@ message ShareDetail {
 	string token = 1;
 	string shareMode = 2;
 	string backendMode = 3;
-	bool reserved = 4;
-	repeated string frontendEndpoint = 5;
-	string backendEndpoint = 6;
-	bool closed = 7;
-	string status = 8;
+	repeated string frontendEndpoint = 4;
+	string backendEndpoint = 5;
+	bool closed = 6;
+	string status = 7;
 }
 
 message ShareHttpHealthcheckRequest{

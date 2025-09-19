@@ -40,7 +40,6 @@ class TestRemoteStatus200Response(unittest.TestCase):
                         token = '', 
                         share_mode = '', 
                         backend_mode = '', 
-                        reserved = True, 
                         frontend_endpoints = [
                             ''
                             ], 

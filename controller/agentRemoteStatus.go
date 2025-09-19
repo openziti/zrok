@@ -56,7 +56,6 @@ func (h *agentRemoteStatusHandler) Handle(params agent.RemoteStatusParams, princ
 			BackendMode:       share.BackendMode,
 			FrontendEndpoints: share.FrontendEndpoint,
 			Open:              !share.Closed,
-			Reserved:          share.Reserved,
 			ShareMode:         share.ShareMode,
 			Status:            share.Status,
 			Token:             share.Token,

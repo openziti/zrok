@@ -343,9 +343,6 @@ type RemoteStatusOKBodySharesItems0 struct {
 	// open
 	Open bool `json:"open,omitempty"`
 
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
-
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
 

@@ -29,12 +29,11 @@ class RemoteStatus200ResponseSharesInner(BaseModel):
     token: Optional[StrictStr] = None
     share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
-    reserved: Optional[StrictBool] = None
     frontend_endpoints: Optional[List[StrictStr]] = Field(default=None, alias="frontendEndpoints")
     backend_endpoint: Optional[StrictStr] = Field(default=None, alias="backendEndpoint")
     open: Optional[StrictBool] = None
     status: Optional[StrictStr] = None
-    __properties: ClassVar[List[str]] = ["token", "shareMode", "backendMode", "reserved", "frontendEndpoints", "backendEndpoint", "open", "status"]
+    __properties: ClassVar[List[str]] = ["token", "shareMode", "backendMode", "frontendEndpoints", "backendEndpoint", "open", "status"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -90,7 +89,6 @@ class RemoteStatus200ResponseSharesInner(BaseModel):
             "token": obj.get("token"),
             "shareMode": obj.get("shareMode"),
             "backendMode": obj.get("backendMode"),
-            "reserved": obj.get("reserved"),
             "frontendEndpoints": obj.get("frontendEndpoints"),
             "backendEndpoint": obj.get("backendEndpoint"),
             "open": obj.get("open"),

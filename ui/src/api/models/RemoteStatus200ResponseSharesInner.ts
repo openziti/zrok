@@ -39,12 +39,6 @@ export interface RemoteStatus200ResponseSharesInner {
     backendMode?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof RemoteStatus200ResponseSharesInner
-     */
-    reserved?: boolean;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof RemoteStatus200ResponseSharesInner
      */
@@ -89,7 +83,6 @@ export function RemoteStatus200ResponseSharesInnerFromJSONTyped(json: any, ignor
         'token': json['token'] == null ? undefined : json['token'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
-        'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'frontendEndpoints': json['frontendEndpoints'] == null ? undefined : json['frontendEndpoints'],
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'open': json['open'] == null ? undefined : json['open'],
@@ -111,7 +104,6 @@ export function RemoteStatus200ResponseSharesInnerToJSONTyped(value?: RemoteStat
         'token': value['token'],
         'shareMode': value['shareMode'],
         'backendMode': value['backendMode'],
-        'reserved': value['reserved'],
         'frontendEndpoints': value['frontendEndpoints'],
         'backendEndpoint': value['backendEndpoint'],
         'open': value['open'],

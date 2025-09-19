@@ -64,9 +64,9 @@ func (cmd *agentStatusCommand) run(_ *cobra.Command, _ []string) {
 	t = table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
-	t.AppendHeader(table.Row{"Token", "Reserved", "Share Mode", "Backend Mode", "Target"})
+	t.AppendHeader(table.Row{"Token", "Share Mode", "Backend Mode", "Target"})
 	for _, share := range status.GetShares() {
-		t.AppendRow(table.Row{share.Token, share.Reserved, share.ShareMode, share.BackendMode, share.BackendEndpoint})
+		t.AppendRow(table.Row{share.Token, share.ShareMode, share.BackendMode, share.BackendEndpoint})
 	}
 	t.Render()
 	fmt.Printf("%d shares in agent\n", len(status.GetShares()))

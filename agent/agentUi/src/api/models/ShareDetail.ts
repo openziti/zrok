@@ -39,12 +39,6 @@ export interface ShareDetail {
     backendMode?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof ShareDetail
-     */
-    reserved?: boolean;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof ShareDetail
      */
@@ -89,7 +83,6 @@ export function ShareDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'token': json['token'] == null ? undefined : json['token'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
-        'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'frontendEndpoint': json['frontendEndpoint'] == null ? undefined : json['frontendEndpoint'],
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'closed': json['closed'] == null ? undefined : json['closed'],
@@ -111,7 +104,6 @@ export function ShareDetailToJSONTyped(value?: ShareDetail | null, ignoreDiscrim
         'token': value['token'],
         'shareMode': value['shareMode'],
         'backendMode': value['backendMode'],
-        'reserved': value['reserved'],
         'frontendEndpoint': value['frontendEndpoint'],
         'backendEndpoint': value['backendEndpoint'],
         'closed': value['closed'],

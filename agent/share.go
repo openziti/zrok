@@ -45,7 +45,6 @@ type share struct {
 	namespaceSelections       []NamespaceSelection
 	shareMode                 sdk.ShareMode
 	backendMode               sdk.BackendMode
-	reserved                  bool
 	insecure                  bool
 	oauthProvider             string
 	oauthEmailAddressPatterns []string

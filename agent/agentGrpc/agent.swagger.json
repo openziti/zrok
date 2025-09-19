@@ -461,9 +461,6 @@
         "backendMode": {
           "type": "string"
         },
-        "reserved": {
-          "type": "boolean"
-        },
         "frontendEndpoint": {
           "type": "array",
           "items": {

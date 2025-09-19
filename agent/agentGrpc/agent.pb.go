@@ -443,11 +443,10 @@ type ShareDetail struct {
 	Token            string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	ShareMode        string                 `protobuf:"bytes,2,opt,name=shareMode,proto3" json:"shareMode,omitempty"`
 	BackendMode      string                 `protobuf:"bytes,3,opt,name=backendMode,proto3" json:"backendMode,omitempty"`
-	Reserved         bool                   `protobuf:"varint,4,opt,name=reserved,proto3" json:"reserved,omitempty"`
-	FrontendEndpoint []string               `protobuf:"bytes,5,rep,name=frontendEndpoint,proto3" json:"frontendEndpoint,omitempty"`
-	BackendEndpoint  string                 `protobuf:"bytes,6,opt,name=backendEndpoint,proto3" json:"backendEndpoint,omitempty"`
-	Closed           bool                   `protobuf:"varint,7,opt,name=closed,proto3" json:"closed,omitempty"`
-	Status           string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	FrontendEndpoint []string               `protobuf:"bytes,4,rep,name=frontendEndpoint,proto3" json:"frontendEndpoint,omitempty"`
+	BackendEndpoint  string                 `protobuf:"bytes,5,opt,name=backendEndpoint,proto3" json:"backendEndpoint,omitempty"`
+	Closed           bool                   `protobuf:"varint,6,opt,name=closed,proto3" json:"closed,omitempty"`
+	Status           string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -501,13 +500,6 @@ func (x *ShareDetail) GetBackendMode() string {
 		return x.BackendMode
 	}
 	return ""
-}
-
-func (x *ShareDetail) GetReserved() bool {
-	if x != nil {
-		return x.Reserved
-	}
-	return false
 }
 
 func (x *ShareDetail) GetFrontendEndpoint() []string {
@@ -1166,16 +1158,15 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x15ReleaseAccessResponse\"+\n" +
 	"\x13ReleaseShareRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"\x16\n" +
-	"\x14ReleaseShareResponse\"\x85\x02\n" +
+	"\x14ReleaseShareResponse\"\xe9\x01\n" +
 	"\vShareDetail\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1c\n" +
 	"\tshareMode\x18\x02 \x01(\tR\tshareMode\x12 \n" +
-	"\vbackendMode\x18\x03 \x01(\tR\vbackendMode\x12\x1a\n" +
-	"\breserved\x18\x04 \x01(\bR\breserved\x12*\n" +
-	"\x10frontendEndpoint\x18\x05 \x03(\tR\x10frontendEndpoint\x12(\n" +
-	"\x0fbackendEndpoint\x18\x06 \x01(\tR\x0fbackendEndpoint\x12\x16\n" +
-	"\x06closed\x18\a \x01(\bR\x06closed\x12\x16\n" +
-	"\x06status\x18\b \x01(\tR\x06status\"\xbd\x01\n" +
+	"\vbackendMode\x18\x03 \x01(\tR\vbackendMode\x12*\n" +
+	"\x10frontendEndpoint\x18\x04 \x03(\tR\x10frontendEndpoint\x12(\n" +
+	"\x0fbackendEndpoint\x18\x05 \x01(\tR\x0fbackendEndpoint\x12\x16\n" +
+	"\x06closed\x18\x06 \x01(\bR\x06closed\x12\x16\n" +
+	"\x06status\x18\a \x01(\tR\x06status\"\xbd\x01\n" +
 	"\x1bShareHttpHealthcheckRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
 	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +

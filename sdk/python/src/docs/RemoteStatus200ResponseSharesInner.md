@@ -8,7 +8,6 @@ Name | Type | Description | Notes
 **token** | **str** |  | [optional] 
 **share_mode** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 
-**reserved** | **bool** |  | [optional] 
 **frontend_endpoints** | **List[str]** |  | [optional] 
 **backend_endpoint** | **str** |  | [optional] 
 **open** | **bool** |  | [optional] 

@@ -226,10 +226,8 @@ func (a *Agent) manager() {
 				if err := proctree.WaitChild(shr.process); err != nil {
 					logrus.Errorf("error joining share '%v': %v", shr.token, err)
 				}
-				if !shr.reserved {
-					if err := a.deleteShare(shr.token); err != nil {
-						logrus.Errorf("error deleting share '%v': %v", shr.token, err)
-					}
+				if err := a.deleteShare(shr.token); err != nil {
+					logrus.Errorf("error deleting share '%v': %v", shr.token, err)
 				}
 				delete(a.shares, shr.token)
 

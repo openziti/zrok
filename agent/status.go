@@ -2,8 +2,9 @@ package agent
 
 import (
 	"context"
-	"github.com/openziti/zrok/agent/agentGrpc"
 	"sort"
+
+	"github.com/openziti/zrok/agent/agentGrpc"
 )
 
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
@@ -26,7 +27,6 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			Token:            token,
 			ShareMode:        string(shr.shareMode),
 			BackendMode:      string(shr.backendMode),
-			Reserved:         shr.reserved,
 			FrontendEndpoint: shr.frontendEndpoints,
 			BackendEndpoint:  shr.target,
 			Closed:           shr.closed,

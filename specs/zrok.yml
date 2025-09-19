@@ -1249,8 +1249,6 @@ paths:
                       type: string
                     backendMode:
                       type: string
-                    reserved:
-                      type: boolean
                     frontendEndpoints:
                       type: array
                       items:
