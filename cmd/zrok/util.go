@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"net"
 	"net/url"
 	"os"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/tui"
@@ -108,4 +110,139 @@ func detectAndRouteToAgent(
 	} else {
 		localFn()
 	}
+}
+
+// backendModeConfig holds the configuration for validating and processing backend modes
+type backendModeConfig struct {
+	expectsTarget bool
+	parseTarget   func(string) (string, error)
+	forceHeadless bool
+}
+
+// validateBackendMode validates the backend mode and processes the target argument.
+// This eliminates the duplicate switch statements found across share commands.
+// Returns the processed target string and whether headless mode should be forced.
+// Set allowedModes to nil to allow all backend modes, or provide a list to restrict.
+func validateBackendMode(mode string, args []string, allowedModes []string) (target string, forceHeadless bool, err error) {
+	configs := map[string]backendModeConfig{
+		"proxy": {
+			expectsTarget: true,
+			parseTarget:   parseUrl,
+			forceHeadless: false,
+		},
+		"web": {
+			expectsTarget: true,
+			parseTarget:   func(s string) (string, error) { return s, nil },
+			forceHeadless: false,
+		},
+		"tcpTunnel": {
+			expectsTarget: true,
+			parseTarget:   func(s string) (string, error) { return s, nil },
+			forceHeadless: false,
+		},
+		"udpTunnel": {
+			expectsTarget: true,
+			parseTarget:   func(s string) (string, error) { return s, nil },
+			forceHeadless: false,
+		},
+		"caddy": {
+			expectsTarget: true,
+			parseTarget:   func(s string) (string, error) { return s, nil },
+			forceHeadless: true,
+		},
+		"drive": {
+			expectsTarget: true,
+			parseTarget:   func(s string) (string, error) { return s, nil },
+			forceHeadless: false,
+		},
+		"socks": {
+			expectsTarget: false,
+			parseTarget:   nil,
+			forceHeadless: false,
+		},
+		"vpn": {
+			expectsTarget: false, // vpn is optional - can use default
+			parseTarget: func(s string) (string, error) {
+				if s == "" {
+					return vpn.DefaultTarget(), nil
+				}
+				_, _, err := net.ParseCIDR(s)
+				if err != nil {
+					return "", errors.New("the 'vpn' backend mode expects a valid CIDR <target>")
+				}
+				return s, nil
+			},
+			forceHeadless: false,
+		},
+	}
+
+	// check if mode is allowed
+	if allowedModes != nil {
+		allowed := false
+		for _, m := range allowedModes {
+			if m == mode {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			return "", false, fmt.Errorf("invalid backend mode '%v'; expected {%s}", mode, strings.Join(allowedModes, ", "))
+		}
+	}
+
+	config, ok := configs[mode]
+	if !ok {
+		// build list of valid modes - either from allowedModes or all available
+		validModes := allowedModes
+		if validModes == nil {
+			validModes = make([]string, 0, len(configs))
+			for k := range configs {
+				validModes = append(validModes, k)
+			}
+		}
+		return "", false, fmt.Errorf("invalid backend mode '%v'; expected {%s}", mode, strings.Join(validModes, ", "))
+	}
+
+	// handle special cases
+	switch mode {
+	case "socks":
+		// socks doesn't expect arguments
+		if len(args) != 0 {
+			return "", false, errors.New("the 'socks' backend mode does not expect a <target>")
+		}
+		return "socks", config.forceHeadless, nil
+
+	case "vpn":
+		// vpn has optional target
+		if len(args) == 0 {
+			return vpn.DefaultTarget(), config.forceHeadless, nil
+		} else if len(args) == 1 {
+			target, err = config.parseTarget(args[0])
+			if err != nil {
+				return "", false, errors.Wrap(err, "unable to create share")
+			}
+			return target, config.forceHeadless, nil
+		} else {
+			return "", false, errors.New("the 'vpn' backend mode expects at most one <target>")
+		}
+
+	default:
+		// standard modes that expect exactly one target
+		if config.expectsTarget {
+			if len(args) != 1 {
+				return "", false, fmt.Errorf("the '%s' backend mode expects a <target>", mode)
+			}
+
+			target, err = config.parseTarget(args[0])
+			if err != nil {
+				if mode == "proxy" {
+					return "", false, errors.Wrap(err, "invalid target endpoint URL")
+				}
+				return "", false, errors.Wrapf(err, "invalid target for backend mode '%s'", mode)
+			}
+			return target, config.forceHeadless, nil
+		}
+	}
+
+	return "", false, fmt.Errorf("unexpected backend mode configuration for '%s'", mode)
 }

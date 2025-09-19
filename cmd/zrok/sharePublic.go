@@ -109,31 +109,17 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
-	var target string
+	// validate and process backend mode (public shares only support specific modes)
+	allowedModes := []string{"proxy", "web", "caddy", "drive"}
+	target, forceHeadless, err := validateBackendMode(cmd.backendMode, args, allowedModes)
+	if err != nil {
+		cmd.error("unable to create share", err)
+	}
+	if forceHeadless {
+		cmd.headless = true
+	}
 
 	superNetwork, _ := root.SuperNetwork()
-
-	switch cmd.backendMode {
-	case "proxy":
-		v, err := parseUrl(args[0])
-		if err != nil {
-			cmd.error("invalid target endpoint URL", err)
-		}
-		target = v
-
-	case "web":
-		target = args[0]
-
-	case "caddy":
-		target = args[0]
-		cmd.headless = true
-
-	case "drive":
-		target = args[0]
-
-	default:
-		cmd.error("unable to create share", fmt.Errorf("invalid backend mode '%v'; expected {proxy, web, caddy, drive}", cmd.backendMode))
-	}
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {

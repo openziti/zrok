@@ -97,81 +97,16 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 }
 
 func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
-	var target string
+	// validate and process backend mode (nil = allow all modes for private shares)
+	target, forceHeadless, err := validateBackendMode(cmd.backendMode, args, nil)
+	if err != nil {
+		cmd.error("unable to create share", err)
+	}
+	if forceHeadless {
+		cmd.headless = true
+	}
 
 	superNetwork, _ := root.SuperNetwork()
-
-	switch cmd.backendMode {
-	case "proxy":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'proxy' backend mode expects a <target>"))
-		}
-		v, err := parseUrl(args[0])
-		if err != nil {
-			cmd.error("invalid target endpoint URL", err)
-		}
-		target = v
-
-	case "web":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'web' backend mode expects a <target>"))
-		}
-		target = args[0]
-
-	case "tcpTunnel":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'tcpTunnel' backend mode expects a <target>"))
-		}
-		target = args[0]
-
-	case "udpTunnel":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'udpTunnel' backend mode expects a <target>"))
-		}
-		target = args[0]
-
-	case "caddy":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'caddy' backend mode expects a <target>"))
-		}
-		target = args[0]
-		cmd.headless = true
-
-	case "drive":
-		if len(args) != 1 {
-			cmd.error("unable to create share", errors.New("the 'drive' backend mode expects a <target>"))
-		}
-		target = args[0]
-
-	case "socks":
-		if len(args) != 0 {
-			cmd.error("unable to create share", errors.New("the 'socks' backend mode expects a <target>"))
-		}
-		target = "socks"
-
-	case "vpn":
-		if len(args) == 1 {
-			_, _, err := net.ParseCIDR(args[0])
-			if err != nil {
-				cmd.error("unable to create share", errors.New("the 'vpn' backend mode expects a valid CIDR <target>"))
-			}
-			target = args[0]
-		} else {
-			target = vpn.DefaultTarget()
-		}
-
-	default:
-		cmd.error("unable to create share", fmt.Errorf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode))
-	}
-
-	root, err := environment.LoadRoot()
-	if err != nil {
-		cmd.error("unable to load environment", err)
-	}
-
-	if !root.IsEnabled() {
-		cmd.error("unable to create share", errors.New("unable to load environment; did you 'zrok enable'?"))
-	}
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
