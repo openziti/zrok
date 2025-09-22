@@ -164,6 +164,18 @@ func (str *Store) FindNamesForShare(shareId int, trx *sqlx.Tx) ([]*NameWithNames
 	return names, nil
 }
 
+func (str *Store) UpdateName(name *Name, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update names set updated_at = current_timestamp, reserved = $1 where id = $2")
+	if err != nil {
+		return errors.Wrap(err, "error preparing name update statement")
+	}
+	_, err = stmt.Exec(name.Reserved, name.Id)
+	if err != nil {
+		return errors.Wrap(err, "error executing name update statement")
+	}
+	return nil
+}
+
 func (str *Store) DeleteName(id int, trx *sqlx.Tx) error {
 	stmt, err := trx.Prepare("update names set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {

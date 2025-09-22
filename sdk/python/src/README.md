@@ -166,6 +166,7 @@ Class | Method | HTTP request | Description
 *ShareApi* | [**unshare**](docs/ShareApi.md#unshare) | **DELETE** /unshare | 
 *ShareApi* | [**update_access**](docs/ShareApi.md#update_access) | **PATCH** /access | 
 *ShareApi* | [**update_share**](docs/ShareApi.md#update_share) | **PATCH** /share | 
+*ShareApi* | [**update_share_name**](docs/ShareApi.md#update_share_name) | **PATCH** /share/name | 
 
 
 ## Documentation For Models
@@ -245,6 +246,7 @@ Class | Method | HTTP request | Description
  - [UpdateAccessRequest](docs/UpdateAccessRequest.md)
  - [UpdateFrontendRequest](docs/UpdateFrontendRequest.md)
  - [UpdateNamespaceRequest](docs/UpdateNamespaceRequest.md)
+ - [UpdateShareNameRequest](docs/UpdateShareNameRequest.md)
  - [UpdateShareRequest](docs/UpdateShareRequest.md)
  - [Verify200Response](docs/Verify200Response.md)
  - [VerifyRequest](docs/VerifyRequest.md)

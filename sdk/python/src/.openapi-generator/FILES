@@ -81,6 +81,7 @@ docs/UnshareRequest.md
 docs/UpdateAccessRequest.md
 docs/UpdateFrontendRequest.md
 docs/UpdateNamespaceRequest.md
+docs/UpdateShareNameRequest.md
 docs/UpdateShareRequest.md
 docs/Verify200Response.md
 docs/VerifyRequest.md
@@ -169,6 +170,7 @@ test/test_unshare_request.py
 test/test_update_access_request.py
 test/test_update_frontend_request.py
 test/test_update_namespace_request.py
+test/test_update_share_name_request.py
 test/test_update_share_request.py
 test/test_verify200_response.py
 test/test_verify_request.py
@@ -261,6 +263,7 @@ zrok_api/models/unshare_request.py
 zrok_api/models/update_access_request.py
 zrok_api/models/update_frontend_request.py
 zrok_api/models/update_namespace_request.py
+zrok_api/models/update_share_name_request.py
 zrok_api/models/update_share_request.py
 zrok_api/models/verify200_response.py
 zrok_api/models/verify_request.py

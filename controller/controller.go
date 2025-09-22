@@ -124,6 +124,7 @@ func Run(inCfg *config.Config) error {
 	api.ShareAccessHandler = newAccessHandler()
 	api.ShareCreateShareNameHandler = newCreateShareNameHandler()
 	api.ShareDeleteShareNameHandler = newDeleteShareNameHandler()
+	api.ShareUpdateShareNameHandler = newUpdateShareNameHandler()
 	api.ShareListAllNamesHandler = newListAllNamesHandler()
 	api.ShareListNamesForNamespaceHandler = newListNamesForNamespaceHandler()
 	api.ShareListShareNamespacesHandler = newListShareNamespacesHandler()

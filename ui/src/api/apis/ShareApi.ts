@@ -25,6 +25,7 @@ import type {
   UnaccessRequest,
   UnshareRequest,
   UpdateAccessRequest,
+  UpdateShareNameRequest,
   UpdateShareRequest,
 } from '../models/index';
 import {
@@ -48,6 +49,8 @@ import {
     UnshareRequestToJSON,
     UpdateAccessRequestFromJSON,
     UpdateAccessRequestToJSON,
+    UpdateShareNameRequestFromJSON,
+    UpdateShareNameRequestToJSON,
     UpdateShareRequestFromJSON,
     UpdateShareRequestToJSON,
 } from '../models/index';
@@ -86,6 +89,10 @@ export interface UpdateAccessOperationRequest {
 
 export interface UpdateShareOperationRequest {
     body?: UpdateShareRequest;
+}
+
+export interface UpdateShareNameOperationRequest {
+    body?: UpdateShareNameRequest;
 }
 
 /**
@@ -458,6 +465,39 @@ export class ShareApi extends runtime.BaseAPI {
      */
     async updateShare(requestParameters: UpdateShareOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateShareRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateShareNameRaw(requestParameters: UpdateShareNameOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/share/name`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateShareNameRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateShareName(requestParameters: UpdateShareNameOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateShareNameRaw(requestParameters, initOverrides);
     }
 
 }

@@ -89,6 +89,7 @@ from zrok_api.models.unshare_request import UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest
 from zrok_api.models.update_namespace_request import UpdateNamespaceRequest
+from zrok_api.models.update_share_name_request import UpdateShareNameRequest
 from zrok_api.models.update_share_request import UpdateShareRequest
 from zrok_api.models.verify200_response import Verify200Response
 from zrok_api.models.verify_request import VerifyRequest

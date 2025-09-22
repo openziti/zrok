@@ -108,6 +108,7 @@ __all__ = [
     "UpdateAccessRequest",
     "UpdateFrontendRequest",
     "UpdateNamespaceRequest",
+    "UpdateShareNameRequest",
     "UpdateShareRequest",
     "Verify200Response",
     "VerifyRequest",
@@ -209,6 +210,7 @@ from zrok_api.models.unshare_request import UnshareRequest as UnshareRequest
 from zrok_api.models.update_access_request import UpdateAccessRequest as UpdateAccessRequest
 from zrok_api.models.update_frontend_request import UpdateFrontendRequest as UpdateFrontendRequest
 from zrok_api.models.update_namespace_request import UpdateNamespaceRequest as UpdateNamespaceRequest
+from zrok_api.models.update_share_name_request import UpdateShareNameRequest as UpdateShareNameRequest
 from zrok_api.models.update_share_request import UpdateShareRequest as UpdateShareRequest
 from zrok_api.models.verify200_response import Verify200Response as Verify200Response
 from zrok_api.models.verify_request import VerifyRequest as VerifyRequest

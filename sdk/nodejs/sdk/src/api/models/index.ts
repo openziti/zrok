@@ -75,6 +75,7 @@ export * from './UnshareRequest';
 export * from './UpdateAccessRequest';
 export * from './UpdateFrontendRequest';
 export * from './UpdateNamespaceRequest';
+export * from './UpdateShareNameRequest';
 export * from './UpdateShareRequest';
 export * from './Verify200Response';
 export * from './VerifyRequest';

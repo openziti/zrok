@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**unshare**](ShareApi.md#unshare) | **DELETE** /unshare | 
 [**update_access**](ShareApi.md#update_access) | **PATCH** /access | 
 [**update_share**](ShareApi.md#update_share) | **PATCH** /share | 
+[**update_share_name**](ShareApi.md#update_share_name) | **PATCH** /share/name | 
 
 
 # **access**
@@ -844,6 +845,82 @@ void (empty response body)
 **400** | bad request |  -  |
 **401** | unauthorized |  -  |
 **404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **update_share_name**
+> update_share_name(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.update_share_name_request import UpdateShareNameRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.ShareApi(api_client)
+    body = zrok_api.UpdateShareNameRequest() # UpdateShareNameRequest |  (optional)
+
+    try:
+        api_instance.update_share_name(body=body)
+    except Exception as e:
+        print("Exception when calling ShareApi->update_share_name: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**UpdateShareNameRequest**](UpdateShareNameRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | name updated successfully |  -  |
+**401** | unauthorized |  -  |
+**404** | name not found |  -  |
+**409** | conflict - cannot change reservation state |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

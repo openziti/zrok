@@ -82,6 +82,7 @@ models/UnshareRequest.ts
 models/UpdateAccessRequest.ts
 models/UpdateFrontendRequest.ts
 models/UpdateNamespaceRequest.ts
+models/UpdateShareNameRequest.ts
 models/UpdateShareRequest.ts
 models/Verify200Response.ts
 models/VerifyRequest.ts

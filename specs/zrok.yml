@@ -1925,6 +1925,37 @@ paths:
             $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
+    patch:
+      tags:
+        - share
+      security:
+        - key: []
+      operationId: updateShareName
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              namespaceToken:
+                type: string
+              name:
+                type: string
+              reserved:
+                type: boolean
+                description: "whether the name should be reserved (true) or released (false)"
+      responses:
+        200:
+          description: name updated successfully
+        401:
+          description: unauthorized
+        404:
+          description: name not found
+        409:
+          description: conflict - cannot change reservation state
+          schema:
+            $ref: "#/definitions/errorMessage"
+        500:
+          description: internal server error
     delete:
       tags:
         - share

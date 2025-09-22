@@ -92,6 +92,12 @@ class TestShareApi(unittest.TestCase):
         """
         pass
 
+    def test_update_share_name(self) -> None:
+        """Test case for update_share_name
+
+        """
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()

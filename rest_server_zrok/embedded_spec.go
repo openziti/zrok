@@ -3046,6 +3046,57 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "description": "whether the name should be reserved (true) or released (false)",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "name updated successfully"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "name not found"
+          },
+          "409": {
+            "description": "conflict - cannot change reservation state",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/share/names": {
@@ -6706,6 +6757,57 @@ func init() {
           },
           "404": {
             "description": "name not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "share"
+        ],
+        "operationId": "updateShareName",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "description": "whether the name should be reserved (true) or released (false)",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "name updated successfully"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "name not found"
+          },
+          "409": {
+            "description": "conflict - cannot change reservation state",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"

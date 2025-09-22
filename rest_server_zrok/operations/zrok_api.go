@@ -263,6 +263,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareUpdateShareHandler: share.UpdateShareHandlerFunc(func(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.UpdateShare has not yet been implemented")
 		}),
+		ShareUpdateShareNameHandler: share.UpdateShareNameHandlerFunc(func(params share.UpdateShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation share.UpdateShareName has not yet been implemented")
+		}),
 		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
 		}),
@@ -464,6 +467,8 @@ type ZrokAPI struct {
 	AdminUpdateNamespaceHandler admin.UpdateNamespaceHandler
 	// ShareUpdateShareHandler sets the operation handler for the update share operation
 	ShareUpdateShareHandler share.UpdateShareHandler
+	// ShareUpdateShareNameHandler sets the operation handler for the update share name operation
+	ShareUpdateShareNameHandler share.UpdateShareNameHandler
 	// AccountVerifyHandler sets the operation handler for the verify operation
 	AccountVerifyHandler account.VerifyHandler
 	// MetadataVersionHandler sets the operation handler for the version operation
@@ -763,6 +768,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareUpdateShareHandler == nil {
 		unregistered = append(unregistered, "share.UpdateShareHandler")
+	}
+	if o.ShareUpdateShareNameHandler == nil {
+		unregistered = append(unregistered, "share.UpdateShareNameHandler")
 	}
 	if o.AccountVerifyHandler == nil {
 		unregistered = append(unregistered, "account.VerifyHandler")
@@ -1156,6 +1164,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["PATCH"] = make(map[string]http.Handler)
 	}
 	o.handlers["PATCH"]["/share"] = share.NewUpdateShare(o.context, o.ShareUpdateShareHandler)
+	if o.handlers["PATCH"] == nil {
+		o.handlers["PATCH"] = make(map[string]http.Handler)
+	}
+	o.handlers["PATCH"]["/share/name"] = share.NewUpdateShareName(o.context, o.ShareUpdateShareNameHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
