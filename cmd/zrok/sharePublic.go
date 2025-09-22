@@ -65,7 +65,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	if root, err := environment.LoadRoot(); err == nil {
 		headless, _ = root.Headless()
 	}
-	cmd.Flags().StringArrayVar(&command.namespaceSelection, "namespace-selection", defaultNamespaceSelections, "Selected frontends to use for the share")
+	cmd.Flags().StringArrayVarP(&command.namespaceSelection, "namespace-selection", "n", defaultNamespaceSelections, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
