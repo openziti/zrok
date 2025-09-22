@@ -79,6 +79,21 @@ class TestOverview(unittest.TestCase):
                                 created_at = 56, 
                                 updated_at = 56, )
                             ], )
+                    ],
+                namespaces = [
+                    zrok_api.models.list_share_namespaces_200_response_inner.listShareNamespaces_200_response_inner(
+                        namespace_token = '', 
+                        name = '', 
+                        description = '', )
+                    ],
+                names = [
+                    zrok_api.models.overview_names_inner.overview_names_inner(
+                        namespace_token = '', 
+                        namespace_name = '', 
+                        name = '', 
+                        share_token = '', 
+                        reserved = True, 
+                        created_at = 56, )
                     ]
             )
         else:

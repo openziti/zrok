@@ -3591,6 +3591,49 @@ func init() {
           "items": {
             "$ref": "#/definitions/environmentAndResources"
           }
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "namespaceName": {
+                "type": "string"
+              },
+              "namespaceToken": {
+                "type": "string"
+              },
+              "reserved": {
+                "type": "boolean"
+              },
+              "shareToken": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "namespaces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "namespaceToken": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -7140,6 +7183,43 @@ func init() {
         }
       }
     },
+    "OverviewNamesItems0": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceName": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        },
+        "reserved": {
+          "type": "boolean"
+        },
+        "shareToken": {
+          "type": "string"
+        }
+      }
+    },
+    "OverviewNamespacesItems0": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespaceToken": {
+          "type": "string"
+        }
+      }
+    },
     "SharesItems0": {
       "type": "object",
       "properties": {
@@ -7374,6 +7454,18 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/environmentAndResources"
+          }
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OverviewNamesItems0"
+          }
+        },
+        "namespaces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OverviewNamespacesItems0"
           }
         }
       }

@@ -112,5 +112,44 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		ovr.Environments = append(ovr.Environments, ear)
 	}
 
+	// find all namespaces the user has access to
+	namespaces, err := str.FindNamespacesForAccount(int(principal.ID), trx)
+	if err != nil {
+		logrus.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
+		return metadata.NewOverviewInternalServerError()
+	}
+
+	// build namespace objects for overview
+	for _, namespace := range namespaces {
+		ovr.Namespaces = append(ovr.Namespaces, &rest_model_zrok.OverviewNamespacesItems0{
+			NamespaceToken: namespace.Token,
+			Name:           namespace.Name,
+			Description:    namespace.Description,
+		})
+	}
+
+	// collect allocated names from all accessible namespaces
+	for _, ns := range namespaces {
+		names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
+		if err != nil {
+			logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+
+		for _, an := range names {
+			nameObj := &rest_model_zrok.OverviewNamesItems0{
+				NamespaceToken: ns.Token,
+				NamespaceName:  ns.Name,
+				Name:           an.Name.Name,
+				Reserved:       an.Name.Reserved,
+				CreatedAt:      an.Name.CreatedAt.Unix(),
+			}
+			if an.ShareToken != nil {
+				nameObj.ShareToken = *an.ShareToken
+			}
+			ovr.Names = append(ovr.Names, nameObj)
+		}
+	}
+
 	return metadata.NewOverviewOK().WithPayload(ovr)
 }

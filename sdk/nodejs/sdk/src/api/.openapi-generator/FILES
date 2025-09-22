@@ -54,6 +54,7 @@ models/ModelConfiguration.ts
 models/Name.ts
 models/NamespaceSelection.ts
 models/Overview.ts
+models/OverviewNamesInner.ts
 models/Ping200Response.ts
 models/Principal.ts
 models/RegenerateAccountToken200Response.ts

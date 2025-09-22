@@ -2224,6 +2224,34 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/environmentAndResources"
+      namespaces:
+        type: array
+        items:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            name:
+              type: string
+            description:
+              type: string
+      names:
+        type: array
+        items:
+          type: object
+          properties:
+            namespaceToken:
+              type: string
+            namespaceName:
+              type: string
+            name:
+              type: string
+            shareToken:
+              type: string
+            reserved:
+              type: boolean
+            createdAt:
+              type: integer
   
   principal:
     type: object

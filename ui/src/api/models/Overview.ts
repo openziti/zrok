@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ListShareNamespaces200ResponseInner } from './ListShareNamespaces200ResponseInner';
+import {
+    ListShareNamespaces200ResponseInnerFromJSON,
+    ListShareNamespaces200ResponseInnerFromJSONTyped,
+    ListShareNamespaces200ResponseInnerToJSON,
+    ListShareNamespaces200ResponseInnerToJSONTyped,
+} from './ListShareNamespaces200ResponseInner';
 import type { EnvironmentAndResources } from './EnvironmentAndResources';
 import {
     EnvironmentAndResourcesFromJSON,
@@ -20,6 +27,13 @@ import {
     EnvironmentAndResourcesToJSON,
     EnvironmentAndResourcesToJSONTyped,
 } from './EnvironmentAndResources';
+import type { OverviewNamesInner } from './OverviewNamesInner';
+import {
+    OverviewNamesInnerFromJSON,
+    OverviewNamesInnerFromJSONTyped,
+    OverviewNamesInnerToJSON,
+    OverviewNamesInnerToJSONTyped,
+} from './OverviewNamesInner';
 
 /**
  * 
@@ -39,6 +53,18 @@ export interface Overview {
      * @memberof Overview
      */
     environments?: Array<EnvironmentAndResources>;
+    /**
+     * 
+     * @type {Array<ListShareNamespaces200ResponseInner>}
+     * @memberof Overview
+     */
+    namespaces?: Array<ListShareNamespaces200ResponseInner>;
+    /**
+     * 
+     * @type {Array<OverviewNamesInner>}
+     * @memberof Overview
+     */
+    names?: Array<OverviewNamesInner>;
 }
 
 /**
@@ -60,6 +86,8 @@ export function OverviewFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         
         'accountLimited': json['accountLimited'] == null ? undefined : json['accountLimited'],
         'environments': json['environments'] == null ? undefined : ((json['environments'] as Array<any>).map(EnvironmentAndResourcesFromJSON)),
+        'namespaces': json['namespaces'] == null ? undefined : ((json['namespaces'] as Array<any>).map(ListShareNamespaces200ResponseInnerFromJSON)),
+        'names': json['names'] == null ? undefined : ((json['names'] as Array<any>).map(OverviewNamesInnerFromJSON)),
     };
 }
 
@@ -76,6 +104,8 @@ export function OverviewToJSONTyped(value?: Overview | null, ignoreDiscriminator
         
         'accountLimited': value['accountLimited'],
         'environments': value['environments'] == null ? undefined : ((value['environments'] as Array<any>).map(EnvironmentAndResourcesToJSON)),
+        'namespaces': value['namespaces'] == null ? undefined : ((value['namespaces'] as Array<any>).map(ListShareNamespaces200ResponseInnerToJSON)),
+        'names': value['names'] == null ? undefined : ((value['names'] as Array<any>).map(OverviewNamesInnerToJSON)),
     };
 }
 

@@ -20,6 +20,8 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictBool
 from typing import Any, ClassVar, Dict, List, Optional
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
+from zrok_api.models.list_share_namespaces200_response_inner import ListShareNamespaces200ResponseInner
+from zrok_api.models.overview_names_inner import OverviewNamesInner
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -29,7 +31,9 @@ class Overview(BaseModel):
     """ # noqa: E501
     account_limited: Optional[StrictBool] = Field(default=None, alias="accountLimited")
     environments: Optional[List[EnvironmentAndResources]] = None
-    __properties: ClassVar[List[str]] = ["accountLimited", "environments"]
+    namespaces: Optional[List[ListShareNamespaces200ResponseInner]] = None
+    names: Optional[List[OverviewNamesInner]] = None
+    __properties: ClassVar[List[str]] = ["accountLimited", "environments", "namespaces", "names"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -77,6 +81,20 @@ class Overview(BaseModel):
                 if _item_environments:
                     _items.append(_item_environments.to_dict())
             _dict['environments'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in namespaces (list)
+        _items = []
+        if self.namespaces:
+            for _item_namespaces in self.namespaces:
+                if _item_namespaces:
+                    _items.append(_item_namespaces.to_dict())
+            _dict['namespaces'] = _items
+        # override the default output from pydantic by calling `to_dict()` of each item in names (list)
+        _items = []
+        if self.names:
+            for _item_names in self.names:
+                if _item_names:
+                    _items.append(_item_names.to_dict())
+            _dict['names'] = _items
         return _dict
 
     @classmethod
@@ -90,7 +108,9 @@ class Overview(BaseModel):
 
         _obj = cls.model_validate({
             "accountLimited": obj.get("accountLimited"),
-            "environments": [EnvironmentAndResources.from_dict(_item) for _item in obj["environments"]] if obj.get("environments") is not None else None
+            "environments": [EnvironmentAndResources.from_dict(_item) for _item in obj["environments"]] if obj.get("environments") is not None else None,
+            "namespaces": [ListShareNamespaces200ResponseInner.from_dict(_item) for _item in obj["namespaces"]] if obj.get("namespaces") is not None else None,
+            "names": [OverviewNamesInner.from_dict(_item) for _item in obj["names"]] if obj.get("names") is not None else None
         })
         return _obj
 

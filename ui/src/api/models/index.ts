@@ -47,6 +47,7 @@ export * from './ModelConfiguration';
 export * from './Name';
 export * from './NamespaceSelection';
 export * from './Overview';
+export * from './OverviewNamesInner';
 export * from './Ping200Response';
 export * from './Principal';
 export * from './RegenerateAccountToken200Response';

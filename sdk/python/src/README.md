@@ -217,6 +217,7 @@ Class | Method | HTTP request | Description
  - [Name](docs/Name.md)
  - [NamespaceSelection](docs/NamespaceSelection.md)
  - [Overview](docs/Overview.md)
+ - [OverviewNamesInner](docs/OverviewNamesInner.md)
  - [Ping200Response](docs/Ping200Response.md)
  - [Principal](docs/Principal.md)
  - [RegenerateAccountToken200Response](docs/RegenerateAccountToken200Response.md)
