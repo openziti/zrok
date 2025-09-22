@@ -105,7 +105,7 @@ func (m *mappings) run() {
 				m.updateMappings(mappings)
 				dl.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestId, time.Since(start))
 			} else {
-				dl.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestId, time.Since(start))
+				dl.Debugf("refresh found no new mappings (highest version '%v') in '%v'", highestId, time.Since(start))
 			}
 
 		case update := <-m.amqp.Updates():
@@ -135,6 +135,7 @@ func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
 	switch update.Operation {
 	case dynamicProxyController.OperationBind:
 		mapping := &dynamicProxyController.FrontendMapping{
+			Id:         update.Id,
 			Name:       update.Name,
 			ShareToken: update.ShareToken,
 		}

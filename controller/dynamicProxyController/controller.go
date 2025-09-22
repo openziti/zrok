@@ -2,7 +2,6 @@ package dynamicProxyController
 
 import (
 	"context"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/openziti/sdk-golang/ziti"
@@ -57,9 +56,6 @@ func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 }
 
 func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string, trx *sqlx.Tx) error {
-	// use current timestamp as version to ensure it's always increasing
-	version := time.Now().UnixNano()
-
 	// create new frontend mapping
 	fm := &store.FrontendMapping{
 		FrontendToken: frontendToken,
@@ -67,15 +63,16 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string,
 		ShareToken:    shareToken,
 	}
 
-	if err := c.str.CreateFrontendMapping(fm, trx); err != nil {
+	fmId, err := c.str.CreateFrontendMapping(fm, trx)
+	if err != nil {
 		return err
 	}
 
 	// broadcast the mapping update via AMQP
 	mapping := Mapping{
+		Id:         int64(fmId),
 		Operation:  OperationBind,
 		Name:       name,
-		Version:    version,
 		ShareToken: shareToken,
 	}
 	return c.sendMappingUpdate(frontendToken, mapping)
@@ -103,9 +100,9 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 
 	var mappings []*store.FrontendMapping
 	if req.GetName() == "" {
-		mappings, err = c.str.FindFrontendMappingsByFrontendTokenWithIdOrHigher(req.GetFrontendToken(), req.GetId(), trx)
+		mappings, err = c.str.FindFrontendMappingsByFrontendTokenWithHigherId(req.GetFrontendToken(), req.GetId(), trx)
 	} else {
-		mappings, err = c.str.FindFrontendMappingsWithIdOrHigher(req.GetFrontendToken(), req.GetName(), req.GetId(), trx)
+		mappings, err = c.str.FindFrontendMappingsWithHigherId(req.GetFrontendToken(), req.GetName(), req.GetId(), trx)
 	}
 	if err != nil {
 		return nil, err

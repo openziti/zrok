@@ -8,8 +8,8 @@ const (
 )
 
 type Mapping struct {
+	Id         int64     `json:"id"`
 	Operation  Operation `json:"o"`
 	Name       string    `json:"n"`
-	Version    int64     `json:"v"`
 	ShareToken string    `json:"st"`
 }
