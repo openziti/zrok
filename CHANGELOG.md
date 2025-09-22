@@ -8,6 +8,10 @@ CHANGE: Completely overhauled the core ziti automation logic. The legacy `contro
 
 CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 
+## v1.1.5
+
+CHANGE: Upgraded go toolchain to `v1.24.6`. (https://github.com/openziti/zrok/issues/1072)
+
 ## v1.1.4
 
 CHANGE: Update `github.com/caddyserver/caddy/v2` to `v2.9.1`; fixes CVE-2024-53259 (would only potentially effect users using the QUIC protocol, very atypical) (https://github.com/openziti/zrok/issues/1047)
