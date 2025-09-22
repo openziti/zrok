@@ -211,7 +211,17 @@ func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
 	if err != nil {
 		return err
 	}
-	dl.Infof("mapping update -> %v", update)
+
+	switch update.Operation {
+	case dynamicProxyController.OperationBind:
+		dl.Debugf("adding mapping for '%v' -> '%v'", update.Name, update.ShareToken)
+
+	case dynamicProxyController.OperationUnbind:
+		dl.Debugf("removing mapping for '%v'", update.Name)
+
+	default:
+		dl.Errorf("unknown operation '%v'", update.Operation)
+	}
 
 	select {
 	case s.updates <- update:
