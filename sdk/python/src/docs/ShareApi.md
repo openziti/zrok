@@ -157,7 +157,7 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/zrok.v1+json
- - **Accept**: Not defined
+ - **Accept**: application/zrok.v1+json
 
 ### HTTP response details
 

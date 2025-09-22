@@ -384,7 +384,7 @@ class ShareApi:
             '201': None,
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(
@@ -454,7 +454,7 @@ class ShareApi:
             '201': None,
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(
@@ -524,7 +524,7 @@ class ShareApi:
             '201': None,
             '401': None,
             '404': None,
-            '409': None,
+            '409': "str",
             '500': None,
         }
         response_data = self.api_client.call_api(
@@ -566,6 +566,13 @@ class ShareApi:
             _body_params = body
 
 
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/zrok.v1+json'
+                ]
+            )
 
         # set the HTTP header `Content-Type`
         if _content_type:

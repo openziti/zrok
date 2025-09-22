@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // CreateShareNameCreatedCode is the HTTP code returned for type CreateShareNameCreated
@@ -95,6 +97,11 @@ CreateShareNameConflict name already exists
 swagger:response createShareNameConflict
 */
 type CreateShareNameConflict struct {
+
+	/*
+	  In: Body
+	*/
+	Payload rest_model_zrok.ErrorMessage `json:"body,omitempty"`
 }
 
 // NewCreateShareNameConflict creates CreateShareNameConflict with default headers values
@@ -103,12 +110,25 @@ func NewCreateShareNameConflict() *CreateShareNameConflict {
 	return &CreateShareNameConflict{}
 }
 
+// WithPayload adds the payload to the create share name conflict response
+func (o *CreateShareNameConflict) WithPayload(payload rest_model_zrok.ErrorMessage) *CreateShareNameConflict {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create share name conflict response
+func (o *CreateShareNameConflict) SetPayload(payload rest_model_zrok.ErrorMessage) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *CreateShareNameConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(409)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // CreateShareNameInternalServerErrorCode is the HTTP code returned for type CreateShareNameInternalServerError

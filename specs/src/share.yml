@@ -149,6 +149,8 @@
         description: namespace not found
       409:
         description: name already exists
+        schema:
+          $ref: "#/definitions/errorMessage"
       500:
         description: internal server error
   delete:

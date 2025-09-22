@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -22,8 +23,11 @@ func newDeleteNameCommand() *deleteNameCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &deleteNameCommand{cmd: cmd}
-	cmd.Flags().StringVarP(&command.namespaceToken, "namespace-token", "n", "", "namespace token")
-	cmd.MarkFlagRequired("namespace-token")
+	defaultNamespace := "public"
+	if root, err := environment.LoadRoot(); err == nil {
+		defaultNamespace, _ = root.DefaultNamespace()
+	}
+	cmd.Flags().StringVarP(&command.namespaceToken, "namespace-token", "n", defaultNamespace, "namespace token")
 	cmd.Run = command.run
 	return command
 }

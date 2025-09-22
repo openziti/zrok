@@ -2996,7 +2996,10 @@ func init() {
             "description": "namespace not found"
           },
           "409": {
-            "description": "name already exists"
+            "description": "name already exists",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"
@@ -6658,7 +6661,10 @@ func init() {
             "description": "namespace not found"
           },
           "409": {
-            "description": "name already exists"
+            "description": "name already exists",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"

@@ -8,10 +8,13 @@ package share
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/rest_model_zrok"
 )
 
 // CreateShareNameReader is a Reader for the CreateShareName structure.
@@ -236,6 +239,7 @@ CreateShareNameConflict describes a response with status code 409, with default 
 name already exists
 */
 type CreateShareNameConflict struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 // IsSuccess returns true when this create share name conflict response has a 2xx status code
@@ -269,14 +273,23 @@ func (o *CreateShareNameConflict) Code() int {
 }
 
 func (o *CreateShareNameConflict) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict ", 409)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict  %+v", 409, o.Payload)
 }
 
 func (o *CreateShareNameConflict) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict ", 409)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict  %+v", 409, o.Payload)
+}
+
+func (o *CreateShareNameConflict) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *CreateShareNameConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

@@ -1,10 +1,14 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,6 +55,12 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	if !available {
 		logrus.Errorf("name '%v' already exists in namespace '%v'", params.Body.Name, ns.Token)
 		return share.NewCreateShareNameConflict()
+	}
+
+	// screen for profanity and DNS-appropriateness
+	if !util.IsValidUniqueName(params.Body.Name) {
+		dl.Errorf("'%v' is not a valid unique name for '%v'", params.Body.Name, principal.Email)
+		return share.NewCreateShareNameConflict().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("'%v' is not a valid share name; failed profanity or DNS check", params.Body.Name)))
 	}
 
 	// create allocated name
