@@ -2,6 +2,8 @@
 
 ## v2.0.0
 
+FEATURE: `zrok overview` now includes a human-readble default output, that formats all of the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
+
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
 CHANGE: `defaultFrontend` configuration replaced with new `defaultNamespace`, which provides the logical equivalent of the old name-handling configuration (https://github.com/openziti/zrok/issues/1065)
