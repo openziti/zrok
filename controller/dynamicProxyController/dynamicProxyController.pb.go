@@ -23,9 +23,9 @@ const (
 
 type FrontendMappingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FrontendToken string                 `protobuf:"bytes,1,opt,name=frontendToken,proto3" json:"frontendToken,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version       int64                  `protobuf:"varint,3,opt,name=version,proto3" json:"version,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	FrontendToken string                 `protobuf:"bytes,2,opt,name=frontendToken,proto3" json:"frontendToken,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -60,6 +60,13 @@ func (*FrontendMappingsRequest) Descriptor() ([]byte, []int) {
 	return file_controller_dynamicProxyController_dynamicProxyController_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *FrontendMappingsRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 func (x *FrontendMappingsRequest) GetFrontendToken() string {
 	if x != nil {
 		return x.FrontendToken
@@ -72,13 +79,6 @@ func (x *FrontendMappingsRequest) GetName() string {
 		return x.Name
 	}
 	return ""
-}
-
-func (x *FrontendMappingsRequest) GetVersion() int64 {
-	if x != nil {
-		return x.Version
-	}
-	return 0
 }
 
 type FrontendMappingsResponse struct {
@@ -127,8 +127,8 @@ func (x *FrontendMappingsResponse) GetFrontendMappings() []*FrontendMapping {
 
 type FrontendMapping struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version       int64                  `protobuf:"varint,2,opt,name=version,proto3" json:"version,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	ShareToken    string                 `protobuf:"bytes,3,opt,name=shareToken,proto3" json:"shareToken,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -164,18 +164,18 @@ func (*FrontendMapping) Descriptor() ([]byte, []int) {
 	return file_controller_dynamicProxyController_dynamicProxyController_proto_rawDescGZIP(), []int{2}
 }
 
+func (x *FrontendMapping) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 func (x *FrontendMapping) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
-}
-
-func (x *FrontendMapping) GetVersion() int64 {
-	if x != nil {
-		return x.Version
-	}
-	return 0
 }
 
 func (x *FrontendMapping) GetShareToken() string {
@@ -189,16 +189,16 @@ var File_controller_dynamicProxyController_dynamicProxyController_proto protoref
 
 const file_controller_dynamicProxyController_dynamicProxyController_proto_rawDesc = "" +
 	"\n" +
-	">controller/dynamicProxyController/dynamicProxyController.proto\"m\n" +
-	"\x17FrontendMappingsRequest\x12$\n" +
-	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\aversion\x18\x03 \x01(\x03R\aversion\"X\n" +
+	">controller/dynamicProxyController/dynamicProxyController.proto\"c\n" +
+	"\x17FrontendMappingsRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12$\n" +
+	"\rfrontendToken\x18\x02 \x01(\tR\rfrontendToken\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\"X\n" +
 	"\x18FrontendMappingsResponse\x12<\n" +
-	"\x10frontendMappings\x18\x01 \x03(\v2\x10.FrontendMappingR\x10frontendMappings\"_\n" +
-	"\x0fFrontendMapping\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
-	"\aversion\x18\x02 \x01(\x03R\aversion\x12\x1e\n" +
+	"\x10frontendMappings\x18\x01 \x03(\v2\x10.FrontendMappingR\x10frontendMappings\"U\n" +
+	"\x0fFrontendMapping\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1e\n" +
 	"\n" +
 	"shareToken\x18\x03 \x01(\tR\n" +
 	"shareToken2a\n" +

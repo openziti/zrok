@@ -64,7 +64,6 @@ func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string,
 	fm := &store.FrontendMapping{
 		FrontendToken: frontendToken,
 		Name:          name,
-		Version:       version,
 		ShareToken:    shareToken,
 	}
 
@@ -104,9 +103,9 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 
 	var mappings []*store.FrontendMapping
 	if req.GetName() == "" {
-		mappings, err = c.str.FindFrontendMappingsByFrontendTokenWithVersionOrHigher(req.GetFrontendToken(), req.GetVersion(), trx)
+		mappings, err = c.str.FindFrontendMappingsByFrontendTokenWithIdOrHigher(req.GetFrontendToken(), req.GetId(), trx)
 	} else {
-		mappings, err = c.str.FindFrontendMappingsWithVersionOrHigher(req.GetFrontendToken(), req.GetName(), req.GetVersion(), trx)
+		mappings, err = c.str.FindFrontendMappingsWithIdOrHigher(req.GetFrontendToken(), req.GetName(), req.GetId(), trx)
 	}
 	if err != nil {
 		return nil, err
@@ -115,8 +114,8 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 	out := make([]*FrontendMapping, len(mappings))
 	for i, storeMapping := range mappings {
 		out[i] = &FrontendMapping{
+			Id:         storeMapping.Id,
 			Name:       storeMapping.Name,
-			Version:    storeMapping.Version,
 			ShareToken: storeMapping.ShareToken,
 		}
 	}

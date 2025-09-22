@@ -7,9 +7,9 @@ service DynamicProxyController {
 }
 
 message FrontendMappingsRequest {
-  string frontendToken = 1;
-  string name = 2;
-  int64 version = 3;
+  int64 id = 1;
+  string frontendToken = 2;
+  string name = 3;
 }
 
 message FrontendMappingsResponse {
@@ -17,7 +17,7 @@ message FrontendMappingsResponse {
 }
 
 message FrontendMapping {
-  string name = 1;
-  int64 version = 2;
+  int64 id = 1;
+  string name = 2;
   string shareToken = 3;
 }

@@ -110,13 +110,13 @@ func (c *controllerClient) dialAndCall(call func(client dynamicProxyController.D
 }
 
 // getFrontendMappings retrieves frontend mappings from the controller
-func (c *controllerClient) getFrontendMappings(frontendToken, name string, version int64) ([]*dynamicProxyController.FrontendMapping, error) {
+func (c *controllerClient) getFrontendMappings(frontendToken, name string, id int64) ([]*dynamicProxyController.FrontendMapping, error) {
 	var mappings []*dynamicProxyController.FrontendMapping
 	err := c.dialAndCall(func(client dynamicProxyController.DynamicProxyControllerClient, ctx context.Context) error {
 		req := &dynamicProxyController.FrontendMappingsRequest{
+			Id:            id,
 			FrontendToken: frontendToken,
 			Name:          name,
-			Version:       version,
 		}
 
 		resp, err := client.FrontendMappings(ctx, req)

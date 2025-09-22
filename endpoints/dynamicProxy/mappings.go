@@ -95,17 +95,17 @@ func (m *mappings) run() {
 		case <-ticker.C:
 			// periodically refresh mappings
 			start := time.Now()
-			highestVersion := m.getHighestVersion()
-			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, highestVersion)
+			highestId := m.getHighestId()
+			mappings, err := m.ctrl.getAllFrontendMappings(m.cfg.FrontendToken, highestId)
 			if err != nil {
-				dl.Errorf("failed to refresh mappings (highest version '%v'): %v", highestVersion, err)
+				dl.Errorf("failed to refresh mappings (highest version '%v'): %v", highestId, err)
 				continue
 			}
 			if len(mappings) > 0 {
 				m.updateMappings(mappings)
-				dl.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestVersion, time.Since(start))
+				dl.Warnf("refresh updated '%d' mappings (highest version '%v') in '%v'", len(mappings), highestId, time.Since(start))
 			} else {
-				dl.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestVersion, time.Since(start))
+				dl.Infof("refresh found no new mappings (highest version '%v') in '%v'", highestId, time.Since(start))
 			}
 
 		case update := <-m.amqp.Updates():
@@ -115,17 +115,17 @@ func (m *mappings) run() {
 	}
 }
 
-func (m *mappings) getHighestVersion() int64 {
+func (m *mappings) getHighestId() int64 {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 
-	var highestVersion int64
+	var highestId int64
 	for _, mapping := range m.nameMap {
-		if version := mapping.GetVersion(); version > highestVersion {
-			highestVersion = version
+		if version := mapping.GetId(); version > highestId {
+			highestId = version
 		}
 	}
-	return highestVersion
+	return highestId
 }
 
 func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
@@ -136,11 +136,10 @@ func (m *mappings) handleMappingUpdate(update *dynamicProxyController.Mapping) {
 	case dynamicProxyController.OperationBind:
 		mapping := &dynamicProxyController.FrontendMapping{
 			Name:       update.Name,
-			Version:    update.Version,
 			ShareToken: update.ShareToken,
 		}
 		m.nameMap[mapping.Name] = mapping
-		dl.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
+		dl.Infof("added mapping: '%v' -> '%v'", mapping.Name, mapping.ShareToken)
 
 	case dynamicProxyController.OperationUnbind:
 		delete(m.nameMap, update.Name)
@@ -160,7 +159,7 @@ func (m *mappings) updateMappings(frontendMappings []*dynamicProxyController.Fro
 		if mapping.Name != "" {
 			m.nameMap[mapping.Name] = mapping
 		}
-		dl.Infof("added mapping: '%v' -> '%v' (%v)", mapping.Name, mapping.ShareToken, mapping.Version)
+		dl.Infof("added mapping: '%v' -> '%v'", mapping.Name, mapping.ShareToken)
 	}
 }
 
@@ -172,9 +171,9 @@ func (m *mappings) dumpMappings() string {
 	t := table.NewWriter()
 	t.SetStyle(table.StyleRounded)
 	t.SetCaption("%d mappings", len(m.nameMap))
-	t.AppendHeader(table.Row{"name", "share token", "version"})
+	t.AppendHeader(table.Row{"name", "share token"})
 	for key, mapping := range m.nameMap {
-		t.AppendRow(table.Row{key, mapping.ShareToken, mapping.Version})
+		t.AppendRow(table.Row{key, mapping.ShareToken})
 	}
 	return t.Render()
 }
