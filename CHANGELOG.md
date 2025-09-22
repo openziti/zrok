@@ -4,6 +4,8 @@
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
+CHANGE: `defaultFrontend` configuration replaced with new `defaultNamespace`, which provides the logical equivalent of the old name-handling configuration (https://github.com/openziti/zrok/issues/1065)
+
 CHANGE: Completely overhauled the core ziti automation logic. The legacy `controller/zrokEdgeSdk` package has been replaced with a much more streamlined, clearer package `controller/automation`. This makes comprehending the controller code a lot simpler. (https://github.com/openziti/zrok/issues/1054)
 
 CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
