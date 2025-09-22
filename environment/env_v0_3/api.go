@@ -85,22 +85,22 @@ func (r *Root) ApiEndpoint() (string, string) {
 	return apiEndpoint, from
 }
 
-func (r *Root) DefaultFrontend() (string, string) {
-	defaultFrontend := "public"
+func (r *Root) DefaultNamespace() (string, string) {
+	defaultNamespace := "public"
 	from := "binary"
 
-	if r.Config() != nil && r.Config().DefaultFrontend != "" {
-		defaultFrontend = r.Config().DefaultFrontend
+	if r.Config() != nil && r.Config().DefaultNamespace != "" {
+		defaultNamespace = r.Config().DefaultNamespace
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_DEFAULT_FRONTEND")
+	env := os.Getenv("ZROK_DEFAULT_NAMESPACE")
 	if env != "" {
-		defaultFrontend = env
-		from = "ZROK_DEFAULT_FRONTEND"
+		defaultNamespace = env
+		from = "ZROK_DEFAULT_NAMESPACE"
 	}
 
-	return defaultFrontend, from
+	return defaultNamespace, from
 }
 
 func (r *Root) Headless() (bool, string) {

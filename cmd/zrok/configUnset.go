@@ -45,8 +45,8 @@ func (cmd *configUnsetCommand) run(_ *cobra.Command, args []string) {
 				fmt.Printf("\n[%v]: because you have a %v-d environment, you won't see your config change until you run %v first!\n\n", tui.WarningLabel, tui.Code.Render("zrok enable"), tui.Code.Render("zrok disable"))
 			}
 
-		case "defaultFrontend":
-			cfg.DefaultFrontend = ""
+		case "defaultNamespace":
+			cfg.DefaultNamespace = ""
 
 		case "headless":
 			cfg.Headless = false

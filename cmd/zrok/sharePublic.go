@@ -58,8 +58,8 @@ func newSharePublicCommand() *sharePublicCommand {
 	command := &sharePublicCommand{cmd: cmd}
 	defaultNamespaceSelections := []string{"public"}
 	if root, err := environment.LoadRoot(); err == nil {
-		defaultFrontend, _ := root.DefaultFrontend()
-		defaultNamespaceSelections = []string{defaultFrontend}
+		defaultNamespace, _ := root.DefaultNamespace()
+		defaultNamespaceSelections = []string{defaultNamespace}
 	}
 	headless := false
 	if root, err := environment.LoadRoot(); err == nil {

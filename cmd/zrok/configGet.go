@@ -42,11 +42,11 @@ func (cmd *configGetCommand) run(_ *cobra.Command, args []string) {
 		} else {
 			fmt.Println("apiEndpoint = <unset>")
 		}
-	case "defaultFrontend":
-		if env.Config() != nil && env.Config().DefaultFrontend != "" {
-			fmt.Printf("defaultFrontend = %v\n", env.Config().DefaultFrontend)
+	case "defaultNamespace":
+		if env.Config() != nil && env.Config().DefaultNamespace != "" {
+			fmt.Printf("defaultNamespace = %v\n", env.Config().DefaultNamespace)
 		} else {
-			fmt.Println("defaultFrontend = <unset>")
+			fmt.Println("defaultNamespace = <unset>")
 		}
 	case "headless":
 		if env.Config() != nil {

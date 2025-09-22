@@ -13,7 +13,7 @@ type Root interface {
 
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
-	DefaultFrontend() (string, string)
+	DefaultNamespace() (string, string)
 	Headless() (bool, string)
 	SuperNetwork() (bool, string)
 
@@ -41,10 +41,10 @@ type Environment struct {
 }
 
 type Config struct {
-	ApiEndpoint     string
-	DefaultFrontend string
-	Headless        bool
-	SuperNetwork    bool
+	ApiEndpoint      string
+	DefaultNamespace string
+	Headless         bool
+	SuperNetwork     bool
 }
 
 type Metadata struct {

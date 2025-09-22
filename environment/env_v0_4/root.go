@@ -226,20 +226,20 @@ func loadConfig() (*env_core.Config, error) {
 		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
 	}
 	out := &env_core.Config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	return out, nil
 }
 
 func saveConfig(cfg *env_core.Config) error {
 	in := &config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
@@ -341,10 +341,10 @@ type metadata struct {
 }
 
 type config struct {
-	ApiEndpoint     string `json:"api_endpoint"`
-	DefaultFrontend string `json:"default_frontend"`
-	Headless        bool   `json:"headless"`
-	SuperNetwork    bool   `json:"super_network"`
+	ApiEndpoint      string `json:"api_endpoint"`
+	DefaultNamespace string `json:"default_namespace"`
+	Headless         bool   `json:"headless"`
+	SuperNetwork     bool   `json:"super_network"`
 }
 
 type environment struct {
