@@ -119,34 +119,55 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 				return false, err
 			}
 			total := 0
-			reserveds := 0
-			uniqueNames := 0
 			for i := range envs {
 				shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
 				if err != nil {
 					return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
 				}
 				total += len(shrs)
-				for _, shr := range shrs {
-					if shr.Reserved {
-						reserveds++
-					}
-					if shr.UniqueName {
-						uniqueNames++
-					}
-				}
+
 				if rc.GetShares() > store.Unlimited && total+1 > rc.GetShares() {
 					logrus.Debugf("account '#%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
 					return false, nil
 				}
-				if reserved && rc.GetReservedShares() > store.Unlimited && reserveds+1 > rc.GetReservedShares() {
-					logrus.Debugf("account '#%d', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
-					return false, nil
+			}
+		}
+	}
+	return true, nil
+}
+
+func (a *Agent) CanReserveName(acctId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
+			return false, err
+		}
+
+		ul, err := a.getUserLimits(acctId, trx)
+		if err != nil {
+			return false, err
+		}
+
+		rc := ul.resource
+		if rc.GetUniqueNames() > store.Unlimited || rc.GetReservedShares() > store.Unlimited {
+			names, err := a.str.FindNamesForAccount(acctId, trx)
+			if err != nil {
+				return false, err
+			}
+
+			reservedNames := 0
+			for _, name := range names {
+				if name.Reserved {
+					reservedNames++
 				}
-				if reserved && uniqueName && rc.GetUniqueNames() > store.Unlimited && uniqueNames+1 > rc.GetUniqueNames() {
-					logrus.Debugf("account '#%d', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
-					return false, nil
-				}
+			}
+
+			if rc.GetUniqueNames() > store.Unlimited && reservedNames+1 > rc.GetUniqueNames() {
+				logrus.Debugf("account '#%d' over unique names limit '%d'", acctId, rc.GetUniqueNames())
+				return false, nil
+			}
+			if rc.GetReservedShares() > store.Unlimited && reservedNames+1 > rc.GetReservedShares() {
+				logrus.Debugf("account '#%d' over reserved shares limit '%d'", acctId, rc.GetReservedShares())
+				return false, nil
 			}
 		}
 	}

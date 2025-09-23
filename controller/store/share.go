@@ -15,18 +15,16 @@ type Share struct {
 	FrontendSelection    *string
 	FrontendEndpoint     *string
 	BackendProxyEndpoint *string
-	Reserved             bool
-	UniqueName           bool
 	PermissionMode       PermissionMode
 }
 
 func (str *Store) CreateShare(envId int, shr *Share, trx *sqlx.Tx) (int, error) {
-	stmt, err := trx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, reserved, unique_name, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
+	stmt, err := trx.Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing shares insert statement")
 	}
 	var id int
-	if err := stmt.QueryRow(envId, shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.UniqueName, shr.PermissionMode).Scan(&id); err != nil {
+	if err := stmt.QueryRow(envId, shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.PermissionMode).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error executing shares insert statement")
 	}
 	return id, nil
@@ -125,12 +123,12 @@ func (str *Store) FindSharesForEnvironment(envId int, trx *sqlx.Tx) ([]*Share, e
 }
 
 func (str *Store) UpdateShare(shr *Share, trx *sqlx.Tx) error {
-	sql := "update shares set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, reserved = $8, unique_name = $9, permission_mode = $10, updated_at = current_timestamp where id = $11"
+	sql := "update shares set z_id = $1, token = $2, share_mode = $3, backend_mode = $4, frontend_selection = $5, frontend_endpoint = $6, backend_proxy_endpoint = $7, permission_mode = $8, updated_at = current_timestamp where id = $9"
 	stmt, err := trx.Prepare(sql)
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares update statement")
 	}
-	_, err = stmt.Exec(shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.Reserved, shr.UniqueName, shr.PermissionMode, shr.Id)
+	_, err = stmt.Exec(shr.ZId, shr.Token, shr.ShareMode, shr.BackendMode, shr.FrontendSelection, shr.FrontendEndpoint, shr.BackendProxyEndpoint, shr.PermissionMode, shr.Id)
 	if err != nil {
 		return errors.Wrap(err, "error executing shares update statement")
 	}

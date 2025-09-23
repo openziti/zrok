@@ -546,8 +546,6 @@ func (h *shareHandler) createShareRecord(envId int, shrZId, shrToken string, par
 		Token:          shrToken,
 		ShareMode:      params.Body.ShareMode,
 		BackendMode:    params.Body.BackendMode,
-		Reserved:       false, // share12 doesn't support reserved shares
-		UniqueName:     false, // share12 doesn't support unique names
 		PermissionMode: store.OpenPermissionMode,
 	}
 
