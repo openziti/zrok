@@ -31,7 +31,7 @@ $ zrok share private localhost:3000
 
 ## What You Can Share
 
-### 🌐 Web Services
+### Web Services
 Instantly make local web apps accessible over the internet:
 
 ```bash
@@ -39,7 +39,7 @@ $ zrok share public localhost:8080
 ```
 ![zrok share public](docs/images/zrok_share_public.png)
 
-### 📁 Files & Directories  
+### Files & Directories  
 Turn any folder into a shareable network drive:
 
 ```bash
@@ -48,7 +48,7 @@ $ zrok share public --backend-mode drive ~/Repos/zrok
 ![zrok share public -b drive](docs/images/zrok_share_public_drive.png)
 ![mounted zrok drive](docs/images/zrok_share_public_drive_explorer.png)
 
-### 🔒 Private Resources
+### Private Resources
 Share TCP/UDP services securely with other zrok users—no public internet exposure.
 
 ## Key Features
@@ -84,7 +84,7 @@ shr, err := sdk.CreateShare(root, &sdk.ShareRequest{
 listener, err := sdk.NewListener(shr.Token, root)
 ```
 
-📖 [Read the SDK guide](https://blog.openziti.io/the-zrok-sdk) for complete examples.
+[Read the SDK guide](https://blog.openziti.io/the-zrok-sdk) for complete examples.
 
 ## Self-Hosting
 
@@ -94,14 +94,14 @@ Run your own `zrok` service—from Raspberry Pi to enterprise scale:
 - Scales from small personal instances to large public services  
 - Built on the same codebase as the public `zrok.io` service
 
-📋 [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/)
+[Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/)
 
 ## Resources
 
-- 📚 **[Documentation](https://docs.zrok.io/)**
-- 🎥 **[Office Hours Videos](https://www.youtube.com/watch?v=Edqv7yRmXb0&list=PLMUj_5fklasLuM6XiCNqwAFBuZD1t2lO2)**
-- 🔨 **[Building from Source](./BUILD.md)**
-- 🤝 **[Contributing](./CONTRIBUTING.md)**
+- **[Documentation](https://docs.zrok.io/)**
+- **[Office Hours Videos](https://www.youtube.com/watch?v=Edqv7yRmXb0&list=PLMUj_5fklasLuM6XiCNqwAFBuZD1t2lO2)**
+- **[Building from Source](./BUILD.md)**
+- **[Contributing](./CONTRIBUTING.md)**
 
 ---
 
