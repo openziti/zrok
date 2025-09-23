@@ -4,11 +4,13 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/util"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,6 +46,12 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
 			return share.NewCreateShareNameUnauthorized()
 		}
+	}
+
+	// check limits
+	if err := h.checkLimits(principal, trx); err != nil {
+		logrus.Errorf("limits error: %v", err)
+		return share.NewCreateShareNameConflict().WithPayload("names limit reached; cannot reserve additional names")
 	}
 
 	// check name availability
@@ -83,4 +91,19 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 
 	logrus.Infof("created allocated name '%v' in namespace '%v' for account '%v'", params.Body.Name, ns.Token, principal.Email)
 	return share.NewCreateShareNameCreated()
+}
+
+func (h *createShareNameHandler) checkLimits(principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
+	if !principal.Limitless {
+		if limitsAgent != nil {
+			ok, err := limitsAgent.CanReserveName(int(principal.ID), trx)
+			if err != nil {
+				return errors.Wrapf(err, "error checking name limits for '%v'", principal.Email)
+			}
+			if !ok {
+				return errors.Errorf("name limit check failed for '%v'", principal.Email)
+			}
+		}
+	}
+	return nil
 }

@@ -2,8 +2,10 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -60,6 +62,13 @@ func (h *updateShareNameHandler) Handle(params share.UpdateShareNameParams, prin
 		return share.NewUpdateShareNameOK()
 	}
 
+	if params.Body.Reserved {
+		if err := h.checkLimits(principal, trx); err != nil {
+			logrus.Errorf("limits error: %v", err)
+			return share.NewUpdateShareNameConflict().WithPayload("names limit reached; cannot reserve additional names")
+		}
+	}
+
 	// update the reservation state
 	name.Reserved = params.Body.Reserved
 	if err := str.UpdateName(name, trx); err != nil {
@@ -74,4 +83,19 @@ func (h *updateShareNameHandler) Handle(params share.UpdateShareNameParams, prin
 
 	logrus.Infof("updated name '%v' in namespace '%v' for account '%v' - reserved set to %v", params.Body.Name, ns.Token, principal.Email, params.Body.Reserved)
 	return share.NewUpdateShareNameOK()
+}
+
+func (h *updateShareNameHandler) checkLimits(principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
+	if !principal.Limitless {
+		if limitsAgent != nil {
+			ok, err := limitsAgent.CanReserveName(int(principal.ID), trx)
+			if err != nil {
+				return errors.Wrapf(err, "error checking name limits for '%v'", principal.Email)
+			}
+			if !ok {
+				return errors.Errorf("name limit check failed for '%v'", principal.Email)
+			}
+		}
+	}
+	return nil
 }

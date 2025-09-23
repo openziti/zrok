@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
+	"github.com/openziti/zrok/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,7 @@ func (cmd *createNameCommand) run(_ *cobra.Command, args []string) {
 
 	zrok, err := env.Client()
 	if err != nil {
-		panic(err)
+		tui.Error("unable to get zrok client", err)
 	}
 
 	req := share.NewCreateShareNameParams()
@@ -48,7 +49,7 @@ func (cmd *createNameCommand) run(_ *cobra.Command, args []string) {
 
 	_, err = zrok.Share.CreateShareName(req, auth)
 	if err != nil {
-		panic(err)
+		tui.Error("unable to create name", err)
 	}
 
 	logrus.Infof("created name '%v' in namespace", args[0])
