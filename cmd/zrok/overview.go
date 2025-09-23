@@ -76,13 +76,13 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 
 	// display account status
 	if overview.AccountLimited {
-		fmt.Println("⚠️  Account Limited")
+		fmt.Println("!! Account Limited")
 		fmt.Println()
 	}
 
 	// display namespaces table
 	if len(overview.Namespaces) > 0 {
-		fmt.Println("🗂️  Namespaces")
+		fmt.Println("Namespaces")
 		fmt.Println()
 		namespacesTable := table.NewWriter()
 		namespacesTable.SetOutputMirror(os.Stdout)
@@ -102,7 +102,7 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 
 	// display names table
 	if len(overview.Names) > 0 {
-		fmt.Println("🏷️  Names")
+		fmt.Println("Names")
 		fmt.Println()
 		namesTable := table.NewWriter()
 		namesTable.SetOutputMirror(os.Stdout)
@@ -129,14 +129,14 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 
 	// display environments and their resources
 	if len(overview.Environments) > 0 {
-		fmt.Println("🌍 Environments")
+		fmt.Println("Environments")
 		fmt.Println()
 
 		for _, envRes := range overview.Environments {
 			env := envRes.Environment
 			if env != nil {
 				// environment header
-				fmt.Printf("📍 %s", env.Description)
+				fmt.Printf("* %s", env.Description)
 				if env.Host != "" {
 					fmt.Printf(" (%s)", env.Host)
 				}
@@ -144,19 +144,19 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 					fmt.Printf(" [%s]", env.Address)
 				}
 				if env.RemoteAgent {
-					fmt.Print(" 🤖")
+					fmt.Print(" (Remote Enabled)")
 				}
 				if env.Limited {
-					fmt.Print(" ⚠️")
+					fmt.Print(" !!")
 				}
 				fmt.Println()
-				fmt.Printf("   ZID: %s\n", env.ZID)
+				fmt.Printf("   envZId: %s\n", env.ZID)
 				fmt.Printf("   Created: %s\n", time.Unix(env.CreatedAt/1000, 0).Format("2006-01-02 15:04:05"))
 				fmt.Println()
 
 				// shares table
 				if len(envRes.Shares) > 0 {
-					fmt.Println("   📤 Shares")
+					fmt.Println("   Shares")
 					sharesTable := table.NewWriter()
 					sharesTable.SetOutputMirror(os.Stdout)
 					sharesTable.SetStyle(table.StyleRounded)
@@ -169,7 +169,7 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 						}
 						limitedIcon := ""
 						if share.Limited {
-							limitedIcon = "⚠️"
+							limitedIcon = "!!"
 						}
 
 						sharesTable.AppendRow(table.Row{
@@ -186,9 +186,9 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 					// display frontend endpoints for each share
 					for _, share := range envRes.Shares {
 						if len(share.FrontendEndpoints) > 0 {
-							fmt.Printf("      📍 %s:\n", share.ShareToken)
+							fmt.Printf("      * %s:\n", share.ShareToken)
 							for _, endpoint := range share.FrontendEndpoints {
-								fmt.Printf("         🔗 %s\n", endpoint)
+								fmt.Printf("         > %s\n", endpoint)
 							}
 						}
 					}
@@ -197,7 +197,7 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 
 				// frontends table
 				if len(envRes.Frontends) > 0 {
-					fmt.Println("   🔌 Frontends")
+					fmt.Println("Frontends")
 					frontendsTable := table.NewWriter()
 					frontendsTable.SetOutputMirror(os.Stdout)
 					frontendsTable.SetStyle(table.StyleRounded)
