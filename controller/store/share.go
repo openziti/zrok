@@ -19,7 +19,7 @@ type Share struct {
 }
 
 func (str *Store) CreateShare(envId int, shr *Share, trx *sqlx.Tx) (int, error) {
-	stmt, err := trx.Unsafe().Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id")
+	stmt, err := trx.Unsafe().Prepare("insert into shares (environment_id, z_id, token, share_mode, backend_mode, frontend_selection, frontend_endpoint, backend_proxy_endpoint, permission_mode) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing shares insert statement")
 	}
