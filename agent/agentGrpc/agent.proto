@@ -3,6 +3,7 @@ syntax = "proto3";
 option go_package = "github.com/openziti/zrok/agent/agentGrpc";
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 service Agent {
 	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {
@@ -52,6 +53,12 @@ message AccessDetail {
 	string token = 2;
 	string bindAddress = 3;
 	repeated string responseHeaders = 4;
+	string status = 5;
+	string failureId = 6;
+	int32 failureCount = 7;
+	string lastError = 8;
+	google.protobuf.Timestamp lastFailure = 9;
+	google.protobuf.Timestamp nextRetry = 10;
 }
 
 message AccessPrivateResponse{
@@ -95,6 +102,11 @@ message ShareDetail {
 	string backendEndpoint = 5;
 	bool closed = 6;
 	string status = 7;
+	string failureId = 8;
+	int32 failureCount = 9;
+	string lastError = 10;
+	google.protobuf.Timestamp lastFailure = 11;
+	google.protobuf.Timestamp nextRetry = 12;
 }
 
 message ShareHttpHealthcheckRequest{

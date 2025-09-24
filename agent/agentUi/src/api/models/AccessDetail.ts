@@ -43,6 +43,42 @@ export interface AccessDetail {
      * @memberof AccessDetail
      */
     responseHeaders?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccessDetail
+     */
+    status?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccessDetail
+     */
+    failureId?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AccessDetail
+     */
+    failureCount?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccessDetail
+     */
+    lastError?: string;
+    /**
+     * 
+     * @type {Date}
+     * @memberof AccessDetail
+     */
+    lastFailure?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof AccessDetail
+     */
+    nextRetry?: Date;
 }
 
 /**
@@ -66,6 +102,12 @@ export function AccessDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'token': json['token'] == null ? undefined : json['token'],
         'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'responseHeaders': json['responseHeaders'] == null ? undefined : json['responseHeaders'],
+        'status': json['status'] == null ? undefined : json['status'],
+        'failureId': json['failureId'] == null ? undefined : json['failureId'],
+        'failureCount': json['failureCount'] == null ? undefined : json['failureCount'],
+        'lastError': json['lastError'] == null ? undefined : json['lastError'],
+        'lastFailure': json['lastFailure'] == null ? undefined : (new Date(json['lastFailure'])),
+        'nextRetry': json['nextRetry'] == null ? undefined : (new Date(json['nextRetry'])),
     };
 }
 
@@ -84,6 +126,12 @@ export function AccessDetailToJSONTyped(value?: AccessDetail | null, ignoreDiscr
         'token': value['token'],
         'bindAddress': value['bindAddress'],
         'responseHeaders': value['responseHeaders'],
+        'status': value['status'],
+        'failureId': value['failureId'],
+        'failureCount': value['failureCount'],
+        'lastError': value['lastError'],
+        'lastFailure': value['lastFailure'] == null ? undefined : ((value['lastFailure']).toISOString()),
+        'nextRetry': value['nextRetry'] == null ? undefined : ((value['nextRetry']).toISOString()),
     };
 }
 

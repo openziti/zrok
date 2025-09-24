@@ -61,6 +61,36 @@ export interface ShareDetail {
      * @memberof ShareDetail
      */
     status?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShareDetail
+     */
+    failureId?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ShareDetail
+     */
+    failureCount?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ShareDetail
+     */
+    lastError?: string;
+    /**
+     * 
+     * @type {Date}
+     * @memberof ShareDetail
+     */
+    lastFailure?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof ShareDetail
+     */
+    nextRetry?: Date;
 }
 
 /**
@@ -87,6 +117,11 @@ export function ShareDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'closed': json['closed'] == null ? undefined : json['closed'],
         'status': json['status'] == null ? undefined : json['status'],
+        'failureId': json['failureId'] == null ? undefined : json['failureId'],
+        'failureCount': json['failureCount'] == null ? undefined : json['failureCount'],
+        'lastError': json['lastError'] == null ? undefined : json['lastError'],
+        'lastFailure': json['lastFailure'] == null ? undefined : (new Date(json['lastFailure'])),
+        'nextRetry': json['nextRetry'] == null ? undefined : (new Date(json['nextRetry'])),
     };
 }
 
@@ -108,6 +143,11 @@ export function ShareDetailToJSONTyped(value?: ShareDetail | null, ignoreDiscrim
         'backendEndpoint': value['backendEndpoint'],
         'closed': value['closed'],
         'status': value['status'],
+        'failureId': value['failureId'],
+        'failureCount': value['failureCount'],
+        'lastError': value['lastError'],
+        'lastFailure': value['lastFailure'] == null ? undefined : ((value['lastFailure']).toISOString()),
+        'nextRetry': value['nextRetry'] == null ? undefined : ((value['nextRetry']).toISOString()),
     };
 }
 

@@ -2,10 +2,12 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"net"
 	"net/http"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -35,6 +37,15 @@ type Agent struct {
 	persistRegistry bool
 	retryTicker     *time.Ticker
 	stopRetries     chan bool
+	failedAccesses  map[string]*AccessRegistryEntry
+	failedShares    map[string]*ShareRegistryEntry
+	nextFailureID   int64
+}
+
+// generateSessionFailureID creates a unique ID for this agent session
+func (a *Agent) generateSessionFailureID() string {
+	id := atomic.AddInt64(&a.nextFailureID, 1)
+	return fmt.Sprintf("failure_%d", id)
 }
 
 func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
@@ -42,15 +53,18 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
 	}
 	return &Agent{
-		cfg:         cfg,
-		root:        root,
-		shares:      make(map[string]*share),
-		addShare:    make(chan *share),
-		rmShare:     make(chan *share),
-		accesses:    make(map[string]*access),
-		addAccess:   make(chan *access),
-		rmAccess:    make(chan *access),
-		stopRetries: make(chan bool),
+		cfg:            cfg,
+		root:           root,
+		shares:         make(map[string]*share),
+		addShare:       make(chan *share),
+		rmShare:        make(chan *share),
+		accesses:       make(map[string]*access),
+		addAccess:      make(chan *access),
+		rmAccess:       make(chan *access),
+		stopRetries:    make(chan bool),
+		failedAccesses: make(map[string]*AccessRegistryEntry),
+		failedShares:   make(map[string]*ShareRegistryEntry),
+		nextFailureID:  0,
 	}, nil
 }
 
@@ -207,22 +221,26 @@ func (a *Agent) ReloadRegistry() error {
 		}
 	}
 
-	// start retry manager if we have any failed shares or accesses
-	hasFailedItems := false
+	// populate failed item maps with session IDs for status tracking
+	a.failedAccesses = make(map[string]*AccessRegistryEntry)
+	a.failedShares = make(map[string]*ShareRegistryEntry)
+
 	for _, entry := range registry.PrivateAccesses {
-		if entry.NextRetry != nil {
-			hasFailedItems = true
-			break
+		if entry.NextRetry != nil { // has retry state = failed
+			failureID := a.generateSessionFailureID()
+			a.failedAccesses[failureID] = entry
 		}
 	}
-	if !hasFailedItems {
-		for _, entry := range registry.PublicShares {
-			if entry.NextRetry != nil {
-				hasFailedItems = true
-				break
-			}
+
+	for _, entry := range registry.PublicShares {
+		if entry.NextRetry != nil { // has retry state = failed
+			failureID := a.generateSessionFailureID()
+			a.failedShares[failureID] = entry
 		}
 	}
+
+	// start retry manager if we have any failed shares or accesses
+	hasFailedItems := len(a.failedAccesses) > 0 || len(a.failedShares) > 0
 	if hasFailedItems {
 		go a.retryManager()
 	}
@@ -457,7 +475,8 @@ func (a *Agent) processRetries() {
 	registryModified := false
 	activeRetries := false
 
-	// process private accesses that are ready for retry
+	// process private accesses that are ready for retry - rebuild failed map
+	newFailedAccesses := make(map[string]*AccessRegistryEntry)
 	var activeAccessEntries []*AccessRegistryEntry
 	for _, entry := range registry.PrivateAccesses {
 		if entry.NextRetry != nil && now.After(*entry.NextRetry) {
@@ -477,6 +496,7 @@ func (a *Agent) processRetries() {
 				entry.LastError = ""
 				entry.NextRetry = nil
 				registryModified = true
+				// SUCCESS: don't add to newFailedAccesses (removed from failed map)
 			} else {
 				logrus.Warnf("retry %d failed for private access '%v': %v",
 					entry.FailureCount+1, entry.Request.Token, err)
@@ -496,14 +516,41 @@ func (a *Agent) processRetries() {
 
 				logrus.Debugf("next retry for private access '%v' scheduled for %v",
 					entry.Request.Token, nextRetry.Format(time.RFC3339))
+
+				// find existing failure ID or create new one
+				var failureID string
+				for fid, existingEntry := range a.failedAccesses {
+					if existingEntry.Request.Token == entry.Request.Token {
+						failureID = fid
+						break
+					}
+				}
+				if failureID == "" {
+					failureID = a.generateSessionFailureID()
+				}
+				newFailedAccesses[failureID] = entry
 			}
 		} else if entry.NextRetry != nil {
 			activeRetries = true
+			// find existing failure ID or create new one
+			var failureID string
+			for fid, existingEntry := range a.failedAccesses {
+				if existingEntry.Request.Token == entry.Request.Token {
+					failureID = fid
+					break
+				}
+			}
+			if failureID == "" {
+				failureID = a.generateSessionFailureID()
+			}
+			newFailedAccesses[failureID] = entry
 		}
 		activeAccessEntries = append(activeAccessEntries, entry)
 	}
+	a.failedAccesses = newFailedAccesses
 
-	// process public shares that are ready for retry
+	// process public shares that are ready for retry - rebuild failed map
+	newFailedShares := make(map[string]*ShareRegistryEntry)
 	var activeShareEntries []*ShareRegistryEntry
 	for _, entry := range registry.PublicShares {
 		if entry.NextRetry != nil && now.After(*entry.NextRetry) {
@@ -524,6 +571,7 @@ func (a *Agent) processRetries() {
 				entry.LastError = ""
 				entry.NextRetry = nil
 				registryModified = true
+				// SUCCESS: don't add to newFailedShares (removed from failed map)
 			} else {
 				logrus.Warnf("retry %d failed for public share '%v': %v",
 					entry.FailureCount+1, entry.Request.Target, err)
@@ -543,13 +591,65 @@ func (a *Agent) processRetries() {
 
 				logrus.Debugf("next retry for public share '%v' scheduled for %v",
 					entry.Request.Target, nextRetry.Format(time.RFC3339))
+
+				// find existing failure ID or create new one
+				var failureID string
+				for fid, existingEntry := range a.failedShares {
+					if existingEntry.Request.Target == entry.Request.Target &&
+						len(existingEntry.Request.NameSelections) == len(entry.Request.NameSelections) {
+						// match by target and name selections to identify same request
+						match := true
+						for i, ns := range existingEntry.Request.NameSelections {
+							if i < len(entry.Request.NameSelections) &&
+								(ns.NamespaceToken != entry.Request.NameSelections[i].NamespaceToken ||
+									ns.Name != entry.Request.NameSelections[i].Name) {
+								match = false
+								break
+							}
+						}
+						if match {
+							failureID = fid
+							break
+						}
+					}
+				}
+				if failureID == "" {
+					failureID = a.generateSessionFailureID()
+				}
+				newFailedShares[failureID] = entry
 			}
 		} else if entry.NextRetry != nil {
 			// still has pending retries
 			activeRetries = true
+			// find existing failure ID or create new one
+			var failureID string
+			for fid, existingEntry := range a.failedShares {
+				if existingEntry.Request.Target == entry.Request.Target &&
+					len(existingEntry.Request.NameSelections) == len(entry.Request.NameSelections) {
+					// match by target and name selections to identify same request
+					match := true
+					for i, ns := range existingEntry.Request.NameSelections {
+						if i < len(entry.Request.NameSelections) &&
+							(ns.NamespaceToken != entry.Request.NameSelections[i].NamespaceToken ||
+								ns.Name != entry.Request.NameSelections[i].Name) {
+							match = false
+							break
+						}
+					}
+					if match {
+						failureID = fid
+						break
+					}
+				}
+			}
+			if failureID == "" {
+				failureID = a.generateSessionFailureID()
+			}
+			newFailedShares[failureID] = entry
 		}
 		activeShareEntries = append(activeShareEntries, entry)
 	}
+	a.failedShares = newFailedShares
 
 	// update registry with active entries (abandoned items removed)
 	registry.PrivateAccesses = activeAccessEntries
