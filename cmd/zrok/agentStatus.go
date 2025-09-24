@@ -79,27 +79,27 @@ func (cmd *agentStatusCommand) displayAccesses(accesses []*agentGrpc.AccessDetai
 
 		// use failure ID in token column if token is empty (failed items)
 		displayToken := access.FrontendToken
-		if displayToken == "" && access.FailureId != "" {
-			displayToken = access.FailureId
+		if displayToken == "" && access.Failure != nil {
+			displayToken = access.Failure.FailureId
 		}
 
 		if cmd.verbose {
-			failureCount := fmt.Sprintf("%d", access.FailureCount)
-			if access.FailureCount == 0 {
-				failureCount = "-"
+			failureCount := "-"
+			if access.Failure != nil {
+				failureCount = fmt.Sprintf("%d", access.Failure.FailureCount)
 			}
 
-			lastError := cmd.truncateString(access.LastError, 30)
-			if lastError == "" {
-				lastError = "-"
+			lastError := ""
+			if access.Failure != nil {
+				lastError = access.Failure.LastError
 			}
 
 			nextRetry := "-"
-			if access.NextRetry != nil {
-				nextRetry = cmd.formatTime(access.NextRetry.AsTime())
+			if access.Failure != nil {
+				nextRetry = fmt.Sprintf("%v", access.Failure.NextRetry.AsTime().Format(time.RFC3339Nano))
 			}
 
-			t.AppendRow(table.Row{displayToken, access.Token, access.BindAddress, status, failureCount, lastError, nextRetry})
+			t.AppendRow(table.Row{displayToken, access.Token, access.BindAddress, status, failureCount, cmd.wrapString(lastError, 35), nextRetry})
 		} else {
 			t.AppendRow(table.Row{displayToken, access.Token, access.BindAddress, status})
 		}
@@ -132,24 +132,24 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 
 		// use failure ID in token column if token is empty (failed items)
 		displayToken := share.Token
-		if displayToken == "" && share.FailureId != "" {
-			displayToken = share.FailureId
+		if displayToken == "" && share.Failure != nil {
+			displayToken = share.Failure.FailureId
 		}
 
 		if cmd.verbose {
-			failureCount := fmt.Sprintf("%d", share.FailureCount)
-			if share.FailureCount == 0 {
-				failureCount = "-"
+			failureCount := "-"
+			if share.Failure != nil {
+				failureCount = fmt.Sprintf("%d", share.Failure.FailureCount)
 			}
 
-			lastError := cmd.truncateString(share.LastError, 30)
-			if lastError == "" {
-				lastError = "-"
+			lastError := ""
+			if share.Failure != nil {
+				lastError = share.Failure.LastError
 			}
 
 			nextRetry := "-"
-			if share.NextRetry != nil {
-				nextRetry = cmd.formatTime(share.NextRetry.AsTime())
+			if share.Failure != nil {
+				nextRetry = fmt.Sprintf("%v", share.Failure.NextRetry.AsTime().Format(time.RFC3339Nano))
 			}
 
 			t.AppendRow(table.Row{
@@ -159,7 +159,7 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 				share.BackendEndpoint,
 				status,
 				failureCount,
-				lastError,
+				cmd.wrapString(lastError, 35),
 				nextRetry,
 			})
 		} else {
@@ -212,11 +212,95 @@ func (cmd *agentStatusCommand) formatStatus(status string) string {
 	}
 }
 
-func (cmd *agentStatusCommand) truncateString(s string, maxLen int) string {
-	if len(s) <= maxLen {
+func (cmd *agentStatusCommand) wrapString(s string, maxWidth int) string {
+	if len(s) <= maxWidth {
 		return s
 	}
-	return s[:maxLen-3] + "..."
+
+	var result []rune
+	line := []rune{}
+	words := [][]rune{}
+	currentWord := []rune{}
+
+	// split input into words
+	for _, r := range s {
+		if r == ' ' || r == '\t' || r == '\n' {
+			if len(currentWord) > 0 {
+				words = append(words, currentWord)
+				currentWord = []rune{}
+			}
+			if r == '\n' {
+				// preserve existing newlines
+				words = append(words, []rune{r})
+			}
+		} else {
+			currentWord = append(currentWord, r)
+		}
+	}
+	if len(currentWord) > 0 {
+		words = append(words, currentWord)
+	}
+
+	// wrap words into lines
+	for _, word := range words {
+		if len(word) == 1 && word[0] == '\n' {
+			// handle preserved newlines
+			result = append(result, line...)
+			result = append(result, '\n')
+			line = []rune{}
+			continue
+		}
+
+		// check if adding this word would exceed the width
+		spaceNeeded := 0
+		if len(line) > 0 {
+			spaceNeeded = 1 // for the space between words
+		}
+
+		if len(line)+spaceNeeded+len(word) > maxWidth {
+			// word doesn't fit on current line
+			if len(line) > 0 {
+				// flush current line
+				result = append(result, line...)
+				result = append(result, '\n')
+				line = []rune{}
+			}
+
+			// if word itself is longer than maxWidth, break it
+			if len(word) > maxWidth {
+				for i := 0; i < len(word); {
+					end := i + maxWidth
+					if end > len(word) {
+						end = len(word)
+					}
+					if i > 0 {
+						result = append(result, '\n')
+					}
+					result = append(result, word[i:end]...)
+					i = end
+				}
+				if len(word) > 0 && len(word)%maxWidth != 0 {
+					result = append(result, '\n')
+				}
+			} else {
+				// word fits on new line
+				line = append(line, word...)
+			}
+		} else {
+			// word fits on current line
+			if len(line) > 0 {
+				line = append(line, ' ')
+			}
+			line = append(line, word...)
+		}
+	}
+
+	// append any remaining line content
+	if len(line) > 0 {
+		result = append(result, line...)
+	}
+
+	return string(result)
 }
 
 func (cmd *agentStatusCommand) formatTime(t time.Time) string {

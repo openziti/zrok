@@ -176,8 +176,8 @@ func (rm *retryManager) retry() {
 			if shrToken, fes, err := rm.a.SharePublic(share.Request); err != nil {
 				dl.Errorf("failed to restart public share '%v': %v", failureId, err)
 				if share.Failure != nil {
-					share.Failure = nil
-					registryModified = true
+					share.Failure.FailureCount++
+					share.Failure.LastError = err.Error()
 				} else {
 					share.Failure = &FailureEntry{
 						FailureCount: 1,
@@ -187,7 +187,8 @@ func (rm *retryManager) retry() {
 				}
 
 				// calculate next retry with exponential backoff
-				delay := time.Duration(math.Min(
+				var delay = 30 * time.Second
+				delay = time.Duration(math.Min(
 					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.FailureCount-1)),
 					float64(rm.a.cfg.RetryMaxDelay),
 				))

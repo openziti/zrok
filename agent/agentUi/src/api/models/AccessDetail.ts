@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { FailureDetail } from './FailureDetail';
+import {
+    FailureDetailFromJSON,
+    FailureDetailFromJSONTyped,
+    FailureDetailToJSON,
+    FailureDetailToJSONTyped,
+} from './FailureDetail';
+
 /**
  * 
  * @export
@@ -51,34 +59,10 @@ export interface AccessDetail {
     status?: string;
     /**
      * 
-     * @type {string}
+     * @type {FailureDetail}
      * @memberof AccessDetail
      */
-    failureId?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AccessDetail
-     */
-    failureCount?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AccessDetail
-     */
-    lastError?: string;
-    /**
-     * 
-     * @type {Date}
-     * @memberof AccessDetail
-     */
-    lastFailure?: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof AccessDetail
-     */
-    nextRetry?: Date;
+    failure?: FailureDetail;
 }
 
 /**
@@ -103,11 +87,7 @@ export function AccessDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'responseHeaders': json['responseHeaders'] == null ? undefined : json['responseHeaders'],
         'status': json['status'] == null ? undefined : json['status'],
-        'failureId': json['failureId'] == null ? undefined : json['failureId'],
-        'failureCount': json['failureCount'] == null ? undefined : json['failureCount'],
-        'lastError': json['lastError'] == null ? undefined : json['lastError'],
-        'lastFailure': json['lastFailure'] == null ? undefined : (new Date(json['lastFailure'])),
-        'nextRetry': json['nextRetry'] == null ? undefined : (new Date(json['nextRetry'])),
+        'failure': json['failure'] == null ? undefined : FailureDetailFromJSON(json['failure']),
     };
 }
 
@@ -127,11 +107,7 @@ export function AccessDetailToJSONTyped(value?: AccessDetail | null, ignoreDiscr
         'bindAddress': value['bindAddress'],
         'responseHeaders': value['responseHeaders'],
         'status': value['status'],
-        'failureId': value['failureId'],
-        'failureCount': value['failureCount'],
-        'lastError': value['lastError'],
-        'lastFailure': value['lastFailure'] == null ? undefined : ((value['lastFailure']).toISOString()),
-        'nextRetry': value['nextRetry'] == null ? undefined : ((value['nextRetry']).toISOString()),
+        'failure': FailureDetailToJSON(value['failure']),
     };
 }
 

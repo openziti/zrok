@@ -54,11 +54,7 @@ message AccessDetail {
 	string bindAddress = 3;
 	repeated string responseHeaders = 4;
 	string status = 5;
-	string failureId = 6;
-	int32 failureCount = 7;
-	string lastError = 8;
-	google.protobuf.Timestamp lastFailure = 9;
-	google.protobuf.Timestamp nextRetry = 10;
+  FailureDetail failure = 6;
 }
 
 message AccessPrivateResponse{
@@ -73,6 +69,14 @@ message AccessPrivateRequest{
 	uint32 autoStartPort = 5;
 	uint32 autoEndPort = 6;
 	repeated string responseHeaders = 7;
+}
+
+message FailureDetail {
+  string failureId = 1;
+  int32 failureCount = 2;
+  string lastError = 3;
+  google.protobuf.Timestamp lastFailure = 4;
+  google.protobuf.Timestamp nextRetry = 5;
 }
 
 message NameSelection {
@@ -102,11 +106,7 @@ message ShareDetail {
 	string backendEndpoint = 5;
 	bool closed = 6;
 	string status = 7;
-	string failureId = 8;
-	int32 failureCount = 9;
-	string lastError = 10;
-	google.protobuf.Timestamp lastFailure = 11;
-	google.protobuf.Timestamp nextRetry = 12;
+  FailureDetail failure = 8;
 }
 
 message ShareHttpHealthcheckRequest{

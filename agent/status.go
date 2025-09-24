@@ -19,9 +19,6 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BindAddress:     acc.bindAddress,
 			ResponseHeaders: acc.responseHeaders,
 			Status:          "active",
-			FailureId:       "",
-			FailureCount:    0,
-			LastError:       "",
 		})
 	}
 
@@ -37,11 +34,13 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BindAddress:     access.Request.BindAddress,
 			ResponseHeaders: access.Request.ResponseHeaders,
 			Status:          status,
-			FailureId:       failureId,
-			FailureCount:    int32(access.Failure.FailureCount),
-			LastError:       access.Failure.LastError,
-			LastFailure:     timestamppb.New(access.Failure.LastFailure),
-			NextRetry:       timestamppb.New(access.Failure.NextRetry),
+			Failure: &agentGrpc.FailureDetail{
+				FailureId:    failureId,
+				FailureCount: int32(access.Failure.FailureCount),
+				LastError:    access.Failure.LastError,
+				LastFailure:  timestamppb.New(access.Failure.LastFailure),
+				NextRetry:    timestamppb.New(access.Failure.NextRetry),
+			},
 		})
 	}
 
@@ -61,9 +60,6 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BackendEndpoint:  shr.target,
 			Closed:           shr.closed,
 			Status:           "active",
-			FailureId:        "",
-			FailureCount:     0,
-			LastError:        "",
 		})
 	}
 
@@ -81,11 +77,13 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BackendEndpoint:  share.Request.Target,
 			Closed:           share.Request.Closed,
 			Status:           status,
-			FailureId:        failureId,
-			FailureCount:     int32(share.Failure.FailureCount),
-			LastError:        share.Failure.LastError,
-			LastFailure:      timestamppb.New(share.Failure.LastFailure),
-			NextRetry:        timestamppb.New(share.Failure.NextRetry),
+			Failure: &agentGrpc.FailureDetail{
+				FailureId:    failureId,
+				FailureCount: int32(share.Failure.FailureCount),
+				LastError:    share.Failure.LastError,
+				LastFailure:  timestamppb.New(share.Failure.LastFailure),
+				NextRetry:    timestamppb.New(share.Failure.NextRetry),
+			},
 		})
 	}
 

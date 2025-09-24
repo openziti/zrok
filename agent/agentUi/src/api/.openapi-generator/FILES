@@ -4,6 +4,7 @@ apis/index.ts
 index.ts
 models/AccessDetail.ts
 models/AccessPrivateResponse.ts
+models/FailureDetail.ts
 models/GooglerpcStatus.ts
 models/NameSelection.ts
 models/ProtobufAny.ts

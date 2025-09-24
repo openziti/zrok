@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AccessDetail';
 export * from './AccessPrivateResponse';
+export * from './FailureDetail';
 export * from './GooglerpcStatus';
 export * from './NameSelection';
 export * from './ProtobufAny';

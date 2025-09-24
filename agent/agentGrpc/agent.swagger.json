@@ -425,6 +425,22 @@
         "status": {
           "type": "string"
         },
+        "failure": {
+          "$ref": "#/definitions/FailureDetail"
+        }
+      }
+    },
+    "AccessPrivateResponse": {
+      "type": "object",
+      "properties": {
+        "frontendToken": {
+          "type": "string"
+        }
+      }
+    },
+    "FailureDetail": {
+      "type": "object",
+      "properties": {
         "failureId": {
           "type": "string"
         },
@@ -442,14 +458,6 @@
         "nextRetry": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "AccessPrivateResponse": {
-      "type": "object",
-      "properties": {
-        "frontendToken": {
-          "type": "string"
         }
       }
     },
@@ -497,23 +505,8 @@
         "status": {
           "type": "string"
         },
-        "failureId": {
-          "type": "string"
-        },
-        "failureCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "lastError": {
-          "type": "string"
-        },
-        "lastFailure": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "nextRetry": {
-          "type": "string",
-          "format": "date-time"
+        "failure": {
+          "$ref": "#/definitions/FailureDetail"
         }
       }
     },

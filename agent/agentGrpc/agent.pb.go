@@ -30,11 +30,7 @@ type AccessDetail struct {
 	BindAddress     string                 `protobuf:"bytes,3,opt,name=bindAddress,proto3" json:"bindAddress,omitempty"`
 	ResponseHeaders []string               `protobuf:"bytes,4,rep,name=responseHeaders,proto3" json:"responseHeaders,omitempty"`
 	Status          string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	FailureId       string                 `protobuf:"bytes,6,opt,name=failureId,proto3" json:"failureId,omitempty"`
-	FailureCount    int32                  `protobuf:"varint,7,opt,name=failureCount,proto3" json:"failureCount,omitempty"`
-	LastError       string                 `protobuf:"bytes,8,opt,name=lastError,proto3" json:"lastError,omitempty"`
-	LastFailure     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=lastFailure,proto3" json:"lastFailure,omitempty"`
-	NextRetry       *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=nextRetry,proto3" json:"nextRetry,omitempty"`
+	Failure         *FailureDetail         `protobuf:"bytes,6,opt,name=failure,proto3" json:"failure,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -104,37 +100,9 @@ func (x *AccessDetail) GetStatus() string {
 	return ""
 }
 
-func (x *AccessDetail) GetFailureId() string {
+func (x *AccessDetail) GetFailure() *FailureDetail {
 	if x != nil {
-		return x.FailureId
-	}
-	return ""
-}
-
-func (x *AccessDetail) GetFailureCount() int32 {
-	if x != nil {
-		return x.FailureCount
-	}
-	return 0
-}
-
-func (x *AccessDetail) GetLastError() string {
-	if x != nil {
-		return x.LastError
-	}
-	return ""
-}
-
-func (x *AccessDetail) GetLastFailure() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastFailure
-	}
-	return nil
-}
-
-func (x *AccessDetail) GetNextRetry() *timestamppb.Timestamp {
-	if x != nil {
-		return x.NextRetry
+		return x.Failure
 	}
 	return nil
 }
@@ -275,6 +243,82 @@ func (x *AccessPrivateRequest) GetResponseHeaders() []string {
 	return nil
 }
 
+type FailureDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FailureId     string                 `protobuf:"bytes,1,opt,name=failureId,proto3" json:"failureId,omitempty"`
+	FailureCount  int32                  `protobuf:"varint,2,opt,name=failureCount,proto3" json:"failureCount,omitempty"`
+	LastError     string                 `protobuf:"bytes,3,opt,name=lastError,proto3" json:"lastError,omitempty"`
+	LastFailure   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=lastFailure,proto3" json:"lastFailure,omitempty"`
+	NextRetry     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=nextRetry,proto3" json:"nextRetry,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FailureDetail) Reset() {
+	*x = FailureDetail{}
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FailureDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FailureDetail) ProtoMessage() {}
+
+func (x *FailureDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FailureDetail.ProtoReflect.Descriptor instead.
+func (*FailureDetail) Descriptor() ([]byte, []int) {
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *FailureDetail) GetFailureId() string {
+	if x != nil {
+		return x.FailureId
+	}
+	return ""
+}
+
+func (x *FailureDetail) GetFailureCount() int32 {
+	if x != nil {
+		return x.FailureCount
+	}
+	return 0
+}
+
+func (x *FailureDetail) GetLastError() string {
+	if x != nil {
+		return x.LastError
+	}
+	return ""
+}
+
+func (x *FailureDetail) GetLastFailure() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastFailure
+	}
+	return nil
+}
+
+func (x *FailureDetail) GetNextRetry() *timestamppb.Timestamp {
+	if x != nil {
+		return x.NextRetry
+	}
+	return nil
+}
+
 type NameSelection struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	NamespaceToken string                 `protobuf:"bytes,1,opt,name=namespaceToken,proto3" json:"namespaceToken,omitempty"`
@@ -285,7 +329,7 @@ type NameSelection struct {
 
 func (x *NameSelection) Reset() {
 	*x = NameSelection{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -297,7 +341,7 @@ func (x *NameSelection) String() string {
 func (*NameSelection) ProtoMessage() {}
 
 func (x *NameSelection) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +354,7 @@ func (x *NameSelection) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NameSelection.ProtoReflect.Descriptor instead.
 func (*NameSelection) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *NameSelection) GetNamespaceToken() string {
@@ -336,7 +380,7 @@ type ReleaseAccessRequest struct {
 
 func (x *ReleaseAccessRequest) Reset() {
 	*x = ReleaseAccessRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +392,7 @@ func (x *ReleaseAccessRequest) String() string {
 func (*ReleaseAccessRequest) ProtoMessage() {}
 
 func (x *ReleaseAccessRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[4]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,7 +405,7 @@ func (x *ReleaseAccessRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseAccessRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseAccessRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{4}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ReleaseAccessRequest) GetFrontendToken() string {
@@ -379,7 +423,7 @@ type ReleaseAccessResponse struct {
 
 func (x *ReleaseAccessResponse) Reset() {
 	*x = ReleaseAccessResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -391,7 +435,7 @@ func (x *ReleaseAccessResponse) String() string {
 func (*ReleaseAccessResponse) ProtoMessage() {}
 
 func (x *ReleaseAccessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[5]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -404,7 +448,7 @@ func (x *ReleaseAccessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseAccessResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseAccessResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{5}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{6}
 }
 
 type ReleaseShareRequest struct {
@@ -416,7 +460,7 @@ type ReleaseShareRequest struct {
 
 func (x *ReleaseShareRequest) Reset() {
 	*x = ReleaseShareRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +472,7 @@ func (x *ReleaseShareRequest) String() string {
 func (*ReleaseShareRequest) ProtoMessage() {}
 
 func (x *ReleaseShareRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[6]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +485,7 @@ func (x *ReleaseShareRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseShareRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseShareRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{6}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ReleaseShareRequest) GetToken() string {
@@ -459,7 +503,7 @@ type ReleaseShareResponse struct {
 
 func (x *ReleaseShareResponse) Reset() {
 	*x = ReleaseShareResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -471,7 +515,7 @@ func (x *ReleaseShareResponse) String() string {
 func (*ReleaseShareResponse) ProtoMessage() {}
 
 func (x *ReleaseShareResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[7]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,7 +528,7 @@ func (x *ReleaseShareResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseShareResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseShareResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{7}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{8}
 }
 
 type ShareDetail struct {
@@ -496,18 +540,14 @@ type ShareDetail struct {
 	BackendEndpoint  string                 `protobuf:"bytes,5,opt,name=backendEndpoint,proto3" json:"backendEndpoint,omitempty"`
 	Closed           bool                   `protobuf:"varint,6,opt,name=closed,proto3" json:"closed,omitempty"`
 	Status           string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
-	FailureId        string                 `protobuf:"bytes,8,opt,name=failureId,proto3" json:"failureId,omitempty"`
-	FailureCount     int32                  `protobuf:"varint,9,opt,name=failureCount,proto3" json:"failureCount,omitempty"`
-	LastError        string                 `protobuf:"bytes,10,opt,name=lastError,proto3" json:"lastError,omitempty"`
-	LastFailure      *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=lastFailure,proto3" json:"lastFailure,omitempty"`
-	NextRetry        *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=nextRetry,proto3" json:"nextRetry,omitempty"`
+	Failure          *FailureDetail         `protobuf:"bytes,8,opt,name=failure,proto3" json:"failure,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ShareDetail) Reset() {
 	*x = ShareDetail{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -519,7 +559,7 @@ func (x *ShareDetail) String() string {
 func (*ShareDetail) ProtoMessage() {}
 
 func (x *ShareDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[8]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +572,7 @@ func (x *ShareDetail) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareDetail.ProtoReflect.Descriptor instead.
 func (*ShareDetail) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{8}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ShareDetail) GetToken() string {
@@ -584,37 +624,9 @@ func (x *ShareDetail) GetStatus() string {
 	return ""
 }
 
-func (x *ShareDetail) GetFailureId() string {
+func (x *ShareDetail) GetFailure() *FailureDetail {
 	if x != nil {
-		return x.FailureId
-	}
-	return ""
-}
-
-func (x *ShareDetail) GetFailureCount() int32 {
-	if x != nil {
-		return x.FailureCount
-	}
-	return 0
-}
-
-func (x *ShareDetail) GetLastError() string {
-	if x != nil {
-		return x.LastError
-	}
-	return ""
-}
-
-func (x *ShareDetail) GetLastFailure() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastFailure
-	}
-	return nil
-}
-
-func (x *ShareDetail) GetNextRetry() *timestamppb.Timestamp {
-	if x != nil {
-		return x.NextRetry
+		return x.Failure
 	}
 	return nil
 }
@@ -632,7 +644,7 @@ type ShareHttpHealthcheckRequest struct {
 
 func (x *ShareHttpHealthcheckRequest) Reset() {
 	*x = ShareHttpHealthcheckRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -644,7 +656,7 @@ func (x *ShareHttpHealthcheckRequest) String() string {
 func (*ShareHttpHealthcheckRequest) ProtoMessage() {}
 
 func (x *ShareHttpHealthcheckRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[9]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +669,7 @@ func (x *ShareHttpHealthcheckRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareHttpHealthcheckRequest.ProtoReflect.Descriptor instead.
 func (*ShareHttpHealthcheckRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{9}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ShareHttpHealthcheckRequest) GetToken() string {
@@ -705,7 +717,7 @@ type ShareHttpHealthcheckResponse struct {
 
 func (x *ShareHttpHealthcheckResponse) Reset() {
 	*x = ShareHttpHealthcheckResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[10]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -717,7 +729,7 @@ func (x *ShareHttpHealthcheckResponse) String() string {
 func (*ShareHttpHealthcheckResponse) ProtoMessage() {}
 
 func (x *ShareHttpHealthcheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[10]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -730,7 +742,7 @@ func (x *ShareHttpHealthcheckResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareHttpHealthcheckResponse.ProtoReflect.Descriptor instead.
 func (*ShareHttpHealthcheckResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{10}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ShareHttpHealthcheckResponse) GetHealthy() bool {
@@ -761,7 +773,7 @@ type SharePrivateRequest struct {
 
 func (x *SharePrivateRequest) Reset() {
 	*x = SharePrivateRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[11]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -773,7 +785,7 @@ func (x *SharePrivateRequest) String() string {
 func (*SharePrivateRequest) ProtoMessage() {}
 
 func (x *SharePrivateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[11]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -786,7 +798,7 @@ func (x *SharePrivateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SharePrivateRequest.ProtoReflect.Descriptor instead.
 func (*SharePrivateRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{11}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SharePrivateRequest) GetTarget() string {
@@ -840,7 +852,7 @@ type SharePrivateResponse struct {
 
 func (x *SharePrivateResponse) Reset() {
 	*x = SharePrivateResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[12]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +864,7 @@ func (x *SharePrivateResponse) String() string {
 func (*SharePrivateResponse) ProtoMessage() {}
 
 func (x *SharePrivateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[12]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +877,7 @@ func (x *SharePrivateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SharePrivateResponse.ProtoReflect.Descriptor instead.
 func (*SharePrivateResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{12}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SharePrivateResponse) GetToken() string {
@@ -893,7 +905,7 @@ type SharePublicRequest struct {
 
 func (x *SharePublicRequest) Reset() {
 	*x = SharePublicRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[13]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -905,7 +917,7 @@ func (x *SharePublicRequest) String() string {
 func (*SharePublicRequest) ProtoMessage() {}
 
 func (x *SharePublicRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[13]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -918,7 +930,7 @@ func (x *SharePublicRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SharePublicRequest.ProtoReflect.Descriptor instead.
 func (*SharePublicRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{13}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *SharePublicRequest) GetTarget() string {
@@ -1001,7 +1013,7 @@ type SharePublicResponse struct {
 
 func (x *SharePublicResponse) Reset() {
 	*x = SharePublicResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[14]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1013,7 +1025,7 @@ func (x *SharePublicResponse) String() string {
 func (*SharePublicResponse) ProtoMessage() {}
 
 func (x *SharePublicResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[14]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1026,7 +1038,7 @@ func (x *SharePublicResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SharePublicResponse.ProtoReflect.Descriptor instead.
 func (*SharePublicResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{14}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SharePublicResponse) GetToken() string {
@@ -1051,7 +1063,7 @@ type StatusRequest struct {
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[15]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1063,7 +1075,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[15]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1076,7 +1088,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{15}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{16}
 }
 
 type StatusResponse struct {
@@ -1089,7 +1101,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[16]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1101,7 +1113,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[16]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1114,7 +1126,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{16}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *StatusResponse) GetAccesses() []*AccessDetail {
@@ -1139,7 +1151,7 @@ type VersionRequest struct {
 
 func (x *VersionRequest) Reset() {
 	*x = VersionRequest{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[17]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1151,7 +1163,7 @@ func (x *VersionRequest) String() string {
 func (*VersionRequest) ProtoMessage() {}
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[17]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1164,7 +1176,7 @@ func (x *VersionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{17}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{18}
 }
 
 type VersionResponse struct {
@@ -1177,7 +1189,7 @@ type VersionResponse struct {
 
 func (x *VersionResponse) Reset() {
 	*x = VersionResponse{}
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[18]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1189,7 +1201,7 @@ func (x *VersionResponse) String() string {
 func (*VersionResponse) ProtoMessage() {}
 
 func (x *VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_agentGrpc_agent_proto_msgTypes[18]
+	mi := &file_agent_agentGrpc_agent_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1202,7 +1214,7 @@ func (x *VersionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionResponse.ProtoReflect.Descriptor instead.
 func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{18}
+	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *VersionResponse) GetV() string {
@@ -1223,19 +1235,14 @@ var File_agent_agentGrpc_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x1bagent/agentGrpc/agent.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x86\x03\n" +
+	"\x1bagent/agentGrpc/agent.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd8\x01\n" +
 	"\fAccessDetail\x12$\n" +
 	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12 \n" +
 	"\vbindAddress\x18\x03 \x01(\tR\vbindAddress\x12(\n" +
 	"\x0fresponseHeaders\x18\x04 \x03(\tR\x0fresponseHeaders\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1c\n" +
-	"\tfailureId\x18\x06 \x01(\tR\tfailureId\x12\"\n" +
-	"\ffailureCount\x18\a \x01(\x05R\ffailureCount\x12\x1c\n" +
-	"\tlastError\x18\b \x01(\tR\tlastError\x12<\n" +
-	"\vlastFailure\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vlastFailure\x128\n" +
-	"\tnextRetry\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tnextRetry\"=\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12(\n" +
+	"\afailure\x18\x06 \x01(\v2\x0e.FailureDetailR\afailure\"=\n" +
 	"\x15AccessPrivateResponse\x12$\n" +
 	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\"\xfe\x01\n" +
 	"\x14AccessPrivateRequest\x12\x14\n" +
@@ -1245,7 +1252,13 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\vautoAddress\x18\x04 \x01(\tR\vautoAddress\x12$\n" +
 	"\rautoStartPort\x18\x05 \x01(\rR\rautoStartPort\x12 \n" +
 	"\vautoEndPort\x18\x06 \x01(\rR\vautoEndPort\x12(\n" +
-	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"K\n" +
+	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"\xe7\x01\n" +
+	"\rFailureDetail\x12\x1c\n" +
+	"\tfailureId\x18\x01 \x01(\tR\tfailureId\x12\"\n" +
+	"\ffailureCount\x18\x02 \x01(\x05R\ffailureCount\x12\x1c\n" +
+	"\tlastError\x18\x03 \x01(\tR\tlastError\x12<\n" +
+	"\vlastFailure\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vlastFailure\x128\n" +
+	"\tnextRetry\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tnextRetry\"K\n" +
 	"\rNameSelection\x12&\n" +
 	"\x0enamespaceToken\x18\x01 \x01(\tR\x0enamespaceToken\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"<\n" +
@@ -1254,7 +1267,7 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x15ReleaseAccessResponse\"+\n" +
 	"\x13ReleaseShareRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"\x16\n" +
-	"\x14ReleaseShareResponse\"\xc1\x03\n" +
+	"\x14ReleaseShareResponse\"\x93\x02\n" +
 	"\vShareDetail\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1c\n" +
 	"\tshareMode\x18\x02 \x01(\tR\tshareMode\x12 \n" +
@@ -1262,13 +1275,8 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x10frontendEndpoint\x18\x04 \x03(\tR\x10frontendEndpoint\x12(\n" +
 	"\x0fbackendEndpoint\x18\x05 \x01(\tR\x0fbackendEndpoint\x12\x16\n" +
 	"\x06closed\x18\x06 \x01(\bR\x06closed\x12\x16\n" +
-	"\x06status\x18\a \x01(\tR\x06status\x12\x1c\n" +
-	"\tfailureId\x18\b \x01(\tR\tfailureId\x12\"\n" +
-	"\ffailureCount\x18\t \x01(\x05R\ffailureCount\x12\x1c\n" +
-	"\tlastError\x18\n" +
-	" \x01(\tR\tlastError\x12<\n" +
-	"\vlastFailure\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\vlastFailure\x128\n" +
-	"\tnextRetry\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tnextRetry\"\xbd\x01\n" +
+	"\x06status\x18\a \x01(\tR\x06status\x12(\n" +
+	"\afailure\x18\b \x01(\v2\x0e.FailureDetailR\afailure\"\xbd\x01\n" +
 	"\x1bShareHttpHealthcheckRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
 	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +
@@ -1332,53 +1340,54 @@ func file_agent_agentGrpc_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agentGrpc_agent_proto_rawDescData
 }
 
-var file_agent_agentGrpc_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_agent_agentGrpc_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*AccessDetail)(nil),                 // 0: AccessDetail
 	(*AccessPrivateResponse)(nil),        // 1: AccessPrivateResponse
 	(*AccessPrivateRequest)(nil),         // 2: AccessPrivateRequest
-	(*NameSelection)(nil),                // 3: NameSelection
-	(*ReleaseAccessRequest)(nil),         // 4: ReleaseAccessRequest
-	(*ReleaseAccessResponse)(nil),        // 5: ReleaseAccessResponse
-	(*ReleaseShareRequest)(nil),          // 6: ReleaseShareRequest
-	(*ReleaseShareResponse)(nil),         // 7: ReleaseShareResponse
-	(*ShareDetail)(nil),                  // 8: ShareDetail
-	(*ShareHttpHealthcheckRequest)(nil),  // 9: ShareHttpHealthcheckRequest
-	(*ShareHttpHealthcheckResponse)(nil), // 10: ShareHttpHealthcheckResponse
-	(*SharePrivateRequest)(nil),          // 11: SharePrivateRequest
-	(*SharePrivateResponse)(nil),         // 12: SharePrivateResponse
-	(*SharePublicRequest)(nil),           // 13: SharePublicRequest
-	(*SharePublicResponse)(nil),          // 14: SharePublicResponse
-	(*StatusRequest)(nil),                // 15: StatusRequest
-	(*StatusResponse)(nil),               // 16: StatusResponse
-	(*VersionRequest)(nil),               // 17: VersionRequest
-	(*VersionResponse)(nil),              // 18: VersionResponse
-	(*timestamppb.Timestamp)(nil),        // 19: google.protobuf.Timestamp
+	(*FailureDetail)(nil),                // 3: FailureDetail
+	(*NameSelection)(nil),                // 4: NameSelection
+	(*ReleaseAccessRequest)(nil),         // 5: ReleaseAccessRequest
+	(*ReleaseAccessResponse)(nil),        // 6: ReleaseAccessResponse
+	(*ReleaseShareRequest)(nil),          // 7: ReleaseShareRequest
+	(*ReleaseShareResponse)(nil),         // 8: ReleaseShareResponse
+	(*ShareDetail)(nil),                  // 9: ShareDetail
+	(*ShareHttpHealthcheckRequest)(nil),  // 10: ShareHttpHealthcheckRequest
+	(*ShareHttpHealthcheckResponse)(nil), // 11: ShareHttpHealthcheckResponse
+	(*SharePrivateRequest)(nil),          // 12: SharePrivateRequest
+	(*SharePrivateResponse)(nil),         // 13: SharePrivateResponse
+	(*SharePublicRequest)(nil),           // 14: SharePublicRequest
+	(*SharePublicResponse)(nil),          // 15: SharePublicResponse
+	(*StatusRequest)(nil),                // 16: StatusRequest
+	(*StatusResponse)(nil),               // 17: StatusResponse
+	(*VersionRequest)(nil),               // 18: VersionRequest
+	(*VersionResponse)(nil),              // 19: VersionResponse
+	(*timestamppb.Timestamp)(nil),        // 20: google.protobuf.Timestamp
 }
 var file_agent_agentGrpc_agent_proto_depIdxs = []int32{
-	19, // 0: AccessDetail.lastFailure:type_name -> google.protobuf.Timestamp
-	19, // 1: AccessDetail.nextRetry:type_name -> google.protobuf.Timestamp
-	19, // 2: ShareDetail.lastFailure:type_name -> google.protobuf.Timestamp
-	19, // 3: ShareDetail.nextRetry:type_name -> google.protobuf.Timestamp
-	3,  // 4: SharePublicRequest.nameSelections:type_name -> NameSelection
+	3,  // 0: AccessDetail.failure:type_name -> FailureDetail
+	20, // 1: FailureDetail.lastFailure:type_name -> google.protobuf.Timestamp
+	20, // 2: FailureDetail.nextRetry:type_name -> google.protobuf.Timestamp
+	3,  // 3: ShareDetail.failure:type_name -> FailureDetail
+	4,  // 4: SharePublicRequest.nameSelections:type_name -> NameSelection
 	0,  // 5: StatusResponse.accesses:type_name -> AccessDetail
-	8,  // 6: StatusResponse.shares:type_name -> ShareDetail
+	9,  // 6: StatusResponse.shares:type_name -> ShareDetail
 	2,  // 7: Agent.AccessPrivate:input_type -> AccessPrivateRequest
-	4,  // 8: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
-	6,  // 9: Agent.ReleaseShare:input_type -> ReleaseShareRequest
-	9,  // 10: Agent.ShareHttpHealthcheck:input_type -> ShareHttpHealthcheckRequest
-	11, // 11: Agent.SharePrivate:input_type -> SharePrivateRequest
-	13, // 12: Agent.SharePublic:input_type -> SharePublicRequest
-	15, // 13: Agent.Status:input_type -> StatusRequest
-	17, // 14: Agent.Version:input_type -> VersionRequest
+	5,  // 8: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
+	7,  // 9: Agent.ReleaseShare:input_type -> ReleaseShareRequest
+	10, // 10: Agent.ShareHttpHealthcheck:input_type -> ShareHttpHealthcheckRequest
+	12, // 11: Agent.SharePrivate:input_type -> SharePrivateRequest
+	14, // 12: Agent.SharePublic:input_type -> SharePublicRequest
+	16, // 13: Agent.Status:input_type -> StatusRequest
+	18, // 14: Agent.Version:input_type -> VersionRequest
 	1,  // 15: Agent.AccessPrivate:output_type -> AccessPrivateResponse
-	5,  // 16: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
-	7,  // 17: Agent.ReleaseShare:output_type -> ReleaseShareResponse
-	10, // 18: Agent.ShareHttpHealthcheck:output_type -> ShareHttpHealthcheckResponse
-	12, // 19: Agent.SharePrivate:output_type -> SharePrivateResponse
-	14, // 20: Agent.SharePublic:output_type -> SharePublicResponse
-	16, // 21: Agent.Status:output_type -> StatusResponse
-	18, // 22: Agent.Version:output_type -> VersionResponse
+	6,  // 16: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
+	8,  // 17: Agent.ReleaseShare:output_type -> ReleaseShareResponse
+	11, // 18: Agent.ShareHttpHealthcheck:output_type -> ShareHttpHealthcheckResponse
+	13, // 19: Agent.SharePrivate:output_type -> SharePrivateResponse
+	15, // 20: Agent.SharePublic:output_type -> SharePublicResponse
+	17, // 21: Agent.Status:output_type -> StatusResponse
+	19, // 22: Agent.Version:output_type -> VersionResponse
 	15, // [15:23] is the sub-list for method output_type
 	7,  // [7:15] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
@@ -1397,7 +1406,7 @@ func file_agent_agentGrpc_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_agentGrpc_agent_proto_rawDesc), len(file_agent_agentGrpc_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
