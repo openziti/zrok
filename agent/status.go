@@ -11,7 +11,7 @@ import (
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
 	var accesses []*agentGrpc.AccessDetail
 
-	// Add active accesses
+	// active accesses
 	for feToken, acc := range i.agent.accesses {
 		accesses = append(accesses, &agentGrpc.AccessDetail{
 			FrontendToken:   feToken,
@@ -25,32 +25,23 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 		})
 	}
 
-	// Add failed accesses with failure IDs
-	for failureID, entry := range i.agent.failedAccesses {
-		var lastFailure, nextRetry *timestamppb.Timestamp
-		if entry.LastFailure != nil {
-			lastFailure = timestamppb.New(*entry.LastFailure)
-		}
-		if entry.NextRetry != nil {
-			nextRetry = timestamppb.New(*entry.NextRetry)
-		}
-
+	// failed accesses
+	for failureId, access := range i.agent.retryManager.accesses {
 		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && entry.FailureCount >= i.agent.cfg.MaxRetries {
+		if i.agent.cfg.MaxRetries > -1 && access.Failure.FailureCount >= i.agent.cfg.MaxRetries {
 			status = "failed"
 		}
-
 		accesses = append(accesses, &agentGrpc.AccessDetail{
 			FrontendToken:   "",
-			Token:           entry.Request.Token,
-			BindAddress:     entry.Request.BindAddress,
-			ResponseHeaders: entry.Request.ResponseHeaders,
+			Token:           access.Request.Token,
+			BindAddress:     access.Request.BindAddress,
+			ResponseHeaders: access.Request.ResponseHeaders,
 			Status:          status,
-			FailureId:       failureID,
-			FailureCount:    int32(entry.FailureCount),
-			LastError:       entry.LastError,
-			LastFailure:     lastFailure,
-			NextRetry:       nextRetry,
+			FailureId:       failureId,
+			FailureCount:    int32(access.Failure.FailureCount),
+			LastError:       access.Failure.LastError,
+			LastFailure:     timestamppb.New(access.Failure.LastFailure),
+			NextRetry:       timestamppb.New(access.Failure.NextRetry),
 		})
 	}
 
@@ -60,7 +51,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 
 	var shares []*agentGrpc.ShareDetail
 
-	// Add active shares
+	// active shares
 	for token, shr := range i.agent.shares {
 		shares = append(shares, &agentGrpc.ShareDetail{
 			Token:            token,
@@ -77,33 +68,24 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 	}
 
 	// Add failed shares with failure IDs
-	for failureID, entry := range i.agent.failedShares {
-		var lastFailure, nextRetry *timestamppb.Timestamp
-		if entry.LastFailure != nil {
-			lastFailure = timestamppb.New(*entry.LastFailure)
-		}
-		if entry.NextRetry != nil {
-			nextRetry = timestamppb.New(*entry.NextRetry)
-		}
-
+	for failureId, share := range i.agent.retryManager.shares {
 		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && entry.FailureCount >= i.agent.cfg.MaxRetries {
+		if i.agent.cfg.MaxRetries > -1 && share.Failure.FailureCount >= i.agent.cfg.MaxRetries {
 			status = "failed"
 		}
-
 		shares = append(shares, &agentGrpc.ShareDetail{
 			Token:            "",
 			ShareMode:        "public",
-			BackendMode:      entry.Request.BackendMode,
-			FrontendEndpoint: []string{},
-			BackendEndpoint:  entry.Request.Target,
-			Closed:           entry.Request.Closed,
+			BackendMode:      share.Request.BackendMode,
+			FrontendEndpoint: nil,
+			BackendEndpoint:  share.Request.Target,
+			Closed:           share.Request.Closed,
 			Status:           status,
-			FailureId:        failureID,
-			FailureCount:     int32(entry.FailureCount),
-			LastError:        entry.LastError,
-			LastFailure:      lastFailure,
-			NextRetry:        nextRetry,
+			FailureId:        failureId,
+			FailureCount:     int32(share.Failure.FailureCount),
+			LastError:        share.Failure.LastError,
+			LastFailure:      timestamppb.New(share.Failure.LastFailure),
+			NextRetry:        timestamppb.New(share.Failure.NextRetry),
 		})
 	}
 

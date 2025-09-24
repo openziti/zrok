@@ -9,28 +9,27 @@ import (
 
 const RegistryV = "2"
 
-type AccessRegistryEntry struct {
-	Request         *AccessPrivateRequest `json:"request"`
-	FailureCount    int                   `json:"failure_count,omitempty"`
-	LastFailure     *time.Time            `json:"last_failure,omitempty"`
-	LastError       string                `json:"last_error,omitempty"`
-	NextRetry       *time.Time            `json:"next_retry,omitempty"`
-	markedForRemoval bool                 `json:"-"`
-}
-
-type ShareRegistryEntry struct {
-	Request         *SharePublicRequest `json:"request"`
-	FailureCount    int                 `json:"failure_count,omitempty"`
-	LastFailure     *time.Time          `json:"last_failure,omitempty"`
-	LastError       string              `json:"last_error,omitempty"`
-	NextRetry       *time.Time          `json:"next_retry,omitempty"`
-	markedForRemoval bool               `json:"-"`
-}
-
 type Registry struct {
 	V               string                 `json:"v"`
 	PrivateAccesses []*AccessRegistryEntry `json:"private_accesses,omitempty"`
 	PublicShares    []*ShareRegistryEntry  `json:"public_shares,omitempty"`
+}
+
+type AccessRegistryEntry struct {
+	Request *AccessPrivateRequest `json:"request"`
+	Failure *FailureEntry         `json:"failure,omitempty"`
+}
+
+type ShareRegistryEntry struct {
+	Request *SharePublicRequest `json:"request"`
+	Failure *FailureEntry       `json:"failure,omitempty"`
+}
+
+type FailureEntry struct {
+	FailureCount int       `json:"failure_count,omitempty"`
+	LastFailure  time.Time `json:"last_failure,omitempty"`
+	LastError    string    `json:"last_error,omitempty"`
+	NextRetry    time.Time `json:"next_retry,omitempty"`
 }
 
 func LoadRegistry(path string) (*Registry, error) {

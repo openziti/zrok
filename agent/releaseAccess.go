@@ -2,28 +2,24 @@ package agent
 
 import (
 	"context"
+
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func (a *Agent) ReleaseAccess(frontendToken string) error {
 	// first check active accesses
 	if acc, found := a.accesses[frontendToken]; found {
 		a.rmAccess <- acc
-		logrus.Infof("released active access '%v'", acc.frontendToken)
+		dl.Infof("released active access '%v'", acc.frontendToken)
 		return nil
 	}
 
-	// if not found in active accesses, check failed accesses using frontendToken as failure ID
-	if failedEntry, found := a.failedAccesses[frontendToken]; found {
-		// mark for removal - retry manager will handle disk persistence
-		failedEntry.markedForRemoval = true
-
-		// remove from in-memory failed map immediately so status won't show it
-		delete(a.failedAccesses, frontendToken)
-
-		logrus.Infof("removed failed access '%v' (failure id: '%v')", failedEntry.Request.Token, frontendToken)
+	// then check failed accesses
+	if a.retryManager.hasFailedAccess(frontendToken) {
+		dl.Infof("released failed access '%v'", frontendToken)
+		a.retryManager.rmFailedAccess(frontendToken)
 		return nil
 	}
 

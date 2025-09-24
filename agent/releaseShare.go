@@ -2,28 +2,24 @@ package agent
 
 import (
 	"context"
+
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func (a *Agent) ReleaseShare(shareToken string) error {
 	// first check active shares
 	if shr, found := a.shares[shareToken]; found {
 		a.rmShare <- shr
-		logrus.Infof("released active share '%v'", shr.token)
+		dl.Infof("released active share '%v'", shr.token)
 		return nil
 	}
 
-	// if not found in active shares, check failed shares using shareToken as failure ID
-	if failedEntry, found := a.failedShares[shareToken]; found {
-		// mark for removal - retry manager will handle disk persistence
-		failedEntry.markedForRemoval = true
-
-		// remove from in-memory failed map immediately so status won't show it
-		delete(a.failedShares, shareToken)
-
-		logrus.Infof("removed failed share '%v' (failure id: '%v')", failedEntry.Request.Target, shareToken)
+	// then check failed shares
+	if a.retryManager.hasFailedShare(shareToken) {
+		dl.Infof("released failed share '%v'", shareToken)
+		a.retryManager.rmFailedShare(shareToken)
 		return nil
 	}
 
