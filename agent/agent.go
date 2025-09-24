@@ -125,6 +125,14 @@ func (a *Agent) ReloadRegistry() error {
 			logrus.Errorf("error restarting private access '%v': %v", req, err)
 		}
 	}
+	logrus.Infof("loaded %d public shares", len(registry.PublicShares))
+	for _, req := range registry.PublicShares {
+		if token, frontends, err := a.SharePublic(req); err == nil {
+			logrus.Infof("restarted public share '%v' -> token='%v', frontends='%v'", req.Target, token, frontends)
+		} else {
+			logrus.Errorf("error restarting public share '%v': %v", req, err)
+		}
+	}
 	logrus.Infof("reload complete")
 	return nil
 }
@@ -134,6 +142,22 @@ func (a *Agent) SaveRegistry() error {
 	for _, acc := range a.accesses {
 		if acc.request != nil {
 			r.PrivateAccesses = append(r.PrivateAccesses, acc.request)
+		}
+	}
+	// save public shares with registered names (namespace:name format)
+	for _, shr := range a.shares {
+		if req, ok := shr.request.(*SharePublicRequest); ok {
+			// only save shares with at least one registered name (not just namespace)
+			hasRegisteredName := false
+			for _, ns := range req.NameSelections {
+				if ns.Name != "" {
+					hasRegisteredName = true
+					break
+				}
+			}
+			if hasRegisteredName {
+				r.PublicShares = append(r.PublicShares, req)
+			}
 		}
 	}
 	registryPath, err := a.root.AgentRegistry()

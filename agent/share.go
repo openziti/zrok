@@ -27,7 +27,7 @@ type NameSelection struct {
 type SharePublicRequest struct {
 	Target               string          `json:"target"`
 	BasicAuth            []string        `json:"basic_auth"`
-	NameSelections       []NameSelection `json:"name_selection"`
+	NameSelections       []NameSelection `json:"name_selections"`
 	BackendMode          string          `json:"backend_mode"`
 	Insecure             bool            `json:"insecure"`
 	OauthProvider        string          `json:"oauth_provider"`

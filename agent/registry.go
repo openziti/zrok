@@ -6,11 +6,12 @@ import (
 	"os"
 )
 
-const RegistryV = "1"
+const RegistryV = "2"
 
 type Registry struct {
 	V               string                  `json:"v"`
-	PrivateAccesses []*AccessPrivateRequest `json:"private_accesses"`
+	PrivateAccesses []*AccessPrivateRequest `json:"private_accesses,omitempty"`
+	PublicShares    []*SharePublicRequest   `json:"public_shares,omitempty"`
 }
 
 func LoadRegistry(path string) (*Registry, error) {
@@ -22,7 +23,10 @@ func LoadRegistry(path string) (*Registry, error) {
 	if err := json.Unmarshal(data, r); err != nil {
 		return nil, err
 	}
-	if r.V != RegistryV {
+	// handle migration from v1 to v2
+	if r.V == "1" {
+		r.V = RegistryV
+	} else if r.V != RegistryV {
 		return nil, fmt.Errorf("invalid registry version '%v'; expected '%v'", r.V, RegistryV)
 	}
 	return r, nil
