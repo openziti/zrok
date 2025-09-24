@@ -479,6 +479,13 @@ func (a *Agent) processRetries() {
 	newFailedAccesses := make(map[string]*AccessRegistryEntry)
 	var activeAccessEntries []*AccessRegistryEntry
 	for _, entry := range registry.PrivateAccesses {
+		// skip entries marked for removal
+		if entry.markedForRemoval {
+			logrus.Debugf("skipping access '%v' marked for removal", entry.Request.Token)
+			registryModified = true
+			continue
+		}
+
 		if entry.NextRetry != nil && now.After(*entry.NextRetry) {
 			if a.cfg.MaxRetries > -1 && entry.FailureCount >= a.cfg.MaxRetries {
 				logrus.Warnf("abandoning private access '%v' after %d failed attempts, last error: %v",
@@ -553,6 +560,13 @@ func (a *Agent) processRetries() {
 	newFailedShares := make(map[string]*ShareRegistryEntry)
 	var activeShareEntries []*ShareRegistryEntry
 	for _, entry := range registry.PublicShares {
+		// skip entries marked for removal
+		if entry.markedForRemoval {
+			logrus.Debugf("skipping share '%v' marked for removal", entry.Request.Target)
+			registryModified = true
+			continue
+		}
+
 		if entry.NextRetry != nil && now.After(*entry.NextRetry) {
 			if a.cfg.MaxRetries > -1 && entry.FailureCount >= a.cfg.MaxRetries {
 				logrus.Warnf("abandoning public share '%v' after %d failed attempts, last error: %v",

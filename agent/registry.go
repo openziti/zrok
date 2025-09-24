@@ -10,19 +10,21 @@ import (
 const RegistryV = "2"
 
 type AccessRegistryEntry struct {
-	Request      *AccessPrivateRequest `json:"request"`
-	FailureCount int                   `json:"failure_count,omitempty"`
-	LastFailure  *time.Time            `json:"last_failure,omitempty"`
-	LastError    string                `json:"last_error,omitempty"`
-	NextRetry    *time.Time            `json:"next_retry,omitempty"`
+	Request         *AccessPrivateRequest `json:"request"`
+	FailureCount    int                   `json:"failure_count,omitempty"`
+	LastFailure     *time.Time            `json:"last_failure,omitempty"`
+	LastError       string                `json:"last_error,omitempty"`
+	NextRetry       *time.Time            `json:"next_retry,omitempty"`
+	markedForRemoval bool                 `json:"-"`
 }
 
 type ShareRegistryEntry struct {
-	Request      *SharePublicRequest `json:"request"`
-	FailureCount int                 `json:"failure_count,omitempty"`
-	LastFailure  *time.Time          `json:"last_failure,omitempty"`
-	LastError    string              `json:"last_error,omitempty"`
-	NextRetry    *time.Time          `json:"next_retry,omitempty"`
+	Request         *SharePublicRequest `json:"request"`
+	FailureCount    int                 `json:"failure_count,omitempty"`
+	LastFailure     *time.Time          `json:"last_failure,omitempty"`
+	LastError       string              `json:"last_error,omitempty"`
+	NextRetry       *time.Time          `json:"next_retry,omitempty"`
+	markedForRemoval bool               `json:"-"`
 }
 
 type Registry struct {
