@@ -66,6 +66,7 @@ models/RemoteShareRequest.ts
 models/RemoteStatus200Response.ts
 models/RemoteStatus200ResponseAccessesInner.ts
 models/RemoteStatus200ResponseSharesInner.ts
+models/RemoteStatus200ResponseSharesInnerFailure.ts
 models/RemoteUnaccessRequest.ts
 models/RemoteUnshareRequest.ts
 models/RemoveNamespaceFrontendMappingRequest.ts

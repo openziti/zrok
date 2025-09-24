@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { FailureDetail } from './FailureDetail';
+import type { Failure } from './Failure';
 import {
-    FailureDetailFromJSON,
-    FailureDetailFromJSONTyped,
-    FailureDetailToJSON,
-    FailureDetailToJSONTyped,
-} from './FailureDetail';
+    FailureFromJSON,
+    FailureFromJSONTyped,
+    FailureToJSON,
+    FailureToJSONTyped,
+} from './Failure';
 
 /**
  * 
@@ -59,10 +59,10 @@ export interface AccessDetail {
     status?: string;
     /**
      * 
-     * @type {FailureDetail}
+     * @type {Failure}
      * @memberof AccessDetail
      */
-    failure?: FailureDetail;
+    failure?: Failure;
 }
 
 /**
@@ -87,7 +87,7 @@ export function AccessDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'responseHeaders': json['responseHeaders'] == null ? undefined : json['responseHeaders'],
         'status': json['status'] == null ? undefined : json['status'],
-        'failure': json['failure'] == null ? undefined : FailureDetailFromJSON(json['failure']),
+        'failure': json['failure'] == null ? undefined : FailureFromJSON(json['failure']),
     };
 }
 
@@ -107,7 +107,7 @@ export function AccessDetailToJSONTyped(value?: AccessDetail | null, ignoreDiscr
         'bindAddress': value['bindAddress'],
         'responseHeaders': value['responseHeaders'],
         'status': value['status'],
-        'failure': FailureDetailToJSON(value['failure']),
+        'failure': FailureToJSON(value['failure']),
     };
 }
 

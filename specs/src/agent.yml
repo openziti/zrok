@@ -250,6 +250,17 @@
                     type: boolean
                   status:
                     type: string
+                  failure:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      count:
+                        type: integer
+                      lastError:
+                        type: string
+                      nextRetry:
+                        type: string
             accesses:
               type: array
               items:
@@ -265,6 +276,19 @@
                     type: array
                     items:
                       type: string
+                  status:
+                    type: string
+                  failure:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      count:
+                        type: integer
+                      lastError:
+                        type: string
+                      nextRetry:
+                        type: string
       401:
         description: unauthorized
       500:

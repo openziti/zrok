@@ -26,10 +26,9 @@ type ShareRegistryEntry struct {
 }
 
 type FailureEntry struct {
-	FailureCount int       `json:"failure_count,omitempty"`
-	LastFailure  time.Time `json:"last_failure,omitempty"`
-	LastError    string    `json:"last_error,omitempty"`
-	NextRetry    time.Time `json:"next_retry,omitempty"`
+	Count     int       `json:"count,omitempty"`
+	LastError string    `json:"last_error,omitempty"`
+	NextRetry time.Time `json:"next_retry,omitempty"`
 }
 
 func LoadRegistry(path string) (*Registry, error) {

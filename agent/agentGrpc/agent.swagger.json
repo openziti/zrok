@@ -426,7 +426,7 @@
           "type": "string"
         },
         "failure": {
-          "$ref": "#/definitions/FailureDetail"
+          "$ref": "#/definitions/Failure"
         }
       }
     },
@@ -438,22 +438,18 @@
         }
       }
     },
-    "FailureDetail": {
+    "Failure": {
       "type": "object",
       "properties": {
-        "failureId": {
+        "id": {
           "type": "string"
         },
-        "failureCount": {
+        "count": {
           "type": "integer",
           "format": "int32"
         },
         "lastError": {
           "type": "string"
-        },
-        "lastFailure": {
-          "type": "string",
-          "format": "date-time"
         },
         "nextRetry": {
           "type": "string",
@@ -506,7 +502,7 @@
           "type": "string"
         },
         "failure": {
-          "$ref": "#/definitions/FailureDetail"
+          "$ref": "#/definitions/Failure"
         }
       }
     },

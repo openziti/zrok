@@ -230,6 +230,7 @@ Class | Method | HTTP request | Description
  - [RemoteStatus200Response](docs/RemoteStatus200Response.md)
  - [RemoteStatus200ResponseAccessesInner](docs/RemoteStatus200ResponseAccessesInner.md)
  - [RemoteStatus200ResponseSharesInner](docs/RemoteStatus200ResponseSharesInner.md)
+ - [RemoteStatus200ResponseSharesInnerFailure](docs/RemoteStatus200ResponseSharesInnerFailure.md)
  - [RemoteUnaccessRequest](docs/RemoteUnaccessRequest.md)
  - [RemoteUnshareRequest](docs/RemoteUnshareRequest.md)
  - [RemoveNamespaceFrontendMappingRequest](docs/RemoveNamespaceFrontendMappingRequest.md)

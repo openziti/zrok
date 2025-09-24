@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { FailureDetail } from './FailureDetail';
+import type { Failure } from './Failure';
 import {
-    FailureDetailFromJSON,
-    FailureDetailFromJSONTyped,
-    FailureDetailToJSON,
-    FailureDetailToJSONTyped,
-} from './FailureDetail';
+    FailureFromJSON,
+    FailureFromJSONTyped,
+    FailureToJSON,
+    FailureToJSONTyped,
+} from './Failure';
 
 /**
  * 
@@ -71,10 +71,10 @@ export interface ShareDetail {
     status?: string;
     /**
      * 
-     * @type {FailureDetail}
+     * @type {Failure}
      * @memberof ShareDetail
      */
-    failure?: FailureDetail;
+    failure?: Failure;
 }
 
 /**
@@ -101,7 +101,7 @@ export function ShareDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'closed': json['closed'] == null ? undefined : json['closed'],
         'status': json['status'] == null ? undefined : json['status'],
-        'failure': json['failure'] == null ? undefined : FailureDetailFromJSON(json['failure']),
+        'failure': json['failure'] == null ? undefined : FailureFromJSON(json['failure']),
     };
 }
 
@@ -123,7 +123,7 @@ export function ShareDetailToJSONTyped(value?: ShareDetail | null, ignoreDiscrim
         'backendEndpoint': value['backendEndpoint'],
         'closed': value['closed'],
         'status': value['status'],
-        'failure': FailureDetailToJSON(value['failure']),
+        'failure': FailureToJSON(value['failure']),
     };
 }
 

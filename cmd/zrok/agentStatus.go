@@ -80,13 +80,13 @@ func (cmd *agentStatusCommand) displayAccesses(accesses []*agentGrpc.AccessDetai
 		// use failure ID in token column if token is empty (failed items)
 		displayToken := access.FrontendToken
 		if displayToken == "" && access.Failure != nil {
-			displayToken = access.Failure.FailureId
+			displayToken = access.Failure.Id
 		}
 
 		if cmd.verbose {
 			failureCount := "-"
 			if access.Failure != nil {
-				failureCount = fmt.Sprintf("%d", access.Failure.FailureCount)
+				failureCount = fmt.Sprintf("%d", access.Failure.Count)
 			}
 
 			lastError := ""
@@ -133,13 +133,13 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 		// use failure ID in token column if token is empty (failed items)
 		displayToken := share.Token
 		if displayToken == "" && share.Failure != nil {
-			displayToken = share.Failure.FailureId
+			displayToken = share.Failure.Id
 		}
 
 		if cmd.verbose {
 			failureCount := "-"
 			if share.Failure != nil {
-				failureCount = fmt.Sprintf("%d", share.Failure.FailureCount)
+				failureCount = fmt.Sprintf("%d", share.Failure.Count)
 			}
 
 			lastError := ""
@@ -210,97 +210,6 @@ func (cmd *agentStatusCommand) formatStatus(status string) string {
 	default:
 		return status
 	}
-}
-
-func (cmd *agentStatusCommand) wrapString(s string, maxWidth int) string {
-	if len(s) <= maxWidth {
-		return s
-	}
-
-	var result []rune
-	line := []rune{}
-	words := [][]rune{}
-	currentWord := []rune{}
-
-	// split input into words
-	for _, r := range s {
-		if r == ' ' || r == '\t' || r == '\n' {
-			if len(currentWord) > 0 {
-				words = append(words, currentWord)
-				currentWord = []rune{}
-			}
-			if r == '\n' {
-				// preserve existing newlines
-				words = append(words, []rune{r})
-			}
-		} else {
-			currentWord = append(currentWord, r)
-		}
-	}
-	if len(currentWord) > 0 {
-		words = append(words, currentWord)
-	}
-
-	// wrap words into lines
-	for _, word := range words {
-		if len(word) == 1 && word[0] == '\n' {
-			// handle preserved newlines
-			result = append(result, line...)
-			result = append(result, '\n')
-			line = []rune{}
-			continue
-		}
-
-		// check if adding this word would exceed the width
-		spaceNeeded := 0
-		if len(line) > 0 {
-			spaceNeeded = 1 // for the space between words
-		}
-
-		if len(line)+spaceNeeded+len(word) > maxWidth {
-			// word doesn't fit on current line
-			if len(line) > 0 {
-				// flush current line
-				result = append(result, line...)
-				result = append(result, '\n')
-				line = []rune{}
-			}
-
-			// if word itself is longer than maxWidth, break it
-			if len(word) > maxWidth {
-				for i := 0; i < len(word); {
-					end := i + maxWidth
-					if end > len(word) {
-						end = len(word)
-					}
-					if i > 0 {
-						result = append(result, '\n')
-					}
-					result = append(result, word[i:end]...)
-					i = end
-				}
-				if len(word) > 0 && len(word)%maxWidth != 0 {
-					result = append(result, '\n')
-				}
-			} else {
-				// word fits on new line
-				line = append(line, word...)
-			}
-		} else {
-			// word fits on current line
-			if len(line) > 0 {
-				line = append(line, ' ')
-			}
-			line = append(line, word...)
-		}
-	}
-
-	// append any remaining line content
-	if len(line) > 0 {
-		result = append(result, line...)
-	}
-
-	return string(result)
 }
 
 func (cmd *agentStatusCommand) formatTime(t time.Time) string {

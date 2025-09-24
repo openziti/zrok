@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { RemoteStatus200ResponseSharesInnerFailure } from './RemoteStatus200ResponseSharesInnerFailure';
+import {
+    RemoteStatus200ResponseSharesInnerFailureFromJSON,
+    RemoteStatus200ResponseSharesInnerFailureFromJSONTyped,
+    RemoteStatus200ResponseSharesInnerFailureToJSON,
+    RemoteStatus200ResponseSharesInnerFailureToJSONTyped,
+} from './RemoteStatus200ResponseSharesInnerFailure';
+
 /**
  * 
  * @export
@@ -61,6 +69,12 @@ export interface RemoteStatus200ResponseSharesInner {
      * @memberof RemoteStatus200ResponseSharesInner
      */
     status?: string;
+    /**
+     * 
+     * @type {RemoteStatus200ResponseSharesInnerFailure}
+     * @memberof RemoteStatus200ResponseSharesInner
+     */
+    failure?: RemoteStatus200ResponseSharesInnerFailure;
 }
 
 /**
@@ -87,6 +101,7 @@ export function RemoteStatus200ResponseSharesInnerFromJSONTyped(json: any, ignor
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'open': json['open'] == null ? undefined : json['open'],
         'status': json['status'] == null ? undefined : json['status'],
+        'failure': json['failure'] == null ? undefined : RemoteStatus200ResponseSharesInnerFailureFromJSON(json['failure']),
     };
 }
 
@@ -108,6 +123,7 @@ export function RemoteStatus200ResponseSharesInnerToJSONTyped(value?: RemoteStat
         'backendEndpoint': value['backendEndpoint'],
         'open': value['open'],
         'status': value['status'],
+        'failure': RemoteStatus200ResponseSharesInnerFailureToJSON(value['failure']),
     };
 }
 

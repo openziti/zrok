@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -51,7 +52,7 @@ func (h *agentRemoteStatusHandler) Handle(params agent.RemoteStatusParams, princ
 
 	out := &agent.RemoteStatusOKBody{}
 	for _, share := range resp.Shares {
-		out.Shares = append(out.Shares, &agent.RemoteStatusOKBodySharesItems0{
+		shareItem := &agent.RemoteStatusOKBodySharesItems0{
 			BackendEndpoint:   share.BackendEndpoint,
 			BackendMode:       share.BackendMode,
 			FrontendEndpoints: share.FrontendEndpoint,
@@ -59,15 +60,38 @@ func (h *agentRemoteStatusHandler) Handle(params agent.RemoteStatusParams, princ
 			ShareMode:         share.ShareMode,
 			Status:            share.Status,
 			Token:             share.Token,
-		})
+		}
+		if share.Failure != nil {
+			shareItem.Failure = &agent.RemoteStatusOKBodySharesItems0Failure{
+				ID:        share.Failure.Id,
+				Count:     int64(share.Failure.Count),
+				LastError: share.Failure.LastError,
+			}
+			if share.Failure.NextRetry != nil {
+				shareItem.Failure.NextRetry = share.Failure.NextRetry.AsTime().Format(time.RFC3339)
+			}
+		}
+		out.Shares = append(out.Shares, shareItem)
 	}
 	for _, access := range resp.Accesses {
-		out.Accesses = append(out.Accesses, &agent.RemoteStatusOKBodyAccessesItems0{
+		accessItem := &agent.RemoteStatusOKBodyAccessesItems0{
 			BindAddress:     access.BindAddress,
 			FrontendToken:   access.FrontendToken,
 			ResponseHeaders: access.ResponseHeaders,
 			Token:           access.Token,
-		})
+			Status:          access.Status,
+		}
+		if access.Failure != nil {
+			accessItem.Failure = &agent.RemoteStatusOKBodyAccessesItems0Failure{
+				ID:        access.Failure.Id,
+				Count:     int64(access.Failure.Count),
+				LastError: access.Failure.LastError,
+			}
+			if access.Failure.NextRetry != nil {
+				accessItem.Failure.NextRetry = access.Failure.NextRetry.AsTime().Format(time.RFC3339)
+			}
+		}
+		out.Accesses = append(out.Accesses, accessItem)
 	}
 
 	return agent.NewRemoteStatusOK().WithPayload(out)

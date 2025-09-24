@@ -40,7 +40,13 @@ class TestRemoteStatus200ResponseAccessesInner(unittest.TestCase):
                 bind_address = '',
                 response_headers = [
                     ''
-                    ]
+                    ],
+                status = '',
+                failure = zrok_api.models.remote_status_200_response_shares_inner_failure.remoteStatus_200_response_shares_inner_failure(
+                    id = '', 
+                    count = 56, 
+                    last_error = '', 
+                    next_retry = '', )
             )
         else:
             return RemoteStatus200ResponseAccessesInner(

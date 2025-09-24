@@ -612,6 +612,23 @@ func init() {
                       "bindAddress": {
                         "type": "string"
                       },
+                      "failure": {
+                        "type": "object",
+                        "properties": {
+                          "count": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "lastError": {
+                            "type": "string"
+                          },
+                          "nextRetry": {
+                            "type": "string"
+                          }
+                        }
+                      },
                       "frontendToken": {
                         "type": "string"
                       },
@@ -620,6 +637,9 @@ func init() {
                         "items": {
                           "type": "string"
                         }
+                      },
+                      "status": {
+                        "type": "string"
                       },
                       "token": {
                         "type": "string"
@@ -637,6 +657,23 @@ func init() {
                       },
                       "backendMode": {
                         "type": "string"
+                      },
+                      "failure": {
+                        "type": "object",
+                        "properties": {
+                          "count": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "lastError": {
+                            "type": "string"
+                          },
+                          "nextRetry": {
+                            "type": "string"
+                          }
+                        }
                       },
                       "frontendEndpoints": {
                         "type": "array",
@@ -7150,6 +7187,23 @@ func init() {
         "bindAddress": {
           "type": "string"
         },
+        "failure": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "id": {
+              "type": "string"
+            },
+            "lastError": {
+              "type": "string"
+            },
+            "nextRetry": {
+              "type": "string"
+            }
+          }
+        },
         "frontendToken": {
           "type": "string"
         },
@@ -7159,7 +7213,27 @@ func init() {
             "type": "string"
           }
         },
+        "status": {
+          "type": "string"
+        },
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "AccessesItems0Failure": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lastError": {
+          "type": "string"
+        },
+        "nextRetry": {
           "type": "string"
         }
       }
@@ -7337,6 +7411,23 @@ func init() {
         "backendMode": {
           "type": "string"
         },
+        "failure": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "id": {
+              "type": "string"
+            },
+            "lastError": {
+              "type": "string"
+            },
+            "nextRetry": {
+              "type": "string"
+            }
+          }
+        },
         "frontendEndpoints": {
           "type": "array",
           "items": {
@@ -7353,6 +7444,23 @@ func init() {
           "type": "string"
         },
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "SharesItems0Failure": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lastError": {
+          "type": "string"
+        },
+        "nextRetry": {
           "type": "string"
         }
       }

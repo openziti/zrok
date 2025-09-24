@@ -64,6 +64,7 @@ docs/RemoteShareRequest.md
 docs/RemoteStatus200Response.md
 docs/RemoteStatus200ResponseAccessesInner.md
 docs/RemoteStatus200ResponseSharesInner.md
+docs/RemoteStatus200ResponseSharesInnerFailure.md
 docs/RemoteUnaccessRequest.md
 docs/RemoteUnshareRequest.md
 docs/RemoveNamespaceFrontendMappingRequest.md
@@ -153,6 +154,7 @@ test/test_remote_share_request.py
 test/test_remote_status200_response.py
 test/test_remote_status200_response_accesses_inner.py
 test/test_remote_status200_response_shares_inner.py
+test/test_remote_status200_response_shares_inner_failure.py
 test/test_remote_unaccess_request.py
 test/test_remote_unshare_request.py
 test/test_remove_namespace_frontend_mapping_request.py
@@ -247,6 +249,7 @@ zrok_api/models/remote_share_request.py
 zrok_api/models/remote_status200_response.py
 zrok_api/models/remote_status200_response_accesses_inner.py
 zrok_api/models/remote_status200_response_shares_inner.py
+zrok_api/models/remote_status200_response_shares_inner_failure.py
 zrok_api/models/remote_unaccess_request.py
 zrok_api/models/remote_unshare_request.py
 zrok_api/models/remove_namespace_frontend_mapping_request.py

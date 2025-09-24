@@ -59,6 +59,7 @@ export * from './RemoteShareRequest';
 export * from './RemoteStatus200Response';
 export * from './RemoteStatus200ResponseAccessesInner';
 export * from './RemoteStatus200ResponseSharesInner';
+export * from './RemoteStatus200ResponseSharesInnerFailure';
 export * from './RemoteUnaccessRequest';
 export * from './RemoteUnshareRequest';
 export * from './RemoveNamespaceFrontendMappingRequest';

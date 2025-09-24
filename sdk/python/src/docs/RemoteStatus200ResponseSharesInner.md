@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **backend_endpoint** | **str** |  | [optional] 
 **open** | **bool** |  | [optional] 
 **status** | **str** |  | [optional] 
+**failure** | [**RemoteStatus200ResponseSharesInnerFailure**](RemoteStatus200ResponseSharesInnerFailure.md) |  | [optional] 
 
 ## Example
 

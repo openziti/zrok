@@ -19,6 +19,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
+from zrok_api.models.remote_status200_response_shares_inner_failure import RemoteStatus200ResponseSharesInnerFailure
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -30,7 +31,9 @@ class RemoteStatus200ResponseAccessesInner(BaseModel):
     token: Optional[StrictStr] = None
     bind_address: Optional[StrictStr] = Field(default=None, alias="bindAddress")
     response_headers: Optional[List[StrictStr]] = Field(default=None, alias="responseHeaders")
-    __properties: ClassVar[List[str]] = ["frontendToken", "token", "bindAddress", "responseHeaders"]
+    status: Optional[StrictStr] = None
+    failure: Optional[RemoteStatus200ResponseSharesInnerFailure] = None
+    __properties: ClassVar[List[str]] = ["frontendToken", "token", "bindAddress", "responseHeaders", "status", "failure"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -71,6 +74,9 @@ class RemoteStatus200ResponseAccessesInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of failure
+        if self.failure:
+            _dict['failure'] = self.failure.to_dict()
         return _dict
 
     @classmethod
@@ -86,7 +92,9 @@ class RemoteStatus200ResponseAccessesInner(BaseModel):
             "frontendToken": obj.get("frontendToken"),
             "token": obj.get("token"),
             "bindAddress": obj.get("bindAddress"),
-            "responseHeaders": obj.get("responseHeaders")
+            "responseHeaders": obj.get("responseHeaders"),
+            "status": obj.get("status"),
+            "failure": RemoteStatus200ResponseSharesInnerFailure.from_dict(obj["failure"]) if obj.get("failure") is not None else None
         })
         return _obj
 

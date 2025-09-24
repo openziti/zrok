@@ -25,7 +25,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 	// failed accesses
 	for failureId, access := range i.agent.retryManager.accesses {
 		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && access.Failure.FailureCount >= i.agent.cfg.MaxRetries {
+		if i.agent.cfg.MaxRetries > -1 && access.Failure.Count >= i.agent.cfg.MaxRetries {
 			status = "failed"
 		}
 		accesses = append(accesses, &agentGrpc.AccessDetail{
@@ -34,12 +34,11 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BindAddress:     access.Request.BindAddress,
 			ResponseHeaders: access.Request.ResponseHeaders,
 			Status:          status,
-			Failure: &agentGrpc.FailureDetail{
-				FailureId:    failureId,
-				FailureCount: int32(access.Failure.FailureCount),
-				LastError:    access.Failure.LastError,
-				LastFailure:  timestamppb.New(access.Failure.LastFailure),
-				NextRetry:    timestamppb.New(access.Failure.NextRetry),
+			Failure: &agentGrpc.Failure{
+				Id:        failureId,
+				Count:     int32(access.Failure.Count),
+				LastError: access.Failure.LastError,
+				NextRetry: timestamppb.New(access.Failure.NextRetry),
 			},
 		})
 	}
@@ -66,7 +65,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 	// Add failed shares with failure IDs
 	for failureId, share := range i.agent.retryManager.shares {
 		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && share.Failure.FailureCount >= i.agent.cfg.MaxRetries {
+		if i.agent.cfg.MaxRetries > -1 && share.Failure.Count >= i.agent.cfg.MaxRetries {
 			status = "failed"
 		}
 		shares = append(shares, &agentGrpc.ShareDetail{
@@ -77,12 +76,11 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 			BackendEndpoint:  share.Request.Target,
 			Closed:           share.Request.Closed,
 			Status:           status,
-			Failure: &agentGrpc.FailureDetail{
-				FailureId:    failureId,
-				FailureCount: int32(share.Failure.FailureCount),
-				LastError:    share.Failure.LastError,
-				LastFailure:  timestamppb.New(share.Failure.LastFailure),
-				NextRetry:    timestamppb.New(share.Failure.NextRetry),
+			Failure: &agentGrpc.Failure{
+				Id:        failureId,
+				Count:     int32(share.Failure.Count),
+				LastError: share.Failure.LastError,
+				NextRetry: timestamppb.New(share.Failure.NextRetry),
 			},
 		})
 	}

@@ -150,20 +150,18 @@ func (a *Agent) ReloadRegistry() error {
 		} else {
 			logrus.Warnf("failed to restart private access '%v': %v (will retry)", access.Request.Token, err)
 			if access.Failure != nil {
-				access.Failure.FailureCount++
-				access.Failure.LastFailure = time.Now()
+				access.Failure.Count++
 				access.Failure.LastError = err.Error()
 			} else {
 				access.Failure = &FailureEntry{
-					FailureCount: 1,
-					LastFailure:  time.Now(),
-					LastError:    err.Error(),
+					Count:     1,
+					LastError: err.Error(),
 				}
 			}
 
 			// calculate next retry with exponential backoff
 			delay := time.Duration(math.Min(
-				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.FailureCount-1)),
+				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
 				float64(a.cfg.RetryMaxDelay),
 			))
 			access.Failure.NextRetry = time.Now().Add(delay)
@@ -186,20 +184,18 @@ func (a *Agent) ReloadRegistry() error {
 		} else {
 			logrus.Warnf("failed to restart public share '%v': %v (will retry)", share.Request.Target, err)
 			if share.Failure != nil {
-				share.Failure.FailureCount++
-				share.Failure.LastFailure = time.Now()
+				share.Failure.Count++
 				share.Failure.LastError = err.Error()
 			} else {
 				share.Failure = &FailureEntry{
-					FailureCount: 1,
-					LastFailure:  time.Now(),
-					LastError:    err.Error(),
+					Count:     1,
+					LastError: err.Error(),
 				}
 			}
 
 			// calculate next retry with exponential backoff
 			delay := time.Duration(math.Min(
-				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.FailureCount-1)),
+				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
 				float64(a.cfg.RetryMaxDelay),
 			))
 			share.Failure.NextRetry = time.Now().Add(delay)

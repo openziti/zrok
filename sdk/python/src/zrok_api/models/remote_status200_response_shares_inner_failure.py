@@ -17,25 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from zrok_api.models.remote_status200_response_shares_inner_failure import RemoteStatus200ResponseSharesInnerFailure
 from typing import Optional, Set
 from typing_extensions import Self
 
-class RemoteStatus200ResponseSharesInner(BaseModel):
+class RemoteStatus200ResponseSharesInnerFailure(BaseModel):
     """
-    RemoteStatus200ResponseSharesInner
+    RemoteStatus200ResponseSharesInnerFailure
     """ # noqa: E501
-    token: Optional[StrictStr] = None
-    share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
-    backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
-    frontend_endpoints: Optional[List[StrictStr]] = Field(default=None, alias="frontendEndpoints")
-    backend_endpoint: Optional[StrictStr] = Field(default=None, alias="backendEndpoint")
-    open: Optional[StrictBool] = None
-    status: Optional[StrictStr] = None
-    failure: Optional[RemoteStatus200ResponseSharesInnerFailure] = None
-    __properties: ClassVar[List[str]] = ["token", "shareMode", "backendMode", "frontendEndpoints", "backendEndpoint", "open", "status", "failure"]
+    id: Optional[StrictStr] = None
+    count: Optional[StrictInt] = None
+    last_error: Optional[StrictStr] = Field(default=None, alias="lastError")
+    next_retry: Optional[StrictStr] = Field(default=None, alias="nextRetry")
+    __properties: ClassVar[List[str]] = ["id", "count", "lastError", "nextRetry"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -55,7 +50,7 @@ class RemoteStatus200ResponseSharesInner(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of RemoteStatus200ResponseSharesInner from a JSON string"""
+        """Create an instance of RemoteStatus200ResponseSharesInnerFailure from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -76,14 +71,11 @@ class RemoteStatus200ResponseSharesInner(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of failure
-        if self.failure:
-            _dict['failure'] = self.failure.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of RemoteStatus200ResponseSharesInner from a dict"""
+        """Create an instance of RemoteStatus200ResponseSharesInnerFailure from a dict"""
         if obj is None:
             return None
 
@@ -91,14 +83,10 @@ class RemoteStatus200ResponseSharesInner(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "token": obj.get("token"),
-            "shareMode": obj.get("shareMode"),
-            "backendMode": obj.get("backendMode"),
-            "frontendEndpoints": obj.get("frontendEndpoints"),
-            "backendEndpoint": obj.get("backendEndpoint"),
-            "open": obj.get("open"),
-            "status": obj.get("status"),
-            "failure": RemoteStatus200ResponseSharesInnerFailure.from_dict(obj["failure"]) if obj.get("failure") is not None else None
+            "id": obj.get("id"),
+            "count": obj.get("count"),
+            "lastError": obj.get("lastError"),
+            "nextRetry": obj.get("nextRetry")
         })
         return _obj
 

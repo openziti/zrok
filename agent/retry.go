@@ -138,19 +138,18 @@ func (rm *retryManager) retry() {
 			if resp, err := rm.a.AccessPrivate(access.Request); err != nil {
 				dl.Errorf("failed to restart private access '%v': %v", access.Request.Token, err)
 				if access.Failure != nil {
-					access.Failure.FailureCount++
+					access.Failure.Count++
 					access.Failure.LastError = err.Error()
 				} else {
 					access.Failure = &FailureEntry{
-						FailureCount: 1,
-						LastFailure:  time.Now(),
-						LastError:    err.Error(),
+						Count:     1,
+						LastError: err.Error(),
 					}
 				}
 
 				// calculate next retry with exponential backoff
 				delay := time.Duration(math.Min(
-					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.FailureCount-1)),
+					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
 					float64(rm.a.cfg.RetryMaxDelay),
 				))
 				access.Failure.NextRetry = time.Now().Add(delay)
@@ -176,20 +175,19 @@ func (rm *retryManager) retry() {
 			if shrToken, fes, err := rm.a.SharePublic(share.Request); err != nil {
 				dl.Errorf("failed to restart public share '%v': %v", failureId, err)
 				if share.Failure != nil {
-					share.Failure.FailureCount++
+					share.Failure.Count++
 					share.Failure.LastError = err.Error()
 				} else {
 					share.Failure = &FailureEntry{
-						FailureCount: 1,
-						LastFailure:  time.Now(),
-						LastError:    err.Error(),
+						Count:     1,
+						LastError: err.Error(),
 					}
 				}
 
 				// calculate next retry with exponential backoff
 				var delay = 30 * time.Second
 				delay = time.Duration(math.Min(
-					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.FailureCount-1)),
+					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
 					float64(rm.a.cfg.RetryMaxDelay),
 				))
 				share.Failure.NextRetry = time.Now().Add(delay)

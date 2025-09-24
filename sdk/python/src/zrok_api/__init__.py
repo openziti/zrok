@@ -92,6 +92,7 @@ __all__ = [
     "RemoteStatus200Response",
     "RemoteStatus200ResponseAccessesInner",
     "RemoteStatus200ResponseSharesInner",
+    "RemoteStatus200ResponseSharesInnerFailure",
     "RemoteUnaccessRequest",
     "RemoteUnshareRequest",
     "RemoveNamespaceFrontendMappingRequest",
@@ -194,6 +195,7 @@ from zrok_api.models.remote_share_request import RemoteShareRequest as RemoteSha
 from zrok_api.models.remote_status200_response import RemoteStatus200Response as RemoteStatus200Response
 from zrok_api.models.remote_status200_response_accesses_inner import RemoteStatus200ResponseAccessesInner as RemoteStatus200ResponseAccessesInner
 from zrok_api.models.remote_status200_response_shares_inner import RemoteStatus200ResponseSharesInner as RemoteStatus200ResponseSharesInner
+from zrok_api.models.remote_status200_response_shares_inner_failure import RemoteStatus200ResponseSharesInnerFailure as RemoteStatus200ResponseSharesInnerFailure
 from zrok_api.models.remote_unaccess_request import RemoteUnaccessRequest as RemoteUnaccessRequest
 from zrok_api.models.remote_unshare_request import RemoteUnshareRequest as RemoteUnshareRequest
 from zrok_api.models.remove_namespace_frontend_mapping_request import RemoveNamespaceFrontendMappingRequest as RemoveNamespaceFrontendMappingRequest

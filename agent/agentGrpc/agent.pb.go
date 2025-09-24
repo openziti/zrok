@@ -30,7 +30,7 @@ type AccessDetail struct {
 	BindAddress     string                 `protobuf:"bytes,3,opt,name=bindAddress,proto3" json:"bindAddress,omitempty"`
 	ResponseHeaders []string               `protobuf:"bytes,4,rep,name=responseHeaders,proto3" json:"responseHeaders,omitempty"`
 	Status          string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	Failure         *FailureDetail         `protobuf:"bytes,6,opt,name=failure,proto3" json:"failure,omitempty"`
+	Failure         *Failure               `protobuf:"bytes,6,opt,name=failure,proto3" json:"failure,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -100,7 +100,7 @@ func (x *AccessDetail) GetStatus() string {
 	return ""
 }
 
-func (x *AccessDetail) GetFailure() *FailureDetail {
+func (x *AccessDetail) GetFailure() *Failure {
 	if x != nil {
 		return x.Failure
 	}
@@ -243,31 +243,30 @@ func (x *AccessPrivateRequest) GetResponseHeaders() []string {
 	return nil
 }
 
-type FailureDetail struct {
+type Failure struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FailureId     string                 `protobuf:"bytes,1,opt,name=failureId,proto3" json:"failureId,omitempty"`
-	FailureCount  int32                  `protobuf:"varint,2,opt,name=failureCount,proto3" json:"failureCount,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
 	LastError     string                 `protobuf:"bytes,3,opt,name=lastError,proto3" json:"lastError,omitempty"`
-	LastFailure   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=lastFailure,proto3" json:"lastFailure,omitempty"`
-	NextRetry     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=nextRetry,proto3" json:"nextRetry,omitempty"`
+	NextRetry     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=nextRetry,proto3" json:"nextRetry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FailureDetail) Reset() {
-	*x = FailureDetail{}
+func (x *Failure) Reset() {
+	*x = Failure{}
 	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FailureDetail) String() string {
+func (x *Failure) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FailureDetail) ProtoMessage() {}
+func (*Failure) ProtoMessage() {}
 
-func (x *FailureDetail) ProtoReflect() protoreflect.Message {
+func (x *Failure) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -279,40 +278,33 @@ func (x *FailureDetail) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FailureDetail.ProtoReflect.Descriptor instead.
-func (*FailureDetail) Descriptor() ([]byte, []int) {
+// Deprecated: Use Failure.ProtoReflect.Descriptor instead.
+func (*Failure) Descriptor() ([]byte, []int) {
 	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *FailureDetail) GetFailureId() string {
+func (x *Failure) GetId() string {
 	if x != nil {
-		return x.FailureId
+		return x.Id
 	}
 	return ""
 }
 
-func (x *FailureDetail) GetFailureCount() int32 {
+func (x *Failure) GetCount() int32 {
 	if x != nil {
-		return x.FailureCount
+		return x.Count
 	}
 	return 0
 }
 
-func (x *FailureDetail) GetLastError() string {
+func (x *Failure) GetLastError() string {
 	if x != nil {
 		return x.LastError
 	}
 	return ""
 }
 
-func (x *FailureDetail) GetLastFailure() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastFailure
-	}
-	return nil
-}
-
-func (x *FailureDetail) GetNextRetry() *timestamppb.Timestamp {
+func (x *Failure) GetNextRetry() *timestamppb.Timestamp {
 	if x != nil {
 		return x.NextRetry
 	}
@@ -540,7 +532,7 @@ type ShareDetail struct {
 	BackendEndpoint  string                 `protobuf:"bytes,5,opt,name=backendEndpoint,proto3" json:"backendEndpoint,omitempty"`
 	Closed           bool                   `protobuf:"varint,6,opt,name=closed,proto3" json:"closed,omitempty"`
 	Status           string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
-	Failure          *FailureDetail         `protobuf:"bytes,8,opt,name=failure,proto3" json:"failure,omitempty"`
+	Failure          *Failure               `protobuf:"bytes,8,opt,name=failure,proto3" json:"failure,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -624,7 +616,7 @@ func (x *ShareDetail) GetStatus() string {
 	return ""
 }
 
-func (x *ShareDetail) GetFailure() *FailureDetail {
+func (x *ShareDetail) GetFailure() *Failure {
 	if x != nil {
 		return x.Failure
 	}
@@ -1235,14 +1227,14 @@ var File_agent_agentGrpc_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x1bagent/agentGrpc/agent.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd8\x01\n" +
+	"\x1bagent/agentGrpc/agent.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd2\x01\n" +
 	"\fAccessDetail\x12$\n" +
 	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12 \n" +
 	"\vbindAddress\x18\x03 \x01(\tR\vbindAddress\x12(\n" +
 	"\x0fresponseHeaders\x18\x04 \x03(\tR\x0fresponseHeaders\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\tR\x06status\x12(\n" +
-	"\afailure\x18\x06 \x01(\v2\x0e.FailureDetailR\afailure\"=\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\"\n" +
+	"\afailure\x18\x06 \x01(\v2\b.FailureR\afailure\"=\n" +
 	"\x15AccessPrivateResponse\x12$\n" +
 	"\rfrontendToken\x18\x01 \x01(\tR\rfrontendToken\"\xfe\x01\n" +
 	"\x14AccessPrivateRequest\x12\x14\n" +
@@ -1252,13 +1244,12 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\vautoAddress\x18\x04 \x01(\tR\vautoAddress\x12$\n" +
 	"\rautoStartPort\x18\x05 \x01(\rR\rautoStartPort\x12 \n" +
 	"\vautoEndPort\x18\x06 \x01(\rR\vautoEndPort\x12(\n" +
-	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"\xe7\x01\n" +
-	"\rFailureDetail\x12\x1c\n" +
-	"\tfailureId\x18\x01 \x01(\tR\tfailureId\x12\"\n" +
-	"\ffailureCount\x18\x02 \x01(\x05R\ffailureCount\x12\x1c\n" +
-	"\tlastError\x18\x03 \x01(\tR\tlastError\x12<\n" +
-	"\vlastFailure\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vlastFailure\x128\n" +
-	"\tnextRetry\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tnextRetry\"K\n" +
+	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"\x87\x01\n" +
+	"\aFailure\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x05R\x05count\x12\x1c\n" +
+	"\tlastError\x18\x03 \x01(\tR\tlastError\x128\n" +
+	"\tnextRetry\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tnextRetry\"K\n" +
 	"\rNameSelection\x12&\n" +
 	"\x0enamespaceToken\x18\x01 \x01(\tR\x0enamespaceToken\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"<\n" +
@@ -1267,7 +1258,7 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x15ReleaseAccessResponse\"+\n" +
 	"\x13ReleaseShareRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"\x16\n" +
-	"\x14ReleaseShareResponse\"\x93\x02\n" +
+	"\x14ReleaseShareResponse\"\x8d\x02\n" +
 	"\vShareDetail\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1c\n" +
 	"\tshareMode\x18\x02 \x01(\tR\tshareMode\x12 \n" +
@@ -1275,8 +1266,8 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x10frontendEndpoint\x18\x04 \x03(\tR\x10frontendEndpoint\x12(\n" +
 	"\x0fbackendEndpoint\x18\x05 \x01(\tR\x0fbackendEndpoint\x12\x16\n" +
 	"\x06closed\x18\x06 \x01(\bR\x06closed\x12\x16\n" +
-	"\x06status\x18\a \x01(\tR\x06status\x12(\n" +
-	"\afailure\x18\b \x01(\v2\x0e.FailureDetailR\afailure\"\xbd\x01\n" +
+	"\x06status\x18\a \x01(\tR\x06status\x12\"\n" +
+	"\afailure\x18\b \x01(\v2\b.FailureR\afailure\"\xbd\x01\n" +
 	"\x1bShareHttpHealthcheckRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
 	"\bhttpVerb\x18\x02 \x01(\tR\bhttpVerb\x12\x1a\n" +
@@ -1345,7 +1336,7 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*AccessDetail)(nil),                 // 0: AccessDetail
 	(*AccessPrivateResponse)(nil),        // 1: AccessPrivateResponse
 	(*AccessPrivateRequest)(nil),         // 2: AccessPrivateRequest
-	(*FailureDetail)(nil),                // 3: FailureDetail
+	(*Failure)(nil),                      // 3: Failure
 	(*NameSelection)(nil),                // 4: NameSelection
 	(*ReleaseAccessRequest)(nil),         // 5: ReleaseAccessRequest
 	(*ReleaseAccessResponse)(nil),        // 6: ReleaseAccessResponse
@@ -1365,34 +1356,33 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil),        // 20: google.protobuf.Timestamp
 }
 var file_agent_agentGrpc_agent_proto_depIdxs = []int32{
-	3,  // 0: AccessDetail.failure:type_name -> FailureDetail
-	20, // 1: FailureDetail.lastFailure:type_name -> google.protobuf.Timestamp
-	20, // 2: FailureDetail.nextRetry:type_name -> google.protobuf.Timestamp
-	3,  // 3: ShareDetail.failure:type_name -> FailureDetail
-	4,  // 4: SharePublicRequest.nameSelections:type_name -> NameSelection
-	0,  // 5: StatusResponse.accesses:type_name -> AccessDetail
-	9,  // 6: StatusResponse.shares:type_name -> ShareDetail
-	2,  // 7: Agent.AccessPrivate:input_type -> AccessPrivateRequest
-	5,  // 8: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
-	7,  // 9: Agent.ReleaseShare:input_type -> ReleaseShareRequest
-	10, // 10: Agent.ShareHttpHealthcheck:input_type -> ShareHttpHealthcheckRequest
-	12, // 11: Agent.SharePrivate:input_type -> SharePrivateRequest
-	14, // 12: Agent.SharePublic:input_type -> SharePublicRequest
-	16, // 13: Agent.Status:input_type -> StatusRequest
-	18, // 14: Agent.Version:input_type -> VersionRequest
-	1,  // 15: Agent.AccessPrivate:output_type -> AccessPrivateResponse
-	6,  // 16: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
-	8,  // 17: Agent.ReleaseShare:output_type -> ReleaseShareResponse
-	11, // 18: Agent.ShareHttpHealthcheck:output_type -> ShareHttpHealthcheckResponse
-	13, // 19: Agent.SharePrivate:output_type -> SharePrivateResponse
-	15, // 20: Agent.SharePublic:output_type -> SharePublicResponse
-	17, // 21: Agent.Status:output_type -> StatusResponse
-	19, // 22: Agent.Version:output_type -> VersionResponse
-	15, // [15:23] is the sub-list for method output_type
-	7,  // [7:15] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	3,  // 0: AccessDetail.failure:type_name -> Failure
+	20, // 1: Failure.nextRetry:type_name -> google.protobuf.Timestamp
+	3,  // 2: ShareDetail.failure:type_name -> Failure
+	4,  // 3: SharePublicRequest.nameSelections:type_name -> NameSelection
+	0,  // 4: StatusResponse.accesses:type_name -> AccessDetail
+	9,  // 5: StatusResponse.shares:type_name -> ShareDetail
+	2,  // 6: Agent.AccessPrivate:input_type -> AccessPrivateRequest
+	5,  // 7: Agent.ReleaseAccess:input_type -> ReleaseAccessRequest
+	7,  // 8: Agent.ReleaseShare:input_type -> ReleaseShareRequest
+	10, // 9: Agent.ShareHttpHealthcheck:input_type -> ShareHttpHealthcheckRequest
+	12, // 10: Agent.SharePrivate:input_type -> SharePrivateRequest
+	14, // 11: Agent.SharePublic:input_type -> SharePublicRequest
+	16, // 12: Agent.Status:input_type -> StatusRequest
+	18, // 13: Agent.Version:input_type -> VersionRequest
+	1,  // 14: Agent.AccessPrivate:output_type -> AccessPrivateResponse
+	6,  // 15: Agent.ReleaseAccess:output_type -> ReleaseAccessResponse
+	8,  // 16: Agent.ReleaseShare:output_type -> ReleaseShareResponse
+	11, // 17: Agent.ShareHttpHealthcheck:output_type -> ShareHttpHealthcheckResponse
+	13, // 18: Agent.SharePrivate:output_type -> SharePrivateResponse
+	15, // 19: Agent.SharePublic:output_type -> SharePublicResponse
+	17, // 20: Agent.Status:output_type -> StatusResponse
+	19, // 21: Agent.Version:output_type -> VersionResponse
+	14, // [14:22] is the sub-list for method output_type
+	6,  // [6:14] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_agent_agentGrpc_agent_proto_init() }
