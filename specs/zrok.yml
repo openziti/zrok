@@ -1136,10 +1136,10 @@ paths:
                 type: array
                 items:
                   type: string
-              namespaceSelections:
+              nameSelections:
                 type: array
                 items:
-                  $ref: "#/definitions/namespaceSelection"
+                  $ref: "#/definitions/nameSelection"
               privateShareToken:
                 type: string
               backendMode:
@@ -2240,7 +2240,7 @@ definitions:
       createdAt:
         type: integer
   
-  namespaceSelection:
+  nameSelection:
     type: object
     properties:
       namespaceToken:
@@ -2341,10 +2341,10 @@ definitions:
       shareMode:
         type: string
         enum: ["public", "private"]
-      namespaceSelections:
+      nameSelections:
         type: array
         items:
-          $ref: "#/definitions/namespaceSelection"
+          $ref: "#/definitions/nameSelection"
       privateShareToken:
         type: string
       backendMode:

@@ -81,11 +81,11 @@ func (l *PublicHttpLooper) startup() error {
 
 	snapshotCreateShare := NewSnapshot("create-share", l.id, 0)
 	shr, err := sdk.CreateShare(l.root, &sdk.ShareRequest{
-		ShareMode:           sdk.PublicShareMode,
-		BackendMode:         sdk.ProxyBackendMode,
-		Target:              target,
-		NamespaceSelections: []sdk.NamespaceSelection{{NamespaceToken: l.namespace}},
-		PermissionMode:      sdk.ClosedPermissionMode,
+		ShareMode:      sdk.PublicShareMode,
+		BackendMode:    sdk.ProxyBackendMode,
+		Target:         target,
+		NameSelections: []sdk.NameSelection{{NamespaceToken: l.namespace}},
+		PermissionMode: sdk.ClosedPermissionMode,
 	})
 	snapshotCreateShare.Complete()
 	if err != nil {

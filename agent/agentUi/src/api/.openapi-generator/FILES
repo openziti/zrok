@@ -5,7 +5,7 @@ index.ts
 models/AccessDetail.ts
 models/AccessPrivateResponse.ts
 models/GooglerpcStatus.ts
-models/NamespaceSelection.ts
+models/NameSelection.ts
 models/ProtobufAny.ts
 models/ShareDetail.ts
 models/ShareHttpHealthcheckResponse.ts

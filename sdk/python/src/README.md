@@ -216,7 +216,7 @@ Class | Method | HTTP request | Description
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)
  - [Name](docs/Name.md)
- - [NamespaceSelection](docs/NamespaceSelection.md)
+ - [NameSelection](docs/NameSelection.md)
  - [Overview](docs/Overview.md)
  - [OverviewNamesInner](docs/OverviewNamesInner.md)
  - [Ping200Response](docs/Ping200Response.md)

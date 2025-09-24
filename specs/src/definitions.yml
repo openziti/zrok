@@ -129,7 +129,7 @@ name:
     createdAt:
       type: integer
 
-namespaceSelection:
+nameSelection:
   type: object
   properties:
     namespaceToken:
@@ -230,10 +230,10 @@ shareRequest:
     shareMode:
       type: string
       enum: ["public", "private"]
-    namespaceSelections:
+    nameSelections:
       type: array
       items:
-        $ref: "#/definitions/namespaceSelection"
+        $ref: "#/definitions/nameSelection"
     privateShareToken:
       type: string
     backendMode:

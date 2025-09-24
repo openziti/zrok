@@ -52,7 +52,7 @@ models/Metrics.ts
 models/MetricsSample.ts
 models/ModelConfiguration.ts
 models/Name.ts
-models/NamespaceSelection.ts
+models/NameSelection.ts
 models/Overview.ts
 models/OverviewNamesInner.ts
 models/Ping200Response.ts

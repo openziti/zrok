@@ -67,7 +67,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	var frontendEndpoints []string
 	var nameIds []int
 	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
-		frontendEndpoints, nameIds, err = h.processNamespaceSelections(params.Body.NamespaceSelections, shrToken, principal, trx)
+		frontendEndpoints, nameIds, err = h.processNameSelections(params.Body.NameSelections, shrToken, principal, trx)
 		if err != nil {
 			logrus.Errorf("namespace selection processing failed: %v", err)
 			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
@@ -196,7 +196,7 @@ func (h *shareHandler) shouldUseInterstitial(backendMode string, principal *rest
 	return !skipInterstitial, nil
 }
 
-func (h *shareHandler) processNamespaceSelections(selections []*rest_model_zrok.NamespaceSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
+func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
 	var frontendEndpoints []string
 	var nameIds []int
 
@@ -358,7 +358,7 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 	// create dial policy (frontends can dial this service)
 	// get frontend identities from namespaces
 	var frontendZIds []string
-	for _, selection := range params.Body.NamespaceSelections {
+	for _, selection := range params.Body.NameSelections {
 		ns, err := str.FindNamespaceWithToken(selection.NamespaceToken, trx.(*sqlx.Tx))
 		if err != nil {
 			return "", nil, errors.Wrapf(err, "error finding namespace with token '%v'", selection.NamespaceToken)

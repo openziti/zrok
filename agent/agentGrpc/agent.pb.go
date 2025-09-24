@@ -226,7 +226,7 @@ func (x *AccessPrivateRequest) GetResponseHeaders() []string {
 	return nil
 }
 
-type NamespaceSelection struct {
+type NameSelection struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	NamespaceToken string                 `protobuf:"bytes,1,opt,name=namespaceToken,proto3" json:"namespaceToken,omitempty"`
 	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -234,20 +234,20 @@ type NamespaceSelection struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *NamespaceSelection) Reset() {
-	*x = NamespaceSelection{}
+func (x *NameSelection) Reset() {
+	*x = NameSelection{}
 	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *NamespaceSelection) String() string {
+func (x *NameSelection) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NamespaceSelection) ProtoMessage() {}
+func (*NameSelection) ProtoMessage() {}
 
-func (x *NamespaceSelection) ProtoReflect() protoreflect.Message {
+func (x *NameSelection) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_agentGrpc_agent_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -259,19 +259,19 @@ func (x *NamespaceSelection) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NamespaceSelection.ProtoReflect.Descriptor instead.
-func (*NamespaceSelection) Descriptor() ([]byte, []int) {
+// Deprecated: Use NameSelection.ProtoReflect.Descriptor instead.
+func (*NameSelection) Descriptor() ([]byte, []int) {
 	return file_agent_agentGrpc_agent_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *NamespaceSelection) GetNamespaceToken() string {
+func (x *NameSelection) GetNamespaceToken() string {
 	if x != nil {
 		return x.NamespaceToken
 	}
 	return ""
 }
 
-func (x *NamespaceSelection) GetName() string {
+func (x *NameSelection) GetName() string {
 	if x != nil {
 		return x.Name
 	}
@@ -790,7 +790,7 @@ type SharePublicRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Target               string                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
 	BasicAuth            []string               `protobuf:"bytes,2,rep,name=basicAuth,proto3" json:"basicAuth,omitempty"`
-	NamespaceSelections  []*NamespaceSelection  `protobuf:"bytes,3,rep,name=namespaceSelections,proto3" json:"namespaceSelections,omitempty"`
+	NameSelections       []*NameSelection       `protobuf:"bytes,3,rep,name=nameSelections,proto3" json:"nameSelections,omitempty"`
 	BackendMode          string                 `protobuf:"bytes,4,opt,name=backendMode,proto3" json:"backendMode,omitempty"`
 	Insecure             bool                   `protobuf:"varint,5,opt,name=insecure,proto3" json:"insecure,omitempty"`
 	OauthProvider        string                 `protobuf:"bytes,6,opt,name=oauthProvider,proto3" json:"oauthProvider,omitempty"`
@@ -846,9 +846,9 @@ func (x *SharePublicRequest) GetBasicAuth() []string {
 	return nil
 }
 
-func (x *SharePublicRequest) GetNamespaceSelections() []*NamespaceSelection {
+func (x *SharePublicRequest) GetNameSelections() []*NameSelection {
 	if x != nil {
-		return x.NamespaceSelections
+		return x.NameSelections
 	}
 	return nil
 }
@@ -1149,8 +1149,8 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\vautoAddress\x18\x04 \x01(\tR\vautoAddress\x12$\n" +
 	"\rautoStartPort\x18\x05 \x01(\rR\rautoStartPort\x12 \n" +
 	"\vautoEndPort\x18\x06 \x01(\rR\vautoEndPort\x12(\n" +
-	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"P\n" +
-	"\x12NamespaceSelection\x12&\n" +
+	"\x0fresponseHeaders\x18\a \x03(\tR\x0fresponseHeaders\"K\n" +
+	"\rNameSelection\x12&\n" +
 	"\x0enamespaceToken\x18\x01 \x01(\tR\x0enamespaceToken\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"<\n" +
 	"\x14ReleaseAccessRequest\x12$\n" +
@@ -1184,11 +1184,11 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x06closed\x18\x05 \x01(\bR\x06closed\x12\"\n" +
 	"\faccessGrants\x18\x06 \x03(\tR\faccessGrants\",\n" +
 	"\x14SharePrivateResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\x93\x03\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\x84\x03\n" +
 	"\x12SharePublicRequest\x12\x16\n" +
 	"\x06target\x18\x01 \x01(\tR\x06target\x12\x1c\n" +
-	"\tbasicAuth\x18\x02 \x03(\tR\tbasicAuth\x12E\n" +
-	"\x13namespaceSelections\x18\x03 \x03(\v2\x13.NamespaceSelectionR\x13namespaceSelections\x12 \n" +
+	"\tbasicAuth\x18\x02 \x03(\tR\tbasicAuth\x126\n" +
+	"\x0enameSelections\x18\x03 \x03(\v2\x0e.NameSelectionR\x0enameSelections\x12 \n" +
 	"\vbackendMode\x18\x04 \x01(\tR\vbackendMode\x12\x1a\n" +
 	"\binsecure\x18\x05 \x01(\bR\binsecure\x12$\n" +
 	"\roauthProvider\x18\x06 \x01(\tR\roauthProvider\x12,\n" +
@@ -1235,7 +1235,7 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*AccessDetail)(nil),                 // 0: AccessDetail
 	(*AccessPrivateResponse)(nil),        // 1: AccessPrivateResponse
 	(*AccessPrivateRequest)(nil),         // 2: AccessPrivateRequest
-	(*NamespaceSelection)(nil),           // 3: NamespaceSelection
+	(*NameSelection)(nil),                // 3: NameSelection
 	(*ReleaseAccessRequest)(nil),         // 4: ReleaseAccessRequest
 	(*ReleaseAccessResponse)(nil),        // 5: ReleaseAccessResponse
 	(*ReleaseShareRequest)(nil),          // 6: ReleaseShareRequest
@@ -1253,7 +1253,7 @@ var file_agent_agentGrpc_agent_proto_goTypes = []any{
 	(*VersionResponse)(nil),              // 18: VersionResponse
 }
 var file_agent_agentGrpc_agent_proto_depIdxs = []int32{
-	3,  // 0: SharePublicRequest.namespaceSelections:type_name -> NamespaceSelection
+	3,  // 0: SharePublicRequest.nameSelections:type_name -> NameSelection
 	0,  // 1: StatusResponse.accesses:type_name -> AccessDetail
 	8,  // 2: StatusResponse.shares:type_name -> ShareDetail
 	2,  // 3: Agent.AccessPrivate:input_type -> AccessPrivateRequest

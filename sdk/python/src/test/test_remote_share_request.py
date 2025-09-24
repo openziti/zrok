@@ -42,8 +42,8 @@ class TestRemoteShareRequest(unittest.TestCase):
                 basic_auth = [
                     ''
                     ],
-                namespace_selections = [
-                    zrok_api.models.namespace_selection.namespaceSelection(
+                name_selections = [
+                    zrok_api.models.name_selection.nameSelection(
                         namespace_token = '', 
                         name = '', )
                     ],

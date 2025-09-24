@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **token** | **str** |  | [optional] 
 **target** | **str** |  | [optional] 
 **basic_auth** | **List[str]** |  | [optional] 
-**namespace_selections** | [**List[NamespaceSelection]**](NamespaceSelection.md) |  | [optional] 
+**name_selections** | [**List[NameSelection]**](NameSelection.md) |  | [optional] 
 **private_share_token** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 
 **insecure** | **bool** |  | [optional] 

@@ -45,7 +45,7 @@ export * from './Metrics';
 export * from './MetricsSample';
 export * from './ModelConfiguration';
 export * from './Name';
-export * from './NamespaceSelection';
+export * from './NameSelection';
 export * from './Overview';
 export * from './OverviewNamesInner';
 export * from './Ping200Response';

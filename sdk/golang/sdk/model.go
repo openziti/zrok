@@ -4,7 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/pkg/errors"
 )
 
@@ -47,19 +46,19 @@ const (
 	ClosedPermissionMode PermissionMode = "closed"
 )
 
-type NamespaceSelection struct {
+type NameSelection struct {
 	NamespaceToken string
 	Name           string
 }
 
-// ParseNamespaceSelection converts a string in the format "<namespaceToken>[:<name>]"
-// into a NamespaceSelection struct. if no name is provided, the Name field will be empty.
-func ParseNamespaceSelection(input string) (NamespaceSelection, error) {
+// ParseNameSelection converts a string in the format "<namespaceToken>[:<name>]"
+// into a NameSelection struct. if no name is provided, the Name field will be empty.
+func ParseNameSelection(input string) (NameSelection, error) {
 	parts := strings.SplitN(input, ":", 2)
 	if len(parts) > 2 {
-		return NamespaceSelection{}, errors.New("invalid namespace selection")
+		return NameSelection{}, errors.New("invalid namespace selection")
 	}
-	selection := NamespaceSelection{
+	selection := NameSelection{
 		NamespaceToken: parts[0],
 	}
 	if len(parts) == 2 {
@@ -74,7 +73,7 @@ type ShareRequest struct {
 	BackendMode               BackendMode
 	ShareMode                 ShareMode
 	Target                    string
-	NamespaceSelections       []NamespaceSelection
+	NameSelections            []NameSelection
 	PrivateShareToken         string
 	BasicAuth                 []string
 	OauthProvider             string
@@ -118,22 +117,3 @@ const (
 	Basic AuthScheme = "basic"
 	Oauth AuthScheme = "oauth"
 )
-
-type Share12Request struct {
-	EnvZId               string
-	ShareMode            string
-	Target               string
-	BackendMode          string
-	PermissionMode       PermissionMode
-	AccessGrants         []string
-	BasicAuthUsers       []string
-	OauthProvider        string
-	OauthEmailDomains    []string
-	OauthRefreshInterval string
-	NamespaceSelections  []*rest_model_zrok.NamespaceSelection
-}
-
-type Share12Response struct {
-	ShareToken             string   `json:"shareToken"`
-	FrontendProxyEndpoints []string `json:"frontendProxyEndpoints"`
-}

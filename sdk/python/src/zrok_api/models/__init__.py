@@ -59,7 +59,7 @@ from zrok_api.models.login_request import LoginRequest
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.metrics_sample import MetricsSample
 from zrok_api.models.name import Name
-from zrok_api.models.namespace_selection import NamespaceSelection
+from zrok_api.models.name_selection import NameSelection
 from zrok_api.models.overview import Overview
 from zrok_api.models.overview_names_inner import OverviewNamesInner
 from zrok_api.models.ping200_response import Ping200Response

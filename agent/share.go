@@ -19,22 +19,22 @@ type SharePrivateRequest struct {
 	AccessGrants      []string `json:"access_grants"`
 }
 
-type NamespaceSelection struct {
+type NameSelection struct {
 	NamespaceToken string `json:"namespace_token"`
 	Name           string `json:"name"`
 }
 
 type SharePublicRequest struct {
-	Target               string               `json:"target"`
-	BasicAuth            []string             `json:"basic_auth"`
-	NamespaceSelections  []NamespaceSelection `json:"namespace_selections"`
-	BackendMode          string               `json:"backend_mode"`
-	Insecure             bool                 `json:"insecure"`
-	OauthProvider        string               `json:"oauth_provider"`
-	OauthEmailDomains    []string             `json:"oauth_email_domains"`
-	OauthRefreshInterval string               `json:"oauth_refresh_interval"`
-	Closed               bool                 `json:"closed"`
-	AccessGrants         []string             `json:"access_grants"`
+	Target               string          `json:"target"`
+	BasicAuth            []string        `json:"basic_auth"`
+	NameSelections       []NameSelection `json:"name_selection"`
+	BackendMode          string          `json:"backend_mode"`
+	Insecure             bool            `json:"insecure"`
+	OauthProvider        string          `json:"oauth_provider"`
+	OauthEmailDomains    []string        `json:"oauth_email_domains"`
+	OauthRefreshInterval string          `json:"oauth_refresh_interval"`
+	Closed               bool            `json:"closed"`
+	AccessGrants         []string        `json:"access_grants"`
 }
 
 type share struct {
@@ -42,7 +42,7 @@ type share struct {
 	frontendEndpoints         []string
 	target                    string
 	basicAuth                 []string
-	namespaceSelections       []NamespaceSelection
+	nameSelections            []NameSelection
 	shareMode                 sdk.ShareMode
 	backendMode               sdk.BackendMode
 	insecure                  bool

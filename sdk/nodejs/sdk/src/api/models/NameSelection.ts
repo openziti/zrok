@@ -16,35 +16,35 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface NamespaceSelection
+ * @interface NameSelection
  */
-export interface NamespaceSelection {
+export interface NameSelection {
     /**
      * 
      * @type {string}
-     * @memberof NamespaceSelection
+     * @memberof NameSelection
      */
     namespaceToken?: string;
     /**
      * 
      * @type {string}
-     * @memberof NamespaceSelection
+     * @memberof NameSelection
      */
     name?: string;
 }
 
 /**
- * Check if a given object implements the NamespaceSelection interface.
+ * Check if a given object implements the NameSelection interface.
  */
-export function instanceOfNamespaceSelection(value: object): value is NamespaceSelection {
+export function instanceOfNameSelection(value: object): value is NameSelection {
     return true;
 }
 
-export function NamespaceSelectionFromJSON(json: any): NamespaceSelection {
-    return NamespaceSelectionFromJSONTyped(json, false);
+export function NameSelectionFromJSON(json: any): NameSelection {
+    return NameSelectionFromJSONTyped(json, false);
 }
 
-export function NamespaceSelectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NamespaceSelection {
+export function NameSelectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): NameSelection {
     if (json == null) {
         return json;
     }
@@ -55,11 +55,11 @@ export function NamespaceSelectionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function NamespaceSelectionToJSON(json: any): NamespaceSelection {
-    return NamespaceSelectionToJSONTyped(json, false);
+export function NameSelectionToJSON(json: any): NameSelection {
+    return NameSelectionToJSONTyped(json, false);
 }
 
-export function NamespaceSelectionToJSONTyped(value?: NamespaceSelection | null, ignoreDiscriminator: boolean = false): any {
+export function NameSelectionToJSONTyped(value?: NameSelection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

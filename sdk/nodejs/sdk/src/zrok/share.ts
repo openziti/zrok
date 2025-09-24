@@ -26,7 +26,7 @@ export type PermissionMode = string;
 export const OPEN_PERMISSION_MODE = "open";
 export const CLOSED_PERMISSION_MODE = "closed";
 
-export class NamespaceSelection {
+export class NameSelection {
     namespaceToken: string;
     name: string | undefined;
 
@@ -41,7 +41,7 @@ export class ShareRequest {
     backendMode: BackendMode;
     shareMode: ShareMode;
     target: string;
-    namespaceSelections: NamespaceSelection[] | undefined;
+    nameSelections: NameSelection[] | undefined;
     basicAuth: string[] | undefined;
     oauthProvider: string | undefined;
     oauthEmailDomains: string[] | undefined;
@@ -55,7 +55,7 @@ export class ShareRequest {
         this.backendMode = backendMode;
         this.shareMode = shareMode;
         this.target = target;
-        this.namespaceSelections = shareMode === PUBLIC_SHARE_MODE ? [{namespaceToken: "public"} as NamespaceSelection] : undefined;
+        this.nameSelections = shareMode === PUBLIC_SHARE_MODE ? [{namespaceToken: "public"} as NameSelection] : undefined;
         this.basicAuth = undefined;
         this.oauthProvider = undefined;
         this.oauthEmailDomains = undefined;
@@ -133,12 +133,12 @@ const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareReq
         target: request.target,
         authScheme: AUTH_SCHEME_NONE,
     };
-    if (request.namespaceSelections) {
-        let nss = new Array<NamespaceSelection>();
-        request.namespaceSelections.forEach(n => {
+    if (request.nameSelections) {
+        let nss = new Array<NameSelection>();
+        request.nameSelections.forEach(n => {
             nss.push({namespaceToken: n.namespaceToken, name: n.name})
         })
-        out.namespaceSelections = nss;
+        out.nameSelections = nss;
     }
 
     if(request.oauthProvider !== undefined) {

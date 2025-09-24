@@ -37,8 +37,8 @@ class TestShareRequest(unittest.TestCase):
             return ShareRequest(
                 env_zid = '',
                 share_mode = 'public',
-                namespace_selections = [
-                    zrok_api.models.namespace_selection.namespaceSelection(
+                name_selections = [
+                    zrok_api.models.name_selection.nameSelection(
                         namespace_token = '', 
                         name = '', )
                     ],

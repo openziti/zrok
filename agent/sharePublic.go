@@ -48,14 +48,14 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 	}
 	shr.basicAuth = req.BasicAuth
 
-	for _, nss := range req.NamespaceSelections {
+	for _, nss := range req.NameSelections {
 		nssStr := nss.NamespaceToken
 		if nss.Name != "" {
 			nssStr += ":" + nss.Name
 		}
-		shrCmd = append(shrCmd, "--namespace-selection", nssStr)
+		shrCmd = append(shrCmd, "--name-selection", nssStr)
 	}
-	shr.namespaceSelections = req.NamespaceSelections
+	shr.nameSelections = req.NameSelections
 
 	if req.Insecure {
 		shrCmd = append(shrCmd, "--insecure")
@@ -123,8 +123,8 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 		Closed:               req.Closed,
 		AccessGrants:         req.AccessGrants,
 	}
-	for _, nssIn := range req.NamespaceSelections {
-		out.NamespaceSelections = append(out.NamespaceSelections, NamespaceSelection{NamespaceToken: nssIn.NamespaceToken, Name: nssIn.Name})
+	for _, nssIn := range req.NameSelections {
+		out.NameSelections = append(out.NameSelections, NameSelection{NamespaceToken: nssIn.NamespaceToken, Name: nssIn.Name})
 	}
 	if shareToken, frontendEndpoints, err := i.agent.SharePublic(out); err == nil {
 		return &agentGrpc.SharePublicResponse{Token: shareToken, FrontendEndpoints: frontendEndpoints}, nil

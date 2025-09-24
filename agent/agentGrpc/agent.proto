@@ -68,7 +68,7 @@ message AccessPrivateRequest{
 	repeated string responseHeaders = 7;
 }
 
-message NamespaceSelection {
+message NameSelection {
   string namespaceToken = 1;
   string name = 2;
 }
@@ -126,7 +126,7 @@ message SharePrivateResponse {
 message SharePublicRequest {
 	string target = 1;
 	repeated string basicAuth = 2;
-	repeated NamespaceSelection namespaceSelections = 3;
+	repeated NameSelection nameSelections = 3;
 	string backendMode = 4;
 	bool insecure = 5;
 	string oauthProvider = 6;

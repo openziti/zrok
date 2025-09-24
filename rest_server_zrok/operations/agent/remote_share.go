@@ -98,8 +98,8 @@ type RemoteShareBody struct {
 	// insecure
 	Insecure bool `json:"insecure,omitempty"`
 
-	// namespace selections
-	NamespaceSelections []*rest_model_zrok.NamespaceSelection `json:"namespaceSelections"`
+	// name selections
+	NameSelections []*rest_model_zrok.NameSelection `json:"nameSelections"`
 
 	// oauth email domains
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
@@ -135,7 +135,7 @@ func (o *RemoteShareBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := o.validateNamespaceSelections(formats); err != nil {
+	if err := o.validateNameSelections(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -209,22 +209,22 @@ func (o *RemoteShareBody) validateBackendMode(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *RemoteShareBody) validateNamespaceSelections(formats strfmt.Registry) error {
-	if swag.IsZero(o.NamespaceSelections) { // not required
+func (o *RemoteShareBody) validateNameSelections(formats strfmt.Registry) error {
+	if swag.IsZero(o.NameSelections) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(o.NamespaceSelections); i++ {
-		if swag.IsZero(o.NamespaceSelections[i]) { // not required
+	for i := 0; i < len(o.NameSelections); i++ {
+		if swag.IsZero(o.NameSelections[i]) { // not required
 			continue
 		}
 
-		if o.NamespaceSelections[i] != nil {
-			if err := o.NamespaceSelections[i].Validate(formats); err != nil {
+		if o.NameSelections[i] != nil {
+			if err := o.NameSelections[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -281,7 +281,7 @@ func (o *RemoteShareBody) validateShareMode(formats strfmt.Registry) error {
 func (o *RemoteShareBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := o.contextValidateNamespaceSelections(ctx, formats); err != nil {
+	if err := o.contextValidateNameSelections(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -291,21 +291,21 @@ func (o *RemoteShareBody) ContextValidate(ctx context.Context, formats strfmt.Re
 	return nil
 }
 
-func (o *RemoteShareBody) contextValidateNamespaceSelections(ctx context.Context, formats strfmt.Registry) error {
+func (o *RemoteShareBody) contextValidateNameSelections(ctx context.Context, formats strfmt.Registry) error {
 
-	for i := 0; i < len(o.NamespaceSelections); i++ {
+	for i := 0; i < len(o.NameSelections); i++ {
 
-		if o.NamespaceSelections[i] != nil {
+		if o.NameSelections[i] != nil {
 
-			if swag.IsZero(o.NamespaceSelections[i]) { // not required
+			if swag.IsZero(o.NameSelections[i]) { // not required
 				return nil
 			}
 
-			if err := o.NamespaceSelections[i].ContextValidate(ctx, formats); err != nil {
+			if err := o.NameSelections[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("body" + "." + "namespaceSelections" + "." + strconv.Itoa(i))
+					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

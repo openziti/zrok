@@ -12,10 +12,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NamespaceSelection namespace selection
+// NameSelection name selection
 //
-// swagger:model namespaceSelection
-type NamespaceSelection struct {
+// swagger:model nameSelection
+type NameSelection struct {
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -24,18 +24,18 @@ type NamespaceSelection struct {
 	NamespaceToken string `json:"namespaceToken,omitempty"`
 }
 
-// Validate validates this namespace selection
-func (m *NamespaceSelection) Validate(formats strfmt.Registry) error {
+// Validate validates this name selection
+func (m *NameSelection) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this namespace selection based on context it is used
-func (m *NamespaceSelection) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this name selection based on context it is used
+func (m *NameSelection) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *NamespaceSelection) MarshalBinary() ([]byte, error) {
+func (m *NameSelection) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -43,8 +43,8 @@ func (m *NamespaceSelection) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *NamespaceSelection) UnmarshalBinary(b []byte) error {
-	var res NamespaceSelection
+func (m *NameSelection) UnmarshalBinary(b []byte) error {
+	var res NameSelection
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

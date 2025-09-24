@@ -21,10 +21,10 @@ func main() {
 	}
 
 	shr, err := sdk.CreateShare(root, &sdk.ShareRequest{
-		BackendMode:         sdk.ProxyBackendMode,
-		ShareMode:           sdk.PublicShareMode,
-		NamespaceSelections: []sdk.NamespaceSelection{{NamespaceToken: "public"}},
-		Target:              "http-server",
+		BackendMode:    sdk.ProxyBackendMode,
+		ShareMode:      sdk.PublicShareMode,
+		NameSelections: []sdk.NameSelection{{NamespaceToken: "public"}},
+		Target:         "http-server",
 	})
 
 	if err != nil {

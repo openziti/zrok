@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { NamespaceSelection } from './NamespaceSelection';
+import type { NameSelection } from './NameSelection';
 import {
-    NamespaceSelectionFromJSON,
-    NamespaceSelectionFromJSONTyped,
-    NamespaceSelectionToJSON,
-    NamespaceSelectionToJSONTyped,
-} from './NamespaceSelection';
+    NameSelectionFromJSON,
+    NameSelectionFromJSONTyped,
+    NameSelectionToJSON,
+    NameSelectionToJSONTyped,
+} from './NameSelection';
 
 /**
  * 
@@ -59,10 +59,10 @@ export interface RemoteShareRequest {
     basicAuth?: Array<string>;
     /**
      * 
-     * @type {Array<NamespaceSelection>}
+     * @type {Array<NameSelection>}
      * @memberof RemoteShareRequest
      */
-    namespaceSelections?: Array<NamespaceSelection>;
+    nameSelections?: Array<NameSelection>;
     /**
      * 
      * @type {string}
@@ -161,7 +161,7 @@ export function RemoteShareRequestFromJSONTyped(json: any, ignoreDiscriminator: 
         'token': json['token'] == null ? undefined : json['token'],
         'target': json['target'] == null ? undefined : json['target'],
         'basicAuth': json['basicAuth'] == null ? undefined : json['basicAuth'],
-        'namespaceSelections': json['namespaceSelections'] == null ? undefined : ((json['namespaceSelections'] as Array<any>).map(NamespaceSelectionFromJSON)),
+        'nameSelections': json['nameSelections'] == null ? undefined : ((json['nameSelections'] as Array<any>).map(NameSelectionFromJSON)),
         'privateShareToken': json['privateShareToken'] == null ? undefined : json['privateShareToken'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'insecure': json['insecure'] == null ? undefined : json['insecure'],
@@ -189,7 +189,7 @@ export function RemoteShareRequestToJSONTyped(value?: RemoteShareRequest | null,
         'token': value['token'],
         'target': value['target'],
         'basicAuth': value['basicAuth'],
-        'namespaceSelections': value['namespaceSelections'] == null ? undefined : ((value['namespaceSelections'] as Array<any>).map(NamespaceSelectionToJSON)),
+        'nameSelections': value['nameSelections'] == null ? undefined : ((value['nameSelections'] as Array<any>).map(NameSelectionToJSON)),
         'privateShareToken': value['privateShareToken'],
         'backendMode': value['backendMode'],
         'insecure': value['insecure'],

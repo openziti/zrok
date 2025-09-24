@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { NamespaceSelection } from './NamespaceSelection';
-import {
-    NamespaceSelectionFromJSON,
-    NamespaceSelectionFromJSONTyped,
-    NamespaceSelectionToJSON,
-    NamespaceSelectionToJSONTyped,
-} from './NamespaceSelection';
 import type { AuthUser } from './AuthUser';
 import {
     AuthUserFromJSON,
@@ -27,6 +20,13 @@ import {
     AuthUserToJSON,
     AuthUserToJSONTyped,
 } from './AuthUser';
+import type { NameSelection } from './NameSelection';
+import {
+    NameSelectionFromJSON,
+    NameSelectionFromJSONTyped,
+    NameSelectionToJSON,
+    NameSelectionToJSONTyped,
+} from './NameSelection';
 
 /**
  * 
@@ -48,10 +48,10 @@ export interface ShareRequest {
     shareMode?: ShareRequestShareModeEnum;
     /**
      * 
-     * @type {Array<NamespaceSelection>}
+     * @type {Array<NameSelection>}
      * @memberof ShareRequest
      */
-    namespaceSelections?: Array<NamespaceSelection>;
+    nameSelections?: Array<NameSelection>;
     /**
      * 
      * @type {string}
@@ -168,7 +168,7 @@ export function ShareRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'envZId': json['envZId'] == null ? undefined : json['envZId'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
-        'namespaceSelections': json['namespaceSelections'] == null ? undefined : ((json['namespaceSelections'] as Array<any>).map(NamespaceSelectionFromJSON)),
+        'nameSelections': json['nameSelections'] == null ? undefined : ((json['nameSelections'] as Array<any>).map(NameSelectionFromJSON)),
         'privateShareToken': json['privateShareToken'] == null ? undefined : json['privateShareToken'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
         'target': json['target'] == null ? undefined : json['target'],
@@ -195,7 +195,7 @@ export function ShareRequestToJSONTyped(value?: ShareRequest | null, ignoreDiscr
         
         'envZId': value['envZId'],
         'shareMode': value['shareMode'],
-        'namespaceSelections': value['namespaceSelections'] == null ? undefined : ((value['namespaceSelections'] as Array<any>).map(NamespaceSelectionToJSON)),
+        'nameSelections': value['nameSelections'] == null ? undefined : ((value['nameSelections'] as Array<any>).map(NameSelectionToJSON)),
         'privateShareToken': value['privateShareToken'],
         'backendMode': value['backendMode'],
         'target': value['target'],

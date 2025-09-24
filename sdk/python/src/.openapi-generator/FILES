@@ -50,7 +50,7 @@ docs/MetadataApi.md
 docs/Metrics.md
 docs/MetricsSample.md
 docs/Name.md
-docs/NamespaceSelection.md
+docs/NameSelection.md
 docs/Overview.md
 docs/OverviewNamesInner.md
 docs/Ping200Response.md
@@ -139,7 +139,7 @@ test/test_metadata_api.py
 test/test_metrics.py
 test/test_metrics_sample.py
 test/test_name.py
-test/test_namespace_selection.py
+test/test_name_selection.py
 test/test_overview.py
 test/test_overview_names_inner.py
 test/test_ping200_response.py
@@ -233,7 +233,7 @@ zrok_api/models/login_request.py
 zrok_api/models/metrics.py
 zrok_api/models/metrics_sample.py
 zrok_api/models/name.py
-zrok_api/models/namespace_selection.py
+zrok_api/models/name_selection.py
 zrok_api/models/overview.py
 zrok_api/models/overview_names_inner.py
 zrok_api/models/ping200_response.py

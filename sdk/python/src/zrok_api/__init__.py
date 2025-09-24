@@ -78,7 +78,7 @@ __all__ = [
     "Metrics",
     "MetricsSample",
     "Name",
-    "NamespaceSelection",
+    "NameSelection",
     "Overview",
     "OverviewNamesInner",
     "Ping200Response",
@@ -180,7 +180,7 @@ from zrok_api.models.login_request import LoginRequest as LoginRequest
 from zrok_api.models.metrics import Metrics as Metrics
 from zrok_api.models.metrics_sample import MetricsSample as MetricsSample
 from zrok_api.models.name import Name as Name
-from zrok_api.models.namespace_selection import NamespaceSelection as NamespaceSelection
+from zrok_api.models.name_selection import NameSelection as NameSelection
 from zrok_api.models.overview import Overview as Overview
 from zrok_api.models.overview_names_inner import OverviewNamesInner as OverviewNamesInner
 from zrok_api.models.ping200_response import Ping200Response as Ping200Response

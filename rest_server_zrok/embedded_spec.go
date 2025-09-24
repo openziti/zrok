@@ -440,10 +440,10 @@ func init() {
                 "insecure": {
                   "type": "boolean"
                 },
-                "namespaceSelections": {
+                "nameSelections": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/namespaceSelection"
+                    "$ref": "#/definitions/nameSelection"
                   }
                 },
                 "oauthEmailDomains": {
@@ -3623,7 +3623,7 @@ func init() {
         }
       }
     },
-    "namespaceSelection": {
+    "nameSelection": {
       "type": "object",
       "properties": {
         "name": {
@@ -3786,10 +3786,10 @@ func init() {
         "envZId": {
           "type": "string"
         },
-        "namespaceSelections": {
+        "nameSelections": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/namespaceSelection"
+            "$ref": "#/definitions/nameSelection"
           }
         },
         "oauthEmailDomains": {
@@ -4298,10 +4298,10 @@ func init() {
                 "insecure": {
                   "type": "boolean"
                 },
-                "namespaceSelections": {
+                "nameSelections": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/namespaceSelection"
+                    "$ref": "#/definitions/nameSelection"
                   }
                 },
                 "oauthEmailDomains": {
@@ -7541,7 +7541,7 @@ func init() {
         }
       }
     },
-    "namespaceSelection": {
+    "nameSelection": {
       "type": "object",
       "properties": {
         "name": {
@@ -7673,10 +7673,10 @@ func init() {
         "envZId": {
           "type": "string"
         },
-        "namespaceSelections": {
+        "nameSelections": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/namespaceSelection"
+            "$ref": "#/definitions/nameSelection"
           }
         },
         "oauthEmailDomains": {

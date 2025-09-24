@@ -89,8 +89,8 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 		PermissionMode:       string(request.PermissionMode),
 		AccessGrants:         request.AccessGrants,
 	}
-	for _, nss := range request.NamespaceSelections {
-		req.Body.NamespaceSelections = append(req.Body.NamespaceSelections, &rest_model_zrok.NamespaceSelection{
+	for _, nss := range request.NameSelections {
+		req.Body.NameSelections = append(req.Body.NameSelections, &rest_model_zrok.NameSelection{
 			NamespaceToken: nss.NamespaceToken,
 			Name:           nss.Name,
 		})

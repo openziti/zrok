@@ -79,8 +79,8 @@ func (h *agentRemoteShareHandler) publicShare(params agent.RemoteShareParams, cl
 		Closed:               !params.Body.Open,
 		AccessGrants:         params.Body.AccessGrants,
 	}
-	for _, nss := range params.Body.NamespaceSelections {
-		req.NamespaceSelections = append(req.NamespaceSelections, &agentGrpc.NamespaceSelection{
+	for _, nss := range params.Body.NameSelections {
+		req.NameSelections = append(req.NameSelections, &agentGrpc.NameSelection{
 			NamespaceToken: nss.NamespaceToken,
 			Name:           nss.Name,
 		})

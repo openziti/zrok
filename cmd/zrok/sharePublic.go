@@ -34,7 +34,7 @@ func init() {
 
 type sharePublicCommand struct {
 	basicAuth            []string
-	namespaceSelection   []string
+	nameSelections       []string
 	backendMode          string
 	headless             bool
 	subordinate          bool
@@ -56,16 +56,16 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	defaultNamespaceSelections := []string{"public"}
+	defaultNameSelections := []string{"public"}
 	if root, err := environment.LoadRoot(); err == nil {
 		rootNamespace, _ := root.DefaultNamespace()
-		defaultNamespaceSelections = []string{rootNamespace}
+		defaultNameSelections = []string{rootNamespace}
 	}
 	headless := false
 	if root, err := environment.LoadRoot(); err == nil {
 		headless, _ = root.Headless()
 	}
-	cmd.Flags().StringArrayVarP(&command.namespaceSelection, "namespace-selection", "n", defaultNamespaceSelections, "Selected frontends to use for the share")
+	cmd.Flags().StringArrayVarP(&command.nameSelections, "name-selection", "n", defaultNameSelections, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
@@ -134,9 +134,9 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		PermissionMode: sdk.ClosedPermissionMode,
 		AccessGrants:   cmd.accessGrants,
 	}
-	for _, nssStr := range cmd.namespaceSelection {
-		if nss, err := sdk.ParseNamespaceSelection(nssStr); err == nil {
-			req.NamespaceSelections = append(req.NamespaceSelections, nss)
+	for _, nssStr := range cmd.nameSelections {
+		if nss, err := sdk.ParseNameSelection(nssStr); err == nil {
+			req.NameSelections = append(req.NameSelections, nss)
 		} else {
 			cmd.error("unable to parse namespace selection", err)
 		}
@@ -404,12 +404,12 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 		Closed:               !cmd.open,
 		AccessGrants:         cmd.accessGrants,
 	}
-	for _, nssStr := range cmd.namespaceSelection {
-		nss, err := sdk.ParseNamespaceSelection(nssStr)
+	for _, nssStr := range cmd.nameSelections {
+		nss, err := sdk.ParseNameSelection(nssStr)
 		if err != nil {
 			tui.Error(fmt.Sprintf("invalid namespace selection '%v'", nssStr), err)
 		}
-		grpcReq.NamespaceSelections = append(grpcReq.NamespaceSelections, &agentGrpc.NamespaceSelection{
+		grpcReq.NameSelections = append(grpcReq.NameSelections, &agentGrpc.NameSelection{
 			NamespaceToken: nss.NamespaceToken,
 			Name:           nss.Name,
 		})

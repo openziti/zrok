@@ -127,10 +127,10 @@
               type: array
               items:
                 type: string
-            namespaceSelections:
+            nameSelections:
               type: array
               items:
-                $ref: "#/definitions/namespaceSelection"
+                $ref: "#/definitions/nameSelection"
             privateShareToken:
               type: string
             backendMode:

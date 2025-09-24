@@ -37,8 +37,8 @@ type ShareRequest struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// namespace selections
-	NamespaceSelections []*NamespaceSelection `json:"namespaceSelections"`
+	// name selections
+	NameSelections []*NameSelection `json:"nameSelections"`
 
 	// oauth email domains
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
@@ -76,7 +76,7 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNamespaceSelections(formats); err != nil {
+	if err := m.validateNameSelections(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -180,22 +180,22 @@ func (m *ShareRequest) validateBasicAuthUsers(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ShareRequest) validateNamespaceSelections(formats strfmt.Registry) error {
-	if swag.IsZero(m.NamespaceSelections) { // not required
+func (m *ShareRequest) validateNameSelections(formats strfmt.Registry) error {
+	if swag.IsZero(m.NameSelections) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(m.NamespaceSelections); i++ {
-		if swag.IsZero(m.NamespaceSelections[i]) { // not required
+	for i := 0; i < len(m.NameSelections); i++ {
+		if swag.IsZero(m.NameSelections[i]) { // not required
 			continue
 		}
 
-		if m.NamespaceSelections[i] != nil {
-			if err := m.NamespaceSelections[i].Validate(formats); err != nil {
+		if m.NameSelections[i] != nil {
+			if err := m.NameSelections[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("namespaceSelections" + "." + strconv.Itoa(i))
+					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("namespaceSelections" + "." + strconv.Itoa(i))
+					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -298,7 +298,7 @@ func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Regis
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateNamespaceSelections(ctx, formats); err != nil {
+	if err := m.contextValidateNameSelections(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -333,21 +333,21 @@ func (m *ShareRequest) contextValidateBasicAuthUsers(ctx context.Context, format
 	return nil
 }
 
-func (m *ShareRequest) contextValidateNamespaceSelections(ctx context.Context, formats strfmt.Registry) error {
+func (m *ShareRequest) contextValidateNameSelections(ctx context.Context, formats strfmt.Registry) error {
 
-	for i := 0; i < len(m.NamespaceSelections); i++ {
+	for i := 0; i < len(m.NameSelections); i++ {
 
-		if m.NamespaceSelections[i] != nil {
+		if m.NameSelections[i] != nil {
 
-			if swag.IsZero(m.NamespaceSelections[i]) { // not required
+			if swag.IsZero(m.NameSelections[i]) { // not required
 				return nil
 			}
 
-			if err := m.NamespaceSelections[i].ContextValidate(ctx, formats); err != nil {
+			if err := m.NameSelections[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("namespaceSelections" + "." + strconv.Itoa(i))
+					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("namespaceSelections" + "." + strconv.Itoa(i))
+					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

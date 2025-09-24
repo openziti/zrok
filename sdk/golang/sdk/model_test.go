@@ -4,17 +4,17 @@ import (
 	"testing"
 )
 
-func TestParseNamespaceSelection(t *testing.T) {
+func TestParseNameSelection(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
-		expected NamespaceSelection
+		expected NameSelection
 		hasError bool
 	}{
 		{
 			name:  "namespace token only",
 			input: "token123",
-			expected: NamespaceSelection{
+			expected: NameSelection{
 				NamespaceToken: "token123",
 				Name:           "",
 			},
@@ -23,7 +23,7 @@ func TestParseNamespaceSelection(t *testing.T) {
 		{
 			name:  "namespace token with name",
 			input: "token123:myname",
-			expected: NamespaceSelection{
+			expected: NameSelection{
 				NamespaceToken: "token123",
 				Name:           "myname",
 			},
@@ -32,7 +32,7 @@ func TestParseNamespaceSelection(t *testing.T) {
 		{
 			name:  "namespace token with empty name",
 			input: "token123:",
-			expected: NamespaceSelection{
+			expected: NameSelection{
 				NamespaceToken: "token123",
 				Name:           "",
 			},
@@ -41,7 +41,7 @@ func TestParseNamespaceSelection(t *testing.T) {
 		{
 			name:  "name with colon in it",
 			input: "token123:name:with:colons",
-			expected: NamespaceSelection{
+			expected: NameSelection{
 				NamespaceToken: "token123",
 				Name:           "name:with:colons",
 			},
@@ -50,14 +50,14 @@ func TestParseNamespaceSelection(t *testing.T) {
 		{
 			name:     "empty input",
 			input:    "",
-			expected: NamespaceSelection{},
+			expected: NameSelection{},
 			hasError: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseNamespaceSelection(tt.input)
+			result, err := ParseNameSelection(tt.input)
 
 			if tt.hasError {
 				if err == nil {

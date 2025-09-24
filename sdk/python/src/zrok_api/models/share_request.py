@@ -20,7 +20,7 @@ import json
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from zrok_api.models.auth_user import AuthUser
-from zrok_api.models.namespace_selection import NamespaceSelection
+from zrok_api.models.name_selection import NameSelection
 from typing import Optional, Set
 from typing_extensions import Self
 
@@ -30,7 +30,7 @@ class ShareRequest(BaseModel):
     """ # noqa: E501
     env_zid: Optional[StrictStr] = Field(default=None, alias="envZId")
     share_mode: Optional[StrictStr] = Field(default=None, alias="shareMode")
-    namespace_selections: Optional[List[NamespaceSelection]] = Field(default=None, alias="namespaceSelections")
+    name_selections: Optional[List[NameSelection]] = Field(default=None, alias="nameSelections")
     private_share_token: Optional[StrictStr] = Field(default=None, alias="privateShareToken")
     backend_mode: Optional[StrictStr] = Field(default=None, alias="backendMode")
     target: Optional[StrictStr] = None
@@ -41,7 +41,7 @@ class ShareRequest(BaseModel):
     oauth_refresh_interval: Optional[StrictStr] = Field(default=None, alias="oauthRefreshInterval")
     permission_mode: Optional[StrictStr] = Field(default=None, alias="permissionMode")
     access_grants: Optional[List[StrictStr]] = Field(default=None, alias="accessGrants")
-    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "namespaceSelections", "privateShareToken", "backendMode", "target", "authScheme", "basicAuthUsers", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "permissionMode", "accessGrants"]
+    __properties: ClassVar[List[str]] = ["envZId", "shareMode", "nameSelections", "privateShareToken", "backendMode", "target", "authScheme", "basicAuthUsers", "oauthProvider", "oauthEmailDomains", "oauthRefreshInterval", "permissionMode", "accessGrants"]
 
     @field_validator('share_mode')
     def share_mode_validate_enum(cls, value):
@@ -112,13 +112,13 @@ class ShareRequest(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of each item in namespace_selections (list)
+        # override the default output from pydantic by calling `to_dict()` of each item in name_selections (list)
         _items = []
-        if self.namespace_selections:
-            for _item_namespace_selections in self.namespace_selections:
-                if _item_namespace_selections:
-                    _items.append(_item_namespace_selections.to_dict())
-            _dict['namespaceSelections'] = _items
+        if self.name_selections:
+            for _item_name_selections in self.name_selections:
+                if _item_name_selections:
+                    _items.append(_item_name_selections.to_dict())
+            _dict['nameSelections'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in basic_auth_users (list)
         _items = []
         if self.basic_auth_users:
@@ -140,7 +140,7 @@ class ShareRequest(BaseModel):
         _obj = cls.model_validate({
             "envZId": obj.get("envZId"),
             "shareMode": obj.get("shareMode"),
-            "namespaceSelections": [NamespaceSelection.from_dict(_item) for _item in obj["namespaceSelections"]] if obj.get("namespaceSelections") is not None else None,
+            "nameSelections": [NameSelection.from_dict(_item) for _item in obj["nameSelections"]] if obj.get("nameSelections") is not None else None,
             "privateShareToken": obj.get("privateShareToken"),
             "backendMode": obj.get("backendMode"),
             "target": obj.get("target"),
