@@ -34,12 +34,9 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 		dl.Info(msg)
 	}
 	var bootErr error
-	shr.sub.BootHandler = func(msgType string, msg subordinate.Message) {
-		bootErr = shr.bootHandler(msgType, msg)
-	}
-	shr.sub.MalformedHandler = func(msg subordinate.Message) {
-		dl.Error(msg)
-	}
+	bootHandler := NewShareBootHandler(shr, &bootErr)
+	shr.sub.BootHandler = bootHandler.HandleBoot
+	shr.sub.MalformedHandler = bootHandler.HandleMalformed
 
 	// build command using CommandBuilder
 	shrCmd := NewSharePublicCommand().

@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"errors"
 	"time"
 
 	"github.com/michaelquigley/df/dl"
@@ -85,46 +84,3 @@ func (s *share) monitor() {
 	s.agent.rmShare <- s
 }
 
-func (s *share) bootHandler(msgType string, msg subordinate.Message) error {
-	switch msgType {
-	case subordinate.BootMessage:
-		if v, found := msg["token"]; found {
-			if str, ok := v.(string); ok {
-				s.token = str
-			}
-		}
-		if v, found := msg["backend_mode"]; found {
-			if str, ok := v.(string); ok {
-				s.backendMode = sdk.BackendMode(str)
-			}
-		}
-		if v, found := msg["share_mode"]; found {
-			if str, ok := v.(string); ok {
-				s.shareMode = sdk.ShareMode(str)
-			}
-		}
-		if v, found := msg["frontend_endpoints"]; found {
-			if vArr, ok := v.([]interface{}); ok {
-				for _, v := range vArr {
-					if str, ok := v.(string); ok {
-						s.frontendEndpoints = append(s.frontendEndpoints, str)
-					}
-				}
-			}
-		}
-		if v, found := msg["target"]; found {
-			if str, ok := v.(string); ok {
-				s.target = str
-			}
-		}
-
-	case subordinate.ErrorMessage:
-		if v, found := msg[subordinate.ErrorMessage]; found {
-			if str, ok := v.(string); ok {
-				return errors.New(str)
-			}
-		}
-	}
-
-	return nil
-}

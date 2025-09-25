@@ -47,31 +47,9 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 		dl.Info(msg)
 	}
 	var bootErr error
-	acc.sub.BootHandler = func(msgType string, msg subordinate.Message) {
-		switch msgType {
-		case subordinate.BootMessage:
-			if v, found := msg["frontend_token"]; found {
-				if str, ok := v.(string); ok {
-					acc.frontendToken = str
-				}
-			}
-			if v, found := msg["bind_address"]; found {
-				if sr, ok := v.(string); ok {
-					acc.bindAddress = sr
-				}
-			}
-
-		case subordinate.ErrorMessage:
-			if v, found := msg[subordinate.ErrorMessage]; found {
-				if str, ok := v.(string); ok {
-					bootErr = errors.New(str)
-				}
-			}
-		}
-	}
-	acc.sub.MalformedHandler = func(msg subordinate.Message) {
-		dl.Error(msg)
-	}
+	bootHandler := NewAccessBootHandler(acc, &bootErr)
+	acc.sub.BootHandler = bootHandler.HandleBoot
+	acc.sub.MalformedHandler = bootHandler.HandleMalformed
 
 	dl.Infof("executing '%v'", accCmd)
 
