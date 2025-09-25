@@ -122,9 +122,9 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 	t.SetStyle(table.StyleRounded)
 
 	if cmd.verbose {
-		t.AppendHeader(table.Row{"Share Token", "Share Mode", "Backend Mode", "Target", "Status", "Failures", "Last Error", "Next Retry"})
+		t.AppendHeader(table.Row{"Share Token", "Share Mode", "Backend Mode", "Frontend Endpoints", "Target", "Status", "Failures", "Last Error", "Next Retry"})
 	} else {
-		t.AppendHeader(table.Row{"Share Token", "Share Mode", "Backend Mode", "Target", "Status"})
+		t.AppendHeader(table.Row{"Share Token", "Share Mode", "Backend Mode", "Frontend Endpoints", "Target", "Status"})
 	}
 
 	for _, share := range shares {
@@ -134,6 +134,14 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 		displayToken := share.Token
 		if displayToken == "" && share.Failure != nil {
 			displayToken = share.Failure.Id
+		}
+
+		frontendsList := ""
+		for i, fe := range share.FrontendEndpoint {
+			if i > 0 {
+				frontendsList += "\n"
+			}
+			frontendsList += fe
 		}
 
 		if cmd.verbose {
@@ -152,18 +160,9 @@ func (cmd *agentStatusCommand) displayShares(shares []*agentGrpc.ShareDetail) {
 				nextRetry = fmt.Sprintf("%v", share.Failure.NextRetry.AsTime().Format(time.RFC3339Nano))
 			}
 
-			t.AppendRow(table.Row{
-				displayToken,
-				share.ShareMode,
-				share.BackendMode,
-				share.BackendEndpoint,
-				status,
-				failureCount,
-				cmd.wrapString(lastError, 35),
-				nextRetry,
-			})
+			t.AppendRow(table.Row{displayToken, share.ShareMode, share.BackendMode, frontendsList, share.BackendEndpoint, status, failureCount, cmd.wrapString(lastError, 35), nextRetry})
 		} else {
-			t.AppendRow(table.Row{displayToken, share.ShareMode, share.BackendMode, share.BackendEndpoint, status})
+			t.AppendRow(table.Row{displayToken, share.ShareMode, share.BackendMode, frontendsList, share.BackendEndpoint, status})
 		}
 	}
 	activeShares, retryingShares, failedShares := cmd.categorizeShares(shares)
