@@ -2,6 +2,18 @@
 
 ## v2.0.0
 
+FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplis what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
+
+FEATURE: `zrok share private` now includes a `--share-token` flag, which allows a user to create a vanity token for private shares. Now that reserved sharing has been replaced with namespaces, the `--share-token` flag allows private sharing to retain custom, persistent share token names. (https://github.com/openziti/zrok/issues/1070)
+
+FEATURE: `zrok modify name` command available to "upgrade" an ephemeral share name to a reserved share name. If you share something ephemerally and later decide that you want to persist that name for future use you can just `zrok share modify -r` that name and retain it indefinitely. (https://github.com/openziti/zrok/issues/1066)
+
+FEATURE: New `zrok access dymamicProxy` which is designed to work with the new namespaces/names functionality. Rather than parsing the `Host` header and trying to extract a share token, the new `dynamicProxy` receives mapping updates from the zrok controller, allowing it to support any kind of mapped name. See the [zrok dynamicProxy Guide](https://docs.zrok.io) for details on setting up the new frontend. `zrok access public` remains available for legacy-style setups. (https://github.com/openziti/zrok/issues/1041)
+
+FEATURE: The zrok Agent now includes significantly improved handling for subordinate processes in error states. Errors encountered during agent reloading and also during active runtime are retried using an exponential falloff approach. Errored accesses or shares are given transient `err_XXXX` tokens, which can be used to manage (release) these processes. (https://github.com/openziti/zrok/issues/1000)
+
+FEATURE: The zrok Agent has been updated for v2 name selections. Now that "reserved shares" have been replaced with reserved names, the zrok Agent will automatically restart any share which contains a name selection with a reserved name. The Agent continues to automatically manage `zrok access private` processes as always.
+
 FEATURE: `zrok overview` now includes a human-readble default output, that formats all of the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
@@ -693,7 +705,7 @@ CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok
 CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
 
 	New and improved URL handling for proxy backends:
-
+	
 	9090 -> http://127.0.0.1:9090
 	localhost:9090 -> http://127.0.0.1:9090
 	https://localhost:9090 -> https://localhost:9090
