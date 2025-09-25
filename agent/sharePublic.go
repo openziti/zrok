@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -24,7 +23,6 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 		return "", nil, errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "public", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:   sdk.PublicShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
@@ -43,50 +41,28 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 		dl.Error(msg)
 	}
 
-	for _, basicAuth := range req.BasicAuth {
-		shrCmd = append(shrCmd, "--basic-auth", basicAuth)
-	}
+	// build command using CommandBuilder
+	shrCmd := NewSharePublicCommand().
+		BackendMode(req.BackendMode).
+		BasicAuth(req.BasicAuth).
+		NameSelections(req.NameSelections).
+		Insecure(req.Insecure).
+		OauthProvider(req.OauthProvider).
+		OauthEmailDomains(req.OauthEmailDomains).
+		OauthRefreshInterval(req.OauthRefreshInterval).
+		Open(!req.Closed).
+		AccessGrants(req.AccessGrants).
+		Target(req.Target).
+		Build()
+
+	// set share properties
 	shr.basicAuth = req.BasicAuth
-
-	for _, nss := range req.NameSelections {
-		nssStr := nss.NamespaceToken
-		if nss.Name != "" {
-			nssStr += ":" + nss.Name
-		}
-		shrCmd = append(shrCmd, "--name-selection", nssStr)
-	}
 	shr.nameSelections = req.NameSelections
-
-	if req.Insecure {
-		shrCmd = append(shrCmd, "--insecure")
-	}
 	shr.insecure = req.Insecure
-
-	if req.OauthProvider != "" {
-		shrCmd = append(shrCmd, "--oauth-provider", req.OauthProvider)
-	}
 	shr.oauthProvider = req.OauthProvider
-
-	for _, pattern := range req.OauthEmailDomains {
-		shrCmd = append(shrCmd, "--oauth-email-domain", pattern)
-	}
 	shr.oauthEmailAddressPatterns = req.OauthEmailDomains
-
-	if req.OauthRefreshInterval != "" {
-		shrCmd = append(shrCmd, "--oauth-refresh-interval", req.OauthRefreshInterval)
-	}
-
-	if !req.Closed {
-		shrCmd = append(shrCmd, "--open")
-	}
 	shr.closed = req.Closed
-
-	for _, grant := range req.AccessGrants {
-		shrCmd = append(shrCmd, "--access-grant", grant)
-	}
 	shr.accessGrants = req.AccessGrants
-
-	shrCmd = append(shrCmd, req.Target)
 	shr.target = req.Target
 
 	dl.Infof("executing '%v'", shrCmd)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -23,11 +22,13 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 		return "", errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	accCmd := []string{os.Args[0], "access", "private", "--subordinate", "-b", req.BindAddress, req.ShareToken}
-	if req.AutoMode {
-		accCmd = append(accCmd, "--auto", "--auto-address", req.AutoAddress, "--auto-start-port", fmt.Sprintf("%v", req.AutoStartPort))
-		accCmd = append(accCmd, "--auto-end-port", fmt.Sprintf("%v", req.AutoEndPort))
-	}
+	// build command using CommandBuilder
+	accCmd := NewAccessPrivateCommand().
+		BindAddress(req.BindAddress).
+		AutoMode(req.AutoMode, req.AutoAddress, int(req.AutoStartPort), int(req.AutoEndPort)).
+		Target(req.ShareToken).
+		Build()
+
 	dl.Info(accCmd)
 
 	acc := &access{

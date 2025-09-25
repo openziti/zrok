@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
@@ -24,7 +23,6 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 		return "", errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "private", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:   sdk.PrivateShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
@@ -43,25 +41,20 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 		dl.Error(msg)
 	}
 
-	if req.PrivateShareToken != "" {
-		shrCmd = append(shrCmd, "--share-token", req.PrivateShareToken)
-	}
-	if req.Insecure {
-		shrCmd = append(shrCmd, "--insecure")
-	}
+	// build command using CommandBuilder
+	shrCmd := NewSharePrivateCommand().
+		BackendMode(req.BackendMode).
+		ShareToken(req.PrivateShareToken).
+		Insecure(req.Insecure).
+		Open(!req.Closed).
+		AccessGrants(req.AccessGrants).
+		Target(req.Target).
+		Build()
+
+	// set share properties
 	shr.insecure = req.Insecure
-
-	if !req.Closed {
-		shrCmd = append(shrCmd, "--open")
-	}
 	shr.closed = req.Closed
-
-	for _, grant := range req.AccessGrants {
-		shrCmd = append(shrCmd, "--access-grant", grant)
-	}
 	shr.accessGrants = req.AccessGrants
-
-	shrCmd = append(shrCmd, req.Target)
 	shr.target = req.Target
 
 	dl.Infof("executing '%v'", shrCmd)
