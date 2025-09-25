@@ -10,9 +10,10 @@ import (
 const RegistryV = "2"
 
 type Registry struct {
-	V               string                 `json:"v"`
-	PrivateAccesses []*AccessRegistryEntry `json:"private_accesses,omitempty"`
-	PublicShares    []*ShareRegistryEntry  `json:"public_shares,omitempty"`
+	V               string                       `json:"v"`
+	PrivateAccesses []*AccessRegistryEntry       `json:"private_accesses,omitempty"`
+	PublicShares    []*PublicShareRegistryEntry  `json:"public_shares,omitempty"`
+	PrivateShares   []*PrivateShareRegistryEntry `json:"private_shares,omitempty"`
 }
 
 type AccessRegistryEntry struct {
@@ -20,9 +21,14 @@ type AccessRegistryEntry struct {
 	Failure *FailureEntry         `json:"failure,omitempty"`
 }
 
-type ShareRegistryEntry struct {
+type PublicShareRegistryEntry struct {
 	Request *SharePublicRequest `json:"request"`
 	Failure *FailureEntry       `json:"failure,omitempty"`
+}
+
+type PrivateShareRegistryEntry struct {
+	Request *SharePrivateRequest `json:"request"`
+	Failure *FailureEntry        `json:"failure,omitempty"`
 }
 
 type FailureEntry struct {

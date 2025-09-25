@@ -63,7 +63,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 	}
 
 	// Add failed shares with failure IDs
-	for failureId, share := range i.agent.retryManager.shares {
+	for failureId, share := range i.agent.retryManager.publicShares {
 		status := "retrying"
 		if i.agent.cfg.MaxRetries > -1 && share.Failure.Count >= i.agent.cfg.MaxRetries {
 			status = "failed"

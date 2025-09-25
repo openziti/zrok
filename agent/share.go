@@ -19,6 +19,10 @@ type SharePrivateRequest struct {
 	AccessGrants      []string `json:"access_grants"`
 }
 
+func (spr *SharePrivateRequest) hasReservedToken() bool {
+	return spr.PrivateShareToken != ""
+}
+
 type NameSelection struct {
 	NamespaceToken string `json:"namespace_token"`
 	Name           string `json:"name"`

@@ -17,10 +17,17 @@ func (a *Agent) ReleaseShare(shareToken string) error {
 		return nil
 	}
 
-	// then check failed shares
-	if a.retryManager.hasFailedShare(shareToken) {
-		dl.Infof("released failed share '%v'", shareToken)
-		a.retryManager.rmFailedShare(shareToken)
+	// then check failed public shares
+	if a.retryManager.hasFailedPublicShare(shareToken) {
+		dl.Infof("released failed public share '%v'", shareToken)
+		a.retryManager.rmFailedPublicShare(shareToken)
+		return nil
+	}
+
+	// then check failed private shares
+	if a.retryManager.hasFailedPrivateShare(shareToken) {
+		dl.Infof("released failed private share '%v'", shareToken)
+		a.retryManager.rmFailedPrivateShare(shareToken)
 		return nil
 	}
 

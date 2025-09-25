@@ -129,7 +129,7 @@ func (a *Agent) ReloadRegistry() error {
 		return err
 	}
 
-	dl.Infof("loaded %d accesses", len(registry.PrivateAccesses))
+	dl.Infof("loaded %d private accesses", len(registry.PrivateAccesses))
 	registryModified := false
 	for _, access := range registry.PrivateAccesses {
 		if feToken, err := a.AccessPrivate(access.Request); err == nil {
@@ -184,9 +184,39 @@ func (a *Agent) ReloadRegistry() error {
 			share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
 			registryModified = true
 
-			a.retryManager.addFailedShare(share)
+			a.retryManager.addFailedPublicShare(share)
 
 			dl.Infof("next retry for public share '%v' scheduled for %v", share.Request.Target, share.Failure.NextRetry.Format(time.RFC3339))
+		}
+	}
+
+	dl.Infof("loaded %d private shares", len(registry.PrivateShares))
+	for _, share := range registry.PrivateShares {
+		if token, err := a.SharePrivate(share.Request); err == nil {
+			dl.Infof("restarted private share '%v' -> token='%v'", share.Request.Target, token)
+			if share.Failure != nil {
+				share.Failure = nil
+				registryModified = true
+			}
+		} else {
+			dl.Warnf("failed to restart private share '%v': %v (will retry)", share.Request.Target, err)
+			if share.Failure != nil {
+				share.Failure.Count++
+				share.Failure.LastError = err.Error()
+			} else {
+				share.Failure = &FailureEntry{
+					Count:     1,
+					LastError: err.Error(),
+				}
+			}
+
+			// calculate next retry with exponential backoff
+			share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
+			registryModified = true
+
+			a.retryManager.addFailedPrivateShare(share)
+
+			dl.Infof("next retry for private share '%v' scheduled for %v", share.Request.Target, share.Failure.NextRetry.Format(time.RFC3339))
 		}
 	}
 
@@ -213,26 +243,37 @@ func (a *Agent) SaveRegistry() error {
 		}
 	}
 
-	// save public shares with registered names (namespace:name format)
+	// save named shares
 	for _, shr := range a.shares {
 		if req, ok := shr.request.(*SharePublicRequest); ok {
-			// only save shares with at least one registered name (not just namespace)
+			// only save public] shares with at least one registered name (not just namespace)
 			if req.hasReservedName() {
-				entry := &ShareRegistryEntry{
+				entry := &PublicShareRegistryEntry{
 					Request: req,
 				}
 				r.PublicShares = append(r.PublicShares, entry)
+			}
+		} else if req, ok := shr.request.(*SharePrivateRequest); ok {
+			// only save private shares with a specified share token
+			if req.hasReservedToken() {
+				entry := &PrivateShareRegistryEntry{
+					Request: req,
+				}
+				r.PrivateShares = append(r.PrivateShares, entry)
 			}
 		}
 	}
 
 	// failures
-	failedAccesses, failedShares := a.retryManager.failures()
+	failedAccesses, failedPublicShares, failedPrivateShares := a.retryManager.failures()
 	for _, failedAccess := range failedAccesses {
 		r.PrivateAccesses = append(r.PrivateAccesses, failedAccess)
 	}
-	for _, failedShares := range failedShares {
-		r.PublicShares = append(r.PublicShares, failedShares)
+	for _, failedPublicShare := range failedPublicShares {
+		r.PublicShares = append(r.PublicShares, failedPublicShare)
+	}
+	for _, failedPrivateShare := range failedPrivateShares {
+		r.PrivateShares = append(r.PrivateShares, failedPrivateShare)
 	}
 
 	registryPath, err := a.root.AgentRegistry()
@@ -333,18 +374,35 @@ func (a *Agent) manager() {
 				// submit the share for retry if it exited abnormally
 				if outShare.processExited && !outShare.releaseRequested {
 					if reqPub, ok := outShare.request.(*SharePublicRequest); ok {
-						share := &ShareRegistryEntry{
-							Request: reqPub,
-							Failure: &FailureEntry{
-								Count: 1,
-							},
+						if reqPub.hasReservedName() {
+							share := &PublicShareRegistryEntry{
+								Request: reqPub,
+								Failure: &FailureEntry{
+									Count: 1,
+								},
+							}
+							if outShare.lastError != nil {
+								share.Failure.LastError = outShare.lastError.Error()
+							}
+							// calculate next retry with exponential backoff
+							share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
+							a.retryManager.addFailedPublicShare(share)
 						}
-						if outShare.lastError != nil {
-							share.Failure.LastError = outShare.lastError.Error()
+					} else if reqPriv, ok := outShare.request.(*SharePrivateRequest); ok {
+						if reqPriv.hasReservedToken() {
+							share := &PrivateShareRegistryEntry{
+								Request: reqPriv,
+								Failure: &FailureEntry{
+									Count: 1,
+								},
+							}
+							if outShare.lastError != nil {
+								share.Failure.LastError = outShare.lastError.Error()
+							}
+							// calculate next retry with exponential backoff
+							share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
+							a.retryManager.addFailedPrivateShare(share)
 						}
-						// calculate next retry with exponential backoff
-						share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
-						a.retryManager.addFailedShare(share)
 					}
 				}
 
