@@ -37,6 +37,15 @@ type SharePublicRequest struct {
 	AccessGrants         []string        `json:"access_grants"`
 }
 
+func (spr *SharePublicRequest) hasReservedName() bool {
+	for _, ns := range spr.NameSelections {
+		if ns.Name != "" {
+			return true
+		}
+	}
+	return false
+}
+
 type share struct {
 	token                     string
 	frontendEndpoints         []string
@@ -52,7 +61,10 @@ type share struct {
 	closed                    bool
 	accessGrants              []string
 
-	request interface{}
+	request          interface{}
+	releaseRequested bool
+	processExited    bool
+	lastError        error
 
 	process *proctree.Child
 	sub     *subordinate.MessageHandler
@@ -63,7 +75,9 @@ type share struct {
 func (s *share) monitor() {
 	if err := proctree.WaitChild(s.process); err != nil {
 		pfxlog.ChannelLogger(s.token).Error(err)
+		s.lastError = err
 	}
+	s.processExited = true
 	s.agent.rmShare <- s
 }
 

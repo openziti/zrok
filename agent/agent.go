@@ -141,14 +141,14 @@ func (a *Agent) ReloadRegistry() error {
 	logrus.Infof("loaded %d accesses", len(registry.PrivateAccesses))
 	registryModified := false
 	for _, access := range registry.PrivateAccesses {
-		if resp, err := a.AccessPrivate(access.Request); err == nil {
-			logrus.Infof("restarted private access '%v' -> '%v'", access.Request.Token, resp)
+		if feToken, err := a.AccessPrivate(access.Request); err == nil {
+			logrus.Infof("restarted private access '%v' -> '%v'", access.Request.ShareToken, feToken)
 			if access.Failure != nil {
 				access.Failure = nil
 				registryModified = true
 			}
 		} else {
-			logrus.Warnf("failed to restart private access '%v': %v (will retry)", access.Request.Token, err)
+			logrus.Warnf("failed to restart private access '%v': %v (will retry)", access.Request.ShareToken, err)
 			if access.Failure != nil {
 				access.Failure.Count++
 				access.Failure.LastError = err.Error()
@@ -169,7 +169,7 @@ func (a *Agent) ReloadRegistry() error {
 
 			a.retryManager.addFailedAccess(access)
 
-			logrus.Infof("next retry for private access '%v' scheduled for %v", access.Request.Token, access.Failure.NextRetry.Format(time.RFC3339))
+			logrus.Infof("next retry for private access '%v' scheduled for %v", access.Request.ShareToken, access.Failure.NextRetry.Format(time.RFC3339))
 		}
 	}
 
@@ -220,7 +220,7 @@ func (a *Agent) ReloadRegistry() error {
 
 func (a *Agent) SaveRegistry() error {
 	r := &Registry{}
-	// save private accesses with retry state
+	// save private accesses
 	for _, acc := range a.accesses {
 		if acc.request != nil {
 			// create new registry entry for this access
@@ -236,14 +236,7 @@ func (a *Agent) SaveRegistry() error {
 	for _, shr := range a.shares {
 		if req, ok := shr.request.(*SharePublicRequest); ok {
 			// only save shares with at least one registered name (not just namespace)
-			hasRegisteredName := false
-			for _, ns := range req.NameSelections {
-				if ns.Name != "" {
-					hasRegisteredName = true
-					break
-				}
-			}
-			if hasRegisteredName {
+			if req.hasReservedName() {
 				// create new registry entry for this share
 				entry := &ShareRegistryEntry{
 					Request: req,
@@ -358,6 +351,28 @@ func (a *Agent) manager() {
 				}
 				delete(a.shares, shr.token)
 
+				// submit the share for retry if it exited abnormally
+				if outShare.processExited && !outShare.releaseRequested {
+					if reqPub, ok := outShare.request.(*SharePublicRequest); ok {
+						share := &ShareRegistryEntry{
+							Request: reqPub,
+							Failure: &FailureEntry{
+								Count: 1,
+							},
+						}
+						if outShare.lastError != nil {
+							share.Failure.LastError = outShare.lastError.Error()
+						}
+						// calculate next retry with exponential backoff
+						delay := time.Duration(math.Min(
+							float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
+							float64(a.cfg.RetryMaxDelay),
+						))
+						share.Failure.NextRetry = time.Now().Add(delay)
+						a.retryManager.addFailedShare(share)
+					}
+				}
+
 				if a.persistRegistry {
 					if err := a.SaveRegistry(); err != nil {
 						logrus.Errorf("unable to persist registry: %v", err)
@@ -391,6 +406,26 @@ func (a *Agent) manager() {
 					logrus.Errorf("error deleting access '%v': %v", acc.frontendToken, err)
 				}
 				delete(a.accesses, acc.frontendToken)
+
+				// submit the access for retry if it exited abnormally
+				if outAccess.processExited && !outAccess.releaseRequested {
+					access := &AccessRegistryEntry{
+						Request: outAccess.request,
+						Failure: &FailureEntry{
+							Count: 1,
+						},
+					}
+					if outAccess.lastError != nil {
+						access.Failure.LastError = outAccess.lastError.Error()
+					}
+					// calculate next retry with exponential backoff
+					delay := time.Duration(math.Min(
+						float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
+						float64(a.cfg.RetryMaxDelay),
+					))
+					access.Failure.NextRetry = time.Now().Add(delay)
+					a.retryManager.addFailedAccess(access)
+				}
 
 				if a.persistRegistry {
 					if err := a.SaveRegistry(); err != nil {

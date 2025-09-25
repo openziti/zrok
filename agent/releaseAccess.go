@@ -11,6 +11,7 @@ import (
 func (a *Agent) ReleaseAccess(frontendToken string) error {
 	// first check active accesses
 	if acc, found := a.accesses[frontendToken]; found {
+		acc.releaseRequested = true
 		a.rmAccess <- acc
 		dl.Infof("released active access '%v'", acc.frontendToken)
 		return nil

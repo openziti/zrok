@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, err error) {
@@ -22,7 +23,7 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 		return "", errors.New("unable to load environment; did you 'zrok enable'?")
 	}
 
-	accCmd := []string{os.Args[0], "access", "private", "--subordinate", "-b", req.BindAddress, req.Token}
+	accCmd := []string{os.Args[0], "access", "private", "--subordinate", "-b", req.BindAddress, req.ShareToken}
 	if req.AutoMode {
 		accCmd = append(accCmd, "--auto", "--auto-address", req.AutoAddress, "--auto-start-port", fmt.Sprintf("%v", req.AutoStartPort))
 		accCmd = append(accCmd, "--auto-end-port", fmt.Sprintf("%v", req.AutoEndPort))
@@ -30,7 +31,7 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 	logrus.Info(accCmd)
 
 	acc := &access{
-		token:           req.Token,
+		token:           req.ShareToken,
 		bindAddress:     req.BindAddress,
 		autoMode:        req.AutoMode,
 		autoAddress:     req.AutoAddress,
@@ -95,7 +96,7 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 
 func (i *agentGrpcImpl) AccessPrivate(_ context.Context, req *agentGrpc.AccessPrivateRequest) (*agentGrpc.AccessPrivateResponse, error) {
 	if frontendToken, err := i.agent.AccessPrivate(&AccessPrivateRequest{
-		Token:           req.Token,
+		ShareToken:      req.Token,
 		BindAddress:     req.BindAddress,
 		AutoMode:        req.AutoMode,
 		AutoAddress:     req.AutoAddress,

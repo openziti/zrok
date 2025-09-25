@@ -30,7 +30,7 @@ func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*
 		}
 		accesses = append(accesses, &agentGrpc.AccessDetail{
 			FrontendToken:   "",
-			Token:           access.Request.Token,
+			Token:           access.Request.ShareToken,
 			BindAddress:     access.Request.BindAddress,
 			ResponseHeaders: access.Request.ResponseHeaders,
 			Status:          status,

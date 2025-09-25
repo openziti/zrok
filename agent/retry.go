@@ -136,7 +136,7 @@ func (rm *retryManager) retry() {
 	for failureId, access := range rm.accesses {
 		if time.Now().After(access.Failure.NextRetry) {
 			if resp, err := rm.a.AccessPrivate(access.Request); err != nil {
-				dl.Errorf("failed to restart private access '%v': %v", access.Request.Token, err)
+				dl.Errorf("failed to restart private access '%v': %v", access.Request.ShareToken, err)
 				if access.Failure != nil {
 					access.Failure.Count++
 					access.Failure.LastError = err.Error()
@@ -161,7 +161,7 @@ func (rm *retryManager) retry() {
 			} else {
 				access.Failure = nil
 				registryModified = true
-				dl.Infof("restarted private access '%v' -> '%v'", access.Request.Token, resp)
+				dl.Infof("restarted private access '%v' -> '%v'", access.Request.ShareToken, resp)
 			}
 		} else {
 			newAccesses[failureId] = access

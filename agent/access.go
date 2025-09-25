@@ -7,7 +7,7 @@ import (
 )
 
 type AccessPrivateRequest struct {
-	Token           string   `json:"token"`
+	ShareToken      string   `json:"share_token"`
 	BindAddress     string   `json:"bind_address"`
 	AutoMode        bool     `json:"auto_mode"`
 	AutoAddress     string   `json:"auto_address"`
@@ -26,7 +26,10 @@ type access struct {
 	autoEndPort     uint16
 	responseHeaders []string
 
-	request *AccessPrivateRequest
+	request          *AccessPrivateRequest
+	releaseRequested bool
+	processExited    bool
+	lastError        error
 
 	process *proctree.Child
 	sub     *subordinate.MessageHandler
@@ -37,6 +40,8 @@ type access struct {
 func (a *access) monitor() {
 	if err := proctree.WaitChild(a.process); err != nil {
 		pfxlog.ChannelLogger(a.token).Error(err)
+		a.lastError = err
 	}
+	a.processExited = true
 	a.agent.rmAccess <- a
 }

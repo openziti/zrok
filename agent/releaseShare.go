@@ -11,6 +11,7 @@ import (
 func (a *Agent) ReleaseShare(shareToken string) error {
 	// first check active shares
 	if shr, found := a.shares[shareToken]; found {
+		shr.releaseRequested = true
 		a.rmShare <- shr
 		dl.Infof("released active share '%v'", shr.token)
 		return nil
