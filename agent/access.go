@@ -1,7 +1,7 @@
 package agent
 
 import (
-	"github.com/michaelquigley/pfxlog"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 )
@@ -39,7 +39,7 @@ type access struct {
 
 func (a *access) monitor() {
 	if err := proctree.WaitChild(a.process); err != nil {
-		pfxlog.ChannelLogger(a.token).Error(err)
+		dl.ChannelLog(a.token).Error(err)
 		a.lastError = err
 	}
 	a.processExited = true

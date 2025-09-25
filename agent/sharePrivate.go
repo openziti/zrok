@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
 )
 
 func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err error) {
@@ -33,14 +33,14 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 		agent:       a,
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
-		logrus.Info(msg)
+		dl.Info(msg)
 	}
 	var bootErr error
 	shr.sub.BootHandler = func(msgType string, msg subordinate.Message) {
 		bootErr = shr.bootHandler(msgType, msg)
 	}
 	shr.sub.MalformedHandler = func(msg subordinate.Message) {
-		logrus.Error(msg)
+		dl.Error(msg)
 	}
 
 	if req.PrivateShareToken != "" {
@@ -64,7 +64,7 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	shrCmd = append(shrCmd, req.Target)
 	shr.target = req.Target
 
-	logrus.Infof("executing '%v'", shrCmd)
+	dl.Infof("executing '%v'", shrCmd)
 
 	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
@@ -80,7 +80,7 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 
 	} else {
 		if err := proctree.WaitChild(shr.process); err != nil {
-			logrus.Errorf("error joining: %v", err)
+			dl.Errorf("error joining: %v", err)
 		}
 		return "", fmt.Errorf("unable to start share: %v", bootErr)
 	}

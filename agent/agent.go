@@ -10,6 +10,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jaevor/go-nanoid"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/agentUi"
 	"github.com/openziti/zrok/agent/proctree"
@@ -17,7 +18,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -65,7 +65,7 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 }
 
 func (a *Agent) Run() error {
-	logrus.Infof("started")
+	dl.Infof("started")
 
 	if err := proctree.Init("zrok Agent"); err != nil {
 		return err
@@ -91,7 +91,7 @@ func (a *Agent) Run() error {
 
 	a.persistRegistry = false
 	if err := a.ReloadRegistry(); err != nil {
-		logrus.Errorf("error reloading registry '%v'", err)
+		dl.Errorf("error reloading registry '%v'", err)
 	}
 	a.persistRegistry = true
 
@@ -105,21 +105,21 @@ func (a *Agent) Run() error {
 }
 
 func (a *Agent) Shutdown() {
-	logrus.Infof("stopping")
+	dl.Infof("stopping")
 
 	a.persistRegistry = false
 
 	a.retryManager.stop()
 
 	if err := os.Remove(a.agentSocket); err != nil {
-		logrus.Warnf("unable to remove agent socket: %v", err)
+		dl.Warnf("unable to remove agent socket: %v", err)
 	}
 	for _, shr := range a.shares {
-		logrus.Debugf("stopping share '%v'", shr.token)
+		dl.Debugf("stopping share '%v'", shr.token)
 		a.rmShare <- shr
 	}
 	for _, acc := range a.accesses {
-		logrus.Debugf("stopping access '%v'", acc.token)
+		dl.Debugf("stopping access '%v'", acc.token)
 		a.rmAccess <- acc
 	}
 }
@@ -138,17 +138,17 @@ func (a *Agent) ReloadRegistry() error {
 		return err
 	}
 
-	logrus.Infof("loaded %d accesses", len(registry.PrivateAccesses))
+	dl.Infof("loaded %d accesses", len(registry.PrivateAccesses))
 	registryModified := false
 	for _, access := range registry.PrivateAccesses {
 		if feToken, err := a.AccessPrivate(access.Request); err == nil {
-			logrus.Infof("restarted private access '%v' -> '%v'", access.Request.ShareToken, feToken)
+			dl.Infof("restarted private access '%v' -> '%v'", access.Request.ShareToken, feToken)
 			if access.Failure != nil {
 				access.Failure = nil
 				registryModified = true
 			}
 		} else {
-			logrus.Warnf("failed to restart private access '%v': %v (will retry)", access.Request.ShareToken, err)
+			dl.Warnf("failed to restart private access '%v': %v (will retry)", access.Request.ShareToken, err)
 			if access.Failure != nil {
 				access.Failure.Count++
 				access.Failure.LastError = err.Error()
@@ -169,20 +169,20 @@ func (a *Agent) ReloadRegistry() error {
 
 			a.retryManager.addFailedAccess(access)
 
-			logrus.Infof("next retry for private access '%v' scheduled for %v", access.Request.ShareToken, access.Failure.NextRetry.Format(time.RFC3339))
+			dl.Infof("next retry for private access '%v' scheduled for %v", access.Request.ShareToken, access.Failure.NextRetry.Format(time.RFC3339))
 		}
 	}
 
-	logrus.Infof("loaded %d public shares", len(registry.PublicShares))
+	dl.Infof("loaded %d public shares", len(registry.PublicShares))
 	for _, share := range registry.PublicShares {
 		if token, frontends, err := a.SharePublic(share.Request); err == nil {
-			logrus.Infof("restarted public share '%v' -> token='%v', frontends='%v'", share.Request.Target, token, frontends)
+			dl.Infof("restarted public share '%v' -> token='%v', frontends='%v'", share.Request.Target, token, frontends)
 			if share.Failure != nil {
 				share.Failure = nil
 				registryModified = true
 			}
 		} else {
-			logrus.Warnf("failed to restart public share '%v': %v (will retry)", share.Request.Target, err)
+			dl.Warnf("failed to restart public share '%v': %v (will retry)", share.Request.Target, err)
 			if share.Failure != nil {
 				share.Failure.Count++
 				share.Failure.LastError = err.Error()
@@ -203,18 +203,18 @@ func (a *Agent) ReloadRegistry() error {
 
 			a.retryManager.addFailedShare(share)
 
-			logrus.Infof("next retry for public share '%v' scheduled for %v", share.Request.Target, share.Failure.NextRetry.Format(time.RFC3339))
+			dl.Infof("next retry for public share '%v' scheduled for %v", share.Request.Target, share.Failure.NextRetry.Format(time.RFC3339))
 		}
 	}
 
 	// save updated registry with retry state
 	if registryModified {
 		if err := registry.Save(registryPath); err != nil {
-			logrus.Errorf("error saving updated registry: %v", err)
+			dl.Errorf("error saving updated registry: %v", err)
 		}
 	}
 
-	logrus.Infof("reload complete")
+	dl.Infof("reload complete")
 	return nil
 }
 
@@ -269,35 +269,35 @@ func (a *Agent) SaveRegistry() error {
 func (a *Agent) remoteAgent() {
 	enrollmentPath, err := a.root.AgentEnrollment()
 	if err != nil {
-		logrus.Errorf("unable to get agent enrollment path: %v", err)
+		dl.Errorf("unable to get agent enrollment path: %v", err)
 		return
 	}
 
 	enrollment, err := LoadEnrollment(enrollmentPath)
 	if err != nil {
-		logrus.Warnf("unable to load agent enrollment: %v", err)
+		dl.Warnf("unable to load agent enrollment: %v", err)
 		return
 	}
 
-	logrus.Infof("listening for remote commands at '%v'", enrollment.Token)
+	dl.Infof("listening for remote commands at '%v'", enrollment.Token)
 
 	l, err := sdk.NewListener(enrollment.Token, a.root)
 	if err != nil {
-		logrus.Errorf("error listening for remote agent: %v", err)
+		dl.Errorf("error listening for remote agent: %v", err)
 		return
 	}
 
 	srv := grpc.NewServer()
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
 	if err := srv.Serve(l); err != nil {
-		logrus.Errorf("error serving: %v", err)
+		dl.Errorf("error serving: %v", err)
 		return
 	}
 }
 
 func (a *Agent) gateway() {
-	logrus.Info("started")
-	defer logrus.Warn("exited")
+	dl.Info("started")
+	defer dl.Warn("exited")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -305,49 +305,49 @@ func (a *Agent) gateway() {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	endpoint := "unix:" + a.agentSocket
-	logrus.Debugf("endpoint: '%v'", endpoint)
+	dl.Debugf("endpoint: '%v'", endpoint)
 	if err := agentGrpc.RegisterAgentHandlerFromEndpoint(ctx, mux, "unix:"+a.agentSocket, opts); err != nil {
-		logrus.Fatalf("unable to register gateway: %v", err)
+		dl.Fatalf("unable to register gateway: %v", err)
 	}
 
 	listener, err := util.AutoListener("tcp", a.cfg.ConsoleAddress, a.cfg.ConsoleStartPort, a.cfg.ConsoleEndPort)
 	if err != nil {
-		logrus.Fatalf("unable to create a listener: %v", err)
+		dl.Fatalf("unable to create a listener: %v", err)
 	}
 	a.httpEndpoint = listener.Addr().String()
 
 	if err := http.Serve(listener, agentUi.Middleware(mux)); err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 	}
 }
 
 func (a *Agent) manager() {
-	logrus.Info("started")
-	defer logrus.Warn("exited")
+	dl.Info("started")
+	defer dl.Warn("exited")
 
 	for {
 		select {
 		case inShare := <-a.addShare:
-			logrus.Infof("adding new share '%v'", inShare.token)
+			dl.Infof("adding new share '%v'", inShare.token)
 			a.shares[inShare.token] = inShare
 
 			if a.persistRegistry {
 				if err := a.SaveRegistry(); err != nil {
-					logrus.Errorf("unable to persist registry: %v", err)
+					dl.Errorf("unable to persist registry: %v", err)
 				}
 			}
 
 		case outShare := <-a.rmShare:
 			if shr, found := a.shares[outShare.token]; found {
-				logrus.Infof("removing share '%v'", shr.token)
+				dl.Infof("removing share '%v'", shr.token)
 				if err := proctree.StopChild(shr.process); err != nil {
-					logrus.Errorf("error stopping share '%v': %v", shr.token, err)
+					dl.Errorf("error stopping share '%v': %v", shr.token, err)
 				}
 				if err := proctree.WaitChild(shr.process); err != nil {
-					logrus.Errorf("error joining share '%v': %v", shr.token, err)
+					dl.Errorf("error joining share '%v': %v", shr.token, err)
 				}
 				if err := a.deleteShare(shr.token); err != nil {
-					logrus.Errorf("error deleting share '%v': %v", shr.token, err)
+					dl.Errorf("error deleting share '%v': %v", shr.token, err)
 				}
 				delete(a.shares, shr.token)
 
@@ -375,35 +375,35 @@ func (a *Agent) manager() {
 
 				if a.persistRegistry {
 					if err := a.SaveRegistry(); err != nil {
-						logrus.Errorf("unable to persist registry: %v", err)
+						dl.Errorf("unable to persist registry: %v", err)
 					}
 				}
 
 			} else {
-				logrus.Debug("skipping unidentified (orphaned) share removal")
+				dl.Debug("skipping unidentified (orphaned) share removal")
 			}
 
 		case inAccess := <-a.addAccess:
-			logrus.Infof("adding new access '%v'", inAccess.frontendToken)
+			dl.Infof("adding new access '%v'", inAccess.frontendToken)
 			a.accesses[inAccess.frontendToken] = inAccess
 
 			if a.persistRegistry {
 				if err := a.SaveRegistry(); err != nil {
-					logrus.Errorf("unable to persist registry: %v", err)
+					dl.Errorf("unable to persist registry: %v", err)
 				}
 			}
 
 		case outAccess := <-a.rmAccess:
 			if acc, found := a.accesses[outAccess.frontendToken]; found {
-				logrus.Infof("removing access '%v'", acc.frontendToken)
+				dl.Infof("removing access '%v'", acc.frontendToken)
 				if err := proctree.StopChild(acc.process); err != nil {
-					logrus.Errorf("error stopping access '%v': %v", acc.frontendToken, err)
+					dl.Errorf("error stopping access '%v': %v", acc.frontendToken, err)
 				}
 				if err := proctree.WaitChild(acc.process); err != nil {
-					logrus.Errorf("error joining access '%v': %v", acc.frontendToken, err)
+					dl.Errorf("error joining access '%v': %v", acc.frontendToken, err)
 				}
 				if err := a.deleteAccess(acc.token, acc.frontendToken); err != nil {
-					logrus.Errorf("error deleting access '%v': %v", acc.frontendToken, err)
+					dl.Errorf("error deleting access '%v': %v", acc.frontendToken, err)
 				}
 				delete(a.accesses, acc.frontendToken)
 
@@ -429,19 +429,19 @@ func (a *Agent) manager() {
 
 				if a.persistRegistry {
 					if err := a.SaveRegistry(); err != nil {
-						logrus.Errorf("unable to persist registry: %v", err)
+						dl.Errorf("unable to persist registry: %v", err)
 					}
 				}
 
 			} else {
-				logrus.Debug("skipping unidentified (orphaned) access removal")
+				dl.Debug("skipping unidentified (orphaned) access removal")
 			}
 		}
 	}
 }
 
 func (a *Agent) deleteShare(token string) error {
-	logrus.Debugf("deleting share '%v'", token)
+	dl.Debugf("deleting share '%v'", token)
 	if err := sdk.DeleteShare(a.root, &sdk.Share{Token: token}); err != nil {
 		return err
 	}
@@ -449,7 +449,7 @@ func (a *Agent) deleteShare(token string) error {
 }
 
 func (a *Agent) deleteAccess(token, frontendToken string) error {
-	logrus.Debugf("deleting access '%v'", frontendToken)
+	dl.Debugf("deleting access '%v'", frontendToken)
 	if err := sdk.DeleteAccess(a.root, &sdk.Access{Token: frontendToken, ShareToken: token}); err != nil {
 		return err
 	}

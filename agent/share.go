@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/michaelquigley/pfxlog"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -74,7 +74,7 @@ type share struct {
 
 func (s *share) monitor() {
 	if err := proctree.WaitChild(s.process); err != nil {
-		pfxlog.ChannelLogger(s.token).Error(err)
+		dl.ChannelLog(s.token).Error(err)
 		s.lastError = err
 	}
 	s.processExited = true
