@@ -618,28 +618,23 @@ func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, tr
 	}
 
 	for _, nameId := range nameIds {
-		logrus.Infof("processing nameId '%v'", nameId)
-
 		// find name record to get the name and namespace
 		name, err := str.GetName(nameId, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding name with id '%v'", nameId)
 		}
-		logrus.Infof("name: %v", name)
 
 		// find namespace
 		ns, err := str.GetNamespace(name.NamespaceId, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding namespace with id '%v'", name.NamespaceId)
 		}
-		logrus.Infof("namespace: %v", ns)
 
 		// find dynamic frontends for this namespace
 		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
 		if err != nil {
 			return errors.Wrapf(err, "error finding dynamic frontends for namespace '%v'", ns.Token)
 		}
-		logrus.Infof("frontends: %v", frontends)
 
 		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
