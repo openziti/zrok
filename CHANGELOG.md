@@ -24,6 +24,8 @@ CHANGE: Completely overhauled the core ziti automation logic. The legacy `contro
 
 CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 
+CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
+
 ## v1.1.5
 
 CHANGE: Upgraded go toolchain to `v1.24.6`. (https://github.com/openziti/zrok/issues/1072)
