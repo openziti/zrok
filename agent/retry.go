@@ -17,6 +17,7 @@ type retryManager struct {
 	addShare  chan *ShareRegistryEntry
 	rmShare   chan string
 	shares    map[string]*ShareRegistryEntry
+	retryCalc *retryCalculator
 }
 
 func newRetryManager(a *Agent) *retryManager {
@@ -29,6 +30,7 @@ func newRetryManager(a *Agent) *retryManager {
 		addShare:  make(chan *ShareRegistryEntry),
 		rmShare:   make(chan string),
 		shares:    make(map[string]*ShareRegistryEntry),
+		retryCalc: newRetryCalculator(a.cfg),
 	}
 }
 
@@ -148,11 +150,7 @@ func (rm *retryManager) retry() {
 				}
 
 				// calculate next retry with exponential backoff
-				delay := time.Duration(math.Min(
-					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
-					float64(rm.a.cfg.RetryMaxDelay),
-				))
-				access.Failure.NextRetry = time.Now().Add(delay)
+				access.Failure.NextRetry = rm.retryCalc.nextRetryTime(access.Failure.Count)
 				registryModified = true
 				newAccesses[failureId] = access
 
@@ -171,7 +169,7 @@ func (rm *retryManager) retry() {
 
 	newShares := make(map[string]*ShareRegistryEntry)
 	for failureId, share := range rm.shares {
-		if time.Now().After(share.Failure.NextRetry) {
+		if rm.retryCalc.shouldRetry(share.Failure.NextRetry) {
 			if shrToken, fes, err := rm.a.SharePublic(share.Request); err != nil {
 				dl.Errorf("failed to restart public share '%v': %v", failureId, err)
 				if share.Failure != nil {
@@ -185,12 +183,7 @@ func (rm *retryManager) retry() {
 				}
 
 				// calculate next retry with exponential backoff
-				var delay = 30 * time.Second
-				delay = time.Duration(math.Min(
-					float64(rm.a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
-					float64(rm.a.cfg.RetryMaxDelay),
-				))
-				share.Failure.NextRetry = time.Now().Add(delay)
+				share.Failure.NextRetry = rm.retryCalc.nextRetryTime(share.Failure.Count)
 				registryModified = true
 				newShares[failureId] = share
 
@@ -213,9 +206,52 @@ func (rm *retryManager) retry() {
 }
 
 func (rm *retryManager) generateId() (string, error) {
-	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 4)
+	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
 	if err != nil {
 		return "", err
 	}
 	return "err_" + gen(), nil
+}
+
+// retryCalculator provides centralized exponential backoff calculation
+// for retry operations throughout the agent system
+type retryCalculator struct {
+	initialDelay time.Duration
+	maxDelay     time.Duration
+}
+
+// newRetryCalculator creates a new retry calculator with the specified delays
+func newRetryCalculator(cfg *AgentConfig) *retryCalculator {
+	return &retryCalculator{
+		initialDelay: cfg.RetryInitialDelay,
+		maxDelay:     cfg.RetryMaxDelay,
+	}
+}
+
+// nextRetryTime returns the absolute time for the next retry
+func (rc *retryCalculator) nextRetryTime(attemptCount int) time.Time {
+	return time.Now().Add(rc.nextRetry(attemptCount))
+}
+
+// nextRetry calculates the next retry delay using exponential backoff
+// attemptCount should be 1 for the first retry, 2 for the second, etc.
+func (rc *retryCalculator) nextRetry(attemptCount int) time.Duration {
+	if attemptCount <= 0 {
+		return rc.initialDelay
+	}
+
+	// calculate exponential backoff: initialDelay * 2^(attemptCount-1)
+	delay := float64(rc.initialDelay) * math.Pow(2, float64(attemptCount-1))
+
+	// cap at maximum delay
+	if delay > float64(rc.maxDelay) {
+		return rc.maxDelay
+	}
+
+	return time.Duration(delay)
+}
+
+// shouldRetry checks if enough time has passed for a retry
+func (rc *retryCalculator) shouldRetry(nextRetryTime time.Time) bool {
+	return time.Now().After(nextRetryTime)
 }

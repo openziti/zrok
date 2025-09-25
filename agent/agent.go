@@ -2,14 +2,12 @@ package agent
 
 import (
 	"context"
-	"math"
 	"net"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/jaevor/go-nanoid"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/agentUi"
@@ -34,16 +32,8 @@ type Agent struct {
 	addAccess       chan *access
 	rmAccess        chan *access
 	retryManager    *retryManager
+	retryCalc       *retryCalculator
 	persistRegistry bool
-}
-
-// generateSessionFailureID creates a unique ID for this agent session
-func (a *Agent) generateSessionFailureID() (string, error) {
-	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 4)
-	if err != nil {
-		return "", err
-	}
-	return "err_" + gen(), nil
 }
 
 func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
@@ -59,6 +49,7 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 		accesses:  make(map[string]*access),
 		addAccess: make(chan *access),
 		rmAccess:  make(chan *access),
+		retryCalc: newRetryCalculator(cfg),
 	}
 	a.retryManager = newRetryManager(a)
 	return a, nil
@@ -109,8 +100,6 @@ func (a *Agent) Shutdown() {
 
 	a.persistRegistry = false
 
-	a.retryManager.stop()
-
 	if err := os.Remove(a.agentSocket); err != nil {
 		dl.Warnf("unable to remove agent socket: %v", err)
 	}
@@ -122,6 +111,8 @@ func (a *Agent) Shutdown() {
 		dl.Debugf("stopping access '%v'", acc.token)
 		a.rmAccess <- acc
 	}
+
+	a.retryManager.stop()
 }
 
 func (a *Agent) Config() *AgentConfig {
@@ -160,11 +151,7 @@ func (a *Agent) ReloadRegistry() error {
 			}
 
 			// calculate next retry with exponential backoff
-			delay := time.Duration(math.Min(
-				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
-				float64(a.cfg.RetryMaxDelay),
-			))
-			access.Failure.NextRetry = time.Now().Add(delay)
+			access.Failure.NextRetry = a.retryCalc.nextRetryTime(access.Failure.Count)
 			registryModified = true
 
 			a.retryManager.addFailedAccess(access)
@@ -194,11 +181,7 @@ func (a *Agent) ReloadRegistry() error {
 			}
 
 			// calculate next retry with exponential backoff
-			delay := time.Duration(math.Min(
-				float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
-				float64(a.cfg.RetryMaxDelay),
-			))
-			share.Failure.NextRetry = time.Now().Add(delay)
+			share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
 			registryModified = true
 
 			a.retryManager.addFailedShare(share)
@@ -223,10 +206,8 @@ func (a *Agent) SaveRegistry() error {
 	// save private accesses
 	for _, acc := range a.accesses {
 		if acc.request != nil {
-			// create new registry entry for this access
 			entry := &AccessRegistryEntry{
 				Request: acc.request,
-				// retry state will be set by retry logic if needed
 			}
 			r.PrivateAccesses = append(r.PrivateAccesses, entry)
 		}
@@ -237,10 +218,8 @@ func (a *Agent) SaveRegistry() error {
 		if req, ok := shr.request.(*SharePublicRequest); ok {
 			// only save shares with at least one registered name (not just namespace)
 			if req.hasReservedName() {
-				// create new registry entry for this share
 				entry := &ShareRegistryEntry{
 					Request: req,
-					// retry state will be set by retry logic if needed
 				}
 				r.PublicShares = append(r.PublicShares, entry)
 			}
@@ -364,11 +343,7 @@ func (a *Agent) manager() {
 							share.Failure.LastError = outShare.lastError.Error()
 						}
 						// calculate next retry with exponential backoff
-						delay := time.Duration(math.Min(
-							float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(share.Failure.Count-1)),
-							float64(a.cfg.RetryMaxDelay),
-						))
-						share.Failure.NextRetry = time.Now().Add(delay)
+						share.Failure.NextRetry = a.retryCalc.nextRetryTime(share.Failure.Count)
 						a.retryManager.addFailedShare(share)
 					}
 				}
@@ -391,6 +366,8 @@ func (a *Agent) manager() {
 				if err := a.SaveRegistry(); err != nil {
 					dl.Errorf("unable to persist registry: %v", err)
 				}
+			} else {
+				dl.Warn("no persist registry?")
 			}
 
 		case outAccess := <-a.rmAccess:
@@ -419,11 +396,7 @@ func (a *Agent) manager() {
 						access.Failure.LastError = outAccess.lastError.Error()
 					}
 					// calculate next retry with exponential backoff
-					delay := time.Duration(math.Min(
-						float64(a.cfg.RetryInitialDelay)*math.Pow(2, float64(access.Failure.Count-1)),
-						float64(a.cfg.RetryMaxDelay),
-					))
-					access.Failure.NextRetry = time.Now().Add(delay)
+					access.Failure.NextRetry = a.retryCalc.nextRetryTime(access.Failure.Count)
 					a.retryManager.addFailedAccess(access)
 				}
 
